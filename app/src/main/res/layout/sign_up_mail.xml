@@ -3,14 +3,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/istanbul_bg">
+    android:background="@drawable/istanbul_bg_blur"
+    android:gravity="bottom">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="15dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView3"
+            android:src="@drawable/btn_back_white"
+            android:layout_weight="5" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView4"
+            android:layout_weight="100" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView5"
+            android:src="@drawable/btn_forward_white"
+            android:layout_weight="5" />
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="250dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:paddingTop="30dp"
+        android:paddingBottom="30dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -19,8 +51,8 @@
             android:layout_gravity="center">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:id="@+id/ivSignupMail"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_enrollment_email_white" />
@@ -34,15 +66,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
-        android:padding="10dp"
-        android:background="#ffffff">
+        android:background="#ffffff"
+        android:padding="10dp">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#ffffff"
-            android:paddingTop="10dp">
+            android:paddingTop="20dp">
 
             <EditText
                 android:layout_width="match_parent"

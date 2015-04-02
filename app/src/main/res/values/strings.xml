@@ -12,4 +12,9 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="country">Country</string>
     <string name="phone_number">Phone Number</string>
+    <string name="title_activity_login_signup">LoginSignupActivity</string>
+    <string name="title_activity_signup_mail">SignupMailActivity</string>
+    <string name="title_activity_signup_name">SignupNameActivity</string>
+    <string name="title_activity_singup_pass">SingupPassActivity</string>
+    <string name="title_activity_signup_phone">SignupPhoneActivity</string>
 </resources>

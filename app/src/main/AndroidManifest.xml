@@ -2,12 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stratesys.mycomms" >
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- *********** -->
+    <!-- Permissions -->
+    <!-- *********** -->
+
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <!-- *********** -->
+    <!-- Permissions -->
+    <!-- *********** -->
 
     <application
+        android:name="com.stratesys.mycomms.GlobalApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,16 +21,30 @@
         <activity
             android:name=".Login1Activity"
             android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".LoginSignupActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
+            android:name=".SignupMailActivity"
+            android:label="@string/title_activity_signup_mail" >
+        </activity>
+        <activity
+            android:name=".SignupNameActivity"
+            android:label="@string/title_activity_signup_name" >
+        </activity>
+        <activity
+            android:name=".SingupPassActivity"
+            android:label="@string/title_activity_singup_pass" >
+        </activity>
+        <activity
+            android:name=".SignupPhoneActivity"
+            android:label="@string/title_activity_signup_phone" >
         </activity>
     </application>
 

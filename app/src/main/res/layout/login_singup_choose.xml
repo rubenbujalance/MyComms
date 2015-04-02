@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:weightSum="1"
     android:filterTouchesWhenObscured="false"
-    android:background="@drawable/istanbul_bg"
+    android:background="@drawable/istanbul_bg_blur"
     android:gravity="center_vertical|center_horizontal">
 
     <Button
@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/login"
-        android:id="@+id/button"
+        android:id="@+id/btLogin"
         android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

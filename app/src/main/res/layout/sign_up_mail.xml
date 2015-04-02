@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/BG_Istanbul">
+    android:background="@drawable/istanbul_bg">
 
     <LinearLayout
         android:orientation="vertical"
@@ -50,7 +50,8 @@
                 android:ems="10"
                 android:id="@+id/etSignupEmail"
                 android:layout_gravity="center_horizontal"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:hint="@string/email" />
 
         </LinearLayout>
 

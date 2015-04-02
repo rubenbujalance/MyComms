@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:weightSum="1"
     android:filterTouchesWhenObscured="false"
-    android:background="@drawable/BG_Istanbul"
+    android:background="@drawable/istanbul_bg"
     android:gravity="center_vertical|center_horizontal">
 
     <Button

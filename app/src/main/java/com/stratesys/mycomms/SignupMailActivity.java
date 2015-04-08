@@ -92,6 +92,7 @@ public class SignupMailActivity extends Activity {
                     getString(R.string.incorrect_format));
 
             ok = false;
+            ok = false;
         }
 
         return ok;

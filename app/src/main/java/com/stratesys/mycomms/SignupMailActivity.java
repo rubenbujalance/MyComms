@@ -94,7 +94,7 @@ public class SignupMailActivity extends Activity {
             ok = false;
         }
 
-        return true;
+        return ok;
     }
 
     private void saveData ()

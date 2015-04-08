@@ -3,16 +3,16 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
-            keyAlias 'mycomms'
-            keyPassword 'Mycomms123'
-            storeFile file('D:/Users/str_rbm/Google Drive/Android/stratesys_keystore.jks')
-            storePassword 'Stratesys123'
+            keyAlias System.getenv("KEY_ALIAS_MYCOMMS_REL")
+            keyPassword System.getenv("KEY_PASS_MYCOMMS_REL")
+            storeFile file(System.getenv("KEYSTORE_REL"))
+            storePassword System.getenv("KEYSTORE_PASS_REL")
         }
         debug {
-            keyAlias 'mycomms_debug'
-            keyPassword 'Mycomms123'
-            storeFile file('D:/Users/str_rbm/Google Drive/Android/stratesys_keystore_debug.jks')
-            storePassword 'Stratesys123'
+            keyAlias System.getenv("KEY_ALIAS_MYCOMMS_DEB")
+            keyPassword System.getenv("KEY_PASS_MYCOMMS_DEB")
+            storeFile file(System.getenv("KEYSTORE_DEB"))
+            storePassword System.getenv("KEYSTORE_PASS_DEB")
         }
     }
     compileSdkVersion 21

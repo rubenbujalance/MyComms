@@ -13,7 +13,7 @@ import android.widget.Button;
 public class LoginSignupActivity extends Activity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+         protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_singup_choose);
 

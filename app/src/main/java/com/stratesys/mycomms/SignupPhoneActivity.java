@@ -1,10 +1,13 @@
 package com.stratesys.mycomms;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
 
 public class SignupPhoneActivity extends Activity {
@@ -13,6 +16,25 @@ public class SignupPhoneActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_phone);
+
+//        ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
+//        ivBtFwd.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent in = new Intent(SignupPhoneActivity.this, SignupPhoneActivity.class);
+//                startActivity(in);
+//            }
+//        });
+
+        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
+        ivBtBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        (findViewById(R.id.etSignupCountry)).requestFocus();
     }
 
 

@@ -1,18 +1,54 @@
 package com.stratesys.mycomms;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 
 public class SignupMailActivity extends Activity {
+
+    EditText mEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_mail);
+
+        mEmail = (EditText)findViewById(R.id.etSignupEmail);
+
+        //Button forward
+        ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
+        ivBtFwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkData()) {
+                    saveData();
+                    Intent in = new Intent(SignupMailActivity.this, SignupPassActivity.class);
+                    startActivity(in);
+                }
+            }
+        });
+
+        //Button back
+        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
+        ivBtBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        //Force the focus of the first field and opens the keyboard
+        InputMethodManager inputMethodManager = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+        inputMethodManager.showSoftInput(findViewById(R.id.etSignupFirstN), InputMethodManager.SHOW_IMPLICIT);
     }
 
 
@@ -36,5 +72,34 @@ public class SignupMailActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean checkData()
+    {
+        boolean ok = true;
+
+        if(mEmail.getText().toString().trim().length() <= 0)
+        {
+            mEmail.setError(
+                    getString(R.string.enter_your_email_to_continue));
+
+            ok = false;
+        }
+        else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(
+                    mEmail.getText().toString().trim()).matches())
+        {
+            mEmail.setError(
+                    getString(R.string.incorrect_format));
+
+            ok = false;
+        }
+
+        return ok;
+    }
+
+    private void saveData ()
+    {
+        UserProfile profile = ((GlobalApp)getApplication()).getUserProfile();
+        profile.setMail(mEmail.getText().toString());
     }
 }

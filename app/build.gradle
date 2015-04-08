@@ -1,26 +1,45 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        release {
+            keyAlias 'mycomms'
+            keyPassword 'Mycomms123'
+            storeFile file('D:/Users/str_rbm/Google Drive/Android/stratesys_keystore.jks')
+            storePassword 'Stratesys123'
+        }
+        debug {
+            keyAlias 'mycomms_debug'
+            keyPassword 'Mycomms123'
+            storeFile file('D:/Users/str_rbm/Google Drive/Android/stratesys_keystore_debug.jks')
+            storePassword 'Stratesys123'
+        }
+    }
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
-
     defaultConfig {
         applicationId "com.stratesys.mycomms"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        signingConfig signingConfigs.debug
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
+    }
+    productFlavors {
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
     compile 'com.google.android.gms:play-services:6.5.87'
+    compile files('lib/gson-2.3.1.jar')
 }

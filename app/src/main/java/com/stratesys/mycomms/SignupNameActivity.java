@@ -1,14 +1,21 @@
 package com.stratesys.mycomms;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -16,8 +23,12 @@ import android.widget.ImageView;
 public class SignupNameActivity extends Activity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_GALLERY = 1;
 
     ImageView mPhoto;
+    EditText mFirstName;
+    EditText mLastName;
+    Bitmap photoBitmap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +36,8 @@ public class SignupNameActivity extends Activity {
         setContentView(R.layout.sign_up_name);
 
         mPhoto = (ImageView)findViewById(R.id.ivAddPhoto);
+        mFirstName = (EditText)findViewById(R.id.etSignupFirstN);
+        mLastName = (EditText)findViewById(R.id.etSignupLastN);
 
         ImageView ivPhoto = (ImageView)findViewById(R.id.ivAddPhoto);
         ivPhoto.setOnClickListener(new View.OnClickListener() {
@@ -34,7 +47,31 @@ public class SignupNameActivity extends Activity {
             }
         });
 
-        (findViewById(R.id.etSignupFirstN)).requestFocus();
+        //Button forward
+        ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
+        ivBtFwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkData()) {
+                    saveData();
+                    Intent in = new Intent(SignupNameActivity.this, SignupMailActivity.class);
+                    startActivity(in);
+                }
+            }
+        });
+
+        //Button back
+        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
+        ivBtBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        //Force the focus of the first field and opens the keyboard
+        InputMethodManager inputMethodManager = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+        inputMethodManager.showSoftInput(findViewById(R.id.etSignupFirstN), InputMethodManager.SHOW_FORCED);
     }
 
     @Override
@@ -61,17 +98,90 @@ public class SignupNameActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
+        {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            mPhoto.setImageBitmap(imageBitmap);
+            photoBitmap = imageBitmap;
+
+            mPhoto.setBackgroundResource(R.drawable.roundedbutton);
+            BitmapDrawable imgDrawable = new BitmapDrawable(getResources(), imageBitmap);
+            mPhoto.setImageDrawable(imgDrawable);
         }
     }
 
     private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+        //Build the alert dialog to let the user choose the origin of the picture
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.how_would_you_like_to_add_a_photo);
+
+        builder.setItems(R.array.add_photo_chooser, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+                Intent in = null;
+
+                if(which == 0)
+                {
+                    in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(in, REQUEST_IMAGE_CAPTURE);
+                }
+                else if(which == 1)
+                {
+                    in = new Intent();
+                    in.setType("image/*");
+                    in.setAction(Intent.ACTION_GET_CONTENT);
+
+                    startActivityForResult(in, REQUEST_IMAGE_GALLERY);
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create();
+        builder.show();
+    }
+
+    private boolean checkData()
+    {
+        boolean ok = true;
+
+        if(photoBitmap == null)
+        {
+            ok = false;
         }
+
+        if(mLastName.getText().toString().trim().length() <= 0)
+        {
+            mLastName.setError(
+                    getString(R.string.enter_your_last_name_to_continue));
+
+            ok = false;
+        }
+
+        if(mFirstName.getText().toString().trim().length() <= 0)
+        {
+            mFirstName.setError(
+                    getString(R.string.enter_your_first_name_to_continue));
+
+            ok = false;
+        }
+
+        return ok;
+    }
+
+    private void saveData ()
+    {
+        UserProfile profile = ((GlobalApp)getApplication()).getUserProfile();
+
+        profile.setFirstName(mFirstName.getText().toString());
+        profile.setLastName(mLastName.getText().toString());
+        profile.setPhotoBitmap(photoBitmap);
     }
 }

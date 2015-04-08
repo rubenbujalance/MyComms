@@ -1,0 +1,14 @@
+---
+## Playbook to upload apk file to s3
+#
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+      - name: Upload the .ipa
+        s3:
+            bucket: "{{ bucket_name }}"
+            src: "{{ apk_file }}"
+            object: "{{ bucket_folder }}/{{ apk_file }}"
+            mode: put

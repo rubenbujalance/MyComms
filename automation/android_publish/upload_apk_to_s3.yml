@@ -6,8 +6,9 @@
   gather_facts: no
   tasks:
 
-      - name: Upload the .ipa
+      - name: Upload the .apk
         s3:
+            region: us-west-2
             bucket: "{{ bucket_name }}"
             src: "{{ apk_file }}"
             object: "{{ bucket_folder }}/{{ apk_file }}"

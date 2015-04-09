@@ -1,10 +1,9 @@
-package com.stratesys.mycomms;
+package com.vodafone.mycomms;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
 
 public class Login1Activity extends Activity {
 

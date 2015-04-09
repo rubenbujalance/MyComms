@@ -1,4 +1,4 @@
-package com.stratesys.mycomms;
+package com.vodafone.mycomms;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,30 +7,40 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageView;
 
-
-public class LoginSignupActivity extends Activity {
+public class SignupPhoneActivity extends Activity {
 
     @Override
-         protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_singup_choose);
+        setContentView(R.layout.sign_up_phone);
 
-        Button btSignup = (Button)findViewById(R.id.btSignupMail);
-        btSignup.setOnClickListener(new View.OnClickListener() {
+//        ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
+//        ivBtFwd.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent in = new Intent(SignupPhoneActivity.this, SignupPhoneActivity.class);
+//                startActivity(in);
+//            }
+//        });
+
+        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
+        ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(LoginSignupActivity.this, SignupNameActivity.class);
-                startActivity(in);
+                finish();
             }
         });
+
+        (findViewById(R.id.etSignupCountry)).requestFocus();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login_signup, menu);
+        getMenuInflater().inflate(R.menu.menu_signup_phone, menu);
         return true;
     }
 

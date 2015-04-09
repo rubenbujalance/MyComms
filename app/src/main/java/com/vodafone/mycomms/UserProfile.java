@@ -1,4 +1,4 @@
-package com.stratesys.mycomms;
+package com.vodafone.mycomms;
 
 import android.content.Context;
 import android.graphics.Bitmap;

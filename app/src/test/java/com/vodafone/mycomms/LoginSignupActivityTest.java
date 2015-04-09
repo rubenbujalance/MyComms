@@ -1,4 +1,4 @@
-package com.stratesys.mycomms;
+package com.vodafone.mycomms;
 
 import junit.framework.TestCase;
 

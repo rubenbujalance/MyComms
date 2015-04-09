@@ -21,7 +21,7 @@ android {
         applicationId "com.stratesys.mycomms"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode __VERSION_CODE__
+        versionCode 99999
         versionName "1.0"
         signingConfig signingConfigs.debug
     }

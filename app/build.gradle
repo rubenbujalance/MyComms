@@ -8,12 +8,12 @@ android {
             storeFile file(System.getenv("KEYSTORE_REL"))
             storePassword System.getenv("KEYSTORE_PASS_REL")
         }
-        debug {
-            keyAlias System.getenv("KEY_ALIAS_MYCOMMS_DEB")
-            keyPassword System.getenv("KEY_PASS_MYCOMMS_DEB")
-            storeFile file(System.getenv("KEYSTORE_DEB"))
-            storePassword System.getenv("KEYSTORE_PASS_DEB")
-        }
+//        debug {
+//            keyAlias System.getenv("KEY_ALIAS_MYCOMMS_DEB")
+//            keyPassword System.getenv("KEY_PASS_MYCOMMS_DEB")
+//            storeFile file(System.getenv("KEYSTORE_DEB"))
+//            storePassword System.getenv("KEYSTORE_PASS_DEB")
+//        }
     }
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
@@ -23,7 +23,7 @@ android {
         targetSdkVersion 21
         versionCode 99999
         versionName "1.0"
-        signingConfig signingConfigs.debug
+        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
@@ -42,4 +42,5 @@ dependencies {
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.google.android.gms:play-services:6.5.87'
     compile files('lib/gson-2.3.1.jar')
+    testCompile 'junit:junit:4.12'
 }

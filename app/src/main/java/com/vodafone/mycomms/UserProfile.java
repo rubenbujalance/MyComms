@@ -18,8 +18,11 @@ import java.util.Date;
 
 public class UserProfile implements Serializable{
 
-    //Fields
-    private String  firstName;
+    /*
+    Fields
+     */
+
+    private String firstName;
     private String lastName;
     private String mail;
     private String password;
@@ -32,13 +35,19 @@ public class UserProfile implements Serializable{
     private Bitmap  photoBitmap;
     private Date    photoDate;
 
-    //Getters and Setters
+    /*
+    File name
+     */
+
+    public static final String fileName = "userprofile.json";
+
+    /*
+    Getters and Setters
+     */
+
     public String getFirstName() {
         return firstName;
     }
-
-    //File name
-    public static final String fileName = "userprofile.json";
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -124,7 +133,10 @@ public class UserProfile implements Serializable{
         this.photoDate = photoDate;
     }
 
-    //Other methods
+    /*
+    Other methods
+     */
+
     public boolean saveUserProfile(Context context)
     {
         Gson gson = new Gson();

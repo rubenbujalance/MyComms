@@ -9,7 +9,7 @@ import android.app.Application;
  * It handles global data and backend services
  */
 
-public class GlobalApp extends Application {
+public class MycommsApp extends Application {
 
     //Global data
     private UserProfile userProfile;

@@ -97,7 +97,7 @@ public class SignupMailActivity extends Activity {
 
     private void saveData ()
     {
-        UserProfile profile = ((GlobalApp)getApplication()).getUserProfile();
+        UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
         profile.setMail(mEmail.getText().toString());
     }
 }

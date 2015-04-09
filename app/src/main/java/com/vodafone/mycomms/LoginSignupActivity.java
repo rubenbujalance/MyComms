@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class LoginSignupActivity extends Activity {
 
@@ -19,8 +20,10 @@ public class LoginSignupActivity extends Activity {
         btSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(LoginSignupActivity.this, SignupNameActivity.class);
-                startActivity(in);
+//                Intent in = new Intent(LoginSignupActivity.this, SignupNameActivity.class);
+//                startActivity(in);
+
+                Toast.makeText(getApplicationContext(), APIWrapper.getBaseURL(), Toast.LENGTH_LONG).show();
             }
         });
     }

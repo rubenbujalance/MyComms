@@ -174,7 +174,7 @@ public class SignupNameActivity extends Activity {
 
     private void saveData ()
     {
-        UserProfile profile = ((GlobalApp)getApplication()).getUserProfile();
+        UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
 
         profile.setFirstName(mFirstName.getText().toString());
         profile.setLastName(mLastName.getText().toString());

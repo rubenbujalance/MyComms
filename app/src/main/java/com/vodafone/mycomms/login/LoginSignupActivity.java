@@ -1,4 +1,4 @@
-package com.vodafone.mycomms;
+package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,40 +6,32 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.Button;
 
-public class SignupPassActivity extends Activity {
+import com.vodafone.mycomms.R;
+
+public class LoginSignupActivity extends Activity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+         protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sign_up_pass);
+        setContentView(R.layout.login_singup_choose);
 
-        ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
-        ivBtFwd.setOnClickListener(new View.OnClickListener() {
+        Button btSignup = (Button)findViewById(R.id.btSignupMail);
+        btSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(SignupPassActivity.this, SignupPhoneActivity.class);
+//                APIWrapper.httpPostAPI("/api/profile", new JSONObject(), null);
+                Intent in = new Intent(LoginSignupActivity.this, SignupMailActivity.class);
                 startActivity(in);
             }
         });
-
-        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
-        ivBtBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        (findViewById(R.id.etSignupPass)).requestFocus();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_singup_pass, menu);
+        getMenuInflater().inflate(R.menu.menu_login_signup, menu);
         return true;
     }
 

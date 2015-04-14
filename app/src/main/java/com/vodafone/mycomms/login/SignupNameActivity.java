@@ -1,4 +1,4 @@
-package com.vodafone.mycomms;
+package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,6 +15,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.vodafone.mycomms.MycommsApp;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.UserProfile;
 
 public class SignupNameActivity extends Activity {
 
@@ -35,10 +40,10 @@ public class SignupNameActivity extends Activity {
         mFirstName = (EditText)findViewById(R.id.etSignupFirstN);
         mLastName = (EditText)findViewById(R.id.etSignupLastN);
 
-        ImageView ivPhoto = (ImageView)findViewById(R.id.ivAddPhoto);
-        ivPhoto.setOnClickListener(new View.OnClickListener() {
+        mPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mFirstName.getWindowToken(), 0);
                 dispatchTakePictureIntent();
             }
         });
@@ -50,7 +55,7 @@ public class SignupNameActivity extends Activity {
             public void onClick(View v) {
                 if(checkData()) {
                     saveData();
-                    Intent in = new Intent(SignupNameActivity.this, SignupMailActivity.class);
+                    Intent in = new Intent(SignupNameActivity.this, SignupPassActivity.class);
                     startActivity(in);
                 }
             }
@@ -66,8 +71,16 @@ public class SignupNameActivity extends Activity {
         });
 
         //Force the focus of the first field and opens the keyboard
-        InputMethodManager inputMethodManager = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        inputMethodManager.showSoftInput(findViewById(R.id.etSignupFirstN), InputMethodManager.SHOW_FORCED);
+        mFirstName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+//                mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                mgr.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+
+        mFirstName.requestFocus();
     }
 
     @Override
@@ -116,7 +129,7 @@ public class SignupNameActivity extends Activity {
         builder.setItems(R.array.add_photo_chooser, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
-                Intent in = null;
+                Intent in;
 
                 if(which == 0)
                 {
@@ -150,6 +163,7 @@ public class SignupNameActivity extends Activity {
 
         if(photoBitmap == null)
         {
+            Toast.makeText(getApplicationContext(),R.string.add_a_photo_to_continue,Toast.LENGTH_SHORT).show();
             ok = false;
         }
 
@@ -164,7 +178,8 @@ public class SignupNameActivity extends Activity {
         if(mFirstName.getText().toString().trim().length() <= 0)
         {
             mFirstName.setError(
-                    getString(R.string.enter_your_first_name_to_continue));
+                    getString(R.string.enter_your_first_name_to_continue),
+                    getResources().getDrawable(R.drawable.ic_error_tooltip));
 
             ok = false;
         }

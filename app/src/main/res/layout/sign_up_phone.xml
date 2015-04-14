@@ -32,8 +32,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/ivBtForward"
             android:src="@drawable/btn_forward_white"
-            android:layout_weight="5"
-            android:visibility="invisible" />
+            android:layout_weight="5" />
     </LinearLayout>
 
     <LinearLayout
@@ -80,8 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/etSignupCountry"
-                android:layout_gravity="center_horizontal"
-                android:hint="@string/country" />
+                android:hint="Country" />
 
             <EditText
                 android:layout_width="match_parent"

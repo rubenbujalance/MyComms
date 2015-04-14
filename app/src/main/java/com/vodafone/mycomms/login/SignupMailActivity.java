@@ -1,4 +1,4 @@
-package com.vodafone.mycomms;
+package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+
+import com.vodafone.mycomms.MycommsApp;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.UserProfile;
 
 public class SignupMailActivity extends Activity {
 
@@ -29,7 +33,7 @@ public class SignupMailActivity extends Activity {
             public void onClick(View v) {
                 if(checkData()) {
                     saveData();
-                    Intent in = new Intent(SignupMailActivity.this, SignupPassActivity.class);
+                    Intent in = new Intent(SignupMailActivity.this, SignupNameActivity.class);
                     startActivity(in);
                 }
             }
@@ -45,8 +49,10 @@ public class SignupMailActivity extends Activity {
         });
 
         //Force the focus of the first field and opens the keyboard
-        InputMethodManager inputMethodManager = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        inputMethodManager.showSoftInput(findViewById(R.id.etSignupFirstN), InputMethodManager.SHOW_IMPLICIT);
+        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+        mEmail.requestFocus();
+//        inputMethodManager.showSoftInput(findViewById(R.id.etSignupFirstN), InputMethodManager.SHOW_IMPLICIT);
+        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
 
@@ -79,7 +85,8 @@ public class SignupMailActivity extends Activity {
         if(mEmail.getText().toString().trim().length() <= 0)
         {
             mEmail.setError(
-                    getString(R.string.enter_your_email_to_continue));
+                    getString(R.string.enter_your_email_to_continue),
+                    getResources().getDrawable(R.drawable.ic_error_tooltip));
 
             ok = false;
         }
@@ -87,7 +94,8 @@ public class SignupMailActivity extends Activity {
                     mEmail.getText().toString().trim()).matches())
         {
             mEmail.setError(
-                    getString(R.string.incorrect_format));
+                    getString(R.string.incorrect_format),
+                    getResources().getDrawable(R.drawable.ic_error_tooltip));
 
             ok = false;
         }

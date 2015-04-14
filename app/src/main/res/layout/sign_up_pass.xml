@@ -41,8 +41,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="center"
-        android:paddingTop="30dp"
-        android:paddingBottom="30dp">
+        android:paddingTop="30dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -58,6 +57,16 @@
                 android:src="@drawable/ic_signup_password" />
 
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/password_explanation"
+            android:id="@+id/tvPassExplanation"
+            android:textColor="#ffffff"
+            android:textAlignment="center"
+            android:gravity="center" />
 
     </LinearLayout>
 
@@ -96,4 +105,5 @@
         </LinearLayout>
 
     </LinearLayout>
+
 </LinearLayout>

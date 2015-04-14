@@ -21,14 +21,23 @@
     <string name="enter_your_first_name_to_continue">Enter your first name to continue</string>
     <string name="enter_your_last_name_to_continue">Enter your last name to continue</string>
     <string name="enter_your_email_to_continue">Enter your email to continue</string>
+    <string name="enter_your_phone_country_to_continue">Enter your phone country to continue</string>
+    <string name="enter_your_phone_number_to_continue">Enter your phone number to continue</string>
     <string name="how_would_you_like_to_add_a_photo">How would you like to add a photo?</string>
     <!--<string name="take_a_photo">Take a photo</string>-->
     <!--<string name="choose_from_gallery">Choose from Gallery</string>-->
     <string name="cancel">Cancel</string>
     <string name="incorrect_format">Incorrect format</string>
+    <string name="add_a_photo_to_continue">Add a photo to continue</string>
+    <string name="resend_code">Resend Code</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="password_explanation">Passwords must contain 8 characters minimum with at least one uppercase and one number</string>
 
     <string-array name="add_photo_chooser">
         <item>Take a photo</item>
         <item>Choose from Gallery</item>
     </string-array>
+    <string name="title_activity_pincode">PincodeActivity</string>
+    <string name="your_sms_verification_code_has_been_sent_to">Your SMS verification code has been sent to</string>
+    <string name="having_trouble">Having trouble?</string>
 </resources>

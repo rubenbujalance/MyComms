@@ -1,9 +1,11 @@
-package com.vodafone.mycomms;
+package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.vodafone.mycomms.R;
 
 public class Login1Activity extends Activity {
 
@@ -12,7 +14,6 @@ public class Login1Activity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login1);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

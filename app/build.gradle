@@ -30,17 +30,14 @@ android {
     productFlavors {
         i {
             applicationId "com.vodafone.mycomms.i"
-            versionName "0.1.0-int"
             resValue "string", "app_name", "MyComms-i"
         }
         q {
             applicationId "com.vodafone.mycomms.q"
-            versionName "0.1.0-qa"
             resValue "string", "app_name", "MyComms-q"
         }
         p {
             applicationId "com.vodafone.mycomms.p"
-            versionName "0.1.0-pro"
             resValue "string", "app_name", "MyComms"
         }
     }
@@ -57,4 +54,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.0.0'
     compile files('lib/gson-2.3.1.jar')
     testCompile 'junit:junit:4.12'
+    compile files('lib/realm-0.80.0.jar')
 }

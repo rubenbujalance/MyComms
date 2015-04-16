@@ -3,6 +3,8 @@ package com.vodafone.mycomms.login;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,6 +20,7 @@ import com.vodafone.mycomms.UserProfile;
 public class SignupMailActivity extends Activity {
 
     EditText mEmail;
+    Drawable errorIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +28,9 @@ public class SignupMailActivity extends Activity {
         setContentView(R.layout.sign_up_mail);
 
         mEmail = (EditText)findViewById(R.id.etSignupEmail);
+
+        errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
+        errorIcon.setBounds(new Rect(0, 0, errorIcon.getIntrinsicWidth(), errorIcon.getIntrinsicHeight()));
 
         //Button forward
         ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
@@ -50,9 +56,9 @@ public class SignupMailActivity extends Activity {
 
         //Force the focus of the first field and opens the keyboard
         InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mEmail.requestFocus();
-//        inputMethodManager.showSoftInput(findViewById(R.id.etSignupFirstN), InputMethodManager.SHOW_IMPLICIT);
         mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+        mEmail.requestFocus();
     }
 
 
@@ -82,11 +88,16 @@ public class SignupMailActivity extends Activity {
     {
         boolean ok = true;
 
+        Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
+        errorIcon.setBounds(new Rect(0, 0,
+                (int)(errorIcon.getIntrinsicWidth()*0.5),
+                (int)(errorIcon.getIntrinsicHeight()*0.5)));
+
         if(mEmail.getText().toString().trim().length() <= 0)
         {
             mEmail.setError(
                     getString(R.string.enter_your_email_to_continue),
-                    getResources().getDrawable(R.drawable.ic_error_tooltip));
+                    errorIcon);
 
             ok = false;
         }
@@ -95,7 +106,7 @@ public class SignupMailActivity extends Activity {
         {
             mEmail.setError(
                     getString(R.string.incorrect_format),
-                    getResources().getDrawable(R.drawable.ic_error_tooltip));
+                    errorIcon);
 
             ok = false;
         }

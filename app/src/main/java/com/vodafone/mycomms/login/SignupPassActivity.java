@@ -1,11 +1,15 @@
 package com.vodafone.mycomms.login;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -50,7 +54,11 @@ public class SignupPassActivity extends Activity {
             }
         });
 
-        (findViewById(R.id.etSignupPass)).requestFocus();
+        //Force show keyboard
+        InputMethodManager mgr = ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
+        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+        mPassword.requestFocus();
     }
 
 
@@ -79,12 +87,19 @@ public class SignupPassActivity extends Activity {
     private boolean checkData()
     {
         boolean ok = true;
+
+        Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
+        errorIcon.setBounds(new Rect(0, 0,
+                (int)(errorIcon.getIntrinsicWidth()*0.5),
+                (int)(errorIcon.getIntrinsicHeight()*0.5)));
+
         Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
 
         if(!pattern.matcher(mPassword.getText().toString().trim()).matches())
         {
             mPassword.setError(
-                    getString(R.string.incorrect_format));
+                    getString(R.string.incorrect_format),
+                    errorIcon);
 
             ok = false;
         }
@@ -92,7 +107,8 @@ public class SignupPassActivity extends Activity {
                     mConfirmPass.getText().toString().trim()) != 0)
         {
             mConfirmPass.setError(
-                    getString(R.string.passwords_do_not_match));
+                    getString(R.string.passwords_do_not_match),
+                    errorIcon);
 
             ok = false;
         }

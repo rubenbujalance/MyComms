@@ -1,7 +1,10 @@
 package com.vodafone.mycomms.login;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -12,7 +15,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.APIWrapper;
 import com.vodafone.mycomms.R;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class SignupPincodeActivity extends Activity {
 
@@ -20,9 +28,17 @@ public class SignupPincodeActivity extends Activity {
     TextView tvPin2;
     TextView tvPin3;
     TextView tvPin4;
+
+    View lnPin1;
+    View lnPin2;
+    View lnPin3;
+    View lnPin4;
+
     EditText etPin;
     TextView tvPinPhoneNumber;
     int nextPinPos;
+
+    ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,20 +49,22 @@ public class SignupPincodeActivity extends Activity {
         tvPin2 = (TextView)findViewById(R.id.tvPin2);
         tvPin3 = (TextView)findViewById(R.id.tvPin3);
         tvPin4 = (TextView)findViewById(R.id.tvPin4);
+
+        lnPin1 = findViewById(R.id.lnPin1);
+        lnPin2 = findViewById(R.id.lnPin2);
+        lnPin3 = findViewById(R.id.lnPin3);
+        lnPin4 = findViewById(R.id.lnPin4);
+
         etPin = (EditText)findViewById(R.id.etPin);
         tvPinPhoneNumber = (TextView)findViewById(R.id.tvPinPhoneNumber);
         nextPinPos = 1;
-
-        //Request focus to the editText
-        etPin.requestFocus();
-        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
         //Set the phone number text on the initial text
         tvPinPhoneNumber.setText(
                 getString(R.string.your_sms_verification_code_has_been_sent_to) + " " +
                         getIntent().getStringExtra("phoneNumber"));
 
+        //Every time a key is pressed, it has to be written to the correct field
         etPin.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -57,6 +75,11 @@ public class SignupPincodeActivity extends Activity {
 
                 if(nextPinPos == 1)
                 {
+                    if(((SignupPincodeActivity)v.getContext()).tvPin1.getText().toString().trim().length()>0) {
+                        setPinColor(Color.WHITE);
+                        resetPin();
+                    }
+
                     text = String.valueOf((char)event.getUnicodeChar());
                     ((SignupPincodeActivity)v.getContext()).tvPin1.setText(text);
                 }
@@ -92,6 +115,12 @@ public class SignupPincodeActivity extends Activity {
                 finish();
             }
         });
+
+        //Force the focus of the first field and opens the keyboard
+        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+        etPin.requestFocus();
     }
 
 
@@ -119,6 +148,86 @@ public class SignupPincodeActivity extends Activity {
 
     public void callPinCheck()
     {
-//        tvPin1.setTextColor("#ff0000");
+        new CheckPhoneApi().execute(new HashMap<String, String>());
     }
+
+    public void setPinColor(int color)
+    {
+        tvPin1.setTextColor(color);
+        tvPin2.setTextColor(color);
+        tvPin3.setTextColor(color);
+        tvPin4.setTextColor(color);
+
+        lnPin1.setBackgroundColor(color);
+        lnPin2.setBackgroundColor(color);
+        lnPin3.setBackgroundColor(color);
+        lnPin4.setBackgroundColor(color);
+    }
+
+    public void resetPin()
+    {
+        tvPin1.setText("");
+        tvPin2.setText("");
+        tvPin3.setText("");
+        tvPin4.setText("");
+    }
+
+    private void callBackPinCheck(HashMap<String,Object> result)
+    {
+        System.out.print(result);
+
+        JSONObject json = null;
+        String text = null;
+        String status = null;
+
+        status = (String)result.get("status");
+
+        if(result.containsKey("json")) json = (JSONObject)result.get("json");
+        else if(result.containsKey("text")) text = (String)result.get("text");
+
+        try {
+            if (status.compareTo("400") == 0 &&
+                    json.get("err") != null) {
+
+            }
+        } catch(Exception ex) {
+            ex.printStackTrace();
+            return;
+        }
+    }
+
+    private class CheckPhoneApi extends AsyncTask<HashMap<String,String>, Void, HashMap<String,Object>> {
+
+        @Override
+        protected HashMap<String,Object> doInBackground(HashMap<String,String>[] params) {
+            HashMap<String,Object> response = null;
+//            HashMap<String,String> hashJsonParams = params[0];
+//            HashMap<String,String> hashHeaders = params[1];
+//
+//            //Build the JSONObject params
+//            Iterator<String> it = hashJsonParams.keySet().iterator();
+//            String key,value = null;
+//            JSONObject httpParams = new JSONObject();
+//
+//            try {
+//                while (it.hasNext()) {
+//                    key = it.next();
+//                    value = hashJsonParams.get(key);
+//                    httpParams.put(key, value);
+//                }
+//            } catch (Exception ex) { ex.printStackTrace(); }
+//
+//            response = APIWrapper.httpPostAPI("/api/profile",httpParams,hashHeaders);
+
+            response = APIWrapper.httpPostAPI("/api/profile",null,null);
+
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<String,Object> result) {
+            callBackPinCheck(result);
+        }
+    }
+
 }

@@ -78,17 +78,17 @@
             <com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/etSignupCountry"
-                android:hint="@string/country" />
+                android:id="@+id/etSignupCompany"
+                android:hint="@string/company" />
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:id="@+id/etSignupPhone"
+                android:id="@+id/etSignupPosition"
                 android:layout_gravity="center_horizontal"
-                android:inputType="phone"
-                android:hint="@string/phone_number" />
+                android:hint="@string/position"
+                android:inputType="textCapWords" />
 
         </LinearLayout>
 

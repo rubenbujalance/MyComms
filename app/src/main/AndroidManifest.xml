@@ -11,6 +11,8 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <!-- *********** -->
     <!-- Appl -->
@@ -21,13 +23,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
-            android:name=".login.Login1Activity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name=".login.LoginSignupActivity"
-            android:label="@string/app_name" >
+            android:name=".login.SplashScreenActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,24 +35,32 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".login.LoginSignupActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".login.SignupMailActivity"
-            android:label="@string/title_activity_signup_mail" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".login.SignupNameActivity"
-            android:label="@string/title_activity_signup_name" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".login.SignupPassActivity"
-            android:label="@string/title_activity_singup_pass" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".login.SignupPhoneActivity"
-            android:label="@string/title_activity_signup_phone" >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".login.SignupPincodeActivity"
-            android:label="@string/title_activity_pincode" >
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".login.SignupCompanyActivity"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

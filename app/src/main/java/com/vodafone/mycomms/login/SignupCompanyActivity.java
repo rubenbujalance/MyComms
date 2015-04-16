@@ -5,18 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
@@ -32,52 +29,56 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SignupPhoneActivity extends Activity {
+public class SignupCompanyActivity extends Activity {
 
-    AutoCompleteTVSelectOnly mCountry;
-    EditText mPhone;
-    ArrayList<HashMap<String,String>> countries;
+    AutoCompleteTVSelectOnly mCompany;
+    EditText mPosition;
+    ArrayList<HashMap<String,String>> companies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sign_up_phone);
+        setContentView(R.layout.sign_up_company);
 
-        mCountry = (AutoCompleteTVSelectOnly) findViewById(R.id.etSignupCountry);
-        mPhone = (EditText)findViewById(R.id.etSignupPhone);
-        loadCountriesArray();
+        mCompany = (AutoCompleteTVSelectOnly) findViewById(R.id.etSignupCompany);
+        mPosition = (EditText)findViewById(R.id.etSignupPosition);
 
         /*
          * Autocomplete Adapter
          */
 
+        // Get the string array
+
+        loadCompaniesArray();
+        String[] simpleCompanies = new String[companies.size()];
+
+        for(int i=0; i<companies.size(); i++)
+        {
+//            simpleCompanies[i] = companies.get(i)[0];
+        }
+
         // Create the adapter and set it to the AutoCompleteTextView
         SimpleAdapter adapter = new SimpleAdapter(
                 this,
-                countries,
-                R.layout.cv_adapter_two_values,
-                new String[] { "name","dial_code" },
-                new int[] { R.id.tvMainValue, R.id.tvSecondValue });
+                companies,
+                android.R.layout.simple_list_item_1,
+                new String[] { "name" },
+                new int[] { android.R.id.text1 });
 
-        mCountry.setAdapter(adapter);
-        mCountry.setViews(new int[] { R.id.tvMainValue, R.id.tvSecondValue });
+        mCompany.setAdapter(adapter);
+        mCompany.setViews(new int[] { android.R.id.text1 });
 
-        //Button forward
         ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
         ivBtFwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(checkData()) {
-                    Intent in = new Intent(SignupPhoneActivity.this, SignupPincodeActivity.class);
-                    String dialCode = mCountry.getText().toString().trim();
-                    dialCode = dialCode.substring(dialCode.lastIndexOf(" "));
-                    in.putExtra("phoneNumber",dialCode + " " + mPhone.getText().toString());
+                    Intent in = new Intent(SignupCompanyActivity.this, SignupPassActivity.class);
                     startActivity(in);
                 }
             }
         });
 
-        //Button back
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,7 +91,7 @@ public class SignupPhoneActivity extends Activity {
         InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
         mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
-        mCountry.requestFocus();
+        mCompany.requestFocus();
     }
 
 
@@ -116,10 +117,13 @@ public class SignupPhoneActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadCountriesArray()
+    private void loadCompaniesArray()
     {
+        /*
+         * Delete this code when companies list comes from API
+         */
         //Get Data From Text Resource File Contains Json Data.
-        InputStream inputStream = getResources().openRawResource(R.raw.countries);
+        InputStream inputStream = getResources().openRawResource(R.raw.companies);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         int ctr;
@@ -133,35 +137,37 @@ public class SignupPhoneActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        String json = byteArrayOutputStream.toString();
+
+        /*
+         * END Delete...
+         */
 
         ArrayList<HashMap<String,String>> data = null;
 
         try {
             // Parse the data into jsonObject to get original data in form of json.
-            JSONObject jObject = new JSONObject(
-                    byteArrayOutputStream.toString());
-            JSONArray jArray = jObject.getJSONArray("countries");
+            JSONObject jObject = new JSONObject(json);
+            JSONArray jArray = jObject.getJSONArray("companies");
             String name;
-            String dial_code;
+            String code;
             String isoCode;
             data = new ArrayList<>();
-            HashMap<String,String> map;
+            HashMap hash;
 
             for (int i = 0; i < jArray.length(); i++) {
                 name = jArray.getJSONObject(i).getString("name");
-                dial_code = jArray.getJSONObject(i).getString("dial_code");
-                isoCode = jArray.getJSONObject(i).getString("code");
-                map = new HashMap<>(3);
-                map.put("name",name);
-                map.put("dial_code",dial_code);
-                map.put("code",isoCode);
-                data.add(map);
+                code = jArray.getJSONObject(i).getString("code");
+                hash = new HashMap();
+                hash.put("name",name);
+                hash.put("code",code);
+                data.add(hash);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        this.countries = data;
+        this.companies = data;
     }
 
     private boolean checkData()
@@ -173,30 +179,31 @@ public class SignupPhoneActivity extends Activity {
                 (int)(errorIcon.getIntrinsicWidth()*0.5),
                 (int)(errorIcon.getIntrinsicHeight()*0.5)));
 
-        if(mCountry.getText().toString().trim().length() <= 0)
+        if(mCompany.getText().toString().trim().length() <= 0)
         {
-            mCountry.setError(
-                    getString(R.string.select_your_phone_country_to_continue),
+            mCompany.setError(
+                    getString(R.string.select_your_company_to_continue),
                     errorIcon);
 
             ok = false;
         }
-        else if(mCountry.getPosition()<0)
+        else if(mCompany.getPosition() < 0)
         {
-            mCountry.setError(
-                    getString(R.string.select_your_phone_country_to_continue),
+            mCompany.setError(
+                    getString(R.string.select_your_company_to_continue),
                     errorIcon);
 
             ok = false;
         }
-        else if(mPhone.getText().toString().trim().length() <= 0)
-        {
-            mPhone.setError(
-                    getString(R.string.enter_your_phone_number_to_continue),
-                    errorIcon);
-
-            ok = false;
-        }
+//        else if(mPosition.getText() != null &&
+//                mPosition.getText().toString().trim().length() <= 0)
+//        {
+//            mPosition.setError(
+//                    getString(R.string.enter_your_position_to_continue),
+//                    errorIcon);
+//
+//            ok = false;
+//        }
 
         return ok;
     }
@@ -204,6 +211,6 @@ public class SignupPhoneActivity extends Activity {
     private void saveData ()
     {
         UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-        profile.setCountryISO(mCountry.getText().toString());
+        profile.setCountryISO(mCompany.getText().toString());
     }
 }

@@ -6,27 +6,33 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.provider.MediaStore;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.custom.CircleImageView;
+import com.vodafone.mycomms.custom.RoundedImageView;
 
 public class SignupNameActivity extends Activity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_GALLERY = 1;
 
-    ImageView mPhoto;
+    CircleImageView mPhoto;
     EditText mFirstName;
     EditText mLastName;
     Bitmap photoBitmap = null;
@@ -36,15 +42,14 @@ public class SignupNameActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_name);
 
-        mPhoto = (ImageView)findViewById(R.id.ivAddPhoto);
+        mPhoto = (CircleImageView)findViewById(R.id.ivAddPhoto);
         mFirstName = (EditText)findViewById(R.id.etSignupFirstN);
         mLastName = (EditText)findViewById(R.id.etSignupLastN);
 
         mPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(mFirstName.getWindowToken(), 0);
-                dispatchTakePictureIntent();
+                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo),null);
             }
         });
 
@@ -55,7 +60,7 @@ public class SignupNameActivity extends Activity {
             public void onClick(View v) {
                 if(checkData()) {
                     saveData();
-                    Intent in = new Intent(SignupNameActivity.this, SignupPassActivity.class);
+                    Intent in = new Intent(SignupNameActivity.this, SignupCompanyActivity.class);
                     startActivity(in);
                 }
             }
@@ -71,14 +76,8 @@ public class SignupNameActivity extends Activity {
         });
 
         //Force the focus of the first field and opens the keyboard
-        mFirstName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-//                mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-                mgr.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
-            }
-        });
+        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
         mFirstName.requestFocus();
     }
@@ -113,18 +112,32 @@ public class SignupNameActivity extends Activity {
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             photoBitmap = imageBitmap;
 
-            mPhoto.setBackgroundResource(R.drawable.roundedbutton);
-            BitmapDrawable imgDrawable = new BitmapDrawable(getResources(), imageBitmap);
-            mPhoto.setImageDrawable(imgDrawable);
+//            mPhoto.setBackgroundResource(R.drawable.roundedbutton);
+//            BitmapDrawable imgDrawable = new BitmapDrawable(getResources(), imageBitmap);
+            mPhoto.setImageBitmap(photoBitmap);
+            mPhoto.setBorderWidth(2);
+            mPhoto.setBorderColor(Color.WHITE);
         }
     }
 
-    private void dispatchTakePictureIntent() {
+    private void dispatchTakePictureIntent(String title, String subtitle) {
 
         //Build the alert dialog to let the user choose the origin of the picture
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.how_would_you_like_to_add_a_photo);
+        builder.setTitle(title);
+
+        if(subtitle != null) {
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.cv_title_subtitle, null);
+            ((TextView) view.findViewById(R.id.tvTitle)).setText(title);
+            ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
+            builder.setCustomTitle(view);
+        }
+        else
+        {
+            builder.setTitle(title);
+        }
 
         builder.setItems(R.array.add_photo_chooser, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
@@ -161,16 +174,16 @@ public class SignupNameActivity extends Activity {
     {
         boolean ok = true;
 
-        if(photoBitmap == null)
-        {
-            Toast.makeText(getApplicationContext(),R.string.add_a_photo_to_continue,Toast.LENGTH_SHORT).show();
-            ok = false;
-        }
+        Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
+        errorIcon.setBounds(new Rect(0, 0,
+                (int)(errorIcon.getIntrinsicWidth()*0.5),
+                (int)(errorIcon.getIntrinsicHeight()*0.5)));
 
         if(mLastName.getText().toString().trim().length() <= 0)
         {
             mLastName.setError(
-                    getString(R.string.enter_your_last_name_to_continue));
+                    getString(R.string.enter_your_last_name_to_continue),
+                    errorIcon);
 
             ok = false;
         }
@@ -179,8 +192,16 @@ public class SignupNameActivity extends Activity {
         {
             mFirstName.setError(
                     getString(R.string.enter_your_first_name_to_continue),
-                    getResources().getDrawable(R.drawable.ic_error_tooltip));
+                    errorIcon);
 
+            ok = false;
+        }
+
+        if(photoBitmap == null && ok)
+        {
+//            Toast.makeText(getApplicationContext(),R.string.add_a_photo_to_continue,Toast.LENGTH_SHORT).show();
+            dispatchTakePictureIntent(getString(R.string.we_need_your_picture),
+                    getString(R.string.please_share_your_smile));
             ok = false;
         }
 

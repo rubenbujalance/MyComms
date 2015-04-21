@@ -5,12 +5,16 @@ import android.graphics.Bitmap;
 
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by str_rbm on 07/04/2015.
@@ -32,8 +36,8 @@ public class UserProfile implements Serializable{
     private String companyName;
     private String position;
 
-    private Bitmap  photoBitmap;
-    private Date    photoDate;
+    private Bitmap photoBitmap;
+    private String photoUrl;
 
     /*
     File name
@@ -125,17 +129,40 @@ public class UserProfile implements Serializable{
         this.photoBitmap = photoBitmap;
     }
 
-    public Date getPhotoDate() {
-        return photoDate;
-    }
+    private boolean uploadPhoto()
+    {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        photoBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
 
-    public void setPhotoDate(Date photoDate) {
-        this.photoDate = photoDate;
+        JSONObject body = new JSONObject();
+//        body.put("file",byteArray);
+//
+//        APIWrapper.httpPostAPI("/api/uploadFile", , new HashMap())
+
+        return true;
     }
 
     /*
     Other methods
      */
+
+    public HashMap getHashMap()
+    {
+        HashMap<String, String> body = new HashMap<String, String>();
+        if(firstName != null) body.put("firstName",firstName);
+        if(lastName != null) body.put("lastName",lastName);
+        if(countryISO != null) body.put("country",countryISO);
+        if(phone != null) body.put("phone",phone);
+        if(mail != null) body.put("email",mail);
+        if(password != null) body.put("password",password);
+//        if(photoUrl != null) body.put("avatar",null);
+        if(companyName != null) body.put("company",companyName);
+        if(position != null) body.put("position",position);
+        if(officeLocation != null) body.put("officeLocation",officeLocation);
+
+        return body;
+    }
 
     public boolean saveUserProfile(Context context)
     {

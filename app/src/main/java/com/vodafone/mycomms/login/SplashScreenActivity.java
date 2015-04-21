@@ -94,33 +94,33 @@ public class SplashScreenActivity extends Activity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        new CheckVersionApi().execute(new HashMap<String, String>(), new HashMap<String, String>());
+        new CheckVersionApi().execute(new HashMap<String, Object>(), null);
     }
 
-    private class CheckVersionApi extends AsyncTask<HashMap<String,String>, Void, HashMap<String,Object>> {
+    private class CheckVersionApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
 
         @Override
-        protected HashMap<String,Object> doInBackground(HashMap<String,String>[] params) {
+        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
 
             HashMap<String,Object> response = null;
-            HashMap<String,String> hashJsonParams = params[0];
-            HashMap<String,String> hashHeaders = params[1];
+            HashMap<String,Object> hashParams = params[0];
+            HashMap<String,Object> hashHeaders = params[1];
 
-            //Build the JSONObject params
-            Iterator<String> it = hashJsonParams.keySet().iterator();
-            String key,value = null;
+//            //Build the JSONObject params
+//            Iterator<String> it = hashParams.keySet().iterator();
+//            String key,value = null;
+//
+//            JSONObject httpParams = new JSONObject();
+//
+//            try {
+//                while (it.hasNext()) {
+//                    key = it.next();
+//                    value = hashParams.get(key);
+//                    httpParams.put(key, value);
+//                }
+//            } catch (Exception ex) { ex.printStackTrace(); }
 
-            JSONObject httpParams = new JSONObject();
-
-            try {
-                while (it.hasNext()) {
-                    key = it.next();
-                    value = hashJsonParams.get(key);
-                    httpParams.put(key, value);
-                }
-            } catch (Exception ex) { ex.printStackTrace(); }
-
-            response = APIWrapper.httpPostAPI("/api/profile",httpParams,hashHeaders);
+            response = APIWrapper.httpPostAPI("/version",hashParams,hashHeaders, SplashScreenActivity.this);
 
             return response;
         }
@@ -173,8 +173,8 @@ public class SplashScreenActivity extends Activity {
             mProgress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             mProgress.setIndeterminate(true);
             mProgress.setCancelable(false);
-            mProgress.setProgressNumberFormat(null);
-            mProgress.setProgressPercentFormat(null);
+//            mProgress.setProgressNumberFormat(null);
+//            mProgress.setProgressPercentFormat(null);
             mProgress.show();
         }
 

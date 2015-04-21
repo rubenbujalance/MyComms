@@ -68,6 +68,7 @@ public class SignupPhoneActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(checkData()) {
+                    saveData();
                     Intent in = new Intent(SignupPhoneActivity.this, SignupPincodeActivity.class);
                     String dialCode = mCountry.getText().toString().trim();
                     dialCode = dialCode.substring(dialCode.lastIndexOf(" "));
@@ -204,6 +205,7 @@ public class SignupPhoneActivity extends Activity {
     private void saveData ()
     {
         UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-        profile.setCountryISO(mCountry.getText().toString());
+        profile.setCountryISO(countries.get(mCountry.getPosition()).get("code"));
+        profile.setPhone(mPhone.getText().toString());
     }
 }

@@ -1,5 +1,7 @@
 package com.vodafone.mycomms;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 
 import org.apache.http.HeaderElement;
@@ -46,8 +48,14 @@ public class APIWrapper {
         params: JSONObject of input parameters, to be set into body
         headers: HashMap of key-value pairs for header params
      */
-    public static HashMap<String,Object> httpPostAPI (String restRequest, JSONObject params, HashMap headers)
+    public static HashMap<String,Object> httpPostAPI (String restRequest, HashMap<String,Object> params, HashMap<String,Object> headers, Context context)
     {
+        JSONObject json = null;
+
+        if(params != null)
+            json = new JSONObject(params);
+        else json = new JSONObject();
+
         HttpClient httpClient = new DefaultHttpClient();
         HttpConnectionParams.setConnectionTimeout(httpClient.getParams(), 10000);
         HttpResponse response;
@@ -81,13 +89,17 @@ public class APIWrapper {
              */
 
             //Set version in Header
-            String versionCode = "27";
-            String versionName = "1.0.0";
-            versionName = versionName.substring(0,versionName.lastIndexOf("."));
+            if(headers == null) headers = new HashMap<>();
+
+            PackageInfo pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            int versionCode = pinfo.versionCode;
+            String versionName = pinfo.versionName;
+
+//            versionName = versionName.substring(0,versionName.lastIndexOf("."));
             headers.put("x-mycomms-version","android/"+versionName+"."+versionCode);
             headers.put("Content-Type","application/json; charset=utf-8");
 
-            ByteArrayEntity entity = new ByteArrayEntity(params.toString().getBytes("UTF8"));
+            ByteArrayEntity entity = new ByteArrayEntity(json.toString().getBytes("UTF8"));
             entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json;charset=UTF-8"));
             httpPost.setEntity(entity);
 
@@ -143,9 +155,11 @@ public class APIWrapper {
 
         try {
             String textEntity = EntityUtils.toString(response.getEntity());
-            String contentType = response.getHeaders("Content-Type")[0].getValue();
+            String contentType;
 
             if(textEntity != null && textEntity.length() > 0) {
+                contentType = response.getHeaders("Content-Type")[0].getValue();
+
                 if (contentType.compareTo("application/json") == 0) {
                     JSONObject json = new JSONObject(textEntity);
                     hash.put("json", json);

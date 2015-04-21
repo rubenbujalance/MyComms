@@ -33,6 +33,7 @@ public class SignupCompanyActivity extends Activity {
 
     AutoCompleteTVSelectOnly mCompany;
     EditText mPosition;
+    EditText mOfficeLoc;
     ArrayList<HashMap<String,String>> companies;
 
     @Override
@@ -42,6 +43,7 @@ public class SignupCompanyActivity extends Activity {
 
         mCompany = (AutoCompleteTVSelectOnly) findViewById(R.id.etSignupCompany);
         mPosition = (EditText)findViewById(R.id.etSignupPosition);
+        mOfficeLoc = (EditText)findViewById(R.id.etSignupOfficeLoc);
 
         /*
          * Autocomplete Adapter
@@ -73,6 +75,7 @@ public class SignupCompanyActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(checkData()) {
+                    saveData();
                     Intent in = new Intent(SignupCompanyActivity.this, SignupPassActivity.class);
                     startActivity(in);
                 }
@@ -195,15 +198,6 @@ public class SignupCompanyActivity extends Activity {
 
             ok = false;
         }
-//        else if(mPosition.getText() != null &&
-//                mPosition.getText().toString().trim().length() <= 0)
-//        {
-//            mPosition.setError(
-//                    getString(R.string.enter_your_position_to_continue),
-//                    errorIcon);
-//
-//            ok = false;
-//        }
 
         return ok;
     }
@@ -211,6 +205,8 @@ public class SignupCompanyActivity extends Activity {
     private void saveData ()
     {
         UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-        profile.setCountryISO(mCompany.getText().toString());
+        profile.setCompanyName(mCompany.getText().toString());
+        profile.setPosition(mPosition.getText().toString());
+        profile.setOfficeLocation(mOfficeLoc.getText().toString());
     }
 }

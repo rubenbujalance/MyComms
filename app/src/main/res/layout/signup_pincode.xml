@@ -174,7 +174,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/resend_code"
-            android:id="@+id/button"
+            android:id="@+id/btResendPin"
             android:background="@drawable/bt_white_elipse_style"
             android:textAllCaps="false"
             android:textSize="20dp"

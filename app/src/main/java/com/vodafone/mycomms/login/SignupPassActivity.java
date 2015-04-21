@@ -40,6 +40,7 @@ public class SignupPassActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(checkData()) {
+                    saveData();
                     Intent in = new Intent(SignupPassActivity.this, SignupPhoneActivity.class);
                     startActivity(in);
                 }

@@ -11,16 +11,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.APIWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class SignupPincodeActivity extends Activity {
 
@@ -36,8 +39,10 @@ public class SignupPincodeActivity extends Activity {
 
     EditText etPin;
     TextView tvPinPhoneNumber;
-    int nextPinPos;
 
+    Button btResendPin;
+
+    int nextPinPos;
     ProgressDialog progress;
 
     @Override
@@ -57,6 +62,7 @@ public class SignupPincodeActivity extends Activity {
 
         etPin = (EditText)findViewById(R.id.etPin);
         tvPinPhoneNumber = (TextView)findViewById(R.id.tvPinPhoneNumber);
+        btResendPin = (Button)findViewById(R.id.btResendPin);
         nextPinPos = 1;
 
         //Set the phone number text on the initial text
@@ -68,39 +74,32 @@ public class SignupPincodeActivity extends Activity {
         etPin.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction()!=KeyEvent.ACTION_UP)
+                if (event.getAction() != KeyEvent.ACTION_UP)
                     return true;
 
                 String text;
 
-                if(nextPinPos == 1)
-                {
-                    if(((SignupPincodeActivity)v.getContext()).tvPin1.getText().toString().trim().length()>0) {
+                if (nextPinPos == 1) {
+                    if (((SignupPincodeActivity) v.getContext()).tvPin1.getText().toString().trim().length() > 0) {
                         setPinColor(Color.WHITE);
                         resetPin();
                     }
 
-                    text = String.valueOf((char)event.getUnicodeChar());
-                    ((SignupPincodeActivity)v.getContext()).tvPin1.setText(text);
-                }
-                else if(nextPinPos == 2)
-                {
-                    text = String.valueOf((char)event.getUnicodeChar());
-                    ((SignupPincodeActivity)v.getContext()).tvPin2.setText(text);
-                }
-                else if(nextPinPos == 3)
-                {
-                    text = String.valueOf((char)event.getUnicodeChar());
-                    ((SignupPincodeActivity)v.getContext()).tvPin3.setText(text);
-                }
-                else if(nextPinPos == 4)
-                {
-                    text = String.valueOf((char)event.getUnicodeChar());
-                    ((SignupPincodeActivity)v.getContext()).tvPin4.setText(text);
-                    callPinCheck();
+                    text = String.valueOf((char) event.getUnicodeChar());
+                    ((SignupPincodeActivity) v.getContext()).tvPin1.setText(text);
+                } else if (nextPinPos == 2) {
+                    text = String.valueOf((char) event.getUnicodeChar());
+                    ((SignupPincodeActivity) v.getContext()).tvPin2.setText(text);
+                } else if (nextPinPos == 3) {
+                    text = String.valueOf((char) event.getUnicodeChar());
+                    ((SignupPincodeActivity) v.getContext()).tvPin3.setText(text);
+                } else if (nextPinPos == 4) {
+                    text = String.valueOf((char) event.getUnicodeChar());
+                    ((SignupPincodeActivity) v.getContext()).tvPin4.setText(text);
+                    callPhoneCheck(etPin.getText().toString());
                 }
 
-                if(nextPinPos<4) nextPinPos++;
+                if (nextPinPos < 4) nextPinPos++;
                 else nextPinPos = 1;
 
                 return true;
@@ -123,6 +122,12 @@ public class SignupPincodeActivity extends Activity {
         etPin.requestFocus();
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        callPhoneCheck(null);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -146,9 +151,19 @@ public class SignupPincodeActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void callPinCheck()
+    public void callPhoneCheck(String pin)
     {
-        new CheckPhoneApi().execute(new HashMap<String, String>());
+        HashMap<String, Object> header = null;
+
+        if(pin != null) {
+            header = new HashMap();
+            header.put("x-otp-pin", pin);
+        }
+
+        HashMap<String, Object> body =
+                ((MycommsApp)getApplication()).getUserProfile().getHashMap();
+
+        new CheckPhoneApi().execute(body,header);
     }
 
     public void setPinColor(int color)
@@ -196,15 +211,15 @@ public class SignupPincodeActivity extends Activity {
         }
     }
 
-    private class CheckPhoneApi extends AsyncTask<HashMap<String,String>, Void, HashMap<String,Object>> {
+    private class CheckPhoneApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
 
         @Override
-        protected HashMap<String,Object> doInBackground(HashMap<String,String>[] params) {
+        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
             HashMap<String,Object> response = null;
-//            HashMap<String,String> hashJsonParams = params[0];
-//            HashMap<String,String> hashHeaders = params[1];
-//
-//            //Build the JSONObject params
+            HashMap<String,Object> hashParams = params[0];
+            HashMap<String,Object> hashHeaders = params[1];
+
+            //Build the JSONObject params
 //            Iterator<String> it = hashJsonParams.keySet().iterator();
 //            String key,value = null;
 //            JSONObject httpParams = new JSONObject();
@@ -216,10 +231,8 @@ public class SignupPincodeActivity extends Activity {
 //                    httpParams.put(key, value);
 //                }
 //            } catch (Exception ex) { ex.printStackTrace(); }
-//
-//            response = APIWrapper.httpPostAPI("/api/profile",httpParams,hashHeaders);
 
-            response = APIWrapper.httpPostAPI("/api/profile",null,null);
+            response = APIWrapper.httpPostAPI("/api/profile",hashParams,hashHeaders, SignupPincodeActivity.this);
 
             return response;
         }

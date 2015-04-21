@@ -22,7 +22,7 @@ public class LoginSignupActivity extends Activity {
             @Override
             public void onClick(View v) {
 //                APIWrapper.httpPostAPI("/api/profile", new JSONObject(), null);
-                Intent in = new Intent(LoginSignupActivity.this, SignupPincodeActivity.class);
+                Intent in = new Intent(LoginSignupActivity.this, SignupMailActivity.class);
                 startActivity(in);
             }
         });

@@ -90,6 +90,15 @@
                 android:hint="@string/position"
                 android:inputType="textCapWords" />
 
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:id="@+id/etSignupOfficeLoc"
+                android:layout_gravity="center_horizontal"
+                android:hint="@string/office_location"
+                android:inputType="textCapWords" />
+
         </LinearLayout>
 
     </LinearLayout>

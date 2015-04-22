@@ -86,6 +86,7 @@ public class SplashScreenActivity extends Activity {
         else
         {
             Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(in);
         }
     }

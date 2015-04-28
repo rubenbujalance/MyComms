@@ -242,5 +242,4 @@ public class SignupPincodeActivity extends Activity {
             callBackPinCheck(result);
         }
     }
-
 }

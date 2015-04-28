@@ -48,4 +48,10 @@
     <string name="must_update_to_last_application_version">Must update to last application version</string>
     <string name="update">Update!</string>
     <string name="office_location">Office Location</string>
+    <string name="title_activity_main">MainActivity</string>
+
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
 </resources>

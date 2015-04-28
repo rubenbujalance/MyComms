@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.MainActivity;
 
 public class LoginSignupActivity extends Activity {
 
@@ -23,6 +24,16 @@ public class LoginSignupActivity extends Activity {
             public void onClick(View v) {
 //                APIWrapper.httpPostAPI("/api/profile", new JSONObject(), null);
                 Intent in = new Intent(LoginSignupActivity.this, SignupMailActivity.class);
+                startActivity(in);
+            }
+        });
+
+        Button btLogin = (Button)findViewById(R.id.btLogin);
+        btLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                APIWrapper.httpPostAPI("/api/profile", new JSONObject(), null);
+                Intent in = new Intent(LoginSignupActivity.this, MainActivity.class);
                 startActivity(in);
             }
         });

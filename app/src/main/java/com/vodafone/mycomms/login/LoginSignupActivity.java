@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.MainActivity;
 
@@ -33,7 +34,7 @@ public class LoginSignupActivity extends Activity {
             @Override
             public void onClick(View v) {
 //                APIWrapper.httpPostAPI("/api/profile", new JSONObject(), null);
-                Intent in = new Intent(LoginSignupActivity.this, MainActivity.class);
+                Intent in = new Intent(LoginSignupActivity.this, ContactListMainActivity.class);
                 startActivity(in);
             }
         });

@@ -66,6 +66,9 @@
             android:label="@string/title_activity_main"
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
+        <activity
+            android:name=".ContactListMainActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:layout_width="70dp"
+    android:paddingRight="12dp"
+    >
+
+    <ImageView android:id="@+id/companyLogo"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_gravity="right"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/icon_sun"
+        />
+    <!-- Local Time -->
+    <TextView android:id="@+id/list_item_status_local_time"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:paddingLeft="4dip"
+        android:paddingRight="4dip"
+
+        android:textSize="10dip"
+        android:orientation="vertical"
+        android:layout_gravity="right"
+        android:text="12:30"
+        android:textColor="@color/material_blue_grey_800"
+        />
+
+    <TextView android:id="@+id/list_item_status_country"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:paddingLeft="4dip"
+        android:paddingRight="4dip"
+        android:textSize="10dip"
+        android:orientation="vertical"
+        android:text="Some country with long name"
+        android:textColor="@color/material_blue_grey_800"
+        android:layout_gravity="right"
+        />
+</LinearLayout>

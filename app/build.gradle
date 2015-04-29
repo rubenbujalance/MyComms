@@ -13,7 +13,7 @@ android {
     buildToolsVersion '21.1.2'
     defaultConfig {
         applicationId "com.vodafone.mycomms"
-        minSdkVersion 9
+        minSdkVersion 13
         targetSdkVersion 21
         versionCode 29
         versionName "0.1"

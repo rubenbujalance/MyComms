@@ -54,4 +54,11 @@
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
+
+    <!-- Section contact list tab bar titles-->
+    <string name="contact_list_tab_favourites">Favourites</string>
+    <string name="contact_list_tab_recents">Recents</string>
+    <string name="contact_list_tab_contacts">Contacts</string>
+
+
 </resources>

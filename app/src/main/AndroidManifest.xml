@@ -67,8 +67,15 @@
             android:theme="@style/Theme.AppCompat.Light"
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
+        <activity android:name=".ContactListMainActivity" >
+        </activity>
         <activity
-            android:name=".ContactListMainActivity">
+            android:name=".util.ToolbarActivity"
+            android:label="@string/title_activity_toolbar" >
+        </activity>
+        <activity
+            android:name=".chat.ChatMainActivity"
+            android:label="@string/title_activity_chat_main" >
         </activity>
     </application>
 

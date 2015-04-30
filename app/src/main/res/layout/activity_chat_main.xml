@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include android:id="@+id/app_bar" layout="@layout/toolbar"/>
+
+        <TextView
+            style="@style/ChatTextLeft"
+            android:text="Hello my dear!"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/chat_bubble_grey"/>
+            <TextView
+                style="@style/ChatTextLeft"
+                android:text="How are you?"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_bubble_grey_tail"/>
+            <TextView
+                style="@style/ChatTextRight"
+                android:text="I'm really tired..."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_bubble_blue"
+                android:textColor="@android:color/white"/>
+            <TextView
+                style="@style/ChatTextRight"
+                android:text="Want coffee?"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_bubble_blue_tail"
+                android:textColor="@android:color/white"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/grey_chat">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_messaging_share"/>
+    </LinearLayout>
+
+</RelativeLayout>

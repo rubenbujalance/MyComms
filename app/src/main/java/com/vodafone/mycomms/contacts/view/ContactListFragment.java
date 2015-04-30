@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.contacts.view;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
@@ -8,16 +9,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
-
+import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
-
-import model.Contact;
 
 /**
  * A fragment representing a list of Items.
@@ -118,6 +115,9 @@ public class ContactListFragment extends ListFragment {
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
             Log.d(Constants.TAG, "ContactListFragment.onListItemClick: ");
+            Intent in = new Intent(getActivity(), ChatMainActivity.class);
+            startActivity(in);
+            //TODO: Implement back navigation
         }
     }
 

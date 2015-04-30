@@ -2,4 +2,8 @@
 
     <color name="black_overlay">#66000000</color>
 
+    <!-- Chat colors-->
+    <color name="white">#ffffff</color>
+    <color name="grey_chat">#f8f8f8</color>
+
 </resources>

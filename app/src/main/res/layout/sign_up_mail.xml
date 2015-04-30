@@ -76,14 +76,11 @@
             android:background="#ffffff"
             android:paddingTop="20dp">
 
-            <EditText
+            <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:id="@+id/etSignupEmail"
-                android:layout_gravity="center_horizontal"
-                android:inputType="textEmailAddress"
-                android:hint="@string/email" />
+                android:layout_gravity="center_horizontal" />
 
         </LinearLayout>
 

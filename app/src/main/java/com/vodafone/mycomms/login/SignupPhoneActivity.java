@@ -22,6 +22,7 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
+import com.vodafone.mycomms.custom.ClearableEditText;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,7 +36,7 @@ import java.util.HashMap;
 public class SignupPhoneActivity extends Activity {
 
     AutoCompleteTVSelectOnly mCountry;
-    EditText mPhone;
+    ClearableEditText mPhone;
     ArrayList<HashMap<String,String>> countries;
 
     @Override
@@ -44,7 +45,7 @@ public class SignupPhoneActivity extends Activity {
         setContentView(R.layout.sign_up_phone);
 
         mCountry = (AutoCompleteTVSelectOnly) findViewById(R.id.etSignupCountry);
-        mPhone = (EditText)findViewById(R.id.etSignupPhone);
+        mPhone = (ClearableEditText)findViewById(R.id.etSignupPhone);
         loadCountriesArray();
 
         /*
@@ -182,10 +183,10 @@ public class SignupPhoneActivity extends Activity {
 
             ok = false;
         }
-        else if(mCountry.getPosition()<0)
+        else if(mCountry.getCodeSelected() == null)
         {
             mCountry.setError(
-                    getString(R.string.select_your_phone_country_to_continue),
+                    getString(R.string.select_a_country_from_the_list),
                     errorIcon);
 
             ok = false;
@@ -205,7 +206,7 @@ public class SignupPhoneActivity extends Activity {
     private void saveData ()
     {
         UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-        profile.setCountryISO(countries.get(mCountry.getPosition()).get("code"));
+        profile.setCountryISO(mCountry.getCodeSelected());
         profile.setPhone(mPhone.getText().toString());
     }
 }

@@ -19,6 +19,7 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
+import com.vodafone.mycomms.custom.ClearableEditText;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,8 +33,8 @@ import java.util.HashMap;
 public class SignupCompanyActivity extends Activity {
 
     AutoCompleteTVSelectOnly mCompany;
-    EditText mPosition;
-    EditText mOfficeLoc;
+    ClearableEditText mPosition;
+    ClearableEditText mOfficeLoc;
     ArrayList<HashMap<String,String>> companies;
 
     @Override
@@ -42,8 +43,8 @@ public class SignupCompanyActivity extends Activity {
         setContentView(R.layout.sign_up_company);
 
         mCompany = (AutoCompleteTVSelectOnly) findViewById(R.id.etSignupCompany);
-        mPosition = (EditText)findViewById(R.id.etSignupPosition);
-        mOfficeLoc = (EditText)findViewById(R.id.etSignupOfficeLoc);
+        mPosition = (ClearableEditText)findViewById(R.id.etSignupPosition);
+        mOfficeLoc = (ClearableEditText)findViewById(R.id.etSignupOfficeLoc);
 
         /*
          * Autocomplete Adapter
@@ -190,7 +191,7 @@ public class SignupCompanyActivity extends Activity {
 
             ok = false;
         }
-        else if(mCompany.getPosition() < 0)
+        else if(mCompany.getCodeSelected() == null)
         {
             mCompany.setError(
                     getString(R.string.select_your_company_to_continue),

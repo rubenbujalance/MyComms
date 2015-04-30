@@ -3,7 +3,7 @@ package com.vodafone.mycomms;
 import android.content.Context;
 import android.graphics.Bitmap;
 
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -166,6 +166,7 @@ public class UserProfile implements Serializable{
 
     public boolean saveUserProfile(Context context)
     {
+        /*
         Gson gson = new Gson();
         String json = gson.toJson(this);
 
@@ -183,10 +184,13 @@ public class UserProfile implements Serializable{
         }
 
         return true;
+        */
+        return false;
     }
 
     public static UserProfile readUserProfile(Context context)
     {
+        /*
         Gson gson = new Gson();
 
         FileInputStream fis;
@@ -217,5 +221,7 @@ public class UserProfile implements Serializable{
         }
 
         return userProfile;
+        */
+        return null;
     }
 }

@@ -6,20 +6,21 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.custom.ClearableEditText;
 
 public class SignupMailActivity extends Activity {
 
-    EditText mEmail;
+    ClearableEditText mEmail;
     Drawable errorIcon;
 
     @Override
@@ -27,7 +28,10 @@ public class SignupMailActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_mail);
 
-        mEmail = (EditText)findViewById(R.id.etSignupEmail);
+        mEmail = (ClearableEditText)findViewById(R.id.etSignupEmail);
+        mEmail.setHint(R.string.email);
+        mEmail.setInput(InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 
         errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
         errorIcon.setBounds(new Rect(0, 0, errorIcon.getIntrinsicWidth(), errorIcon.getIntrinsicHeight()));

@@ -25,6 +25,7 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
+import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.custom.RoundedImageView;
 
 public class SignupNameActivity extends Activity {
@@ -33,8 +34,8 @@ public class SignupNameActivity extends Activity {
     static final int REQUEST_IMAGE_GALLERY = 1;
 
     CircleImageView mPhoto;
-    EditText mFirstName;
-    EditText mLastName;
+    ClearableEditText mFirstName;
+    ClearableEditText mLastName;
     Bitmap photoBitmap = null;
 
     @Override
@@ -43,8 +44,8 @@ public class SignupNameActivity extends Activity {
         setContentView(R.layout.sign_up_name);
 
         mPhoto = (CircleImageView)findViewById(R.id.ivAddPhoto);
-        mFirstName = (EditText)findViewById(R.id.etSignupFirstN);
-        mLastName = (EditText)findViewById(R.id.etSignupLastN);
+        mFirstName = (ClearableEditText)findViewById(R.id.etSignupFirstN);
+        mLastName = (ClearableEditText)findViewById(R.id.etSignupLastN);
 
         mPhoto.setOnClickListener(new View.OnClickListener() {
             @Override

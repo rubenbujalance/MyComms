@@ -89,7 +89,7 @@
             android:layout_height="wrap_content"
             android:background="#ffffff">
 
-            <EditText
+            <ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
@@ -98,7 +98,7 @@
                 android:layout_gravity="center_horizontal"
                 android:hint="@string/first_name" />
 
-            <EditText
+            <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"

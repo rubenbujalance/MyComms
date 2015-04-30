@@ -95,7 +95,6 @@ public class APIWrapper {
             int versionCode = pinfo.versionCode;
             String versionName = pinfo.versionName;
 
-//            versionName = versionName.substring(0,versionName.lastIndexOf("."));
             headers.put("x-mycomms-version","android/"+versionName+"."+versionCode);
             headers.put("Content-Type","application/json; charset=utf-8");
 

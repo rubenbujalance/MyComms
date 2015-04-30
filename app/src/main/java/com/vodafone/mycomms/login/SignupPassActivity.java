@@ -16,13 +16,14 @@ import android.widget.ImageView;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.custom.ClearableEditText;
 
 import java.util.regex.Pattern;
 
 public class SignupPassActivity extends Activity {
 
-    EditText mPassword;
-    EditText mConfirmPass;
+    ClearableEditText mPassword;
+    ClearableEditText mConfirmPass;
 
     private static final String PASSWORD_PATTERN =
             "((?=.*\\d)(?=.*[A-Z]).{8,20})";
@@ -32,8 +33,8 @@ public class SignupPassActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_pass);
 
-        mPassword = (EditText)findViewById(R.id.etSignupPass);
-        mConfirmPass = (EditText)findViewById(R.id.etSignupPassConf);
+        mPassword = (ClearableEditText)findViewById(R.id.etSignupPass);
+        mConfirmPass = (ClearableEditText)findViewById(R.id.etSignupPassConf);
 
         ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
         ivBtFwd.setOnClickListener(new View.OnClickListener() {

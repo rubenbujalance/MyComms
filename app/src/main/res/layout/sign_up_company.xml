@@ -81,7 +81,7 @@
                 android:id="@+id/etSignupCompany"
                 android:hint="@string/company" />
 
-            <EditText
+            <ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -90,7 +90,7 @@
                 android:hint="@string/position"
                 android:inputType="textCapWords" />
 
-            <EditText
+            <ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"

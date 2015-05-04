@@ -5,5 +5,7 @@
     <!-- Chat colors-->
     <color name="white">#ffffff</color>
     <color name="grey_chat">#f8f8f8</color>
+    <color name="grey_sent">#aaaaaa</color>
+    <color name="grey_chat_name">#a1a1a1</color>
 
 </resources>

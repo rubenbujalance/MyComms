@@ -1,9 +1,9 @@
 package com.vodafone.mycomms.main;
 
 import com.vodafone.mycomms.util.APIWrapper;
-import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.util.SystemUiHider;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.os.Environment;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.login.LoginSignupActivity;
+import com.vodafone.mycomms.util.SystemUiHider;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

@@ -3,53 +3,65 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/white">
 
-    <LinearLayout
+    <include android:id="@+id/app_bar" layout="@layout/toolbar"/>
+
+    <!--Empty ScrollView needed so the recyclerview doesn't hide the toolbar-->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </ScrollView>
+
+    <view
+        android:id="@+id/recycler_view"
+        android:layout_below="@id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <include android:id="@+id/app_bar" layout="@layout/toolbar"/>
-
-        <TextView
-            style="@style/ChatTextLeft"
-            android:text="Hello my dear!"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/chat_bubble_grey"/>
-            <TextView
-                style="@style/ChatTextLeft"
-                android:text="How are you?"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/chat_bubble_grey_tail"/>
-            <TextView
-                style="@style/ChatTextRight"
-                android:text="I'm really tired..."
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/chat_bubble_blue"
-                android:textColor="@android:color/white"/>
-            <TextView
-                style="@style/ChatTextRight"
-                android:text="Want coffee?"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/chat_bubble_blue_tail"
-                android:textColor="@android:color/white"/>
-
-
-    </LinearLayout>
+        class="android.support.v7.widget.RecyclerView"
+        android:layout_above="@+id/message_layout"/>
 
     <LinearLayout
+        android:id="@+id/message_layout"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_alignParentBottom="true"
         android:background="@color/grey_chat">
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/btn_messaging_share"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chat_text_box"
+            android:background="@color/white"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingRight="5dp"
+            android:paddingLeft="5dp"
+            android:hint="Type a message..."
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chat_send"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Send"
+            android:textSize="18sp"
+            android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
 </RelativeLayout>

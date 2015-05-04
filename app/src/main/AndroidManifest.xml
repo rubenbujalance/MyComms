@@ -77,6 +77,22 @@
             android:name=".chat.ChatMainActivity"
             android:label="@string/title_activity_chat_main" >
         </activity>
+        <activity
+            android:name=".login.MailSentActivity"
+            android:label="@string/title_activity_mail_sent" >
+        </activity>
+        <activity
+            android:name=".SignupTypeChoose"
+            android:label="@string/title_activity_signup_type_choose" >
+        </activity>
+        <activity
+            android:name=".login.SignupTypeChooseActivity"
+            android:label="@string/title_activity_signup_type_choose" >
+        </activity>
+        <activity
+            android:name=".login.LoginActivity"
+            android:label="@string/title_activity_login" >
+        </activity>
     </application>
 
 </manifest>

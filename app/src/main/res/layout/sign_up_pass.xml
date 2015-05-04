@@ -84,23 +84,17 @@
             android:layout_height="wrap_content"
             android:background="#ffffff">
 
-            <ClearableEditText
+            <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:id="@+id/etSignupPass"
-                android:layout_gravity="center_horizontal"
-                android:inputType="textPassword"
-                android:hint="@string/password" />
+                android:layout_gravity="center_horizontal" />
 
-            <ClearableEditText
+            <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:id="@+id/etSignupPassConf"
-                android:layout_gravity="center_horizontal"
-                android:inputType="textPassword"
-                android:hint="@string/confirm_password" />
+                android:layout_gravity="center_horizontal" />
 
         </LinearLayout>
 

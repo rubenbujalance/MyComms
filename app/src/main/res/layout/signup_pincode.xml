@@ -64,7 +64,6 @@
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:inputType="number"
-            android:ems="10"
             android:id="@+id/etPin"
             android:visibility="visible"
             android:numeric="integer" />

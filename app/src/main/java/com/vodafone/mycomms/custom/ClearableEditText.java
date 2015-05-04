@@ -88,7 +88,7 @@ public class ClearableEditText extends RelativeLayout {
         edit_text.setHint(encode);
     }
 
-    public void setInput(int type) {
+    public void setInputType(int type) {
         edit_text.setInputType(type);
     }
 
@@ -96,4 +96,5 @@ public class ClearableEditText extends RelativeLayout {
     {
         edit_text.setError(error,icon);
     }
+
 }

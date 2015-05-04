@@ -1,41 +1,42 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 
-public class LoginSignupActivity extends Activity {
+public class LoginActivity extends ActionBarActivity {
+
+    Button btLoginSalesforce;
+    Button btLogin;
+    TextView tvForgotPass;
+    EditText etEmail;
+    EditText etPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_signup_choose);
+        setContentView(R.layout.activity_login);
 
-        Button btSignup = (Button)findViewById(R.id.btSignup);
-        btSignup.setOnClickListener(new View.OnClickListener() {
+        btLogin = (Button)findViewById(R.id.btLogin);
+        btLoginSalesforce = (Button)findViewById(R.id.btLoginSalesforce);
+        tvForgotPass = (TextView)findViewById(R.id.tvForgotPass);
+        etEmail = (EditText)findViewById(R.id.etEmail);
+        etPassword = (EditText)findViewById(R.id.etPassword);
+
+        //Button back
+        ImageView ivBack = (ImageView)findViewById(R.id.ivBtBack);
+        ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(LoginSignupActivity.this, SignupTypeChooseActivity.class);
-                startActivity(in);
-            }
-        });
-
-        Button btLogin = (Button)findViewById(R.id.btLogin);
-        btLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                APIWrapper.httpPostAPI("/api/profile", new JSONObject(), null);
-                Intent in = new Intent(LoginSignupActivity.this, LoginActivity.class);
-                startActivity(in);
+                finish();
             }
         });
     }
@@ -43,7 +44,7 @@ public class LoginSignupActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login_signup, menu);
+        getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 

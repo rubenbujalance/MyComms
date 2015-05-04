@@ -81,23 +81,17 @@
                 android:id="@+id/etSignupCompany"
                 android:hint="@string/company" />
 
-            <ClearableEditText
+            <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:id="@+id/etSignupPosition"
-                android:layout_gravity="center_horizontal"
-                android:hint="@string/position"
-                android:inputType="textCapWords" />
+                android:layout_gravity="center_horizontal" />
 
-            <ClearableEditText
+            <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:id="@+id/etSignupOfficeLoc"
-                android:layout_gravity="center_horizontal"
-                android:hint="@string/office_location"
-                android:inputType="textCapWords" />
+                android:layout_gravity="center_horizontal" />
 
         </LinearLayout>
 

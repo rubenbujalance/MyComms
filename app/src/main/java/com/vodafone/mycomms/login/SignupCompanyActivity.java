@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,6 +46,16 @@ public class SignupCompanyActivity extends Activity {
         mCompany = (AutoCompleteTVSelectOnly) findViewById(R.id.etSignupCompany);
         mPosition = (ClearableEditText)findViewById(R.id.etSignupPosition);
         mOfficeLoc = (ClearableEditText)findViewById(R.id.etSignupOfficeLoc);
+
+        mPosition.setHint(R.string.position);
+        mPosition.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+        mOfficeLoc.setHint(R.string.office_location);
+        mOfficeLoc.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
         /*
          * Autocomplete Adapter

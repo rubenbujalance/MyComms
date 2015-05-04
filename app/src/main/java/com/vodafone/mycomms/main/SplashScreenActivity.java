@@ -1,9 +1,5 @@
-package com.vodafone.mycomms.login;
+package com.vodafone.mycomms.main;
 
-import com.vodafone.mycomms.APIWrapper;
-import com.vodafone.mycomms.util.SystemUiHider;
-
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -12,18 +8,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.PersistableBundle;
-import android.provider.MediaStore;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.TextView;
 
+import com.vodafone.mycomms.APIWrapper;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.login.LoginSignupActivity;
+import com.vodafone.mycomms.util.SystemUiHider;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -39,7 +30,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.

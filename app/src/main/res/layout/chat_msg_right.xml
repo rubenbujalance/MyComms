@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/sent_time"
+            style="@style/ChatSent"
+            android:text="Thursday 18:40 a.m"
+            android:layout_gravity="center_horizontal"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="1dp"
+            android:layout_marginLeft="5dp"
+            android:paddingLeft="5dp">
+            <TextView
+                android:id="@+id/chat_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/ChatText"
+                tools:text="I'm so tired...
+                I haven't slept today
+                I'm sooo tired"
+                android:gravity="right"
+                android:background="@drawable/chat_bubble_blue_tail"
+                android:textColor="@android:color/white"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/chat_name"
+                android:layout_toStartOf="@+id/chat_name"/>
+
+            <TextView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/chat_name"
+                android:background="@drawable/chat_name"
+                android:text="AM"
+                android:textColor="@color/grey_chat_name"
+                android:gravity="center"
+                android:layout_marginRight="5dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/sent_text"
+            style="@style/ChatSent"
+            android:visibility="gone"
+            android:text="Delivered"
+            android:paddingTop="0dp"
+            android:layout_marginRight="12dp"
+            android:layout_gravity="right"/>
+    </LinearLayout>
+
+</RelativeLayout>

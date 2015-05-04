@@ -15,7 +15,7 @@ android {
         applicationId "com.vodafone.mycomms"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 32
+        versionCode 38
         versionName "0.1"
         signingConfig signingConfigs.release
     }
@@ -50,10 +50,11 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 //    compile files('lib/gson-2.3.1.jar')
-//    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
 //    compile files('lib/realm-0.80.0.jar')
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:support-v4:22.0.0'
 //    compile 'com.google.android.gms:play-services:7.0.0'
 //    compile 'com.android.support:appcompat-v7:22.0.+'
+    compile 'com.android.support:recyclerview-v7:21.0.+'
 }

@@ -1,8 +1,10 @@
-package com.vodafone.mycomms;
+package com.vodafone.mycomms.util;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
+
+import com.vodafone.mycomms.EndpointWrapper;
 
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
@@ -30,12 +32,7 @@ import java.util.Iterator;
 
 public class APIWrapper {
 
-    private static final String baseURL = "int.my-comms.com";
     private static final String httpProtocol = "https://";
-
-    public static String getBaseURL() {
-        return baseURL;
-    }
 
     public static String getHttpProtocol() {
         return httpProtocol;
@@ -63,7 +60,7 @@ public class APIWrapper {
         JSONObject jsonResponse = null;
 
         try {
-            HttpPost httpPost = new HttpPost(getHttpProtocol() + getBaseURL() + restRequest);
+            HttpPost httpPost = new HttpPost(getHttpProtocol() + EndpointWrapper.getBaseURL() + restRequest);
 
             /*
              * Testing Code

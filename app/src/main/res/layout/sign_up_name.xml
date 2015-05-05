@@ -89,7 +89,7 @@
             android:layout_height="wrap_content"
             android:background="#ffffff">
 
-            <ClearableEditText
+            <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
@@ -101,11 +101,8 @@
             <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:ems="10"
                 android:id="@+id/etSignupLastN"
-                android:paddingTop="10dp"
-                android:hint="@string/last_name" />
+                android:paddingTop="10dp" />
         </LinearLayout>
 
     </LinearLayout>

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +36,16 @@ public class SignupPassActivity extends Activity {
 
         mPassword = (ClearableEditText)findViewById(R.id.etSignupPass);
         mConfirmPass = (ClearableEditText)findViewById(R.id.etSignupPassConf);
+
+        mPassword.setHint(R.string.password);
+        mPassword.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+        mConfirmPass.setHint(R.string.confirm_password);
+        mConfirmPass.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
         ImageView ivBtFwd = (ImageView)findViewById(R.id.ivBtForward);
         ivBtFwd.setOnClickListener(new View.OnClickListener() {

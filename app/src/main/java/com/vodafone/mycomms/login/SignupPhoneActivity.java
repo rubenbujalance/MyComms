@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.opengl.Visibility;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +47,11 @@ public class SignupPhoneActivity extends Activity {
 
         mCountry = (AutoCompleteTVSelectOnly) findViewById(R.id.etSignupCountry);
         mPhone = (ClearableEditText)findViewById(R.id.etSignupPhone);
+
+        mPhone.setHint(R.string.phone_number);
+        mPhone.setInputType(
+                InputType.TYPE_CLASS_PHONE);
+
         loadCountriesArray();
 
         /*
@@ -121,7 +127,7 @@ public class SignupPhoneActivity extends Activity {
     private void loadCountriesArray()
     {
         //Get Data From Text Resource File Contains Json Data.
-        InputStream inputStream = getResources().openRawResource(R.raw.countries);
+        InputStream inputStream = getResources().openRawResource(R.raw.countries_new);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         int ctr;
@@ -140,9 +146,10 @@ public class SignupPhoneActivity extends Activity {
 
         try {
             // Parse the data into jsonObject to get original data in form of json.
-            JSONObject jObject = new JSONObject(
-                    byteArrayOutputStream.toString());
-            JSONArray jArray = jObject.getJSONArray("countries");
+//            JSONObject jObject = new JSONObject(
+//                    byteArrayOutputStream.toString());
+            JSONArray jArray = new JSONArray(byteArrayOutputStream.toString());
+//            JSONArray jArray = jObject.getJSONArray(null);
             String name;
             String dial_code;
             String isoCode;
@@ -151,8 +158,8 @@ public class SignupPhoneActivity extends Activity {
 
             for (int i = 0; i < jArray.length(); i++) {
                 name = jArray.getJSONObject(i).getString("name");
-                dial_code = jArray.getJSONObject(i).getString("dial_code");
-                isoCode = jArray.getJSONObject(i).getString("code");
+                dial_code = "+" + jArray.getJSONObject(i).getString("Dial");
+                isoCode = jArray.getJSONObject(i).getString("ISO3166-1-Alpha-2");
                 map = new HashMap<>(3);
                 map.put("name",name);
                 map.put("dial_code",dial_code);

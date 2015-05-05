@@ -12,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.provider.MediaStore;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,6 +47,18 @@ public class SignupNameActivity extends Activity {
         mPhoto = (CircleImageView)findViewById(R.id.ivAddPhoto);
         mFirstName = (ClearableEditText)findViewById(R.id.etSignupFirstN);
         mLastName = (ClearableEditText)findViewById(R.id.etSignupLastN);
+
+        mFirstName.setHint(R.string.first_name);
+        mFirstName.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_PERSON_NAME |
+                        InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+        mLastName.setHint(R.string.last_name);
+        mLastName.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_VARIATION_PERSON_NAME |
+                        InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
         mPhoto.setOnClickListener(new View.OnClickListener() {
             @Override

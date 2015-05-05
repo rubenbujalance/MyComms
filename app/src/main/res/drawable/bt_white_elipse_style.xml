@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--<item android:state_pressed="true" >-->
-        <!--<shape>-->
-            <!--&lt;!&ndash;<gradient&ndash;&gt;-->
-            <!--&lt;!&ndash;android:startColor="#00a0dd"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:endColor="#00a0dd"&ndash;&gt;-->
-            <!--&lt;!&ndash;android:angle="270" />&ndash;&gt;-->
-            <!--&lt;!&ndash;<solid&ndash;&gt;-->
-                <!--&lt;!&ndash;android:color="#b0b0b0" />&ndash;&gt;-->
-            <!--<stroke-->
-            <!--android:width="2dp"-->
-            <!--android:color="#ffffff" />-->
-            <!--<corners-->
-                <!--android:radius="80dp" />-->
-            <!--<padding-->
-                <!--android:left="20dp"-->
-                <!--android:top="10dp"-->
-                <!--android:right="20dp"-->
-                <!--android:bottom="10dp" />-->
-        <!--</shape>-->
-    <!--</item>-->
+    <item android:state_pressed="true" >
+        <shape>
+            <!--<gradient-->
+            <!--android:startColor="#00a0dd"-->
+            <!--android:endColor="#00a0dd"-->
+            <!--android:angle="270" />-->
+            <!--<solid-->
+            <!--android:color="#a0a0a0" />-->
+            <stroke
+                android:width="3dp"
+                android:color="#aaaaaa" />
+            <corners
+                android:radius="80dp" />
+            <padding
+                android:left="20dp"
+                android:top="10dp"
+                android:right="20dp"
+                android:bottom="10dp" />
+        </shape>
+    </item>
     <item>
         <shape>
             <!--<gradient-->

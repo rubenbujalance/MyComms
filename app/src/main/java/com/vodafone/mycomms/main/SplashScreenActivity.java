@@ -1,5 +1,9 @@
 package com.vodafone.mycomms.main;
 
+import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.SystemUiHider;
+
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -11,7 +15,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 
-import com.vodafone.mycomms.APIWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.util.SystemUiHider;
@@ -75,10 +78,10 @@ public class SplashScreenActivity extends Activity {
         }
         else
         {
-            Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
-            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            Intent in = new Intent(getApplicationContext(), LoginSignupActivity.class);
+            Intent in = new Intent(getApplicationContext(), LoginSignupActivity.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(in);
-            finish();
         }
     }
 

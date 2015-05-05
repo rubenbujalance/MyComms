@@ -15,7 +15,7 @@ android {
         applicationId "com.vodafone.mycomms"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 38
+        versionCode 40
         versionName "0.1"
         signingConfig signingConfigs.release
     }

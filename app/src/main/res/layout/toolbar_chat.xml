@@ -33,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:text="Jack Sheppard"
+                android:visibility="gone"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 android:textColor="@color/white"/>
@@ -41,6 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:visibility="gone"
                 android:text="Seen long time ago"
                 android:textSize="11sp"
                 android:textColor="@color/white"/>

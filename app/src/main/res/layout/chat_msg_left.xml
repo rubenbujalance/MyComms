@@ -32,11 +32,11 @@
                 android:gravity="left"
                 android:background="@drawable/chat_bubble_grey_tail"
                 android:layout_toRightOf="@+id/chat_name"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:id="@+id/chat_name"
-                android:background="@drawable/chat_name"
+                android:background="@drawable/cartoon_round_contact_image_example"
                 android:text="JB"
                 android:textColor="@color/grey_chat_name"
                 android:gravity="center"

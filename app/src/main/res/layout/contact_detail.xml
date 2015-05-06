@@ -109,7 +109,7 @@
                         android:layout_height="20dp"
                         android:id="@+id/imageView5"
                         android:layout_gravity="right"
-                        android:src="@drawable/icon_donotdisturb_white"
+                        android:src="@drawable/icon_dontdisturb_white"
                         android:layout_marginBottom="10dp"
                         android:layout_marginRight="20dp" />
 

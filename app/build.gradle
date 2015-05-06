@@ -13,9 +13,9 @@ android {
     buildToolsVersion '21.1.2'
     defaultConfig {
         applicationId "com.vodafone.mycomms"
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 21
-        versionCode 39
+        versionCode 99999
         versionName "0.1"
         signingConfig signingConfigs.release
     }
@@ -47,6 +47,14 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+
+    maven {
+        url 'http://lorenzo.villani.me/android-cropimage/'
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 //    compile files('lib/gson-2.3.1.jar')
@@ -57,4 +65,5 @@ dependencies {
 //    compile 'com.google.android.gms:play-services:7.0.0'
 //    compile 'com.android.support:appcompat-v7:22.0.+'
     compile 'com.android.support:recyclerview-v7:21.0.+'
+    compile 'me.villani.lorenzo.android:android-cropimage:1.1.0'
 }

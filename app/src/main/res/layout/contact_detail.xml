@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/istanbul_bg_blur"
+    android:gravity="bottom">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:paddingTop="55dp"
+        android:paddingBottom="20dp"
+        android:weightSum="1"
+        android:id="@+id/top">
+
+        <include android:id="@+id/app_bar" layout="@layout/toolbar_contacts"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="15dp"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/ivBtBack"
+                    android:src="@drawable/btn_back_white"
+                    android:layout_weight="5" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageView4"
+                    android:layout_weight="100" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Edit"
+                    android:id="@+id/btEdit"
+                    android:layout_weight="5"
+                    android:textColor="#ffffffff" />
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/roundborder"
+            android:id="@+id/ddd">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:id="@+id/contactImage"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_circle_contact_photo"
+                android:contentDescription="ContactBackground" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:paddingLeft="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="First, Last Name"
+                    android:id="@+id/contactName"
+                    android:textIsSelectable="false"
+                    android:textSize="@dimen/abc_text_size_large_material"
+                    android:textColor="#ffffffff"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="London, UK (2 days ago)"
+                    android:id="@+id/contactLocation"
+                    android:textColor="#ffffff" />
+
+                <TextClock
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textClock"
+                    android:layout_gravity="right"
+                    android:paddingRight="20dp"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#dcdde0"
+        android:id="@+id/content"
+        android:weightSum="1"
+        android:focusable="false">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/roundborder"
+            android:paddingTop="20dp"
+            android:id="@+id/aboutLayout"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:layout_margin="10dp"
+            android:layout_weight="0.86"
+            android:backgroundTint="#ffffff">
+
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/roundborder"
+            android:paddingTop="20dp"
+            android:id="@+id/contactLayout"
+            android:layout_margin="10dp"
+            android:layout_weight="0.09"
+            android:backgroundTint="#ffffff" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="56dp"
+        android:focusableInTouchMode="false"
+        android:id="@+id/bottom">
+
+        <!-- Footer -->
+        <RelativeLayout android:id="@+id/footer"
+            android:layout_width="fill_parent" android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_height="?attr/actionBarSize"
+                android:layout_width="match_parent"
+                android:orientation="vertical">
+
+                <include android:id="@+id/app_footer" layout="@layout/toolbar_footer"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+</LinearLayout>

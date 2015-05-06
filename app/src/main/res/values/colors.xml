@@ -11,4 +11,7 @@
     <color name="grey_sent">#aaaaaa</color>
     <color name="grey_chat_name">#a1a1a1</color>
 
+    <!--Profile colors-->
+    <color name="grey_profile_background">#f2f2f2</color>
+
 </resources>

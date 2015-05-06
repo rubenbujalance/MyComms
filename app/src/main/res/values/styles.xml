@@ -78,4 +78,21 @@
         <item name="android:textSize">10sp</item>
     </style>
 
+    <!--Profile styles-->
+    <style name="ProfileBox">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:background">@color/white</item>
+    </style>
+    <style name="TextViewProfile">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+    <style name="EditViewProfile">
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:enabled">false</item>
+    </style>
 </resources>

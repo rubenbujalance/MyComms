@@ -9,4 +9,9 @@ public class Constants {
     //Chat Constants
     public static final int LEFT_CHAT = 0;
     public static final int RIGHT_CHAT = 1;
+
+    //Profile Constants
+    public static final int PREFERENCES = 0;
+    public static final int ACCOUNTS = 1;
+    public static final int MY_PROFILE = 2;
 }

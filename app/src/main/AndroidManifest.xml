@@ -83,16 +83,18 @@
             android:label="@string/title_activity_mail_sent" >
         </activity>
         <activity
-            android:name=".SignupTypeChoose"
-            android:label="@string/title_activity_signup_type_choose" >
-        </activity>
-        <activity
             android:name=".login.SignupTypeChooseActivity"
             android:label="@string/title_activity_signup_type_choose" >
         </activity>
         <activity
             android:name=".login.LoginActivity"
             android:label="@string/title_activity_login" >
+        </activity>
+        <activity
+            android:name=".profile.ProfileMainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustPan"
+            android:label="@string/title_activity_profile">
         </activity>
     </application>
 

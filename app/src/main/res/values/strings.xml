@@ -83,4 +83,21 @@
     <string name="dont_have_salesforce">Don\'t have Salesforce?</string>
     <string name="forgot_password">Forgot password?</string>
 
+    <!-- Section profile list tab bar titles-->
+    <string name="profile_list_tab_preferences">Preferences</string>
+    <string name="profile_list_tab_accounts">Accounts</string>
+    <string name="profile_list_tab_my_profile">My Profile</string>
+    <string name="title_activity_profile">Profile</string>
+    <string-array name="phones_array">
+        <item>Mobile</item>
+        <item>Personal</item>
+        <item>Home</item>
+        <item>Work</item>
+    </string-array>
+    <string-array name="email_array">
+        <item>House</item>
+        <item>Work</item>
+        <item>Other</item>
+    </string-array>
+
 </resources>

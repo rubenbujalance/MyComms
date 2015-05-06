@@ -7,17 +7,16 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
+import com.vodafone.mycomms.profile.ProfileMainActivity;
 
 public class ToolbarActivity extends ActionBarActivity {
 
-    private String LOG_TAG = ToolbarActivity.class.getSimpleName();
     private Toolbar mToolbar;
     private Toolbar mFooter;
 
@@ -83,7 +82,6 @@ public class ToolbarActivity extends ActionBarActivity {
         footerHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(LOG_TAG, "footer_home: ");
                 Intent in = new Intent(context, ChatMainActivity.class);
                 startActivity(in);
             }
@@ -94,7 +92,6 @@ public class ToolbarActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 // set an exit transition
-                Log.i(LOG_TAG, "footer_profile: ");
                 Intent in = new Intent(context, ChatMainActivity.class);
                 startActivity(in);
                 overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
@@ -105,7 +102,6 @@ public class ToolbarActivity extends ActionBarActivity {
         footerComingsoon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(LOG_TAG, "coming_soon: ");
                 Intent in = new Intent(context, ChatMainActivity.class);
                 startActivity(in);
             }
@@ -117,8 +113,7 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(LOG_TAG, "contactsProfile: ");
-                Intent in = new Intent(context, ChatMainActivity.class);
+                Intent in = new Intent(context, ProfileMainActivity.class);
                 startActivity(in);
                 overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
             }
@@ -129,7 +124,6 @@ public class ToolbarActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 // set an exit transition
-                Log.i(LOG_TAG, "contactsSearch: ");
                 Intent in = new Intent(context, ChatMainActivity.class);
                 startActivity(in);
                 overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
@@ -140,7 +134,6 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(LOG_TAG, "contactsAdd: ");
                 Intent in = new Intent(context, ChatMainActivity.class);
                 startActivity(in);
             }

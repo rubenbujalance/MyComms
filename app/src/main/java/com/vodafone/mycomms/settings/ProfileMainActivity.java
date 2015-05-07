@@ -3,7 +3,9 @@ package com.vodafone.mycomms.settings;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -32,6 +34,14 @@ public class ProfileMainActivity extends ToolbarActivity implements ProfileFragm
             transaction.replace(R.id.sample_content_fragment, fragment);
             transaction.commit();
         }
+
+        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
+        ivBtBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     @Override

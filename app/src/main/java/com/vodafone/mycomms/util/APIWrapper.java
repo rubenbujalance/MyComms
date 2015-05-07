@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 public class APIWrapper {
 
@@ -174,6 +175,27 @@ public class APIWrapper {
             return true;
         else
             return false;
+    }
+
+    public static HashMap<String,Object> httpPostAPIMock (String restRequest, HashMap<String,Object> params, HashMap<String,Object> headers, Context context)
+    {
+        HashMap<String,Object> result = null;
+        Pattern p = Pattern.compile("/user/(.*)/password");
+
+        if(restRequest.compareTo("/api/profile")==0)
+        {
+
+        }
+        else if(restRequest.compareTo("/auth/login")==0)
+        {
+
+        }
+        else if(p.matcher(restRequest).matches())
+        {
+
+        }
+
+        return result;
     }
 }
 

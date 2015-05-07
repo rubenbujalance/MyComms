@@ -66,6 +66,7 @@
     
     <string name="user_already_exists">User already exists</string>
     <string name="the_entered_email_is_registered">The entered email is registered for another user. Please try with another email</string>
+    <string name="the_entered_email_is_registered_2">The entered email is registered. Please Login.</string>
     <string name="ok">OK</string>
     <string name="uh_oh">Uh Oh!</string>
     <string name="title_activity_mail_sent">MailSentActivity</string>

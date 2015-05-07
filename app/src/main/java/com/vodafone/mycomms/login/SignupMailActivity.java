@@ -122,13 +122,19 @@ public class SignupMailActivity extends Activity {
                     json.get("err") != null &&
                     ((String)json.get("err")).compareTo("auth_proxy_user_error")==0) {
                 title = getString(R.string.user_already_exists);
-                subtitle = getString(R.string.the_entered_email_is_registered);
+                subtitle = getString(R.string.the_entered_email_is_registered_2);
             }
             else if (status.compareTo("400") == 0 &&
                     json.get("err") != null &&
                     ((String)json.get("err")).compareTo("user_domain_not_allowed")==0) {
                 title = getString(R.string.uh_oh);
                 subtitle = "("+status+") "+json.get("des");
+            }
+            else if (status.compareTo("400") == 0 &&
+                    json.get("err") != null &&
+                    ((String)json.get("err")).compareTo("invalid_version")==0) {
+                title = getString(R.string.new_version_available);
+                subtitle = getString(R.string.must_update_to_last_application_version);
             }
             else
             {
@@ -147,11 +153,27 @@ public class SignupMailActivity extends Activity {
                 ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
                 builder.setCustomTitle(view);
 
-                builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }
-                });
+                if (status.compareTo("403") == 0 &&
+                        json.get("err") != null &&
+                        ((String)json.get("err")).compareTo("auth_proxy_user_error")==0) {
+                    builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent in = new Intent(SignupMailActivity.this, LoginActivity.class);
+                            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            in.putExtra("email",mEmail.getText().toString());
+                            startActivity(in);
+                            finish();
+                        }
+                    });
+                }
+                else
+                {
+                    builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+                }
 
                 builder.create();
                 builder.show();

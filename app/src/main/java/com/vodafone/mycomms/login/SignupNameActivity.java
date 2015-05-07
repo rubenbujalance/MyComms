@@ -201,6 +201,7 @@ public class SignupNameActivity extends Activity {
             mPhoto.setImageBitmap(bitmap);
             mPhoto.setBorderWidth(2);
             mPhoto.setBorderColor(Color.WHITE);
+            photoBitmap = bitmap;
         }
     }
 

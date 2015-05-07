@@ -36,7 +36,8 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/header"
-            android:layout_marginBottom="10dp">
+            android:layout_marginBottom="10dp"
+            android:paddingBottom="10dp">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -55,10 +56,9 @@
                     android:layout_weight="5" />
 
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="264dp"
+                    android:layout_height="95dp"
                     android:id="@+id/imageView4"
-                    android:layout_weight="100"
                     android:src="@drawable/cartoon_round_contact_image_example"
                     android:adjustViewBounds="false" />
 
@@ -75,7 +75,7 @@
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="20dp"
                 android:id="@+id/bottomHeader">
 
                 <LinearLayout
@@ -84,44 +84,64 @@
                     android:layout_height="fill_parent"
                     android:paddingLeft="20dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:text="First, Last Name"
-                        android:id="@+id/contactName"
-                        android:textIsSelectable="false"
-                        android:textSize="@dimen/abc_text_size_large_material"
-                        android:textColor="#ffffffff"
-                        android:textStyle="bold" />
+                        android:weightSum="1">
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="fill_parent"
+                            android:layout_weight="0.93">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="London, UK (2 days ago)"
-                        android:id="@+id/contactLocation"
-                        android:textColor="#ffffff" />
+                            <TextView
+                                android:layout_width="249dp"
+                                android:layout_height="wrap_content"
+                                android:text="First, Last Name"
+                                android:id="@+id/contactName"
+                                android:textIsSelectable="false"
+                                android:textSize="@dimen/abc_text_size_large_material"
+                                android:textColor="#ffffffff"
+                                android:textStyle="bold" />
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:id="@+id/imageView5"
-                        android:layout_gravity="right"
-                        android:src="@drawable/icon_dontdisturb_white"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginRight="20dp" />
+                            <TextView
+                                android:layout_width="211dp"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
+                                android:text="London, UK (2 days ago)"
+                                android:id="@+id/contactLocation"
+                                android:textColor="#ffffff" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
 
-                    <TextClock
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/textClock"
-                        android:layout_gravity="right"
-                        android:paddingRight="20dp"
-                        android:textColor="#ffffff" />
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:id="@+id/imageView5"
+                                android:src="@drawable/icon_dontdisturb_white"
+                                android:layout_marginBottom="10dp"
+                                android:layout_marginRight="20dp" />
+
+                            <TextView
+                                android:layout_width="45dp"
+                                android:layout_height="wrap_content"
+                                android:text="20:46"
+                                android:id="@+id/clock4"
+                                android:layout_gravity="right"
+                                android:textColor="#ffffffff" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </LinearLayout>
+
         </LinearLayout>
 
             <LinearLayout
@@ -151,8 +171,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/ProfileBox"
-                    android:layout_margin="15dp"
-                    android:background="@drawable/roundborder">
+                    android:background="@drawable/roundborder"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="5dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -177,8 +200,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/ProfileBox"
-                    android:layout_margin="15dp"
-                    android:background="@drawable/roundborder">
+                    android:background="@drawable/roundborder"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -202,10 +228,13 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -222,7 +251,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
@@ -242,7 +274,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
@@ -262,7 +297,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
@@ -282,7 +320,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">

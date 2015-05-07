@@ -16,8 +16,15 @@
             android:id="@+id/textView3"
             android:autoText="false" />
 
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vacation Time"
+            android:id="@+id/button2" />
+
         <Switch
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Do Not Disturb"
             android:id="@+id/switch1"
@@ -44,7 +51,7 @@
             android:autoText="false" />
 
         <Switch
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Share current time"
             android:id="@+id/switch2"
@@ -64,6 +71,13 @@
             android:text="ABOUT"
             android:id="@+id/textView6"
             android:autoText="false" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="About MyContacts"
+            android:id="@+id/button3" />
     </LinearLayout>
 
     <LinearLayout

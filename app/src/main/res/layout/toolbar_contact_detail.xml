@@ -1,7 +1,6 @@
 <android.support.v7.widget.Toolbar
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mycomms="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="?actionBarSize"
     mycomms:theme="@style/ActionBarThemeOverlay"
@@ -64,6 +63,7 @@
                 android:layout_marginRight="10dp"
                 android:background="@drawable/ic_enrroll_mail_white"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:contentDescription="Email Button" />
         </LinearLayout>
     </LinearLayout>

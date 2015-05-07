@@ -6,7 +6,7 @@
     android:layout_height="?actionBarSize"
     mycomms:theme="@style/ActionBarThemeOverlay"
     android:gravity="top"
-    android:background="@color/dim_foreground_material_dark"
+    android:background="#ff4a6776"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
 
     <LinearLayout

@@ -150,7 +150,9 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/ProfileBox">
+                    style="@style/ProfileBox"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/roundborder">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -174,8 +176,9 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    style="@style/ProfileBox">
+                    style="@style/ProfileBox"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/roundborder">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -199,7 +202,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
                     <TextView
@@ -218,7 +222,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
                     <TextView
@@ -237,7 +242,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
                     <TextView
@@ -256,7 +262,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
                     <TextView
@@ -275,8 +282,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
                     <TextView

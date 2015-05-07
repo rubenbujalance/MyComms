@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
@@ -34,16 +33,18 @@ public class ChatListViewArrayAdapter extends ArrayAdapter<DummyChatItem> {
 
             viewHolder = new ViewHolder();
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
+            viewHolder.lastEventDate = (TextView) convertView.findViewById(R.id.chat_list_item_last_event_day);
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
               viewHolder = (ViewHolder) convertView.getTag();
+
         }
 
         // update the item view
         Contact contact = getItem(position).getContact();
-         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
-
+        viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
+        viewHolder.lastEventDate.setText(getItem(position).getLastEventDate());
         return convertView;
     }
 
@@ -52,6 +53,6 @@ public class ChatListViewArrayAdapter extends ArrayAdapter<DummyChatItem> {
      */
     private static class ViewHolder {
         TextView textViewName;
-
+        TextView lastEventDate;
     }
 }

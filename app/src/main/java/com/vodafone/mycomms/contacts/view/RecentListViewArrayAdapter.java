@@ -37,6 +37,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
             viewHolder.textViewOccupation = (TextView) convertView.findViewById(R.id.list_item_content_occupation);
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
             viewHolder.imageViewRecentType = (ImageView) convertView.findViewById(R.id.list_item_recent_type_image);
+            viewHolder.textViewRecentItemTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
@@ -49,6 +50,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewOccupation.setText(contact.getOccupation());
+        viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
         //viewHolder.textViewTime.setText(contact.getTime());
 
         if(recentItem.getItemType() == RecentItem.RecentItemType.MAIL){
@@ -58,6 +60,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
         } else if (recentItem.getItemType() == RecentItem.RecentItemType.CHAT){
             viewHolder.imageViewRecentType.setImageResource(R.drawable.icon_recent_message);
         }
+
+
 
         return convertView;
     }
@@ -70,6 +74,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
         TextView textViewOccupation;
         TextView textViewCompany;
         TextView textViewTime;
+        TextView textViewRecentItemTime;
         ImageView imageViewRecentType;
     }
 }

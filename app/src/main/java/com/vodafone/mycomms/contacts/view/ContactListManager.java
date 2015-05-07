@@ -28,25 +28,25 @@ public class ContactListManager {
         addContact(new Contact("004", "Super" , "Tom", "House cat"            , "Tom and Jerry City" ,   "Hanna-Barbera", false, "01:50", "USA", false, false));
         addContact(new Contact("005", "Super" , "Jerry", "Mouse"            , "Tom and Jerry City" ,   "Hanna-Barbera", true , "09:15", "USA", true, false ));
 
-        addRecent(new RecentItem(contactList.get(0), RecentItem.RecentItemType.MAIL));
-        addRecent(new RecentItem(contactList.get(0) , RecentItem.RecentItemType.CALL));
-        addRecent(new RecentItem(contactList.get(0), RecentItem.RecentItemType.CHAT));
-        addRecent(new RecentItem(contactList.get(2), RecentItem.RecentItemType.CHAT));
-        addRecent(new RecentItem(contactList.get(3), RecentItem.RecentItemType.CHAT));
-        addRecent(new RecentItem(contactList.get(1), RecentItem.RecentItemType.MAIL));
+        addRecent(new RecentItem(contactList.get(0), RecentItem.RecentItemType.MAIL , "5 min"));
+        addRecent(new RecentItem(contactList.get(0) , RecentItem.RecentItemType.CALL , "4 hours"));
+        addRecent(new RecentItem(contactList.get(0), RecentItem.RecentItemType.CHAT, "8 hours" ));
+        addRecent(new RecentItem(contactList.get(2), RecentItem.RecentItemType.CHAT, "3 days"  ));
+        addRecent(new RecentItem(contactList.get(3), RecentItem.RecentItemType.CHAT, "4 days"));
+        addRecent(new RecentItem(contactList.get(1), RecentItem.RecentItemType.MAIL , "5 days"));
 
-        addChatItem(contactList.get(0));
-        addChatItem(contactList.get(1));
-        addChatItem(contactList.get(2));
-        addChatItem(contactList.get(3));
+        addChatItem(contactList.get(0), "Tue");
+        addChatItem(contactList.get(1), "4/24/15");
+        addChatItem(contactList.get(2), "4/19/15");
+        addChatItem(contactList.get(3), "3/22/15");
     }
 
     private void addRecent(RecentItem item) {
         recentList.add(item);
     }
 
-    private void addChatItem(Contact contact) {
-        chatList.add(new DummyChatItem(contact));
+    private void addChatItem(Contact contact, String lastEventTime) {
+        chatList.add(new DummyChatItem(contact, lastEventTime));
     }
 
     synchronized public static ContactListManager getInstance(){

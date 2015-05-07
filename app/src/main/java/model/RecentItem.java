@@ -9,9 +9,12 @@ public class RecentItem {
 
     private Contact contact;
 
-    public RecentItem(Contact contact, RecentItemType itemType){
+    private String recentEventTime;
+
+    public RecentItem(Contact contact, RecentItemType itemType, String recentEventTime){
         this.setItemType(itemType);
         this.setContact(contact);
+        this.setRecentEventTime(recentEventTime);
     }
 
     public RecentItemType getItemType() {
@@ -28,6 +31,14 @@ public class RecentItem {
 
     public void setContact(Contact contact) {
         this.contact = contact;
+    }
+
+    public String getRecentEventTime() {
+        return recentEventTime;
+    }
+
+    public void setRecentEventTime(String recentEventTime) {
+        this.recentEventTime = recentEventTime;
     }
 
     public enum RecentItemType {MAIL, CHAT, CALL}

@@ -7,9 +7,19 @@ public class DummyChatItem {
 
     private String lastMessage = "Me: And I say Hello Hello Hello!";
     private Contact contact;
+    private String lastEventDate;
 
-    public DummyChatItem(Contact contact){
+    public String getLastEventDate() {
+        return lastEventDate;
+    }
+
+    public void setLastEventDate(String lastEventDate) {
+        this.lastEventDate = lastEventDate;
+    }
+
+    public DummyChatItem(Contact contact, String lastEventDate){
         this.setContact(contact);
+        this.setLastEventDate(lastEventDate);
     }
 
 

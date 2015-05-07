@@ -1,5 +1,9 @@
 package com.vodafone.mycomms.main;
 
+import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.SystemUiHider;
+
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -52,28 +56,28 @@ public class SplashScreenActivity extends Activity {
 
     private void callBackVersionCheck(final String result)
     {
-        if(result != null) { //TODO - Remove "false" before pushing to Git
-        /*
-         * New version detected! Show an alert and start the update...
-         */
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.new_version_available));
-            builder.setMessage(getString(R.string.must_update_to_last_application_version));
-            builder.setCancelable(false);
-
-            builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    //Launch download and install
-                    new UpdateVersion().execute(result);
-                    dialog.dismiss();
-                }
-            });
-
-            builder.create();
-            builder.show();
-
-        }
-        else
+//        if(result != null) { //TODO - Remove "false" before pushing to Git
+//        /*
+//         * New version detected! Show an alert and start the update...
+//         */
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setTitle(getString(R.string.new_version_available));
+//            builder.setMessage(getString(R.string.must_update_to_last_application_version));
+//            builder.setCancelable(false);
+//
+//            builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//                    //Launch download and install
+//                    new UpdateVersion().execute(result);
+//                    dialog.dismiss();
+//                }
+//            });
+//
+//            builder.create();
+//            builder.show();
+//
+//        }
+//        else
         {
             Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
             startActivity(in);

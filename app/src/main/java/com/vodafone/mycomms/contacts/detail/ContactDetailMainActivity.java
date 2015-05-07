@@ -1,10 +1,12 @@
 package com.vodafone.mycomms.contacts.detail;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 public class ContactDetailMainActivity extends ToolbarActivity {
@@ -20,6 +22,15 @@ public class ContactDetailMainActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        ImageView btnChat = (ImageView)findViewById(R.id.btchat);
+
+        btnChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ContactDetailMainActivity.this, ChatMainActivity.class));
             }
         });
     }

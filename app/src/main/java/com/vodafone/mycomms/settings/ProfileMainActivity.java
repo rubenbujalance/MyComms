@@ -1,5 +1,6 @@
-package com.vodafone.mycomms.profile;
+package com.vodafone.mycomms.settings;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.WindowManager;
@@ -10,7 +11,7 @@ import com.vodafone.mycomms.util.ToolbarActivity;
 /**
  * Created by amg on 05/05/2015.
  */
-public class ProfileMainActivity extends ToolbarActivity implements ProfileFragment.OnFragmentInteractionListener{
+public class ProfileMainActivity extends ToolbarActivity implements ProfileFragment.OnFragmentInteractionListener, PreferencesFragment.OnFragmentInteractionListener{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 
@@ -43,5 +44,9 @@ public class ProfileMainActivity extends ToolbarActivity implements ProfileFragm
 
     @Override
     public void onFragmentInteraction(String id) {
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
     }
 }

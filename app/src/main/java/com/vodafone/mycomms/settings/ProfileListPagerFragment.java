@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.profile;
+package com.vodafone.mycomms.settings;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -53,8 +53,8 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
             switch (position){
                 case Constants.PREFERENCES:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
-                    ProfileFragment profileFragment2 = ProfileFragment.newInstance(position, "whatever");
-                    fragment = profileFragment2;
+                    PreferencesFragment preferencesFragment = PreferencesFragment.newInstance(position, "whatever");
+                    fragment = preferencesFragment;
                     break;
                 case Constants.ACCOUNTS:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);

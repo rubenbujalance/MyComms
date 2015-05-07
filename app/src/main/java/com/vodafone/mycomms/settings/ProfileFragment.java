@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.profile;
+package com.vodafone.mycomms.settings;
 
 import android.app.Activity;
 import android.os.Bundle;

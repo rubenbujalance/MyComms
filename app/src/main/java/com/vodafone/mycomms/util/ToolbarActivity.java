@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
-import com.vodafone.mycomms.profile.ProfileMainActivity;
+import com.vodafone.mycomms.settings.ProfileMainActivity;
 
 public class ToolbarActivity extends ActionBarActivity {
 

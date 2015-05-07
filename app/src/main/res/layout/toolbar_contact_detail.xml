@@ -6,8 +6,8 @@
     android:layout_height="?actionBarSize"
     mycomms:theme="@style/ActionBarThemeOverlay"
     android:gravity="top"
-    android:background="#ff4a6776"
-    mycomms:titleTextAppearance="@style/ActionBar.TitleText">
+    mycomms:titleTextAppearance="@style/ActionBar.TitleText"
+    android:background="#ff4a6b76">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,8 +16,9 @@
         android:layout_marginBottom="5dp"
         android:layout_marginRight="10dp"
         android:weightSum="3"
-        android:background="@android:color/transparent"
-        android:orientation="horizontal">
+        android:background="#ff4a6b76"
+        android:orientation="horizontal"
+        android:id="@+id/toolbar">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +57,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:gravity="center_horizontal" >
+            android:gravity="center_horizontal"
+            android:id="@+id/">
             <ImageView
                 android:id="@+id/more"
                 android:layout_width="wrap_content"

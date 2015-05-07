@@ -3,40 +3,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/contact_blur"
+    android:background="@drawable/istanbul_bg_blur"
     android:gravity="bottom"
-    android:baselineAligned="false"
-    android:backgroundTint="#ff00a2ff"
-    android:backgroundTintMode="multiply">
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_gravity="center"
-        android:paddingTop="55dp"
-        android:weightSum="1"
-        android:id="@+id/top"
-        android:layout_marginBottom="10dp">
-
-    </LinearLayout>
+    android:baselineAligned="false">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/scrollView">
+        android:id="@+id/scrollView"
+        android:layout_marginTop="10dp">
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/container">
+            android:id="@+id/container"
+            android:weightSum="1">
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:id="@+id/header"
-                android:layout_marginBottom="10dp">
+                android:layout_marginBottom="10dp"
+                android:paddingBottom="10dp"
+                android:layout_weight="6"
+                android:layout_gravity="center_horizontal">
 
                 <LinearLayout
                     android:orientation="horizontal"
@@ -55,18 +45,33 @@
                         android:layout_weight="5" />
 
                     <ImageView
-                        android:layout_width="wrap_content"
+                        android:layout_width="264dp"
                         android:layout_height="wrap_content"
-                        android:id="@+id/imageView4"
-                        android:layout_weight="100"
+                        android:id="@+id/avatar"
                         android:src="@drawable/cartoon_round_contact_image_example"
-                        android:adjustViewBounds="false" />
+                        android:adjustViewBounds="false"
+                        android:layout_weight="1.55" />
 
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:id="@+id/imageView8"
-                        android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha" />
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:id="@+id/iconStatus"
+                            android:background="@drawable/icoSunWhite" />
+
+                        <TextView
+                            android:layout_width="45dp"
+                            android:layout_height="29dp"
+                            android:text="20:46"
+                            android:id="@+id/clock4"
+                            android:layout_gravity="right"
+                            android:textColor="#ffffffff" />
+
+                    </LinearLayout>
 
 
                 </LinearLayout>
@@ -75,7 +80,7 @@
                     android:orientation="horizontal"
                     android:layout_width="fill_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="40dp"
+                    android:layout_marginTop="20dp"
                     android:id="@+id/bottomHeader">
 
                     <LinearLayout
@@ -84,50 +89,53 @@
                         android:layout_height="fill_parent"
                         android:paddingLeft="20dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
-                            android:text="First, Last Name"
-                            android:id="@+id/contactName"
-                            android:textIsSelectable="false"
-                            android:textSize="@dimen/abc_text_size_large_material"
-                            android:textColor="#ffffffff"
-                            android:textStyle="bold" />
+                            android:weightSum="1">
+                            <LinearLayout
+                                android:orientation="vertical"
+                                android:layout_width="wrap_content"
+                                android:layout_height="fill_parent"
+                                android:layout_weight="0.93"
+                                android:layout_gravity="center">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="London, UK (2 days ago)"
-                            android:id="@+id/contactLocation"
-                            android:textColor="#ffffff" />
+                                <TextView
+                                    android:layout_width="180dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="Smith Doe, John"
+                                    android:id="@+id/contactName"
+                                    android:textIsSelectable="false"
+                                    android:textSize="@dimen/abc_text_size_large_material"
+                                    android:textColor="#ffffffff"
+                                    android:textStyle="bold"
+                                    android:textAlignment="gravity"
+                                    android:layout_gravity="center" />
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:id="@+id/imageView5"
-                            android:layout_gravity="right"
-                            android:src="@drawable/icon_dontdisturb_white"
-                            android:layout_marginBottom="10dp"
-                            android:layout_marginRight="20dp" />
+                                <TextView
+                                    android:layout_width="165dp"
+                                    android:layout_height="match_parent"
+                                    android:textAppearance="?android:attr/textAppearanceSmall"
+                                    android:text="London, UK (2 days ago)"
+                                    android:id="@+id/contactLocation"
+                                    android:textColor="#ffffff"
+                                    android:textAlignment="gravity"
+                                    android:layout_gravity="center" />
+                            </LinearLayout>
 
-                        <TextClock
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/textClock"
-                            android:layout_gravity="right"
-                            android:paddingRight="20dp"
-                            android:textColor="#ffffff" />
+                        </LinearLayout>
 
                     </LinearLayout>
 
                 </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:background="#dcdde0"
                 android:id="@+id/content"
                 android:weightSum="1"
@@ -151,8 +159,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/ProfileBox"
-                    android:layout_margin="15dp"
-                    android:background="@drawable/roundborder">
+                    android:background="@drawable/roundborder"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="5dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -177,8 +188,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/ProfileBox"
-                    android:layout_margin="15dp"
-                    android:background="@drawable/roundborder">
+                    android:background="@drawable/roundborder"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -190,7 +204,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Email"
-                        android:text="andrew.wiggin@vodafone.com"
+                        android:text="john.smith@vodafone.com"
                         android:ems="10"
                         android:layout_below="@+id/email"
                         android:layout_alignParentLeft="true"
@@ -202,10 +216,13 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -216,13 +233,17 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Company name"
-                        android:id="@+id/company"/>
+                        android:id="@+id/company"
+                        android:text="MyComms Corp." />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
@@ -242,7 +263,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
@@ -262,7 +286,10 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
@@ -275,14 +302,17 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Office"
+                        android:hint="742, Evergreen Terrace"
                         android:id="@+id/office_location"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
                     android:background="@drawable/roundborder"
                     style="@style/ProfileBox"
                     android:orientation="vertical">
@@ -295,7 +325,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Additional"
+                        android:hint="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus volutpat ante sit amet ligula porttitor, a rhoncus tortor accumsan."
                         android:lines="3"
                         android:id="@+id/additional_info"/>
                 </LinearLayout>
@@ -306,12 +336,12 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:focusableInTouchMode="false"
         android:id="@+id/bottom">
 
         <!-- Footer -->
-        <RelativeLayout android:id="@+id/footer"
+        <!--<RelativeLayout android:id="@+id/footer"
             android:layout_width="fill_parent" android:orientation="horizontal"
             android:layout_alignParentBottom="true"
             android:layout_height="wrap_content">
@@ -326,7 +356,7 @@
 
             </LinearLayout>
 
-        </RelativeLayout>
+        </RelativeLayout>-->
 
     </LinearLayout>
 </LinearLayout>

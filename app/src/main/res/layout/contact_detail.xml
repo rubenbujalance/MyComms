@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/ivBtBack"
                     android:src="@drawable/btn_back_white"
-                    android:layout_weight="5" />
+                    android:focusable="false" />
 
                 <ImageView
                     android:layout_width="264dp"
@@ -61,7 +61,7 @@
                         android:layout_width="36dp"
                         android:layout_height="36dp"
                         android:id="@+id/iconStatus"
-                        android:background="@drawable/icoSunWhite" />
+                        android:background="@drawable/ico_sun_white" />
 
                     <TextView
                         android:layout_width="45dp"

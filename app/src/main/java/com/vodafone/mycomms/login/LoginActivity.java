@@ -56,6 +56,10 @@ public class LoginActivity extends ActionBarActivity {
         etPassword.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
+        String email = getIntent().getStringExtra("email");
+        if(email != null)
+            etEmail.setText(email);
+
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

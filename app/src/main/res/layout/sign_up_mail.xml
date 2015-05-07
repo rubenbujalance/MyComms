@@ -41,8 +41,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="center"
-        android:paddingTop="30dp"
-        android:paddingBottom="30dp">
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -65,16 +65,14 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:background="#ffffff"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:background="#ffffff">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#ffffff"
-            android:paddingTop="20dp">
+            android:layout_marginTop="20dp">
 
             <com.vodafone.mycomms.custom.ClearableEditText
                 android:layout_width="match_parent"

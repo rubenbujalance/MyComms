@@ -25,6 +25,7 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.layout_profile_activity);
         activateToolbar();
+        setToolbarTitle("Andrew Wiggins");
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;

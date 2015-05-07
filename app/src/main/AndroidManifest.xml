@@ -103,7 +103,7 @@
             android:windowSoftInputMode="stateAlwaysVisible|adjustPan" >
         </activity>
         <activity
-            android:name=".settings.ProfileMainActivity"
+            android:name=".settings.SettingsMainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateVisible|adjustPan"
             android:label="@string/title_activity_profile">
@@ -114,7 +114,8 @@
             android:windowSoftInputMode="stateAlwaysVisible|adjustPan" >
         </activity>
         <activity
-            android:name=".chatlist.ChatListActivity" >
+            android:name=".chatlist.ChatListActivity"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

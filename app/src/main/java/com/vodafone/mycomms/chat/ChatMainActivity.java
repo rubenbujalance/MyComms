@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
@@ -38,7 +39,15 @@ public class ChatMainActivity extends ToolbarActivity {
         setContentView(R.layout.activity_chat_main);
         activateToolbar();
         setToolbarBackground(R.drawable.toolbar_header);
+        setChatListeners(this);
 
+        ImageView backButton = (ImageView) findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         /*Toolbar mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

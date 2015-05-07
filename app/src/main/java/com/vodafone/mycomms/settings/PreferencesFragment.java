@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 
@@ -75,6 +76,9 @@ public class PreferencesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_preferences, container, false);
+
+        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+        //editProfile.setVisibility(View.INVISIBLE);
         return v;
     }
 

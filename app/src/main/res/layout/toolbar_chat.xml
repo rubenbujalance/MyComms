@@ -4,8 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="?actionBarSize"
     mycomms:theme="@style/ActionBarThemeOverlay"
+    mycomms:contentInsetEnd="0dp"
+    mycomms:contentInsetStart="0dp"
     android:gravity="top"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_marginLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_back_white"/>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

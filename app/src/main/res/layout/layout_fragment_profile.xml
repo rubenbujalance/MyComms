@@ -15,7 +15,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:background="@drawable/istanbul_bg_blur">
+                android:background="@drawable/istanbul_bg_blur_header">
 
                 <com.vodafone.mycomms.custom.CircleImageView
                     android:layout_width="96dp"
@@ -156,6 +156,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Company name"
+                        android:text="Vodafone"
                         android:id="@+id/company"/>
                 </LinearLayout>
 
@@ -175,6 +176,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Position"
+                        android:text="Leader"
                         android:id="@+id/position"/>
                 </LinearLayout>
 
@@ -194,6 +196,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Department"
+                        android:text="Human Resources"
                         android:id="@+id/department"/>
                 </LinearLayout>
 
@@ -213,6 +216,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Office"
+                        android:text="Barcelona"
                         android:id="@+id/office_location"/>
                 </LinearLayout>
 
@@ -233,6 +237,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Additional"
+                        android:text="That's me!"
                         android:lines="3"
                         android:id="@+id/additional_info"/>
                 </LinearLayout>

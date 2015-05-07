@@ -13,5 +13,10 @@ public class Constants {
     //Profile Constants
     public static final int PREFERENCES = 0;
     public static final int ACCOUNTS = 1;
-    public static final int MY_PROFILE = 2;
+    public static final int MY_PROFILE = 1;
+
+    //Footer Constants
+    public static final int CONTACTS = 0;
+    public static final int DASHBOARD = 1;
+    public static final int RECENTS = 2;
 }

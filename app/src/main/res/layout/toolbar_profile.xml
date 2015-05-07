@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="?actionBarSize"
+    mycomms:contentInsetEnd="0dp"
+    mycomms:contentInsetStart="0dp"
     mycomms:theme="@style/ActionBarThemeOverlay"
     android:gravity="top"
     android:background="@color/grey_toolbar"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_height="match_parent"
         android:layout_marginRight="10dp"
         android:background="@android:color/transparent"
         android:orientation="horizontal">
@@ -23,14 +23,15 @@
             android:id="@+id/ivBtBack"
             android:src="@drawable/btn_back_white"
             android:background="@android:color/transparent"
-            android:layout_alignParentBottom="true" />
+            android:layout_centerVertical="true"
+            android:paddingLeft="10dp"/>
 
         <TextView
             android:id="@+id/toolbar_title"
             android:layout_width="180dp"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
-            tools:text="Profile"
+            tools:text="Andrew Wiggins"
             android:textSize="22sp"
             android:gravity="center"
             android:layout_centerVertical="true"
@@ -45,7 +46,6 @@
             android:background="@android:color/transparent"
             android:textSize="22sp"
             android:layout_centerVertical="true"
-            android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"/>
     </RelativeLayout>

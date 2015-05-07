@@ -35,6 +35,8 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
             transaction.replace(R.id.sample_content_fragment, fragment);
             transaction.commit();
         }
+
+        activateFooterSelected(Constants.CONTACTS);
     }
 
 

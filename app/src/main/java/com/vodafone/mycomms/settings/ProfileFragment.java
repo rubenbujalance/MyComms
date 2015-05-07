@@ -58,6 +58,8 @@ public class ProfileFragment extends Fragment{
 
        initSpinners(v);
        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+       editProfile.setVisibility(View.VISIBLE);
+       Log.i(Constants.TAG, "ProfileFragment.onCreateView: ");
        editProfile.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {

@@ -45,7 +45,7 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
 
         @Override
         public int getCount() {
-            return 3;
+            return 2;
         }
         @Override
         public Fragment getItem(int position) {
@@ -56,11 +56,11 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
                     PreferencesFragment preferencesFragment = PreferencesFragment.newInstance(position, "whatever");
                     fragment = preferencesFragment;
                     break;
-                case Constants.ACCOUNTS:
+                /*case Constants.ACCOUNTS:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     ProfileFragment profileFragment3 = ProfileFragment.newInstance(position, "whatever");
                     fragment = profileFragment3;
-                    break;
+                    break;*/
                 case Constants.MY_PROFILE:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     ProfileFragment profileFragment = ProfileFragment.newInstance(position, "whatever");
@@ -76,8 +76,8 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
         public CharSequence getPageTitle(int position) {
             if(position == Constants.PREFERENCES)
                 return getString(R.string.profile_list_tab_preferences);
-            else if (position == Constants.ACCOUNTS)
-                return getString(R.string.profile_list_tab_accounts);
+            //else if (position == Constants.ACCOUNTS)
+            //    return getString(R.string.profile_list_tab_accounts);
             else if (position == Constants.MY_PROFILE){
                 return getString(R.string.profile_list_tab_my_profile);
             }

@@ -7,15 +7,18 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.ChatListActivity;
-import com.vodafone.mycomms.settings.ProfileMainActivity;
+import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
+import com.vodafone.mycomms.settings.SettingsMainActivity;
 
 public class ToolbarActivity extends ActionBarActivity {
 
@@ -80,33 +83,51 @@ public class ToolbarActivity extends ActionBarActivity {
     }
 
     protected void setFooterListeners(final Context context){
+
+        ImageView footerContacts = (ImageView) findViewById(R.id.footer_contacts);
         ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);
+        ImageView footerRecents = (ImageView) findViewById(R.id.footer_recents);
+
+        footerContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerProfile");
+                // set an exit transition
+                Intent in = new Intent(context, ContactListMainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(in);
+                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+            }
+        });
+
         footerHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Intent in = new Intent(context, ContactListMainActivity.class);
-                startActivity(in);
+                //Intent in = new Intent(context, ContactListMainActivity.class);
+                //startActivity(in);
             }
         });
 
-        ImageView footerProfile = (ImageView) findViewById(R.id.footer_profile);
-        footerProfile.setOnClickListener(new View.OnClickListener() {
+        footerRecents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // set an exit transition
-                Intent in = new Intent(context, ContactListMainActivity.class);
-                startActivity(in);
-                overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
-            }
-        });
-
-        ImageView footerComingsoon = (ImageView) findViewById(R.id.footer_coming_soon);
-        footerComingsoon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerRecents");
                 Intent in = new Intent(context, ChatListActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(in);
+                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+            }
+        });
+    }
+
+    protected void setChatListeners(final Context context) {
+        ImageView imageContact = (ImageView) findViewById(R.id.user_img);
+        imageContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(context, ContactDetailMainActivity.class);
+                startActivity(in);
+                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
     }
@@ -116,9 +137,9 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(context, ProfileMainActivity.class);
+                Intent in = new Intent(context, SettingsMainActivity.class);
                 startActivity(in);
-                overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
+                //overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
             }
         });
 
@@ -129,7 +150,7 @@ public class ToolbarActivity extends ActionBarActivity {
                 // set an exit transition
                 Intent in = new Intent(context, ChatMainActivity.class);
                 startActivity(in);
-                overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
+                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
 
@@ -141,5 +162,43 @@ public class ToolbarActivity extends ActionBarActivity {
                 startActivity(in);
             }
         });
+    }
+
+    public void activateFooterSelected(int selected){
+        LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
+        LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
+        LinearLayout layoutRecents = (LinearLayout) findViewById(R.id.footer_recents_layout);
+
+        ImageView footerContacts = (ImageView) findViewById(R.id.footer_contacts);
+        ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);
+        ImageView footerRecents = (ImageView) findViewById(R.id.footer_recents);
+
+        switch (selected){
+            case Constants.CONTACTS:
+                layoutContacts.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
+                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.icon_create_event_date_time));
+                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.icon_tabbar_contacts_selected));
+                } else{
+                    footerRecents.setBackground(getResources().getDrawable(R.drawable.icon_create_event_date_time));
+                    footerContacts.setBackground(getResources().getDrawable(R.drawable.icon_tabbar_contacts_selected));
+                }
+                break;
+            case Constants.DASHBOARD:
+                break;
+            case Constants.RECENTS:
+                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
+                layoutRecents.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.icon_tabbar_contacts_unselected));
+                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.icon_create_event_date_time_selected));
+                }else{
+                    footerContacts.setBackground(getResources().getDrawable(R.drawable.icon_tabbar_contacts_unselected));
+                    footerRecents.setBackground(getResources().getDrawable(R.drawable.icon_create_event_date_time_selected));
+                }
+                break;
+        }
     }
 }

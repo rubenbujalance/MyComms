@@ -5,8 +5,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.view.ContactListFragment;
-import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
@@ -28,6 +26,7 @@ public class ChatListActivity extends ToolbarActivity implements ChatListFragmen
 
         setFooterListeners(this);
         setContactsListeners(this);
+        activateFooterSelected(Constants.RECENTS);
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;

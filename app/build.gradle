@@ -15,7 +15,7 @@ android {
         applicationId "com.vodafone.mycomms"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 99999
+        versionCode 99999 //TODO - Set to 99999 before pushing to Git
         versionName "0.1"
         signingConfig signingConfigs.release
     }

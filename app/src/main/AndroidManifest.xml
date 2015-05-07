@@ -67,34 +67,47 @@
             android:theme="@style/Theme.AppCompat.Light"
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
-        <activity android:name=".ContactListMainActivity" >
+        <activity
+            android:name=".ContactListMainActivity"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".util.ToolbarActivity"
-            android:label="@string/title_activity_toolbar" >
+            android:label="@string/title_activity_toolbar"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".chat.ChatMainActivity"
-            android:windowSoftInputMode="stateVisible|adjustPan"
-            android:label="@string/title_activity_chat_main" >
+            android:label="@string/title_activity_chat_main"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustPan" >
         </activity>
         <activity
             android:name=".login.MailSentActivity"
-            android:label="@string/title_activity_mail_sent" >
+            android:label="@string/title_activity_mail_sent"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".login.SignupTypeChooseActivity"
-            android:label="@string/title_activity_signup_type_choose" >
+            android:label="@string/title_activity_signup_type_choose"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".login.LoginActivity"
-            android:label="@string/title_activity_login" >
+            android:label="@string/title_activity_login"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan" >
         </activity>
         <activity
             android:name=".profile.ProfileMainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateVisible|adjustPan"
             android:label="@string/title_activity_profile">
+        </activity>
+        <activity
+            android:name=".login.ForgotPassActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustPan" >
         </activity>
     </application>
 

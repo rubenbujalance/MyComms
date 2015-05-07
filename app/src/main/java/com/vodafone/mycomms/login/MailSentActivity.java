@@ -78,9 +78,9 @@ public class MailSentActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent in = new Intent(getApplicationContext(), LoginSignupActivity.class);
+        Intent in = new Intent(MailSentActivity.this, LoginSignupActivity.class);
+        in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(in);
-        finish();
     }
 
     public void callPhoneCheck(String pin)

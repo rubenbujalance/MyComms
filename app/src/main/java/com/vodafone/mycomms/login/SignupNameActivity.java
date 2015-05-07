@@ -5,20 +5,21 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.provider.MediaStore;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,12 +28,11 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
-import com.vodafone.mycomms.custom.RoundedImageView;
 
 public class SignupNameActivity extends Activity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    static final int REQUEST_IMAGE_GALLERY = 1;
+    static final int REQUEST_IMAGE_GALLERY = 2;
 
     CircleImageView mPhoto;
     ClearableEditText mFirstName;
@@ -118,22 +118,6 @@ public class SignupNameActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
-        {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            photoBitmap = imageBitmap;
-
-//            mPhoto.setBackgroundResource(R.drawable.roundedbutton);
-//            BitmapDrawable imgDrawable = new BitmapDrawable(getResources(), imageBitmap);
-            mPhoto.setImageBitmap(photoBitmap);
-            mPhoto.setBorderWidth(2);
-            mPhoto.setBorderColor(Color.WHITE);
-        }
-    }
-
     private void dispatchTakePictureIntent(String title, String subtitle) {
 
         //Build the alert dialog to let the user choose the origin of the picture
@@ -167,7 +151,7 @@ public class SignupNameActivity extends Activity {
                 {
                     in = new Intent();
                     in.setType("image/*");
-                    in.setAction(Intent.ACTION_GET_CONTENT);
+                    in.setAction(Intent.ACTION_PICK);
 
                     startActivityForResult(in, REQUEST_IMAGE_GALLERY);
                 }
@@ -182,6 +166,42 @@ public class SignupNameActivity extends Activity {
 
         builder.create();
         builder.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
+        {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            photoBitmap = imageBitmap;
+
+//            CropImageIntentBuilder in = new CropImageIntentBuilder(500,500,Uri.parse(getFilesDir()+"imageTemp"));
+//            startActivity(in);
+
+            mPhoto.setImageBitmap(photoBitmap);
+            mPhoto.setBorderWidth(2);
+            mPhoto.setBorderColor(Color.WHITE);
+        }
+        else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK)
+        {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            Bitmap bitmap = null;
+
+            if (cursor.moveToFirst()) {
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String filePath = cursor.getString(columnIndex);
+                bitmap = BitmapFactory.decodeFile(filePath);
+            }
+            cursor.close();
+
+            //Set bitmap to CircleImageView
+            mPhoto.setImageBitmap(bitmap);
+            mPhoto.setBorderWidth(2);
+            mPhoto.setBorderColor(Color.WHITE);
+        }
     }
 
     private boolean checkData()

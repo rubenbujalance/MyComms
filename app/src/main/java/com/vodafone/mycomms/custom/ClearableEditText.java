@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 
@@ -94,7 +95,22 @@ public class ClearableEditText extends RelativeLayout {
 
     public void setError(CharSequence error, Drawable icon)
     {
-        edit_text.setError(error,icon);
+        edit_text.setError(error, icon);
+    }
+
+    public void setOnEditorActionListener(TextView.OnEditorActionListener l)
+    {
+        edit_text.setOnEditorActionListener(l);
+    }
+
+    public void addTextChangedListener(TextWatcher w)
+    {
+        edit_text.addTextChangedListener(w);
+    }
+
+    public void setCompoundDrawables(Drawable l, Drawable t, Drawable r, Drawable b)
+    {
+        edit_text.setCompoundDrawables(l,t,r,b);
     }
 
 }

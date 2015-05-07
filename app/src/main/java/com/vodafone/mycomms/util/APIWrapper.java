@@ -2,14 +2,13 @@ package com.vodafone.mycomms.util;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.os.AsyncTask;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.util.Log;
 
 import com.vodafone.mycomms.EndpointWrapper;
 
-import org.apache.http.HeaderElement;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -21,12 +20,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -62,30 +55,7 @@ public class APIWrapper {
         try {
             HttpPost httpPost = new HttpPost(getHttpProtocol() + EndpointWrapper.getBaseURL() + restRequest);
 
-            /*
-             * Testing Code
-             */
-/*
-            params = new JSONObject();
-            params.put("firstName", "rubenF1");
-            params.put("lastName", "rubenL1");
-            params.put("country", "ES");
-            params.put("phone", "661350545");
-            params.put("email", "ruben_bujalance@stratesys-ts.com");
-            params.put("password", "123456aA");
-            params.put("avatar", "");
-            params.put("company", "Stratesys");
-            params.put("position", "Technical Senior Consultant");
-            params.put("officeLocation", "Barcelona");
-
-            headers = new HashMap<String,String>();
-//            headers.put("x-otp-pin","1234");
-*/
-            /*
-             * END Testing Code
-             */
-
-            //Set version in Header
+            //Set version and Content-Type in Header
             if(headers == null) headers = new HashMap<>();
 
             PackageInfo pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
@@ -95,6 +65,7 @@ public class APIWrapper {
             headers.put("x-mycomms-version","android/"+versionName+"."+versionCode);
             headers.put("Content-Type","application/json; charset=utf-8");
 
+            //Set body JSON
             ByteArrayEntity entity = new ByteArrayEntity(json.toString().getBytes("UTF8"));
             entity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json;charset=UTF-8"));
             httpPost.setEntity(entity);
@@ -120,37 +91,58 @@ public class APIWrapper {
         return httpResToHash(response);
     }
 
-    public static JSONObject httpGetAPI(String restRequest, JSONObject params, HashMap headers)
+    public static HashMap<String,Object> httpGetAPI(String restRequest, HashMap headers, Context context)
     {
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet(restRequest);
-        JSONObject response = null;
+        String url = getHttpProtocol() + EndpointWrapper.getBaseURL() + restRequest;
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpResponse httpResponse;
+        HttpGet httpGet;
 
         try {
-            HttpResponse execute = client.execute(httpGet);
-            InputStream content = execute.getEntity().getContent();
 
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(content));
-            String s = "";
+            httpGet = new HttpGet(url);
 
-            while ((s = buffer.readLine()) != null) {
-//                response += s;
+            //Set version and Content-Type in Header
+            if(headers == null) headers = new HashMap<>();
+
+            PackageInfo pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            int versionCode = pinfo.versionCode;
+            String versionName = pinfo.versionName;
+
+            headers.put("x-mycomms-version","android/"+versionName+"."+versionCode);
+            headers.put("Content-Type","application/json; charset=utf-8");
+
+            Iterator headersIt = headers.keySet().iterator();
+            String param;
+            String value;
+
+            while(headersIt.hasNext())
+            {
+                param = (String)headersIt.next();
+                value = (String)headers.get(param);
+                httpGet.addHeader(param, value);
             }
 
+            httpResponse = httpclient.execute(httpGet);
+
         } catch (Exception e) {
+            Log.d(Constants.TAG, "APIWrapper.httpGetAPI: ");
             e.printStackTrace();
+            return null;
         }
 
-        return response;
+        return httpResToHash(httpResponse);
     }
 
     private static HashMap<String,Object> httpResToHash(HttpResponse response)
     {
         if(response == null) return null;
         HashMap<String, Object> hash = new HashMap<>();
-
+        String textEntity = null;
         try {
-            String textEntity = EntityUtils.toString(response.getEntity());
+            if(response.getEntity() != null)
+                textEntity = EntityUtils.toString(response.getEntity());
+
             String contentType;
 
             if(textEntity != null && textEntity.length() > 0) {
@@ -172,6 +164,16 @@ public class APIWrapper {
         }
 
         return hash;
+    }
+
+    //Check network connection
+    public static boolean isConnected(Context context){
+        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected())
+            return true;
+        else
+            return false;
     }
 }
 

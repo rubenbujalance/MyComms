@@ -1,9 +1,5 @@
 package com.vodafone.mycomms.main;
 
-import com.vodafone.mycomms.util.APIWrapper;
-import com.vodafone.mycomms.util.SystemUiHider;
-
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -17,6 +13,7 @@ import android.os.Environment;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.SystemUiHider;
 
 import org.apache.http.HttpEntity;
@@ -55,7 +52,7 @@ public class SplashScreenActivity extends Activity {
 
     private void callBackVersionCheck(final String result)
     {
-        if(result != null) {
+        if(result != null) { //TODO - Remove "false" before pushing to Git
         /*
          * New version detected! Show an alert and start the update...
          */
@@ -78,10 +75,9 @@ public class SplashScreenActivity extends Activity {
         }
         else
         {
-//            Intent in = new Intent(getApplicationContext(), LoginSignupActivity.class);
-            Intent in = new Intent(getApplicationContext(), LoginSignupActivity.class);
-            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
             startActivity(in);
+            finish();
         }
     }
 

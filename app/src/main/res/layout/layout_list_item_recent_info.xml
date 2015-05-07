@@ -6,7 +6,7 @@
     android:paddingRight="12dp"
     >
 
-    <ImageView android:id="@+id/list_item_image_status_daynight"
+    <ImageView android:id="@+id/list_item_recent_type_image"
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:layout_gravity="right"
@@ -15,7 +15,7 @@
         android:src="@drawable/icon_sun"
         />
     <!-- Local Time -->
-    <TextView android:id="@+id/list_item_status_local_time"
+    <TextView android:id="@+id/list_item_recent_info_time"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:paddingLeft="4dip"
@@ -28,15 +28,5 @@
         android:textColor="@color/material_blue_grey_800"
         />
 
-    <TextView android:id="@+id/list_item_status_country"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:paddingLeft="4dip"
-        android:paddingRight="4dip"
-        android:textSize="10dip"
-        android:orientation="vertical"
-        android:text="Some country with long name"
-        android:textColor="@color/material_blue_grey_800"
-        android:layout_gravity="right"
-        />
+
 </LinearLayout>

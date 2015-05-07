@@ -11,8 +11,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
+import com.vodafone.mycomms.chatlist.ChatListActivity;
 import com.vodafone.mycomms.settings.ProfileMainActivity;
 
 public class ToolbarActivity extends ActionBarActivity {
@@ -78,21 +80,22 @@ public class ToolbarActivity extends ActionBarActivity {
     }
 
     protected void setFooterListeners(final Context context){
-        ImageView footerHome = (ImageView) findViewById(R.id.footer_profile);
+        ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);
         footerHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(context, ChatMainActivity.class);
+
+                Intent in = new Intent(context, ContactListMainActivity.class);
                 startActivity(in);
             }
         });
 
-        ImageView footerProfile = (ImageView) findViewById(R.id.footer_dashboard);
+        ImageView footerProfile = (ImageView) findViewById(R.id.footer_profile);
         footerProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // set an exit transition
-                Intent in = new Intent(context, ChatMainActivity.class);
+                Intent in = new Intent(context, ContactListMainActivity.class);
                 startActivity(in);
                 overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
@@ -102,7 +105,7 @@ public class ToolbarActivity extends ActionBarActivity {
         footerComingsoon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(context, ChatMainActivity.class);
+                Intent in = new Intent(context, ChatListActivity.class);
                 startActivity(in);
             }
         });

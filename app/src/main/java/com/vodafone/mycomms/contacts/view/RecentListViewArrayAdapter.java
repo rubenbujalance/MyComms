@@ -13,62 +13,63 @@ import com.vodafone.mycomms.R;
 import java.util.List;
 
 import model.Contact;
+import model.RecentItem;
 
 /**
  * Created by str_vig on 28/04/2015.
  */
-public class ListViewArrayAdapter extends ArrayAdapter<Contact> {
-
-    public ListViewArrayAdapter(Context context, List<Contact> items) {
-        super(context, R.layout.layout_list_item_contact, items);
+public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
+    public RecentListViewArrayAdapter(Context context, List<RecentItem> items) {
+        super(context, R.layout.layout_list_item_recent, items);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+        RecentViewHolder viewHolder;
 
         if(convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.layout_list_item_contact, parent, false);
+            convertView = inflater.inflate(R.layout.layout_list_item_recent, parent, false);
 
-            viewHolder = new ViewHolder();
+            viewHolder = new RecentViewHolder();
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
             viewHolder.textViewOccupation = (TextView) convertView.findViewById(R.id.list_item_content_occupation);
-            viewHolder.textViewCountry = (TextView) convertView.findViewById(R.id.list_item_status_country);
-            viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_status_local_time);
-            viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
+            viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
+            viewHolder.imageViewRecentType = (ImageView) convertView.findViewById(R.id.list_item_recent_type_image);
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
-              viewHolder = (ViewHolder) convertView.getTag();
+              viewHolder = (RecentViewHolder) convertView.getTag();
         }
 
         // update the item view
-        Contact contact = getItem(position);
-
+        RecentItem recentItem = getItem(position);
+        Contact contact = getItem(position).getContact();
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewOccupation.setText(contact.getOccupation());
-        viewHolder.textViewCountry.setText(contact.getCountry());
-        viewHolder.textViewTime.setText(contact.getTime());
-        if(contact.isDayTime()){
-            viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_sun);
-        }else{
-            viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_moon);
+        //viewHolder.textViewTime.setText(contact.getTime());
+
+        if(recentItem.getItemType() == RecentItem.RecentItemType.MAIL){
+            viewHolder.imageViewRecentType.setImageResource(R.drawable.btn_more_invite);
+        }else if(recentItem.getItemType() == RecentItem.RecentItemType.CALL){
+            viewHolder.imageViewRecentType.setImageResource(R.drawable.icon_recent_phone);
+        } else if (recentItem.getItemType() == RecentItem.RecentItemType.CHAT){
+            viewHolder.imageViewRecentType.setImageResource(R.drawable.icon_recent_message);
         }
+
         return convertView;
     }
 
     /**
      * The view holder design pattern
      */
-    private static class ViewHolder {
+    private static class RecentViewHolder {
         TextView textViewName;
         TextView textViewOccupation;
         TextView textViewCompany;
         TextView textViewTime;
-        TextView textViewCountry;
-        ImageView imageViewDayNight;
+        ImageView imageViewRecentType;
     }
 }

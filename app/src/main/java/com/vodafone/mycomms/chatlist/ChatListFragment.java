@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.contacts.view;
+package com.vodafone.mycomms.chatlist;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,7 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
+import com.vodafone.mycomms.chat.ChatMainActivity;
+import com.vodafone.mycomms.contacts.view.ContactListManager;
+import com.vodafone.mycomms.contacts.view.ListViewArrayAdapter;
+import com.vodafone.mycomms.contacts.view.RecentListViewArrayAdapter;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
@@ -23,10 +26,7 @@ import com.vodafone.mycomms.view.tab.SlidingTabLayout;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends ListFragment {
-
-    private SlidingTabLayout mSlidingTabLayout;
-    private ViewPager mViewPager;
+public class ChatListFragment extends ListFragment {
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -41,9 +41,9 @@ public class ContactListFragment extends ListFragment {
     private OnFragmentInteractionListener mListener;
 
     // TODO: Rename and change types of parameters
-    public static ContactListFragment newInstance(int index, String param2) {
+    public static ChatListFragment newInstance(int index, String param2) {
         Log.d(Constants.TAG, "ContactListFragment.newInstance: " +  index);
-        ContactListFragment fragment = new ContactListFragment();
+        ChatListFragment fragment = new ChatListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, index);
         args.putString(ARG_PARAM2, param2);
@@ -63,14 +63,14 @@ public class ContactListFragment extends ListFragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ContactListFragment() {
+    public ChatListFragment() {
 
     }
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "ContactListFragment.onCreate: ");
+        Log.d(Constants.TAG, "ChatListFragment.onCreate: ");
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
@@ -78,13 +78,8 @@ public class ContactListFragment extends ListFragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        if(mIndex == 0) {
-            setListAdapter(new ListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getFavouriteList()));
-        }else if(mIndex == 1 ){
-            setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getRecentList()));
-        }else{
-            setListAdapter(new ListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getContactList()));
-        }
+        setListAdapter(new ChatListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getChatList()));
+
 
     }
 
@@ -115,7 +110,7 @@ public class ContactListFragment extends ListFragment {
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
             Log.d(Constants.TAG, "ContactListFragment.onListItemClick: ");
-            Intent in = new Intent(getActivity(), ContactDetailMainActivity.class);
+            Intent in = new Intent(getActivity(), ChatMainActivity.class);
             startActivity(in);
             //TODO: Implement back navigation
         }

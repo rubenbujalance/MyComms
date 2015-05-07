@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:layout_width="70dp"
+    android:paddingRight="12dp"
+    >
+
+    <TextView android:id="@+id/chat_list_item_last_event_day"
+        android:layout_height="70dp"
+        android:layout_width="70dp"
+        android:paddingLeft="4dip"
+        android:paddingRight="4dip"
+        android:textSize="10dip"
+        android:orientation="vertical"
+        android:layout_gravity="right"
+        android:gravity="center"
+        android:text="Tue"
+        android:textColor="@color/material_blue_grey_800"
+        />
+</LinearLayout>

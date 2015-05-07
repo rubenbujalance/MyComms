@@ -66,7 +66,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            Log.d(Constants.TAG, "PagerAdapter.destroyItem: " + position);
+            Log.d(Constants.TAG, "ContactListPagerAdapter.destroyItem: ");
         }
     }
 }

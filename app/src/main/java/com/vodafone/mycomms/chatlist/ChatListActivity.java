@@ -1,9 +1,10 @@
-package com.vodafone.mycomms;
+package com.vodafone.mycomms.chatlist;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.util.Constants;
@@ -12,17 +13,17 @@ import com.vodafone.mycomms.util.ToolbarActivity;
 /**
  * Created by str_vig on 21/04/2015.
  */
-public class ContactListMainActivity extends ToolbarActivity implements ContactListFragment.OnFragmentInteractionListener{
+public class ChatListActivity extends ToolbarActivity implements ChatListFragment.OnFragmentInteractionListener{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "ContactListMainActivity.onCreate: ");
+        Log.d(Constants.TAG, "ChatMainActivity.onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
         activateToolbar();
-        setToolbarTitle("Contacts");
+        setToolbarTitle("Messages");
         activateFooter();
 
         setFooterListeners(this);
@@ -31,7 +32,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
             transaction = getSupportFragmentManager().beginTransaction();
-            ContactListPagerFragment fragment = new ContactListPagerFragment();
+            ChatListFragment fragment = new ChatListFragment();
             transaction.replace(R.id.sample_content_fragment, fragment);
             transaction.commit();
         }

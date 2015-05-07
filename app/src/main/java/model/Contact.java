@@ -118,4 +118,6 @@ public class Contact {
     public void setRecent(boolean isRecent) {
         this.isRecent = isRecent;
     }
+
+
 }

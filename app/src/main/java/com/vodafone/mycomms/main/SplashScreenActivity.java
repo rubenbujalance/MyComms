@@ -54,7 +54,8 @@ public class SplashScreenActivity extends Activity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        if(!APIWrapper.isConnected(this)) {
+        if(!APIWrapper.isConnected(this))
+        {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.no_internet_connection));

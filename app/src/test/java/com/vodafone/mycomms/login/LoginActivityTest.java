@@ -7,7 +7,7 @@ import android.test.AndroidTestCase;
  */
 public class LoginActivityTest extends AndroidTestCase {
 
-    @Overrqide
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
     }

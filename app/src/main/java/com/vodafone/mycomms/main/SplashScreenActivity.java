@@ -50,6 +50,34 @@ public class SplashScreenActivity extends Activity {
         mContext = this;
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        if(!APIWrapper.isConnected(this))
+        {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(getString(R.string.no_internet_connection));
+            builder.setMessage(getString(R.string.no_internet_connection_is_available));
+            builder.setCancelable(false);
+
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //Launch download and install
+                    dialog.dismiss();
+                    finish();
+                }
+            });
+
+            builder.create();
+            builder.show();
+        }
+        else {
+            new CheckVersionApi().execute(new HashMap<String, Object>(), null);
+        }
+    }
+
     private void callBackVersionCheck(final String result)
     {
         if(result != null) { //TODO - Remove "false" before pushing to Git
@@ -79,13 +107,6 @@ public class SplashScreenActivity extends Activity {
             startActivity(in);
             finish();
         }
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        new CheckVersionApi().execute(new HashMap<String, Object>(), null);
     }
 
     private class CheckVersionApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

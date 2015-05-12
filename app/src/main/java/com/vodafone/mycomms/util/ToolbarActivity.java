@@ -88,7 +88,11 @@ public class ToolbarActivity extends ActionBarActivity {
         ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);
         ImageView footerRecents = (ImageView) findViewById(R.id.footer_recents);
 
-        footerContacts.setOnClickListener(new View.OnClickListener() {
+        LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
+        LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
+        LinearLayout layoutRecents = (LinearLayout) findViewById(R.id.footer_recents_layout);
+
+        layoutContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerProfile");
@@ -100,7 +104,7 @@ public class ToolbarActivity extends ActionBarActivity {
             }
         });
 
-        footerHome.setOnClickListener(new View.OnClickListener() {
+        layoutDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Intent in = new Intent(context, ContactListMainActivity.class);
@@ -108,7 +112,7 @@ public class ToolbarActivity extends ActionBarActivity {
             }
         });
 
-        footerRecents.setOnClickListener(new View.OnClickListener() {
+        layoutRecents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerRecents");

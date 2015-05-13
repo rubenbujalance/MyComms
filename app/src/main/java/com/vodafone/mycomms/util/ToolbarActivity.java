@@ -88,13 +88,18 @@ public class ToolbarActivity extends ActionBarActivity {
         ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);
         ImageView footerRecents = (ImageView) findViewById(R.id.footer_recents);
 
-        footerContacts.setOnClickListener(new View.OnClickListener() {
+        LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
+        LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
+        LinearLayout layoutRecents = (LinearLayout) findViewById(R.id.footer_recents_layout);
+
+        layoutContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerProfile");
                 // set an exit transition
                 Intent in = new Intent(context, ContactListMainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
@@ -108,12 +113,13 @@ public class ToolbarActivity extends ActionBarActivity {
             }
         });
 
-        footerRecents.setOnClickListener(new View.OnClickListener() {
+        layoutRecents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerRecents");
                 Intent in = new Intent(context, ChatListActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }

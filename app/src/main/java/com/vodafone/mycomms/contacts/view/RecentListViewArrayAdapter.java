@@ -49,7 +49,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
         Contact contact = getItem(position).getContact();
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
-        viewHolder.textViewOccupation.setText(contact.getOccupation());
+        //viewHolder.textViewOccupation.setText(contact.getOccupation());
         viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
         //viewHolder.textViewTime.setText(contact.getTime());
 

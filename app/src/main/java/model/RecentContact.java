@@ -4,13 +4,10 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * Created by str_vig on 28/04/2015.
+ * Created by AMG on 12/05/2015.
  */
-public class Contact extends RealmObject {
-
-    @PrimaryKey
-    private String id;
-
+public class RecentContact extends RealmObject {
+    private int lastInteraction;
     private String platform;
     private String firstName;
     private String lastName;
@@ -23,10 +20,15 @@ public class Contact extends RealmObject {
     private int lastSeen;
     private String officeLocation;
 
-    public Contact() {
+    @PrimaryKey
+    private String id;
+
+    public RecentContact(){
+
     }
 
-    public Contact(String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String id) {
+    public RecentContact(int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String id) {
+        this.lastInteraction = lastInteraction;
         this.platform = platform;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -41,12 +43,12 @@ public class Contact extends RealmObject {
         this.id = id;
     }
 
-    public String getId() {
-        return id;
+    public int getLastInteraction() {
+        return lastInteraction;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setLastInteraction(int lastInteraction) {
+        this.lastInteraction = lastInteraction;
     }
 
     public String getPlatform() {
@@ -79,6 +81,22 @@ public class Contact extends RealmObject {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getPhones() {
+        return phones;
+    }
+
+    public void setPhones(String phones) {
+        this.phones = phones;
+    }
+
+    public String getEmails() {
+        return emails;
+    }
+
+    public void setEmails(String emails) {
+        this.emails = emails;
     }
 
     public String getPosition() {
@@ -121,19 +139,11 @@ public class Contact extends RealmObject {
         this.officeLocation = officeLocation;
     }
 
-    public String getPhones() {
-        return phones;
+    public String getId() {
+        return id;
     }
 
-    public void setPhones(String phones) {
-        this.phones = phones;
-    }
-
-    public String getEmails() {
-        return emails;
-    }
-
-    public void setEmails(String emails) {
-        this.emails = emails;
+    public void setId(String id) {
+        this.id = id;
     }
 }

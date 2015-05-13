@@ -1,0 +1,154 @@
+{
+  "data": [
+    {
+      "id": "row_id1",
+      "platform": "mc",
+      "firstName": "James",
+      "lastName": "Bond",
+      "avatar": "http://...",
+      "phones": [
+        {
+          "country": "ES",
+          "phone": "+34321654321"
+        },
+        {
+          "country": "US",
+          "phone": "+13213214321"
+        }
+      ],
+      "emails": [
+        {
+          "email": "email1@domain.com"
+        },
+        {
+          "email": "email2@domain.com"
+        }
+      ],
+      "position": "Spy",
+      "company": "MI6",
+      "timezone": "America",
+      "lastSeen": 123456789,
+      "officeLocation": "London"
+    },
+    {
+      "id": "row_id2",
+      "platform": "mc",
+      "firstName": "Stannis",
+      "lastName": "Baratheon",
+      "avatar": "http://...",
+      "phones": [
+        {
+          "country": "ES",
+          "phone": "+34321654321"
+        },
+        {
+          "country": "US",
+          "phone": "+13213214321"
+        }
+      ],
+      "emails": [
+        {
+          "email": "email1@domain.com"
+        },
+        {
+          "email": "email2@domain.com"
+        }
+      ],
+      "position": "King",
+      "company": "The Baratheons",
+      "timezone": "Westeros",
+      "lastSeen": 123456789,
+      "officeLocation": "Storm's End"
+    },
+    {
+      "id": "row_id3",
+      "platform": "mc",
+      "firstName": "Mad",
+      "lastName": "Max",
+      "avatar": "http://...",
+      "phones": [
+        {
+          "country": "ES",
+          "phone": "+34321654321"
+        },
+        {
+          "country": "US",
+          "phone": "+13213214321"
+        }
+      ],
+      "emails": [
+        {
+          "email": "email1@domain.com"
+        },
+        {
+          "email": "email2@domain.com"
+        }
+      ],
+      "position": "Driver",
+      "company": "Warner",
+      "timezone": "America/Los_Angeles",
+      "lastSeen": 123456789,
+      "officeLocation": "Australia"
+    },
+    {
+      "id": "row_id4",
+      "platform": "mc",
+      "firstName": "Scarlett",
+      "lastName": "Johannsson",
+      "avatar": "http://...",
+      "phones": [
+        {
+          "country": "ES",
+          "phone": "+34321654321"
+        },
+        {
+          "country": "US",
+          "phone": "+13213214321"
+        }
+      ],
+      "emails": [
+        {
+          "email": "email1@domain.com"
+        },
+        {
+          "email": "email2@domain.com"
+        }
+      ],
+      "position": "Actress",
+      "company": "Hollywood",
+      "timezone": "America",
+      "lastSeen": 123456789,
+      "officeLocation": "Los Angeles"
+    },
+    {
+      "id": "row_id5",
+      "platform": "mc",
+      "firstName": "Lionel",
+      "lastName": "Messi",
+      "avatar": "http://...",
+      "phones": [
+        {
+          "country": "ES",
+          "phone": "+34321654321"
+        },
+        {
+          "country": "US",
+          "phone": "+13213214321"
+        }
+      ],
+      "emails": [
+        {
+          "email": "email1@domain.com"
+        },
+        {
+          "email": "email2@domain.com"
+        }
+      ],
+      "position": "God",
+      "company": "FC Barcelona",
+      "timezone": "Catalunya",
+      "lastSeen": 123456789,
+      "officeLocation": "Barcelona"
+    }
+  ]
+}

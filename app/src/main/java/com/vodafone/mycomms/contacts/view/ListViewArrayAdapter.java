@@ -47,7 +47,7 @@ public class ListViewArrayAdapter extends ArrayAdapter<Contact> {
         // update the item view
         Contact contact = getItem(position);
 
-        viewHolder.textViewCompany.setText(contact.getCompany());
+        /*viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewOccupation.setText(contact.getOccupation());
         viewHolder.textViewCountry.setText(contact.getCountry());
@@ -56,7 +56,7 @@ public class ListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_sun);
         }else{
             viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_moon);
-        }
+        }*/
         return convertView;
     }
 

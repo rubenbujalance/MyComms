@@ -1,12 +1,18 @@
 package com.vodafone.mycomms.chat;
 
-public class ChatListItem {
+import io.realm.RealmObject;
+
+public class ChatListItem extends RealmObject {
     private String chatText;
     private int chatType;
 
     public ChatListItem(String chatText, int chatType) {
         this.chatText = chatText;
         this.chatType = chatType;
+    }
+
+    public ChatListItem(){
+
     }
 
     public String getChatText() {

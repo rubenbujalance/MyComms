@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +13,7 @@ import android.widget.ListView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.view.ContactListManager;
-import com.vodafone.mycomms.contacts.view.ListViewArrayAdapter;
-import com.vodafone.mycomms.contacts.view.RecentListViewArrayAdapter;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 /**
  * A fragment representing a list of Items.

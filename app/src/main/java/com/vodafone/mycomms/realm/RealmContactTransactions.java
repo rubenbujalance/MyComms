@@ -199,6 +199,7 @@ public class RealmContactTransactions {
         if (result1!=null){
             for (Contact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
+                Log.i(Constants.TAG, "RealmContactTransactions.getAllContacts: " + contactListItem.getFirstName());
             }
         }
         return contactArrayList;
@@ -226,6 +227,7 @@ public class RealmContactTransactions {
         if (result1!=null){
             for (FavouriteContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
+                Log.i(Constants.TAG, "RealmContactTransactions.getAllFavouriteContacts: " + contactListItem.getFirstName());
             }
         }
         return contactArrayList;

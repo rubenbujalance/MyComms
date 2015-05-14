@@ -16,6 +16,8 @@ import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
+import io.realm.Realm;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -27,6 +29,7 @@ public class ContactListFragment extends ListFragment {
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
+    private Realm realm;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -78,12 +81,16 @@ public class ContactListFragment extends ListFragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+        realm = Realm.getInstance(getActivity());
+        ContactListManager.getInstance().loadFakeContacts(getActivity(), realm);
+        ContactListManager.getInstance().loadFakeFavouriteContacts(getActivity(), realm);
+        Log.i(Constants.TAG, "ContactListFragment.onCreate: TEST");
         if(mIndex == 0) {
-            setListAdapter(new ListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getFavouriteList()));
+            setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getFavouriteList(getActivity(), realm)));
         }else if(mIndex == 1 ){
-            setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getRecentList()));
+            setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getRecentList(getActivity(), realm)));
         }else{
-            setListAdapter(new ListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getContactList()));
+            setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getContactList(getActivity(), realm)));
         }
 
     }
@@ -136,6 +143,9 @@ public class ContactListFragment extends ListFragment {
         public void onFragmentInteraction(String id);
     }
 
-
-
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realm.close();
+    }
 }

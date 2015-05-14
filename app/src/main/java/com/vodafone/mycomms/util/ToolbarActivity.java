@@ -180,7 +180,7 @@ public class ToolbarActivity extends ActionBarActivity {
         ImageView footerRecents = (ImageView) findViewById(R.id.footer_recents);
 
         switch (selected){
-            case Constants.CONTACTS:
+            case Constants.TOOLBAR_CONTACTS:
                 layoutContacts.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
                 layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
@@ -191,9 +191,9 @@ public class ToolbarActivity extends ActionBarActivity {
                     footerContacts.setBackground(getResources().getDrawable(R.drawable.icon_tabbar_contacts_selected));
                 }
                 break;
-            case Constants.DASHBOARD:
+            case Constants.TOOLBAR_DASHBOARD:
                 break;
-            case Constants.RECENTS:
+            case Constants.TOOLBAR_RECENTS:
                 layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
                 layoutRecents.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
 

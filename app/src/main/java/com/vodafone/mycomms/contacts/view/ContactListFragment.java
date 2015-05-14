@@ -10,13 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
+import java.util.List;
+
 import io.realm.Realm;
+import model.Contact;
 
 /**
  * A fragment representing a list of Items.
@@ -30,6 +34,7 @@ public class ContactListFragment extends ListFragment {
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private Realm realm;
+    private List<Contact> contactList;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -85,12 +90,13 @@ public class ContactListFragment extends ListFragment {
         ContactListManager.getInstance().loadFakeContacts(getActivity(), realm);
         ContactListManager.getInstance().loadFakeFavouriteContacts(getActivity(), realm);
         Log.i(Constants.TAG, "ContactListFragment.onCreate: TEST");
-        if(mIndex == 0) {
+        if(mIndex == Constants.CONTACTS_FAVOURITE) {
             setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getFavouriteList(getActivity(), realm)));
-        }else if(mIndex == 1 ){
+        }else if(mIndex == Constants.CONTACTS_RECENT){
             setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getRecentList(getActivity(), realm)));
-        }else{
-            setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getContactList(getActivity(), realm)));
+        }else if(mIndex == Constants.CONTACTS_ALL){
+            contactList = ContactListManager.getInstance().getContactList(getActivity(), realm);
+            setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList));
         }
 
     }
@@ -121,10 +127,13 @@ public class ContactListFragment extends ListFragment {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
-            Log.d(Constants.TAG, "ContactListFragment.onListItemClick: ");
             Intent in = new Intent(getActivity(), ContactDetailMainActivity.class);
-            startActivity(in);
             //TODO: Implement back navigation
+            if(mIndex == Constants.CONTACTS_ALL) {
+                in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId() );
+                Toast.makeText(getActivity(), "Contact clicked: " + contactList.get(position).getFirstName(), Toast.LENGTH_LONG).show();
+            }
+            startActivity(in);
         }
     }
 

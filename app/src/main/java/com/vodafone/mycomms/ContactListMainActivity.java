@@ -39,7 +39,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
             transaction.commit();
         }
 
-        activateFooterSelected(Constants.CONTACTS);
+        activateFooterSelected(Constants.TOOLBAR_CONTACTS);
         //Realm.deleteRealmFile(this);
         //realm = Realm.getInstance(this);
         //MockClass mockClass = new MockClass(this, realm);

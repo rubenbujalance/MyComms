@@ -26,7 +26,7 @@ public class ChatListActivity extends ToolbarActivity implements ChatListFragmen
 
         setFooterListeners(this);
         setContactsListeners(this);
-        activateFooterSelected(Constants.RECENTS);
+        activateFooterSelected(Constants.TOOLBAR_RECENTS);
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;

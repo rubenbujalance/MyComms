@@ -1,24 +1,47 @@
 apply plugin: 'com.android.application'
 
 android {
+    def versionPropsFile = file('version.properties')
+    def int version_Code
+    def String keyAliasMyCommsRel
+    def String keyPassMyCommsRel
+    def String keystoreRel
+    def String keystorePassRel
+
+    if (versionPropsFile.canRead()) {
+        def Properties versionProps = new Properties()
+
+        versionProps.load(new FileInputStream(versionPropsFile))
+        version_Code = versionProps['VERSION_CODE'].toInteger().intValue()
+        keyAliasMyCommsRel = versionProps['KEY_ALIAS']
+        keyPassMyCommsRel = versionProps['KEY_PASSWORD']
+        keystoreRel = versionProps['STORE_FILE']
+        keystorePassRel = versionProps['STORE_PASSWORD']
+
+    } else {
+        throw new GradleException("Could not read version.properties!")
+    }
+
     signingConfigs {
         release {
-            keyAlias System.getenv("KEY_ALIAS_MYCOMMS_REL")
-            keyPassword System.getenv("KEY_PASS_MYCOMMS_REL")
-            storeFile file(System.getenv("KEYSTORE_REL"))
-            storePassword System.getenv("KEYSTORE_PASS_REL")
+            keyAlias keyAliasMyCommsRel
+            keyPassword keyPassMyCommsRel
+            storeFile file(keystoreRel)
+            storePassword keystorePassRel
         }
     }
     compileSdkVersion 21
     buildToolsVersion '21.1.2'
+
     defaultConfig {
         applicationId "com.vodafone.mycomms"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 99999 //TODO - Set to 99999 before pushing to Git
+        versionCode version_Code
         versionName "0.1"
         signingConfig signingConfigs.release
     }
+
     buildTypes {
         release {
             minifyEnabled false

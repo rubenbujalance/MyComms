@@ -105,7 +105,7 @@ public class ToolbarActivity extends ActionBarActivity {
             }
         });
 
-        footerHome.setOnClickListener(new View.OnClickListener() {
+        layoutDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Intent in = new Intent(context, ContactListMainActivity.class);

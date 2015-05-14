@@ -11,6 +11,10 @@ import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+
 
 public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
@@ -19,13 +23,23 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     private Context mContext;
 
     public ChatRecyclerViewAdapter(Context context, ArrayList<ChatListItem> chatListItem) {
-        fakeDataLoad();
+        mContext = context;
+        /*fakeDataLoad();
         if (chatListItem != null) {
             for (int i=0;i<chatListItem.size();i++){
                 chatList.add(chatListItem.get(i));
             }
+        }*/
+        Realm realm = Realm.getInstance(mContext);
+        RealmQuery<ChatListItem> query = realm.where(ChatListItem.class);
+
+        // Execute the query:
+        RealmResults<ChatListItem> result1 = query.findAll();
+        if (result1!=null){
+            for (ChatListItem chatListItems : result1) {
+                chatList.add(chatListItems);
+            }
         }
-        mContext = context;
     }
 
     private void fakeDataLoad() {

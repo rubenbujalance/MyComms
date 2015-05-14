@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.chat;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,8 @@ import com.vodafone.mycomms.util.ToolbarActivity;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+
 public class ChatMainActivity extends ToolbarActivity {
 
     private String LOG_TAG = ChatMainActivity.class.getSimpleName();
@@ -28,6 +31,7 @@ public class ChatMainActivity extends ToolbarActivity {
     private EditText chatTextBox;
     private String chatText = "";
     private ArrayList<ChatListItem> chatList = new ArrayList<>();
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +74,6 @@ public class ChatMainActivity extends ToolbarActivity {
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
                 try {
                     chatText = cs.toString();
-                    Log.i(LOG_TAG,"Text Changed is: " + chatText);
                 } catch (Exception e) {
                     Log.e(LOG_TAG, "onTextChanged error: " + e.toString());
                 }
@@ -90,20 +93,44 @@ public class ChatMainActivity extends ToolbarActivity {
         sendChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(LOG_TAG,"Sending text " + chatText);
+                Log.i(LOG_TAG, "Sending text " + chatText);
                 sendText();
+            }
+        });
+
+        final Context mContext = this;
+        ImageView clearText = (ImageView) findViewById(R.id.send_image);
+        clearText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(LOG_TAG,"sendText()");
+                realm = Realm.getInstance(mContext);
+                realm.beginTransaction();
+                realm.clear(ChatListItem.class);
+                realm.commitTransaction();
+                mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
+                mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
             }
         });
     }
 
     private void sendText() {
+        // Obtain a Realm instance
+        realm = Realm.getInstance(this);
+
+        realm.beginTransaction();
         ChatListItem chatListItem = new ChatListItem(chatText, Constants.RIGHT_CHAT);
+        //ChatListItem chatItem = realm.createObject(ChatListItem.class); // Create a new object
+        //chatItem.setChatText(chatText);
+        //chatItem.setChatType(Constants.RIGHT_CHAT);
+        realm.copyToRealm(chatListItem);
+        realm.commitTransaction();
+
         chatList.add(chatListItem);
         mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
-        chatTextBox.setText("");
-        Log.i(LOG_TAG, "Adapter Set");
 
+        chatTextBox.setText("");
     }
 
     @Override
@@ -126,5 +153,13 @@ public class ChatMainActivity extends ToolbarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (realm != null){
+            realm.close();
+        }
     }
 }

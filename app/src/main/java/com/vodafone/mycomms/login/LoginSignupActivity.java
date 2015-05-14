@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 
 public class LoginSignupActivity extends Activity {
@@ -21,7 +22,9 @@ public class LoginSignupActivity extends Activity {
         btSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(LoginSignupActivity.this, SignupTypeChooseActivity.class);
+                //Intent in = new Intent(LoginSignupActivity.this, SignupTypeChooseActivity.class);
+                Intent in = new Intent(LoginSignupActivity.this, ContactListMainActivity.class); //TODO: Don't upload
+                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//TODO: Don't upload
                 startActivity(in);
             }
         });

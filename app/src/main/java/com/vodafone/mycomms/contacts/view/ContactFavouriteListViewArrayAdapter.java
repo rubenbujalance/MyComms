@@ -12,14 +12,14 @@ import com.vodafone.mycomms.R;
 
 import java.util.List;
 
-import model.Contact;
+import model.FavouriteContact;
 
 /**
  * Created by str_vig on 28/04/2015.
  */
-public class ListViewArrayAdapter extends ArrayAdapter<Contact> {
+public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<FavouriteContact> {
 
-    public ListViewArrayAdapter(Context context, List<Contact> items) {
+    public ContactFavouriteListViewArrayAdapter(Context context, List<FavouriteContact> items) {
         super(context, R.layout.layout_list_item_contact, items);
     }
 
@@ -34,8 +34,8 @@ public class ListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder = new ViewHolder();
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
-            viewHolder.textViewOccupation = (TextView) convertView.findViewById(R.id.list_item_content_occupation);
-            viewHolder.textViewCountry = (TextView) convertView.findViewById(R.id.list_item_status_country);
+            viewHolder.textViewPosition = (TextView) convertView.findViewById(R.id.list_item_content_position);
+            viewHolder.textViewOfficeLocation = (TextView) convertView.findViewById(R.id.list_item_office_location);
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_status_local_time);
             viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
             convertView.setTag(viewHolder);
@@ -45,18 +45,19 @@ public class ListViewArrayAdapter extends ArrayAdapter<Contact> {
         }
 
         // update the item view
-        Contact contact = getItem(position);
+        FavouriteContact contact = getItem(position);
 
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
-        viewHolder.textViewOccupation.setText(contact.getOccupation());
-        viewHolder.textViewCountry.setText(contact.getCountry());
-        viewHolder.textViewTime.setText(contact.getTime());
-        if(contact.isDayTime()){
+        viewHolder.textViewPosition.setText(contact.getPosition());
+        viewHolder.textViewOfficeLocation.setText(contact.getOfficeLocation());
+        viewHolder.textViewTime.setText(contact.getTimezone());
+        /*if(contact.isDayTime()){
             viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_sun);
         }else{
             viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_moon);
-        }
+        }*/
+        viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_sun);
         return convertView;
     }
 
@@ -65,10 +66,10 @@ public class ListViewArrayAdapter extends ArrayAdapter<Contact> {
      */
     private static class ViewHolder {
         TextView textViewName;
-        TextView textViewOccupation;
+        TextView textViewPosition;
         TextView textViewCompany;
         TextView textViewTime;
-        TextView textViewCountry;
+        TextView textViewOfficeLocation;
         ImageView imageViewDayNight;
     }
 }

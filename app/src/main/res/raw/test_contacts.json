@@ -123,8 +123,8 @@
     {
       "id": "row_id5",
       "platform": "mc",
-      "firstName": "Lionel",
-      "lastName": "Messi",
+      "firstName": "Fox",
+      "lastName": "Mulder",
       "avatar": "http://...",
       "phones": [
         {
@@ -144,11 +144,11 @@
           "email": "email2@domain.com"
         }
       ],
-      "position": "God",
-      "company": "FC Barcelona",
-      "timezone": "Catalunya",
+      "position": "Investigator",
+      "company": "FBI",
+      "timezone": "America",
       "lastSeen": 123456789,
-      "officeLocation": "Barcelona"
+      "officeLocation": "Massachussets"
     }
   ]
 }

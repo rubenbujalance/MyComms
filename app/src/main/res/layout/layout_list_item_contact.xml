@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:id="@+id/back"
+        android:tag="back"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/gold">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView5"
+            android:layout_alignParentEnd="false"
+            android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+            android:adjustViewBounds="true"
+            android:contentDescription="Favorite"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/front"
+        android:tag="front"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffffff">
     <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
         android:layout_width="70dp"
         android:layout_height = "70dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" />
     <include android:id="@+id/layout_list_item_content" layout="@layout/layout_list_item_content"
-        android:layout_width="wrap_content"
+        android:layout_width="184dp"
         android:layout_toRightOf="@id/layout_list_item_image"
         android:layout_height="70dp"
         android:layout_centerHorizontal="true"
         />
     <include android:id="@+id/layout_list_item_status"
         layout="@layout/layout_list_item_status"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height = "wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"/>
-</RelativeLayout>
+    </LinearLayout>
+</FrameLayout >

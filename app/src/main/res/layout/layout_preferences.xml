@@ -89,7 +89,7 @@
             android:layout_width="198dp"
             android:layout_height="35dp"
             android:text="Logout"
-            android:id="@+id/button"
+            android:id="@+id/btLogout"
             android:background="#ffff452b"
             android:singleLine="false"
             android:textColor="#ffffff"

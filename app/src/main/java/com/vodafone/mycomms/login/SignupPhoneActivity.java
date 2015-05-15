@@ -5,28 +5,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -139,7 +135,7 @@ public class SignupPhoneActivity extends Activity {
             }
             inputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(Constants.TAG, "SignupPhoneActivity.loadCountriesArray: \n" + e.toString());
         }
 
         ArrayList<HashMap<String,String>> data = null;
@@ -167,7 +163,7 @@ public class SignupPhoneActivity extends Activity {
                 data.add(map);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(Constants.TAG, "SignupPhoneActivity.loadCountriesArray: \n" + e.toString());
         }
 
         this.countries = data;

@@ -1,15 +1,21 @@
 package com.vodafone.mycomms.settings;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.login.LoginSignupActivity;
+import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UserSecurity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,6 +85,25 @@ public class PreferencesFragment extends Fragment {
 
         TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
         //editProfile.setVisibility(View.INVISIBLE);
+
+        Button btLogout = (Button)v.findViewById(R.id.btLogout);
+        btLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(Constants.TAG, "PreferencesFragment.onClick: Logout");
+                
+                //Reset user security data
+                UserSecurity.resetTokens(getActivity());
+
+                //Go to login page as a new task
+                Intent in = new Intent(getActivity(), LoginSignupActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(in);
+                getActivity().finish();
+            }
+        });
+
         return v;
     }
 

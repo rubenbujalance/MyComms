@@ -42,6 +42,14 @@ public class SignupTypeChooseActivity extends ActionBarActivity {
             }
         });
 
+        mSignupSalesforce.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(SignupTypeChooseActivity.this, OAuthActivity.class);
+                startActivity(in);
+            }
+        });
+
         //Button back
         mBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,7 +60,7 @@ public class SignupTypeChooseActivity extends ActionBarActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_signup_type_choose, menu);
         return true;

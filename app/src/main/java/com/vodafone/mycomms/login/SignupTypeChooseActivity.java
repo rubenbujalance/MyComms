@@ -1,8 +1,8 @@
 package com.vodafone.mycomms.login;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +25,14 @@ public class SignupTypeChooseActivity extends ActionBarActivity {
         mSignupEmail = (Button)findViewById(R.id.btSignupMail);
         mSignupSalesforce = (Button)findViewById(R.id.btSignupSalesforce);
         mBack = (ImageView)findViewById(R.id.btBack);
+
+        mSignupSalesforce.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent in = new Intent(SignupTypeChooseActivity.this, ContactListMainActivity.class);
+                //startActivity(in);
+            }
+        });
 
         mSignupEmail.setOnClickListener(new View.OnClickListener() {
             @Override

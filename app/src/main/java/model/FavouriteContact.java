@@ -4,12 +4,9 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * Created by str_vig on 28/04/2015.
+ * Created by AMG on 12/05/2015.
  */
-public class Contact extends RealmObject {
-
-    @PrimaryKey
-    private String id;
+public class FavouriteContact extends RealmObject {
 
     private String platform;
     private String firstName;
@@ -23,10 +20,13 @@ public class Contact extends RealmObject {
     private int lastSeen;
     private String officeLocation;
 
-    public Contact() {
+    @PrimaryKey
+    private String id;
+
+    public FavouriteContact() {
     }
 
-    public Contact(String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String id) {
+    public FavouriteContact(String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String id) {
         this.platform = platform;
         this.firstName = firstName;
         this.lastName = lastName;

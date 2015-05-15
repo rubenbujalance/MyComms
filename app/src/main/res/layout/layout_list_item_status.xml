@@ -28,7 +28,7 @@
         android:textColor="@color/material_blue_grey_800"
         />
 
-    <TextView android:id="@+id/list_item_status_country"
+    <TextView android:id="@+id/list_item_office_location"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:paddingLeft="4dip"

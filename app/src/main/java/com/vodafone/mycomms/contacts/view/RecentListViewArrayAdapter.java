@@ -34,7 +34,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
             viewHolder = new RecentViewHolder();
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
-            viewHolder.textViewOccupation = (TextView) convertView.findViewById(R.id.list_item_content_occupation);
+            viewHolder.textViewOccupation = (TextView) convertView.findViewById(R.id.list_item_content_position);
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
             viewHolder.imageViewRecentType = (ImageView) convertView.findViewById(R.id.list_item_recent_type_image);
             viewHolder.textViewRecentItemTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
@@ -49,7 +49,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
         Contact contact = getItem(position).getContact();
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
-        viewHolder.textViewOccupation.setText(contact.getOccupation());
+        //viewHolder.textViewPosition.setText(contact.getOccupation());
         viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
         //viewHolder.textViewTime.setText(contact.getTime());
 

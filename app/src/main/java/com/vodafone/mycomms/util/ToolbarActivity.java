@@ -99,6 +99,7 @@ public class ToolbarActivity extends ActionBarActivity {
                 // set an exit transition
                 Intent in = new Intent(context, ContactListMainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
@@ -118,6 +119,7 @@ public class ToolbarActivity extends ActionBarActivity {
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerRecents");
                 Intent in = new Intent(context, ChatListActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }

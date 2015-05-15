@@ -179,7 +179,7 @@ public class SignupMailActivity extends Activity {
                 builder.show();
             }
         } catch(Exception ex) {
-            ex.printStackTrace();
+            Log.e(Constants.TAG, "SignupMailActivity.callBackEmailCheck: \n" + ex.toString());
             return;
         }
     }

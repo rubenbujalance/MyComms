@@ -39,6 +39,11 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         activateFooterSelected(Constants.CONTACTS);
     }
 
+    //Prevent of going from main screen back to login
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {

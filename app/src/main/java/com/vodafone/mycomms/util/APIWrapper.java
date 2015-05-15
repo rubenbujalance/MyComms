@@ -85,7 +85,7 @@ public class APIWrapper {
             response = httpClient.execute(httpPost);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(Constants.TAG, "APIWrapper.httpPostAPI: \n" + e.toString());
             return null;
         }
 
@@ -126,9 +126,8 @@ public class APIWrapper {
 
             httpResponse = httpclient.execute(httpGet);
 
-        } catch (Exception e) {
-            Log.d(Constants.TAG, "APIWrapper.httpGetAPI: ");
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "APIWrapper.httpGetAPI: \n" + ex.toString());
             return null;
         }
 
@@ -160,7 +159,7 @@ public class APIWrapper {
             hash.put("status", String.valueOf(response.getStatusLine().getStatusCode()));
 
         } catch(Exception ex) {
-            ex.printStackTrace();
+            Log.e(Constants.TAG, "APIWrapper.httpResToHash: \n" + ex.toString());
             return null;
         }
 

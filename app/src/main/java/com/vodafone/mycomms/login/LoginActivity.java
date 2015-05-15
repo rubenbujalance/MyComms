@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +25,11 @@ import android.widget.TextView;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 
@@ -206,6 +211,14 @@ public class LoginActivity extends ActionBarActivity {
             }
             else
             {
+                //Get tokens and expiration data from http response
+                JSONObject jsonResponse = (JSONObject)result.get("json");
+                String accessToken = jsonResponse.getString("accessToken");
+                String refreshToken = jsonResponse.getString("refreshToken");
+                long expiresIn = jsonResponse.getLong("expiresIn");
+
+                UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
+
                 //Force hide keyboard
                 InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
                 mgr.hideSoftInputFromWindow(etEmail.getWindowToken(), 0);
@@ -216,8 +229,8 @@ public class LoginActivity extends ActionBarActivity {
                 finish();
             }
         } catch(Exception ex) {
-            ex.printStackTrace();
-            return;
+            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck: \n" + ex.toString());
+            finish();
         }
     }
 

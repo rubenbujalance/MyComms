@@ -24,5 +24,20 @@ public class Constants {
     public static final int CONTACTS_FAVOURITE = 0;
     public static final int CONTACTS_RECENT = 1;
     public static final int CONTACTS_ALL = 2;
+
+    //Contacts API and BD Fields
+    public static final String CONTACT_DATA = "data";
     public static final String CONTACT_ID = "id";
+    public static final String CONTACT_PLATFORM = "platform";
+    public static final String CONTACT_FNAME = "firstName";
+    public static final String CONTACT_LNAME = "lastName";
+    public static final String CONTACT_AVATAR = "avatar";
+    public static final String CONTACT_POSITION = "position";
+    public static final String CONTACT_COMPANY = "company";
+    public static final String CONTACT_TIMEZONE = "timezone";
+    public static final String CONTACT_LASTSEEN = "lastSeen";
+    public static final String CONTACT_OFFICE_LOC = "officeLocation";
+    public static final String CONTACT_PHONES = "phones";
+    public static final String CONTACT_EMAILS = "emails";
+
 }

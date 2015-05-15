@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.controller.ContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
@@ -23,6 +24,7 @@ import java.util.List;
 import io.realm.Realm;
 import model.Contact;
 import model.FavouriteContact;
+import model.RecentContact;
 
 /**
  * A fragment representing a list of Items.
@@ -38,8 +40,10 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
     private Realm realm;
     private List<Contact> contactList;
     private List<FavouriteContact> favouriteContactList;
+    private List<RecentContact> recentContactList;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     protected Handler handler = new Handler();
+    private ContactController mContactController;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -55,7 +59,6 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
 
     // TODO: Rename and change types of parameters
     public static ContactListFragment newInstance(int index, String param2) {
-        Log.d(Constants.TAG, "ContactListFragment.newInstance: " +  index);
         ContactListFragment fragment = new ContactListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PARAM1, index);
@@ -66,9 +69,8 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
 
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-       Log.d(Constants.TAG, "ContactListFragment.onCreateView: "  + mIndex);
-       View v = inflater.inflate(R.layout.layout_fragment_pager_list, container, false);
-       mSwipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_list, container, false);
+       View v = inflater.inflate(R.layout.layout_fragment_pager_messages_list, container, false);
+       mSwipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
        mSwipeRefreshLayout.setOnRefreshListener(this);
 
        return mSwipeRefreshLayout;
@@ -85,7 +87,6 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "ContactListFragment.onCreate: ");
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
@@ -94,20 +95,30 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
         }
 
         realm = Realm.getInstance(getActivity());
-        ContactListManager.getInstance().loadFakeContacts(getActivity(), realm);
-        ContactListManager.getInstance().loadFakeFavouriteContacts(getActivity(), realm);
-        Log.i(Constants.TAG, "ContactListFragment.onCreate: TEST");
+        mContactController = new ContactController(realm, getActivity());
+        //TODO: CALL A LA API PARA GET DE CONTACTOS. CUANDO ACABE LLAMAR CARGA DE LISTA POR SEGUNDA VEZ + setListAdapter
+        //TODO: CALL A LA API PARA GET DE FAVORITOS. CUANDO ACABE LLAMAR CARGA DE LISTA POR SEGUNDA VEZ + setListAdapter
+        //TODO: CALL A LA API PARA GET DE RECIENTES. CUANDO ACABE LLAMAR CARGA DE LISTA POR SEGUNDA VEZ + setListAdapter
+        //TODO: CALL A LA BD PARA CARGAR LISTA DE CONTACTOS (VIEJOS)
+        contactList = mContactController.getAllContacts();
+        //TODO: CALL A LA BD PARA CARGAR LISTA DE FAVORITOS (VIEJOS)
+        favouriteContactList = mContactController.getAllFavouriteContacts();
+        //TODO: CALL A LA BD PARA CARGAR LISTA DE RECIENTES (VIEJOS)
+        //recentContactList = mContactController.getAllRecentContacts();
+
+        mContactController.loadFakeContacts();
+        mContactController.loadFakeFavouriteContacts();
+
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
-            favouriteContactList = ContactListManager.getInstance().getFavouriteList(getActivity(), realm);
-            setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getFavouriteList(getActivity(), realm)));
+            setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
+                    mContactController.getAllFavouriteContacts()));
         }else if(mIndex == Constants.CONTACTS_RECENT){
-            //contactList = ContactListManager.getInstance().getContactList(getActivity(), realm);
-            setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getRecentList(getActivity(), realm)));
+            setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(),
+                    ContactListManager.getInstance().getRecentList(getActivity(), realm)));
         }else if(mIndex == Constants.CONTACTS_ALL){
-            contactList = ContactListManager.getInstance().getContactList(getActivity(), realm);
+            contactList = mContactController.getAllContacts();
             setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList));
         }
-
     }
 
     @Override

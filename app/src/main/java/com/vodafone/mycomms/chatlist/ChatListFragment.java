@@ -3,7 +3,9 @@ package com.vodafone.mycomms.chatlist;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +24,7 @@ import com.vodafone.mycomms.util.Constants;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ChatListFragment extends ListFragment {
+public class ChatListFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener{
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -35,6 +37,8 @@ public class ChatListFragment extends ListFragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    protected Handler handler = new Handler();
 
     // TODO: Rename and change types of parameters
     public static ChatListFragment newInstance(int index, String param2) {
@@ -49,10 +53,11 @@ public class ChatListFragment extends ListFragment {
 
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-       Log.d(Constants.TAG, "ContactListFragment.onCreateView: "  + mIndex);
-       View v = inflater.inflate(R.layout.layout_fragment_pager_list, container, false);
+       View v = inflater.inflate(R.layout.layout_fragment_pager_messages_list, container, false);
+       mSwipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_messages_list, container, false);
+       mSwipeRefreshLayout.setOnRefreshListener(this);
 
-       return v;
+       return mSwipeRefreshLayout;
    }
 
     /**
@@ -125,6 +130,18 @@ public class ChatListFragment extends ListFragment {
         public void onFragmentInteraction(String id);
     }
 
+    @Override
+    public void onRefresh() {
+        //TODO: Refresh function here. Filter tab
+        handler.postDelayed(testIsGood, 5000);
+    }
 
+    public Runnable testIsGood = new Runnable() {
+        @Override
+        public void run() {
+            Log.wtf(Constants.TAG, "ChatListFragment.run: TEEEEESTINGGGG");
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    };
 
 }

@@ -29,8 +29,8 @@ public class RealmContactTransactions {
     public void insertContact (Contact newContact){
         try {
             mRealm.beginTransaction();
-            Contact contact = mRealm.createObject(Contact.class);
-            contact.setId("XXX");
+            /*Contact contact = mRealm.createObject(Contact.class);
+            contact.setId(newContact.getId());
             contact.setFirstName(newContact.getFirstName());
             contact.setLastName(newContact.getLastName());
             contact.setPlatform(newContact.getPlatform());
@@ -42,9 +42,10 @@ public class RealmContactTransactions {
             contact.setOfficeLocation(newContact.getOfficeLocation());
 
             contact.setEmails(newContact.getEmails());
-            contact.setPhones(newContact.getPhones());
+            contact.setPhones(newContact.getPhones());*/
 
-            mRealm.copyToRealmOrUpdate(contact);
+            //mRealm.copyToRealmOrUpdate(contact);
+            mRealm.copyToRealmOrUpdate(newContact);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -56,9 +57,10 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            Contact contact;
+            //Contact contact;
             for (int i = 0; i < size; i++) {
-                contact = mRealm.createObject(Contact.class);
+                //contact = mRealm.createObject(Contact.class);
+               /* contact = new Contact();
                 contact.setId(contactArrayList.get(i).getId());
                 contact.setFirstName(contactArrayList.get(i).getFirstName());
                 contact.setLastName(contactArrayList.get(i).getLastName());
@@ -72,11 +74,13 @@ public class RealmContactTransactions {
 
                 contact.setEmails(contactArrayList.get(i).getEmails());
                 contact.setPhones(contactArrayList.get(i).getPhones());
-
-                mRealm.copyToRealmOrUpdate(contact);
+                //mRealm.copyToRealmOrUpdate(contact);
+                mRealm.copyToRealmOrUpdate(contact);*/
+                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
+            e.printStackTrace();
             Log.e(Constants.TAG, "RealmContactTransactions.insertContactList: " + e.toString());
         }
     }
@@ -84,8 +88,8 @@ public class RealmContactTransactions {
     public void insertFavouriteContact (FavouriteContact newContact){
         try {
             mRealm.beginTransaction();
-            FavouriteContact contact = mRealm.createObject(FavouriteContact.class);
-            contact.setId("XXX");
+            /*FavouriteContact contact = mRealm.createObject(FavouriteContact.class);
+            contact.setId(newContact.getId());
             contact.setFirstName(newContact.getFirstName());
             contact.setLastName(newContact.getLastName());
             contact.setPlatform(newContact.getPlatform());
@@ -99,7 +103,8 @@ public class RealmContactTransactions {
             contact.setEmails(newContact.getEmails());
             contact.setPhones(newContact.getPhones());
 
-            mRealm.copyToRealmOrUpdate(contact);
+            mRealm.copyToRealmOrUpdate(contact);*/
+            mRealm.copyToRealmOrUpdate(newContact);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -111,9 +116,10 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            FavouriteContact contact;
+            //FavouriteContact contact;
             for (int i = 0; i < size; i++) {
-                contact = mRealm.createObject(FavouriteContact.class);
+                //contact = mRealm.createObject(FavouriteContact.class);
+                /*contact = new FavouriteContact();
                 contact.setId(contactArrayList.get(i).getId());
                 contact.setFirstName(contactArrayList.get(i).getFirstName());
                 contact.setLastName(contactArrayList.get(i).getLastName());
@@ -126,9 +132,10 @@ public class RealmContactTransactions {
                 contact.setOfficeLocation(contactArrayList.get(i).getOfficeLocation());
 
                 contact.setEmails(contactArrayList.get(i).getEmails());
-                contact.setPhones(contactArrayList.get(i).getPhones());
+                contact.setPhones(contactArrayList.get(i).getPhones());*/
 
-                mRealm.copyToRealmOrUpdate(contact);
+                //mRealm.copyToRealmOrUpdate(contact);
+                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -139,8 +146,8 @@ public class RealmContactTransactions {
     public void insertRecentContact (RecentContact newContact){
         try {
             mRealm.beginTransaction();
-            RecentContact contact = mRealm.createObject(RecentContact.class);
-            contact.setId("XXX");
+            /*RecentContact contact = mRealm.createObject(RecentContact.class);
+            contact.setId(newContact.getId());
             contact.setFirstName(newContact.getFirstName());
             contact.setLastName(newContact.getLastName());
             contact.setPlatform(newContact.getPlatform());
@@ -152,9 +159,9 @@ public class RealmContactTransactions {
             contact.setOfficeLocation(newContact.getOfficeLocation());
 
             contact.setEmails(newContact.getEmails());
-            contact.setPhones(newContact.getPhones());
+            contact.setPhones(newContact.getPhones());*/
 
-            mRealm.copyToRealmOrUpdate(contact);
+            mRealm.copyToRealmOrUpdate(newContact);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -166,9 +173,10 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            RecentContact contact;
+            //RecentContact contact;
             for (int i = 0; i < size; i++) {
-                contact = mRealm.createObject(RecentContact.class);
+                //contact = mRealm.createObject(RecentContact.class);
+                /*contact = new RecentContact();
                 contact.setId(contactArrayList.get(i).getId());
                 contact.setFirstName(contactArrayList.get(i).getFirstName());
                 contact.setLastName(contactArrayList.get(i).getLastName());
@@ -181,9 +189,10 @@ public class RealmContactTransactions {
                 contact.setOfficeLocation(contactArrayList.get(i).getOfficeLocation());
 
                 contact.setEmails(contactArrayList.get(i).getEmails());
-                contact.setPhones(contactArrayList.get(i).getPhones());
+                contact.setPhones(contactArrayList.get(i).getPhones());*/
 
-                mRealm.copyToRealmOrUpdate(contact);
+                //mRealm.copyToRealmOrUpdate(contact);
+                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){

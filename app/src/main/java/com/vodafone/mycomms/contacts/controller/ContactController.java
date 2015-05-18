@@ -106,6 +106,7 @@ public class ContactController {
     public Contact mapContact(JSONObject jsonObject){
         Contact contact = new Contact();
         try {
+            if (!jsonObject.isNull(Constants.CONTACT_ID)) contact.setId(jsonObject.getString(Constants.CONTACT_ID));
             if (!jsonObject.isNull(Constants.CONTACT_DATA)) contact.setId(jsonObject.getString(Constants.CONTACT_DATA));
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
@@ -226,7 +227,7 @@ public class ContactController {
     }
 
     public void loadFakeContacts() {
-        if (realmContactTransactions.getAllContacts().size() == 0){
+        //if (realmContactTransactions.getAllContacts().size() == 0){
             InputStream stream = null;
             stream = mContext.getResources().openRawResource(R.raw.test_contacts);
             JsonElement json = new JsonParser().parse(new InputStreamReader(stream));
@@ -251,11 +252,11 @@ public class ContactController {
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "loadFakeContacts: " + e.toString());
             }
-        }
+        //}
     }
 
     public void loadFakeFavouriteContacts() {
-        if (realmContactTransactions.getAllFavouriteContacts().size() == 0){
+        //if (realmContactTransactions.getAllFavouriteContacts().size() == 0){
             InputStream stream = null;
             stream = mContext.getResources().openRawResource(R.raw.test_contacts);
             JsonElement json = new JsonParser().parse(new InputStreamReader(stream));
@@ -282,6 +283,6 @@ public class ContactController {
                 e.printStackTrace();
                 Log.e(Constants.TAG, "loadFakeFavouriteContact: " + e.toString());
             }
-        }
+        //}
     }
 }

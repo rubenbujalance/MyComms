@@ -15,7 +15,8 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView5"
+            android:id="@+id/btFavorite"
+            android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha" />
             android:layout_alignParentEnd="false"
             android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha"
             android:adjustViewBounds="true"

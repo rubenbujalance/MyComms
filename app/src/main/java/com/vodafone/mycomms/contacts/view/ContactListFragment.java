@@ -2,6 +2,7 @@ package com.vodafone.mycomms.contacts.view;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ListFragment;
@@ -11,8 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
+import com.fortysevendeg.swipelistview.SwipeListView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.controller.ContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
@@ -44,6 +48,8 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
     private SwipeRefreshLayout mSwipeRefreshLayout;
     protected Handler handler = new Handler();
     private ContactController mContactController;
+    private ContactListViewArrayAdapter adapter;
+    private SwipeListView swipeListView;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -73,8 +79,35 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
        mSwipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
        mSwipeRefreshLayout.setOnRefreshListener(this);
 
+       final SwipeListView swipeListView = (SwipeListView) v.findViewById(android.R.id.list);
+       swipeListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
+           @Override
+           public void onOpened(int position, boolean toRight) {
+               View v = swipeListView.getChildAt(position);
+               swipeListView.getChildAt(position).setBackgroundColor(Color.CYAN);
+               final ImageView favContact = (ImageView) swipeListView.findViewById(R.id.fav_contact);
+               favContact.setOnClickListener((new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+                       Log.i(Constants.TAG, "ContactListFragment.onClick: TESTING");
+                       favContact.setImageDrawable(getResources().getDrawable(R.drawable.abc_btn_rating_star_on_mtrl_alpha));
+                   }
+               }));
+
+
+           }
+
+           @Override
+           public void onClosed(int position, boolean fromRight) {
+           }
+
+           @Override
+           public void onListChanged() {
+           }
+       });
+
        return mSwipeRefreshLayout;
-   }
+    }
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -87,6 +120,7 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(Constants.TAG, "ContactListFragment.onCreate: ");
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {

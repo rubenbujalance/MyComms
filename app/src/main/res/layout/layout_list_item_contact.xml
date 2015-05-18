@@ -15,7 +15,9 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/imageView5"
+            android:id="@+id/btFavorite"
+            android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha" />
+            android:id="@+id/fav_contact"
             android:layout_alignParentEnd="false"
             android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha"
             android:adjustViewBounds="true"
@@ -29,7 +31,8 @@
         android:tag="front"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffffff">
+        android:background="#ffffffff"
+        android:layout_marginLeft="5dp">
     <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
         android:layout_width="70dp"
         android:layout_height = "70dp"

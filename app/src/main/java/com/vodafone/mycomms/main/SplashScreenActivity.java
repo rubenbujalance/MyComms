@@ -10,24 +10,26 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.SystemUiHider;
+import com.vodafone.mycomms.util.UserSecurity;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
@@ -80,32 +82,46 @@ public class SplashScreenActivity extends Activity {
 
     private void callBackVersionCheck(final String result)
     {
-        //if(result == null) { //TODO - Remove before pushing to Git
-        if(result != null) {
+        try {
+            if(result == null) { //TODO - Remove before pushing to Git
+            //if(result != null) {
         /*
          * New version detected! Show an alert and start the update...
          */
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.new_version_available));
-            builder.setMessage(getString(R.string.must_update_to_last_application_version));
-            builder.setCancelable(false);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(getString(R.string.new_version_available));
+                builder.setMessage(getString(R.string.must_update_to_last_application_version));
+                builder.setCancelable(false);
 
-            builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    //Launch download and install
-                    new UpdateVersion().execute(result);
-                    dialog.dismiss();
+                builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Launch download and install
+                        new UpdateVersion().execute(result);
+                        dialog.dismiss();
+                    }
+                });
+
+                builder.create();
+                builder.show();
+
+            } else {
+                //If version is correct, check login
+                if (UserSecurity.isUserLogged(this)) {
+                    if (UserSecurity.hasExpired(this)) {
+                        renewToken();
+                    } else {
+                        Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                        startActivity(in);
+                        finish();
+                    }
+                } else {
+                    Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
+                    startActivity(in);
+                    finish();
                 }
-            });
-
-            builder.create();
-            builder.show();
-
-        }
-        else
-        {
-            Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
-            startActivity(in);
+            }
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: \n" + ex.toString());
             finish();
         }
     }
@@ -114,28 +130,7 @@ public class SplashScreenActivity extends Activity {
 
         @Override
         protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
-
-            HashMap<String,Object> response = null;
-            HashMap<String,Object> hashParams = params[0];
-            HashMap<String,Object> hashHeaders = params[1];
-
-//            //Build the JSONObject params
-//            Iterator<String> it = hashParams.keySet().iterator();
-//            String key,value = null;
-//
-//            JSONObject httpParams = new JSONObject();
-//
-//            try {
-//                while (it.hasNext()) {
-//                    key = it.next();
-//                    value = hashParams.get(key);
-//                    httpParams.put(key, value);
-//                }
-//            } catch (Exception ex) { ex.printStackTrace(); }
-
-            response = APIWrapper.httpPostAPI("/version",hashParams,hashHeaders, SplashScreenActivity.this);
-
-            return response;
+            return APIWrapper.httpPostAPI("/version",params[0],params[1], SplashScreenActivity.this);
         }
 
         @Override
@@ -161,7 +156,7 @@ public class SplashScreenActivity extends Activity {
                     callBackVersionCheck(null);
                 }
             } catch(Exception ex) {
-                ex.printStackTrace();
+                Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: \n" + ex.toString());
                 finish();
             }
         }
@@ -240,11 +235,8 @@ public class SplashScreenActivity extends Activity {
                         instream.close();// till here, it works fine - .apk is download to my sdcard in download file
                     }
 
-                } catch (ConnectTimeoutException cte) {
-                    cte.printStackTrace();
-                    return false;
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e(Constants.TAG, "UpdateVersion.downloadAndInstall: \n" + e.toString());
                     return false;
                 } finally {
                     m_httpClient.getConnectionManager().closeExpiredConnections();
@@ -257,15 +249,66 @@ public class SplashScreenActivity extends Activity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            } catch (Exception e1) {
-                e1.printStackTrace();
+            } catch (Exception ex) {
+                Log.e(Constants.TAG, "UpdateVersion.downloadAndInstall: \n" + ex.toString());
                 return false;
             }
 
             return true;
+        }
+    }
+
+    public void renewToken()
+    {
+        HashMap<String,Object> params = new HashMap<>();
+        params.put("accessToken", UserSecurity.getAccessToken(this));
+        params.put("refreshToken", UserSecurity.getRefreshToken(this));
+
+        new RenewTokenAPI().execute(params, null);
+    }
+
+    private void callBackRenewToken(HashMap<String, Object> result)
+    {
+        String status = (String)result.get("status");
+
+        try {
+            if (status.compareTo("200") == 0) {
+                //Renew succeeded, save tokens and go to app
+
+                //Get tokens and expiration data from http response
+                //Renew doesn't return refresh token
+                JSONObject jsonResponse = (JSONObject)result.get("json");
+                String accessToken = jsonResponse.getString("accessToken");
+                long expiresIn = jsonResponse.getLong("expiresIn");
+
+                UserSecurity.setTokens(accessToken, null, expiresIn, this);
+
+                //Go to app
+                Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                startActivity(in);
+                finish();
+            }
+            else
+            {
+                //Renew failed, go to login
+                Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
+                startActivity(in);
+                finish();
+            }
+        } catch(Exception ex) {
+            Log.e(Constants.TAG, "SplashScreenActivity.callBackRenewToken: \n" + ex.toString());
+            finish();
+        }
+    }
+
+    private class RenewTokenAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+        @Override
+        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
+            return APIWrapper.httpPostAPI("/auth/renew", params[0], params[1], SplashScreenActivity.this);
+        }
+        @Override
+        protected void onPostExecute(HashMap<String,Object> result) {
+            callBackRenewToken(result);
         }
     }
 }

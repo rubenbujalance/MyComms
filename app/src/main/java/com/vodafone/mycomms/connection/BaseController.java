@@ -15,6 +15,9 @@ import com.vodafone.mycomms.util.Constants;
  * Created by str_vig on 14/05/2015.
  */
 public class BaseController extends Controller {
+
+    IConnectionCallback connectionCallback;
+
     public BaseController(Activity activity) {
         super(activity);
     }
@@ -39,7 +42,7 @@ public class BaseController extends Controller {
 
     @Override
     public void onConnectionError(ConnectionException e) {
-        Log.w(Constants.TAG, "BaseController.onConnectionError: " + e.getUrl() +  ", " + e.getException() + ", " + e.getContent());
+        Log.w(Constants.TAG, "BaseController.onConnectionError: " + e.getUrl() + ", " + e.getException() + ", " + e.getContent());
         if(e.getException() != null){
             Log.d(Constants.TAG, "BaseController.onConnectionError: " + e.getException().getMessage());
         }
@@ -53,5 +56,11 @@ public class BaseController extends Controller {
         }
     }
 
+    public IConnectionCallback getConnectionCallback() {
+        return connectionCallback;
+    }
 
+    public void setConnectionCallback(IConnectionCallback connectionCallback) {
+        this.connectionCallback = connectionCallback;
+    }
 }

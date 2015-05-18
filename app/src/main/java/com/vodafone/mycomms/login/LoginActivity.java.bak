@@ -10,7 +10,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,17 +23,12 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.util.APIWrapper;
-import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
-
-import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class LoginActivity extends ActionBarActivity implements ILoginConnectionCallback {
+public class LoginActivity extends ActionBarActivity {
 
     private static final int FORGOT_PASSWORD_ACTIVITY = 1;
 
@@ -43,8 +37,6 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
     TextView tvForgotPass;
     EditText etEmail;
     EditText etPassword;
-
-    LoginController loginController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,9 +123,6 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
                 finish();
             }
         });
-
-        loginController = new LoginController(this);
-        loginController.setConnectionCallback(this);
     }
 
     @Override
@@ -185,7 +174,11 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
     public void callPassCheck()
     {
-        loginController.startLogin(etEmail.getText().toString(), etPassword.getText().toString());
+        HashMap body = new HashMap<>();
+        body.put("username", etEmail.getText().toString());
+        body.put("password", etPassword.getText().toString());
+
+        new CheckPasswordApi().execute(body, null);
     }
 
     private void callBackPassCheck(HashMap<String, Object> result)
@@ -213,14 +206,6 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
             }
             else
             {
-                //Get tokens and expiration data from http response
-                JSONObject jsonResponse = (JSONObject)result.get("json");
-                String accessToken = jsonResponse.getString("accessToken");
-                String refreshToken = jsonResponse.getString("refreshToken");
-                long expiresIn = jsonResponse.getLong("expiresIn");
-
-                UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
-
                 //Force hide keyboard
                 InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
                 mgr.hideSoftInputFromWindow(etEmail.getWindowToken(), 0);
@@ -231,19 +216,9 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
                 finish();
             }
         } catch(Exception ex) {
-            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck:" , ex);
+            ex.printStackTrace();
             return;
         }
-    }
-
-    @Override
-    public void onLoginSuccess() {
-        Log.d(Constants.TAG, "LoginActivity.onLoginSuccess: ");
-    }
-
-    @Override
-    public void onLoginError() {
-        Log.e(Constants.TAG, "LoginActivity.onLoginError: ");
     }
 
     private class CheckPasswordApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

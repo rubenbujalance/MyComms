@@ -20,20 +20,10 @@ import java.util.Iterator;
  */
 public class LoginConnection extends BaseConnection{
     private static final String URL = "/auth/login";
+    private static final int method = HttpConnection.POST;
 
     public LoginConnection(Context context, ConnectionListener listener){
-        super(URL, context, listener, HttpConnection.POST);
+        super(URL, context, listener, method);
         Log.d(Constants.TAG, "LoginConnection.LoginConnection: ");
     }
-
-
-    public void setPayLoad(String json){
-        Log.d(Constants.TAG, "LoginConnection.setPayLoad: ");
-
-        this.getConnection().setEncoding("UTF-8");
-        this.getConnection().setData(json.toString());
-    }
-
-
-
 }

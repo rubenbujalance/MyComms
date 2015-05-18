@@ -1,8 +1,14 @@
 package com.vodafone.mycomms;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.view.View.OnClickListener;
 
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
@@ -45,6 +51,11 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         //MockClass mockClass = new MockClass(this, realm);
     }
 
+    //Prevent of going from main screen back to login
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -66,4 +77,5 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         super.onDestroy();
         realm.close();
     }
+
 }

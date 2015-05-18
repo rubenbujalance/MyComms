@@ -67,11 +67,13 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        Log.d(Constants.TAG, "ContactListFragment.onCreateView: "  + mIndex);
-       View v = inflater.inflate(R.layout.layout_fragment_pager_list, container, false);
-       mSwipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_list, container, false);
+       View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+       /*mSwipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
        mSwipeRefreshLayout.setOnRefreshListener(this);
 
-       return mSwipeRefreshLayout;
+       return mSwipeRefreshLayout;*/
+
+       return v;
    }
 
     /**

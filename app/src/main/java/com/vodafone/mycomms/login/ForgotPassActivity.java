@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONObject;
 
@@ -165,7 +167,7 @@ public class ForgotPassActivity extends ActionBarActivity {
                 finish();
             }
         } catch(Exception ex) {
-            ex.printStackTrace();
+            Log.e(Constants.TAG, "ForgotPassActivity.callBackSendNewPass: \n" + ex.toString());
             return;
         }
     }

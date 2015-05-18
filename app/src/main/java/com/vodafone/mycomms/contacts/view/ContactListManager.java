@@ -26,12 +26,6 @@ public class ContactListManager {
     private List<DummyChatItem> chatList = new ArrayList<DummyChatItem>();
 
     private ContactListManager(){
-        /*addContact(new Contact("001","Captain", "Planet", "Saviour of the planet" , "Planet Earth" , "The planeteers", true, "15:30" , "Planet Earth" , true,true));
-        addContact(new Contact("002", "Bat"   , "Man"   , "The Batman"            , "Gotham City"  , "Wayne Corp.",  true, "16:50" , "USA" , false, false));
-        addContact(new Contact("003", "Super" , "Man", "The Superman"            , "Metropolis" ,   "Daily Planet", false , "01:30", "USA" , false, false));
-        addContact(new Contact("004", "Super" , "Tom", "House cat"            , "Tom and Jerry City" ,   "Hanna-Barbera", false, "01:50", "USA", false, false));
-        addContact(new Contact("005", "Super" , "Jerry", "Mouse"            , "Tom and Jerry City" ,   "Hanna-Barbera", true , "09:15", "USA", true, false ));
-*/
     }
 
     private void addRecent(RecentItem item) {
@@ -62,7 +56,7 @@ public class ContactListManager {
     }
 
     private List<Contact> getRealmContacts(Context context, Realm realm) {
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, context);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm);
         List<Contact> realmContactList = realmContactTransactions.getAllContacts();
         addRecent(new RecentItem(realmContactList.get(0), RecentItem.RecentItemType.MAIL , "5 min"));
         addRecent(new RecentItem(realmContactList.get(0) , RecentItem.RecentItemType.CALL , "4 hours"));
@@ -91,7 +85,7 @@ public class ContactListManager {
     }
 
     private List<FavouriteContact> getRealmFavouriteContacts(Context context, Realm realm) {
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, context);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm);
         return realmContactTransactions.getAllFavouriteContacts();
     }
 

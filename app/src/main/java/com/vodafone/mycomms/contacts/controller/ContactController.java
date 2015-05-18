@@ -34,7 +34,7 @@ public class ContactController {
     public ContactController(Realm realm, Context context) {
         mContext = context;
         mRealm = realm;
-        realmContactTransactions = new RealmContactTransactions(realm, context);
+        realmContactTransactions = new RealmContactTransactions(realm);
     }
 
     public List<Contact> getAllContacts(){

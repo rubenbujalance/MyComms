@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -33,7 +34,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends ActionBarActivity implements ILoginConnectionCallback {
 
     private static final int FORGOT_PASSWORD_ACTIVITY = 1;
 
@@ -42,6 +43,8 @@ public class LoginActivity extends ActionBarActivity {
     TextView tvForgotPass;
     EditText etEmail;
     EditText etPassword;
+
+    LoginController loginController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +131,8 @@ public class LoginActivity extends ActionBarActivity {
                 finish();
             }
         });
+
+        loginController = new LoginController(this);
     }
 
     @Override
@@ -179,11 +184,17 @@ public class LoginActivity extends ActionBarActivity {
 
     public void callPassCheck()
     {
+//        HashMap body = new HashMap<>();
+//        body.put("username", etEmail.getText().toString());
+//        body.put("password", etPassword.getText().toString());
+//
+//        new CheckPasswordApi().execute(body, null);
         HashMap body = new HashMap<>();
-        body.put("username", etEmail.getText().toString());
-        body.put("password", etPassword.getText().toString());
+        body.put("username", "ruben_bujalance@stratesys-ts.com");
+        body.put("password", "i9Vs1Qm8U");
 
-        new CheckPasswordApi().execute(body, null);
+        //loginController.startLogin(body);
+        loginController.startLogin(etEmail.getText().toString(), etPassword.getText().toString());
     }
 
     private void callBackPassCheck(HashMap<String, Object> result)
@@ -230,7 +241,7 @@ public class LoginActivity extends ActionBarActivity {
             }
         } catch(Exception ex) {
             Log.e(Constants.TAG, "LoginActivity.callBackPassCheck: \n" + ex.toString());
-            finish();
+            return;
         }
     }
 

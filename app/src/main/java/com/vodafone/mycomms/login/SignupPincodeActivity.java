@@ -238,7 +238,7 @@ public class SignupPincodeActivity extends Activity {
                 startActivity(in);
             }
         } catch(Exception ex) {
-            ex.printStackTrace();
+            Log.e(Constants.TAG, "SignupPincodeActivity.callBackPhoneCheck: \n" + ex.toString());
             doingCall = false;
             return;
         }

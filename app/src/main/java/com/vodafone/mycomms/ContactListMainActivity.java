@@ -51,6 +51,11 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         //MockClass mockClass = new MockClass(this, realm);
     }
 
+    //Prevent of going from main screen back to login
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {

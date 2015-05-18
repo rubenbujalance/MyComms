@@ -7,12 +7,11 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
@@ -21,6 +20,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -150,7 +150,7 @@ public class SignupCompanyActivity extends Activity {
             }
             inputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(Constants.TAG, "SignupCompanyActivity.loadCompaniesArray: \n" + e.toString());
         }
         String json = byteArrayOutputStream.toString();
 
@@ -179,7 +179,7 @@ public class SignupCompanyActivity extends Activity {
                 data.add(hash);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(Constants.TAG, "SignupCompanyActivity.loadCompaniesArray: \n" + e.toString());
         }
 
         this.companies = data;

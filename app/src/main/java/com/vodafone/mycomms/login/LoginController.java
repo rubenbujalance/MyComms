@@ -6,6 +6,7 @@ import android.util.Log;
 import com.framework.library.controller.Controller;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.login.connection.LoginConnection;
 import com.vodafone.mycomms.util.Constants;
 
@@ -21,18 +22,20 @@ import java.util.HashMap;
 public class LoginController extends BaseController {
 
     private LoginConnection loginConnection;
+    private ILoginConnectionCallback loginConnectionCallback;
 
     public LoginController(Activity activity) {
         super(activity);
     }
 
+
     public void startLogin(String email, String password){
         HashMap body = new HashMap<>();
-//        body.put("username", email);
-//        body.put("password", password);
+        body.put("username", email);
+        body.put("password", password);
 
-        body.put("username", "ruben_bujalance@stratesys-ts.com");
-        body.put("password", "i9Vs1Qm8U");
+//        body.put("username", "ruben_bujalance@stratesys-ts.com");
+//        body.put("password", "i9Vs1Qm8U");
         startLogin(body);
     }
 
@@ -74,5 +77,10 @@ public class LoginController extends BaseController {
         } catch (Exception e){
             Log.e(Constants.TAG, "LoginController.onConnectionComplete: " , e);
         }
+
+        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof ILoginConnectionCallback){
+            ((ILoginConnectionCallback)this.getConnectionCallback()).onLoginSuccess();
+        }
     }
+
 }

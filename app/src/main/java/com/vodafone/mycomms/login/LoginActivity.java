@@ -133,6 +133,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         });
 
         loginController = new LoginController(this);
+        loginController.setConnectionCallback(this);
     }
 
     @Override
@@ -184,16 +185,6 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
     public void callPassCheck()
     {
-//        HashMap body = new HashMap<>();
-//        body.put("username", etEmail.getText().toString());
-//        body.put("password", etPassword.getText().toString());
-//
-//        new CheckPasswordApi().execute(body, null);
-        HashMap body = new HashMap<>();
-        body.put("username", "ruben_bujalance@stratesys-ts.com");
-        body.put("password", "i9Vs1Qm8U");
-
-        //loginController.startLogin(body);
         loginController.startLogin(etEmail.getText().toString(), etPassword.getText().toString());
     }
 
@@ -240,9 +231,19 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
                 finish();
             }
         } catch(Exception ex) {
-            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck: \n" + ex.toString());
+            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck:" , ex);
             return;
         }
+    }
+
+    @Override
+    public void onLoginSuccess() {
+        Log.d(Constants.TAG, "LoginActivity.onLoginSuccess: ");
+    }
+
+    @Override
+    public void onLoginError() {
+        Log.e(Constants.TAG, "LoginActivity.onLoginError: ");
     }
 
     private class CheckPasswordApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

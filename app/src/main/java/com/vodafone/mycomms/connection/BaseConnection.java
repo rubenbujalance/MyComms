@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import com.framework.library.connection.ConnectionInterfaces;
+import com.framework.library.connection.ConnectionInterfaces.ConnectionListener;
 import com.framework.library.connection.DefaultConnection;
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.IModel;
@@ -22,11 +22,10 @@ public class BaseConnection extends DefaultConnection {
     private static final String KEY_APP_VERSION = "x-mycomms-version";
     private static final String KEY_CONTENT_TYPE = "Content-Type";
     private static final String VALUE_CONTENT_TYPE = "application/json; charset=utf-8";
-
     public static final String VALUE_UNAUTHORIZED = "unauthorized";
 
     private static int numOfFailedAuthRequest = 0;
-    public static final int MAX_AUTH_RETRY = 5;
+    public static final int MAX_AUTH_RETRY = 1;
 
     /**
      *
@@ -35,7 +34,7 @@ public class BaseConnection extends DefaultConnection {
      * @param listener
      * @param method HTTP
      */
-    protected BaseConnection(String URL, Context context, ConnectionInterfaces.ConnectionListener listener , int method){
+    protected BaseConnection(String URL, Context context, ConnectionListener listener , int method){
 
         setUrl(APIWrapper.getHttpProtocol() + EndpointWrapper.getBaseURL() + URL);
 
@@ -67,7 +66,7 @@ public class BaseConnection extends DefaultConnection {
      *
      * @param context
      */
-    protected void setDefaultHeaders(Context context)  {
+    private void setDefaultHeaders(Context context)  {
         HttpConnection connection = getConnection();
         if(connection != null) {
             if(appVersion == null) {
@@ -91,5 +90,14 @@ public class BaseConnection extends DefaultConnection {
             Log.wtf(Constants.TAG, "BaseConnection.setDefaultHeaders: Connection is not inicialized...");
         }
 
+    }
+
+    /**
+     * Set the payload for the
+     * @param json
+     */
+    public void setPayLoad(String json){
+        this.getConnection().setEncoding("UTF-8");
+        this.getConnection().setData(json.toString());
     }
 }

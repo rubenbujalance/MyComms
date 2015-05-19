@@ -1,21 +1,13 @@
 package com.vodafone.mycomms;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.view.View.OnClickListener;
 
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
-
-import io.realm.Realm;
 
 /**
  * Created by str_vig on 21/04/2015.
@@ -23,7 +15,6 @@ import io.realm.Realm;
 public class ContactListMainActivity extends ToolbarActivity implements ContactListFragment.OnFragmentInteractionListener{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
-    private Realm realm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +36,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
             transaction.commit();
         }
 
-        activateFooterSelected(Constants.TOOLBAR_CONTACTS);
+        activateFooterSelected(Constants.CONTACTS);
         //Realm.deleteRealmFile(this);
         //realm = Realm.getInstance(this);
         //MockClass mockClass = new MockClass(this, realm);
@@ -71,11 +62,4 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     public void onFragmentInteraction(String id) {
 
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        realm.close();
-    }
-
 }

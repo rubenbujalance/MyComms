@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.login;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -47,7 +48,8 @@ public class ForgotPassActivity extends ActionBarActivity {
         btSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callSendNewPass();
+                if(APIWrapper.checkConnectionAndAlert(ForgotPassActivity.this))
+                    callSendNewPass();
             }
         });
 
@@ -164,6 +166,8 @@ public class ForgotPassActivity extends ActionBarActivity {
             else
             {
                 //Come back to loginActivity
+                Intent returnIntent = new Intent();
+                setResult(RESULT_OK,returnIntent);
                 finish();
             }
         } catch(Exception ex) {

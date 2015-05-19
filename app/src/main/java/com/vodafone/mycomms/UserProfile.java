@@ -3,41 +3,42 @@ package com.vodafone.mycomms;
 import android.content.Context;
 import android.graphics.Bitmap;
 
-//import com.google.gson.Gson;
-
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashMap;
+
+//import com.google.gson.Gson;
 
 /**
  * Created by str_rbm on 07/04/2015.
  */
 
-public class UserProfile implements Serializable{
+public final class UserProfile implements Serializable{
 
     /*
     Fields
      */
 
-    private String firstName;
-    private String lastName;
-    private String mail;
-    private String password;
-    private String countryISO;
-    private String phone;
-    private String officeLocation;
-    private String companyName;
-    private String position;
+    private static String _firstName;
+    private static String _lastName;
+    private static String _mail;
+    private static String _password;
+    private static String _countryISO;
+    private static String _phone;
+    private static String _officeLocation;
+    private static String _companyName;
+    private static String _position;
+    private static String _avatar;
+    private static String _oauthPrefix;
 
-    private Bitmap photoBitmap;
-    private String photoUrl;
+    private static Bitmap _photoBitmap;
+
+    /*
+    OAuth Token
+     */
+    private static String _oauth;
 
     /*
     File name
@@ -49,90 +50,119 @@ public class UserProfile implements Serializable{
     Getters and Setters
      */
 
-    public String getFirstName() {
-        return firstName;
+    public static String getFirstName() {
+        return _firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public static void setFirstName(String firstName) {
+        _firstName = firstName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public static String getLastName() {
+        return _lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public static void setLastName(String lastName) {
+        _lastName = lastName;
     }
 
-    public String getMail() {
-        return mail;
+    public static String getMail() {
+        return _mail;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public static void setMail(String mail) {
+        _mail = mail;
     }
 
-    public String getPassword() {
-        return password;
+    public static String getPassword() {
+        return _password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public static void setPassword(String password) {
+        _password = password;
     }
 
-    public String getCountryISO() {
-        return countryISO;
+    public static String getCountryISO() {
+        return _countryISO;
     }
 
-    public void setCountryISO(String countryISO) {
-        this.countryISO = countryISO;
+    public static void setCountryISO(String countryISO) {
+        _countryISO = countryISO;
     }
 
-    public String getPhone() {
-        return phone;
+    public static String getPhone() {
+        return _phone;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public static void setPhone(String phone) {
+        _phone = phone;
     }
 
-    public String getOfficeLocation() {
-        return officeLocation;
+    public static String getOfficeLocation() {
+        return _officeLocation;
     }
 
-    public void setOfficeLocation(String officeLocation) {
-        this.officeLocation = officeLocation;
+    public static void setOfficeLocation(String officeLocation) {
+        _officeLocation = officeLocation;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public static String getCompanyName() {
+        return _companyName;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public static void setCompanyName(String companyName) {
+        _companyName = companyName;
     }
 
-    public String getPosition() {
-        return position;
+    public static String getPosition() {
+        return _position;
     }
 
-    public void setPosition(String position) {
-        this.position = position;
+    public static void setPosition(String position) {
+        _position = position;
     }
 
-    public Bitmap getPhotoBitmap() {
-        return photoBitmap;
+    public static Bitmap getPhotoBitmap() {
+        return _photoBitmap;
     }
 
-    public void setPhotoBitmap(Bitmap photoBitmap) {
-        this.photoBitmap = photoBitmap;
+    public static void setPhotoBitmap(Bitmap photoBitmap) {
+        _photoBitmap = photoBitmap;
     }
 
-    private boolean uploadPhoto()
+    public static String getAvatar() {
+        return _avatar;
+    }
+
+    public static void setAvatar(String avatar) {
+        _avatar = avatar;
+    }
+
+    public static String getOauth() {
+        return _oauth;
+    }
+
+    public static void setOauth(String oauth) {
+        UserProfile._oauth = oauth;
+    }
+
+    public static String getOauthPrefix() {
+        return _oauthPrefix;
+    }
+
+    public static void setOauthPrefix(String oauthPrefix) {
+        _oauthPrefix = oauthPrefix;
+    }
+
+
+    /*
+    Other methods
+     */
+
+    private static boolean uploadPhoto()
     {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        photoBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        _photoBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
 
         JSONObject body = new JSONObject();
@@ -143,23 +173,19 @@ public class UserProfile implements Serializable{
         return true;
     }
 
-    /*
-    Other methods
-     */
-
-    public HashMap getHashMap()
+    public static HashMap getHashMap()
     {
         HashMap<String, String> body = new HashMap<String, String>();
-        if(firstName != null) body.put("firstName",firstName);
-        if(lastName != null) body.put("lastName",lastName);
-        if(countryISO != null) body.put("country",countryISO);
-        if(phone != null) body.put("phone",phone);
-        if(mail != null) body.put("email",mail);
-        if(password != null) body.put("password",password);
-//        if(photoUrl != null) body.put("avatar",null);
-        if(companyName != null) body.put("company",companyName);
-        if(position != null) body.put("position",position);
-        if(officeLocation != null) body.put("officeLocation",officeLocation);
+        if(_firstName != null) body.put("firstName",_firstName);
+        if(_lastName != null) body.put("lastName",_lastName);
+        if(_countryISO != null) body.put("country",_countryISO);
+        if(_phone != null) body.put("phone",_phone);
+        if(_mail != null) body.put("email",_mail);
+        if(_password != null) body.put("password",_password);
+        if(_companyName != null) body.put("company",_companyName);
+        if(_position != null) body.put("position",_position);
+        if(_officeLocation != null) body.put("officeLocation",_officeLocation);
+        if(_oauth != null) body.put(_oauthPrefix,_oauth);
 
         return body;
     }

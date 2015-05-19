@@ -23,7 +23,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
@@ -88,6 +87,10 @@ public class SignupNameActivity extends Activity {
                 finish();
             }
         });
+
+        //Load data if comes from Salesforce signup
+        if(UserProfile.getFirstName() != null) mFirstName.setText(UserProfile.getFirstName());
+        if(UserProfile.getLastName() != null) mLastName.setText(UserProfile.getLastName());
 
         //Force the focus of the first field and opens the keyboard
         InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
@@ -245,10 +248,8 @@ public class SignupNameActivity extends Activity {
 
     private void saveData ()
     {
-        UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-
-        profile.setFirstName(mFirstName.getText().toString());
-        profile.setLastName(mLastName.getText().toString());
-        profile.setPhotoBitmap(photoBitmap);
+        UserProfile.setFirstName(mFirstName.getText().toString());
+        UserProfile.setLastName(mLastName.getText().toString());
+        UserProfile.setPhotoBitmap(photoBitmap);
     }
 }

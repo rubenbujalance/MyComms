@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:id="@+id/back"
+        android:tag="back"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/grey_chat_name">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btFavorite"
+            android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/front"
+        android:tag="front"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffffff"
+        android:weightSum="1"
+        android:layout_marginLeft="5dp">
     <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
         android:layout_width="70dp"
         android:layout_height = "70dp"
@@ -13,11 +37,12 @@
         android:layout_toRightOf="@id/layout_list_item_image"
         android:layout_height="70dp"
         android:layout_centerHorizontal="true"
-        />
+        android:layout_weight="1.03" />
     <include android:id="@+id/layout_list_item_recent_info"
         layout="@layout/layout_list_item_recent_info"
         android:layout_width="wrap_content"
-        android:layout_height = "wrap_content"
+        android:layout_height = "match_parent"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"/>
-</RelativeLayout>
+    </LinearLayout>
+</FrameLayout>

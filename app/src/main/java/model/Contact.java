@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey;
 /**
  * Created by str_vig on 28/04/2015.
  */
-public class Contact extends RealmObject {
+public class Contact extends RealmObject{
 
     @PrimaryKey
     private String id;

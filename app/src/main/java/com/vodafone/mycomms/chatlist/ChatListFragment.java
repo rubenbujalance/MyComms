@@ -75,8 +75,6 @@ public class ChatListFragment extends ListFragment {
         }
 
         setListAdapter(new ChatListViewArrayAdapter(getActivity().getApplicationContext(), ContactListManager.getInstance().getChatList()));
-
-
     }
 
     @Override

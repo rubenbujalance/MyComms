@@ -76,6 +76,9 @@ repositories {
     maven {
         url 'http://lorenzo.villani.me/android-cropimage/'
     }
+    maven {
+        url 'http://clinker.47deg.com/nexus/content/groups/public'
+    }
 }
 
 dependencies {
@@ -89,4 +92,9 @@ dependencies {
     compile 'me.villani.lorenzo.android:android-cropimage:1.1.0'
     compile 'io.realm:realm-android:0.80.1'
     compile files('lib/gson-2.3.1.jar')
+    compile ('com.fortysevendeg.swipelistview:swipelistview:1.0-SNAPSHOT@aar') {
+        transitive = true
+    }
+
+    compile files('lib/android-framework-library.jar')
 }

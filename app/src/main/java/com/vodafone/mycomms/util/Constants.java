@@ -39,5 +39,8 @@ public class Constants {
     public static final String CONTACT_OFFICE_LOC = "officeLocation";
     public static final String CONTACT_PHONES = "phones";
     public static final String CONTACT_EMAILS = "emails";
+    public static final String CONTACT_AVAILABILITY = "availability";
+    public static final String CONTACT_PRESENCE = "presence";
+    public static final String CONTACT_COUNTRY = "country";
 
 }

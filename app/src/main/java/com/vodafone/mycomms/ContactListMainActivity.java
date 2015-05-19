@@ -9,15 +9,12 @@ import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
-import io.realm.Realm;
-
 /**
  * Created by str_vig on 21/04/2015.
  */
 public class ContactListMainActivity extends ToolbarActivity implements ContactListFragment.OnFragmentInteractionListener{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
-    private Realm realm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,11 +61,5 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     @Override
     public void onFragmentInteraction(String id) {
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        realm.close();
     }
 }

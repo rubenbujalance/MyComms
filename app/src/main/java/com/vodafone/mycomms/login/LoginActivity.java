@@ -68,7 +68,8 @@ public class LoginActivity extends ActionBarActivity {
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callPassCheck();
+                if(APIWrapper.checkConnectionAndAlert(LoginActivity.this))
+                    callPassCheck();
             }
         });
 
@@ -112,6 +113,17 @@ public class LoginActivity extends ActionBarActivity {
             }
         });
 
+        btLoginSalesforce.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(APIWrapper.checkConnectionAndAlert(LoginActivity.this)) {
+                    Intent in = new Intent(LoginActivity.this, OAuthActivity.class);
+                    in.putExtra("oauth", "sf");
+                    startActivity(in);
+                }
+            }
+        });
+
         tvForgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,7 +144,7 @@ public class LoginActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FORGOT_PASSWORD_ACTIVITY)
+        if (requestCode == FORGOT_PASSWORD_ACTIVITY && resultCode == RESULT_OK)
         {
             Utils.showAlert(this, getString(R.string.new_password_sent), getString(R.string.we_have_sent_you_an_email));
         }
@@ -225,6 +237,9 @@ public class LoginActivity extends ActionBarActivity {
 
                 //Start Main activity
                 Intent in = new Intent(LoginActivity.this, ContactListMainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
                 startActivity(in);
                 finish();
             }

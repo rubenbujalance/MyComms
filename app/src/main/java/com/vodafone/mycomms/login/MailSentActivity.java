@@ -3,8 +3,8 @@ package com.vodafone.mycomms.login;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,9 +12,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.util.APIWrapper;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.util.APIWrapper;
 
 import java.util.HashMap;
 
@@ -35,7 +35,7 @@ public class MailSentActivity extends ActionBarActivity {
         mWeSent = (TextView)findViewById(R.id.tvWeSent);
 
         HashMap<String, Object> userProfile =
-                ((MycommsApp)getApplication()).getUserProfile().getHashMap();
+                UserProfile.getHashMap();
         mWeSent.setText(getString(R.string.we_sent_an_email_to)+"\n"+userProfile.get("email"));
 
         pin = (String)this.getIntent().getExtras().get("pin");
@@ -89,7 +89,7 @@ public class MailSentActivity extends ActionBarActivity {
         header.put("x-otp-pin", pin);
 
         HashMap<String, Object> body =
-                ((MycommsApp)getApplication()).getUserProfile().getHashMap();
+                UserProfile.getHashMap();
 
         new CheckPhoneApi().execute(body,header);
     }

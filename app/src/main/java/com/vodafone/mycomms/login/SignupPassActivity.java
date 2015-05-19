@@ -11,10 +11,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.ClearableEditText;
@@ -131,7 +129,6 @@ public class SignupPassActivity extends Activity {
 
     private void saveData ()
     {
-        UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-        profile.setPassword(mPassword.getText().toString());
+        UserProfile.setPassword(mPassword.getText().toString());
     }
 }

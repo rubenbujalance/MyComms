@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.APIWrapper;
 
 public class SignupTypeChooseActivity extends ActionBarActivity {
 
@@ -26,27 +27,24 @@ public class SignupTypeChooseActivity extends ActionBarActivity {
         mSignupSalesforce = (Button)findViewById(R.id.btSignupSalesforce);
         mBack = (ImageView)findViewById(R.id.btBack);
 
-        mSignupSalesforce.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Intent in = new Intent(SignupTypeChooseActivity.this, ContactListMainActivity.class);
-                //startActivity(in);
-            }
-        });
-
         mSignupEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(SignupTypeChooseActivity.this, SignupMailActivity.class);
-                startActivity(in);
+                if(APIWrapper.checkConnectionAndAlert(SignupTypeChooseActivity.this)) {
+                    Intent in = new Intent(SignupTypeChooseActivity.this, SignupMailActivity.class);
+                    startActivity(in);
+                }
             }
         });
 
         mSignupSalesforce.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(SignupTypeChooseActivity.this, OAuthActivity.class);
-                startActivity(in);
+                if(APIWrapper.checkConnectionAndAlert(SignupTypeChooseActivity.this)) {
+                    Intent in = new Intent(SignupTypeChooseActivity.this, OAuthActivity.class);
+                    in.putExtra("oauth", "sf");
+                    startActivity(in);
+                }
             }
         });
 

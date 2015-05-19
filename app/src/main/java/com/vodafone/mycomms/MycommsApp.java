@@ -11,18 +11,18 @@ import android.app.Application;
 
 public class MycommsApp extends Application {
 
-    //Global data
-    private UserProfile userProfile;
-
-    //Methods
-    public UserProfile getUserProfile() {
-        if(userProfile == null) {
-            userProfile = UserProfile.readUserProfile(this);
-
-            if(userProfile == null)
-                userProfile = new UserProfile();
-        }
-
-        return userProfile;
-    }
+//    //Global data
+//    private UserProfile userProfile;
+//
+//    //Methods
+//    public UserProfile getUserProfile() {
+//        if(userProfile == null) {
+//            userProfile = UserProfile.readUserProfile(this);
+//
+//            if(userProfile == null)
+//                userProfile = new UserProfile();
+//        }
+//
+//        return userProfile;
+//    }
 }

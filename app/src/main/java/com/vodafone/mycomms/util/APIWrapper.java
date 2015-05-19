@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.R;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -22,7 +23,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 
 public class APIWrapper {
 
@@ -176,25 +176,20 @@ public class APIWrapper {
             return false;
     }
 
-    public static HashMap<String,Object> httpPostAPIMock (String restRequest, HashMap<String,Object> params, HashMap<String,Object> headers, Context context)
-    {
-        HashMap<String,Object> result = null;
-        Pattern p = Pattern.compile("/user/(.*)/password");
-
-        if(restRequest.compareTo("/api/profile")==0)
+    public static boolean checkConnectionAndAlert(Context context){
+        if(isConnected(context))
         {
-
+            return true;
         }
-        else if(restRequest.compareTo("/auth/login")==0)
+        else
         {
+            Utils.showAlert(
+                    context,
+                    context.getString(R.string.no_internet_connection),
+                    context.getString(R.string.no_internet_connection_is_available));
 
+            return false;
         }
-        else if(p.matcher(restRequest).matches())
-        {
-
-        }
-
-        return result;
     }
 }
 

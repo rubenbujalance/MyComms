@@ -15,7 +15,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
@@ -35,6 +34,7 @@ public class SignupPhoneActivity extends Activity {
     AutoCompleteTVSelectOnly mCountry;
     ClearableEditText mPhone;
     ArrayList<HashMap<String,String>> countries;
+    HashMap<String,HashMap<String,String>> hashCountries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +90,22 @@ public class SignupPhoneActivity extends Activity {
             }
         });
 
+        //Load data if comes from OAuth signup
+        if(UserProfile.getCountryISO() != null) {
+
+            String country = hashCountries.get(UserProfile.getCountryISO()).get("name") + " " +
+                                hashCountries.get(UserProfile.getCountryISO()).get("dial_code");
+            String code = hashCountries.get(UserProfile.getCountryISO()).get("code");
+
+            if(country != null)
+            {
+                mCountry.setCodeSelected(code);
+                mCountry.setText(country);
+            }
+        }
+
+        if(UserProfile.getPhone() != null) mPhone.setText(UserProfile.getPhone());
+
         //Force the focus of the first field and opens the keyboard
         InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
         mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
@@ -139,6 +155,7 @@ public class SignupPhoneActivity extends Activity {
         }
 
         ArrayList<HashMap<String,String>> data = null;
+        HashMap<String,HashMap<String,String>> hash = null;
 
         try {
             // Parse the data into jsonObject to get original data in form of json.
@@ -150,6 +167,7 @@ public class SignupPhoneActivity extends Activity {
             String dial_code;
             String isoCode;
             data = new ArrayList<>();
+            hash = new HashMap<>();
             HashMap<String,String> map;
 
             for (int i = 0; i < jArray.length(); i++) {
@@ -161,12 +179,14 @@ public class SignupPhoneActivity extends Activity {
                 map.put("dial_code",dial_code);
                 map.put("code",isoCode);
                 data.add(map);
+                hash.put(isoCode,map);
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "SignupPhoneActivity.loadCountriesArray: \n" + e.toString());
         }
 
         this.countries = data;
+        this.hashCountries = hash;
     }
 
     private boolean checkData()
@@ -208,8 +228,7 @@ public class SignupPhoneActivity extends Activity {
 
     private void saveData ()
     {
-        UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-        profile.setCountryISO(mCountry.getCodeSelected());
-        profile.setPhone(mPhone.getText().toString());
+        UserProfile.setCountryISO(mCountry.getCodeSelected());
+        UserProfile.setPhone(mPhone.getText().toString());
     }
 }

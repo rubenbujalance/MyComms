@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.login;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,10 +11,13 @@ import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UserSecurity;
 
 import org.json.JSONObject;
 
@@ -22,6 +26,7 @@ import java.util.HashMap;
 public class OAuthActivity extends Activity {
 
     WebView wvOAuth;
+    String oauthPrefix;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,13 +35,17 @@ public class OAuthActivity extends Activity {
 
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);
 
+        //Read OAuth prefix
+        oauthPrefix = getIntent().getStringExtra("oauth");
+
+        //Load web view
         wvOAuth.getSettings().setJavaScriptEnabled(true);
         wvOAuth.getSettings().setSupportMultipleWindows(true);
         wvOAuth.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 //If it is callback url, call api to get token
-                if (Uri.parse(url).getPath().compareTo("/auth/sf/callback") == 0) {
+                if (Uri.parse(url).getPath().compareTo("/auth/"+ oauthPrefix + "/callback") == 0) {
                     callOAuthCallback(Uri.parse(url).getPath()+"?"+Uri.parse(url).getQuery());
                     return true;
                 }
@@ -47,7 +56,8 @@ public class OAuthActivity extends Activity {
 
         });
 
-        wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/sf");
+        //Launch OAuth corresponding URL
+        wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix);
     }
 
     @Override
@@ -97,15 +107,41 @@ public class OAuthActivity extends Activity {
 
         try {
             if (status.compareTo("200") == 0) {
-                //User exists. We can get accessToken
-                json = (JSONObject)result.get("json");
-//                json.get("accessToken")
-//
-//                json.
+                //User exists
+                //Get tokens and expiration data from http response
+                JSONObject jsonResponse = (JSONObject)result.get("json");
+                String accessToken = jsonResponse.getString("accessToken");
+                String refreshToken = jsonResponse.getString("refreshToken");
+                long expiresIn = jsonResponse.getLong("expiresIn");
+
+                UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
+
+                //Start Main activity
+                Intent in = new Intent(OAuthActivity.this, ContactListMainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                startActivity(in);
+                finish();
             }
             else if (status.compareTo("203") == 0) {
                 //We have got user information, continue SignUp process
+                //Save user data and go to signup
+                JSONObject jsonResponse = (JSONObject)result.get("json");
+                UserProfile.setMail(jsonResponse.getString("email"));
+                UserProfile.setFirstName(jsonResponse.getString("name"));
+                UserProfile.setLastName(jsonResponse.getString("lastname"));
+                UserProfile.setOfficeLocation(jsonResponse.getString("officeLocation"));
+                UserProfile.setCountryISO(jsonResponse.getString("country"));
+                UserProfile.setPhone(jsonResponse.getString("phone"));
+                UserProfile.setAvatar(jsonResponse.getString("avatar"));
+                UserProfile.setOauth(jsonResponse.getString(oauthPrefix));
+                UserProfile.setOauthPrefix(oauthPrefix);
+                UserProfile.setPosition(jsonResponse.getString("position"));
 
+                Intent in = new Intent(OAuthActivity.this, SignupMailActivity.class);
+                startActivity(in);
+                finish();
             }
             else
             {
@@ -121,7 +157,7 @@ public class OAuthActivity extends Activity {
     private class CallOAuthCallback extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
         @Override
         protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
-            return APIWrapper.httpGetAPI("/user/" + params[2].get("url") + "/password", params[1], OAuthActivity.this);
+            return APIWrapper.httpGetAPI((String)params[2].get("url"), params[1], OAuthActivity.this);
         }
         @Override
         protected void onPostExecute(HashMap<String,Object> result) {

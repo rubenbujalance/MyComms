@@ -85,6 +85,10 @@ public class ClearableEditText extends RelativeLayout {
         return text;
     }
 
+    public void setText(CharSequence text) {
+        edit_text.setText(text);
+    }
+
     public void setHint(int encode) {
         edit_text.setHint(encode);
     }

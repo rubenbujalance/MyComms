@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clickable="false"
     >
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1" >
+        android:layout_weight="1"
+        android:clickable="false">
 
-        <com.fortysevendeg.swipelistview.SwipeListView
+        <!--<com.fortysevendeg.swipelistview.SwipeListView
             xmlns:swipe="http://schemas.android.com/apk/res-auto"
             android:id="@android:id/list"
             android:listSelector="#00000000"
@@ -25,6 +27,13 @@
             swipe:swipeAnimationTime="350"
             swipe:swipeOffsetLeft="280dp"
             swipe:swipeOffsetRight="280dp"
+            />-->
+
+        <ListView
+            android:id="@android:id/list"
+            android:listSelector="#00000000"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             />
 
         <!-- View to show if the list is emtpy -->
@@ -32,8 +41,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="No items."/>
+            android:text="No items."
+            android:clickable="false"/>
 
     </FrameLayout>
 
-</android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

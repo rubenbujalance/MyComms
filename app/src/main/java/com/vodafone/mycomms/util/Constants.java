@@ -42,5 +42,10 @@ public class Constants {
     public static final String CONTACT_AVAILABILITY = "availability";
     public static final String CONTACT_PRESENCE = "presence";
     public static final String CONTACT_COUNTRY = "country";
+    public static final String CONTACT_FAVOURITES = "favourites";
+
+    //Contacts API Calls
+    public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
+    public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
 
 }

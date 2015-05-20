@@ -103,6 +103,7 @@ public class RealmContactTransactions {
         RealmResults<Contact> result1 = query.findAll();
         if (result1!=null){
             for (Contact contactListItem : result1) {
+                Log.i(Constants.TAG, "RealmContactTransactions.getAllContacts: contact Id: " + contactListItem.getId());
                 contactArrayList.add(contactListItem);
             }
         }
@@ -123,11 +124,28 @@ public class RealmContactTransactions {
         return contactArrayList;
     }
 
+    public Contact getContactById(String contactId){
+        RealmQuery<Contact> query = mRealm.where(Contact.class);
+        query.equalTo(Constants.CONTACT_ID, contactId);
+
+        RealmResults<Contact> result1 = query.findAll();
+
+        if (result1!=null){
+            Log.i(Constants.TAG, "RealmContactTransactions.getContactById: FOUND");
+            return result1.first();
+        }else {
+            Log.i(Constants.TAG, "RealmContactTransactions.getContactById: NOT FOUND");
+            return null;
+        }
+    }
+
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         RealmResults<FavouriteContact> result1 = query.findAll();
         if (result1 != null){
+            //result1.sort(Constants.CONTACT_FNAME); // Sort ascending
+            result1.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
             for (FavouriteContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }
@@ -211,6 +229,7 @@ public class RealmContactTransactions {
     }
 
     public void deleteAllFavouriteContacts() {
+        Log.i(Constants.TAG, "RealmContactTransactions.deleteAllFavouriteContacts: ");
         mRealm.beginTransaction();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         RealmResults<FavouriteContact> result1 = query.findAll();

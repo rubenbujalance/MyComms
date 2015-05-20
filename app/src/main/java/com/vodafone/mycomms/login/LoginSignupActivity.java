@@ -23,7 +23,7 @@ public class LoginSignupActivity extends Activity {
             public void onClick(View v) {
                 Intent in = new Intent(LoginSignupActivity.this, SignupTypeChooseActivity.class);
                 //Intent in = new Intent(LoginSignupActivity.this, ContactListMainActivity.class); //TODO: Don't upload
-                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//TODO: Don't upload
+                //in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);//TODO: Don't upload
                 startActivity(in);
             }
         });

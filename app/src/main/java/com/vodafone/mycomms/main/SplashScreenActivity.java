@@ -93,8 +93,8 @@ public class SplashScreenActivity extends Activity {
     private void callBackVersionCheck(final String result)
     {
         try {
-            if(result == null) { //TODO - Remove before pushing to Git
-            //if(result != null) {
+            //if(result == null) { //TODO - Remove before pushing to Git
+            if(result != null) {
         /*
          * New version detected! Show an alert and start the update...
          */

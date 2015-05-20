@@ -59,5 +59,4 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     public void onFragmentInteraction(String id) {
 
     }
-
 }

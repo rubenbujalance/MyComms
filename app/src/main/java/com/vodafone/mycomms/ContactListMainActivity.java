@@ -36,10 +36,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
             transaction.commit();
         }
 
-        activateFooterSelected(Constants.CONTACTS);
-        //Realm.deleteRealmFile(this);
-        //realm = Realm.getInstance(this);
-        //MockClass mockClass = new MockClass(this, realm);
+        activateFooterSelected(Constants.TOOLBAR_CONTACTS);
     }
 
     //Prevent of going from main screen back to login
@@ -62,4 +59,5 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     public void onFragmentInteraction(String id) {
 
     }
+
 }

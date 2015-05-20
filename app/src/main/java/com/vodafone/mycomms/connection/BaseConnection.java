@@ -23,6 +23,9 @@ public class BaseConnection extends DefaultConnection {
     private static final String KEY_CONTENT_TYPE = "Content-Type";
     private static final String VALUE_CONTENT_TYPE = "application/json; charset=utf-8";
     public static final String VALUE_UNAUTHORIZED = "unauthorized";
+    //TODO: HARDCODED
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION_CODE = "Bearer 53A85tTGPZXmyOFsugkDI42Z8_p0V_hElTMg6D1T1XfvbDTxXOsOYsAH4v0ygFiqSSNKvlzeCKOlj8ht3BqrMUShPu8PhfxblJEy3S2rZvEZfupmh_uJ6WeHtX1MVt5g8p6ds4Et8xXUJ9CKLbRxuVJI-V0aGHQ9mgi0_eI5IFE";
 
     private static int numOfFailedAuthRequest = 0;
     public static final int MAX_AUTH_RETRY = 1;
@@ -85,6 +88,7 @@ public class BaseConnection extends DefaultConnection {
 
             connection.addHeader(KEY_APP_VERSION, appVersion);
             connection.addHeader(KEY_CONTENT_TYPE, VALUE_CONTENT_TYPE);
+            connection.addHeader(AUTHORIZATION, AUTHORIZATION_CODE);
 
         } else{
             Log.wtf(Constants.TAG, "BaseConnection.setDefaultHeaders: Connection is not inicialized...");
@@ -99,5 +103,11 @@ public class BaseConnection extends DefaultConnection {
     public void setPayLoad(String json){
         this.getConnection().setEncoding("UTF-8");
         this.getConnection().setData(json.toString());
+    }
+
+    @Override
+    public void setUrl(String url){
+        Log.d(Constants.TAG, "BaseConnection.setUrl: " + url);
+        super.setUrl(url);
     }
 }

@@ -126,14 +126,14 @@ public class RealmContactTransactions {
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
-
         RealmResults<FavouriteContact> result1 = query.findAll();
-        if (result1!=null){
+        if (result1 != null){
             for (FavouriteContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }
+            return contactArrayList;
         }
-        return contactArrayList;
+        return null;
     }
 
     public ArrayList<FavouriteContact> getFilteredFavouriteContacts(String field, String filter){

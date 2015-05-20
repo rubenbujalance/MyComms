@@ -19,6 +19,9 @@ public class FavouriteContact extends RealmObject {
     private String timezone;
     private int lastSeen;
     private String officeLocation;
+    private String availability;
+    private String presence;
+    private String country;
 
     @PrimaryKey
     private String id;
@@ -26,7 +29,8 @@ public class FavouriteContact extends RealmObject {
     public FavouriteContact() {
     }
 
-    public FavouriteContact(String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String id) {
+    public FavouriteContact(String id, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country) {
+        this.id = id;
         this.platform = platform;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -38,7 +42,9 @@ public class FavouriteContact extends RealmObject {
         this.timezone = timezone;
         this.lastSeen = lastSeen;
         this.officeLocation = officeLocation;
-        this.id = id;
+        this.availability = availability;
+        this.presence = presence;
+        this.country = country;
     }
 
     public String getId() {
@@ -135,5 +141,29 @@ public class FavouriteContact extends RealmObject {
 
     public void setEmails(String emails) {
         this.emails = emails;
+    }
+
+    public String getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(String availability) {
+        this.availability = availability;
+    }
+
+    public String getPresence() {
+        return presence;
+    }
+
+    public void setPresence(String presence) {
+        this.presence = presence;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 }

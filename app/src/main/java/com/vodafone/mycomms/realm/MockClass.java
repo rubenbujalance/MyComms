@@ -42,7 +42,7 @@ public class MockClass {
 
         InputStream stream = null;
         stream = context.getResources().openRawResource(R.raw.test_contacts);
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, context);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
         //realmContactTransactions.insertContactListJSON(stream);
 
 

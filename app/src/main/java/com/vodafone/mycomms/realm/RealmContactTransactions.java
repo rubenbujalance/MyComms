@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.realm;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.vodafone.mycomms.util.Constants;
@@ -19,32 +18,15 @@ import model.RecentContact;
  */
 public class RealmContactTransactions {
     private Realm mRealm;
-    private Context mContext;
 
-    public RealmContactTransactions(Realm realm, Context context) {
+    public RealmContactTransactions(Realm realm) {
         mRealm = realm;
-        mContext = context;
     }
 
     public void insertContact (Contact newContact){
         try {
             mRealm.beginTransaction();
-            Contact contact = mRealm.createObject(Contact.class);
-            contact.setId("XXX");
-            contact.setFirstName(newContact.getFirstName());
-            contact.setLastName(newContact.getLastName());
-            contact.setPlatform(newContact.getPlatform());
-            contact.setAvatar(newContact.getAvatar());
-            contact.setPosition(newContact.getPosition());
-            contact.setCompany(newContact.getCompany());
-            contact.setTimezone(newContact.getTimezone());
-            contact.setLastSeen(newContact.getLastSeen());
-            contact.setOfficeLocation(newContact.getOfficeLocation());
-
-            contact.setEmails(newContact.getEmails());
-            contact.setPhones(newContact.getPhones());
-
-            mRealm.copyToRealmOrUpdate(contact);
+            mRealm.copyToRealmOrUpdate(newContact);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -56,27 +38,12 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            Contact contact;
             for (int i = 0; i < size; i++) {
-                contact = mRealm.createObject(Contact.class);
-                contact.setId(contactArrayList.get(i).getId());
-                contact.setFirstName(contactArrayList.get(i).getFirstName());
-                contact.setLastName(contactArrayList.get(i).getLastName());
-                contact.setPlatform(contactArrayList.get(i).getPlatform());
-                contact.setAvatar(contactArrayList.get(i).getAvatar());
-                contact.setPosition(contactArrayList.get(i).getPosition());
-                contact.setCompany(contactArrayList.get(i).getCompany());
-                contact.setTimezone(contactArrayList.get(i).getTimezone());
-                contact.setLastSeen(contactArrayList.get(i).getLastSeen());
-                contact.setOfficeLocation(contactArrayList.get(i).getOfficeLocation());
-
-                contact.setEmails(contactArrayList.get(i).getEmails());
-                contact.setPhones(contactArrayList.get(i).getPhones());
-
-                mRealm.copyToRealmOrUpdate(contact);
+                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
+            e.printStackTrace();
             Log.e(Constants.TAG, "RealmContactTransactions.insertContactList: " + e.toString());
         }
     }
@@ -84,22 +51,7 @@ public class RealmContactTransactions {
     public void insertFavouriteContact (FavouriteContact newContact){
         try {
             mRealm.beginTransaction();
-            FavouriteContact contact = mRealm.createObject(FavouriteContact.class);
-            contact.setId("XXX");
-            contact.setFirstName(newContact.getFirstName());
-            contact.setLastName(newContact.getLastName());
-            contact.setPlatform(newContact.getPlatform());
-            contact.setAvatar(newContact.getAvatar());
-            contact.setPosition(newContact.getPosition());
-            contact.setCompany(newContact.getCompany());
-            contact.setTimezone(newContact.getTimezone());
-            contact.setLastSeen(newContact.getLastSeen());
-            contact.setOfficeLocation(newContact.getOfficeLocation());
-
-            contact.setEmails(newContact.getEmails());
-            contact.setPhones(newContact.getPhones());
-
-            mRealm.copyToRealmOrUpdate(contact);
+            mRealm.copyToRealmOrUpdate(newContact);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -111,24 +63,8 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            FavouriteContact contact;
             for (int i = 0; i < size; i++) {
-                contact = mRealm.createObject(FavouriteContact.class);
-                contact.setId(contactArrayList.get(i).getId());
-                contact.setFirstName(contactArrayList.get(i).getFirstName());
-                contact.setLastName(contactArrayList.get(i).getLastName());
-                contact.setPlatform(contactArrayList.get(i).getPlatform());
-                contact.setAvatar(contactArrayList.get(i).getAvatar());
-                contact.setPosition(contactArrayList.get(i).getPosition());
-                contact.setCompany(contactArrayList.get(i).getCompany());
-                contact.setTimezone(contactArrayList.get(i).getTimezone());
-                contact.setLastSeen(contactArrayList.get(i).getLastSeen());
-                contact.setOfficeLocation(contactArrayList.get(i).getOfficeLocation());
-
-                contact.setEmails(contactArrayList.get(i).getEmails());
-                contact.setPhones(contactArrayList.get(i).getPhones());
-
-                mRealm.copyToRealmOrUpdate(contact);
+                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -139,22 +75,7 @@ public class RealmContactTransactions {
     public void insertRecentContact (RecentContact newContact){
         try {
             mRealm.beginTransaction();
-            RecentContact contact = mRealm.createObject(RecentContact.class);
-            contact.setId("XXX");
-            contact.setFirstName(newContact.getFirstName());
-            contact.setLastName(newContact.getLastName());
-            contact.setPlatform(newContact.getPlatform());
-            contact.setAvatar(newContact.getAvatar());
-            contact.setPosition(newContact.getPosition());
-            contact.setCompany(newContact.getCompany());
-            contact.setTimezone(newContact.getTimezone());
-            contact.setLastSeen(newContact.getLastSeen());
-            contact.setOfficeLocation(newContact.getOfficeLocation());
-
-            contact.setEmails(newContact.getEmails());
-            contact.setPhones(newContact.getPhones());
-
-            mRealm.copyToRealmOrUpdate(contact);
+            mRealm.copyToRealmOrUpdate(newContact);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -166,24 +87,8 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            RecentContact contact;
             for (int i = 0; i < size; i++) {
-                contact = mRealm.createObject(RecentContact.class);
-                contact.setId(contactArrayList.get(i).getId());
-                contact.setFirstName(contactArrayList.get(i).getFirstName());
-                contact.setLastName(contactArrayList.get(i).getLastName());
-                contact.setPlatform(contactArrayList.get(i).getPlatform());
-                contact.setAvatar(contactArrayList.get(i).getAvatar());
-                contact.setPosition(contactArrayList.get(i).getPosition());
-                contact.setCompany(contactArrayList.get(i).getCompany());
-                contact.setTimezone(contactArrayList.get(i).getTimezone());
-                contact.setLastSeen(contactArrayList.get(i).getLastSeen());
-                contact.setOfficeLocation(contactArrayList.get(i).getOfficeLocation());
-
-                contact.setEmails(contactArrayList.get(i).getEmails());
-                contact.setPhones(contactArrayList.get(i).getPhones());
-
-                mRealm.copyToRealmOrUpdate(contact);
+                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -221,21 +126,20 @@ public class RealmContactTransactions {
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
-
         RealmResults<FavouriteContact> result1 = query.findAll();
-        if (result1!=null){
+        if (result1 != null){
             for (FavouriteContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }
+            return contactArrayList;
         }
-        return contactArrayList;
+        return null;
     }
 
     public ArrayList<FavouriteContact> getFilteredFavouriteContacts(String field, String filter){
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         query.equalTo(field, filter);
-        // Execute the query:
         RealmResults<FavouriteContact> result1 = query.findAll();
         if (result1!=null){
             for (FavouriteContact contactListItem : result1) {
@@ -248,7 +152,6 @@ public class RealmContactTransactions {
     public ArrayList<RecentContact> getAllRecentContacts(){
         ArrayList<RecentContact> contactArrayList = new ArrayList<>();
         RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
-        // Execute the query:
         RealmResults<RecentContact> result1 = query.findAll();
         if (result1!=null){
             result1.sort("lastInteraction"); // Sort ascending
@@ -264,7 +167,6 @@ public class RealmContactTransactions {
         ArrayList<RecentContact> contactArrayList = new ArrayList<>();
         RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
         query.equalTo(field, filter);
-        // Execute the query:
         RealmResults<RecentContact> result1 = query.findAll();
         if (result1!=null){
             result1.sort("lastInteraction"); // Sort ascending
@@ -278,10 +180,8 @@ public class RealmContactTransactions {
 
     public void deleteContact(String field, String filter) {
         mRealm.beginTransaction();
-        ArrayList<Contact> contactArrayList = new ArrayList<>();
         RealmQuery<Contact> query = mRealm.where(Contact.class);
         query.equalTo(field, filter);
-        // Execute the query:
         RealmResults<Contact> result1 = query.findAll();
         if (result1 != null) {
             result1.clear();
@@ -291,9 +191,7 @@ public class RealmContactTransactions {
 
     public void deleteAllContacts() {
         mRealm.beginTransaction();
-        ArrayList<Contact> contactArrayList = new ArrayList<>();
         RealmQuery<Contact> query = mRealm.where(Contact.class);
-        // Execute the query:
         RealmResults<Contact> result1 = query.findAll();
         if (result1 != null) {
             result1.clear();
@@ -303,10 +201,8 @@ public class RealmContactTransactions {
 
     public void deleteFavouriteContact(String field, String filter) {
         mRealm.beginTransaction();
-        ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         query.equalTo(field, filter);
-        // Execute the query:
         RealmResults<FavouriteContact> result1 = query.findAll();
         if (result1 != null) {
             result1.clear();
@@ -316,9 +212,7 @@ public class RealmContactTransactions {
 
     public void deleteAllFavouriteContacts() {
         mRealm.beginTransaction();
-        ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
-        // Execute the query:
         RealmResults<FavouriteContact> result1 = query.findAll();
         if (result1 != null) {
             result1.clear();
@@ -328,10 +222,8 @@ public class RealmContactTransactions {
 
     public void deleteRecentContact(String field, String filter) {
         mRealm.beginTransaction();
-        ArrayList<RecentContact> contactArrayList = new ArrayList<>();
         RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
         query.equalTo(field, filter);
-        // Execute the query:
         RealmResults<RecentContact> result1 = query.findAll();
         if (result1 != null) {
             result1.clear();
@@ -341,9 +233,7 @@ public class RealmContactTransactions {
 
     public void deleteAllRecentContacts() {
         mRealm.beginTransaction();
-        ArrayList<RecentContact> contactArrayList = new ArrayList<>();
         RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
-        // Execute the query:
         RealmResults<RecentContact> result1 = query.findAll();
         if (result1 != null) {
             result1.clear();
@@ -354,22 +244,39 @@ public class RealmContactTransactions {
     public void updateContact(String field, String filter, Contact newContact) {
         mRealm.beginTransaction();
         RealmResults<Contact> realmContacts = mRealm.where(Contact.class).equalTo(field, filter).findAll();
-        realmContacts.first().setFirstName(newContact.getFirstName());//TODO: This will need to use all Contact information
+        realmContacts.first().setFirstName(newContact.getFirstName());
+        mRealm.commitTransaction();
+    }
+
+    public void updateContact(Contact updatedContact) {
+        mRealm.beginTransaction();
+        mRealm.copyToRealmOrUpdate(updatedContact);
         mRealm.commitTransaction();
     }
 
     public void updateFavouriteContact(String field, String filter, FavouriteContact newContact) {
         mRealm.beginTransaction();
         RealmResults<FavouriteContact> realmContacts = mRealm.where(FavouriteContact.class).equalTo(field, filter).findAll();
-        realmContacts.first().setFirstName(newContact.getFirstName());//TODO: This will need to use all FavouriteContact information
+        realmContacts.first().setFirstName(newContact.getFirstName());
+        mRealm.commitTransaction();
+    }
+
+    public void updateFavouriteContact(FavouriteContact updatedContact) {
+        mRealm.beginTransaction();
+        mRealm.copyToRealmOrUpdate(updatedContact);
         mRealm.commitTransaction();
     }
 
     public void updateRecentContact(String field, String filter, RecentContact newContact) {
         mRealm.beginTransaction();
         RealmResults<RecentContact> realmContacts = mRealm.where(RecentContact.class).equalTo(field, filter).findAll();
-        realmContacts.first().setFirstName(newContact.getFirstName());//TODO: This will need to use all RecentContact information
+        realmContacts.first().setFirstName(newContact.getFirstName());
         mRealm.commitTransaction();
     }
 
+    public void updateRecentContact(RecentContact updatedContact) {
+        mRealm.beginTransaction();
+        mRealm.copyToRealmOrUpdate(updatedContact);
+        mRealm.commitTransaction();
+    }
 }

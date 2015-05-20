@@ -30,6 +30,10 @@ public class BaseConnection extends DefaultConnection {
     private static final String KEY_CONTENT_TYPE = "Content-Type";
     private static final String VALUE_CONTENT_TYPE = "application/json; charset=utf-8";
     public static final String VALUE_UNAUTHORIZED = "unauthorized";
+    //TODO: HARDCODED
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String AUTHORIZATION_CODE = "Bearer 53A85tTGPZXmyOFsugkDI42Z8_p0V_hElTMg6D1T1XfvbDTxXOsOYsAH4v0ygFiqSSNKvlzeCKOlj8ht3BqrMUShPu8PhfxblJEy3S2rZvEZfupmh_uJ6WeHtX1MVt5g8p6ds4Et8xXUJ9CKLbRxuVJI-V0aGHQ9mgi0_eI5IFE";
+
     public static final String VALUE_INVALID_ACCESS_TOKEN = "invalid_access_token";
     public static final String VALUE_INVALID_TOKEN = "invalid_token";
     public static final String VALUE_INVALID_VERSION = "invalid_version";
@@ -152,4 +156,5 @@ public class BaseConnection extends DefaultConnection {
     public Context getContext() {
         return context;
     }
+    
 }

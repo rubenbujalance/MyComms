@@ -19,11 +19,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.util.APIWrapper;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONObject;
@@ -32,7 +31,7 @@ import java.util.HashMap;
 
 public class SignupMailActivity extends Activity {
 
-    ClearableEditText mEmail;
+    ClearableEditText etEmail;
     Drawable errorIcon;
 
     @Override
@@ -40,9 +39,9 @@ public class SignupMailActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_up_mail);
 
-        mEmail = (ClearableEditText)findViewById(R.id.etSignupEmail);
-        mEmail.setHint(R.string.email);
-        mEmail.setInputType(InputType.TYPE_CLASS_TEXT |
+        etEmail = (ClearableEditText)findViewById(R.id.etSignupEmail);
+        etEmail.setHint(R.string.email);
+        etEmail.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 
         errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
@@ -54,7 +53,8 @@ public class SignupMailActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if(checkData()) {
-                    callEmailCheck();
+                    if(APIWrapper.checkConnectionAndAlert(SignupMailActivity.this))
+                        callEmailCheck();
                 }
             }
         });
@@ -65,18 +65,21 @@ public class SignupMailActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //Force hide keyboard
-                InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-                mgr.hideSoftInputFromWindow(mEmail.getWindowToken(), 0);
+                InputMethodManager mgr = ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
+                mgr.hideSoftInputFromWindow(etEmail.getWindowToken(), 0);
                 //Finish the activity
                 finish();
             }
         });
 
+        //Load data if comes from Salesforce signup
+        if(UserProfile.getMail() != null) etEmail.setText(UserProfile.getMail());
+
         //Force the focus of the first field and opens the keyboard
         InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
         mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
-        mEmail.requestFocus();
+        etEmail.requestFocus();
     }
 
     @Override
@@ -160,7 +163,7 @@ public class SignupMailActivity extends Activity {
                         public void onClick(DialogInterface dialog, int id) {
                             Intent in = new Intent(SignupMailActivity.this, LoginActivity.class);
                             in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            in.putExtra("email",mEmail.getText().toString());
+                            in.putExtra("email", etEmail.getText().toString());
                             startActivity(in);
                             finish();
                         }
@@ -189,7 +192,7 @@ public class SignupMailActivity extends Activity {
         HashMap<String, Object> header = null;
 
         HashMap<String, Object> body = new HashMap<>();
-        body.put("email", mEmail.getText().toString());
+        body.put("email", etEmail.getText().toString());
         body.put("password", "123456aA"); //Password dummy, solo para comprobar el mail en este punto
 
         new CheckEmailApi().execute(body,header);
@@ -204,18 +207,18 @@ public class SignupMailActivity extends Activity {
                 (int)(errorIcon.getIntrinsicWidth()*0.5),
                 (int)(errorIcon.getIntrinsicHeight()*0.5)));
 
-        if(mEmail.getText().toString().trim().length() <= 0)
+        if(etEmail.getText().toString().trim().length() <= 0)
         {
-            mEmail.setError(
+            etEmail.setError(
                     getString(R.string.enter_your_email_to_continue),
                     errorIcon);
 
             ok = false;
         }
         else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(
-                    mEmail.getText().toString().trim()).matches())
+                    etEmail.getText().toString().trim()).matches())
         {
-            mEmail.setError(
+            etEmail.setError(
                     getString(R.string.incorrect_format),
                     errorIcon);
 
@@ -227,8 +230,7 @@ public class SignupMailActivity extends Activity {
 
     private void saveData ()
     {
-        UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-        profile.setMail(mEmail.getText().toString());
+        UserProfile.setMail(etEmail.getText().toString());
     }
 
     private class CheckEmailApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

@@ -15,7 +15,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
@@ -101,6 +100,11 @@ public class SignupCompanyActivity extends Activity {
                 finish();
             }
         });
+
+        //Load data if comes from Salesforce signup
+        if(UserProfile.getCompanyName() != null) mCompany.setText(UserProfile.getCompanyName());
+        if(UserProfile.getPosition() != null) mPosition.setText(UserProfile.getPosition());
+        if(UserProfile.getOfficeLocation() != null) mOfficeLoc.setText(UserProfile.getOfficeLocation());
 
         //Force the focus of the first field and opens the keyboard
         InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
@@ -216,9 +220,8 @@ public class SignupCompanyActivity extends Activity {
 
     private void saveData ()
     {
-        UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
-        profile.setCompanyName(mCompany.getText().toString());
-        profile.setPosition(mPosition.getText().toString());
-        profile.setOfficeLocation(mOfficeLoc.getText().toString());
+        UserProfile.setCompanyName(mCompany.getText().toString());
+        UserProfile.setPosition(mPosition.getText().toString());
+        UserProfile.setOfficeLocation(mOfficeLoc.getText().toString());
     }
 }

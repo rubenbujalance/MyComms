@@ -58,22 +58,32 @@ public class SplashScreenActivity extends Activity {
 
         if(!APIWrapper.isConnected(this))
         {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.no_internet_connection));
-            builder.setMessage(getString(R.string.no_internet_connection_is_available));
-            builder.setCancelable(false);
-
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    //Launch download and install
-                    dialog.dismiss();
+            if (UserSecurity.isUserLogged(this)) {
+                if (!UserSecurity.hasExpired(this)) {
+                    Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                    startActivity(in);
                     finish();
                 }
-            });
-
-            builder.create();
-            builder.show();
+            } else {
+                Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
+                startActivity(in);
+                finish();
+            }
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setTitle(getString(R.string.no_internet_connection));
+//            builder.setMessage(getString(R.string.no_internet_connection_is_available));
+//            builder.setCancelable(false);
+//
+//            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog, int id) {
+//                    //Launch download and install
+//                    dialog.dismiss();
+//                    finish();
+//                }
+//            });
+//
+//            builder.create();
+//            builder.show();
         }
         else {
             new CheckVersionApi().execute(new HashMap<String, Object>(), null);
@@ -83,7 +93,8 @@ public class SplashScreenActivity extends Activity {
     private void callBackVersionCheck(final String result)
     {
         try {
-            if (result != null) {
+            //if(result == null) { //TODO - Remove before pushing to Git
+            if(result != null) {
         /*
          * New version detected! Show an alert and start the update...
          */

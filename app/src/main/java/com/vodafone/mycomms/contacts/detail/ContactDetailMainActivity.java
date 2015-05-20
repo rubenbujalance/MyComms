@@ -58,7 +58,7 @@ public class ContactDetailMainActivity extends ToolbarActivity {
     }
 
     private Contact getContact(String contactId){
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, this);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm);
         List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_ID, contactId);
 
         return contactList.get(0);

@@ -20,7 +20,6 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
@@ -37,6 +36,7 @@ public class ContactController extends BaseController {
     private Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private String apiCall;
 
     public ContactController(Activity activity, Realm realm) {
         super(activity);
@@ -52,34 +52,57 @@ public class ContactController extends BaseController {
         realmContactTransactions = new RealmContactTransactions(realm);
     }
 
-    public void getContactList(String accessToken){
+    public void getContactList(String accessToken, String api){
         Log.i(Constants.TAG, "ContactController.startLogin: accessToken " + accessToken);
         if(contactConnection != null){
             contactConnection.cancel();
         }
-        contactConnection = new ContactConnection(getContext(), this);
+        apiCall = api;
+        contactConnection = new ContactConnection(getContext(), this, apiCall);
+        contactConnection.request();
+    }
 
+    public void getFavouritesList(String accessToken, String api){
+        Log.i(Constants.TAG, "ContactController.getFavouritesList: accessToken " + accessToken);
+        if(contactConnection != null){
+            contactConnection.cancel();
+        }
+        apiCall = api;
+        contactConnection = new ContactConnection(getContext(), this, apiCall);
         contactConnection.request();
     }
 
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-        Log.i(Constants.TAG, "ContactController.onConnectionComplete: ");
+        Log.i(Constants.TAG, "ContactController.onConnectionComplete: init: " + apiCall);
         String result = response.getData().toString();
         Log.i(Constants.TAG, "ContactController.onConnectionComplete: " + result);
         JSONObject jsonResponse;
 
-        try {
-            jsonResponse = new JSONObject(result);
-            Log.i(Constants.TAG, "ContactController.onConnectionComplete: jsonResponse: " + jsonResponse.toString());
-            ArrayList<Contact> realmContactList = new ArrayList<>();
-            realmContactList = insertContactListInRealm(jsonResponse);
-            if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback){
-                ((IContactsConnectionCallback)this.getConnectionCallback()).onContactsResponse(realmContactList);
+        if (apiCall.equals(Constants.CONTACT_API_GET_CONTACTS)) {
+            try {
+                jsonResponse = new JSONObject(result);
+                Log.i(Constants.TAG, "ContactController.onConnectionComplete: jsonResponse: " + jsonResponse.toString());
+                ArrayList<Contact> realmContactList = new ArrayList<>();
+                realmContactList = insertContactListInRealm(jsonResponse);
+                if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
+                    ((IContactsConnectionCallback) this.getConnectionCallback()).onContactsResponse(realmContactList);
+                }
+
+                realmContactTransactions.getContactById("mc_55361a9cc729d4430b9722f3");
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
             }
-        } catch (Exception e){
-            Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
+        } else if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)){
+            try {
+                jsonResponse = new JSONObject(result);
+
+                insertFavouriteContactInRealm(jsonResponse);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
+            }
         }
     }
 
@@ -104,11 +127,13 @@ public class ContactController extends BaseController {
         return realmContactList;
     }
 
-    public List<Contact> getAllContacts(){
+    public ArrayList<Contact> getAllContacts(){
+        Log.d(Constants.TAG, "ContactController.getAllContacts: ");
         return realmContactTransactions.getAllContacts();
     }
 
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
+        Log.i(Constants.TAG, "ContactController.getAllFavouriteContacts: ");
         ArrayList<FavouriteContact> favList = new ArrayList<>();
         favList = realmContactTransactions.getAllFavouriteContacts();
         return favList;
@@ -145,31 +170,29 @@ public class ContactController extends BaseController {
         realmContactTransactions.insertContactList(contactList);
     }
 
-    public void insertFavouriteContactInRealm(JsonElement json){
-        JSONObject jsonObject = null;
+    public void insertFavouriteContactInRealm(JSONObject json){
         JSONArray jsonArray = null;
-        try {
-            jsonObject = new JSONObject(json.toString());
-            jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDBController.insertFavouriteContactInRealm: " + e.toString());
-        }
         Contact contact;
-        ArrayList<Contact> contactList = new ArrayList<>();
+        ArrayList<FavouriteContact> contactList = new ArrayList<>();
         try {
+            Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: jsonResponse: " + json.toString());
+            jsonArray = json.getJSONArray(Constants.CONTACT_FAVOURITES);
             for (int i = 0; i < jsonArray.length(); i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject);
+                contact = realmContactTransactions.getContactById(jsonArray.getString(i));
                 if (contact != null) {
-                    contactList.add(contact);
+                    contactList.add(mapContactToFavourite(contact));
+                    Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: contactList " + contactList.get(i).toString());
                 }
+            }
+            if (contactList.size()!=0) {
+                realmContactTransactions.deleteAllFavouriteContacts();
+                realmContactTransactions.insertFavouriteContactList(contactList);
+                Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: inserted contactList ");
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDBController.insertFavouriteContactInRealm: " + e.toString());
+            Log.e(Constants.TAG, "ContactController.insertFavouriteContactInRealm : " + e.toString());
         }
-        realmContactTransactions.insertContactList(contactList);
     }
 
     public static Contact mapContact(JSONObject jsonObject){

@@ -207,22 +207,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
         try {
             if (status.compareTo("200") != 0) {
-                btLogin.setText(getString(R.string.oops_wrong_password));
-
-                int sdk = android.os.Build.VERSION.SDK_INT;
-                if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                    btLogin.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.bt_red_style));
-                } else {
-                    btLogin.setBackground(this.getResources().getDrawable(R.drawable.bt_red_style));
-                }
-
-                Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
-                errorIcon.setBounds(new Rect(0, 0,
-                        (int) (errorIcon.getIntrinsicWidth() * 0.5),
-                        (int) (errorIcon.getIntrinsicHeight() * 0.5)));
-
-//                etPassword.setError(getString(R.string.oops_wrong_password), errorIcon);
-                etPassword.setCompoundDrawables(null, null, errorIcon, null);
+               onLoginError();
             }
             else
             {
@@ -266,6 +251,23 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
     @Override
     public void onLoginError() {
         Log.e(Constants.TAG, "LoginActivity.onLoginError: ");
+        btLogin.setText(getString(R.string.oops_wrong_password));
+
+        int sdk = android.os.Build.VERSION.SDK_INT;
+        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            btLogin.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.bt_red_style));
+        } else {
+            btLogin.setBackground(this.getResources().getDrawable(R.drawable.bt_red_style));
+        }
+
+        Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
+        errorIcon.setBounds(new Rect(0, 0,
+                (int) (errorIcon.getIntrinsicWidth() * 0.5),
+                (int) (errorIcon.getIntrinsicHeight() * 0.5)));
+
+//                etPassword.setError(getString(R.string.oops_wrong_password), errorIcon);
+        etPassword.setCompoundDrawables(null, null, errorIcon, null);
+
     }
 
     @Override

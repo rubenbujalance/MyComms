@@ -19,11 +19,12 @@ import java.util.Iterator;
  * Created by str_vig on 14/05/2015.
  */
 public class LoginConnection extends BaseConnection{
-    private static final String URL = "/auth/login";
+    public static final String URL = "/auth/login";
     private static final int method = HttpConnection.POST;
 
     public LoginConnection(Context context, ConnectionListener listener){
         super(URL, context, listener, method);
         Log.d(Constants.TAG, "LoginConnection.LoginConnection: ");
     }
+
 }

@@ -200,6 +200,11 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
         }
     };
 
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.d(Constants.TAG, "ContactListFragment.onConnectionNotAvailable: ");
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

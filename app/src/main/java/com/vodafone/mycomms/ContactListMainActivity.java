@@ -77,5 +77,4 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         super.onDestroy();
         realm.close();
     }
-
 }

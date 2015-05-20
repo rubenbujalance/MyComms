@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.connection.TestConnection;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -221,14 +222,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
                 UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
 
-                //Force hide keyboard
-                InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-                mgr.hideSoftInputFromWindow(etEmail.getWindowToken(), 0);
-
-                //Start Main activity
-                Intent in = new Intent(LoginActivity.this, ContactListMainActivity.class);
-                startActivity(in);
-                finish();
+                startMainActivity();
             }
         } catch(Exception ex) {
             Log.e(Constants.TAG, "LoginActivity.callBackPassCheck:" , ex);
@@ -236,14 +230,35 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         }
     }
 
+    private void startMainActivity(){
+        //Force hide keyboard
+        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+        mgr.hideSoftInputFromWindow(etEmail.getWindowToken(), 0);
+
+
+        //Start Main activity
+        Intent in = new Intent(LoginActivity.this, ContactListMainActivity.class);
+
+        in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(in);
+        finish();
+    }
     @Override
     public void onLoginSuccess() {
         Log.d(Constants.TAG, "LoginActivity.onLoginSuccess: ");
+
+//        TestConnection testConnection = new TestConnection(this.getApplicationContext(), this.loginController);
+//        testConnection.request();
     }
 
     @Override
     public void onLoginError() {
         Log.e(Constants.TAG, "LoginActivity.onLoginError: ");
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.w(Constants.TAG, "LoginActivity.onConnectionNotAvailable: ");
     }
 
     private class CheckPasswordApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

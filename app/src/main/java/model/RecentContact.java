@@ -22,9 +22,10 @@ public class RecentContact extends RealmObject {
     private String availability;
     private String presence;
     private String country;
-
-    @PrimaryKey
     private String id;
+
+    private String action;
+    private String actionTimeStamp;
 
     public RecentContact(){
 
@@ -46,6 +47,8 @@ public class RecentContact extends RealmObject {
         this.availability = availability;
         this.presence = presence;
         this.country = country;
+        this.action = action;
+        this.actionTimeStamp = actionTimeStamp;
     }
 
     public int getLastInteraction() {
@@ -174,5 +177,21 @@ public class RecentContact extends RealmObject {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getActionTimeStamp() {
+        return actionTimeStamp;
+    }
+
+    public void setActionTimeStamp(String actionTimeStamp) {
+        this.actionTimeStamp = actionTimeStamp;
     }
 }

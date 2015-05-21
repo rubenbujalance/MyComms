@@ -14,7 +14,6 @@ import com.vodafone.mycomms.R;
 import java.util.List;
 
 import model.RecentContact;
-import model.RecentItem;
 
 /**
  * Created by str_vig on 28/04/2015.
@@ -36,6 +35,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
             convertView = inflater.inflate(R.layout.layout_list_item_recent, parent, false);
 
             viewHolder = new RecentViewHolder();
+            viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.companyLogo);
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
             viewHolder.textViewOccupation = (TextView) convertView.findViewById(R.id.list_item_content_position);
@@ -73,8 +73,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         } else if (contact.getAction().equals("call")) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_phone));
         }
-
-        viewHolder.textViewTime.setText(contact.getActionTimeStamp());
+        //viewHolder.textViewTime.setText(contact.getActionTimeStamp());
 
         return convertView;
     }

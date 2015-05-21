@@ -22,7 +22,6 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
@@ -228,15 +227,15 @@ public class ContactController extends BaseController {
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
 
-                Log.e(Constants.TAG, "ContactController.insertRecentContactInRealm : id?=" +  jsonArray.getJSONObject(i).getString("id"));
-                contact = realmContactTransactions.getContactById( jsonArray.getJSONObject(i).getString("id"));
+                Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm : id?=" + jsonArray.getJSONObject(i).getString("id"));
+                contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString("id"));
 //                RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
 //                List<Contact> contactList2 = realmContactTransactions.getFilteredContacts(Constants.CONTACT_ID, jsonArray.getJSONObject(i).getString("id"));
 //
 //                contact = contactList2.get(0);
 
                 if (contact != null) {
-                    contactList.add(mapContactToRecent(contact));
+                    contactList.add(mapContactToRecent(contact,jsonArray.getJSONObject(i)));
                     Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: contactList " + contactList.get(i).toString());
                 }
             }
@@ -381,7 +380,7 @@ public class ContactController extends BaseController {
         return contact;
     }
 
-    public RecentContact mapContactToRecent(Contact contact){
+    public RecentContact mapContactToRecent(Contact contact, JSONObject jsonObject){
         RecentContact recentContact = new RecentContact();
         recentContact.setId(contact.getId());
         recentContact.setPlatform(contact.getPlatform());
@@ -397,6 +396,12 @@ public class ContactController extends BaseController {
         recentContact.setAvailability(contact.getAvailability());
         recentContact.setPresence(contact.getPresence());
         recentContact.setCountry(contact.getCountry());
+        try {
+            recentContact.setAction(jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
+            recentContact.setActionTimeStamp(jsonObject.getInt(Constants.CONTACT_RECENTS_ACTION_TIME));
+        } catch (JSONException e){
+            Log.e(Constants.TAG, "ContactController.mapContactToRecent: " + e);
+        }
         return recentContact;
     }
 

@@ -130,4 +130,17 @@ public final class Utils {
             return null;
         else return _countries.get(code);
     }
+
+    public static String getStringTimeDifference(int millis){
+        long timeDiffMilis = millis;
+        long minutes = timeDiffMilis / 60000;
+        long hours = minutes / 60;
+        long days = hours / 24;
+        String difference = "";
+        if(days >= 1) difference = days + " days ";
+        else if(hours >=1) difference = hours + " hours ";
+        else if(minutes >=1) difference = minutes + " min";
+
+        return difference;
+    }
 }

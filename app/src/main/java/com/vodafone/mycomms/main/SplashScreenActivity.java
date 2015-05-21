@@ -144,11 +144,11 @@ public class SplashScreenActivity extends Activity {
             String text = null;
             String status = null;
 
-            status = (String)result.get("status");
-
-            if(result.containsKey("json")) json = (JSONObject)result.get("json");
-
             try {
+                status = (String)result.get("status");
+
+                if(result.containsKey("json")) json = (JSONObject)result.get("json");
+
                 if (status.compareTo("400") == 0 &&
                         json.get("err") != null &&
                         json.get("err").toString().compareTo("invalid_version") == 0) {

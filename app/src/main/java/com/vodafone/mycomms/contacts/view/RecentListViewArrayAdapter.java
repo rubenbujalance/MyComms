@@ -8,19 +8,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 
 import java.util.List;
 
-import model.Contact;
-import model.RecentItem;
+import model.RecentContact;
 
 /**
  * Created by str_vig on 28/04/2015.
  */
-public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
-    public RecentListViewArrayAdapter(Context context, List<RecentItem> items) {
+public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
+    private Context mContext;
+
+    public RecentListViewArrayAdapter(Context context, List<RecentContact> items) {
         super(context, R.layout.layout_list_item_recent, items);
+        this.mContext = context;
     }
 
     @Override
@@ -32,6 +35,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
             convertView = inflater.inflate(R.layout.layout_list_item_recent, parent, false);
 
             viewHolder = new RecentViewHolder();
+            viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.companyLogo);
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
             viewHolder.textViewOccupation = (TextView) convertView.findViewById(R.id.list_item_content_position);
@@ -44,24 +48,32 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
               viewHolder = (RecentViewHolder) convertView.getTag();
         }
 
-        // update the item view
-        RecentItem recentItem = getItem(position);
-        Contact contact = getItem(position).getContact();
-        viewHolder.textViewCompany.setText(contact.getCompany());
-        viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
-        //viewHolder.textViewPosition.setText(contact.getOccupation());
-        viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
-        //viewHolder.textViewTime.setText(contact.getTime());
 
-        if(recentItem.getItemType() == RecentItem.RecentItemType.MAIL){
-            viewHolder.imageViewRecentType.setImageResource(R.drawable.btn_more_invite);
-        }else if(recentItem.getItemType() == RecentItem.RecentItemType.CALL){
-            viewHolder.imageViewRecentType.setImageResource(R.drawable.icon_recent_phone);
-        } else if (recentItem.getItemType() == RecentItem.RecentItemType.CHAT){
-            viewHolder.imageViewRecentType.setImageResource(R.drawable.icon_recent_message);
+        // update the item view
+        RecentContact contact = getItem(position);
+
+        if (!contact.getAvatar().equals("")) {
+            Picasso.with(mContext).load(contact.getAvatar())
+                    .error(R.drawable.cartoon_round_contact_image_example)
+                    .into(viewHolder.imageAvatar);
+        } else {
+            viewHolder.imageAvatar.setImageDrawable(mContext.getResources().getDrawable(R.drawable.cartoon_round_contact_image_example));
         }
 
+        viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
+        viewHolder.textViewOccupation.setText(contact.getPosition());
+        viewHolder.textViewCompany.setText(contact.getCompany());
 
+        if(!contact.getAction().equals("")) {
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_error_tooltip));
+        } else if (contact.getAction().equals("sms")) {
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_message));
+        } else if (contact.getAction().equals("email")) {
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.img_verify_email));
+        } else if (contact.getAction().equals("call")) {
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_phone));
+        }
+        //viewHolder.textViewTime.setText(contact.getActionTimeStamp());
 
         return convertView;
     }
@@ -76,5 +88,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
         TextView textViewTime;
         TextView textViewRecentItemTime;
         ImageView imageViewRecentType;
+        ImageView imageAvatar;
     }
 }

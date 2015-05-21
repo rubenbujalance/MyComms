@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -52,6 +55,14 @@ public final class Utils {
 
         builder.create();
         builder.show();
+    }
+
+    public static String getTimeFromMillis(int millis){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+        return formatter.format(calendar.getTime());
+
     }
 
     private static boolean loadCountriesHash(Context context)

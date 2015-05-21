@@ -139,7 +139,8 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
             //setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(),
             //        ContactListManager.getInstance().getRecentList(getActivity(), realm)));
         }else if(mIndex == Constants.CONTACTS_ALL){
-            setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(), mContactController.getAllContacts()));
+            contactList = mContactController.getAllContacts();
+            setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(),contactList ));
         }
         //TODO: CALL A LA API PARA GET DE CONTACTOS. CUANDO ACABE LLAMAR CARGA DE LISTA POR SEGUNDA VEZ + setListAdapter UNDER DEVELOPMENT
         //TODO: CALL A LA API PARA GET DE FAVORITOS. CUANDO ACABE LLAMAR CARGA DE LISTA POR SEGUNDA VEZ + setListAdapter

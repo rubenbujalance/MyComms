@@ -104,7 +104,7 @@ public class ContactController extends BaseController {
         return realmContactList;
     }
 
-    public List<Contact> getAllContacts(){
+    public ArrayList<Contact> getAllContacts(){
         return realmContactTransactions.getAllContacts();
     }
 

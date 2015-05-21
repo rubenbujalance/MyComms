@@ -12,7 +12,15 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import model.Contact;
 
@@ -61,15 +69,56 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewPosition.setText(contact.getPosition());
-        viewHolder.textViewOfficeLocation.setText(contact.getOfficeLocation());
 
-        viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getLastSeen()));
-        /*if(contact.isDayTime()){
-            viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_sun);
-        }else{
-            viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_moon);
-        }*/
-        viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_sun);
+        //Icon
+        String icon = null;
+        try {
+            icon = new JSONObject(contact.getPresence()).getString("icon");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(icon.compareTo("dnd")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_notdisturb);
+        else if(icon.compareTo("vacation")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_vacation);
+        else if(icon.compareTo("moon")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_moon);
+        else viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
+
+        //viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getLastSeen()));
+
+        //Local time
+        String presenceDetail = null;
+
+        try {
+            presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            assert null != presenceDetail;
+            if (presenceDetail.equals("#LOCAL_TIME#")) {
+                TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+                Calendar currentCal = Calendar.getInstance();
+
+                SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
+                sourceFormat.setTimeZone(currentCal.getTimeZone());
+
+                Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE));
+
+                SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
+                destFormat.setTimeZone(tz);
+
+                String result = destFormat.format(parsed);
+
+                viewHolder.textViewTime.setText(result);
+            } else {
+                viewHolder.textViewTime.setText(presenceDetail);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
         return convertView;
     }
 

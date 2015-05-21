@@ -62,11 +62,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         viewHolder.textViewPosition.setText(contact.getPosition());
         viewHolder.textViewOfficeLocation.setText(contact.getOfficeLocation());
         viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getLastSeen()));
-        /*if(contact.isDayTime()){
-            viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_sun);
-        }else{
-            viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_moon);
-        }*/
+
         viewHolder.imageViewDayNight.setImageResource(R.drawable.icon_sun);
         return convertView;
     }

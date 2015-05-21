@@ -137,6 +137,7 @@ public class RealmContactTransactions {
     }
 
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
+        Log.i(Constants.TAG, "RealmContactTransactions.getAllFavouriteContacts: ");
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         RealmResults<FavouriteContact> result1 = query.findAll();

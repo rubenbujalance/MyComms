@@ -13,6 +13,7 @@ import com.vodafone.mycomms.R;
 import java.util.List;
 
 import model.RecentContact;
+import model.RecentItem;
 
 /**
  * Created by str_vig on 28/04/2015.
@@ -54,7 +55,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         //DAVID viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
         //viewHolder.textViewTime.setText(contact.getTime());
 
-        /*DAVID if(recentItem.getItemType() == RecentItem.RecentItemType.MAIL){
+        /*if(recentItem.getItemType() == RecentItem.RecentItemType.MAIL){
             viewHolder.imageViewRecentType.setImageResource(R.drawable.btn_more_invite);
         }else if(recentItem.getItemType() == RecentItem.RecentItemType.CALL){
             viewHolder.imageViewRecentType.setImageResource(R.drawable.icon_recent_phone);

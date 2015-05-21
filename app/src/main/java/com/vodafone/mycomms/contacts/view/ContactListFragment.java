@@ -153,19 +153,23 @@ public class ContactListFragment extends ListFragment{
             Intent in = new Intent(getActivity(), ContactDetailMainActivity.class);
             if(mIndex == Constants.CONTACTS_ALL) {
                 in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId() );
+                startActivity(in);
             } else if (mIndex == Constants.CONTACTS_RECENT) {
                 try {
                     String action = recentContactList.get(position).getAction();
                     if (action.compareTo("call") == 0) {
-                        JSONArray jPhones = new JSONArray(recentContactList.get(position).getPhones());
-                        String phone = (String) ((JSONObject) jPhones.get(0)).get("phone");
-                        Utils.launchCall(phone, getActivity());
+                        String strPhones = recentContactList.get(position).getPhones();
+                        if (strPhones != null) {
+                            JSONArray jPhones = new JSONArray(strPhones);
+                            String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
+                            Utils.launchCall(phone, getActivity());
+                        }
                     }
                     else if (action.compareTo("sms") == 0) {
                         String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null) {
                             JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String) ((JSONObject) jPhones.get(0)).get("phone");
+                            String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
                             Utils.launchSms(phone, getActivity());
                         }
                     }
@@ -173,8 +177,7 @@ public class ContactListFragment extends ListFragment{
                         String strEmails = recentContactList.get(position).getEmails();
                         if (strEmails != null) {
                             JSONArray jPhones = new JSONArray(strEmails);
-                            String email = (String) ((JSONObject) jPhones.get(0)).get("email");
-
+                            String email = (String)((JSONObject) jPhones.get(0)).get("email");
                             Utils.launchEmail(email, getActivity());
                         }
                     }
@@ -183,8 +186,9 @@ public class ContactListFragment extends ListFragment{
                 }
             } else if (mIndex == Constants.CONTACTS_FAVOURITE) { {
                 in.putExtra(Constants.CONTACT_ID,favouriteContactList.get(position).getId() );
+                startActivity(in);
             }}
-            startActivity(in);
+
         }
     }
 /*

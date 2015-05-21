@@ -51,22 +51,34 @@ public class SplashScreenActivity extends Activity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-        if(!APIWrapper.isConnected(this))
+        //Check if it has been called from the email link
+        Uri uriData = getIntent().getData();
+
+        if(uriData != null &&
+                uriData.getHost() != null &&
+                uriData.getHost().compareTo("user") == 0)
         {
-            if (UserSecurity.isUserLogged(this)) {
-                if (!UserSecurity.hasExpired(this)) {
-                    Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+            String refreshToken = uriData.getLastPathSegment();
+            UserSecurity.setTokens(null, refreshToken, 0, this);
+            renewToken();
+        }
+        else {
+            //Normal behaviour
+            if (!APIWrapper.isConnected(this)) {
+                if (UserSecurity.isUserLogged(this)) {
+                    if (!UserSecurity.hasExpired(this)) {
+                        Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                        startActivity(in);
+                        finish();
+                    }
+                } else {
+                    Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
                     startActivity(in);
                     finish();
                 }
             } else {
-                Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
-                startActivity(in);
-                finish();
+                new CheckVersionApi().execute(new HashMap<String, Object>(), null);
             }
-        }
-        else {
-            new CheckVersionApi().execute(new HashMap<String, Object>(), null);
         }
     }
 
@@ -156,7 +168,7 @@ public class SplashScreenActivity extends Activity {
     public void renewToken()
     {
         HashMap<String,Object> params = new HashMap<>();
-        params.put("accessToken", UserSecurity.getAccessToken(this));
+//        params.put("accessToken", UserSecurity.getAccessToken(this));
         params.put("refreshToken", UserSecurity.getRefreshToken(this));
 
         new RenewTokenAPI().execute(params, null);

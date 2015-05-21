@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +15,15 @@ import android.widget.ListView;
 import com.fortysevendeg.swipelistview.SwipeListView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactController;
-import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
@@ -120,6 +120,7 @@ public class ContactListFragment extends ListFragment{
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
         setListAdapterTabs();
         
     }
@@ -152,12 +153,42 @@ public class ContactListFragment extends ListFragment{
             Intent in = new Intent(getActivity(), ContactDetailMainActivity.class);
             if(mIndex == Constants.CONTACTS_ALL) {
                 in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId() );
+                startActivity(in);
             } else if (mIndex == Constants.CONTACTS_RECENT) {
-                in.putExtra(Constants.CONTACT_ID,recentContactList.get(position).getId() );
+                try {
+                    String action = recentContactList.get(position).getAction();
+                    if (action.compareTo("call") == 0) {
+                        String strPhones = recentContactList.get(position).getPhones();
+                        if (strPhones != null) {
+                            JSONArray jPhones = new JSONArray(strPhones);
+                            String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
+                            Utils.launchCall(phone, getActivity());
+                        }
+                    }
+                    else if (action.compareTo("sms") == 0) {
+                        String strPhones = recentContactList.get(position).getPhones();
+                        if (strPhones != null) {
+                            JSONArray jPhones = new JSONArray(strPhones);
+                            String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
+                            Utils.launchSms(phone, getActivity());
+                        }
+                    }
+                    else if (action.compareTo("email") == 0) {
+                        String strEmails = recentContactList.get(position).getEmails();
+                        if (strEmails != null) {
+                            JSONArray jPhones = new JSONArray(strEmails);
+                            String email = (String)((JSONObject) jPhones.get(0)).get("email");
+                            Utils.launchEmail(email, getActivity());
+                        }
+                    }
+                } catch (Exception ex) {
+                    Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);
+                }
             } else if (mIndex == Constants.CONTACTS_FAVOURITE) { {
                 in.putExtra(Constants.CONTACT_ID,favouriteContactList.get(position).getId() );
+                startActivity(in);
             }}
-            startActivity(in);
+
         }
     }
 /*

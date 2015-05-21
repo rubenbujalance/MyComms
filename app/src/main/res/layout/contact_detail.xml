@@ -26,16 +26,17 @@
             android:layout_marginBottom="10dp"
             android:paddingBottom="10dp"
             android:layout_weight="6"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="top|center_horizontal"
+            android:gravity="top|center_horizontal">
 
-            <LinearLayout
+            <RelativeLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingRight="10dp"
                 android:paddingLeft="10dp"
                 android:id="@+id/topHeader"
-                android:focusable="true">
+                android:focusable="true" >
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -44,76 +45,68 @@
                     android:src="@drawable/btn_back_white"
                     android:focusable="false" />
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" >
-
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_height="29dp"
-                        android:id="@+id/textView8"
-                        android:layout_gravity="right"
-                        android:textColor="#bbbbbb"
-                        android:textSize="12dp" />
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="264dp"
-                    android:layout_height="wrap_content"
+                <com.vodafone.mycomms.custom.CircleImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:id="@+id/avatar"
                     android:src="@drawable/cartoon_round_contact_image_example"
                     android:adjustViewBounds="false"
-                    android:layout_weight="1.55" />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:orientation="vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:gravity="right">
+                    android:gravity="end|right"
+                    android:id="@+id/rel"
+                    android:layout_alignParentRight="true">
 
                     <ImageView
                         android:layout_width="35dp"
                         android:layout_height="35dp"
-                        android:id="@+id/iconStatus"
-                        android:background="@mipmap/ico_sun_white" />
-                        android:id="@+id/contact_icon_status"
-                        android:background="@drawable/icon_sun" />
+                        android:id="@+id/ivStatus"
+                        android:layout_alignParentRight="true"
+                        />
 
                     <TextView
                         android:layout_width="50dp"
                         android:layout_height="20dp"
                         android:text="20:46"
                         android:id="@+id/contact_local_time"
-                        android:layout_gravity="right"
                         android:textColor="#ffffffff"
-                        android:gravity="right" />
+                        android:gravity="right"
+                        android:layout_below="@+id/ivStatus"
+                        android:layout_alignParentRight="true"/>
 
                     <TextView
                         android:layout_width="100dp"
                         android:layout_height="20dp"
                         android:text="United States"
                         android:id="@+id/contact_country"
-                        android:layout_gravity="right"
                         android:textColor="#cccccc"
                         android:textSize="12dp"
-                        android:gravity="right" />
+                        android:gravity="right"
+                        android:layout_below="@+id/contact_local_time"
+                        android:layout_alignParentRight="true"/>
 
                     <TextView
                         android:layout_width="100dp"
                         android:layout_height="20dp"
                         android:text="Seen 2d ago"
                         android:id="@+id/contact_last_seen"
-                        android:layout_gravity="right"
                         android:textColor="#cccccc"
                         android:textSize="12dp"
-                        android:gravity="right" />
+                        android:gravity="right"
+                        android:layout_below="@+id/contact_country"
+                        android:layout_alignParentRight="true"/>
 
-                </LinearLayout>
+                </RelativeLayout>
 
 
-            </LinearLayout>
+            </RelativeLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -126,7 +119,8 @@
                     android:orientation="vertical"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:paddingLeft="20dp">
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp">
 
                     <LinearLayout
                         android:orientation="horizontal"
@@ -148,18 +142,17 @@
                                 android:textIsSelectable="false"
                                 android:textSize="@dimen/abc_text_size_large_material"
                                 android:textColor="#ffffffff"
-                                android:textStyle="bold"
                                 android:textAlignment="gravity"
                                 android:layout_gravity="center"
                                 android:gravity="center" />
 
                             <TextView
                                 android:layout_width="match_parent"
-                                android:layout_height="20dp"
+                                android:layout_height="25dp"
                                 android:textAppearance="?android:attr/textAppearanceSmall"
                                 android:text="Senior Enterprise Manager"
                                 android:id="@+id/contact_position"
-                                android:textColor="#ffffff"
+                                android:textColor="#aaaaaa"
                                 android:textAlignment="gravity"
                                 android:layout_gravity="center"
                                 android:textSize="18dp"
@@ -171,7 +164,7 @@
                                 android:textAppearance="?android:attr/textAppearanceSmall"
                                 android:text="Vodafone Global Enterprise"
                                 android:id="@+id/contact_company"
-                                android:textColor="#ffffff"
+                                android:textColor="#aaaaaa"
                                 android:textAlignment="gravity"
                                 android:layout_gravity="center"
                                 android:textSize="14dp"
@@ -423,7 +416,7 @@
                         style="@style/TextViewProfile"
                         android:text="Office Location"
                         android:textSize="16dp" />
-                    <EditText
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -129,6 +131,33 @@ public final class Utils {
         if(!loadCountriesHash(context))
             return null;
         else return _countries.get(code);
+    }
+
+    public static void launchCall(String phone, Context context)
+    {
+        String url = "tel:"+phone;
+        Intent in = new Intent(Intent.ACTION_CALL, Uri.parse(url));
+        context.startActivity(in);
+    }
+
+    public static void launchEmail(String email, Context context)
+    {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("message/rfc822");
+        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+//                        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+//                        intent.putExtra(Intent.EXTRA_TEXT, "I'm email body.");
+
+        context.startActivity(intent);
+    }
+
+    public static void launchSms(String phone, Context context)
+    {
+        String url = "sms:"+phone;
+        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+        sendIntent.setData(Uri.parse(url));
+//                        sendIntent.putExtra("sms_body", x);
+        context.startActivity(sendIntent);
     }
 
     public static String getStringTimeDifference(int millis){

@@ -75,7 +75,7 @@ public class RealmContactTransactions {
     public void insertRecentContact (RecentContact newContact){
         try {
             mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(newContact);
+            mRealm.copyToRealm(newContact);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -88,7 +88,7 @@ public class RealmContactTransactions {
         try {
             mRealm.beginTransaction();
             for (int i = 0; i < size; i++) {
-                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
+                mRealm.copyToRealm(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){

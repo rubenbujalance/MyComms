@@ -10,6 +10,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
@@ -181,13 +183,13 @@ public class ContactController extends BaseController {
                 contact = realmContactTransactions.getContactById(jsonArray.getString(i));
                 if (contact != null) {
                     contactList.add(mapContactToFavourite(contact));
-                    Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: contactList " + contactList.get(i).toString());
                 }
             }
             if (contactList.size()!=0) {
-                realmContactTransactions.deleteAllFavouriteContacts();
+                //realmContactTransactions.deleteAllFavouriteContacts();
                 realmContactTransactions.insertFavouriteContactList(contactList);
                 Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: inserted contactList ");
+                BusProvider.getInstance().post(new SetContactListAdapterEvent());
             }
         } catch (JSONException e) {
             e.printStackTrace();

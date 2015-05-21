@@ -40,7 +40,6 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
             viewHolder.textViewPosition = (TextView) convertView.findViewById(R.id.list_item_content_position);
-            viewHolder.textViewOfficeLocation = (TextView) convertView.findViewById(R.id.list_item_office_location);
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_status_local_time);
             viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
             convertView.setTag(viewHolder);

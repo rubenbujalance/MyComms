@@ -21,6 +21,7 @@ import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -29,6 +30,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
+
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RefreshContactListEvent;
+import com.vodafone.mycomms.util.Constants;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -304,6 +309,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageSelected(position);
             }
+            Log.i(Constants.TAG, "TabClickListener.onPageSelected: ");
+            BusProvider.getInstance().post(new RefreshContactListEvent());
         }
 
     }
@@ -319,5 +326,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
         }
     }
+
+
 
 }

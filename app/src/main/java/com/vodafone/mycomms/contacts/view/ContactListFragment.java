@@ -15,14 +15,11 @@ import android.widget.ListView;
 import com.fortysevendeg.swipelistview.SwipeListView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactController;
-import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
@@ -36,26 +33,25 @@ import model.RecentContact;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends ListFragment implements IContactsConnectionCallback {
+public class ContactListFragment extends ListFragment{
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private Realm realm;
+    private ContactController mContactController;
     private ArrayList<Contact> contactList;
     private ArrayList<FavouriteContact> favouriteContactList;
     private ArrayList<RecentContact> recentContactList;
     protected Handler handler = new Handler();
-    private ContactController mContactController;
+
     private ContactListViewArrayAdapter adapter;
     private SwipeListView swipeListView;
-    private String accessToken;
-    private String apiCall;
-
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
 
     // TODO: Rename and change types of parameters
     private int mIndex;
@@ -76,7 +72,6 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
-
        /*final SwipeListView swipeListView = (SwipeListView) v.findViewById(android.R.id.list);
        swipeListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
            @Override
@@ -110,31 +105,18 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
      * fragment (e.g. upon screen orientation changes).
      */
     public ContactListFragment() {
-
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "ContactListFragment.onCreate: ");
         super.onCreate(savedInstanceState);
-
+        realm = Realm.getInstance(getActivity());
+        mContactController = new ContactController(getActivity(),realm);
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        accessToken = UserSecurity.getAccessToken(getActivity());
-        realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(this,realm);
-        apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        mContactController.getContactList(accessToken, apiCall);
-        mContactController.setConnectionCallback(this);
-
         setListAdapterTabs();
-        //TODO: CALL A LA API PARA GET DE CONTACTOS. CUANDO ACABE LLAMAR CARGA DE LISTA POR SEGUNDA VEZ + setListAdapter UNDER DEVELOPMENT
-        //TODO: CALL A LA API PARA GET DE FAVORITOS. CUANDO ACABE LLAMAR CARGA DE LISTA POR SEGUNDA VEZ + setListAdapter
-        //TODO: CALL A LA API PARA GET DE RECIENTES. CUANDO ACABE LLAMAR CARGA DE LISTA POR SEGUNDA VEZ + setListAdapter
-        //TODO: CALL A LA BD PARA CARGAR LISTA DE CONTACTOS (VIEJOS)
     }
 
     @Override
@@ -154,7 +136,6 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
         mListener = null;
     }
 
-
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -164,7 +145,6 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
             Intent in = new Intent(getActivity(), ContactDetailMainActivity.class);
-            //TODO: Implement back navigation
             if(mIndex == Constants.CONTACTS_ALL) {
                 in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId() );
             } else if (mIndex == Constants.CONTACTS_RECENT) {
@@ -190,11 +170,6 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
         }
     };*/
 
-    @Override
-    public void onConnectionNotAvailable() {
-        Log.d(Constants.TAG, "ContactListFragment.onConnectionNotAvailable: ");
-    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -217,7 +192,7 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
     }
 
     public void setListAdapterTabs(){
-        Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: apiCall " + apiCall);
+        Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
             favouriteContactList = mContactController.getAllFavouriteContacts();
             if (favouriteContactList.size()!=0) {
@@ -235,19 +210,5 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
                 setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList));
             }
         }
-    }
-
-    @Override
-    public void onContactsResponse(List<Contact> contactList) {
-        Log.i(Constants.TAG, "onContactsResponse: " + apiCall);
-
-        if(apiCall == Constants.CONTACT_API_GET_FAVOURITES) {
-
-        }else if(apiCall == Constants.CONTACT_API_GET_CONTACTS){
-            apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-            mContactController.getFavouritesList(accessToken, apiCall);
-        }
-
-        setListAdapterTabs();
     }
 }

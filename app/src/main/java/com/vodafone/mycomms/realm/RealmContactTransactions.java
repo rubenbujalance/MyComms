@@ -103,7 +103,6 @@ public class RealmContactTransactions {
         RealmResults<Contact> result1 = query.findAll();
         if (result1!=null){
             for (Contact contactListItem : result1) {
-                Log.i(Constants.TAG, "RealmContactTransactions.getAllContacts: contact Id: " + contactListItem.getId());
                 contactArrayList.add(contactListItem);
             }
         }
@@ -131,10 +130,8 @@ public class RealmContactTransactions {
         RealmResults<Contact> result1 = query.findAll();
 
         if (result1!=null){
-            Log.i(Constants.TAG, "RealmContactTransactions.getContactById: FOUND");
             return result1.first();
         }else {
-            Log.i(Constants.TAG, "RealmContactTransactions.getContactById: NOT FOUND");
             return null;
         }
     }

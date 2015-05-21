@@ -11,6 +11,7 @@ import io.realm.Realm;
 import model.Contact;
 import model.DummyChatItem;
 import model.FavouriteContact;
+import model.RecentContact;
 import model.RecentItem;
 
 /**
@@ -76,8 +77,13 @@ public class ContactListManager {
         this.contactList = contactList;
     }
 
-    public List<RecentItem> getRecentList(Context context, Realm realm) {
-        return recentList;
+    public List<RecentContact> getRecentList(Context context, Realm realm) {
+        return getRealmRecentContacts(context, realm);
+    }
+
+    private List<RecentContact> getRealmRecentContacts(Context context, Realm realm) {
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm);
+        return realmContactTransactions.getAllRecentContacts();
     }
 
     public List<FavouriteContact> getFavouriteList(Context context, Realm realm) {

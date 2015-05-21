@@ -48,11 +48,12 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
 
 
         // update the item view
-        RecentContact recentItem = getItem(position);
-
+        //RecentContact recentItem = getItem(position);
         //Contact contact = getItem(position).getContact();
-        viewHolder.textViewCompany.setText(recentItem.getCompany());
-        viewHolder.textViewName.setText(recentItem.getFirstName() + " " + recentItem.getLastName() );
+        RecentContact contact = getItem(position);
+
+        viewHolder.textViewCompany.setText(contact.getCompany());
+        viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         //viewHolder.textViewPosition.setText(contact.getOccupation());
         //DAVID viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
         //viewHolder.textViewTime.setText(contact.getTime());

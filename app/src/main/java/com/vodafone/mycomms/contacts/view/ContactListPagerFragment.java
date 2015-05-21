@@ -131,13 +131,13 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         if(apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)) {
             //BusProvider.getInstance().post(new RefreshContactListEvent());
             contactListFragment.setListAdapterTabs();
-            //contactRecentListFragment.setListAdapterTabs();
+            contactRecentListFragment.setListAdapterTabs();
             contactFavouritesListFragment.setListAdapterTabs();
         }else if(apiCall.equals(Constants.CONTACT_API_GET_CONTACTS)){
             apiCall = Constants.CONTACT_API_GET_FAVOURITES;
             mContactController.getFavouritesList(accessToken, apiCall);
             contactListFragment.setListAdapterTabs();
-            //contactRecentListFragment.setListAdapterTabs();
+            contactRecentListFragment.setListAdapterTabs();
             contactFavouritesListFragment.setListAdapterTabs();
         }
     }

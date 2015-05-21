@@ -14,9 +14,10 @@ android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="2dip"
+    android:lines="1"
     android:textSize="16dip"
     android:text="Captain Planet"
-    android:textColor="@color/bright_foreground_material_light"
+    android:textColor="@color/contact_strong_blue_text"
 
     />
 
@@ -25,9 +26,10 @@ android:orientation="vertical"
     android:layout_height="wrap_content"
     android:layout_width="fill_parent"
     android:paddingBottom="2dip"
+    android:lines="1"
     android:textSize="12dip"
     android:text="Saviour of the Planet"
-    android:textColor="@color/material_blue_grey_800"
+    android:textColor="@color/contact_soft_blue_text"
     />
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -47,10 +49,11 @@ android:orientation="vertical"
         android:layout_width="fill_parent"
         android:paddingLeft="4dip"
         android:textSize="10dip"
+              android:lines="1"
         android:orientation="vertical"
         android:layout_gravity="center_vertical"
         android:text="Planet Earth Company "
-        android:textColor="@color/material_blue_grey_800"
+        android:textColor="@color/contact_soft_blue_text"
         />
 
 

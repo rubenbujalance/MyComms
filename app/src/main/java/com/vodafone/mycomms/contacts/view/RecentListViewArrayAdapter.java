@@ -52,7 +52,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         //viewHolder.textViewPosition.setText(contact.getOccupation());
-        //DAVID viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
+        //viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
         //viewHolder.textViewTime.setText(contact.getTime());
 
         /*if(recentItem.getItemType() == RecentItem.RecentItemType.MAIL){

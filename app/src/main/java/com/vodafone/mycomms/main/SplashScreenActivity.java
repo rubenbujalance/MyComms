@@ -45,6 +45,7 @@ public class SplashScreenActivity extends Activity {
 
         setContentView(R.layout.splash_screen);
         mContext = this;
+
     }
 
     @Override
@@ -176,9 +177,9 @@ public class SplashScreenActivity extends Activity {
 
     private void callBackRenewToken(HashMap<String, Object> result)
     {
-        String status = (String)result.get("status");
-
         try {
+            String status = (String)result.get("status");
+
             if (status.compareTo("200") == 0) {
                 //Renew succeeded, save tokens and go to app
 

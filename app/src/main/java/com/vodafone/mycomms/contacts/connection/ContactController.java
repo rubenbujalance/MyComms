@@ -278,6 +278,7 @@ public class ContactController extends BaseController {
         favoriteContact.setLastName(contact.getLastName());
         favoriteContact.setAvatar(contact.getAvatar());
         favoriteContact.setCompany(contact.getCompany());
+        favoriteContact.setPosition(contact.getPosition());
         favoriteContact.setLastSeen(contact.getLastSeen());
         favoriteContact.setOfficeLocation(contact.getOfficeLocation());
         favoriteContact.setPhones(contact.getPhones());

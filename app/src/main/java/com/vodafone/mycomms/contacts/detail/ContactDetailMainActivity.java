@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
@@ -118,17 +119,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         TextView position = (TextView) findViewById(R.id.contact_position);
         position.setText(contactToShow.getPosition());
-//        TextView contactLocation = (TextView) findViewById(R.id.contact_location);
-//        contactLocation.setText(contactToShow.getCompany());
-
-
 
         TextView phoneNumber = (TextView) findViewById(R.id.contact_phone_number);
         phoneNumber.setText(getElementFromJsonArrayString(contactToShow.getPhones(), "phone"));
 
         TextView email = (TextView) findViewById(R.id.contact_email);
         email.setText(getElementFromJsonArrayString(contactToShow.getEmails(), "email"));
-
 
         EditText officeLocation = (EditText)findViewById(R.id.contact_office_location);
         officeLocation.setText(contactToShow.getOfficeLocation());

@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
@@ -95,8 +94,8 @@ public class ContactDetailMainActivity extends ToolbarActivity {
         TextView company = (TextView) findViewById(R.id.contact_company);
         company.setText(contactToShow.getCompany());
 
-        TextView contactLocation = (TextView) findViewById(R.id.contact_location);
-        contactLocation.setText(contactToShow.getCompany());
+//        TextView contactLocation = (TextView) findViewById(R.id.contact_location);
+//        contactLocation.setText(contactToShow.getCompany());
 
         TextView phoneNumber = (TextView) findViewById(R.id.contact_phone_number);
         phoneNumber.setText(getElementFromJsonArrayString(contactToShow.getPhones(), "phone"));
@@ -104,7 +103,7 @@ public class ContactDetailMainActivity extends ToolbarActivity {
         TextView email = (TextView) findViewById(R.id.contact_email);
         email.setText(getElementFromJsonArrayString(contactToShow.getEmails(), "email"));
 
-        EditText position = (EditText) findViewById(R.id.contact_position);
+        TextView position = (TextView) findViewById(R.id.contact_position);
         position.setText(contactToShow.getCompany());
 
         EditText officeLocation = (EditText)findViewById(R.id.contact_office_location);
@@ -114,13 +113,13 @@ public class ContactDetailMainActivity extends ToolbarActivity {
         // "presence":{"icon":"sun","detail":"#LOCAL_TIME#"}
         //EditText department = (EditText)findViewById(R.id.contact_department);
 
-        EditText additionalInfo = (EditText) findViewById(R.id.contact_additional_info);
-        LinearLayout additionalInfoBox = (LinearLayout) findViewById(R.id.contact_additional_info_box);
-        TextView additionalInfoLabel = (TextView) findViewById(R.id.contact_additional_info_label);
-
-        additionalInfoLabel.setVisibility(View.GONE);
-        additionalInfoBox.setVisibility(View.GONE);
-        additionalInfo.setVisibility(View.GONE);
+//        EditText additionalInfo = (EditText) findViewById(R.id.contact_additional_info);
+//        LinearLayout additionalInfoBox = (LinearLayout) findViewById(R.id.contact_additional_info_box);
+//        TextView additionalInfoLabel = (TextView) findViewById(R.id.contact_additional_info_label);
+//
+//        additionalInfoLabel.setVisibility(View.GONE);
+//        additionalInfoBox.setVisibility(View.GONE);
+//        additionalInfo.setVisibility(View.GONE);
 
     }
 

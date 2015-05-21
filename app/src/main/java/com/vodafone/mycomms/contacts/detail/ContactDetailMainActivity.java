@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.contacts.detail;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,9 +26,10 @@ import java.util.List;
 import io.realm.Realm;
 import model.Contact;
 
-public class ContactDetailMainActivity extends ToolbarActivity {
+public class ContactDetailMainActivity extends ToolbarActivity implements IContactDetailConnectionCallback {
     private Realm realm;
     private Contact contact;
+    private ContactDetailController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +41,12 @@ public class ContactDetailMainActivity extends ToolbarActivity {
 
         Intent intent = getIntent();
         String contactId = intent.getExtras().getString(Constants.CONTACT_ID);
+        controller = new ContactDetailController(this, realm);
+        controller.setConnectionCallback(this);
         contact = getContact(contactId);
 
 
+        
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +87,23 @@ public class ContactDetailMainActivity extends ToolbarActivity {
         return result;
     }
 
+
+    private String getElementFromJsonObjectString(String json, String key){
+        Log.d(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " + json + ", key=" + key);
+        JSONObject jsonObject = null;
+        String result = null;
+        try {
+            jsonObject = new JSONObject(json);
+            result = jsonObject.getString(key);
+
+            Log.d(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " + result);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " , e);
+        }
+        return result;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -95,8 +117,8 @@ public class ContactDetailMainActivity extends ToolbarActivity {
         TextView company = (TextView) findViewById(R.id.contact_company);
         company.setText(contactToShow.getCompany());
 
-        TextView contactLocation = (TextView) findViewById(R.id.contact_location);
-        contactLocation.setText(contactToShow.getCompany());
+        TextView position = (TextView) findViewById(R.id.contact_position);
+        position.setText(contactToShow.getPosition());
 
         TextView phoneNumber = (TextView) findViewById(R.id.contact_phone_number);
         phoneNumber.setText(getElementFromJsonArrayString(contactToShow.getPhones(), "phone"));
@@ -104,23 +126,21 @@ public class ContactDetailMainActivity extends ToolbarActivity {
         TextView email = (TextView) findViewById(R.id.contact_email);
         email.setText(getElementFromJsonArrayString(contactToShow.getEmails(), "email"));
 
-        EditText position = (EditText) findViewById(R.id.contact_position);
-        position.setText(contactToShow.getCompany());
-
         EditText officeLocation = (EditText)findViewById(R.id.contact_office_location);
         officeLocation.setText(contactToShow.getOfficeLocation());
 
-        String dayTimeString =  getElementFromJsonArrayString(contactToShow.getEmails(), "email");
-        // "presence":{"icon":"sun","detail":"#LOCAL_TIME#"}
+        String dayTimeString =  getElementFromJsonObjectString(contactToShow.getPresence(), "icon"); // "presence":{"icon":"sun","detail":"#LOCAL_TIME#"}
+        String getCountryCode = contactToShow.getCountry();
+
         //EditText department = (EditText)findViewById(R.id.contact_department);
 
-        EditText additionalInfo = (EditText) findViewById(R.id.contact_additional_info);
-        LinearLayout additionalInfoBox = (LinearLayout) findViewById(R.id.contact_additional_info_box);
-        TextView additionalInfoLabel = (TextView) findViewById(R.id.contact_additional_info_label);
-
-        additionalInfoLabel.setVisibility(View.GONE);
-        additionalInfoBox.setVisibility(View.GONE);
-        additionalInfo.setVisibility(View.GONE);
+//        EditText additionalInfo = (EditText) findViewById(R.id.contact_additional_info);
+//        LinearLayout additionalInfoBox = (LinearLayout) findViewById(R.id.contact_additional_info_box);
+//        TextView additionalInfoLabel = (TextView) findViewById(R.id.contact_additional_info_label);
+//
+//        additionalInfoLabel.setVisibility(View.GONE);
+//        additionalInfoBox.setVisibility(View.GONE);
+//        additionalInfo.setVisibility(View.GONE);
 
     }
 
@@ -132,6 +152,8 @@ public class ContactDetailMainActivity extends ToolbarActivity {
         Log.d(Constants.TAG, "ContactDetailMainActivity.getContact: " + printContact(contact));
 
         loadContactDetails(contact);
+
+        controller.getContactDetail(contactId);
         return contact;
     }
 
@@ -145,5 +167,16 @@ public class ContactDetailMainActivity extends ToolbarActivity {
             buf.append("company:");
             buf.append(contact.getCompany());
             return buf.toString();
+    }
+
+    @Override
+    public void onContactDetailReceived(Contact contact) {
+        Log.d(Constants.TAG, "ContactDetailMainActivity.onContactDetailReceived: " + printContact(contact));
+        loadContactDetails(contact);
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.d(Constants.TAG, "ContactDetailMainActivity.onConnectionNotAvailable: ");
     }
 }

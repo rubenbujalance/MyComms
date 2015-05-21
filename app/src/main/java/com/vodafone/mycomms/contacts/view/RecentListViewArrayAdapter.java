@@ -10,16 +10,18 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import model.Contact;
+import model.RecentContact;
 import model.RecentItem;
 
 /**
  * Created by str_vig on 28/04/2015.
  */
-public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
-    public RecentListViewArrayAdapter(Context context, List<RecentItem> items) {
+public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
+    public RecentListViewArrayAdapter(Context context, List<RecentContact> items) {
         super(context, R.layout.layout_list_item_recent, items);
     }
 
@@ -44,22 +46,24 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentItem> {
               viewHolder = (RecentViewHolder) convertView.getTag();
         }
 
+
         // update the item view
-        RecentItem recentItem = getItem(position);
-        Contact contact = getItem(position).getContact();
-        viewHolder.textViewCompany.setText(contact.getCompany());
-        viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
+        RecentContact recentItem = getItem(position);
+
+        //Contact contact = getItem(position).getContact();
+        viewHolder.textViewCompany.setText(recentItem.getCompany());
+        viewHolder.textViewName.setText(recentItem.getFirstName() + " " + recentItem.getLastName() );
         //viewHolder.textViewPosition.setText(contact.getOccupation());
-        viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
+        //DAVID viewHolder.textViewRecentItemTime.setText(recentItem.getRecentEventTime());
         //viewHolder.textViewTime.setText(contact.getTime());
 
-        if(recentItem.getItemType() == RecentItem.RecentItemType.MAIL){
+        /*DAVID if(recentItem.getItemType() == RecentItem.RecentItemType.MAIL){
             viewHolder.imageViewRecentType.setImageResource(R.drawable.btn_more_invite);
         }else if(recentItem.getItemType() == RecentItem.RecentItemType.CALL){
             viewHolder.imageViewRecentType.setImageResource(R.drawable.icon_recent_phone);
         } else if (recentItem.getItemType() == RecentItem.RecentItemType.CHAT){
             viewHolder.imageViewRecentType.setImageResource(R.drawable.icon_recent_message);
-        }
+        }*/
 
 
 

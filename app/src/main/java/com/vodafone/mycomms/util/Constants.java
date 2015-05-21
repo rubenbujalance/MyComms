@@ -43,9 +43,11 @@ public class Constants {
     public static final String CONTACT_PRESENCE = "presence";
     public static final String CONTACT_COUNTRY = "country";
     public static final String CONTACT_FAVOURITES = "favourites";
+    public static final String CONTACT_RECENTS = "recents";
 
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
+    public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
 
 }

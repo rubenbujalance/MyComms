@@ -72,6 +72,16 @@ public class ContactController extends BaseController {
         contactConnection.request();
     }
 
+    public void getRecentsList(String accessToken, String api){
+        Log.i(Constants.TAG, "ContactController.getRecentsList: accessToken " + accessToken);
+        if(contactConnection != null){
+            contactConnection.cancel();
+        }
+        apiCall = api;
+        contactConnection = new ContactConnection(getContext(), this, apiCall);
+        contactConnection.request();
+    }
+
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
@@ -100,6 +110,14 @@ public class ContactController extends BaseController {
                 jsonResponse = new JSONObject(result);
 
                 insertFavouriteContactInRealm(jsonResponse);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
+            }
+        } else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
+            try {
+                jsonResponse = new JSONObject(result);
+
+                insertRecentContactInRealm(jsonResponse);
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
             }
@@ -140,7 +158,10 @@ public class ContactController extends BaseController {
     }
 
     public ArrayList<RecentContact> getAllRecentContacts(){
-        return realmContactTransactions.getAllRecentContacts();
+        Log.i(Constants.TAG, "ContactController.getAllRecentContacts: ");
+        ArrayList<RecentContact> recentList = new ArrayList<>();
+        recentList = realmContactTransactions.getAllRecentContacts();
+        return recentList;
     }
 
     public void insertContactsInRealm(JSONObject json){
@@ -192,6 +213,31 @@ public class ContactController extends BaseController {
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactController.insertFavouriteContactInRealm : " + e.toString());
+        }
+    }
+
+    public void insertRecentContactInRealm(JSONObject json){
+        JSONArray jsonArray = null;
+        Contact contact;
+        ArrayList<RecentContact> contactList = new ArrayList<>();
+        try {
+            Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: jsonResponse: " + json.toString());
+            jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                contact = realmContactTransactions.getContactById(jsonArray.getString(i));
+                if (contact != null) {
+                    contactList.add(mapContactToRecent(contact));
+                    Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: contactList " + contactList.get(i).toString());
+                }
+            }
+            if (contactList.size()!=0) {
+                realmContactTransactions.deleteAllRecentContacts();
+                realmContactTransactions.insertRecentContactList(contactList);
+                Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: inserted contactList ");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "ContactController.insertRecentContactInRealm : " + e.toString());
         }
     }
 
@@ -401,5 +447,34 @@ public class ContactController extends BaseController {
             Log.e(Constants.TAG, "loadFakeFavouriteContact: " + e.toString());
         }
         //}
+    }
+
+    public void loadFakeRecentContacts() {
+        InputStream stream = null;
+        stream = mContext.getResources().openRawResource(R.raw.test_contacts);
+        JsonElement json = new JsonParser().parse(new InputStreamReader(stream));
+        JSONObject jsonObject = null;
+        JSONArray jsonArray = null;
+        try {
+            jsonObject = new JSONObject(json.toString());
+            jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "loadFakeRecentContact: " + e.toString());
+        }
+
+        try {
+            ArrayList<RecentContact> realmContactList = new ArrayList<>();
+            RecentContact contact;
+            for (int i = 0; i < 2; i++) {
+                jsonObject = jsonArray.getJSONObject(i);
+                contact = mapRecentContact(jsonObject);
+                realmContactList.add(contact);
+            }
+            realmContactTransactions.insertRecentContactList(realmContactList);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "loadFakeRecentContact: " + e.toString());
+        }
     }
 }

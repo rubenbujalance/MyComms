@@ -168,9 +168,9 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
             if(mIndex == Constants.CONTACTS_ALL) {
                 in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId() );
             } else if (mIndex == Constants.CONTACTS_RECENT) {
-                in.putExtra(Constants.CONTACT_ID, "row_id1");
+                in.putExtra(Constants.CONTACT_ID,recentContactList.get(position).getId() );
             } else if (mIndex == Constants.CONTACTS_FAVOURITE) { {
-                //in.putExtra(Constants.CONTACT_ID,favouriteContactList.get(position).getId() );
+                in.putExtra(Constants.CONTACT_ID,favouriteContactList.get(position).getId() );
             }}
             startActivity(in);
         }
@@ -225,8 +225,10 @@ public class ContactListFragment extends ListFragment implements IContactsConnec
                         favouriteContactList));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
-            //setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(),
-            //        ContactListManager.getInstance().getRecentList(getActivity(), realm)));
+            recentContactList = mContactController.getAllRecentContacts();
+            if (recentContactList.size()!=0) {
+               setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList));
+            }
         }else if(mIndex == Constants.CONTACTS_ALL){
             contactList = mContactController.getAllContacts();
             if (contactList.size()!=0) {

@@ -117,6 +117,7 @@ public class ContactListFragment extends ListFragment{
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         setListAdapterTabs();
+        
     }
 
     @Override

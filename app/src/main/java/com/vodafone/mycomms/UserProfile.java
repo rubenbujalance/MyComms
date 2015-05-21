@@ -34,6 +34,7 @@ public final class UserProfile implements Serializable{
     private static String _oauthPrefix;
 
     private static Bitmap _photoBitmap;
+    private static String _photoPath;
 
     /*
     OAuth Token
@@ -154,6 +155,14 @@ public final class UserProfile implements Serializable{
         _oauthPrefix = oauthPrefix;
     }
 
+    public static String getPhotoPath() {
+        return _photoPath;
+    }
+
+    public static void setPhotoPath(String photoPath) {
+        UserProfile._photoPath = photoPath;
+    }
+
 
     /*
     Other methods
@@ -186,6 +195,7 @@ public final class UserProfile implements Serializable{
         if(_position != null) body.put("position",_position);
         if(_officeLocation != null) body.put("officeLocation",_officeLocation);
         if(_oauth != null) body.put(_oauthPrefix,_oauth);
+        if(_avatar != null) body.put("avatar", _avatar);
 
         return body;
     }

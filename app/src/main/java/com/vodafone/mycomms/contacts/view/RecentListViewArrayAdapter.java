@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.Utils;
 
 import java.util.List;
 
@@ -48,7 +49,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
               viewHolder = (RecentViewHolder) convertView.getTag();
         }
 
-
         // update the item view
         RecentContact contact = getItem(position);
 
@@ -64,7 +64,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         viewHolder.textViewOccupation.setText(contact.getPosition());
         viewHolder.textViewCompany.setText(contact.getCompany());
 
-        if(!contact.getAction().equals("")) {
+        if(contact.getAction().equals("")) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_error_tooltip));
         } else if (contact.getAction().equals("sms")) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_message));
@@ -73,7 +73,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         } else if (contact.getAction().equals("call")) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_phone));
         }
-        //viewHolder.textViewTime.setText(contact.getActionTimeStamp());
+        viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getActionTimeStamp()));
 
         return convertView;
     }

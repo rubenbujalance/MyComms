@@ -386,6 +386,7 @@ public class ContactController extends BaseController {
         recentContact.setLastName(contact.getLastName());
         recentContact.setAvatar(contact.getAvatar());
         recentContact.setCompany(contact.getCompany());
+        recentContact.setPosition(contact.getPosition());
         recentContact.setLastSeen(contact.getLastSeen());
         recentContact.setOfficeLocation(contact.getOfficeLocation());
         recentContact.setPhones(contact.getPhones());

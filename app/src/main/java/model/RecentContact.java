@@ -1,7 +1,6 @@
 package model;
 
 import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by AMG on 12/05/2015.
@@ -22,16 +21,17 @@ public class RecentContact extends RealmObject {
     private String availability;
     private String presence;
     private String country;
-
-    @PrimaryKey
     private String id;
+
+    private String action;
+    private int actionTimeStamp;
 
     public RecentContact(){
 
     }
 
-    public RecentContact(String id, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country) {
-        this.id = id;
+    public RecentContact(int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country, String id, String action, int actionTimeStamp) {
+        this.lastInteraction = lastInteraction;
         this.platform = platform;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -46,6 +46,9 @@ public class RecentContact extends RealmObject {
         this.availability = availability;
         this.presence = presence;
         this.country = country;
+        this.id = id;
+        this.action = action;
+        this.actionTimeStamp = actionTimeStamp;
     }
 
     public int getLastInteraction() {
@@ -174,5 +177,21 @@ public class RecentContact extends RealmObject {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public int getActionTimeStamp() {
+        return actionTimeStamp;
+    }
+
+    public void setActionTimeStamp(int actionTimeStamp) {
+        this.actionTimeStamp = actionTimeStamp;
     }
 }

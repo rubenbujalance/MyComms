@@ -75,7 +75,7 @@ public class RealmContactTransactions {
     public void insertRecentContact (RecentContact newContact){
         try {
             mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(newContact);
+            mRealm.copyToRealm(newContact);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -88,7 +88,7 @@ public class RealmContactTransactions {
         try {
             mRealm.beginTransaction();
             for (int i = 0; i < size; i++) {
-                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
+                mRealm.copyToRealm(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -123,11 +123,27 @@ public class RealmContactTransactions {
         return contactArrayList;
     }
 
+    public Contact getContactById(String contactId){
+        RealmQuery<Contact> query = mRealm.where(Contact.class);
+        query.equalTo(Constants.CONTACT_ID, contactId);
+
+        RealmResults<Contact> result1 = query.findAll();
+
+        if (result1!=null){
+            return result1.first();
+        }else {
+            return null;
+        }
+    }
+
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
+        Log.i(Constants.TAG, "RealmContactTransactions.getAllFavouriteContacts: ");
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         RealmResults<FavouriteContact> result1 = query.findAll();
         if (result1 != null){
+            //result1.sort(Constants.CONTACT_FNAME); // Sort ascending
+            result1.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
             for (FavouriteContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }
@@ -154,8 +170,8 @@ public class RealmContactTransactions {
         RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
         RealmResults<RecentContact> result1 = query.findAll();
         if (result1!=null){
-            result1.sort("lastInteraction"); // Sort ascending
-            result1.sort("lastInteraction", RealmResults.SORT_ORDER_ASCENDING);
+            result1.sort("actionTimeStamp"); // Sort ascending
+            result1.sort("actionTimeStamp", RealmResults.SORT_ORDER_DESCENDING);
             for (RecentContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }
@@ -211,6 +227,7 @@ public class RealmContactTransactions {
     }
 
     public void deleteAllFavouriteContacts() {
+        Log.i(Constants.TAG, "RealmContactTransactions.deleteAllFavouriteContacts: ");
         mRealm.beginTransaction();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         RealmResults<FavouriteContact> result1 = query.findAll();
@@ -280,3 +297,4 @@ public class RealmContactTransactions {
         mRealm.commitTransaction();
     }
 }
+

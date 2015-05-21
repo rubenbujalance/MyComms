@@ -296,3 +296,4 @@ public class RealmContactTransactions {
         mRealm.commitTransaction();
     }
 }
+

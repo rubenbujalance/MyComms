@@ -132,12 +132,12 @@ public final class Utils {
     public static void launchEmail(String email, Context context)
     {
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/html");
+        intent.setType("message/rfc822");
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
 //                        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
 //                        intent.putExtra(Intent.EXTRA_TEXT, "I'm email body.");
 
-        context.startActivity(Intent.createChooser(intent, "Send Email"));
+        context.startActivity(intent);
     }
 
     public static void launchSms(String phone, Context context)

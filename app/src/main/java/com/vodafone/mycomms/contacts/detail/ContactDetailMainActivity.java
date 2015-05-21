@@ -136,10 +136,10 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 try {
-                    String strPhones = contact.getEmails();
+                    String strEmails = contact.getEmails();
 
-                    if (strPhones != null) {
-                        JSONArray jPhones = new JSONArray(strPhones);
+                    if (strEmails != null) {
+                        JSONArray jPhones = new JSONArray(strEmails);
                         String email = (String) ((JSONObject) jPhones.get(0)).get("email");
 
                         Utils.launchEmail(email, ContactDetailMainActivity.this);
@@ -212,15 +212,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 finish();
             }
         });
-
-        btChatBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(ContactDetailMainActivity.this, ChatMainActivity.class));
-            }
-        });
-
-
 
         loadContactDetail();
     }

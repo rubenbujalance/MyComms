@@ -21,7 +21,7 @@ public class ContactListManager {
     private static ContactListManager instance;
 
     private List<Contact> contactList = new ArrayList<Contact>();
-    private List<RecentItem> recentList = new ArrayList<RecentItem>();
+    private List<RecentContact> recentList = new ArrayList<RecentContact>();
     private List<FavouriteContact> favouriteList = new ArrayList<FavouriteContact>();
 
     private List<DummyChatItem> chatList = new ArrayList<DummyChatItem>();
@@ -29,7 +29,7 @@ public class ContactListManager {
     private ContactListManager(){
     }
 
-    private void addRecent(RecentItem item) {
+    private void addRecent(RecentContact item) {
         recentList.add(item);
     }
 
@@ -59,12 +59,6 @@ public class ContactListManager {
     private List<Contact> getRealmContacts(Context context, Realm realm) {
         RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm);
         List<Contact> realmContactList = realmContactTransactions.getAllContacts();
-        addRecent(new RecentItem(realmContactList.get(0), RecentItem.RecentItemType.MAIL , "5 min"));
-        addRecent(new RecentItem(realmContactList.get(0) , RecentItem.RecentItemType.CALL , "4 hours"));
-        addRecent(new RecentItem(realmContactList.get(0), RecentItem.RecentItemType.CHAT, "8 hours" ));
-        addRecent(new RecentItem(realmContactList.get(2), RecentItem.RecentItemType.CHAT, "3 days"  ));
-        addRecent(new RecentItem(realmContactList.get(3), RecentItem.RecentItemType.CHAT, "4 days"));
-        addRecent(new RecentItem(realmContactList.get(1), RecentItem.RecentItemType.MAIL , "5 days"));
 
         addChatItem(realmContactList.get(0), "Tue");
         addChatItem(realmContactList.get(1), "4/24/15");
@@ -95,7 +89,7 @@ public class ContactListManager {
         return realmContactTransactions.getAllFavouriteContacts();
     }
 
-    public void setRecentList(List<RecentItem> recentList) {
+    public void setRecentList(List<RecentContact> recentList) {
         this.recentList = recentList;
     }
 

@@ -10,17 +10,15 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import model.Contact;
 import model.RecentContact;
-import model.RecentItem;
 
 /**
  * Created by str_vig on 28/04/2015.
  */
 public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
+
     public RecentListViewArrayAdapter(Context context, List<RecentContact> items) {
         super(context, R.layout.layout_list_item_recent, items);
     }
@@ -48,8 +46,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
 
 
         // update the item view
-        //RecentContact recentItem = getItem(position);
-        //Contact contact = getItem(position).getContact();
         RecentContact contact = getItem(position);
 
         viewHolder.textViewCompany.setText(contact.getCompany());

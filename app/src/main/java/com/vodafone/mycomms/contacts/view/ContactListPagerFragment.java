@@ -16,6 +16,7 @@ import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshContactListEvent;
+import com.vodafone.mycomms.events.RefreshRecentsContactListEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -141,8 +142,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
             mContactController.getRecentList(accessToken, apiCall);
 
         }else if(apiCall.equals(Constants.CONTACT_API_GET_CONTACTS)){
-            apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-            mContactController.getFavouritesList(accessToken, apiCall);
+            //apiCall = Constants.CONTACT_API_GET_FAVOURITES;
+            //mContactController.getFavouritesList(accessToken, apiCall);
 
             if (contactListFragment!=null)
                 contactListFragment.setListAdapterTabs();
@@ -166,7 +167,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
 
     @Subscribe
     public void refreshContactListEvent(RefreshContactListEvent event) {
-        Log.i(Constants.TAG, "RefreshContactListEvent: setListAdapterTabs");
+        Log.i(Constants.TAG, "RefreshContactListEvent: refreshContactListEvent");
         mContactController.getContactList(accessToken, apiCall);
         mContactController.setConnectionCallback(this);
     }
@@ -181,4 +182,13 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         if (contactFavouritesListFragment!=null)
             contactFavouritesListFragment.setListAdapterTabs();
     }
+
+    @Subscribe
+    public void refreshRecentsContactListEvent(RefreshRecentsContactListEvent event) {
+        Log.i(Constants.TAG, "RefreshContactListEvent: refreshRecentsContactListEvent");
+        apiCall = Constants.CONTACT_API_GET_RECENTS;
+        //mContactController.getRecentList(accessToken, apiCall);
+        //mContactController.setConnectionCallback(this);
+    }
+
 }

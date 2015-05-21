@@ -137,6 +137,7 @@ public class RealmContactTransactions {
     }
 
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
+        Log.i(Constants.TAG, "RealmContactTransactions.getAllFavouriteContacts: ");
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         RealmResults<FavouriteContact> result1 = query.findAll();
@@ -169,8 +170,8 @@ public class RealmContactTransactions {
         RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
         RealmResults<RecentContact> result1 = query.findAll();
         if (result1!=null){
-            result1.sort("lastInteraction"); // Sort ascending
-            result1.sort("lastInteraction", RealmResults.SORT_ORDER_ASCENDING);
+            result1.sort("actionTimeStamp"); // Sort ascending
+            result1.sort("actionTimeStamp", RealmResults.SORT_ORDER_DESCENDING);
             for (RecentContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }

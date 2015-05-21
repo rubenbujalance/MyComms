@@ -112,6 +112,8 @@ public class ContactController extends BaseController {
                 jsonResponse = new JSONObject(result);
 
                 insertFavouriteContactInRealm(jsonResponse);
+                //Log.i(Constants.TAG, "ContactController.onConnectionComplete: BusProvider RefreshContactListEvent");
+                //BusProvider.getInstance().post(new RefreshContactListEvent());
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactController.onConnectionComplete: favourites", e);
             }

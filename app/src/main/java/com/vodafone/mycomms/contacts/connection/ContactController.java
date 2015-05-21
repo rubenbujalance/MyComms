@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
@@ -55,7 +56,7 @@ public class ContactController extends BaseController {
     }
 
     public void getContactList(String accessToken, String api){
-        Log.i(Constants.TAG, "ContactController.startLogin: accessToken " + accessToken);
+        Log.i(Constants.TAG, "ContactController.getContactList: " + api);
         if(contactConnection != null){
             contactConnection.cancel();
         }
@@ -74,8 +75,8 @@ public class ContactController extends BaseController {
         contactConnection.request();
     }
 
-    public void getRecentsList(String accessToken, String api){
-        Log.i(Constants.TAG, "ContactController.getRecentsList: accessToken " + accessToken);
+    public void getRecentList(String accessToken, String api){
+        Log.i(Constants.TAG, "ContactController.getRecentList: accessToken " + accessToken);
         if(contactConnection != null){
             contactConnection.cancel();
         }
@@ -87,7 +88,7 @@ public class ContactController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-        Log.i(Constants.TAG, "ContactController.onConnectionComplete: init: " + apiCall);
+        Log.i(Constants.TAG, "ContactController.onConnectionComplete: init: " + apiCall + ", url=" + response.getUrl());
         String result = response.getData().toString();
         Log.i(Constants.TAG, "ContactController.onConnectionComplete: " + result);
         JSONObject jsonResponse;
@@ -102,10 +103,10 @@ public class ContactController extends BaseController {
                     ((IContactsConnectionCallback) this.getConnectionCallback()).onContactsResponse(realmContactList);
                 }
 
-                realmContactTransactions.getContactById("mc_55361a9cc729d4430b9722f3");
+               // realmContactTransactions.getContactById("mc_55361a9cc729d4430b9722f3");
 
             } catch (Exception e) {
-                Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
+                Log.e(Constants.TAG, "ContactController.onConnectionComplete: contacts " , e);
             }
         } else if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)){
             try {
@@ -113,7 +114,7 @@ public class ContactController extends BaseController {
 
                 insertFavouriteContactInRealm(jsonResponse);
             } catch (Exception e) {
-                Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
+                Log.e(Constants.TAG, "ContactController.onConnectionComplete: favourites", e);
             }
         } else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
             try {
@@ -121,7 +122,7 @@ public class ContactController extends BaseController {
 
                 insertRecentContactInRealm(jsonResponse);
             } catch (Exception e) {
-                Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
+                Log.e(Constants.TAG, "ContactController.onConnectionComplete: recents " , e);
             }
         }
     }
@@ -226,7 +227,14 @@ public class ContactController extends BaseController {
             Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
-                contact = realmContactTransactions.getContactById(jsonArray.getString(i));
+
+                Log.e(Constants.TAG, "ContactController.insertRecentContactInRealm : id?=" +  jsonArray.getJSONObject(i).getString("id"));
+                contact = realmContactTransactions.getContactById( jsonArray.getJSONObject(i).getString("id"));
+//                RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
+//                List<Contact> contactList2 = realmContactTransactions.getFilteredContacts(Constants.CONTACT_ID, jsonArray.getJSONObject(i).getString("id"));
+//
+//                contact = contactList2.get(0);
+
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact));
                     Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: contactList " + contactList.get(i).toString());

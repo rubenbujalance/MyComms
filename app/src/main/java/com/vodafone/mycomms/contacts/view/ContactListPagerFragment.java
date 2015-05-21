@@ -130,15 +130,37 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
 
         if(apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)) {
             //BusProvider.getInstance().post(new RefreshContactListEvent());
-            contactListFragment.setListAdapterTabs();
-            contactRecentListFragment.setListAdapterTabs();
-            contactFavouritesListFragment.setListAdapterTabs();
+            if (contactListFragment!=null)
+                contactListFragment.setListAdapterTabs();
+            if (contactRecentListFragment!=null)
+                contactRecentListFragment.setListAdapterTabs();
+            if (contactFavouritesListFragment!=null)
+                contactFavouritesListFragment.setListAdapterTabs();
+
+            apiCall = Constants.CONTACT_API_GET_RECENTS;
+            mContactController.getRecentList(accessToken, apiCall);
+
         }else if(apiCall.equals(Constants.CONTACT_API_GET_CONTACTS)){
             apiCall = Constants.CONTACT_API_GET_FAVOURITES;
             mContactController.getFavouritesList(accessToken, apiCall);
-            contactListFragment.setListAdapterTabs();
-            contactRecentListFragment.setListAdapterTabs();
-            contactFavouritesListFragment.setListAdapterTabs();
+
+            if (contactListFragment!=null)
+                contactListFragment.setListAdapterTabs();
+            if (contactRecentListFragment!=null)
+                contactRecentListFragment.setListAdapterTabs();
+            if (contactFavouritesListFragment!=null)
+                contactFavouritesListFragment.setListAdapterTabs();
+
+            apiCall = Constants.CONTACT_API_GET_RECENTS;
+            mContactController.getRecentList(accessToken, apiCall);
+        }else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
+            if (contactListFragment!=null)
+                contactListFragment.setListAdapterTabs();
+            if (contactRecentListFragment!=null)
+                contactRecentListFragment.setListAdapterTabs();
+            if (contactFavouritesListFragment!=null)
+                contactFavouritesListFragment.setListAdapterTabs();
+
         }
     }
 

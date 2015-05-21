@@ -241,7 +241,7 @@
                         android:lines="3"
                         android:id="@+id/contact_additional_info"/>
                 </LinearLayout>
-            </LinearLayout>
+            </LinearLayout>x
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

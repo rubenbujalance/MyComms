@@ -78,6 +78,8 @@
                         android:layout_height="35dp"
                         android:id="@+id/iconStatus"
                         android:background="@mipmap/ico_sun_white" />
+                        android:id="@+id/contact_icon_status"
+                        android:background="@drawable/icon_sun" />
 
                     <TextView
                         android:layout_width="50dp"

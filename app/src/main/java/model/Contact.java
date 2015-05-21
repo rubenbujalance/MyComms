@@ -166,4 +166,5 @@ public class Contact extends RealmObject{
     public void setCountry(String country) {
         this.country = country;
     }
+
 }

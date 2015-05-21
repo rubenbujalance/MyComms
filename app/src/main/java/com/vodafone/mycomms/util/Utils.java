@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Created by str_rbm on 16/04/2015.
  */
@@ -40,5 +43,13 @@ public class Utils {
 
         builder.create();
         builder.show();
+    }
+
+    public static String getTimeFromMillis(int millis){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+        return formatter.format(calendar.getTime());
+
     }
 }

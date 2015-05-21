@@ -186,7 +186,7 @@ public class ContactController extends BaseController {
                 }
             }
             if (contactList.size()!=0) {
-                //realmContactTransactions.deleteAllFavouriteContacts();
+                realmContactTransactions.deleteAllFavouriteContacts();
                 realmContactTransactions.insertFavouriteContactList(contactList);
                 Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: inserted contactList ");
                 BusProvider.getInstance().post(new SetContactListAdapterEvent());
@@ -201,7 +201,7 @@ public class ContactController extends BaseController {
         Contact contact = new Contact();
         try {
             if (!jsonObject.isNull(Constants.CONTACT_ID)) contact.setId(jsonObject.getString(Constants.CONTACT_ID));
-            if (!jsonObject.isNull(Constants.CONTACT_DATA)) contact.setId(jsonObject.getString(Constants.CONTACT_DATA));
+            //if (!jsonObject.isNull(Constants.CONTACT_DATA)) contact.setId(jsonObject.getString(Constants.CONTACT_DATA));
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))

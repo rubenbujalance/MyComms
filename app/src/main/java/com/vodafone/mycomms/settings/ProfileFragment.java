@@ -91,15 +91,15 @@ public class ProfileFragment extends Fragment{
         profilePhoneNumber.setEnabled(enabled);
         EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
         profileEmail.setEnabled(enabled);
-        EditText profileCompany = (EditText) getActivity().findViewById(R.id.company);
+        EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
         profileCompany.setEnabled(enabled);
-        EditText profilePosition = (EditText) getActivity().findViewById(R.id.position);
+        EditText profilePosition = (EditText) getActivity().findViewById(R.id.contact_position);
         profilePosition.setEnabled(enabled);
         EditText profileDepartment = (EditText) getActivity().findViewById(R.id.department);
         profileDepartment.setEnabled(enabled);
         EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.office_location);
         profileOfficeLocation.setEnabled(enabled);
-        EditText profileInfo = (EditText) getActivity().findViewById(R.id.additional_info);
+        EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
         profileInfo.setEnabled(enabled);
     }
 

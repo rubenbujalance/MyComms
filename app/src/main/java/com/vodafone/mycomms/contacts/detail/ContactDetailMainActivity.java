@@ -1,14 +1,12 @@
 package com.vodafone.mycomms.contacts.detail;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
@@ -16,12 +14,17 @@ import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import io.realm.Realm;
 import model.Contact;
@@ -29,6 +32,10 @@ import model.Contact;
 public class ContactDetailMainActivity extends ToolbarActivity implements IContactDetailConnectionCallback {
     private Realm realm;
     private Contact contact;
+    private ImageView ivIconStatus;
+    private TextView tvLocalTime;
+    private TextView tvCountry;
+    private TextView tvLastSeen;
     private ContactDetailController controller;
 
     @Override
@@ -45,8 +52,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
 
+        ivIconStatus = (ImageView)findViewById(R.id.ivStatus);
+        tvLocalTime = (TextView)findViewById(R.id.contact_local_time);
+        tvCountry = (TextView)findViewById(R.id.contact_country);
+        tvLastSeen = (TextView)findViewById(R.id.contact_last_seen);
 
-        
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +73,72 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 startActivity(new Intent(ContactDetailMainActivity.this, ChatMainActivity.class));
             }
         });
+
+        loadContactDetail();
+        loadContactStatusInfo();
+    }
+
+    private void loadContactStatusInfo()
+    {
+        Calendar currentCal = Calendar.getInstance();
+
+        try {
+            //Icon
+            String icon = new JSONObject(contact.getPresence()).getString("icon");
+
+            if(icon.compareTo("dnd")==0) ivIconStatus.setImageResource(R.mipmap.ico_notdisturb_white);
+            else if(icon.compareTo("vacation")==0) ivIconStatus.setImageResource(R.mipmap.ico_vacation_white);
+            else if(icon.compareTo("moon")==0) ivIconStatus.setImageResource(R.mipmap.ico_moon_white);
+            else ivIconStatus.setImageResource(R.mipmap.ico_sun_white);
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
+        }
+        try {
+            //Local time
+            TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+            tz = TimeZone.getTimeZone("Europe/Madrid");
+
+            SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            sourceFormat.setTimeZone(currentCal.getTimeZone());
+            Date parsed = sourceFormat.parse(currentCal.toString());
+
+            SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
+            destFormat.setTimeZone(TimeZone.getTimeZone(contact.getTimezone()));
+
+            String result = destFormat.format(parsed);
+
+            tvLocalTime.setText(result);
+
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
+        }
+        try {
+            //Country
+            if(contact.getCountry() != null && contact.getCountry().length()>0)
+                tvCountry.setText(Utils.getCountry(contact.getCountry(), this).get("name"));
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
+        }
+        try {
+            //Last seen
+            if(contact.getLastSeen() != 0)
+            {
+                String lastSeenStr = null;
+
+                long timeDiffMilis = contact.getLastSeen();
+                long minutes = timeDiffMilis / 60000;
+                long hours = minutes / 60;
+                long days = hours / 24;
+
+                if(days >= 1) lastSeenStr = days + "d";
+                else if(hours >=1) lastSeenStr = hours + "h";
+                else if(minutes >=1) lastSeenStr = minutes + "m";
+
+                tvLastSeen.setText("Seen " + lastSeenStr + " ago");
+            }
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
+        }
     }
 
     private String getElementFromJsonArrayString(String jsonArrayString, String key){
@@ -102,6 +178,26 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " , e);
         }
         return result;
+    }
+
+    private void loadContactAvatar()
+    {
+//
+//        Picasso.with(mContext).load(contact.getAvatar())
+//                .error(R.drawable.cartoon_round_contact_image_example)
+//                .into(viewHolder.imageAvatar);
+    }
+
+    private void loadContactInfo()
+    {
+//        sagasf
+    }
+
+    private void loadContactDetail()
+    {
+        loadContactStatusInfo();
+        loadContactAvatar();
+        loadContactInfo();
     }
 
     @Override

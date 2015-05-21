@@ -76,10 +76,7 @@
                     <ImageView
                         android:layout_width="35dp"
                         android:layout_height="35dp"
-                        android:id="@+id/iconStatus"
-                        android:background="@mipmap/ico_sun_white" />
-                        android:id="@+id/contact_icon_status"
-                        android:background="@drawable/icon_sun" />
+                        android:id="@+id/ivStatus" />
 
                     <TextView
                         android:layout_width="50dp"
@@ -148,7 +145,6 @@
                                 android:textIsSelectable="false"
                                 android:textSize="@dimen/abc_text_size_large_material"
                                 android:textColor="#ffffffff"
-                                android:textStyle="bold"
                                 android:textAlignment="gravity"
                                 android:layout_gravity="center"
                                 android:gravity="center" />
@@ -159,10 +155,10 @@
                                 android:textAppearance="?android:attr/textAppearanceSmall"
                                 android:text="Senior Enterprise Manager"
                                 android:id="@+id/contact_position"
-                                android:textColor="#ffffff"
+                                android:textColor="#aaaaaa"
                                 android:textAlignment="gravity"
                                 android:layout_gravity="center"
-                                android:textSize="18dp"
+                                android:textSize="20dp"
                                 android:gravity="center" />
 
                             <TextView
@@ -171,7 +167,7 @@
                                 android:textAppearance="?android:attr/textAppearanceSmall"
                                 android:text="Vodafone Global Enterprise"
                                 android:id="@+id/contact_company"
-                                android:textColor="#ffffff"
+                                android:textColor="#aaaaaa"
                                 android:textAlignment="gravity"
                                 android:layout_gravity="center"
                                 android:textSize="14dp"

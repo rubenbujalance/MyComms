@@ -34,7 +34,7 @@ public class Constants {
     public static final String CONTACT_AVATAR = "avatar";
     public static final String CONTACT_POSITION = "position";
     public static final String CONTACT_COMPANY = "company";
-    public static final String CONTACT_TIMEZONE = "timezone";
+    public static final String CONTACT_TIMEZONE = "timeZone";
     public static final String CONTACT_LASTSEEN = "lastSeen";
     public static final String CONTACT_OFFICE_LOC = "officeLocation";
     public static final String CONTACT_PHONES = "phones";

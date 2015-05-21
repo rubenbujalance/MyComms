@@ -54,14 +54,17 @@ android {
         i {
             applicationId "com.vodafone.mycomms.i"
             resValue "string", "app_name", "MyComms-i"
+            resValue "string", "app_scheme", "mycomms-i"
         }
         q {
             applicationId "com.vodafone.mycomms.q"
             resValue "string", "app_name", "MyComms-q"
+            resValue "string", "app_scheme", "mycomms-qa"
         }
         p {
             applicationId "com.vodafone.mycomms.p"
             resValue "string", "app_name", "MyComms"
+            resValue "string", "app_scheme", "mycomms"
         }
     }
 

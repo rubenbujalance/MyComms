@@ -226,6 +226,9 @@ public class SignupPincodeActivity extends Activity {
             if (status.compareTo("200") == 0) {
                 setPinColor(Color.WHITE);
 
+                //Save avatar in shared preferences
+//                UserProfile.
+
                 //Force hide keyboard
                 InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
                 mgr.hideSoftInputFromWindow(etPin.getWindowToken(), 0);

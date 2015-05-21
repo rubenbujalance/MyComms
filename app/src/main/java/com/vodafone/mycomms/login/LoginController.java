@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.util.Log;
 
 import com.framework.library.controller.Controller;
+import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
@@ -86,6 +87,15 @@ public class LoginController extends BaseController {
         }
 
 
+    }
+
+    @Override
+    public void onConnectionError(ConnectionException ex){
+        super.onConnectionError(ex);
+        Log.w(Constants.TAG, "LoginController.onConnectionError: ");
+        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof ILoginConnectionCallback && ex.getUrl() !=null  && ex.getUrl().contains(LoginConnection.URL)){
+            ((ILoginConnectionCallback)this.getConnectionCallback()).onLoginError();
+        }
     }
 
 }

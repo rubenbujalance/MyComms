@@ -11,5 +11,5 @@ import model.Contact;
  */
 public interface IContactsConnectionCallback extends IConnectionCallback {
     void onContactsResponse(ArrayList<Contact> contactList);
-    //void onFavouritesResponse(List<Contact> contactList);
+    void onRecentsContactsResponse();
 }

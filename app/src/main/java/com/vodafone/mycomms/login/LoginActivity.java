@@ -24,7 +24,6 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.connection.TestConnection;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -198,7 +197,18 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
     public void callPassCheck()
     {
-        loginController.startLogin(etEmail.getText().toString(), etPassword.getText().toString());
+        if(etEmail.getText().toString().trim().length() <= 0)
+        {
+            onLoginError(getString(R.string.oops_wrong_email));
+        }
+        else if(!android.util.Patterns.EMAIL_ADDRESS.matcher(
+                etEmail.getText().toString().trim()).matches())
+        {
+            onLoginError(getString(R.string.oops_wrong_email));
+        }
+        else {
+            loginController.startLogin(etEmail.getText().toString(), etPassword.getText().toString());
+        }
     }
 
     private void callBackPassCheck(HashMap<String, Object> result)
@@ -207,7 +217,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
         try {
             if (status.compareTo("200") != 0) {
-               onLoginError();
+               onLoginError(getString(R.string.oops_wrong_password));
             }
             else
             {
@@ -249,9 +259,9 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
     }
 
     @Override
-    public void onLoginError() {
+    public void onLoginError(CharSequence error) {
         Log.e(Constants.TAG, "LoginActivity.onLoginError: ");
-        btLogin.setText(getString(R.string.oops_wrong_password));
+        btLogin.setText(error);
 
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -273,6 +283,11 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
     @Override
     public void onConnectionNotAvailable() {
         Log.w(Constants.TAG, "LoginActivity.onConnectionNotAvailable: ");
+    }
+
+    @Override
+    public void onConnectionError() {
+        onLoginError(getString(R.string.connection_error));
     }
 
     private class CheckPasswordApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

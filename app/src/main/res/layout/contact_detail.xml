@@ -123,55 +123,49 @@
                     android:paddingRight="20dp">
 
                     <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="fill_parent"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:weightSum="1">
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:layout_width="wrap_content"
-                            android:layout_height="fill_parent"
-                            android:layout_weight="0.93"
-                            android:layout_gravity="center">
+                        android:layout_weight="0.93"
+                        android:layout_gravity="center"
+                        android:gravity="center_horizontal">
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Smith Doe, John"
-                                android:id="@+id/contact_contact_name"
-                                android:textIsSelectable="false"
-                                android:textSize="@dimen/abc_text_size_large_material"
-                                android:textColor="#ffffffff"
-                                android:textAlignment="gravity"
-                                android:layout_gravity="center"
-                                android:gravity="center" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Smith Doe, John"
+                            android:id="@+id/contact_contact_name"
+                            android:textIsSelectable="false"
+                            android:textSize="@dimen/abc_text_size_large_material"
+                            android:textColor="#ffffffff"
+                            android:textAlignment="gravity"
+                            android:layout_gravity="center"
+                            android:gravity="center" />
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="25dp"
-                                android:textAppearance="?android:attr/textAppearanceSmall"
-                                android:text="Senior Enterprise Manager"
-                                android:id="@+id/contact_position"
-                                android:textColor="#aaaaaa"
-                                android:textAlignment="gravity"
-                                android:layout_gravity="center"
-                                android:textSize="18dp"
-                                android:gravity="center" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="25dp"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text="Senior Enterprise Manager"
+                            android:id="@+id/contact_position"
+                            android:textColor="#aaaaaa"
+                            android:textAlignment="gravity"
+                            android:layout_gravity="center"
+                            android:textSize="18dp"
+                            android:gravity="center" />
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="20dp"
-                                android:textAppearance="?android:attr/textAppearanceSmall"
-                                android:text="Vodafone Global Enterprise"
-                                android:id="@+id/contact_company"
-                                android:textColor="#aaaaaa"
-                                android:textAlignment="gravity"
-                                android:layout_gravity="center"
-                                android:textSize="14dp"
-                                android:textStyle="bold"
-                                android:gravity="center" />
-                        </LinearLayout>
-
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="20dp"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text="Vodafone Global Enterprise"
+                            android:id="@+id/contact_company"
+                            android:textColor="#aaaaaa"
+                            android:textAlignment="gravity"
+                            android:layout_gravity="center"
+                            android:textSize="14dp"
+                            android:textStyle="bold"
+                            android:gravity="center" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -188,7 +182,7 @@
         android:id="@+id/content"
         android:weightSum="1"
         android:focusable="false"
-                android:paddingBottom="40dp">
+                android:paddingBottom="20dp">
 
         <LinearLayout
             android:orientation="vertical"
@@ -200,7 +194,8 @@
                 layout="@layout/toolbar_contact_detail"
                 android:id="@+id/include"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp" />
         </LinearLayout>
 
                 <RelativeLayout

@@ -109,11 +109,13 @@ public class ContactController extends BaseController {
             }
         } else if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)){
             try {
-                jsonResponse = new JSONObject(result);
-
-                insertFavouriteContactInRealm(jsonResponse);
-                //Log.i(Constants.TAG, "ContactController.onConnectionComplete: BusProvider RefreshContactListEvent");
-                //BusProvider.getInstance().post(new RefreshContactListEvent());
+                if (result != null && !result.equals("")) {
+                    jsonResponse = new JSONObject(result);
+                    insertFavouriteContactInRealm(jsonResponse);
+                } else {
+                    realmContactTransactions.deleteAllFavouriteContacts();
+                }
+                BusProvider.getInstance().post(new SetContactListAdapterEvent());
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactController.onConnectionComplete: favourites", e);
             }
@@ -153,7 +155,7 @@ public class ContactController extends BaseController {
         return realmContactList;
     }
 
-    public ArrayList<Contact> getAllContacts(){
+    public ArrayList<Contact> getAllContacts() {
         Log.d(Constants.TAG, "ContactController.getAllContacts: ");
         return realmContactTransactions.getAllContacts();
     }
@@ -216,7 +218,7 @@ public class ContactController extends BaseController {
                 realmContactTransactions.deleteAllFavouriteContacts();
                 realmContactTransactions.insertFavouriteContactList(contactList);
                 Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: inserted contactList ");
-                BusProvider.getInstance().post(new SetContactListAdapterEvent());
+                //BusProvider.getInstance().post(new SetContactListAdapterEvent());
             }
         } catch (JSONException e) {
             e.printStackTrace();

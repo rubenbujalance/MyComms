@@ -231,18 +231,18 @@ public class ContactListFragment extends ListFragment{
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
             favouriteContactList = mContactController.getAllFavouriteContacts();
-            if (favouriteContactList.size()!=0) {
+            if (favouriteContactList!=null) {
                 setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
                         favouriteContactList));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
             recentContactList = mContactController.getAllRecentContacts();
-            if (recentContactList.size()!=0) {
+            if (recentContactList!=null) {
                setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList));
             }
         }else if(mIndex == Constants.CONTACTS_ALL){
             contactList = mContactController.getAllContacts();
-            if (contactList.size()!=0) {
+            if (contactList!=null) {
                 setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList));
             }
         }

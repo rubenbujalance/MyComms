@@ -5,13 +5,13 @@
     android:orientation="vertical"
     android:background="@drawable/istanbul_bg_blur"
     android:gravity="bottom"
-    android:baselineAligned="false">
+    android:baselineAligned="false"
+    android:paddingTop="10dp">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/scrollView"
-        android:layout_marginTop="10dp">
+        android:id="@+id/scrollView">
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
@@ -23,7 +23,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/header"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:paddingBottom="10dp"
             android:layout_weight="6"
             android:layout_gravity="top|center_horizontal"
@@ -456,30 +456,4 @@
         </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:focusableInTouchMode="false"
-        android:id="@+id/bottom">
-
-        <!-- Footer -->
-        <!--<RelativeLayout android:id="@+id/footer"
-            android:layout_width="fill_parent" android:orientation="horizontal"
-            android:layout_alignParentBottom="true"
-            android:layout_height="wrap_content">
-            <LinearLayout
-                android:layout_height="?attr/actionBarSize"
-                android:layout_width="match_parent"
-                android:orientation="vertical"
-                android:id="@+id/contentFooter"
-                android:focusableInTouchMode="true">
-
-                <include android:id="@+id/app_footer" layout="@layout/toolbar_footer"/>
-
-            </LinearLayout>
-
-        </RelativeLayout>-->
-
-    </LinearLayout>
 </LinearLayout>

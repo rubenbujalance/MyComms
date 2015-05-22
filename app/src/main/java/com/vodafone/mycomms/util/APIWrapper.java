@@ -146,7 +146,7 @@ public class APIWrapper {
             String contentType;
 
             if(textEntity != null && textEntity.length() > 0) {
-                contentType = response.getHeaders("Content-Type")[0].getValue();
+                 contentType = response.getHeaders("Content-Type")[0].getValue();
 
                 if (contentType.compareTo("application/json") == 0) {
                     JSONObject json = new JSONObject(textEntity);
@@ -159,9 +159,9 @@ public class APIWrapper {
             hash.put("status", String.valueOf(response.getStatusLine().getStatusCode()));
 
         } catch(Exception ex) {
-            Log.e(Constants.TAG, "APIWrapper.httpResToHash: \n" + ex.toString());
+        Log.e(Constants.TAG, "APIWrapper.httpResToHash: \n" + ex.toString());
             return null;
-        }
+    }
 
         return hash;
     }

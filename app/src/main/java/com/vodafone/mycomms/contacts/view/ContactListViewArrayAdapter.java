@@ -61,6 +61,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         if (!contact.getAvatar().equals("")) {
             Picasso.with(mContext).load(contact.getAvatar())
                     .error(R.drawable.cartoon_round_contact_image_example)
+                    .placeholder( R.drawable.progress_animation )
                     .into(viewHolder.imageAvatar);
         } else{
             viewHolder.imageAvatar.setImageDrawable(mContext.getResources().getDrawable(R.drawable.cartoon_round_contact_image_example));

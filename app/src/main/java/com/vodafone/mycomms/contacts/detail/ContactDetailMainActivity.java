@@ -320,6 +320,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     {
         Picasso.with(this).load(contact.getAvatar())
                 .error(R.drawable.cartoon_round_contact_image_example)
+                .placeholder( R.drawable.progress_animation )
                 .into(ivAvatar);
 
         ivAvatar.setBorderWidth(2);

@@ -26,16 +26,17 @@
             android:layout_marginBottom="10dp"
             android:paddingBottom="10dp"
             android:layout_weight="6"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="top|center_horizontal"
+            android:gravity="top|center_horizontal">
 
-            <LinearLayout
+            <RelativeLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingRight="10dp"
                 android:paddingLeft="10dp"
                 android:id="@+id/topHeader"
-                android:focusable="true">
+                android:focusable="true" >
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -44,37 +45,68 @@
                     android:src="@drawable/btn_back_white"
                     android:focusable="false" />
 
-                <ImageView
-                    android:layout_width="264dp"
-                    android:layout_height="wrap_content"
+                <com.vodafone.mycomms.custom.CircleImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:id="@+id/avatar"
                     android:src="@drawable/cartoon_round_contact_image_example"
                     android:adjustViewBounds="false"
-                    android:layout_weight="1.55" />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10dp" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:orientation="vertical"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:gravity="end|right"
+                    android:id="@+id/rel"
+                    android:layout_alignParentRight="true">
 
                     <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:id="@+id/iconStatus"
-                        android:background="@drawable/ico_sun_white" />
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:id="@+id/ivStatus"
+                        android:layout_alignParentRight="true"
+                        />
 
                     <TextView
-                        android:layout_width="45dp"
-                        android:layout_height="29dp"
+                        android:layout_width="50dp"
+                        android:layout_height="20dp"
                         android:text="20:46"
-                        android:id="@+id/clock4"
-                        android:layout_gravity="right"
-                        android:textColor="#ffffffff" />
+                        android:id="@+id/contact_local_time"
+                        android:textColor="#ffffffff"
+                        android:gravity="right"
+                        android:layout_below="@+id/ivStatus"
+                        android:layout_alignParentRight="true"/>
 
-                </LinearLayout>
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="20dp"
+                        android:text="United States"
+                        android:id="@+id/contact_country"
+                        android:textColor="#cccccc"
+                        android:textSize="12dp"
+                        android:gravity="right"
+                        android:layout_below="@+id/contact_local_time"
+                        android:layout_alignParentRight="true"/>
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="20dp"
+                        android:text="Seen 2d ago"
+                        android:id="@+id/contact_last_seen"
+                        android:textColor="#cccccc"
+                        android:textSize="12dp"
+                        android:gravity="right"
+                        android:layout_below="@+id/contact_country"
+                        android:layout_alignParentRight="true"/>
+
+                </RelativeLayout>
 
 
-            </LinearLayout>
+            </RelativeLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -87,7 +119,8 @@
                     android:orientation="vertical"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:paddingLeft="20dp">
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp">
 
                     <LinearLayout
                         android:orientation="horizontal"
@@ -102,26 +135,41 @@
                             android:layout_gravity="center">
 
                             <TextView
-                                android:layout_width="180dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="Smith Doe, John"
-                                android:id="@+id/contactName"
+                                android:id="@+id/contact_contact_name"
                                 android:textIsSelectable="false"
                                 android:textSize="@dimen/abc_text_size_large_material"
                                 android:textColor="#ffffffff"
-                                android:textStyle="bold"
                                 android:textAlignment="gravity"
-                                android:layout_gravity="center" />
+                                android:layout_gravity="center"
+                                android:gravity="center" />
 
                             <TextView
-                                android:layout_width="165dp"
-                                android:layout_height="match_parent"
+                                android:layout_width="match_parent"
+                                android:layout_height="25dp"
                                 android:textAppearance="?android:attr/textAppearanceSmall"
-                                android:text="London, UK (2 days ago)"
-                                android:id="@+id/contactLocation"
-                                android:textColor="#ffffff"
+                                android:text="Senior Enterprise Manager"
+                                android:id="@+id/contact_position"
+                                android:textColor="#aaaaaa"
                                 android:textAlignment="gravity"
-                                android:layout_gravity="center" />
+                                android:layout_gravity="center"
+                                android:textSize="18dp"
+                                android:gravity="center" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="20dp"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
+                                android:text="Vodafone Global Enterprise"
+                                android:id="@+id/contact_company"
+                                android:textColor="#aaaaaa"
+                                android:textAlignment="gravity"
+                                android:layout_gravity="center"
+                                android:textSize="14dp"
+                                android:textStyle="bold"
+                                android:gravity="center" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -161,26 +209,60 @@
                     style="@style/ProfileBox"
                     android:background="@drawable/roundborder"
                     android:layout_marginLeft="15dp"
+                    android:layout_marginTop="5dp"
                     android:layout_marginRight="15dp"
-                    android:layout_marginTop="15dp"
                     android:layout_marginBottom="5dp">
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="20dp"
                         android:text="Phone"
                         style="@style/TextViewProfile"
-                        android:id="@+id/phone_number"/>
-                    <EditText
+                        android:id="@+id/phone_number_label"
+                        android:textSize="16dp" />
+
+                    <RelativeLayout
+                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/EditViewProfile"
-                        android:hint="Phone Number"
-                        android:text="+34 684503080"
-                        android:inputType="textEmailAddress"
-                        android:ems="10"
-                        android:layout_below="@+id/phone_number"
-                        android:id="@+id/phone_number1"
-                        android:enabled="false"/>
+                        android:layout_below="@+id/phone_number_label" >
+
+                        <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/EditViewProfile"
+                            android:hint="Phone Number"
+                            android:text="+34 684503080"
+                            android:inputType="textEmailAddress"
+                            android:id="@+id/contact_phone_number"
+                            android:enabled="false"
+                            android:textSize="14dp" />
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentEnd="true"
+                            android:gravity="end">
+
+                            <ImageView
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:id="@+id/bt_sms"
+                                android:layout_toLeftOf="@+id/bt_sms"
+                                android:src="@mipmap/btn_contact_messaging" />
+
+                            <ImageView
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:id="@+id/bt_call"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:gravity="end"
+                                android:src="@mipmap/btn_contact_phone"
+                                android:layout_marginLeft="20dp" />
+                        </LinearLayout>
+
+                    </RelativeLayout>
 
                 </RelativeLayout>
 
@@ -195,47 +277,128 @@
                     android:layout_marginBottom="5dp">
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="20dp"
                         android:text="Email"
                         style="@style/TextViewProfile"
-                        android:id="@+id/email"/>
-                    <EditText
+                        android:id="@+id/contact_email_label"
+                        android:textSize="16dp" />
+
+                    <RelativeLayout
+                        android:orientation="horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/EditViewProfile"
-                        android:hint="Email"
-                        android:text="john.smith@vodafone.com"
-                        android:ems="10"
-                        android:layout_below="@+id/email"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:id="@+id/email1"/>
+                        android:layout_below="@+id/contact_email_label" >
+
+                        <EditText
+                            style="@style/EditViewProfile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:hint="Phone Number"
+                            android:text="ruben_bujalance@stratesys-ts.com"
+                            android:inputType="textEmailAddress"
+                            android:id="@+id/contact_email"
+                            android:enabled="false"
+                            android:textSize="14dp" />
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_alignParentEnd="true"
+                            android:gravity="end" >
+
+                            <ImageView
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:id="@+id/bt_chat"
+                                android:layout_toLeftOf="@+id/bt_chat"
+                                android:src="@mipmap/btn_contact_messaging" />
+
+                            <ImageView
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:id="@+id/bt_email"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentRight="true"
+                                android:gravity="end"
+                                android:src="@mipmap/btn_contact_email"
+                                android:layout_marginLeft="20dp" />
+                        </LinearLayout>
+                    </RelativeLayout>
 
                 </RelativeLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/roundborder"
-                    style="@style/ProfileBox"
-                    android:orientation="vertical"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/TextViewProfile"
-                        android:text="Company"/>
-                    <EditText
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/EditViewProfile"
-                        android:hint="Company name"
-                        android:id="@+id/company"
-                        android:text="MyComms Corp." />
-                </LinearLayout>
+                <!--<LinearLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@drawable/roundborder"-->
+                    <!--style="@style/ProfileBox"-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:layout_marginLeft="15dp"-->
+                    <!--android:layout_marginRight="15dp"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:layout_marginBottom="5dp">-->
+                    <!--<TextView-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--style="@style/TextViewProfile"-->
+                        <!--android:text="Company"-->
+                        <!--android:id="@+id/company_label"-->
+                        <!--/>-->
+                    <!--<EditText-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--style="@style/EditViewProfile"-->
+                        <!--android:hint="Company name"-->
+                        <!--android:id="@+id/contact_company"-->
+                        <!--android:text="MyComms Corp." />-->
+                <!--</LinearLayout>-->
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:layout_marginLeft="15dp"-->
+                    <!--android:layout_marginRight="15dp"-->
+                    <!--android:layout_marginBottom="5dp"-->
+                    <!--android:background="@drawable/roundborder"-->
+                    <!--style="@style/ProfileBox"-->
+                    <!--android:orientation="vertical">-->
+                    <!--<TextView-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--style="@style/TextViewProfile"-->
+                        <!--android:text="Position"/>-->
+                    <!--<EditText-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--style="@style/EditViewProfile"-->
+                        <!--android:hint="Position"-->
+                        <!--android:id="@+id/contact_position"/>-->
+                <!--</LinearLayout>-->
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:layout_marginLeft="15dp"-->
+                    <!--android:layout_marginRight="15dp"-->
+                    <!--android:layout_marginBottom="5dp"-->
+                    <!--android:background="@drawable/roundborder"-->
+                    <!--style="@style/ProfileBox"-->
+                    <!--android:orientation="vertical">-->
+                    <!--<TextView-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--style="@style/TextViewProfile"-->
+                        <!--android:text="Department"/>-->
+                    <!--<EditText-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--style="@style/EditViewProfile"-->
+                        <!--android:hint="Department"-->
+                        <!--android:id="@+id/contact_department"/>-->
+                <!--</LinearLayout>-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -251,84 +414,44 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Position"/>
-                    <EditText
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/EditViewProfile"
-                        android:hint="Position"
-                        android:id="@+id/position"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="@drawable/roundborder"
-                    style="@style/ProfileBox"
-                    android:orientation="vertical">
+                        android:text="Office Location"
+                        android:textSize="16dp" />
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/TextViewProfile"
-                        android:text="Department"/>
-                    <EditText
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/EditViewProfile"
-                        android:hint="Department"
-                        android:id="@+id/department"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="@drawable/roundborder"
-                    style="@style/ProfileBox"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/TextViewProfile"
-                        android:text="Office Location"/>
-                    <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="742, Evergreen Terrace"
-                        android:id="@+id/office_location"/>
+                        android:id="@+id/contact_office_location"
+                        android:textSize="14dp" />
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginBottom="5dp"
-                    android:background="@drawable/roundborder"
-                    style="@style/ProfileBox"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        style="@style/TextViewProfile"
-                        android:text="Additional Information"/>
-                    <EditText
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        style="@style/EditViewProfile"
-                        android:hint="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus volutpat ante sit amet ligula porttitor, a rhoncus tortor accumsan."
-                        android:lines="3"
-                        android:id="@+id/additional_info"/>
-                </LinearLayout>
+                <!--<LinearLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:layout_marginLeft="15dp"-->
+                    <!--android:layout_marginRight="15dp"-->
+                    <!--android:layout_marginBottom="5dp"-->
+                    <!--android:background="@drawable/roundborder"-->
+                    <!--style="@style/ProfileBox"-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:id="@+id/contact_additional_info_box"-->
+                    <!-->-->
+                    <!--<TextView-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--style="@style/TextViewProfile"-->
+                        <!--android:text="Additional Information"-->
+                        <!--android:id="@+id/contact_additional_info_label"-->
+                        <!--/>-->
+                    <!--<EditText-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--style="@style/EditViewProfile"-->
+                        <!--android:hint="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus volutpat ante sit amet ligula porttitor, a rhoncus tortor accumsan."-->
+                        <!--android:lines="3"-->
+                        <!--android:id="@+id/contact_additional_info"/>-->
+                <!--</LinearLayout>-->
     </LinearLayout>
         </LinearLayout>
     </ScrollView>

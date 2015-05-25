@@ -10,13 +10,18 @@
         android:tag="back"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:background="@color/grey_chat_name">
+        android:background="@color/gold">
 
-        <ImageButton
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btFavorite"
-            android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha" />
+            android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+            android:layout_alignParentLeft="false"
+            android:adjustViewBounds="true"
+            android:contentDescription="Favorite"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp" />
     </RelativeLayout>
 
     <LinearLayout
@@ -25,8 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#ffffffff"
-        android:weightSum="1"
-        android:layout_marginLeft="5dp">
+        android:weightSum="1">
     <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
         android:layout_width="70dp"
         android:layout_height = "70dp"

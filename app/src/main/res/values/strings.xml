@@ -35,7 +35,9 @@
     <string name="resend_email">Resend Email</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="password_explanation">Passwords must contain at lease 8 characters with at least one capital, one lower, and one number</string>
-
+    <string name="update2">Update</string>
+    <string name="downloading_new_version">Downloading new version</string>
+    <string name="please_check_the_download_status_in_the_notifications_bar">Please check download status in the notifications bar</string>
     <string-array name="add_photo_chooser">
         <item>Take a photo</item>
         <item>Choose from Gallery</item>
@@ -95,7 +97,7 @@
     <string name="profile_list_tab_accounts">Accounts</string>
     <string name="profile_list_tab_my_profile">My Profile</string>
     <string name="title_activity_profile">Profile</string>
-    <string name="no_internet_connection_is_available">No Internet connection is available. Application will finish</string>
+    <string name="no_internet_connection_is_available">No Internet connection is available</string>
     <string name="no_internet_connection">No Internet Connection</string>
 
     <string name="pref_file_tokens">com.vodafone.mycomms.PREF_FILE_TOKENS</string>

@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.connection.TestConnection;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -71,7 +72,8 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                callPassCheck();
+                if(APIWrapper.checkConnectionAndAlert(LoginActivity.this))
+                    callPassCheck();
             }
         });
 
@@ -115,6 +117,17 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
             }
         });
 
+        btLoginSalesforce.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(APIWrapper.checkConnectionAndAlert(LoginActivity.this)) {
+                    Intent in = new Intent(LoginActivity.this, OAuthActivity.class);
+                    in.putExtra("oauth", "sf");
+                    startActivity(in);
+                }
+            }
+        });
+
         tvForgotPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,11 +146,12 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         });
 
         loginController = new LoginController(this);
+        loginController.setConnectionCallback(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FORGOT_PASSWORD_ACTIVITY)
+        if (requestCode == FORGOT_PASSWORD_ACTIVITY && resultCode == RESULT_OK)
         {
             Utils.showAlert(this, getString(R.string.new_password_sent), getString(R.string.we_have_sent_you_an_email));
         }
@@ -184,16 +198,6 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
     public void callPassCheck()
     {
-//        HashMap body = new HashMap<>();
-//        body.put("username", etEmail.getText().toString());
-//        body.put("password", etPassword.getText().toString());
-//
-//        new CheckPasswordApi().execute(body, null);
-        HashMap body = new HashMap<>();
-        body.put("username", "ruben_bujalance@stratesys-ts.com");
-        body.put("password", "i9Vs1Qm8U");
-
-        //loginController.startLogin(body);
         loginController.startLogin(etEmail.getText().toString(), etPassword.getText().toString());
     }
 
@@ -203,22 +207,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
         try {
             if (status.compareTo("200") != 0) {
-                btLogin.setText(getString(R.string.oops_wrong_password));
-
-                int sdk = android.os.Build.VERSION.SDK_INT;
-                if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                    btLogin.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.bt_red_style));
-                } else {
-                    btLogin.setBackground(this.getResources().getDrawable(R.drawable.bt_red_style));
-                }
-
-                Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
-                errorIcon.setBounds(new Rect(0, 0,
-                        (int) (errorIcon.getIntrinsicWidth() * 0.5),
-                        (int) (errorIcon.getIntrinsicHeight() * 0.5)));
-
-//                etPassword.setError(getString(R.string.oops_wrong_password), errorIcon);
-                etPassword.setCompoundDrawables(null, null, errorIcon, null);
+               onLoginError();
             }
             else
             {
@@ -230,19 +219,60 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
                 UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
 
-                //Force hide keyboard
-                InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-                mgr.hideSoftInputFromWindow(etEmail.getWindowToken(), 0);
-
-                //Start Main activity
-                Intent in = new Intent(LoginActivity.this, ContactListMainActivity.class);
-                startActivity(in);
-                finish();
+                startMainActivity();
             }
         } catch(Exception ex) {
-            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck: \n" + ex.toString());
+            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck:" , ex);
             return;
         }
+    }
+
+    private void startMainActivity(){
+        //Force hide keyboard
+        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+        mgr.hideSoftInputFromWindow(etEmail.getWindowToken(), 0);
+
+
+        //Start Main activity
+        Intent in = new Intent(LoginActivity.this, ContactListMainActivity.class);
+
+        in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(in);
+        finish();
+    }
+    @Override
+    public void onLoginSuccess() {
+        Log.d(Constants.TAG, "LoginActivity.onLoginSuccess: ");
+        startMainActivity();
+//        TestConnection testConnection = new TestConnection(this.getApplicationContext(), this.loginController);
+//        testConnection.request();
+    }
+
+    @Override
+    public void onLoginError() {
+        Log.e(Constants.TAG, "LoginActivity.onLoginError: ");
+        btLogin.setText(getString(R.string.oops_wrong_password));
+
+        int sdk = android.os.Build.VERSION.SDK_INT;
+        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            btLogin.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.bt_red_style));
+        } else {
+            btLogin.setBackground(this.getResources().getDrawable(R.drawable.bt_red_style));
+        }
+
+        Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
+        errorIcon.setBounds(new Rect(0, 0,
+                (int) (errorIcon.getIntrinsicWidth() * 0.5),
+                (int) (errorIcon.getIntrinsicHeight() * 0.5)));
+
+//                etPassword.setError(getString(R.string.oops_wrong_password), errorIcon);
+        etPassword.setCompoundDrawables(null, null, errorIcon, null);
+
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.w(Constants.TAG, "LoginActivity.onConnectionNotAvailable: ");
     }
 
     private class CheckPasswordApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

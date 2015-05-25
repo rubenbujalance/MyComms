@@ -84,7 +84,7 @@
                         android:layout_height="wrap_content"
                         android:text="Phone"
                         style="@style/TextViewProfile"
-                        android:id="@+id/phone_number"/>
+                        android:id="@+id/contact_phone_number"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -93,7 +93,7 @@
                         android:text="+34 684503080"
                         android:inputType="textEmailAddress"
                         android:ems="10"
-                        android:layout_below="@+id/phone_number"
+                        android:layout_below="@+id/contact_phone_number"
                         android:id="@+id/phone_number1"
                         android:enabled="false"/>
 
@@ -117,7 +117,7 @@
                         android:layout_height="wrap_content"
                         android:text="Email"
                         style="@style/TextViewProfile"
-                        android:id="@+id/email"/>
+                        android:id="@+id/contact_email"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
                         android:hint="Email"
                         android:text="andrew.wiggin@vodafone.com"
                         android:ems="10"
-                        android:layout_below="@+id/email"
+                        android:layout_below="@+id/contact_email"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
                         android:id="@+id/email1"/>
@@ -157,7 +157,7 @@
                         style="@style/EditViewProfile"
                         android:hint="Company name"
                         android:text="Vodafone"
-                        android:id="@+id/company"/>
+                        android:id="@+id/contact_company"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -177,7 +177,7 @@
                         style="@style/EditViewProfile"
                         android:hint="Position"
                         android:text="Leader"
-                        android:id="@+id/position"/>
+                        android:id="@+id/contact_position"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -239,9 +239,9 @@
                         android:hint="Additional"
                         android:text="That's me!"
                         android:lines="3"
-                        android:id="@+id/additional_info"/>
+                        android:id="@+id/contact_additional_info"/>
                 </LinearLayout>
-            </LinearLayout>
+            </LinearLayout>x
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

@@ -18,10 +18,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.util.APIWrapper;
-import com.vodafone.mycomms.MycommsApp;
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UserSecurity;
 
 import org.json.JSONObject;
 
@@ -105,7 +107,9 @@ public class SignupPincodeActivity extends Activity {
                     text = String.valueOf((char) event.getUnicodeChar());
                     tvPin4.setText(text);
                     pin += text;
-                    callPhoneCheck(pin);
+
+                    if(APIWrapper.checkConnectionAndAlert(SignupPincodeActivity.this))
+                        callPhoneCheck(pin);
                 }
 
                 if (nextPinPos < 4) nextPinPos++;
@@ -141,8 +145,8 @@ public class SignupPincodeActivity extends Activity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-
-        callPhoneCheck(null);
+        if(APIWrapper.checkConnectionAndAlert(SignupPincodeActivity.this))
+            callPhoneCheck(null);
     }
 
     @Override
@@ -178,7 +182,7 @@ public class SignupPincodeActivity extends Activity {
         }
 
         HashMap<String, Object> body =
-                ((MycommsApp)getApplication()).getUserProfile().getHashMap();
+                UserProfile.getHashMap();
 
         new CheckPhoneApi().execute(body,header);
     }
@@ -219,13 +223,11 @@ public class SignupPincodeActivity extends Activity {
         else if(result.containsKey("text")) text = (String)result.get("text");
 
         try {
-            if (status.compareTo("200") != 0) {
-                if(pin != null && pin.trim().length()>0)
-                    setPinColor(Color.RED);
-            }
-            else
-            {
+            if (status.compareTo("200") == 0) {
                 setPinColor(Color.WHITE);
+
+                //Save avatar in shared preferences
+//                UserProfile.
 
                 //Force hide keyboard
                 InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
@@ -236,6 +238,38 @@ public class SignupPincodeActivity extends Activity {
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 in.putExtra("pin",pin); //We'll need the pin to resend email
                 startActivity(in);
+            }
+            else if (status.compareTo("201") == 0) {
+                //User created from OAuth, not necessary to check mail
+                //We have accessToken to access app
+
+                //Delete the oauth from userProfile
+                UserProfile.setOauth(null);
+                UserProfile.setOauthPrefix(null);
+                setPinColor(Color.WHITE);
+
+                //Force hide keyboard
+                InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+                mgr.hideSoftInputFromWindow(etPin.getWindowToken(), 0);
+
+                //Get tokens and expiration data from http response
+                JSONObject jsonResponse = (JSONObject)result.get("json");
+                String accessToken = jsonResponse.getString("accessToken");
+                String refreshToken = jsonResponse.getString("refreshToken");
+                long expiresIn = jsonResponse.getLong("expiresIn");
+
+                UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
+
+                //Start main activity and clear history
+                Intent in = new Intent(getApplicationContext(), ContactListMainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(in);
+            }
+            else
+            {
+                if(pin != null && pin.trim().length()>0)
+                    setPinColor(Color.RED);
             }
         } catch(Exception ex) {
             Log.e(Constants.TAG, "SignupPincodeActivity.callBackPhoneCheck: \n" + ex.toString());

@@ -12,9 +12,12 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,11 +26,20 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.util.Constants;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
 
 public class SignupNameActivity extends Activity {
 
@@ -38,6 +50,7 @@ public class SignupNameActivity extends Activity {
     ClearableEditText mFirstName;
     ClearableEditText mLastName;
     Bitmap photoBitmap = null;
+    String photoPath = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +101,14 @@ public class SignupNameActivity extends Activity {
                 finish();
             }
         });
+
+//        //Load data if comes from Salesforce signup
+//        // TODO - Remove after tests
+//        UserProfile.setAvatar("https://www.iconaholic.com/work/bartender-icon.png");
+
+        if(UserProfile.getFirstName() != null) mFirstName.setText(UserProfile.getFirstName());
+        if(UserProfile.getLastName() != null) mLastName.setText(UserProfile.getLastName());
+//        if(UserProfile.getAvatar() != null) new LoadAvatarFromUrl().execute(UserProfile.getAvatar());
 
         //Force the focus of the first field and opens the keyboard
         InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
@@ -145,6 +166,7 @@ public class SignupNameActivity extends Activity {
                 if(which == 0)
                 {
                     in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    in.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
                     startActivityForResult(in, REQUEST_IMAGE_CAPTURE);
                 }
                 else if(which == 1)
@@ -172,37 +194,161 @@ public class SignupNameActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
         {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            photoBitmap = imageBitmap;
-
-//            CropImageIntentBuilder in = new CropImageIntentBuilder(500,500,Uri.parse(getFilesDir()+"imageTemp"));
-//            startActivity(in);
-
+            photoBitmap = decodeFile(photoPath);
             mPhoto.setImageBitmap(photoBitmap);
             mPhoto.setBorderWidth(2);
             mPhoto.setBorderColor(Color.WHITE);
+
+            //Reset avatar from user profile
+            UserProfile.setAvatar(null);
         }
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK)
         {
             Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            Bitmap bitmap = null;
+            photoPath = getRealPathFromURI(selectedImage);
+//            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+//            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+//            Bitmap bitmap = null;
+//
+//            if (cursor.moveToFirst()) {
+//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+//                String filePath = cursor.getString(columnIndex);
+//                bitmap = BitmapFactory.decodeFile(filePath);
+//            }
+//            cursor.close();
+//
+//            //Set bitmap to CircleImageView
+//            mPhoto.setImageBitmap(bitmap);
+//            mPhoto.setBorderWidth(2);
+//            mPhoto.setBorderColor(Color.WHITE);
+//            photoBitmap = bitmap;
 
-            if (cursor.moveToFirst()) {
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String filePath = cursor.getString(columnIndex);
-                bitmap = BitmapFactory.decodeFile(filePath);
-            }
-            cursor.close();
-
-            //Set bitmap to CircleImageView
-            mPhoto.setImageBitmap(bitmap);
+            photoBitmap = decodeFile(photoPath);
+            mPhoto.setImageBitmap(photoBitmap);
             mPhoto.setBorderWidth(2);
             mPhoto.setBorderColor(Color.WHITE);
-            photoBitmap = bitmap;
+
+            //Reset avatar from user profile
+            UserProfile.setAvatar(null);
         }
+    }
+
+    public Uri setImageUri() {
+        // Store image in dcim
+        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new Date().getTime() + ".jpg");
+        Uri imgUri = Uri.fromFile(file);
+        photoPath = file.getAbsolutePath();
+        return imgUri;
+    }
+
+    public Bitmap decodeFile(String path) {
+        try {
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, o);
+//            // The new size we want to scale to
+//            final int REQUIRED_SIZE = 70;
+//
+//            // Find the correct scale value. It should be the power of 2.
+//            int scale = 1;
+//            while (o.outWidth / scale / 2 >= REQUIRED_SIZE && o.outHeight / scale / 2 >= REQUIRED_SIZE)
+//                scale *= 2;
+//
+//            // Decode with inSampleSize
+//            BitmapFactory.Options o2 = new BitmapFactory.Options();
+//            o2.inSampleSize = scale;
+//            return BitmapFactory.decodeFile(path, o2);
+            return BitmapFactory.decodeFile(path);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        String result;
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
+    }
+
+    private void loadAvatarFromUrl(String filepath)
+    {
+        //Just load the image, don't save in UserProfile, we already have the url
+        if(filepath == null) return;
+
+        Bitmap bitmapTemp = decodeFile(filepath);
+        mPhoto.setImageBitmap(bitmapTemp);
+        mPhoto.setBorderWidth(2);
+        mPhoto.setBorderColor(Color.WHITE);
+    }
+
+    private String saveImageFromUrl(String strUrl)
+    {
+        //Reads and saves image from URL, and return de filepath
+        String filepath = null;
+
+        try
+        {
+            URL url = new URL(strUrl);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.setDoOutput(true);
+            urlConnection.connect();
+
+            String filename="downloadedFile.png";
+//            File cacheDirRoot = getExternalCacheDir().getAbsoluteFile();
+//            File file = new File(cacheDirRoot,filename);
+//            if(!file.createNewFile())
+//                return null;
+            File file = new File(getCacheDir(), filename);
+
+            FileOutputStream fileOutput = new FileOutputStream(file);
+            InputStream inputStream = urlConnection.getInputStream();
+            int totalSize = urlConnection.getContentLength();
+            int downloadedSize = 0;
+            byte[] buffer = new byte[1024];
+            int bufferLength;
+
+            while ( (bufferLength = inputStream.read(buffer)) > 0 )
+            {
+                fileOutput.write(buffer, 0, bufferLength);
+                downloadedSize += bufferLength;
+                Log.i("Progress:","downloadedSize:"+downloadedSize+"totalSize:"+ totalSize);
+            }
+
+            fileOutput.flush();
+            fileOutput.close();
+
+            if(downloadedSize == totalSize) filepath = file.getPath();
+        }
+        catch (MalformedURLException e)
+        {
+            Log.e(Constants.TAG, "SignupNameActivity.loadAvatarFromUrl: ", e);
+            return null;
+        }
+        catch (IOException e)
+        {
+            Log.e(Constants.TAG, "SignupNameActivity.loadAvatarFromUrl: ", e);
+            return null;
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "SignupNameActivity.loadAvatarFromUrl: ", e);
+            return null;
+        }
+
+        Log.i("filepath:"," " + filepath) ;
+
+        return filepath;
     }
 
     private boolean checkData()
@@ -245,10 +391,21 @@ public class SignupNameActivity extends Activity {
 
     private void saveData ()
     {
-        UserProfile profile = ((MycommsApp)getApplication()).getUserProfile();
+        UserProfile.setFirstName(mFirstName.getText().toString());
+        UserProfile.setLastName(mLastName.getText().toString());
+        UserProfile.setPhotoBitmap(photoBitmap);
+        UserProfile.setPhotoPath(photoPath);
+    }
 
-        profile.setFirstName(mFirstName.getText().toString());
-        profile.setLastName(mLastName.getText().toString());
-        profile.setPhotoBitmap(photoBitmap);
+    private class LoadAvatarFromUrl extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String[] params) {
+            return saveImageFromUrl(params[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            loadAvatarFromUrl(result);
+        }
     }
 }

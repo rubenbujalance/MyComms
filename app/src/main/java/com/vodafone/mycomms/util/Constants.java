@@ -51,5 +51,6 @@ public class Constants {
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
-
+    public static final String CONTACT_API_POST_FAVOURITE = "/api/me/favourites";
+    public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
 }

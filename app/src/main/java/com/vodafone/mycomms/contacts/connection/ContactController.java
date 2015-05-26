@@ -275,6 +275,7 @@ public class ContactController extends BaseController {
                 contact = realmContactTransactions.getContactById(jsonArray.getString(i));
                 if (contact != null) {
                     contactList.add(mapContactToFavourite(contact));
+                    updateContactAvatar(contact, i==jsonArray.length()-1);
                 }
             }
             if (contactList.size()!=0) {
@@ -300,6 +301,7 @@ public class ContactController extends BaseController {
                 contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString("id"));
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
+                    updateContactAvatar(contact, i == jsonArray.length() - 1);
                 }
             }
             if (contactList.size()!=0) {

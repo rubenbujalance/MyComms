@@ -10,11 +10,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -45,6 +45,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
             viewHolder = new ViewHolder();
             viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.companyLogo);
+            viewHolder.textAvatar = (TextView) convertView.findViewById(R.id.avatarText);
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
             viewHolder.textViewPosition = (TextView) convertView.findViewById(R.id.list_item_content_position);
@@ -58,13 +59,29 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
         // update the item view
         Contact contact = getItem(position);
-        if (!contact.getAvatar().equals("")) {
-            Picasso.with(mContext).load(contact.getAvatar())
-                    .error(R.drawable.cartoon_round_contact_image_example)
-                    .into(viewHolder.imageAvatar);
+
+        //Image avatar
+        File avatarFile = new File(mContext.getFilesDir(), "avatar_"+contact.getId()+".jpg");
+
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0 &&
+                contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists()) {
+
+            viewHolder.textAvatar.setText(null);
+
+            Picasso.with(mContext)
+                .load(avatarFile)
+                .into(viewHolder.imageAvatar);
+
         } else{
-            viewHolder.imageAvatar.setImageDrawable(mContext.getResources().getDrawable(R.drawable.cartoon_round_contact_image_example));
+            String initials = contact.getFirstName().substring(0,1) +
+                                contact.getLastName().substring(0,1);
+
+            viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
+            viewHolder.textAvatar.setText(initials);
         }
+
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewPosition.setText(contact.getPosition());
@@ -131,5 +148,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         TextView textViewTime;
         ImageView imageViewDayNight;
         ImageView imageAvatar;
+        TextView textAvatar;
     }
 }

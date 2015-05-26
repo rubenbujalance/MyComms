@@ -129,7 +129,7 @@ public class RealmContactTransactions {
 
         RealmResults<Contact> result1 = query.findAll();
 
-        if (result1!=null){
+        if (result1!=null && result1.size()>0){
             return result1.first();
         }else {
             return null;

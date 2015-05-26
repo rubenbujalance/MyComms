@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.fortysevendeg.swipelistview.SwipeListView;
 import com.vodafone.mycomms.R;
@@ -56,6 +57,7 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
     private ListView listView;
     private SwipeRefreshLayout refreshLayout;
     private Parcelable state;
+    private TextView emptyText;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -83,6 +85,7 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
        refreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
        listView = (ListView) refreshLayout.findViewById(android.R.id.list);
+       emptyText = (TextView) refreshLayout.findViewById(android.R.id.empty);
        /*final SwipeListView swipeListView = (SwipeListView) v.findViewById(android.R.id.list);
        swipeListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
            @Override
@@ -259,11 +262,15 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
                         favouriteContactList));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
+            if (emptyText!=null)
+                emptyText.setText("");
             recentContactList = mContactController.getAllRecentContacts();
             if (recentContactList!=null) {
                setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList));
             }
         }else if(mIndex == Constants.CONTACTS_ALL){
+            if (emptyText!=null)
+                emptyText.setText("");
             contactList = mContactController.getAllContacts();
             adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
             if (contactList!=null) {

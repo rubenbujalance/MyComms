@@ -116,4 +116,6 @@
     </string-array>
     <string name="title_activity_oauth_web">OAuthWebActivity</string>
 
+    <string name="no_favourite_records">Store a list of your favourite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favourite contacts.</string>
+
 </resources>

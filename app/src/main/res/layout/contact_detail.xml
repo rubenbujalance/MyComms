@@ -3,29 +3,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/istanbul_bg_blur"
-    android:gravity="bottom"
     android:baselineAligned="false"
-    android:paddingTop="10dp">
+    android:background="@drawable/istanbul_bg_blur">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/scrollView">
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        android:paddingTop="10dp">
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/container"
-            android:weightSum="1">
+            android:id="@+id/container">
         <LinearLayout
             android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:id="@+id/header"
-            android:layout_marginBottom="5dp"
-            android:paddingBottom="10dp"
-            android:layout_weight="6"
+            android:paddingBottom="15dp"
             android:layout_gravity="top|center_horizontal"
             android:gravity="top|center_horizontal">
 
@@ -126,7 +122,6 @@
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.93"
                         android:layout_gravity="center"
                         android:gravity="center_horizontal">
 
@@ -177,12 +172,11 @@
             <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="#dcdde0"
         android:id="@+id/content"
-        android:weightSum="1"
         android:focusable="false"
-                android:paddingBottom="20dp">
+        android:paddingBottom="60dp" >
 
         <LinearLayout
             android:orientation="vertical"
@@ -237,6 +231,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
                             android:gravity="end">
 
                             <ImageView
@@ -300,6 +295,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true"
                             android:gravity="end" >
 
                             <ImageView

@@ -141,7 +141,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
             //mContactController.getRecentList(accessToken, apiCall);
         }else if(apiCall.equals(Constants.CONTACT_API_GET_CONTACTS)){
             //apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-            //mContactController.getFavouritesList(accessToken, apiCall);
+            //mC            ontactController.getFavouritesList(accessToken, apiCall);
 
             if (contactListFragment!=null)
                 contactListFragment.setListAdapterTabs();

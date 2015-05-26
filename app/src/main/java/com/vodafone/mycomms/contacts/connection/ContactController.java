@@ -2,16 +2,21 @@ package com.vodafone.mycomms.contacts.connection;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.model.ConnectionResponse;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
+import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
@@ -19,12 +24,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import io.realm.Realm;
 import model.Contact;
+import model.ContactAvatar;
 import model.FavouriteContact;
 import model.RecentContact;
 
@@ -92,22 +99,22 @@ public class ContactController extends BaseController {
         Log.i(Constants.TAG, "ContactController.onConnectionComplete: " + result);
         JSONObject jsonResponse;
 
-        if (apiCall.equals(Constants.CONTACT_API_GET_CONTACTS)) {
+        if (apiCall.equals(Constants.CONTACT_API_GET_CONTACTS) &&
+                result != null && result.trim().length()>0) {
             try {
                 jsonResponse = new JSONObject(result);
                 Log.i(Constants.TAG, "ContactController.onConnectionComplete: jsonResponse: " + jsonResponse.toString());
-                ArrayList<Contact> realmContactList = new ArrayList<>();
-                realmContactList = insertContactListInRealm(jsonResponse);
+                ArrayList<Contact> realmContactList = insertContactListInRealm(jsonResponse);
+
                 if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
                     ((IContactsConnectionCallback) this.getConnectionCallback()).onContactsResponse(realmContactList);
                 }
 
-               // realmContactTransactions.getContactById("mc_55361a9cc729d4430b9722f3");
-
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactController.onConnectionComplete: contacts " , e);
             }
-        } else if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)){
+        } else if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES) &&
+                    result != null && result.trim().length()>0){
             try {
                 jsonResponse = new JSONObject(result);
 
@@ -117,7 +124,8 @@ public class ContactController extends BaseController {
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactController.onConnectionComplete: favourites", e);
             }
-        } else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
+        } else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS) &&
+                result != null && result.trim().length()>0){
             try {
                 jsonResponse = new JSONObject(result);
 
@@ -134,14 +142,19 @@ public class ContactController extends BaseController {
 
     private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
         ArrayList<Contact> realmContactList = new ArrayList<>();
+
         try {
             Log.i(Constants.TAG, "ContactController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
             Contact contact;
+            boolean doRefreshAdapter;
+
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
                 contact = mapContact(jsonObject);
                 realmContactList.add(contact);
+                doRefreshAdapter = (i==jsonArray.length()-1);
+                updateContactAvatar(contact, doRefreshAdapter);
             }
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
             realmContactTransactions.insertContactList(realmContactList);
@@ -153,7 +166,59 @@ public class ContactController extends BaseController {
         return realmContactList;
     }
 
-    public ArrayList<Contact> getAllContacts(){
+    private void updateContactAvatar (Contact contact, boolean doRefreshAdapter)
+    {
+        try {
+            RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
+            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getId());
+            if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
+                String filename = "avatar_" + contact.getId() + ".jpg";
+                Picasso.with(mContext)
+                        .load(contact.getAvatar())
+                        .into(getImageTarget(filename, doRefreshAdapter));
+
+                if (avatar == null)
+                    avatar = new ContactAvatar(contact.getId(), contact.getAvatar(), filename);
+                else avatar.setUrl(contact.getAvatar());
+
+                realmAvatarTransactions.insertAvatar(avatar);
+            }
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "ContactController.updateContactAvatar: ", ex);
+        }
+    }
+
+    private Target getImageTarget(final String fileName, final boolean doRefreshAdapter)
+    {
+        return new Target() {
+            @Override
+            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+//                        File file = new File(mContext.get, fileName);
+                        try {
+//                            file.createNewFile();
+                            FileOutputStream ostream = mContext.openFileOutput(fileName, Context.MODE_PRIVATE);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, ostream);
+                            ostream.close();
+
+                            if(doRefreshAdapter)
+                                BusProvider.getInstance().post(new SetContactListAdapterEvent());
+                        } catch (Exception e) {
+                            Log.e(Constants.TAG, "ContactController.getImageTarget.run: ", e);
+                        }
+                    }
+                }).start();
+            }
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {}
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {}
+        };
+    }
+
+    public ArrayList<Contact> getAllContacts() {
         Log.d(Constants.TAG, "ContactController.getAllContacts: ");
         return realmContactTransactions.getAllContacts();
     }

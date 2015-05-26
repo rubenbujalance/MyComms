@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshContactListEvent;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
 
 /**
@@ -310,7 +311,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 mViewPagerPageChangeListener.onPageSelected(position);
             }
             Log.i(Constants.TAG, "TabClickListener.onPageSelected: ");
-            BusProvider.getInstance().post(new RefreshContactListEvent());
+            BusProvider.getInstance().post(new SetContactListAdapterEvent());
         }
 
     }

@@ -143,9 +143,9 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
 
             if (contactListFragment!=null)// && !morePages)
                 contactListFragment.setListAdapterTabs();
-            if (contactRecentListFragment!=null)// && !morePages)
+            if (contactRecentListFragment!=null && !morePages)
                 contactRecentListFragment.setListAdapterTabs();
-            if (contactFavouritesListFragment!=null)// && !morePages)
+            if (contactFavouritesListFragment!=null && !morePages)
                 contactFavouritesListFragment.setListAdapterTabs();
 
             if (morePages){

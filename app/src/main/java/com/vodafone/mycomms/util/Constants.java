@@ -46,10 +46,15 @@ public class Constants {
     public static final String CONTACT_RECENTS = "recents";
     public static final String CONTACT_RECENTS_ACTION = "action";
     public static final String CONTACT_RECENTS_ACTION_TIME = "timestamp";
+    public static final String CONTACT_PAGINATION = "pagination";
+    public static final String CONTACT_PAGINATION_MORE_PAGES = "morePages";
+    public static final String CONTACT_PAGINATION_OFFSET = "offset";
+    public static final String CONTACT_PAGINATION_PAGESIZE = "pageSize";
 
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
-
+    public static final String CONTACT_API_POST_FAVOURITE = "/api/me/favourites";
+    public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
 }

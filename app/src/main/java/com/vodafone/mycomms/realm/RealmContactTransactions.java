@@ -136,6 +136,26 @@ public class RealmContactTransactions {
         }
     }
 
+    public boolean favouriteContactIsInRealm(String contactId){
+        //Checks if the Contact is favourite. If it is, it deletes it and returns false to send it to the API
+        Log.i(Constants.TAG, "RealmContactTransactions.favouriteContactIsInRealm: ");
+        mRealm.beginTransaction();
+        RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
+
+        query.equalTo(Constants.CONTACT_ID, contactId);
+
+        RealmResults<FavouriteContact> result1 = query.findAll();
+
+        if (result1!=null && result1.size()!=0){
+            result1.clear();
+            mRealm.commitTransaction();
+            return true;
+        }else {
+            mRealm.cancelTransaction();
+            return false;
+        }
+    }
+
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
         Log.i(Constants.TAG, "RealmContactTransactions.getAllFavouriteContacts: ");
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();

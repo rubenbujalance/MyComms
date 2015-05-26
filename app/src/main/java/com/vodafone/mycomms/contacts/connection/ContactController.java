@@ -94,6 +94,9 @@ public class ContactController extends BaseController {
         String result = response.getData().toString();
         Log.i(Constants.TAG, "ContactController.onConnectionComplete: " + result);
         JSONObject jsonResponse;
+        if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)){
+            search = Constants.CONTACTS_FAVOURITE;
+        }
 
         switch (search) {
             case Constants.CONTACTS_ALL:

@@ -9,6 +9,9 @@ import android.util.Log;
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RefreshFavouritesEvent;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -42,7 +45,7 @@ public class FavouriteController  extends BaseController {
     }
 
     public void manageFavourite(String contactId){
-        Log.i(Constants.TAG, "FavouriteController.addFavourite: ");
+        Log.i(Constants.TAG, "FavouriteController.manageFavourite: ");
         int method;
         JSONObject json = null;
         HashMap body = new HashMap<>();
@@ -77,39 +80,9 @@ public class FavouriteController  extends BaseController {
 
     @Override
     public void onConnectionComplete(ConnectionResponse response){
-        Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: ");
         super.onConnectionComplete(response);
+        Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: ");
         String result = response.getData().toString();
-
-    }
-
-    private class DeleteFavouriteRecord extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
-        @Override
-        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
-            APIWrapper apiWrapper = new APIWrapper();
-            return apiWrapper.httpDeleteAPI(Constants.CONTACT_API_DEL_FAVOURITE, params[0], params[1], mContext);
-        }
-        @Override
-        protected void onPostExecute(HashMap<String,Object> result) {
-            callBackPassCheck(result);
-        }
-    }
-
-    private void callBackPassCheck(HashMap<String, Object> result) {
-        String status = (String)result.get("status");
-
-        try {
-            if (status.compareTo("204") != 0) {
-                //onLoginError();
-                Log.e(Constants.TAG, "FavouriteController.callBackPassCheck: Status204");
-            } else if (status.compareTo("500") != 0) {
-                //onLoginError();
-                Log.e(Constants.TAG, "FavouriteController.callBackPassCheck: Status500");
-            } else {
-                Log.i(Constants.TAG, "FavouriteController.callBackPassCheck: All Good");
-            }
-        } catch(Exception ex) {
-            Log.e(Constants.TAG, "FavouriteController.callBackPassCheck:" , ex);
-        }
+        BusProvider.getInstance().post(new RefreshFavouritesEvent());
     }
 }

@@ -32,7 +32,6 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     private boolean mBusRegistered = false;
     private ContactController mContactController;
     private Realm realm;
-    private String accessToken;
     private String apiCall;
     private ContactListFragment contactListFragment;
     private ContactListFragment contactRecentListFragment;
@@ -46,11 +45,10 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        accessToken = UserSecurity.getAccessToken(getActivity());
         realm = Realm.getInstance(getActivity());
         mContactController = new ContactController(this,realm);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        mContactController.getContactList(accessToken, apiCall);
+        mContactController.getContactList(apiCall);
         mContactController.setConnectionCallback(this);
         BusProvider.getInstance().register(this);
     }
@@ -125,7 +123,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     }
 
     @Override
-    public void onContactsResponse(ArrayList<Contact> responseContactList) {
+    public void onContactsResponse(ArrayList<Contact> responseContactList, boolean morePages, int offsetPaging) {
         Log.i(Constants.TAG, "onContactsResponse: " + apiCall);
 
         if(apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)) {
@@ -138,20 +136,25 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
                 contactFavouritesListFragment.setListAdapterTabs();
 
             //apiCall = Constants.CONTACT_API_GET_RECENTS;
-            //mContactController.getRecentList(accessToken, apiCall);
+            //mContactController.getRecentList(apiCall);
         }else if(apiCall.equals(Constants.CONTACT_API_GET_CONTACTS)){
             //apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-            //mContactController.getFavouritesList(accessToken, apiCall);
+            //mContactController.getFavouritesList(apiCall);
 
-            if (contactListFragment!=null)
+            if (contactListFragment!=null)// && !morePages)
                 contactListFragment.setListAdapterTabs();
-            if (contactRecentListFragment!=null)
+            if (contactRecentListFragment!=null)// && !morePages)
                 contactRecentListFragment.setListAdapterTabs();
-            if (contactFavouritesListFragment!=null)
+            if (contactFavouritesListFragment!=null)// && !morePages)
                 contactFavouritesListFragment.setListAdapterTabs();
 
-            apiCall = Constants.CONTACT_API_GET_RECENTS;
-            mContactController.getRecentList(accessToken, apiCall);
+            if (morePages){
+                apiCall = Constants.CONTACT_API_GET_CONTACTS;
+                mContactController.getContactList(apiCall + "&o=" + offsetPaging);
+            } else {
+                apiCall = Constants.CONTACT_API_GET_RECENTS;
+                mContactController.getRecentList(apiCall);
+            }
         }else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
             if (contactListFragment!=null)
                 contactListFragment.setListAdapterTabs();
@@ -160,13 +163,13 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
             if (contactFavouritesListFragment!=null)
                 contactFavouritesListFragment.setListAdapterTabs();
             apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-            mContactController.getFavouritesList(accessToken, apiCall);
+            mContactController.getFavouritesList(apiCall);
         }
     }
 
     @Override
-    public void onRecentsContactsResponse() {
-        Log.i(Constants.TAG, "onRecentsContactsResponse: " + apiCall);
+    public void onRecentContactsResponse() {
+        Log.i(Constants.TAG, "onRecentContactsResponse: " + apiCall);
 
         if (contactListFragment!=null)
             contactListFragment.setListAdapterTabs();
@@ -175,14 +178,14 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         if (contactFavouritesListFragment!=null)
             contactFavouritesListFragment.setListAdapterTabs();
         apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-        mContactController.getFavouritesList(accessToken, apiCall);
+        mContactController.getFavouritesList(apiCall);
     }
 
     @Subscribe
     public void refreshContactListEvent(RefreshContactListEvent event) {
         Log.i(Constants.TAG, "RefreshContactListEvent: refreshContactListEvent");
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        mContactController.getContactList(accessToken, apiCall);
+        mContactController.getContactList(apiCall);
         mContactController.setConnectionCallback(this);
     }
 

@@ -105,8 +105,7 @@ public class FavouriteController  extends BaseController {
                 Log.i(Constants.TAG, "FavouriteController.callBackPassCheck: All Good");
             }
         } catch(Exception ex) {
-            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck:" , ex);
-            return;
+            Log.e(Constants.TAG, "FavouriteController.callBackPassCheck:" , ex);
         }
     }
 }

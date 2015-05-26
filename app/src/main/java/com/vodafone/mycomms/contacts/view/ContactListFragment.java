@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.fortysevendeg.swipelistview.SwipeListView;
@@ -37,7 +40,7 @@ import model.RecentContact;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends ListFragment{
+public class ContactListFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
@@ -50,12 +53,14 @@ public class ContactListFragment extends ListFragment{
 
     private ContactListViewArrayAdapter adapter;
     private SwipeListView swipeListView;
+    private ListView listView;
+    private SwipeRefreshLayout refreshLayout;
+    private Parcelable state;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String ARG_PARAM3 = "param3";
 
     // TODO: Rename and change types of parameters
     private int mIndex;
@@ -76,6 +81,8 @@ public class ContactListFragment extends ListFragment{
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+       refreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+       listView = (ListView) refreshLayout.findViewById(android.R.id.list);
        /*final SwipeListView swipeListView = (SwipeListView) v.findViewById(android.R.id.list);
        swipeListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
            @Override
@@ -100,8 +107,23 @@ public class ContactListFragment extends ListFragment{
            public void onListChanged() {
            }
        });*/
+       refreshLayout.setEnabled(false);
+       listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+           @Override
+           public void onScrollStateChanged(AbsListView absListView, int i) {
 
-       return v;
+           }
+
+           @Override
+           public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+               if (firstVisibleItem == 0)
+                   refreshLayout.setEnabled(true);
+               else
+                   refreshLayout.setEnabled(false);
+           }
+       });
+
+       return refreshLayout;
     }
 
     /**
@@ -191,20 +213,21 @@ public class ContactListFragment extends ListFragment{
 
         }
     }
-/*
+
     @Override
     public void onRefresh() {
         //TODO: Refresh function here. Filter tab
         handler.postDelayed(testIsGood, 5000);
+        refreshLayout.setRefreshing(false);
     }
 
     public Runnable testIsGood = new Runnable() {
         @Override
         public void run() {
             Log.wtf(Constants.TAG, "ContactListFragment.run: TEEEEESTINGGGG");
-            mSwipeRefreshLayout.setRefreshing(false);
+            refreshLayout.setRefreshing(false);
         }
-    };*/
+    };
 
     /**
      * This interface must be implemented by activities that contain this
@@ -242,8 +265,20 @@ public class ContactListFragment extends ListFragment{
             }
         }else if(mIndex == Constants.CONTACTS_ALL){
             contactList = mContactController.getAllContacts();
+            adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
             if (contactList!=null) {
-                setListAdapter(new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList));
+                if (listView!=null)
+                    state = listView.onSaveInstanceState();
+                if (adapter != null){
+                    setListAdapter(adapter);
+                    if (state!=null)
+                        listView.onRestoreInstanceState(state);
+                } else {
+                    adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+                    setListAdapter(adapter);
+                    if (state!=null)
+                        listView.onRestoreInstanceState(state);
+                }
             }
         }
     }

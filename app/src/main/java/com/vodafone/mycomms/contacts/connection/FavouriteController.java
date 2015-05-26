@@ -56,6 +56,10 @@ public class FavouriteController  extends BaseController {
             body.put("", "");
             json = new JSONObject();
             apiCall = apiCall + contactId;
+            String test = "{}";
+            mFavouriteConnection = new FavouriteConnection(getContext(), this, apiCall, method);
+            mFavouriteConnection.setPayLoad(test);
+            mFavouriteConnection.request();
             //HashMap<String,Object> params = new HashMap<>();
             //params.put("id", contactId);
             //new DeleteFavouriteRecord().execute(params, null);*/

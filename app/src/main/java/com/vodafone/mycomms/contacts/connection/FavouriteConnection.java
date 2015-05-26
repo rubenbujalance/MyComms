@@ -13,6 +13,6 @@ public class FavouriteConnection extends BaseConnection {
 
     public FavouriteConnection(Context context, ConnectionInterfaces.ConnectionListener listener, String apiCall, int method){
         super(apiCall, context, listener, method);
-        Log.i(Constants.TAG, "ContactConnection.ContactConnection: " + apiCall);
+        Log.i(Constants.TAG, "FavouriteConnection.ContactConnection: " + apiCall);
     }
 }

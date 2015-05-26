@@ -4,14 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.connection.IConnectionCallback;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.SetConnectionLayoutVisibility;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
+import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
@@ -19,8 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -424,92 +424,15 @@ public class ContactController extends BaseController {
         return recentContact;
     }
 
-    public void loadFakeContacts() {
-        //if (realmContactTransactions.getAllContacts().size() == 0){
-        InputStream stream = null;
-        stream = mContext.getResources().openRawResource(R.raw.test_contacts);
-        JsonElement json = new JsonParser().parse(new InputStreamReader(stream));
-        JSONObject jsonObject = null;
-        JSONArray jsonArray = null;
-        try {
-            jsonObject = new JSONObject(json.toString());
-            jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            ArrayList<Contact> realmContactList = new ArrayList<>();
-            Contact contact;
-            for (int i = 0; i < jsonArray.length(); i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject);
-                realmContactList.add(contact);
-            }
-            realmContactTransactions.insertContactList(realmContactList);
-        } catch (JSONException e) {
-            Log.e(Constants.TAG, "loadFakeContacts: " + e.toString());
-        }
-        //}
+    @Override
+    public void onConnectionError(ConnectionException e) {
+        super.onConnectionError(e);
+        BusProvider.getInstance().post(new SetNoConnectionLayoutVisibility());
     }
 
-    public void loadFakeFavouriteContacts() {
-        //if (realmContactTransactions.getAllFavouriteContacts().size() == 0){
-        InputStream stream = null;
-        stream = mContext.getResources().openRawResource(R.raw.test_contacts);
-        JsonElement json = new JsonParser().parse(new InputStreamReader(stream));
-        JSONObject jsonObject = null;
-        JSONArray jsonArray = null;
-        try {
-            jsonObject = new JSONObject(json.toString());
-            jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "loadFakeFavouriteContact: " + e.toString());
-        }
-
-        try {
-            ArrayList<FavouriteContact> realmContactList = new ArrayList<>();
-            FavouriteContact contact;
-            for (int i = 0; i < 2; i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                contact = mapFavouriteContact(jsonObject);
-                realmContactList.add(contact);
-            }
-            realmContactTransactions.insertFavouriteContactList(realmContactList);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "loadFakeFavouriteContact: " + e.toString());
-        }
-        //}
-    }
-
-    public void loadFakeRecentContacts() {
-        InputStream stream = null;
-        stream = mContext.getResources().openRawResource(R.raw.test_contacts);
-        JsonElement json = new JsonParser().parse(new InputStreamReader(stream));
-        JSONObject jsonObject = null;
-        JSONArray jsonArray = null;
-        try {
-            jsonObject = new JSONObject(json.toString());
-            jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "loadFakeRecentContact: " + e.toString());
-        }
-
-        try {
-            ArrayList<RecentContact> realmContactList = new ArrayList<>();
-            RecentContact contact;
-            for (int i = 0; i < 2; i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                contact = mapRecentContact(jsonObject);
-                realmContactList.add(contact);
-            }
-            realmContactTransactions.insertRecentContactList(realmContactList);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "loadFakeRecentContact: " + e.toString());
-        }
+    @Override
+    public IConnectionCallback getConnectionCallback() {
+        BusProvider.getInstance().post(new SetConnectionLayoutVisibility());
+        return super.getConnectionCallback();
     }
 }

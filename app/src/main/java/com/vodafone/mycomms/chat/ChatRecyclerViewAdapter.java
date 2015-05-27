@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vodafone.mycomms.R;
+import model.ChatListItem;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -46,17 +47,12 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         ChatListItem chatListItem;
         for (int i=0;i<20;i++){
             if ((i % 2) == 0){
-                chatListItem = new ChatListItem("You say goodbye", Constants.LEFT_CHAT);
+                //chatListItem = new ChatListItem("You say goodbye", Constants.LEFT_CHAT);
             } else {
-                chatListItem = new ChatListItem("And I say Hello. Hello Hello!", Constants.RIGHT_CHAT);
+                //chatListItem = new ChatListItem("And I say Hello. Hello Hello!", Constants.RIGHT_CHAT);
             }
-            chatList.add(chatListItem);
+            chatList.add(null);
         }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return chatList.get(position).getChatType();
     }
 
     @Override
@@ -78,8 +74,8 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     @Override
     public void onBindViewHolder(ChatHolder chatHolder, int i) {
-        String test = chatList.get(i).getChatText();
-        chatHolder.chatTextView.setText(test);
+        //String test = chatList.get(i).getChatText();
+        //chatHolder.chatTextView.setText(test);
         //Fake data show
         if (i==3 || i==9 || i==15 || i==17){
             chatHolder.chatSentTime.setVisibility(View.VISIBLE);

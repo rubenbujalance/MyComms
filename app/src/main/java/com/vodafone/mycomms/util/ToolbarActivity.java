@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
-import com.vodafone.mycomms.chatlist.ChatListActivity;
+import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 

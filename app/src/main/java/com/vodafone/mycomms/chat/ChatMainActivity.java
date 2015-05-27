@@ -16,7 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.util.Constants;
+import model.ChatListItem;
+
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 import java.util.ArrayList;
@@ -119,7 +120,7 @@ public class ChatMainActivity extends ToolbarActivity {
         realm = Realm.getInstance(this);
 
         realm.beginTransaction();
-        ChatListItem chatListItem = new ChatListItem(chatText, Constants.RIGHT_CHAT);
+        ChatListItem chatListItem = new ChatListItem("mc_5535b16c13be4b7975c515fe", "mc_555a0792121ef1695cc7c1c3", "Nick Fury", "Ruben Bujalance", "Me porculea o ke ase", "dj");
         //ChatListItem chatItem = realm.createObject(ChatListItem.class); // Create a new object
         //chatItem.setChatText(chatText);
         //chatItem.setChatType(Constants.RIGHT_CHAT);

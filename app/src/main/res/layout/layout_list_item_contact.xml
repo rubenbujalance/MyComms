@@ -40,8 +40,7 @@
         android:layout_width="184dp"
         android:layout_toRightOf="@id/layout_list_item_image"
         android:layout_height="70dp"
-        android:layout_centerHorizontal="true"
-        />
+        android:layout_centerHorizontal="true"/>
     <include android:id="@+id/layout_list_item_status"
         layout="@layout/layout_list_item_status"
         android:layout_width="match_parent"

@@ -10,11 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 
 import com.vodafone.mycomms.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.lang.reflect.Method;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,7 +31,7 @@ import java.util.Iterator;
 /**
  * Created by str_rbm on 16/04/2015.
  */
-public final class Utils {
+public final class Utils extends Activity {
 
     private static HashMap<String, HashMap<String, String>> _countries = null;
 
@@ -171,5 +174,67 @@ public final class Utils {
         else if(minutes >=1) difference = minutes + " min";
 
         return difference;
+    }
+
+    /*
+    * Returns the unique device ID: IMEI for GSM and the MEID or ESN for CDMA phones.
+    */
+    public String getImei() {
+        TelephonyManager   telephonyManager  =  ( TelephonyManager
+                )getSystemService( Context.TELEPHONY_SERVICE );
+
+        String imeistring = telephonyManager.getDeviceId();
+
+
+        return imeistring;
+    }
+
+    /*
+    * Returns the unique device ID: IMSI for a GSM phone.
+    */
+    public String getImsi() {
+        TelephonyManager   telephonyManager  =  ( TelephonyManager
+                )getSystemService( Context.TELEPHONY_SERVICE );
+
+        String imsistring = telephonyManager.getSubscriberId();
+
+        return imsistring;
+    }
+
+    /*
+    * Returns the unique device ID: HardwareID
+    */
+    public String getHardWareId() {
+        String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
+
+        return hwID;
+    }
+
+    /*
+    * Returns the unique device ID: SerialNumber
+    */
+    public String getSerialId() {
+        String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
+
+        String serialnum = null;
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class, String.class );
+            serialnum = (String)(   get.invoke(c, "ro.serialno", "unknown" )  );
+        } catch (Exception ignored) {
+            serialnum = "none";
+        }
+
+        return serialnum;
+    }
+
+    /*
+    * Returns Settings.Secure.ANDROID_ID returns the unique DeviceID
+    */
+    public String getAndroidId() {
+        String androidId = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        return androidId;
     }
 }

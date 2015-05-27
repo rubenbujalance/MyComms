@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -28,15 +28,26 @@
             swipe:swipeOffsetLeft="280dp"
             swipe:swipeOffsetRight="280dp"
             />
+        <!--<ListView
+            android:id="@android:id/list"
+            android:visibility="gone"
+            android:listSelector="#00000000"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>-->
 
         <!-- View to show if the list is emtpy -->
-        <TextView android:id="@android:id/empty"
+        <TextView
+            android:id="@android:id/empty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="No items."
+            android:text="@string/no_favourite_records"
+            android:textColor="@color/grey_chat_name"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="50dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:clickable="false"/>
 
     </FrameLayout>
-
-</LinearLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

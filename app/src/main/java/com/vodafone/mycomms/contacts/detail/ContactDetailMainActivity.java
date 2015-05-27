@@ -1,5 +1,7 @@
 package com.vodafone.mycomms.contacts.detail;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -7,11 +9,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
+import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -68,7 +73,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         realm = Realm.getInstance(this);
 
         Intent intent = getIntent();
-        String contactId = intent.getExtras().getString(Constants.CONTACT_ID);
+        final String contactId = intent.getExtras().getString(Constants.CONTACT_ID);
         controller = new ContactDetailController(this, realm);
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
@@ -215,6 +220,17 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         });
 
         loadContactDetail();
+
+        final Activity activity = this;
+        LinearLayout favouriteTesting = (LinearLayout) findViewById(R.id.office_location_layout);
+        favouriteTesting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "Inserting favourite", Toast.LENGTH_LONG).show();
+                FavouriteController favouriteController = new FavouriteController(activity,realm);
+                favouriteController.manageFavourite(contactId);
+            }
+        });
     }
 
     private void loadContactStatusInfo()

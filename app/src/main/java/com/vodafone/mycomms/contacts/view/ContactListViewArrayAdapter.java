@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,9 +25,6 @@ import java.util.TimeZone;
 
 import model.Contact;
 
-/**
- * Created by str_vig on 28/04/2015.
- */
 public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
     private Context mContext;
 
@@ -61,7 +59,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         Contact contact = getItem(position);
 
         //Image avatar
-        File avatarFile = new File(mContext.getFilesDir(), "avatar_"+contact.getId()+".jpg");
+        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&

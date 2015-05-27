@@ -25,9 +25,6 @@ import java.util.TimeZone;
 
 import model.Contact;
 
-/**
- * Created by str_vig on 28/04/2015.
- */
 public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
     private Context mContext;
 

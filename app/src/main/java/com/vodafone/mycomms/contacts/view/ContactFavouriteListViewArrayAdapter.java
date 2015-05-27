@@ -62,7 +62,6 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         FavouriteContact contact = getItem(position);
 
         //Image avatar
-        //File avatarFile = new File(mContext.getFilesDir(), "avatar_"+contact.getId()+".jpg");
         File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
 
         if (contact.getAvatar()!=null &&

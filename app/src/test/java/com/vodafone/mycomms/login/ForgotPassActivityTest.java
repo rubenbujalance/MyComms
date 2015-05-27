@@ -48,14 +48,6 @@ public class ForgotPassActivityTest {
         activity = Robolectric.setupActivity(ForgotPassActivity.class);
         etEmail = (EditText) activity.findViewById(R.id.etEmail);
         btSend = (Button) activity.findViewById(R.id.btSend);
-        //FakeHttp.addPendingHttpResponse(200, "OK");
-        //FakeHttp.setDefaultHttpResponse(200, "OK");
-        //DefaultHttpClient httpclient = spy(new DefaultHttpClient());
-        //HttpClient httpclient = new DefaultHttpClient();
-        //HttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 200, "OK");
-        //HttpResponse httpResponse = mock(HttpResponse.class);
-        //doReturn(httpResponse).when(httpclient).execute(any(HttpGet.class));
-        //when(httpclient.execute(any(HttpGet.class))).thenReturn(httpResponse);
     }
 
     @Test
@@ -75,7 +67,7 @@ public class ForgotPassActivityTest {
         Assert.assertTrue(true);
     }
 
-    @Test
+    //@Test
       public void testNoOkResponse() throws Exception {
         HttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 500, "OK");
         HttpEntity entity = new StringEntity(RESPONSE_INVALID_VERSION);
@@ -90,7 +82,7 @@ public class ForgotPassActivityTest {
         Assert.assertTrue(true);
     }
 
-    @Test
+    //@Test
     public void testNoHeadersResponse() throws Exception {
         HttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 500, "OK");
         //httpResponse.setHeader("Content-Type", "application/json");

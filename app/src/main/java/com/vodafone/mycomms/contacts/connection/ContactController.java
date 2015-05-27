@@ -2,18 +2,27 @@ package com.vodafone.mycomms.contacts.connection;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.connection.IConnectionCallback;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.SetConnectionLayoutVisibility;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
+import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
@@ -21,10 +30,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import io.realm.Realm;
 import model.Contact;
+import model.ContactAvatar;
 import model.FavouriteContact;
 import model.RecentContact;
 
@@ -97,74 +114,80 @@ public class ContactController extends BaseController {
         if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)){
             search = Constants.CONTACTS_FAVOURITE;
         }
-
-        switch (search) {
-            case Constants.CONTACTS_ALL:
-                try {
-                    jsonResponse = new JSONObject(result);
-                    JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
-                    if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
-                        morePages = true;
-                        offsetPaging = offsetPaging + 1;
-                        search = Constants.CONTACTS_ALL;
-                    } else{
-                        search = Constants.CONTACTS_RECENT;
-                        offsetPaging = 0;
-                    }
-                    Log.i(Constants.TAG, "ContactController.onConnectionComplete: jsonResponse: " + jsonResponse.toString());
-                    ArrayList<Contact> realmContactList = new ArrayList<>();
-                    realmContactList = insertContactListInRealm(jsonResponse);
-                    if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
-                        ((IContactsConnectionCallback) this.getConnectionCallback()).onContactsResponse(realmContactList, morePages, offsetPaging);
-                    }
-
-                    // realmContactTransactions.getContactById("mc_55361a9cc729d4430b9722f3");
-
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "ContactController.onConnectionComplete: contacts ", e);
-                }
-                break;
-            case Constants.CONTACTS_RECENT:
-                try {
-                    search = Constants.CONTACTS_FAVOURITE;
-                    jsonResponse = new JSONObject(result);
-
-                    insertRecentContactInRealm(jsonResponse);
-
-                    if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
-                        ((IContactsConnectionCallback) this.getConnectionCallback()).onRecentContactsResponse();
-                    }
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "ContactController.onConnectionComplete: recents ", e);
-                }
-                break;
-            case Constants.CONTACTS_FAVOURITE:
-                try {
-                    search = Constants.CONTACTS_ALL;
-                    if (result != null && !result.equals("")) {
+        if (result != null && result.trim().length()>0) {
+            switch (search) {
+                case Constants.CONTACTS_ALL:
+                    try {
                         jsonResponse = new JSONObject(result);
-                        insertFavouriteContactInRealm(jsonResponse);
-                    } else {
-                        realmContactTransactions.deleteAllFavouriteContacts();
+                        JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
+                        if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
+                            morePages = true;
+                            offsetPaging = offsetPaging + 1;
+                            search = Constants.CONTACTS_ALL;
+                        } else {
+                            search = Constants.CONTACTS_RECENT;
+                            offsetPaging = 0;
+                        }
+                        Log.i(Constants.TAG, "ContactController.onConnectionComplete: jsonResponse: " + jsonResponse.toString());
+                        ArrayList<Contact> realmContactList = new ArrayList<>();
+                        realmContactList = insertContactListInRealm(jsonResponse);
+                        if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
+                            ((IContactsConnectionCallback) this.getConnectionCallback()).onContactsResponse(realmContactList, morePages, offsetPaging);
+                        }
+
+                        // realmContactTransactions.getContactById("mc_55361a9cc729d4430b9722f3");
+
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "ContactController.onConnectionComplete: contacts ", e);
                     }
-                    BusProvider.getInstance().post(new SetContactListAdapterEvent());
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "ContactController.onConnectionComplete: favourites", e);
-                }
-                break;
+                    break;
+                case Constants.CONTACTS_RECENT:
+                    try {
+                        search = Constants.CONTACTS_FAVOURITE;
+                        jsonResponse = new JSONObject(result);
+
+                        insertRecentContactInRealm(jsonResponse);
+
+                        if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
+                            ((IContactsConnectionCallback) this.getConnectionCallback()).onRecentContactsResponse();
+                        }
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "ContactController.onConnectionComplete: recents ", e);
+                    }
+                    break;
+                case Constants.CONTACTS_FAVOURITE:
+                    try {
+                        search = Constants.CONTACTS_ALL;
+                        if (result != null && !result.equals("")) {
+                            jsonResponse = new JSONObject(result);
+                            insertFavouriteContactInRealm(jsonResponse);
+                        } else {
+                            realmContactTransactions.deleteAllFavouriteContacts();
+                        }
+                        BusProvider.getInstance().post(new SetContactListAdapterEvent());
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "ContactController.onConnectionComplete: favourites", e);
+                    }
+                    break;
+            }
         }
     }
 
     private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
         ArrayList<Contact> realmContactList = new ArrayList<>();
+
         try {
             Log.i(Constants.TAG, "ContactController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
             Contact contact;
+            boolean doRefreshAdapter;
+
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
                 contact = mapContact(jsonObject);
                 realmContactList.add(contact);
+                doRefreshAdapter = (i==jsonArray.length()-1);
+                updateContactAvatar(contact, doRefreshAdapter);
             }
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
             realmContactTransactions.insertContactList(realmContactList);
@@ -174,6 +197,30 @@ public class ContactController extends BaseController {
             return null;
         }
         return realmContactList;
+    }
+
+    private void updateContactAvatar (Contact contact, boolean doRefreshAdapter)
+    {
+        try {
+            if (contact.getAvatar()==null || contact.getAvatar().length()==0)
+                return;
+
+            RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
+            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getId());
+            if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
+                Log.i(Constants.TAG, "ContactController.updateContactAvatar: TESTING");
+                String filename = "avatar_" + contact.getId() + ".jpg";
+
+                new DownloadAvatars().execute(contact.getAvatar(), filename);
+                if (avatar == null)
+                    avatar = new ContactAvatar(contact.getId(), contact.getAvatar(), filename);
+                else avatar.setUrl(contact.getAvatar());
+
+                realmAvatarTransactions.insertAvatar(avatar);
+            }
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "ContactController.updateContactAvatar: ", ex);
+        }
     }
 
     public ArrayList<Contact> getAllContacts() {
@@ -233,6 +280,7 @@ public class ContactController extends BaseController {
                 contact = realmContactTransactions.getContactById(jsonArray.getString(i));
                 if (contact != null) {
                     contactList.add(mapContactToFavourite(contact));
+                    updateContactAvatar(contact, i==jsonArray.length()-1);
                 }
             }
             if (contactList.size()!=0) {
@@ -258,6 +306,7 @@ public class ContactController extends BaseController {
                 contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString("id"));
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
+                    updateContactAvatar(contact, i == jsonArray.length() - 1);
                 }
             }
             if (contactList.size()!=0) {
@@ -437,5 +486,69 @@ public class ContactController extends BaseController {
     public IConnectionCallback getConnectionCallback() {
         BusProvider.getInstance().post(new SetConnectionLayoutVisibility());
         return super.getConnectionCallback();
+    }
+
+    class DownloadAvatars extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... aurl) {
+            try {
+                URL url = new URL(aurl[0]);
+                String avatarFileName = aurl[1];
+                String dir = Constants.CONTACT_AVATAR_DIR;
+
+                File file = new File(mContext.getFilesDir() + dir);
+                if (file.exists()) {
+                    file.delete();
+                }
+                file.mkdirs();
+                if (downloadFile(String.valueOf(url),dir,avatarFileName)){
+                    String avatarFile = mContext.getFilesDir() + dir + avatarFileName;
+                    Log.i(Constants.TAG, "DownloadAvatars.doInBackground: avatarFile: " + avatarFile);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(Constants.TAG, "DownloadAvatars.doInBackground: " + e.toString());
+            }
+            return null;
+
+        }
+
+        public boolean downloadFile(final String path, String dir, String avatarFileName) {
+            try {
+                URL url = new URL(path);
+
+                URLConnection ucon = url.openConnection();
+                ucon.setReadTimeout(5000);
+                ucon.setConnectTimeout(10000);
+
+                InputStream is = ucon.getInputStream();
+                BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
+
+                File file = new File(mContext.getFilesDir() + dir + avatarFileName);
+
+                if (file.exists()) {
+                    file.delete();
+                }
+                file.createNewFile();
+
+                FileOutputStream outStream = new FileOutputStream(file);
+                byte[] buff = new byte[5 * 1024];
+
+                int len;
+                while ((len = inStream.read(buff)) != -1) {
+                    outStream.write(buff, 0, len);
+                }
+                outStream.flush();
+                outStream.close();
+                inStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e(Constants.TAG, "DownloadAvatars.downloadFile: " + e.toString());
+                return false;
+            }
+
+            return true;
+        }
     }
 }

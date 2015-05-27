@@ -57,4 +57,10 @@ public class Constants {
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_FAVOURITE = "/api/me/favourites";
     public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
+
+    //Contact Avatar BD Fields
+    public static final String AVATAR_CONTACT_ID = "contactId";
+    public static final String AVATAR_URL = "urlAvatar";
+    public static final String AVATAR_PATH = "pathAvatar";
+    public static final String CONTACT_AVATAR_DIR = "/avatars/files/";
 }

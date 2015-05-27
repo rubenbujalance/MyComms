@@ -96,14 +96,11 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
 
     @Subscribe
     public void setNoConnectionLayoutVisibility(SetNoConnectionLayoutVisibility event){
-        Log.i(Constants.TAG, "ContactListPagerFragment.setNoConnectionLayoutVisibility: ");
         setConnectionLayoutVisibility(false);
     }
 
-
     @Subscribe
     public void setConnectionLayoutVisibility(SetConnectionLayoutVisibility event){
-        Log.i(Constants.TAG, "ContactListPagerFragment.SetConnectionLayoutVisibility: ");
         setConnectionLayoutVisibility(true);
     }
 }

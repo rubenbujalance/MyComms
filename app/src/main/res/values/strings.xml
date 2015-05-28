@@ -118,6 +118,8 @@
 
     <string name="no_favourite_records">Store a list of your favourite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favourite contacts.</string>
     <string name="no_recent_records">You have no recent interactions with other users</string>
+
+    <!--Toolbar titles-->
     <string name="toolbar_title_messages">Messages</string>
     <string name="toolbar_title_contact_list">My Contacts</string>
 

@@ -66,5 +66,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
             chatListHolder.textAvatar.setText(initials);
         }
     }
+    public ChatListItem getChatListItem(int position) {
+        return (null != mChatListItem ? mChatListItem.get(position) : null);
+    }
 
 }

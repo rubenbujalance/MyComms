@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.chatlist.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -10,8 +11,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -44,14 +47,27 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), loadFakeData());
        //TODO: GET CHAT LIST
        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+
+       mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(),
+               mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+           @Override
+           public void onItemClick(View view, int position) {
+               Toast.makeText(getActivity(), "Sender Id: " + mChatRecyclerViewAdapter.getChatListItem(position).getChatSenderId(), Toast.LENGTH_SHORT).show();
+
+               Intent in = new Intent(getActivity(), ChatMainActivity.class);
+               in.putExtra(Constants.CHAT_CONTACT_ID, mChatRecyclerViewAdapter.getChatListItem(position).getChatSenderId());
+               startActivity(in);
+
+           }
+       }));
+
        return mSwipeRefreshLayout;
    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(Constants.TAG, "ChatListFragment.onCreate: ");
-        //((ChatListActivity)getActivity()).activateChatListToolbar();
+        Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
     }
 
     private ArrayList<ChatListItem> loadFakeData() {

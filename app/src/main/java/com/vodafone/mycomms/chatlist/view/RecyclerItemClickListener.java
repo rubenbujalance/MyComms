@@ -6,15 +6,11 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-/**
- * Created by Lestat on 20/04/2015.
- */
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
 
     public static interface OnItemClickListener
     {
         public void onItemClick(View view, int position);
-        public void onItemLongClick(View view, int position);
     }
 
     private OnItemClickListener mListener;
@@ -25,13 +21,6 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
-            }
-
-            public void onLongPress(MotionEvent e) {
-                View childView = recyclerView.findChildViewUnder(e.getX(),e.getY());
-                if(childView != null && mListener != null) {
-                    mListener.onItemLongClick(childView, recyclerView.getChildPosition(childView));
-                }
             }
         });
     }

@@ -24,7 +24,7 @@ public class ChatListActivity extends ToolbarActivity{
         activateFooter();
 
         setFooterListeners(this);
-        setContactsListeners(this);
+        setChatListListeners(this);
         activateFooterSelected(Constants.TOOLBAR_RECENTS);
 
         if (savedInstanceState == null) {
@@ -36,13 +36,8 @@ public class ChatListActivity extends ToolbarActivity{
         }
     }
 
-    public void test(){
-
-    }
-
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-
     }
 
     @Override

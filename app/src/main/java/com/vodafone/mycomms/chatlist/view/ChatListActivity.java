@@ -20,8 +20,7 @@ public class ChatListActivity extends ToolbarActivity{
         Log.i(Constants.TAG, "ChatMainActivity.onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
-        activateToolbar();
-        setToolbarTitle("Messages");
+        activateChatListToolbar();
         activateFooter();
 
         setFooterListeners(this);
@@ -37,6 +36,9 @@ public class ChatListActivity extends ToolbarActivity{
         }
     }
 
+    public void test(){
+
+    }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {

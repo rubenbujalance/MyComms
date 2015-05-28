@@ -8,6 +8,7 @@
     mycomms:contentInsetStart="0dp"
     mycomms:theme="@style/ActionBarThemeOverlay"
     android:gravity="top"
+    android:visibility="visible"
     android:background="@color/grey_toolbar"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
     <RelativeLayout
@@ -30,34 +31,24 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
         <ImageView
-            android:id="@+id/contacts_search"
+            android:id="@+id/chat_add"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@drawable/btn_nav_bar_search"
-            android:layout_centerVertical="true"
+            android:background="@drawable/btn_navbar_add"
             android:layout_alignTop="@+id/contacts_profile"
-            android:layout_toRightOf="@+id/contacts_profile"
-            android:layout_toEndOf="@+id/contacts_profile"/>
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
         <TextView
             android:id="@+id/toolbar_title"
             android:layout_width="180dp"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
-            android:text="@string/toolbar_title_contact_list"
+            android:text="@string/toolbar_title_messages"
             android:textSize="22sp"
             android:gravity="center"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"/>
 
-        <ImageView
-            android:id="@+id/contacts_add"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:background="@drawable/btn_navbar_add"
-            android:visibility="invisible"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
 </android.support.v7.widget.Toolbar>

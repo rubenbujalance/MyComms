@@ -36,6 +36,30 @@ public class ToolbarActivity extends ActionBarActivity {
         return mToolbar;
     }
 
+    public Toolbar activateContactListToolbar() {
+        mToolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_inbox);
+        if(mToolbar != null) {
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            mToolbar.setVisibility(View.VISIBLE);
+            goneToolbar.setVisibility(View.GONE);
+        }
+        return mToolbar;
+    }
+
+    public Toolbar activateChatListToolbar() {
+        mToolbar = (Toolbar) findViewById(R.id.app_inbox);
+        Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_bar);
+        if(mToolbar != null) {
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            mToolbar.setVisibility(View.VISIBLE);
+            goneToolbar.setVisibility(View.GONE);
+        }
+        return mToolbar;
+    }
+
     protected Toolbar activateFooter() {
         if(mFooter == null) {
             mFooter = (Toolbar) findViewById(R.id.app_footer);

@@ -51,6 +51,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(Constants.TAG, "ChatListFragment.onCreate: ");
+        //((ChatListActivity)getActivity()).activateChatListToolbar();
     }
 
     private ArrayList<ChatListItem> loadFakeData() {

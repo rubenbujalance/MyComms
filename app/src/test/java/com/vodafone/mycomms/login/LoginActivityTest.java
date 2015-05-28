@@ -51,8 +51,6 @@ public class LoginActivityTest {
 
     @Before
     public void setUp() throws Exception {
-        //HttpResponse httpResponse = Util.buildOkResponse();
-        //FakeHttp.setDefaultHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(LoginActivity.class);
         btLogin = (Button) activity.findViewById(R.id.btLogin);
         btLoginSalesforce = (Button) activity.findViewById(R.id.btLoginSalesforce);

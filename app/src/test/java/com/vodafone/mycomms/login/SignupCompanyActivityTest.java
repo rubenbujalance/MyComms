@@ -47,6 +47,7 @@ import static com.vodafone.mycomms.constants.Constants.LASTNAME;
 public class SignupCompanyActivityTest {
 
     SignupCompanyActivity activity;
+    ImageView ivBtFwd;
     AutoCompleteTVSelectOnly mCompany;
     ClearableEditText mPosition;
     ClearableEditText mOfficeLoc;
@@ -55,6 +56,7 @@ public class SignupCompanyActivityTest {
     @Before
       public void setUp() {
         activity = Robolectric.setupActivity(SignupCompanyActivity.class);
+        ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         mCompany = activity.mCompany;
         mPosition = activity.mPosition;
         mOfficeLoc = activity.mOfficeLoc;
@@ -62,96 +64,35 @@ public class SignupCompanyActivityTest {
 
     @Test
      public void testForwardEmptyCompany() {
-        ImageView ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtFwd.performClick();
         Assert.assertTrue(mCompany.getError().equals(activity.getString(R.string.select_your_company_to_continue)));
     }
 
     @Test
     public void testForward() {
-        mCompany.setText("S");
+        String companyName = "Stratesys";
+        String companyCode = "001";
+        mCompany.setText(companyName);
+        mCompany.setCodeSelected(companyCode);
         mCompany.callOnClick();
-        mCompany.setListSelection(0);
+        /*mCompany.setListSelection(0);
+        mCompany.setSelection(0);
+        mCompany.isPopupShowing();
+        mCompany.callOnClick();
+        mCompany.getAdapter();
         Shadows.shadowOf(mCompany.getDropDownBackground());
-        Shadows.shadowOf(mCompany).checkedPerformClick();
-        ImageView ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
+        Shadows.shadowOf(mCompany).checkedPerformClick();*/
         ivBtFwd.performClick();
-        Assert.assertTrue(mCompany.getError().equals(activity.getString(R.string.select_your_company_to_continue)));
-    }
-
-    /*@Test
-        public void testForwardEmptyPictureTakeAPhoto() {
-        mFirstName.setText(FIRSTNAME);
-        mLastName.setText(LASTNAME);
-        ivBtFwd.performClick();
-        AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
-        ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
-        View view = sAlert.getCustomTitleView();
-        String title = ((TextView)view.findViewById(R.id.tvTitle)).getText().toString();
-        Assert.assertTrue(title.equals(activity.getString(R.string.we_need_your_picture)));
-        sAlert.clickOnItem(0);
-        Assert.assertNotNull(activity.photoPath);
-        ShadowActivity sActivity = Shadows.shadowOf(activity);
-        Intent requestIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File file = new File(activity.photoPath);
-        Uri imgUri = Uri.fromFile(file);
-        requestIntent.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
-        Intent responseIntent = new Intent();
-        sActivity.receiveResult(requestIntent, Activity.RESULT_OK, responseIntent);
-        Assert.assertNotNull(activity.photoBitmap);
-    }
-
-    @Test
-         public void testForwardEmptyPictureChooseAPhoto() {
-        mFirstName.setText(FIRSTNAME);
-        mLastName.setText(LASTNAME);
-        ivBtFwd.performClick();
-        AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
-        ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
-        View view = sAlert.getCustomTitleView();
-        String title = ((TextView)view.findViewById(R.id.tvTitle)).getText().toString();
-        Assert.assertTrue(title.equals(activity.getString(R.string.we_need_your_picture)));
-        sAlert.clickOnItem(1);
-        ShadowActivity sActivity = Shadows.shadowOf(activity);
-        Intent requestIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        requestIntent.setType("image/*");
-        requestIntent.setAction(Intent.ACTION_PICK);
-        Intent responseIntent = new Intent();
-        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new Date().getTime() + ".jpg");
-        Uri imgUri = Uri.fromFile(file);
-        responseIntent.setData(imgUri);
-        sActivity.receiveResult(requestIntent, Activity.RESULT_OK, responseIntent);
-        Assert.assertNotNull(activity.photoPath);
-        Assert.assertNotNull(activity.photoBitmap);
-    }
-
-    @Test
-    public void testForwardToSignupCompany() {
-        mFirstName.setText(FIRSTNAME);
-        mLastName.setText(LASTNAME);
-        ivBtFwd.performClick();
-        AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
-        ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
-        View view = sAlert.getCustomTitleView();
-        String title = ((TextView)view.findViewById(R.id.tvTitle)).getText().toString();
-        Assert.assertTrue(title.equals(activity.getString(R.string.we_need_your_picture)));
-        sAlert.clickOnItem(1);
-        ShadowActivity sActivity = Shadows.shadowOf(activity);
-        Intent requestIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        requestIntent.setType("image/*");
-        requestIntent.setAction(Intent.ACTION_PICK);
-        Intent responseIntent = new Intent();
-        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new Date().getTime() + ".jpg");
-        Uri imgUri = Uri.fromFile(file);
-        responseIntent.setData(imgUri);
-        sActivity.receiveResult(requestIntent, Activity.RESULT_OK, responseIntent);
-        Assert.assertNotNull(activity.photoPath);
-        Assert.assertNotNull(activity.photoBitmap);
-        ivBtFwd.performClick();
-        Assert.assertTrue(UserProfile.getFirstName() != null);
-        Shadows.shadowOf(activity).getNextStartedActivity();
-        Intent expectedIntent = new Intent(activity, SignupCompanyActivity.class);
+        Assert.assertTrue(companyName.equals(UserProfile.getCompanyName()));
+        Intent expectedIntent = new Intent(activity, SignupPassActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
-    }*/
+    }
+
+    @Test
+    public void testBack() throws Exception {
+        ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
+        ivBtBack.performClick();
+        Assert.assertTrue(activity.isFinishing());
+    }
 
 }

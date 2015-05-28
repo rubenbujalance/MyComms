@@ -6,6 +6,7 @@ import android.widget.EditText;
 
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.test.util.Util;
 
 
 import org.apache.http.HttpEntity;
@@ -20,6 +21,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static com.vodafone.mycomms.constants.Constants.*;
 import static org.mockito.Mockito.*;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
@@ -34,7 +37,6 @@ import org.robolectric.shadows.ShadowActivity;
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class ForgotPassActivityTest {
 
-    private final String RESPONSE_INVALID_VERSION = "{\"err\":\"invalid_version\",\"des\":\"Must update to last application version\",\"data\":\"https://s3-us-west-2.amazonaws.com/mycomms-android/MyComms/android/dev/91/MyComms-i.apk\"}";
 
     Activity activity;
     Button btSend;
@@ -42,9 +44,6 @@ public class ForgotPassActivityTest {
 
     @Before
     public void setUp() throws Exception {
-        HttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 204, "OK");
-        httpResponse.setHeader("Content-Type", "application/json");
-        FakeHttp.setDefaultHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(ForgotPassActivity.class);
         etEmail = (EditText) activity.findViewById(R.id.etEmail);
         btSend = (Button) activity.findViewById(R.id.btSend);
@@ -52,15 +51,17 @@ public class ForgotPassActivityTest {
 
     @Test
     public void testSend() throws Exception {
+        HttpResponse httpResponse = Util.buildOkResponse();
+        FakeHttp.addPendingHttpResponse(httpResponse);
         //Empty e-mail
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.oops_wrong_email), btSend.getText());
         //Invalid e-mail
-        etEmail.setText("invalid_email");
+        etEmail.setText(INVALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.oops_wrong_email), btSend.getText());
         //Valid e-mail
-        etEmail.setText("valid@test.com");
+        etEmail.setText(VALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
         Assert.assertTrue(activity.isFinishing());
@@ -69,10 +70,7 @@ public class ForgotPassActivityTest {
 
     //@Test
       public void testNoOkResponse() throws Exception {
-        HttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 500, "OK");
-        HttpEntity entity = new StringEntity(RESPONSE_INVALID_VERSION);
-        httpResponse.setEntity(entity);
-        httpResponse.setHeader("Content-Type", "application/json");
+        HttpResponse httpResponse = Util.buildResponse(500);
         FakeHttp.addPendingHttpResponse(httpResponse);
         //Valid e-mail
         etEmail.setText("valid@test.com");
@@ -85,10 +83,9 @@ public class ForgotPassActivityTest {
     //@Test
     public void testNoHeadersResponse() throws Exception {
         HttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 500, "OK");
-        //httpResponse.setHeader("Content-Type", "application/json");
         FakeHttp.addPendingHttpResponse(httpResponse);
         //Valid e-mail
-        etEmail.setText("valid@test.com");
+        etEmail.setText(VALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
         Assert.assertTrue(activity.isFinishing());

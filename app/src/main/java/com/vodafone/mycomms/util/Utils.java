@@ -237,4 +237,17 @@ public final class Utils extends Activity {
 
         return androidId;
     }
+
+    /*
+    * Returns the unique DeviceID
+    */
+    public String getDeviceId() {
+        if (getImei() != null) {
+            return getImei();
+        } else if (getSerialId() != null) {
+            return getSerialId();
+        } else {
+            return getAndroidId();
+        }
+    }
 }

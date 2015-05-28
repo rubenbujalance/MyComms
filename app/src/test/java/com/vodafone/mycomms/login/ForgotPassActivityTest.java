@@ -51,7 +51,7 @@ public class ForgotPassActivityTest {
 
     @Test
     public void testSend() throws Exception {
-        HttpResponse httpResponse = Util.buildOkResponse();
+        HttpResponse httpResponse = Util.buildResponse(204);
         FakeHttp.addPendingHttpResponse(httpResponse);
         //Empty e-mail
         btSend.performClick();
@@ -65,31 +65,16 @@ public class ForgotPassActivityTest {
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
         Assert.assertTrue(activity.isFinishing());
-        Assert.assertTrue(true);
     }
 
-    //@Test
-      public void testNoOkResponse() throws Exception {
-        HttpResponse httpResponse = Util.buildResponse(500);
-        FakeHttp.addPendingHttpResponse(httpResponse);
-        //Valid e-mail
-        etEmail.setText("valid@test.com");
-        btSend.performClick();
-        Assert.assertEquals("Must update to last application version", btSend.getText());
-        Assert.assertTrue(activity.isFinishing());
-        Assert.assertTrue(true);
-    }
-
-    //@Test
+    @Test
     public void testNoHeadersResponse() throws Exception {
-        HttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 500, "OK");
+        HttpResponse httpResponse = Util.buildResponse(500);
         FakeHttp.addPendingHttpResponse(httpResponse);
         //Valid e-mail
         etEmail.setText(VALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
-        Assert.assertTrue(activity.isFinishing());
-        Assert.assertTrue(true);
     }
 
 }

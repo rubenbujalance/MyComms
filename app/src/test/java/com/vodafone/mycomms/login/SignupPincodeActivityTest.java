@@ -58,14 +58,6 @@ public class SignupPincodeActivityTest {
     }
 
     @Test
-     public void testForwardBadPassword() {
-        Assert.assertTrue(true);
-        /*ivBtFwd.performClick();
-        EditText innerPassword = (EditText)mPassword.findViewById(R.id.clearable_edit);
-        Assert.assertTrue(innerPassword.getError().equals(activity.getString(R.string.incorrect_format)));*/
-    }
-
-    @Test
     public void testSendPincode() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, CHECK_PHONE_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);

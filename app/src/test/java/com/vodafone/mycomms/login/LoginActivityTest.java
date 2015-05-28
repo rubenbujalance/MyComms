@@ -62,7 +62,7 @@ public class LoginActivityTest {
 
     @Test
      public void testLoginOk() throws Exception {
-        HttpResponse httpResponse = Util.buildOkResponse(LOGIN_OK_RESPONSE);
+        HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         etEmail.setText(VALID_EMAIL);
         etPassword.setText(PASSWORD);
@@ -96,18 +96,6 @@ public class LoginActivityTest {
     }
 
     @Test
-     public void testInvalidEmail() throws Exception {
-        HttpResponse httpResponse = Util.buildOkResponse();
-        FakeHttp.addPendingHttpResponse(httpResponse);
-        etEmail.setText(INVALID_EMAIL);
-        btLogin.performClick();
-        //Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.oops_wrong_email)));
-        //Assert.assertTrue(activity.isFinishing());
-        //Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
-        //Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
-    }
-
-    @Test
      public void testInvalidVersionResponse() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(400, INVALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -128,7 +116,8 @@ public class LoginActivityTest {
     public void testLoginSalesforce() throws Exception {
         btLoginSalesforce.performClick();
         Intent expectedIntent = new Intent(activity, OAuthActivity.class);
-        //Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+        expectedIntent.putExtra("oauth", "sf");
+        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
     @Test

@@ -64,6 +64,8 @@ public class SignupNameActivityTest {
 
     @Test
      public void testForwardEmptyName() {
+        mFirstName.setText("");
+        mLastName.setText("");
         ivBtFwd.performClick();
         EditText innerFirstName = (EditText)mFirstName.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerFirstName.getError().equals(activity.getString(R.string.enter_your_first_name_to_continue)));

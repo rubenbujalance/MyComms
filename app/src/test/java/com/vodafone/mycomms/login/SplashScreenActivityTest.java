@@ -29,8 +29,11 @@ import org.robolectric.res.builder.RobolectricPackageManager;
 import org.robolectric.shadows.FakeHttp;
 import org.robolectric.shadows.ShadowAlertDialog;
 
+import static com.vodafone.mycomms.constants.Constants.ACCESS_TOKEN;
+import static com.vodafone.mycomms.constants.Constants.EXPIRES_IN;
 import static com.vodafone.mycomms.constants.Constants.INVALID_VERSION_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
+import static com.vodafone.mycomms.constants.Constants.REFRESH_TOKEN;
 import static com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE;
 
 /**
@@ -49,11 +52,8 @@ public class SplashScreenActivityTest {
 
     @Test
         public void testCheckVersionUserLoggedOk() throws Exception {
-        String accessToken = "c7n_CO-qva-s9vgLfbljwQKLqf9hQVhMFNvWgP-ula0O-SG0DYdXPgI6zt1cgdZuBfvLSFXdjc_T2hpGNJ_mv3M_IClqDYqUAUNCFeiLPtUJIvvoO5IKYXlPgYHkCZsZ0Maf6bGXhLXLIyZQcjPvLtovTLgEN0tQZIpfMIVFpG4";
-        String refreshToken = "RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKr8o99gutaENceAfVbeSPvcHeiQaiAeQmcZpxwEXj7aza8t7jjTlImw59f6sj6RVhokHtrokRCNIzxC7Jfe8qhJoGZ6WnSaEJlh1EFJFqag0M";
-        long expiresIn = 1000L;
-        UserSecurity.setTokens(accessToken, refreshToken, expiresIn, RuntimeEnvironment.application);
-        HttpResponse httpResponse = Util.buildOkResponse(VALID_VERSION_RESPONSE);
+        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN, RuntimeEnvironment.application);
+        HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());
@@ -66,11 +66,8 @@ public class SplashScreenActivityTest {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
-                String accessToken = "c7n_CO-qva-s9vgLfbljwQKLqf9hQVhMFNvWgP-ula0O-SG0DYdXPgI6zt1cgdZuBfvLSFXdjc_T2hpGNJ_mv3M_IClqDYqUAUNCFeiLPtUJIvvoO5IKYXlPgYHkCZsZ0Maf6bGXhLXLIyZQcjPvLtovTLgEN0tQZIpfMIVFpG4";
-        String refreshToken = "RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKr8o99gutaENceAfVbeSPvcHeiQaiAeQmcZpxwEXj7aza8t7jjTlImw59f6sj6RVhokHtrokRCNIzxC7Jfe8qhJoGZ6WnSaEJlh1EFJFqag0M";
-        long expiresIn = 1000L;
-        UserSecurity.setTokens(accessToken, refreshToken, expiresIn, RuntimeEnvironment.application);
-        HttpResponse httpResponse = Util.buildOkResponse(VALID_VERSION_RESPONSE);
+        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN, RuntimeEnvironment.application);
+        HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());
@@ -81,23 +78,21 @@ public class SplashScreenActivityTest {
     @Test
     public void testCheckVersionNoNetworkConnectionUserNotLogged() throws Exception {
         Context context = RuntimeEnvironment.application.getApplicationContext();
+        UserSecurity.resetTokens(context);
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
-        HttpResponse httpResponse = Util.buildOkResponse(VALID_VERSION_RESPONSE);
+        HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
-        //Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
     @Test
     public void testCheckVersionUserLoggedRenewTokenOk() throws Exception {
-        String accessToken = "c7n_CO-qva-s9vgLfbljwQKLqf9hQVhMFNvWgP-ula0O-SG0DYdXPgI6zt1cgdZuBfvLSFXdjc_T2hpGNJ_mv3M_IClqDYqUAUNCFeiLPtUJIvvoO5IKYXlPgYHkCZsZ0Maf6bGXhLXLIyZQcjPvLtovTLgEN0tQZIpfMIVFpG4";
-        String refreshToken = "RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKr8o99gutaENceAfVbeSPvcHeiQaiAeQmcZpxwEXj7aza8t7jjTlImw59f6sj6RVhokHtrokRCNIzxC7Jfe8qhJoGZ6WnSaEJlh1EFJFqag0M";
-        long expiresIn = 1L;
-        UserSecurity.setTokens(accessToken, refreshToken, expiresIn, RuntimeEnvironment.application);
-        HttpResponse httpResponse = Util.buildOkResponse(VALID_VERSION_RESPONSE);
+        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 1, RuntimeEnvironment.application);
+        HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         HttpResponse httpResponseRenewToken = Util.buildResponse(200, LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponseRenewToken);
@@ -109,11 +104,8 @@ public class SplashScreenActivityTest {
 
     @Test
     public void testCheckVersionUserLoggedRenewTokenToLoginSignup() throws Exception {
-        String accessToken = "c7n_CO-qva-s9vgLfbljwQKLqf9hQVhMFNvWgP-ula0O-SG0DYdXPgI6zt1cgdZuBfvLSFXdjc_T2hpGNJ_mv3M_IClqDYqUAUNCFeiLPtUJIvvoO5IKYXlPgYHkCZsZ0Maf6bGXhLXLIyZQcjPvLtovTLgEN0tQZIpfMIVFpG4";
-        String refreshToken = "RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKr8o99gutaENceAfVbeSPvcHeiQaiAeQmcZpxwEXj7aza8t7jjTlImw59f6sj6RVhokHtrokRCNIzxC7Jfe8qhJoGZ6WnSaEJlh1EFJFqag0M";
-        long expiresIn = 1L;
-        UserSecurity.setTokens(accessToken, refreshToken, expiresIn, RuntimeEnvironment.application);
-        HttpResponse httpResponse = Util.buildOkResponse(VALID_VERSION_RESPONSE);
+        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 1, RuntimeEnvironment.application);
+        HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         HttpResponse httpResponseRenewToken = Util.buildResponse(500, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponseRenewToken);
@@ -121,7 +113,7 @@ public class SplashScreenActivityTest {
         Assert.assertTrue(activity.isFinishing());
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         System.out.println("NextStartedActivity: " + Shadows.shadowOf(activity).getNextStartedActivity());
-        //Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
     @Test
@@ -152,11 +144,8 @@ public class SplashScreenActivityTest {
     //@Test
     public void testEmailLink() throws Exception {
         String link = "<a href=\"intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\">Link to MyComms</a>";
-        String accessToken = "c7n_CO-qva-s9vgLfbljwQKLqf9hQVhMFNvWgP-ula0O-SG0DYdXPgI6zt1cgdZuBfvLSFXdjc_T2hpGNJ_mv3M_IClqDYqUAUNCFeiLPtUJIvvoO5IKYXlPgYHkCZsZ0Maf6bGXhLXLIyZQcjPvLtovTLgEN0tQZIpfMIVFpG4";
-        String refreshToken = "RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKr8o99gutaENceAfVbeSPvcHeiQaiAeQmcZpxwEXj7aza8t7jjTlImw59f6sj6RVhokHtrokRCNIzxC7Jfe8qhJoGZ6WnSaEJlh1EFJFqag0M";
-        long expiresIn = 1000L;
-        UserSecurity.setTokens(accessToken, refreshToken, expiresIn, RuntimeEnvironment.application);
-        HttpResponse httpResponse = Util.buildOkResponse(VALID_VERSION_RESPONSE);
+        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN, RuntimeEnvironment.application);
+        HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());

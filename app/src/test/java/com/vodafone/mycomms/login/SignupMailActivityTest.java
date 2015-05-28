@@ -53,6 +53,7 @@ public class SignupMailActivityTest {
 
     @Test
      public void testForwardEmptyEmail() {
+        etEmail.setText("");
         ivBtFwd.performClick();
         EditText innerEtEmail = (EditText)etEmail.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerEtEmail.getError().equals(activity.getString(R.string.enter_your_email_to_continue)));
@@ -68,7 +69,7 @@ public class SignupMailActivityTest {
 
     @Test
     public void testForwardToSignupName() throws Exception {
-        HttpResponse httpResponse = Util.buildOkResponse();
+        HttpResponse httpResponse = Util.buildResponse(204);
         FakeHttp.addPendingHttpResponse(httpResponse);
         etEmail.setText(VALID_EMAIL);
         ivBtFwd.performClick();

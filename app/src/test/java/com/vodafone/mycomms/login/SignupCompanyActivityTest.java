@@ -51,7 +51,7 @@ public class SignupCompanyActivityTest {
     AutoCompleteTVSelectOnly mCompany;
     ClearableEditText mPosition;
     ClearableEditText mOfficeLoc;
-    ArrayList<HashMap<String,String>> companies;
+
 
     @Before
       public void setUp() {

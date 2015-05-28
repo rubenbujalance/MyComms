@@ -52,8 +52,8 @@ public class OAuthActivityTest {
 
     @Test
      public void testOAuthToContactList() throws Exception {
-        HttpResponse httpResponse2 = Util.buildResponse(200, LOGIN_OK_RESPONSE);
-        FakeHttp.addPendingHttpResponse(httpResponse2);
+        HttpResponse httpResponse = Util.buildResponse(200, LOGIN_OK_RESPONSE);
+        FakeHttp.addPendingHttpResponse(httpResponse);
         String url = "https://" + EndpointWrapper.getBaseURL() + "/auth/" + activity.oauthPrefix + "/callback";
         ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);

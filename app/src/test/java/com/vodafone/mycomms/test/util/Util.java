@@ -14,16 +14,8 @@ import org.robolectric.shadows.FakeHttp;
 public class Util {
 
     private static final ProtocolVersion DEFAULT_HTTP_VERSION = HttpVersion.HTTP_1_1;
-    private static final int DEFAULT_HTTP_RETURN_CODE = 204;
     private static final String DEFAULT_HTTP_RETURN_REASON = "OK";
 
-    public static HttpResponse buildOkResponse() throws Exception {
-        return buildOkResponse(null);
-    }
-
-    public static HttpResponse buildOkResponse(String stringEntity) throws Exception {
-        return buildResponse(DEFAULT_HTTP_VERSION, DEFAULT_HTTP_RETURN_CODE, DEFAULT_HTTP_RETURN_REASON, stringEntity);
-    }
 
     public static HttpResponse buildResponse(int code) throws Exception {
         return buildResponse(code, null);

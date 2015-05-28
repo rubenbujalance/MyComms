@@ -24,6 +24,9 @@ public class Constants {
     public static final int CONTACTS_FAVOURITE = 0;
     public static final int CONTACTS_RECENT = 1;
     public static final int CONTACTS_ALL = 2;
+    public static final String CONTACTS_ACTION_CALL = "call";
+    public static final String CONTACTS_ACTION_SMS = "sms";
+    public static final String CONTACTS_ACTION_EMAIL = "email";
 
     //Contacts API and BD Fields
     public static final String CONTACT_DATA = "data";

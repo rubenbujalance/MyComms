@@ -41,6 +41,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private Realm realm;
     private Contact contact;
     private ContactDetailController controller;
+    private String contactId;
 
     //Views
     private ImageView ivIconStatus;
@@ -74,7 +75,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         realm = Realm.getInstance(this);
 
         Intent intent = getIntent();
-        final String contactId = intent.getExtras().getString(Constants.CONTACT_ID);
+        contactId = intent.getExtras().getString(Constants.CONTACT_ID);
         controller = new ContactDetailController(this, realm);
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
@@ -201,6 +202,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
+                in.putExtra(Constants.CHAT_CONTACT_ID, contactId);
                 startActivity(in);
             }
         });
@@ -209,6 +211,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
+                in.putExtra(Constants.CHAT_CONTACT_ID, contactId);
                 startActivity(in);
             }
         });

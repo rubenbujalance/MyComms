@@ -178,8 +178,8 @@ public class ToolbarActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 // set an exit transition
-                Intent in = new Intent(context, ChatMainActivity.class);
-                startActivity(in);
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
@@ -188,8 +188,8 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(context, ChatMainActivity.class);
-                startActivity(in);
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
             }
         });
     }

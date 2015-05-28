@@ -7,10 +7,13 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,7 +42,7 @@ import model.RecentContact;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends ListFragment {
+public class ContactListFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
@@ -53,6 +56,7 @@ public class ContactListFragment extends ListFragment {
     private ContactListViewArrayAdapter adapter;
     private SwipeListView swipeListView;
     private ListView listView;
+    private SwipeRefreshLayout refreshLayout;
     private Parcelable state;
     private TextView emptyText;
 
@@ -80,10 +84,50 @@ public class ContactListFragment extends ListFragment {
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
-       listView = (ListView) v.findViewById(android.R.id.list);
-       emptyText = (TextView) v.findViewById(android.R.id.empty);
+       refreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+       listView = (ListView) refreshLayout.findViewById(android.R.id.list);
+       emptyText = (TextView) refreshLayout.findViewById(android.R.id.empty);
+       /*final SwipeListView swipeListView = (SwipeListView) v.findViewById(android.R.id.list);
+       swipeListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
+           @Override
+           public void onOpened(int position, boolean toRight) {
+               View v = swipeListView.getChildAt(position);
+               swipeListView.getChildAt(position).setBackgroundColor(Color.CYAN);
+               final ImageView favContact = (ImageView) swipeListView.findViewById(R.id.fav_contact);
+               favContact.setOnClickListener((new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+                       Log.i(Constants.TAG, "ContactListFragment.onClick: TESTING");
+                       favContact.setImageDrawable(getResources().getDrawable(R.drawable.abc_btn_rating_star_on_mtrl_alpha));
+                   }
+               }));
+           }
 
-       return v;
+           @Override
+           public void onClosed(int position, boolean fromRight) {
+           }
+
+           @Override
+           public void onListChanged() {
+           }
+       });*/
+       refreshLayout.setEnabled(false);
+       listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+           @Override
+           public void onScrollStateChanged(AbsListView absListView, int i) {
+
+           }
+
+           @Override
+           public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+               if (firstVisibleItem == 0)
+                   refreshLayout.setEnabled(true);
+               else
+                   refreshLayout.setEnabled(false);
+           }
+       });
+
+       return refreshLayout;
     }
 
     /**
@@ -174,6 +218,21 @@ public class ContactListFragment extends ListFragment {
         }
     }
 
+    @Override
+    public void onRefresh() {
+        //TODO: Refresh function here. Filter tab
+        handler.postDelayed(testIsGood, 5000);
+        refreshLayout.setRefreshing(false);
+    }
+
+    public Runnable testIsGood = new Runnable() {
+        @Override
+        public void run() {
+            Log.wtf(Constants.TAG, "ContactListFragment.run: TEEEEESTINGGGG");
+            refreshLayout.setRefreshing(false);
+        }
+    };
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -231,4 +290,5 @@ public class ContactListFragment extends ListFragment {
             }
         }
     }
+
 }

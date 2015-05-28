@@ -10,8 +10,10 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
+import java.io.File;
 import java.util.List;
 
 import model.RecentContact;
@@ -37,6 +39,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
 
             viewHolder = new RecentViewHolder();
             viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.companyLogo);
+            viewHolder.textAvatar = (TextView) convertView.findViewById(R.id.avatarText);
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
             viewHolder.textViewOccupation = (TextView) convertView.findViewById(R.id.list_item_content_position);
@@ -52,13 +55,27 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         // update the item view
         RecentContact contact = getItem(position);
 
-        if (!contact.getAvatar().equals("")) {
-            Picasso.with(mContext).load(contact.getAvatar())
-                    .error(R.drawable.cartoon_round_contact_image_example)
-                    .placeholder( R.drawable.progress_animation )
+        //Image avatar
+        //File avatarFile = new File(mContext.getFilesDir(), "avatar_"+contact.getId()+".jpg");
+        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0 &&
+                contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists()) {
+
+            viewHolder.textAvatar.setText(null);
+
+            Picasso.with(mContext)
+                    .load(avatarFile)
                     .into(viewHolder.imageAvatar);
-        } else {
-            viewHolder.imageAvatar.setImageDrawable(mContext.getResources().getDrawable(R.drawable.cartoon_round_contact_image_example));
+
+        } else{
+            String initials = contact.getFirstName().substring(0,1) +
+                    contact.getLastName().substring(0,1);
+
+            viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
+            viewHolder.textAvatar.setText(initials);
         }
 
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
@@ -90,5 +107,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         TextView textViewRecentItemTime;
         ImageView imageViewRecentType;
         ImageView imageAvatar;
+        TextView textAvatar;
     }
 }

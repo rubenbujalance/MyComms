@@ -15,6 +15,7 @@ public class Contact extends RealmObject{
     private String firstName;
     private String lastName;
     private String avatar;
+    private String pathAvatar;
     private String phones;
     private String emails;
     private String position;
@@ -29,12 +30,13 @@ public class Contact extends RealmObject{
     public Contact() {
     }
 
-    public Contact(String id, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country) {
+    public Contact(String id, String platform, String firstName, String lastName, String avatar, String pathAvatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country) {
         this.id = id;
         this.platform = platform;
         this.firstName = firstName;
         this.lastName = lastName;
         this.avatar = avatar;
+        this.setPathAvatar(pathAvatar);
         this.phones = phones;
         this.emails = emails;
         this.position = position;
@@ -167,4 +169,11 @@ public class Contact extends RealmObject{
         this.country = country;
     }
 
+    public String getPathAvatar() {
+        return pathAvatar;
+    }
+
+    public void setPathAvatar(String pathAvatar) {
+        this.pathAvatar = pathAvatar;
+    }
 }

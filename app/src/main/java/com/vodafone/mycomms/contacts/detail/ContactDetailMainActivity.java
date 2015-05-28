@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -334,10 +335,10 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        Picasso.with(this).load(contact.getAvatar())
-                .error(R.drawable.cartoon_round_contact_image_example)
-                .placeholder( R.drawable.progress_animation )
-                .into(ivAvatar);
+        Picasso.with(this)
+            .load(new File(getFilesDir(), "avatar_"+contact.getId()+".jpg"))
+            .error(R.drawable.cartoon_round_contact_image_example)
+            .into(ivAvatar);
 
         ivAvatar.setBorderWidth(2);
         ivAvatar.setBorderColor(Color.WHITE);

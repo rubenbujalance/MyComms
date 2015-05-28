@@ -102,6 +102,7 @@ public class RealmContactTransactions {
 
         RealmResults<Contact> result1 = query.findAll();
         if (result1!=null){
+            result1.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
             for (Contact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }
@@ -129,7 +130,7 @@ public class RealmContactTransactions {
 
         RealmResults<Contact> result1 = query.findAll();
 
-        if (result1!=null){
+        if (result1!=null && result1.size()>0){
             return result1.first();
         }else {
             return null;

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 import model.ChatListItem;
 
-
 public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHolder>{
 
     private ArrayList<ChatListItem> mChatListItem = new ArrayList<>();

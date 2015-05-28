@@ -15,9 +15,6 @@ import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
-/**
- * Created by str_vig on 21/04/2015.
- */
 public class ContactListMainActivity extends ToolbarActivity implements ContactListFragment.OnFragmentInteractionListener{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";

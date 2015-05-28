@@ -54,6 +54,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private TextView tvEmail;
     private TextView tvOfficeLocation;
     private CircleImageView ivAvatar;
+    private TextView textAvatar;
 
     //Buttons
     private ImageView btSms;
@@ -90,6 +91,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
+        textAvatar = (TextView)findViewById(R.id.avatarText);
 
         //Buttons
         btSms = (ImageView)findViewById(R.id.bt_sms);
@@ -335,13 +337,27 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        Picasso.with(this)
-            .load(new File(getFilesDir(), "avatar_"+contact.getId()+".jpg"))
-            .error(R.drawable.cartoon_round_contact_image_example)
-            .into(ivAvatar);
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
 
-        ivAvatar.setBorderWidth(2);
-        ivAvatar.setBorderColor(Color.WHITE);
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0 &&
+                contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists()) {
+
+            textAvatar.setText(null);
+
+            Picasso.with(this)
+                    .load(avatarFile)
+                    .into(ivAvatar);
+
+        } else{
+            String initials = contact.getFirstName().substring(0,1) +
+                    contact.getLastName().substring(0,1);
+
+            ivAvatar.setImageResource(R.color.grey_middle);
+            textAvatar.setText(initials);
+        }
+
     }
 
     private void loadContactDetail()

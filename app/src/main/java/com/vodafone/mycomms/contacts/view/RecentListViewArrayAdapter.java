@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
 import java.io.File;
@@ -55,7 +56,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         RecentContact contact = getItem(position);
 
         //Image avatar
-        File avatarFile = new File(mContext.getFilesDir(), "avatar_"+contact.getId()+".jpg");
+        //File avatarFile = new File(mContext.getFilesDir(), "avatar_"+contact.getId()+".jpg");
+        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&

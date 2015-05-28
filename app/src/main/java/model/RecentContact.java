@@ -2,9 +2,6 @@ package model;
 
 import io.realm.RealmObject;
 
-/**
- * Created by AMG on 12/05/2015.
- */
 public class RecentContact extends RealmObject {
     private int lastInteraction;
     private String platform;

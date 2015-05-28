@@ -15,15 +15,16 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import model.ChatMessage;
 
 
 public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     private String LOG_TAG = ChatRecyclerViewAdapter.class.getSimpleName();
-    private ArrayList<ChatListItem> chatList = new ArrayList<>();
+    private ArrayList<ChatMessage> chatList = new ArrayList<>();
     private Context mContext;
 
-    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatListItem> chatListItem) {
+    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem) {
         mContext = context;
         /*fakeDataLoad();
         if (chatListItem != null) {
@@ -32,27 +33,32 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
             }
         }*/
         Realm realm = Realm.getInstance(mContext);
-        RealmQuery<ChatListItem> query = realm.where(ChatListItem.class);
+        RealmQuery<ChatMessage> query = realm.where(ChatMessage.class);
 
         // Execute the query:
-        RealmResults<ChatListItem> result1 = query.findAll();
+        RealmResults<ChatMessage> result1 = query.findAll();
         if (result1!=null){
-            for (ChatListItem chatListItems : result1) {
+            for (ChatMessage chatListItems : result1) {
                 chatList.add(chatListItems);
             }
         }
     }
 
     private void fakeDataLoad() {
-        ChatListItem chatListItem;
-        for (int i=0;i<20;i++){
-            if ((i % 2) == 0){
-                //chatListItem = new ChatListItem("You say goodbye", Constants.LEFT_CHAT);
-            } else {
-                //chatListItem = new ChatListItem("And I say Hello. Hello Hello!", Constants.RIGHT_CHAT);
-            }
-            chatList.add(null);
-        }
+//        ChatMessage chatListItem;
+//        for (int i=0;i<20;i++){
+//            if ((i % 2) == 0){
+//                chatListItem = new ChatMessage("You say goodbye", Constants.LEFT_CHAT);
+//            } else {
+//                chatListItem = new ChatMessage("And I say Hello. Hello Hello!", Constants.RIGHT_CHAT);
+//            }
+//            chatList.add(chatListItem);
+//        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return chatList.get(position).getType();
     }
 
     @Override
@@ -74,8 +80,8 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     @Override
     public void onBindViewHolder(ChatHolder chatHolder, int i) {
-        //String test = chatList.get(i).getChatText();
-        //chatHolder.chatTextView.setText(test);
+        String test = chatList.get(i).getText();
+        chatHolder.chatTextView.setText(test);
         //Fake data show
         if (i==3 || i==9 || i==15 || i==17){
             chatHolder.chatSentTime.setVisibility(View.VISIBLE);

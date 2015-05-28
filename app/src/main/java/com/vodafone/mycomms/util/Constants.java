@@ -63,4 +63,21 @@ public class Constants {
     public static final String AVATAR_URL = "urlAvatar";
     public static final String AVATAR_PATH = "pathAvatar";
     public static final String CONTACT_AVATAR_DIR = "/avatars/files/";
+
+    //Chat BD Fields
+    public static final String CHAT_MESSAGE_ID = "id";
+    public static final String CHAT_MESSAGE_PROFILE_ID = "profile_id";
+    public static final String CHAT_MESSAGE_CONTACT_ID = "contact_id";
+    public static final String CHAT_MESSAGE_TIMESTAMP = "timestamp";
+    public static final String CHAT_MESSAGE_DIRECTION = "direction";
+    public static final String CHAT_MESSAGE_TYPE = "type";
+    public static final String CHAT_MESSAGE_TEXT = "text";
+    public static final String CHAT_MESSAGE_RESOURCE_URI = "resourceUri";
+    public static final String CHAT_MESSAGE_READ = "read";
+    public static final String CHAT_MESSAGE_DELIVERED = "delivered";
+    public static final String CHAT_ID = "id";
+    public static final String CHAT_PROFILE_ID = "profile_id";
+    public static final String CHAT_CONTACT_ID = "contact_id";
+    public static final String CHAT_LAST_MESSAGE_ID = "lastMessage_id";
+
 }

@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.realm.RealmChatTransactions;
 import model.ChatListItem;
 
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -23,6 +24,7 @@ import com.vodafone.mycomms.util.ToolbarActivity;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import model.ChatMessage;
 
 public class ChatMainActivity extends ToolbarActivity {
 
@@ -31,12 +33,17 @@ public class ChatMainActivity extends ToolbarActivity {
     private ChatRecyclerViewAdapter mChatRecyclerViewAdapter;
     private EditText chatTextBox;
     private String chatText = "";
-    private ArrayList<ChatListItem> chatList = new ArrayList<>();
-    private Realm realm;
+    private ArrayList<ChatMessage> chatList = new ArrayList<>();
+    private Realm mRealm;
+    private RealmChatTransactions chatTransactions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mRealm = Realm.getInstance(this);
+        chatTransactions = new RealmChatTransactions(mRealm);
+
         //This prevents the view focusing on the edit text and opening the keyboard
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -105,33 +112,27 @@ public class ChatMainActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 Log.i(LOG_TAG,"sendText()");
-                realm = Realm.getInstance(mContext);
-                realm.beginTransaction();
-                realm.clear(ChatListItem.class);
-                realm.commitTransaction();
-                mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
-                mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+//                mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
+//                mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
             }
         });
     }
 
     private void sendText() {
         // Obtain a Realm instance
-        realm = Realm.getInstance(this);
-
-        realm.beginTransaction();
-        ChatListItem chatListItem = new ChatListItem("mc_5535b16c13be4b7975c515fe", "mc_555a0792121ef1695cc7c1c3", "Nick Fury", "Ruben Bujalance", "Me porculea o ke ase", "dj");
-        //ChatListItem chatItem = realm.createObject(ChatListItem.class); // Create a new object
-        //chatItem.setChatText(chatText);
-        //chatItem.setChatType(Constants.RIGHT_CHAT);
-        realm.copyToRealm(chatListItem);
-        realm.commitTransaction();
-
-        chatList.add(chatListItem);
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
-
-        chatTextBox.setText("");
+//        realm.beginTransaction();
+//        ChatListItem chatListItem = new ChatListItem(chatText, Constants.RIGHT_CHAT);
+//        //ChatListItem chatItem = realm.createObject(ChatListItem.class); // Create a new object
+//        //chatItem.setChatText(chatText);
+//        //chatItem.setChatType(Constants.RIGHT_CHAT);
+//        realm.copyToRealm(chatListItem);
+//        realm.commitTransaction();
+//
+//        chatList.add(chatListItem);
+//        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
+//        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+//
+//        chatTextBox.setText("");
     }
 
     @Override
@@ -159,8 +160,8 @@ public class ChatMainActivity extends ToolbarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (realm != null){
-            realm.close();
+        if (mRealm != null){
+            mRealm.close();
         }
     }
 }

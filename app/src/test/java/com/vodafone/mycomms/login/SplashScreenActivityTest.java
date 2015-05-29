@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.widget.Button;
 
 import com.vodafone.mycomms.BuildConfig;
@@ -28,6 +29,8 @@ import org.robolectric.annotation.Config;
 import org.robolectric.res.builder.RobolectricPackageManager;
 import org.robolectric.shadows.FakeHttp;
 import org.robolectric.shadows.ShadowAlertDialog;
+
+import java.net.URI;
 
 import static com.vodafone.mycomms.constants.Constants.ACCESS_TOKEN;
 import static com.vodafone.mycomms.constants.Constants.EXPIRES_IN;
@@ -90,8 +93,8 @@ public class SplashScreenActivityTest {
     }
 
     @Test
-    public void testCheckVersionUserLoggedRenewTokenOk() throws Exception {
-        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 1, RuntimeEnvironment.application);
+     public void testCheckVersionUserLoggedRenewTokenOk() throws Exception {
+        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 0, RuntimeEnvironment.application);
         HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         HttpResponse httpResponseRenewToken = Util.buildResponse(200, LOGIN_OK_RESPONSE);
@@ -104,7 +107,7 @@ public class SplashScreenActivityTest {
 
     @Test
     public void testCheckVersionUserLoggedRenewTokenToLoginSignup() throws Exception {
-        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 1, RuntimeEnvironment.application);
+        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 0, RuntimeEnvironment.application);
         HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         HttpResponse httpResponseRenewToken = Util.buildResponse(500, VALID_VERSION_RESPONSE);
@@ -112,7 +115,6 @@ public class SplashScreenActivityTest {
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
-        System.out.println("NextStartedActivity: " + Shadows.shadowOf(activity).getNextStartedActivity());
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
@@ -141,11 +143,15 @@ public class SplashScreenActivityTest {
         Assert.assertTrue(activity.isFinishing());
     }
 
-    //@Test
+    @Test
     public void testEmailLink() throws Exception {
-        String link = "<a href=\"intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\">Link to MyComms</a>";
+        //String link = "<a href=\"intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\">Link to MyComms</a>";
+        Uri uri = Uri.parse("intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\\");
+        Intent incomingIntent = new Intent();
+        incomingIntent.setData(uri);
+        activity = Robolectric.buildActivity(OAuthActivity.class).withIntent(incomingIntent).create().get();
         UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN, RuntimeEnvironment.application);
-        HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
+        HttpResponse httpResponse = Util.buildResponse(200, LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());

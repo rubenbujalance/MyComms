@@ -64,7 +64,7 @@ public class MailSentActivityTest {
         Assert.assertTrue("/api/profile".equals(latestSentHttpPost.getURI().getPath()));
     }
 
-    @Test
+    //@Test
     public void testBack() throws Exception {
         KeyEvent keyEvent = new KeyEvent(0,0,KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK, 0, 0);
         activity.dispatchKeyEvent(keyEvent);

@@ -1,23 +1,12 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
-import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
 
 import org.junit.Assert;
@@ -28,16 +17,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowActivity;
-import org.robolectric.shadows.ShadowAlertDialog;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
-import static com.vodafone.mycomms.constants.Constants.FIRSTNAME;
-import static com.vodafone.mycomms.constants.Constants.LASTNAME;
 
 /**
  * Created by str_evc on 18/05/2015.

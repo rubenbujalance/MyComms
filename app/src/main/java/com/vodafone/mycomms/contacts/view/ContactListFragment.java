@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -200,7 +199,7 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
                             Utils.launchSms(phone, getActivity());
                         }*/
                         in = new Intent(getActivity(), ChatMainActivity.class);
-                        in.putExtra(Constants.CHAT_CONTACT_ID, recentContactList.get(position).getId());
+                        in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getId());
                         startActivity(in);
                     }
                     else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {

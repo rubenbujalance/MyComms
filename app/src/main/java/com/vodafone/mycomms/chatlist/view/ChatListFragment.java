@@ -55,7 +55,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
                Toast.makeText(getActivity(), "Sender Id: " + mChatRecyclerViewAdapter.getChatListItem(position).getChatSenderId(), Toast.LENGTH_SHORT).show();
 
                Intent in = new Intent(getActivity(), ChatMainActivity.class);
-               in.putExtra(Constants.CHAT_CONTACT_ID, mChatRecyclerViewAdapter.getChatListItem(position).getChatSenderId());
+               in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, mChatRecyclerViewAdapter.getChatListItem(position).getChatSenderId());
                startActivity(in);
 
            }

@@ -1,9 +1,7 @@
 package com.vodafone.mycomms.contacts.detail;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,11 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.framework.library.connection.HttpConnection;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
-import com.vodafone.mycomms.contacts.connection.FavouriteConnection;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -33,7 +29,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -222,7 +217,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
-                in.putExtra(Constants.CHAT_CONTACT_ID, contactId);
+                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
                 startActivity(in);
             }
         });
@@ -231,7 +226,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
-                in.putExtra(Constants.CHAT_CONTACT_ID, contactId);
+                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
                 startActivity(in);
             }
         });

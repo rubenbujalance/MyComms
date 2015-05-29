@@ -8,4 +8,6 @@ import com.vodafone.mycomms.connection.IConnectionCallback;
 public interface ILoginConnectionCallback extends IConnectionCallback {
     void onLoginSuccess();
     void onLoginError();
+
+
 }

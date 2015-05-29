@@ -224,8 +224,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
                 in.putExtra(Constants.CHAT_CONTACT_ID, contactId);
                 startActivity(in);
-                action = Constants.CONTACTS_ACTION_SMS;
-                mRecentContactController.insertRecent(contactId, action);
             }
         });
 
@@ -235,8 +233,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
                 in.putExtra(Constants.CHAT_CONTACT_ID, contactId);
                 startActivity(in);
-                action = Constants.CONTACTS_ACTION_SMS;
-                mRecentContactController.insertRecent(contactId, action);
             }
         });
 

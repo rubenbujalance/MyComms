@@ -1,11 +1,10 @@
 package com.vodafone.mycomms.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,11 +16,13 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
+import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import model.Chat;
 import model.ChatMessage;
 
 public class ChatMainActivity extends ToolbarActivity {
@@ -29,27 +30,52 @@ public class ChatMainActivity extends ToolbarActivity {
     private String LOG_TAG = ChatMainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private ChatRecyclerViewAdapter mChatRecyclerViewAdapter;
-    private EditText chatTextBox;
-    private String chatText = "";
-    private ArrayList<ChatMessage> chatList = new ArrayList<>();
+    private EditText etChatTextBox;
+//    private String _chatText = "";
+    private ArrayList<ChatMessage> _chatList = new ArrayList<>();
+    private Chat _chat;
+
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mRealm = Realm.getInstance(this);
-        chatTransactions = new RealmChatTransactions(mRealm);
-
-        //This prevents the view focusing on the edit text and opening the keyboard
-        getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
         setContentView(R.layout.activity_chat_main);
         activateToolbar();
         setToolbarBackground(R.drawable.toolbar_header);
         setChatListeners(this);
+
+        mRealm = Realm.getInstance(this);
+        chatTransactions = new RealmChatTransactions(mRealm, this);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(layoutManager);
+        refreshAdapter();
+
+        etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
+
+        //Load chat from db
+        Intent in = getIntent();
+        String contact_id = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
+
+        //TODO RBM - Remove after testing
+//        contact_id = "mc_554b20fc80eb511a3c1d1262";
+
+        if(contact_id==null || contact_id.length()==0) finish(); //Prevent from errors
+
+        _chat = chatTransactions.getChatById(contact_id);
+
+        //If there was no chat, create a new one, but not saved in db yet
+        //If chat exists, load all messages
+        if(_chat==null) _chat = chatTransactions.newChatInstance(contact_id);
+        else loadMessagesArray();
+
+        //This prevents the view focusing on the edit text and opening the keyboard
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         ImageView backButton = (ImageView) findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -66,40 +92,27 @@ public class ChatMainActivity extends ToolbarActivity {
             }
         });*/
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, null);
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
-
-        chatTextBox = (EditText) findViewById(R.id.chat_text_box);
-        chatTextBox.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                try {
-                    chatText = cs.toString();
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "onTextChanged error: " + e.toString());
-                }
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable arg0) {
-            }
-        });
+//        etChatTextBox.addTextChangedListener(new TextWatcher() {
+//
+//            @Override
+//            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+//                try {
+//                    _chatText = cs.toString();
+//                } catch (Exception e) {
+//                    Log.e(LOG_TAG, "onTextChanged error: " + e.toString());
+//                }
+//            }
+//            @Override
+//            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,int arg3) {}
+//            @Override
+//            public void afterTextChanged(Editable arg0) {}
+//        });
 
         TextView sendChat = (TextView) findViewById(R.id.chat_send);
         sendChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(LOG_TAG, "Sending text " + chatText);
+                Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());
                 sendText();
             }
         });
@@ -110,27 +123,36 @@ public class ChatMainActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 Log.i(LOG_TAG,"sendText()");
-//                mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
-//                mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+                chatTransactions.deleteAllChatMessages(_chat.getContact_id());
+                refreshAdapter();
             }
         });
     }
 
-    private void sendText() {
-        // Obtain a Realm instance
-//        realm.beginTransaction();
-//        ChatListItem chatListItem = new ChatListItem(chatText, Constants.RIGHT_CHAT);
-//        //ChatListItem chatItem = realm.createObject(ChatListItem.class); // Create a new object
-//        //chatItem.setChatText(chatText);
-//        //chatItem.setChatType(Constants.RIGHT_CHAT);
-//        realm.copyToRealm(chatListItem);
-//        realm.commitTransaction();
-//
-//        chatList.add(chatListItem);
-//        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
-//        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
-//
-//        chatTextBox.setText("");
+    private void sendText()
+    {
+        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
+                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                Constants.CHAT_MESSAGE_TYPE_TEXT, etChatTextBox.getText().toString(), "");
+
+        chatTransactions.insertChat(_chat);
+        chatTransactions.insertChatMessage(chatMsg);
+
+        _chatList.add(chatMsg);
+        refreshAdapter();
+        etChatTextBox.setText("");
+    }
+
+    private void loadMessagesArray()
+    {
+        _chatList = chatTransactions.getAllChatMessages(_chat.getContact_id());
+        refreshAdapter();
+    }
+
+    private void refreshAdapter()
+    {
+        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList);
+        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
     @Override

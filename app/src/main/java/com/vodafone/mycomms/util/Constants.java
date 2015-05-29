@@ -6,6 +6,9 @@ package com.vodafone.mycomms.util;
 public class Constants {
     public static final String TAG = "MyComms";
 
+    //Shared preferences
+    public static final String MYCOMMS_SHARED_PREFS = "mycomms";
+
     //Chat Constants
     public static final int LEFT_CHAT = 0;
     public static final int RIGHT_CHAT = 1;
@@ -14,6 +17,7 @@ public class Constants {
     public static final int PREFERENCES = 0;
     public static final int ACCOUNTS = 1;
     public static final int MY_PROFILE = 1;
+    public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
 
     //Footer Constants
     public static final int TOOLBAR_CONTACTS = 0;
@@ -65,19 +69,28 @@ public class Constants {
     public static final String CONTACT_AVATAR_DIR = "/avatars/files/";
 
     //Chat BD Fields
-    public static final String CHAT_MESSAGE_ID = "id";
-    public static final String CHAT_MESSAGE_PROFILE_ID = "profile_id";
-    public static final String CHAT_MESSAGE_CONTACT_ID = "contact_id";
-    public static final String CHAT_MESSAGE_TIMESTAMP = "timestamp";
-    public static final String CHAT_MESSAGE_DIRECTION = "direction";
-    public static final String CHAT_MESSAGE_TYPE = "type";
-    public static final String CHAT_MESSAGE_TEXT = "text";
-    public static final String CHAT_MESSAGE_RESOURCE_URI = "resourceUri";
-    public static final String CHAT_MESSAGE_READ = "read";
-    public static final String CHAT_MESSAGE_DELIVERED = "delivered";
-    public static final String CHAT_ID = "id";
-    public static final String CHAT_PROFILE_ID = "profile_id";
-    public static final String CHAT_CONTACT_ID = "contact_id";
-    public static final String CHAT_LAST_MESSAGE_ID = "lastMessage_id";
+    public static final String CHAT_MESSAGE_FIELD_ID = "id";
+    public static final String CHAT_MESSAGE_FIELD_PROFILE_ID = "profile_id";
+    public static final String CHAT_MESSAGE_FIELD_CONTACT_ID = "contact_id";
+    public static final String CHAT_MESSAGE_FIELD_TIMESTAMP = "timestamp";
+    public static final String CHAT_MESSAGE_FIELD_DIRECTION = "direction";
+    public static final String CHAT_MESSAGE_FIELD_TYPE = "type";
+    public static final String CHAT_MESSAGE_FIELD_TEXT = "text";
+    public static final String CHAT_MESSAGE_FIELD_RESOURCE_URI = "resourceUri";
+    public static final String CHAT_MESSAGE_FIELD_READ = "read";
+    public static final String CHAT_MESSAGE_FIELD_DELIVERED = "delivered";
+    public static final String CHAT_FIELD_ID = "id";
+    public static final String CHAT_FIELD_PROFILE_ID = "profile_id";
+    public static final String CHAT_FIELD_CONTACT_ID = "contact_id";
+    public static final String CHAT_FIELD_LAST_MESSAGE_ID = "lastMessage_id";
 
+    //Chat constants
+    public static final int CHAT_MESSAGE_TYPE_TEXT = 0;
+    public static final int CHAT_MESSAGE_TYPE_PICTURE = 1;
+    public static final String CHAT_MESSAGE_DIRECTION_SENT = "0";
+    public static final String CHAT_MESSAGE_DIRECTION_RECEIVED = "1";
+    public static final String CHAT_MESSAGE_STATUS_READ = "1";
+    public static final String CHAT_MESSAGE_STATUS_NOT_READ = "0";
+    public static final String CHAT_MESSAGE_STATUS_DELIVERED = "1";
+    public static final String CHAT_MESSAGE_STATUS_NOT_DELIVERED = "0";
 }

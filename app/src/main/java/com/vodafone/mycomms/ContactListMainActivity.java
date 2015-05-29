@@ -75,9 +75,9 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     private void checkAndUploadAvatar()
     {
         //Check sharedPreferences
-        // TODO - Check sharedPreferences
+        // TODO RBM - Check sharedPreferences
 
-        // TODO - Upload avatar
+        // TODO RBM - Upload avatar
     }
 
     @Override

@@ -211,31 +211,31 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         }
     }
 
-    private void callBackPassCheck(HashMap<String, Object> result)
-    {
-        String status = (String)result.get("status");
-
-        try {
-            if (status.compareTo("200") != 0) {
-               onLoginError(getString(R.string.oops_wrong_password));
-            }
-            else
-            {
-                //Get tokens and expiration data from http response
-                JSONObject jsonResponse = (JSONObject)result.get("json");
-                String accessToken = jsonResponse.getString("accessToken");
-                String refreshToken = jsonResponse.getString("refreshToken");
-                long expiresIn = jsonResponse.getLong("expiresIn");
-
-                UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
-
-                startMainActivity();
-            }
-        } catch(Exception ex) {
-            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck:" , ex);
-            return;
-        }
-    }
+//    private void callBackPassCheck(HashMap<String, Object> result)
+//    {
+//        String status = (String)result.get("status");
+//
+//        try {
+//            if (status.compareTo("200") != 0) {
+//               onLoginError(getString(R.string.oops_wrong_password));
+//            }
+//            else
+//            {
+//                //Get tokens and expiration data from http response
+//                JSONObject jsonResponse = (JSONObject)result.get("json");
+//                String accessToken = jsonResponse.getString("accessToken");
+//                String refreshToken = jsonResponse.getString("refreshToken");
+//                long expiresIn = jsonResponse.getLong("expiresIn");
+//
+//                UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
+//
+//                startMainActivity();
+//            }
+//        } catch(Exception ex) {
+//            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck:" , ex);
+//            return;
+//        }
+//    }
 
     private void startMainActivity(){
         //Force hide keyboard
@@ -290,14 +290,14 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         onLoginError(getString(R.string.connection_error));
     }
 
-    private class CheckPasswordApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
-        @Override
-        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
-            return APIWrapper.httpPostAPI("/auth/login", params[0], params[1], LoginActivity.this);
-        }
-        @Override
-        protected void onPostExecute(HashMap<String,Object> result) {
-            callBackPassCheck(result);
-        }
-    }
+//    private class CheckPasswordApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+//        @Override
+//        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
+//            return APIWrapper.httpPostAPI("/auth/login", params[0], params[1], LoginActivity.this);
+//        }
+//        @Override
+//        protected void onPostExecute(HashMap<String,Object> result) {
+//            callBackPassCheck(result);
+//        }
+//    }
 }

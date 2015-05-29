@@ -103,7 +103,6 @@ public class SignupNameActivity extends Activity {
         });
 
 //        //Load data if comes from Salesforce signup
-//        // TODO - Remove after tests
 //        UserProfile.setAvatar("https://www.iconaholic.com/work/bartender-icon.png");
 
         if(UserProfile.getFirstName() != null) mFirstName.setText(UserProfile.getFirstName());

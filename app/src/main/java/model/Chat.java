@@ -17,11 +17,11 @@ public class Chat extends RealmObject{
 
     public Chat() {}
 
-    public Chat(String profile_id, String contact_id, String lastMessage_id)
+    public Chat(String profile_id, String contact_id)
     {
         this.setProfile_id(profile_id);
         this.setContact_id(contact_id);
-        this.setLastMessage_id(lastMessage_id);
+        this.setLastMessage_id("");
 
         this.setId(profile_id + "_" + contact_id);
     }

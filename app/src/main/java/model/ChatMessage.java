@@ -19,7 +19,7 @@ public class ChatMessage extends RealmObject{
 
     private long timestamp;
 
-    private String direction; //0-Sent; 1-Received. It's string in case we need an index
+    private String direction; //0-Sent; 1-Received. String just in case we need an index
     private int type; //Text-0, picture-1,..., map, video, file, etc.
     private String text;
     private String resourceUri;

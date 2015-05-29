@@ -43,21 +43,11 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         }
     }
 
-    private void fakeDataLoad() {
-//        ChatMessage chatListItem;
-//        for (int i=0;i<20;i++){
-//            if ((i % 2) == 0){
-//                chatListItem = new ChatMessage("You say goodbye", Constants.LEFT_CHAT);
-//            } else {
-//                chatListItem = new ChatMessage("And I say Hello. Hello Hello!", Constants.RIGHT_CHAT);
-//            }
-//            chatList.add(chatListItem);
-//        }
-    }
-
     @Override
     public int getItemViewType(int position) {
-        return chatList.get(position).getType();
+        if(chatList.get(position).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_SENT)==0)
+            return Constants.RIGHT_CHAT;
+        else return Constants.LEFT_CHAT;
     }
 
     @Override
@@ -79,15 +69,16 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     @Override
     public void onBindViewHolder(ChatHolder chatHolder, int i) {
-        String test = chatList.get(i).getText();
-        chatHolder.chatTextView.setText(test);
-        //Fake data show
-        if (i==3 || i==9 || i==15 || i==17){
-            chatHolder.chatSentTime.setVisibility(View.VISIBLE);
-        }
-        if (i==chatList.size()-1){
-            chatHolder.chatSentText.setVisibility(View.VISIBLE);
-        }
+        chatHolder.chatTextView.setText(chatList.get(i).getText());
+        chatHolder.chatSentTime.setVisibility(View.VISIBLE);
+
+//        //Fake data show
+//        if (i==3 || i==9 || i==15 || i==17){
+//            chatHolder.chatSentTime.setVisibility(View.VISIBLE);
+//        }
+//        if (i==chatList.size()-1){
+//            chatHolder.chatSentText.setVisibility(View.VISIBLE);
+//        }
     }
 
 }

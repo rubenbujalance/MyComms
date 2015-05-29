@@ -1,10 +1,13 @@
 package com.vodafone.mycomms.realm;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -17,14 +20,40 @@ import model.ChatMessage;
  */
 public class RealmChatTransactions {
     private Realm mRealm;
+    private String _profile_id;
 
-    public RealmChatTransactions(Realm realm) {
+    public RealmChatTransactions(Realm realm, Context context) {
+
         mRealm = realm;
+        _profile_id = null;
+
+        SharedPreferences sp = context.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        if(sp==null) return;
+
+        _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+        //TODO RBM - Remove after testing
+//        _profile_id = "mc_555a0792121ef1695cc7c1c3";
     }
 
     /*
      ******** CHAT MESSAGE Transactions *********
      */
+
+    //CONSTRUCTORS
+
+    public ChatMessage newChatMessageInstance(String contact_id, String direction,
+                                       int type, String text, String resourceUri)
+    {
+        long timestamp = Calendar.getInstance().getTimeInMillis();
+
+        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,timestamp,
+                                    direction,type,text,resourceUri,"0","0");
+
+        return chatMessage;
+    }
 
     //INSERTS
 
@@ -32,10 +61,17 @@ public class RealmChatTransactions {
         if(newChatMessage==null) return;
 
         try {
+            //Insert new chat message
             mRealm.beginTransaction();
+            newChatMessage.setProfile_id(_profile_id);
             mRealm.copyToRealmOrUpdate(newChatMessage);
 
+            //Update associated Chat with new last message
+            Chat chat = getChatById(newChatMessage.getContact_id());
+            chat.setLastMessage_id(newChatMessage.getId());
             mRealm.commitTransaction();
+//            insertChat(chat); //Begins and commits the transaction itself
+
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ",e);
         }
@@ -59,17 +95,17 @@ public class RealmChatTransactions {
 
     //GETS
 
-    public ArrayList<ChatMessage> getAllChatMessages(String profile_id, String contact_id)
+    public ArrayList<ChatMessage> getAllChatMessages(String contact_id)
     {
-        if(profile_id==null || contact_id==null) return null;
+        if(_profile_id==null || contact_id==null) return null;
 
         ArrayList<ChatMessage> chatMessageArrayList = null;
 
         try {
             chatMessageArrayList = new ArrayList<>();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_PROFILE_ID, profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_CONTACT_ID, contact_id);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id);
 
             RealmResults<ChatMessage> result1 = query.findAll();
             if (result1 != null) {
@@ -84,17 +120,17 @@ public class RealmChatTransactions {
         return chatMessageArrayList;
     }
 
-    public ArrayList<ChatMessage> getFilteredChatMessages(String profile_id, String contact_id, String field, String filter)
+    public ArrayList<ChatMessage> getFilteredChatMessages(String contact_id, String field, String filter)
     {
-        if(profile_id==null || contact_id==null) return null;
+        if(_profile_id==null || contact_id==null) return null;
 
         ArrayList<ChatMessage> chatMessageArrayList = null;
 
         try {
             chatMessageArrayList = new ArrayList<>();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_PROFILE_ID, profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_CONTACT_ID, contact_id)
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id)
                     .equalTo(field, filter);
 
             RealmResults<ChatMessage> result1 = query.findAll();
@@ -110,12 +146,13 @@ public class RealmChatTransactions {
         return chatMessageArrayList;
     }
 
-    public ChatMessage getChatMessageById(String chatMessageId){
+    public ChatMessage getChatMessageById(String contact_id, long timestamp){
         ChatMessage chatMessage = null;
 
         try {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_ID, chatMessageId);
+            String chatMessageId = _profile_id + "_" + contact_id + "_" + timestamp;
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, chatMessageId);
             chatMessage = query.findFirst();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ",e);
@@ -124,38 +161,21 @@ public class RealmChatTransactions {
         return chatMessage;
     }
 
-    public long getChatMessagesCount(String profile_id, String contact_id){
-        if(contact_id==null || profile_id==null) return 0;
-
-        long count = 0;
-
-        try {
-            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            count = query.equalTo(Constants.CHAT_MESSAGE_PROFILE_ID, profile_id)
-                                    .equalTo(Constants.CHAT_MESSAGE_CONTACT_ID, contact_id)
-                                    .count();
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ",e);
-        }
-
-        return count;
-    }
-
-    public ChatMessage getLastChatMessage(String profile_id, String contact_id){
-        if(contact_id==null || profile_id==null) return null;
+    public ChatMessage getLastChatMessage(String contact_id){
+        if(contact_id==null || _profile_id==null) return null;
 
         ChatMessage message = null;
 
         try {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            long timestamp = query.equalTo(Constants.CHAT_MESSAGE_PROFILE_ID, profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_CONTACT_ID, contact_id)
-                    .maximumInt(Constants.CHAT_MESSAGE_TIMESTAMP);
-            String id = profile_id + "_" + contact_id + "_" + timestamp;
-            message = getChatMessageById(id);
+            long timestamp = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id)
+                    .maximumInt(Constants.CHAT_MESSAGE_FIELD_TIMESTAMP);
+
+            message = getChatMessageById(contact_id, timestamp);
 
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.getLastChatMessage: ",e);
         }
 
         return message;
@@ -163,16 +183,16 @@ public class RealmChatTransactions {
 
     //DELETES
 
-    public void deleteChatMessageByFilter(String profile_id, String contact_id, String field, String filter)
+    public void deleteChatMessageByFilter(String contact_id, String field, String filter)
     {
-        if(profile_id==null || contact_id==null) return;
+        if(_profile_id==null || contact_id==null) return;
 
         try {
             mRealm.beginTransaction();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
 
-            query.equalTo(Constants.CHAT_MESSAGE_PROFILE_ID, profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_CONTACT_ID, contact_id)
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id)
                     .equalTo(field, filter);
 
             RealmResults<ChatMessage> result1 = query.findAll();
@@ -185,11 +205,13 @@ public class RealmChatTransactions {
         }
     }
 
-    public void deleteChatMessageById(String chatMessageId) {
+    public void deleteChatMessageById(String contact_id, long timestamp) {
         try {
             mRealm.beginTransaction();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_ID, chatMessageId);
+            String chatMessageId = _profile_id + "_" + contact_id + "_" + timestamp;
+
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, chatMessageId);
             RealmResults<ChatMessage> result1 = query.findAll();
             if (result1 != null) {
                 result1.clear();
@@ -200,11 +222,14 @@ public class RealmChatTransactions {
         }
     }
 
-    public void deleteAllChatMessages() {
+    public void deleteAllChatMessages(String contact_id) {
         try {
             mRealm.beginTransaction();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             RealmResults<ChatMessage> result1 = query.findAll();
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id);
+
             if (result1 != null) {
                 result1.clear();
             }
@@ -217,6 +242,14 @@ public class RealmChatTransactions {
     /*
      ******** CHAT Transactions *********
      */
+
+    //CONSTRUCTORS
+
+    public Chat newChatInstance(String contact_id)
+    {
+        Chat chat = new Chat(_profile_id, contact_id);
+        return chat;
+    }
 
     //INSERTS
 
@@ -233,14 +266,14 @@ public class RealmChatTransactions {
         }
     }
 
-    public void insertChatList (ArrayList<Chat> chatMessageArrayList){
-        if(chatMessageArrayList==null || chatMessageArrayList.size()==0) return;
+    public void insertChatList (ArrayList<Chat> chatArrayList){
+        if(chatArrayList==null || chatArrayList.size()==0) return;
 
-        int size = chatMessageArrayList.size();
+        int size = chatArrayList.size();
         try {
             mRealm.beginTransaction();
             for (int i = 0; i < size; i++) {
-                mRealm.copyToRealmOrUpdate(chatMessageArrayList.get(i));
+                mRealm.copyToRealmOrUpdate(chatArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -258,6 +291,7 @@ public class RealmChatTransactions {
         try {
             chatMessageArrayList = new ArrayList<>();
             RealmQuery<Chat> query = mRealm.where(Chat.class);
+            query.equalTo(Constants.CHAT_FIELD_PROFILE_ID, _profile_id);
             RealmResults<Chat> result1 = query.findAll();
 
             if (result1 != null) {
@@ -294,18 +328,37 @@ public class RealmChatTransactions {
         return chatMessageArrayList;
     }
 
-    public Chat getChatById(String chatMessageId){
+    public Chat getChatById(String contact_id){
         Chat chatMessage = null;
 
         try {
             RealmQuery<Chat> query = mRealm.where(Chat.class);
-            query.equalTo(Constants.CHAT_ID, chatMessageId);
+            String chatId = _profile_id + "_" + contact_id;
+            query.equalTo(Constants.CHAT_FIELD_ID, chatId);
             chatMessage = query.findFirst();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getChatById: ",e);
         }
 
         return chatMessage;
+    }
+
+    public long getChatPendingMessagesCount(String contact_id){
+        if(contact_id==null || _profile_id==null) return 0;
+
+        long count = 0;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_STATUS_NOT_READ)
+                    .count();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmChatTransactions.getChatMessagesCount: ",e);
+        }
+
+        return count;
     }
 
     //DELETES
@@ -328,12 +381,22 @@ public class RealmChatTransactions {
         }
     }
 
-    public void deleteChatById(String chatMessageId) {
+    public void deleteChatById(String contact_id) {
         try {
             mRealm.beginTransaction();
             RealmQuery<Chat> query = mRealm.where(Chat.class);
-            query.equalTo(Constants.CHAT_ID, chatMessageId);
+            String chatId = _profile_id + "_" + contact_id;
+            query.equalTo(Constants.CHAT_FIELD_ID, chatId);
             RealmResults<Chat> result1 = query.findAll();
+            Chat chat;
+
+            //Delete all associated chat messages
+            for(int i=0; i<result1.size(); i++)
+            {
+                chat = result1.get(i);
+                deleteAllChatMessages(chat.getContact_id());
+            }
+
             if (result1 != null) {
                 result1.clear();
             }
@@ -348,6 +411,19 @@ public class RealmChatTransactions {
             mRealm.beginTransaction();
             RealmQuery<Chat> query = mRealm.where(Chat.class);
             RealmResults<Chat> result1 = query.findAll();
+
+            //Delete all associated chat messages
+            Chat chat;
+            for (int i = 0; i < result1.size(); i++) {
+                try {
+                    chat = result1.get(i);
+                    deleteAllChatMessages(chat.getContact_id());
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "RealmChatTransactions.deleteAllChats: ",e);
+                }
+            }
+
+            //Delete chats
             if (result1 != null) {
                 result1.clear();
             }

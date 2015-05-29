@@ -1,8 +1,12 @@
 package model;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class RecentContact extends RealmObject {
+    @PrimaryKey
+    private String uniqueId;
+
     private int lastInteraction;
     private String platform;
     private String firstName;
@@ -27,7 +31,8 @@ public class RecentContact extends RealmObject {
 
     }
 
-    public RecentContact(int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country, String id, String action, int actionTimeStamp) {
+    public RecentContact(String uniqueId, int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country, String id, String action, int actionTimeStamp) {
+        this.uniqueId = uniqueId;
         this.lastInteraction = lastInteraction;
         this.platform = platform;
         this.firstName = firstName;
@@ -46,6 +51,14 @@ public class RecentContact extends RealmObject {
         this.id = id;
         this.action = action;
         this.actionTimeStamp = actionTimeStamp;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
     }
 
     public int getLastInteraction() {

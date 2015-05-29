@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.chatlist;
+package com.vodafone.mycomms.chatlist.view;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -11,21 +11,20 @@ import com.vodafone.mycomms.util.ToolbarActivity;
 /**
  * Created by str_vig on 21/04/2015.
  */
-public class ChatListActivity extends ToolbarActivity implements ChatListFragment.OnFragmentInteractionListener{
+public class ChatListActivity extends ToolbarActivity{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "ChatMainActivity.onCreate: ");
+        Log.i(Constants.TAG, "ChatMainActivity.onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
-        activateToolbar();
-        setToolbarTitle("Messages");
+        activateChatListToolbar();
         activateFooter();
 
         setFooterListeners(this);
-        setContactsListeners(this);
+        setChatListListeners(this);
         activateFooterSelected(Constants.TOOLBAR_RECENTS);
 
         if (savedInstanceState == null) {
@@ -37,19 +36,12 @@ public class ChatListActivity extends ToolbarActivity implements ChatListFragmen
         }
     }
 
-
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
-
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-
-    }
-
-    @Override
-    public void onFragmentInteraction(String id) {
 
     }
 }

@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
-import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 import java.util.ArrayList;

@@ -104,7 +104,10 @@ public class ContactController extends BaseController {
         JSONObject jsonResponse;
         if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)){
             search = Constants.CONTACTS_FAVOURITE;
+        } else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
+            search = Constants.CONTACTS_RECENT;
         }
+
         if (result != null && result.trim().length()>0) {
             switch (search) {
                 case Constants.CONTACTS_ALL:
@@ -311,7 +314,7 @@ public class ContactController extends BaseController {
             if (contactList.size()!=0) {
                 realmContactTransactions.deleteAllRecentContacts();
                 realmContactTransactions.insertRecentContactList(contactList);
-                Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: inserted contactList ");
+                Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: inserted RecentcontactList ");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -467,6 +470,7 @@ public class ContactController extends BaseController {
         recentContact.setPresence(contact.getPresence());
         recentContact.setCountry(contact.getCountry());
         try {
+            recentContact.setUniqueId(contact.getId()+jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setAction(jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setActionTimeStamp(jsonObject.getInt(Constants.CONTACT_RECENTS_ACTION_TIME));
         } catch (JSONException e){

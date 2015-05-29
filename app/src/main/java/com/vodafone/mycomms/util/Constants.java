@@ -28,6 +28,9 @@ public class Constants {
     public static final int CONTACTS_FAVOURITE = 0;
     public static final int CONTACTS_RECENT = 1;
     public static final int CONTACTS_ALL = 2;
+    public static final String CONTACTS_ACTION_CALL = "call";
+    public static final String CONTACTS_ACTION_SMS = "sms";
+    public static final String CONTACTS_ACTION_EMAIL = "email";
 
     //Contacts API and BD Fields
     public static final String CONTACT_DATA = "data";
@@ -42,7 +45,9 @@ public class Constants {
     public static final String CONTACT_LASTSEEN = "lastSeen";
     public static final String CONTACT_OFFICE_LOC = "officeLocation";
     public static final String CONTACT_PHONES = "phones";
+    public static final String CONTACT_PHONE = "phone";
     public static final String CONTACT_EMAILS = "emails";
+    public static final String CONTACT_EMAIL = "email";
     public static final String CONTACT_AVAILABILITY = "availability";
     public static final String CONTACT_PRESENCE = "presence";
     public static final String CONTACT_COUNTRY = "country";
@@ -59,6 +64,7 @@ public class Constants {
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
+    public static final String CONTACT_API_POST_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_FAVOURITE = "/api/me/favourites";
     public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
 

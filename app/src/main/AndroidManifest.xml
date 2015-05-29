@@ -123,7 +123,7 @@
             android:windowSoftInputMode="stateAlwaysVisible|adjustPan" >
         </activity>
         <activity
-            android:name=".chatlist.ChatListActivity"
+            android:name=".chatlist.view.ChatListActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity

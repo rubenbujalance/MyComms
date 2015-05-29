@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vodafone.mycomms.R;
+import model.ChatListItem;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;

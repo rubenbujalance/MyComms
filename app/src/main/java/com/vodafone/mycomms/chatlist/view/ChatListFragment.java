@@ -54,8 +54,8 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
        //TODO: GET CHAT LIST
        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
 
-       mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(),
-               mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+       mRecyclerView.addOnItemTouchListener(new ChatListRecyclerItemClickListener(getActivity(),
+               mRecyclerView, new ChatListRecyclerItemClickListener.OnItemClickListener() {
            @Override
            public void onItemClick(View view, int position) {
                Intent in = new Intent(getActivity(), ChatMainActivity.class);

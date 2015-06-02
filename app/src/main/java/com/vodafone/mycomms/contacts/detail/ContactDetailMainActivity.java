@@ -388,7 +388,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
+        if (realm!=null)
+            realm.close();
     }
 
     public void loadContactInfo(){
@@ -409,10 +410,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         controller.getContactDetail(contactId);
         return contact;
-    }
-
-    private void insertRecent(){
-
     }
 
     private String printContact(Contact contact){

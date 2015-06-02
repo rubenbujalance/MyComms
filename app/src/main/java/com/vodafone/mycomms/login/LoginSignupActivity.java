@@ -18,7 +18,7 @@ public class LoginSignupActivity extends Activity {
         setContentView(R.layout.login_signup_choose);
 
         Button btSignup = (Button)findViewById(R.id.btSignup);
-        btSignup.setOnClickListener(new View.OnClickListener() {
+            btSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(LoginSignupActivity.this, SignupTypeChooseActivity.class);

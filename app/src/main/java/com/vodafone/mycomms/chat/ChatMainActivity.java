@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.detail.RecentContactController;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -37,6 +38,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
+    private RecentContactController mRecentController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +140,9 @@ public class ChatMainActivity extends ToolbarActivity {
         _chat.setLastMessageTime(chatMsg.getTimestamp());
         _chat.setLastMessage(chatMsg.getText());
         _chat.setLastMessage_id(chatMsg.getId());
+        RecentContactController mRecentContactController = new RecentContactController(this,mRealm);
+        String action = Constants.CONTACTS_ACTION_SMS;
+        mRecentContactController.insertRecent(_chat.getContact_id(), action);
         chatTransactions.insertChat(_chat);
         chatTransactions.insertChatMessage(chatMsg);
 

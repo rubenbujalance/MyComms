@@ -352,7 +352,7 @@ public class RealmChatTransactions {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_STATUS_NOT_READ)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
                     .count();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getChatMessagesCount: ",e);

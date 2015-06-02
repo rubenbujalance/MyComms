@@ -68,6 +68,16 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         //Set text message
         chatHolder.chatTextView.setText(chatList.get(i).getText());
 
+        //Set text status
+        if(chatList.get(i).getStatus().compareTo("0")==0)
+            chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
+        else if(chatList.get(i).getStatus().compareTo("1")==0)
+            chatHolder.chatSentText.setText(mContext.getString(R.string.status_sent));
+        else if(chatList.get(i).getStatus().compareTo("2")==0)
+            chatHolder.chatSentText.setText(mContext.getString(R.string.status_delivered));
+        else if(chatList.get(i).getStatus().compareTo("3")==0)
+            chatHolder.chatSentText.setText(mContext.getString(R.string.status_read));
+
         //Set message time
         long currentTimestamp = chatList.get(i).getTimestamp();
         long previousTimestamp = 0;

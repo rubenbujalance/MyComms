@@ -24,11 +24,11 @@ public class ChatMessage extends RealmObject{
     private String text;
     private String resourceUri;
     private String read; //0-No; 1-Yes. It's string in case we need an index
-    private String delivered; //0-No; 1-Yes. It's string in case we need an index
+    private String status; //0-Not Sent; 1-Sent; 2-Delivered; 3-Read. It's string in case we need an index
 
     public ChatMessage() {}
 
-    public ChatMessage(String profile_id, String contact_id, long timestamp, String direction, int type, String text, String resourceUri, String read, String delivered)
+    public ChatMessage(String profile_id, String contact_id, long timestamp, String direction, int type, String text, String resourceUri, String read, String status)
     {
         this.setProfile_id(profile_id);
         this.setContact_id(contact_id);
@@ -38,7 +38,7 @@ public class ChatMessage extends RealmObject{
         this.setText(text);
         this.setResourceUri(resourceUri);
         this.setRead(read);
-        this.setDelivered(delivered);
+        this.setStatus(status);
 
         this.setId(profile_id + "_" + contact_id + "_" + timestamp);
     }
@@ -115,11 +115,11 @@ public class ChatMessage extends RealmObject{
         this.read = read;
     }
 
-    public String getDelivered() {
-        return delivered;
+    public String getStatus() {
+        return status;
     }
 
-    public void setDelivered(String delivered) {
-        this.delivered = delivered;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

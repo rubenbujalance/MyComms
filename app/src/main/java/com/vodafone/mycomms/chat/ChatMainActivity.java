@@ -3,9 +3,12 @@ package com.vodafone.mycomms.chat;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,12 +18,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -34,6 +39,10 @@ public class ChatMainActivity extends ToolbarActivity {
     private RecyclerView mRecyclerView;
     private ChatRecyclerViewAdapter mChatRecyclerViewAdapter;
     private EditText etChatTextBox;
+    private TextView tvSendChat;
+    private ImageView ivAvatarImage;
+    private TextView tvAvatarText;
+
 //    private String _chatText = "";
     private ArrayList<ChatMessage> _chatList = new ArrayList<>();
     private Chat _chat;
@@ -50,7 +59,6 @@ public class ChatMainActivity extends ToolbarActivity {
         setContentView(R.layout.activity_chat_main);
         activateToolbar();
         setToolbarBackground(R.drawable.toolbar_header);
-        setChatListeners(this);
 
         mRealm = Realm.getInstance(this);
         chatTransactions = new RealmChatTransactions(mRealm, this);
@@ -63,6 +71,9 @@ public class ChatMainActivity extends ToolbarActivity {
         refreshAdapter();
 
         etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
+        tvSendChat = (TextView) findViewById(R.id.chat_send);
+        ivAvatarImage = (ImageView) findViewById(R.id.companyLogo);
+        tvAvatarText = (TextView) findViewById(R.id.avatarText);
 
         //Load chat from db
         Intent in = getIntent();
@@ -87,6 +98,9 @@ public class ChatMainActivity extends ToolbarActivity {
         _profile_id = "mc_555a0792121ef1695cc7c1c3";
         _profile = contactTransactions.getContactById(_profile_id);
 
+        //Chat listeners
+        setChatListeners(this, _contact);
+
         //Load chat
         _chat = chatTransactions.getChatById(contact_id);
 
@@ -106,6 +120,33 @@ public class ChatMainActivity extends ToolbarActivity {
                 finish();
             }
         });
+
+        //Set avatar
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+_contact.getId()+".jpg");
+
+        if (_contact.getAvatar()!=null &&
+                _contact.getAvatar().length()>0 &&
+                _contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists()) {
+
+            tvAvatarText.setText(null);
+
+            Picasso.with(this)
+                    .load(avatarFile)
+                    .into(ivAvatarImage);
+
+        } else{
+            String initials = _contact.getFirstName().substring(0,1) +
+                    _contact.getLastName().substring(0,1);
+
+            ivAvatarImage.setImageResource(R.color.grey_middle);
+            tvAvatarText.setText(initials);
+        }
+
+        //Sent chat in grey by default
+        tvSendChat.setTextColor(Color.GRAY);
+        tvSendChat.setEnabled(false);
+
         /*Toolbar mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,24 +155,28 @@ public class ChatMainActivity extends ToolbarActivity {
             }
         });*/
 
-//        etChatTextBox.addTextChangedListener(new TextWatcher() {
-//
-//            @Override
-//            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-//                try {
-//                    _chatText = cs.toString();
-//                } catch (Exception e) {
-//                    Log.e(LOG_TAG, "onTextChanged error: " + e.toString());
-//                }
-//            }
-//            @Override
-//            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,int arg3) {}
-//            @Override
-//            public void afterTextChanged(Editable arg0) {}
-//        });
+        etChatTextBox.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                if(cs!=null && cs.length()>0)
+                {
+                    tvSendChat.setEnabled(true);
+                    tvSendChat.setTextColor(Color.parseColor("#02B1FF"));
+                }
+                else
+                {
+                    tvSendChat.setEnabled(false);
+                    tvSendChat.setTextColor(Color.GRAY);
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,int arg3) {}
+            @Override
+            public void afterTextChanged(Editable arg0) {}
+        });
 
-        TextView sendChat = (TextView) findViewById(R.id.chat_send);
-        sendChat.setOnClickListener(new View.OnClickListener() {
+        tvSendChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());

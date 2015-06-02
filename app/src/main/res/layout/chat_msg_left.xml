@@ -34,13 +34,13 @@
                 android:layout_toRightOf="@+id/layout_list_item_image"/>
 
             <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
-                android:layout_width="35dp"
-                android:layout_height = "35dp"
-                android:layout_marginRight="5dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_gravity="bottom"
-                android:layout_centerVertical="true" />
+            android:layout_width="35dp"
+            android:layout_height = "35dp"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="bottom"
+            android:layout_centerVertical="true" />
         </RelativeLayout>
         <TextView
             android:id="@+id/sent_text"

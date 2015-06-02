@@ -20,6 +20,8 @@ import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
+import model.Contact;
+
 public class ToolbarActivity extends ActionBarActivity {
 
     private Toolbar mToolbar;
@@ -150,12 +152,14 @@ public class ToolbarActivity extends ActionBarActivity {
         });
     }
 
-    protected void setChatListeners(final Context context) {
-        ImageView imageContact = (ImageView) findViewById(R.id.user_img);
+    protected void setChatListeners(final Context context, final Contact contact) {
+        ImageView imageContact = (ImageView) findViewById(R.id.companyLogo);
         imageContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(context, ContactDetailMainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                in.putExtra(Constants.CONTACT_ID, contact.getId());
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }

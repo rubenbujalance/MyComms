@@ -100,6 +100,10 @@
     <string name="no_internet_connection_is_available">No Internet connection is available</string>
     <string name="no_internet_connection">No Internet Connection</string>
     <string name="connection_error">Connection error</string>
+    <string name="status_not_sent">Not sent</string>
+    <string name="status_sent">Sent</string>
+    <string name="status_delivered">Delivered</string>
+    <string name="status_read">Read</string>
 
     <string name="pref_file_tokens">com.vodafone.mycomms.PREF_FILE_TOKENS</string>
 

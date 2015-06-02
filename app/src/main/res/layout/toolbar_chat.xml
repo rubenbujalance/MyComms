@@ -8,36 +8,38 @@
     mycomms:contentInsetStart="0dp"
     android:gravity="top"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
-    <ImageButton
-        android:id="@+id/back_button"
-        android:layout_marginLeft="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_back_white"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp" >
-        <ImageView
-            android:id="@+id/user_img"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/cartoon_round_contact_image_example" />
+        android:layout_marginBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_back_white"
+            android:layout_centerVertical="true" />
+        <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
+            android:layout_width="60dp"
+            android:layout_height = "60dp"
+            android:layout_centerInParent="true" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_centerVertical="true"
-            android:background="@android:color/transparent"
-            android:layout_toRightOf="@+id/user_img"
-            android:layout_toEndOf="@+id/user_img"
+            android:layout_toRightOf="@+id/layout_list_item_image"
+            android:layout_toEndOf="@+id/layout_list_item_image"
             android:visibility="gone">
             <TextView
                 android:id="@+id/usr_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:text="Jack Sheppard"
                 android:visibility="gone"
                 android:textStyle="bold"
@@ -47,7 +49,6 @@
                 android:id="@+id/usr_last_login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:visibility="gone"
                 android:text="Seen long time ago"
                 android:textSize="11sp"

@@ -84,7 +84,7 @@ public class Constants {
     public static final String CHAT_MESSAGE_FIELD_TEXT = "text";
     public static final String CHAT_MESSAGE_FIELD_RESOURCE_URI = "resourceUri";
     public static final String CHAT_MESSAGE_FIELD_READ = "read";
-    public static final String CHAT_MESSAGE_FIELD_DELIVERED = "delivered";
+    public static final String CHAT_MESSAGE_FIELD_STATUS = "status";
     public static final String CHAT_FIELD_ID = "id";
     public static final String CHAT_FIELD_PROFILE_ID = "profile_id";
     public static final String CHAT_FIELD_CONTACT_ID = "contact_id";
@@ -95,8 +95,10 @@ public class Constants {
     public static final int CHAT_MESSAGE_TYPE_PICTURE = 1;
     public static final String CHAT_MESSAGE_DIRECTION_SENT = "0";
     public static final String CHAT_MESSAGE_DIRECTION_RECEIVED = "1";
-    public static final String CHAT_MESSAGE_STATUS_READ = "1";
-    public static final String CHAT_MESSAGE_STATUS_NOT_READ = "0";
-    public static final String CHAT_MESSAGE_STATUS_DELIVERED = "1";
-    public static final String CHAT_MESSAGE_STATUS_NOT_DELIVERED = "0";
+    public static final String CHAT_MESSAGE_STATUS_NOT_SENT = "0";
+    public static final String CHAT_MESSAGE_STATUS_SENT = "1";
+    public static final String CHAT_MESSAGE_STATUS_DELIVERED = "2";
+    public static final String CHAT_MESSAGE_STATUS_READ = "3";
+    public static final String CHAT_MESSAGE_NOT_READ = "0";
+    public static final String CHAT_MESSAGE_READ = "1";
 }

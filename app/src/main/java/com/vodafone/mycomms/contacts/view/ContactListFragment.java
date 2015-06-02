@@ -200,7 +200,7 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
                             Utils.launchSms(phone, getActivity());
                         }*/
                         in = new Intent(getActivity(), ChatMainActivity.class);
-                        in.putExtra(Constants.CHAT_CONTACT_ID, recentContactList.get(position).getId());
+                        in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getId());
                         startActivity(in);
                     }
                     else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {

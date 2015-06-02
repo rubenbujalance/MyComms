@@ -11,14 +11,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
+import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import model.Chat;
 import model.ChatListItem;
 
 public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
@@ -28,6 +30,8 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     private RecyclerView mRecyclerView;
     private ChatListRecyclerViewAdapter mChatRecyclerViewAdapter;
+    private Realm mRealm;
+    private RealmChatTransactions mChatTransactions;
 
     public static ChatListFragment newInstance(int index, String param2) {
         Log.d(Constants.TAG, "ContactListFragment.newInstance: " + index);
@@ -44,7 +48,9 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
        mRecyclerView.setLayoutManager(layoutManager);
 
-       mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), loadFakeData());
+       ArrayList<Chat> chatList = new ArrayList<>();
+       chatList = mChatTransactions.getAllChats();
+       mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), chatList);
        //TODO: GET CHAT LIST
        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
 
@@ -52,10 +58,8 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
                mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
            @Override
            public void onItemClick(View view, int position) {
-               Toast.makeText(getActivity(), "Sender Id: " + mChatRecyclerViewAdapter.getChatListItem(position).getChatSenderId(), Toast.LENGTH_SHORT).show();
-
                Intent in = new Intent(getActivity(), ChatMainActivity.class);
-               in.putExtra(Constants.CHAT_CONTACT_ID, mChatRecyclerViewAdapter.getChatListItem(position).getChatSenderId());
+               in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, mChatRecyclerViewAdapter.getChat(position).getContact_id());
                startActivity(in);
 
            }
@@ -68,6 +72,8 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
+        mRealm = Realm.getInstance(getActivity());
+        mChatTransactions = new RealmChatTransactions(mRealm, getActivity());
     }
 
     private ArrayList<ChatListItem> loadFakeData() {
@@ -88,6 +94,12 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onRefresh() {
         handler.postDelayed(testIsGood, 5000);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mRealm.close();
     }
 
     public Runnable testIsGood = new Runnable() {

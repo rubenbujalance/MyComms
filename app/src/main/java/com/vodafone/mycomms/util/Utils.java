@@ -59,7 +59,7 @@ public final class Utils {
         builder.show();
     }
 
-    public static String getTimeFromMillis(int millis){
+    public static String getTimeFromMillis(long millis){
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
         SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");

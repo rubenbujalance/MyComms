@@ -13,12 +13,15 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
+import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import io.realm.Realm;
 import model.Chat;
@@ -134,6 +137,9 @@ public class ChatMainActivity extends ToolbarActivity {
                 _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
                 Constants.CHAT_MESSAGE_TYPE_TEXT, etChatTextBox.getText().toString(), "");
 
+        _chat.setLastMessageTime(chatMsg.getTimestamp());
+        _chat.setLastMessage(chatMsg.getText());
+        _chat.setLastMessage_id(chatMsg.getId());
         chatTransactions.insertChat(_chat);
         chatTransactions.insertChatMessage(chatMsg);
 
@@ -152,6 +158,10 @@ public class ChatMainActivity extends ToolbarActivity {
     {
         mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+    }
+
+    private void newChatListItem() {
+        //Insert _chat;
     }
 
     @Override

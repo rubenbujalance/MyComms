@@ -89,6 +89,7 @@ public class Constants {
     public static final String CHAT_FIELD_PROFILE_ID = "profile_id";
     public static final String CHAT_FIELD_CONTACT_ID = "contact_id";
     public static final String CHAT_FIELD_LAST_MESSAGE_ID = "lastMessage_id";
+    public static final String CHAT_FIELD_LAST_MESSAGE_TIME = "lastMessageTime";
 
     //Chat constants
     public static final int CHAT_MESSAGE_TYPE_TEXT = 0;

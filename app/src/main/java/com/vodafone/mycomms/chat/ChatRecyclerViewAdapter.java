@@ -20,19 +20,17 @@ import model.ChatMessage;
 
 public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
-    private String LOG_TAG = ChatRecyclerViewAdapter.class.getSimpleName();
     private ArrayList<ChatMessage> chatList = new ArrayList<>();
     private Context mContext;
 
     public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem) {
         mContext = context;
-        /*fakeDataLoad();
         if (chatListItem != null) {
             for (int i=0;i<chatListItem.size();i++){
                 chatList.add(chatListItem.get(i));
             }
-        }*/
-        Realm realm = Realm.getInstance(mContext);
+        }
+        /*Realm realm = Realm.getInstance(mContext);
         RealmQuery<ChatMessage> query = realm.where(ChatMessage.class);
 
         // Execute the query:
@@ -41,7 +39,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
             for (ChatMessage chatListItems : result1) {
                 chatList.add(chatListItems);
             }
-        }
+        }*/
     }
 
     @Override

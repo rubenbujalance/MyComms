@@ -9,25 +9,26 @@ import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import model.ChatListItem;
+import model.Chat;
 
 public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHolder>{
 
-    private ArrayList<ChatListItem> mChatListItem = new ArrayList<>();
+    private ArrayList<Chat> mChat = new ArrayList<>();
     private Context mContext;
 
-    public ChatListRecyclerViewAdapter(Context context, ArrayList<ChatListItem> chatListItem) {
+    public ChatListRecyclerViewAdapter(Context context, ArrayList<Chat> Chat) {
         mContext = context;
-        mChatListItem = chatListItem;
+        mChat = Chat;
     }
 
     @Override
     public int getItemCount() {
-        return mChatListItem.size();
+        return mChat.size();
     }
 
     @Override
@@ -39,16 +40,16 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
     @Override
     public void onBindViewHolder(ChatListHolder chatListHolder, int i) {
-        chatListHolder.textViewName.setText(mChatListItem.get(i).getChatSenderName());
-        chatListHolder.textViewMessage.setText(mChatListItem.get(i).getLastMessage());
-        chatListHolder.textViewTime.setText(mChatListItem.get(i).getLastMessageTime());
+        chatListHolder.textViewName.setText(mChat.get(i).getContactName() + " " + mChat.get(i).getContactSurname());
+        chatListHolder.textViewMessage.setText(mChat.get(i).getLastMessage());
+        chatListHolder.textViewTime.setText(Utils.getTimeFromMillis(mChat.get(i).getLastMessageTime()));
 
         //Image avatar
-        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+mChatListItem.get(i).getChatSenderId()+".jpg");
+        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+mChat.get(i).getContact_id()+".jpg");
 
-        if (mChatListItem.get(i).getChatSenderId()!=null &&
-                mChatListItem.get(i).getChatSenderId().length()>0 &&
-                mChatListItem.get(i).getChatSenderId().compareTo("")!=0 &&
+        if (mChat.get(i).getContact_id()!=null &&
+                mChat.get(i).getContact_id().length()>0 &&
+                mChat.get(i).getContact_id().compareTo("")!=0 &&
                 avatarFile.exists()) {
 
             chatListHolder.textAvatar.setText(null);
@@ -58,15 +59,15 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                     .into(chatListHolder.imageAvatar);
 
         } else{
-            String initials = mChatListItem.get(i).getChatSenderName().substring(0,1);
-                    //+ contact.getLastName().substring(0,1);
+            String initials = mChat.get(i).getContactName().substring(0,1)
+                    + mChat.get(i).getContactSurname().substring(0,1);
 
             chatListHolder.imageAvatar.setImageResource(R.color.grey_middle);
             chatListHolder.textAvatar.setText(initials);
         }
     }
-    public ChatListItem getChatListItem(int position) {
-        return (null != mChatListItem ? mChatListItem.get(position) : null);
+    public Chat getChat(int position) {
+        return (null != mChat ? mChat.get(position) : null);
     }
 
 }

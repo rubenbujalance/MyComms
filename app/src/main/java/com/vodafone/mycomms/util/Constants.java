@@ -18,6 +18,7 @@ public class Constants {
     public static final int ACCOUNTS = 1;
     public static final int MY_PROFILE = 1;
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
+    public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
 
     //Footer Constants
     public static final int TOOLBAR_CONTACTS = 0;

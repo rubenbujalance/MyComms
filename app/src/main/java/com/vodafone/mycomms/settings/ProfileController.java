@@ -1,5 +1,8 @@
 package com.vodafone.mycomms.settings;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
@@ -14,6 +17,7 @@ import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.settings.connection.ProfileConnection;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UserSecurity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,14 +33,27 @@ public class ProfileController extends BaseController {
         super(fragment);
     }
 
+    public ProfileController(Activity activity) {
+        super(activity);
+    }
+
     public void getProfile(){
         Log.d(Constants.TAG, "ProfileController.getProfile: ");
         if(profileConnection != null){
             profileConnection.cancel();
         }
-
         profileConnection = new ProfileConnection(getContext(), this);
         profileConnection.request();
+    }
+
+    public void setProfileId(String profileId){
+        Log.i(Constants.TAG, "ProfileController.setProfileId: ");
+        SharedPreferences sp = getContext().getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.PROFILE_ID_SHARED_PREF, profileId);
+        editor.putString(Constants.ACCESS_TOKEN_SHARED_PREF, UserSecurity.getAccessToken(getContext()));
+        editor.apply();
     }
 
     @Override

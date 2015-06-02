@@ -42,7 +42,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     public void onBindViewHolder(ChatListHolder chatListHolder, int i) {
         chatListHolder.textViewName.setText(mChat.get(i).getContactName() + " " + mChat.get(i).getContactSurname());
         chatListHolder.textViewMessage.setText(mChat.get(i).getLastMessage());
-        chatListHolder.textViewTime.setText(Utils.getTimeFromMillis(mChat.get(i).getLastMessageTime()));
+        String timeDifference = Utils.getStringChatTimeDifference(mChat.get(i).getLastMessageTime());
+        chatListHolder.textViewTime.setText(timeDifference);
 
         //Image avatar
         File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+mChat.get(i).getContact_id()+".jpg");

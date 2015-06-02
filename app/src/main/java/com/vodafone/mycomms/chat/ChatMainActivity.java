@@ -13,7 +13,6 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -21,7 +20,6 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import io.realm.Realm;
 import model.Chat;

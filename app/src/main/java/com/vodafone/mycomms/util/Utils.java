@@ -22,8 +22,11 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by str_rbm on 16/04/2015.
@@ -63,6 +66,14 @@ public final class Utils {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
         SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+        return formatter.format(calendar.getTime());
+
+    }
+
+    public static String getDateFromMillis(long millis){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yy");
         return formatter.format(calendar.getTime());
 
     }
@@ -160,6 +171,33 @@ public final class Utils {
         context.startActivity(sendIntent);
     }
 
+    public static String dayStringFormat(long msecs) {
+        GregorianCalendar cal = new GregorianCalendar();
+
+        cal.setTime(new Date(msecs));
+
+        int dow = cal.get(Calendar.DAY_OF_WEEK);
+
+        switch (dow) {
+            case Calendar.MONDAY:
+                return "Monday";
+            case Calendar.TUESDAY:
+                return "Tuesday";
+            case Calendar.WEDNESDAY:
+                return "Wednesday";
+            case Calendar.THURSDAY:
+                return "Thursday";
+            case Calendar.FRIDAY:
+                return "Friday";
+            case Calendar.SATURDAY:
+                return "Saturday";
+            case Calendar.SUNDAY:
+                return "Sunday";
+        }
+
+        return "Unknown";
+    }
+
     public static String getStringTimeDifference(int millis){
         long timeDiffMilis = millis;
         long minutes = timeDiffMilis / 60000;
@@ -171,5 +209,20 @@ public final class Utils {
         else if(minutes >=1) difference = minutes + " min";
 
         return difference;
+    }
+
+    public static String getStringChatTimeDifference(long millis){
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        long days = TimeUnit.MILLISECONDS.toDays(millis);
+        long currentTime = System.currentTimeMillis();
+        long currentHours = TimeUnit.MILLISECONDS.toHours(currentTime);
+        long currentDays = TimeUnit.MILLISECONDS.toDays(currentTime);
+        if( (currentHours-hours) < 24){
+            return getTimeFromMillis(millis);
+        } else if ( (currentDays - days) <= 7){
+            return dayStringFormat(millis);
+        } else{
+            return getDateFromMillis(millis);
+        }
     }
 }

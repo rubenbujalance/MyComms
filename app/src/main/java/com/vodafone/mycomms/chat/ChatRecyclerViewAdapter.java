@@ -6,16 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
-import model.ChatListItem;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
 import model.ChatMessage;
+import model.Contact;
 
 
 public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
@@ -23,22 +23,16 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     private String LOG_TAG = ChatRecyclerViewAdapter.class.getSimpleName();
     private ArrayList<ChatMessage> chatList = new ArrayList<>();
     private Context mContext;
+    private Contact _contact;
+    private Contact _profile;
 
-    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem) {
+    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem, Contact profile, Contact contact) {
         mContext = context;
-        /*fakeDataLoad();
-        if (chatListItem != null) {
-            for (int i=0;i<chatListItem.size();i++){
-                chatList.add(chatListItem.get(i));
-            }
-        }*/
-        Realm realm = Realm.getInstance(mContext);
-        RealmQuery<ChatMessage> query = realm.where(ChatMessage.class);
+        this._contact = contact;
+        this._profile = profile;
 
-        // Execute the query:
-        RealmResults<ChatMessage> result1 = query.findAll();
-        if (result1!=null){
-            for (ChatMessage chatListItems : result1) {
+        if (chatListItem!=null){
+            for (ChatMessage chatListItems : chatListItem) {
                 chatList.add(chatListItems);
             }
         }
@@ -70,16 +64,55 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     @Override
     public void onBindViewHolder(ChatHolder chatHolder, int i) {
-        chatHolder.chatTextView.setText(chatList.get(i).getText());
-        chatHolder.chatSentTime.setVisibility(View.VISIBLE);
 
-//        //Fake data show
-//        if (i==3 || i==9 || i==15 || i==17){
-//            chatHolder.chatSentTime.setVisibility(View.VISIBLE);
-//        }
-//        if (i==chatList.size()-1){
-//            chatHolder.chatSentText.setVisibility(View.VISIBLE);
-//        }
+        //Set text message
+        chatHolder.chatTextView.setText(chatList.get(i).getText());
+
+        //Set message time
+        long currentTimestamp = chatList.get(i).getTimestamp();
+        long previousTimestamp = 0;
+        if(i>0) previousTimestamp = chatList.get(i-1).getTimestamp();
+
+        long thirtyMinutesDiff = 30 * 60 * 1000;
+
+        if(currentTimestamp - previousTimestamp > thirtyMinutesDiff ||
+            previousTimestamp == 0)
+        {
+            chatHolder.chatSentTime.setVisibility(View.VISIBLE);
+            chatHolder.chatSentTime.setText(Utils.getStringChatTimeDifference(currentTimestamp));
+        }
+        else
+        {
+            chatHolder.chatSentTime.setVisibility(View.GONE);
+        }
+
+        //Set message avatar
+        Contact contact;
+
+        if(chatHolder.getItemViewType() == Constants.LEFT_CHAT)
+            contact = _contact;
+        else contact = _profile;
+
+        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0 &&
+                contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists()) {
+
+            chatHolder.chatAvatarText.setText(null);
+
+            Picasso.with(mContext)
+                    .load(avatarFile)
+                    .into(chatHolder.chatAvatarImage);
+
+        } else{
+            String initials = contact.getFirstName().substring(0,1) +
+                    contact.getLastName().substring(0,1);
+
+            chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
+            chatHolder.chatAvatarText.setText(initials);
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.vodafone.mycomms.chat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import model.Chat;
 import model.ChatMessage;
+import model.Contact;
 
 public class ChatMainActivity extends ToolbarActivity {
 
@@ -34,9 +37,12 @@ public class ChatMainActivity extends ToolbarActivity {
 //    private String _chatText = "";
     private ArrayList<ChatMessage> _chatList = new ArrayList<>();
     private Chat _chat;
+    private Contact _contact;
+    private Contact _profile;
 
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
+    private RealmContactTransactions contactTransactions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +54,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
         mRealm = Realm.getInstance(this);
         chatTransactions = new RealmChatTransactions(mRealm, this);
+        contactTransactions = new RealmContactTransactions(mRealm);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -61,11 +68,26 @@ public class ChatMainActivity extends ToolbarActivity {
         Intent in = getIntent();
         String contact_id = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
 
-        //TODO RBM - Remove after testing
-//        contact_id = "mc_554b20fc80eb511a3c1d1262";
-
         if(contact_id==null || contact_id.length()==0) finish(); //Prevent from errors
 
+        //Contact and profile
+        _contact = contactTransactions.getContactById(contact_id);
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        if(sp==null)
+        {
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
+            finish();
+        }
+
+        String _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        //TODO RBM - Remove after testing
+        _profile_id = "mc_555a0792121ef1695cc7c1c3";
+        _profile = contactTransactions.getContactById(_profile_id);
+
+        //Load chat
         _chat = chatTransactions.getChatById(contact_id);
 
         //If there was no chat, create a new one, but not saved in db yet
@@ -151,7 +173,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
     private void refreshAdapter()
     {
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList);
+        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList, _profile, _contact);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 

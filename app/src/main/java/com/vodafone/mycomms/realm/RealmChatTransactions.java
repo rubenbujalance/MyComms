@@ -35,7 +35,7 @@ public class RealmChatTransactions {
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
         //TODO RBM - Remove after testing
-//        _profile_id = "mc_555a0792121ef1695cc7c1c3";
+        _profile_id = "mc_555a0792121ef1695cc7c1c3";
     }
 
     /*

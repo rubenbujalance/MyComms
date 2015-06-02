@@ -60,6 +60,9 @@ public class Constants {
     public static final String CONTACT_PAGINATION_OFFSET = "offset";
     public static final String CONTACT_PAGINATION_PAGESIZE = "pageSize";
 
+    public static final String PROFILE_SETTINGS = "settings";
+    public static final String PROFILE_PLATFORMS = "platforms";
+
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";

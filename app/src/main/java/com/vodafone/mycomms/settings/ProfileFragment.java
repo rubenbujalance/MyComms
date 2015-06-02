@@ -12,10 +12,14 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
+
+import model.UserProfile;
 
 /**
  * A fragment representing a list of Items.
@@ -24,7 +28,7 @@ import com.vodafone.mycomms.view.tab.SlidingTabLayout;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ProfileFragment extends Fragment{
+public class ProfileFragment extends Fragment implements IProfileConnectionCallback{
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
@@ -41,6 +45,7 @@ public class ProfileFragment extends Fragment{
     private boolean enabled = false;
 
     private OnFragmentInteractionListener mListener;
+    private ProfileController profileController;
 
     // TODO: Rename and change types of parameters
     public static ProfileFragment newInstance(int index, String param2) {
@@ -150,6 +155,11 @@ public class ProfileFragment extends Fragment{
         }else{
             Log.i(Constants.TAG, "ProfileFragment.onCreate: " + mIndex);
         }
+
+        profileController = new ProfileController(this);
+        profileController.setConnectionCallback(this);
+        profileController.getProfile();
+
     }
 
     @Override
@@ -167,6 +177,42 @@ public class ProfileFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onProfileReceived(UserProfile userProfile) {
+        Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
+
+        EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
+        profileName.setText(userProfile.getFirstName());
+        EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
+        profileSurname.setText(userProfile.getLastName());
+        EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
+        profilePhoneNumber.setText(userProfile.getPhones());
+        EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
+        profileEmail.setText(userProfile.getEmails());
+        EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
+        profileCompany.setText(userProfile.getCompany());
+        EditText profilePosition = (EditText) getActivity().findViewById(R.id.contact_position);
+        profilePosition.setText(userProfile.getPosition());
+        EditText profileDepartment = (EditText) getActivity().findViewById(R.id.department);
+        profileDepartment.setText("????????");
+        EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.office_location);
+        profileOfficeLocation.setText(userProfile.getOfficeLocation());
+        EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
+        profileInfo.setText("????????");
+
+    }
+
+    @Override
+    public void onProfileConnectionError() {
+        Log.d(Constants.TAG, "ProfileFragment.onProfileConnectionError: ");
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.w(Constants.TAG, "ProfileFragment.onConnectionNotAvailable: ");
+        Toast.makeText(getActivity().getApplicationContext(), "Connection not available" ,Toast.LENGTH_LONG);
     }
 
     /**

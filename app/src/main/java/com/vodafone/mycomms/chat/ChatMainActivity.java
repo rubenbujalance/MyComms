@@ -24,11 +24,11 @@ import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback
 import com.vodafone.mycomms.contacts.detail.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshChatListEvent;
-import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -211,9 +211,14 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
     private void sendText()
     {
+        String msg = etChatTextBox.getText().toString();
+        if(!XMPPTransactions.sendText(_contact.getId(), msg))
+            return;
+
+        //Save to DB
         ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
                 _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                Constants.CHAT_MESSAGE_TYPE_TEXT, etChatTextBox.getText().toString(), "");
+                Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
 
         _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
 

@@ -100,7 +100,6 @@ public class ContactController extends BaseController {
         boolean morePages = false;
         Log.i(Constants.TAG, "ContactController.onConnectionComplete: init: " + apiCall + ", url=" + response.getUrl());
         String result = response.getData().toString();
-        Log.i(Constants.TAG, "ContactController.onConnectionComplete: " + result);
         JSONObject jsonResponse;
         if (apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)){
             search = Constants.CONTACTS_FAVOURITE;
@@ -122,7 +121,6 @@ public class ContactController extends BaseController {
                             search = Constants.CONTACTS_RECENT;
                             offsetPaging = 0;
                         }
-                        Log.i(Constants.TAG, "ContactController.onConnectionComplete: jsonResponse: " + jsonResponse.toString());
                         ArrayList<Contact> realmContactList = new ArrayList<>();
                         realmContactList = insertContactListInRealm(jsonResponse);
                         if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +55,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private TextView tvEmail;
     private TextView tvOfficeLocation;
     private CircleImageView ivAvatar;
+    private int imageStarOn;
+    private int imageStarOff;
 
     //Buttons
     private ImageView btSms;
@@ -63,6 +66,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ImageView btEmailBar;
     private ImageView btChatBar;
     private ImageView btCallBar;
+    private ImageView btFavourite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +94,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
+        imageStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+        imageStarOff = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
 
         //Buttons
         btSms = (ImageView)findViewById(R.id.bt_sms);
@@ -99,6 +105,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         btChatBar = (ImageView)findViewById(R.id.btchat);
         btEmailBar = (ImageView)findViewById(R.id.btemail);
         btCallBar = (ImageView)findViewById(R.id.btcall);
+        btFavourite = (ImageView)findViewById(R.id.btFavourite);
 
         btCall.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -208,6 +215,27 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
                 startActivity(in);
+            }
+        });
+
+        btFavourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this,realm);
+                favouriteController.manageFavourite(contactId);
+
+                if(btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
+                    Drawable imageStar = getResources().getDrawable(imageStarOn);
+                    btFavourite.setImageDrawable(imageStar);
+                    btFavourite.setTag("abc_btn_rating_star_on_mtrl_alpha.png");
+                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png"){
+                    Drawable imageStar = getResources().getDrawable(imageStarOff);
+                    btFavourite.setImageDrawable(imageStar);
+                    btFavourite.setTag("abc_btn_rating_star_off_mtrl_alpha.png");
+                }
+
+                Log.e(Constants.TAG, "TAG: "+btFavourite.getTag());
+
             }
         });
 

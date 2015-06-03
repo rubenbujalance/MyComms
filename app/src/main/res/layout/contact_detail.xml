@@ -41,6 +41,21 @@
                     android:src="@drawable/btn_back_white"
                     android:focusable="false" />
 
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/btFavourite"
+                        android:tag="abc_btn_rating_star_off_mtrl_alpha.png"
+                        android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+                        android:layout_marginTop="40dp"
+                        android:layout_marginLeft="60dp"
+                        android:clickable="true" />
+                </RelativeLayout>
+
                 <com.vodafone.mycomms.custom.CircleImageView
                     android:layout_width="120dp"
                     android:layout_height="120dp"
@@ -319,78 +334,6 @@
 
                 </RelativeLayout>
 
-                <!--<LinearLayout-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@drawable/roundborder"-->
-                    <!--style="@style/ProfileBox"-->
-                    <!--android:orientation="vertical"-->
-                    <!--android:layout_marginLeft="15dp"-->
-                    <!--android:layout_marginRight="15dp"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:layout_marginBottom="5dp">-->
-                    <!--<TextView-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--style="@style/TextViewProfile"-->
-                        <!--android:text="Company"-->
-                        <!--android:id="@+id/company_label"-->
-                        <!--/>-->
-                    <!--<EditText-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--style="@style/EditViewProfile"-->
-                        <!--android:hint="Company name"-->
-                        <!--android:id="@+id/contact_company"-->
-                        <!--android:text="MyComms Corp." />-->
-                <!--</LinearLayout>-->
-
-                <!--<LinearLayout-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:layout_marginLeft="15dp"-->
-                    <!--android:layout_marginRight="15dp"-->
-                    <!--android:layout_marginBottom="5dp"-->
-                    <!--android:background="@drawable/roundborder"-->
-                    <!--style="@style/ProfileBox"-->
-                    <!--android:orientation="vertical">-->
-                    <!--<TextView-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--style="@style/TextViewProfile"-->
-                        <!--android:text="Position"/>-->
-                    <!--<EditText-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--style="@style/EditViewProfile"-->
-                        <!--android:hint="Position"-->
-                        <!--android:id="@+id/contact_position"/>-->
-                <!--</LinearLayout>-->
-
-                <!--<LinearLayout-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:layout_marginLeft="15dp"-->
-                    <!--android:layout_marginRight="15dp"-->
-                    <!--android:layout_marginBottom="5dp"-->
-                    <!--android:background="@drawable/roundborder"-->
-                    <!--style="@style/ProfileBox"-->
-                    <!--android:orientation="vertical">-->
-                    <!--<TextView-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--style="@style/TextViewProfile"-->
-                        <!--android:text="Department"/>-->
-                    <!--<EditText-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--style="@style/EditViewProfile"-->
-                        <!--android:hint="Department"-->
-                        <!--android:id="@+id/contact_department"/>-->
-                <!--</LinearLayout>-->
-
                 <LinearLayout
                     android:id="@+id/office_location_layout"
                     android:layout_width="match_parent"
@@ -417,33 +360,6 @@
                         android:textSize="14dp" />
                 </LinearLayout>
 
-                <!--<LinearLayout-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:layout_marginLeft="15dp"-->
-                    <!--android:layout_marginRight="15dp"-->
-                    <!--android:layout_marginBottom="5dp"-->
-                    <!--android:background="@drawable/roundborder"-->
-                    <!--style="@style/ProfileBox"-->
-                    <!--android:orientation="vertical"-->
-                    <!--android:id="@+id/contact_additional_info_box"-->
-                    <!-->-->
-                    <!--<TextView-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--style="@style/TextViewProfile"-->
-                        <!--android:text="Additional Information"-->
-                        <!--android:id="@+id/contact_additional_info_label"-->
-                        <!--/>-->
-                    <!--<EditText-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--style="@style/EditViewProfile"-->
-                        <!--android:hint="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus volutpat ante sit amet ligula porttitor, a rhoncus tortor accumsan."-->
-                        <!--android:lines="3"-->
-                        <!--android:id="@+id/contact_additional_info"/>-->
-                <!--</LinearLayout>-->
     </LinearLayout>
         </LinearLayout>
     </ScrollView>

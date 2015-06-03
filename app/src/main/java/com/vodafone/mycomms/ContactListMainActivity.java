@@ -108,9 +108,10 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
         if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
             profileController = new ProfileController(this);
-            profileController.getProfile();
             profileController.setConnectionCallback(this);
+            profileController.getProfile();
         }
+
         String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         Log.i(Constants.TAG, "ContactListMainActivity.validateAccessToken: profileId: " + profileId);
     }
@@ -134,6 +135,16 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     @Override
     public void onProfileConnectionError() {
         Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: error");
+    }
+
+    @Override
+    public void onUpdateProfileConnectionError() {
+
+    }
+
+    @Override
+    public void onUpdateProfileConnectionCompleted() {
+
     }
 
     @Override

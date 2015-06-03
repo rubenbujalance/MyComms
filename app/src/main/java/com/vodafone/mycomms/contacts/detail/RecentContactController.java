@@ -16,6 +16,7 @@ import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.HashMap;
 
 import io.realm.Realm;
@@ -37,10 +38,9 @@ public class RecentContactController extends BaseController {
         Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
         JSONObject json = null;
         HashMap body = new HashMap<>();
-        RecentContactController recentContactController;
         int method = HttpConnection.POST;
         String apiCall = Constants.CONTACT_API_POST_RECENTS;
-        long timestamp = System.currentTimeMillis();
+        long timestamp = Calendar.getInstance().getTimeInMillis();
         body.put(Constants.CONTACT_ID, contactId);
         body.put(Constants.CONTACT_RECENTS_ACTION, action);
         body.put(Constants.CONTACT_RECENTS_ACTION_TIME, timestamp);
@@ -54,12 +54,10 @@ public class RecentContactController extends BaseController {
     public void onConnectionComplete(ConnectionResponse response) {
         Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: ");
         super.onConnectionComplete(response);
-        String result = response.getData().toString();
-        Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: " + result);
         String apiCall = Constants.CONTACT_API_GET_RECENTS;
         ContactController contactController = new ContactController(getActivity(), mRealm);
         contactController.getRecentList(apiCall);
         //Refresh Recent List
-        BusProvider.getInstance().post(new SetContactListAdapterEvent());
+        //BusProvider.getInstance().post(new SetContactListAdapterEvent());
     }
 }

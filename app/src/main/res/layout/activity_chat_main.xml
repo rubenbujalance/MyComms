@@ -4,7 +4,7 @@
     android:background="@drawable/istanbul_bg_blur">
 
     <include android:id="@+id/app_bar" layout="@layout/toolbar_chat"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="60dp" />
 
     <!--Empty ScrollView needed so the recyclerview doesn't hide the toolbar_chat-->
@@ -22,7 +22,8 @@
         android:layout_height="match_parent"
         class="android.support.v7.widget.RecyclerView"
         android:layout_above="@+id/message_layout"
-        android:background="@color/white"/>
+        android:background="@color/white"
+        android:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/message_layout"

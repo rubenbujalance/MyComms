@@ -86,7 +86,6 @@ public class SplashScreenActivity extends Activity {
     private void callBackVersionCheck(final String result)
     {
         try {
-            //if(result == null) { //TODO - Remove before pushing to Git
             if(result != null) {
         /*
          * New version detected! Show an alert and start the update...
@@ -209,17 +208,6 @@ public class SplashScreenActivity extends Activity {
         }
     }
 
-    private class RenewTokenAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
-        @Override
-        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
-            return APIWrapper.httpPostAPI("/auth/renew", params[0], params[1], SplashScreenActivity.this);
-        }
-        @Override
-        protected void onPostExecute(HashMap<String,Object> result) {
-            callBackRenewToken(result);
-        }
-    }
-
     private boolean isDownloadManagerAvailable() {
         try {
             Intent intent = new Intent(Intent.ACTION_MAIN);
@@ -265,5 +253,17 @@ public class SplashScreenActivity extends Activity {
 
         builder.create();
         builder.show();
+    }
+
+    //Async Tasks
+    private class RenewTokenAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+        @Override
+        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
+            return APIWrapper.httpPostAPI("/auth/renew", params[0], params[1], SplashScreenActivity.this);
+        }
+        @Override
+        protected void onPostExecute(HashMap<String,Object> result) {
+            callBackRenewToken(result);
+        }
     }
 }

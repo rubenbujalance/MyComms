@@ -12,7 +12,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
 import com.vodafone.mycomms.events.BusProvider;
@@ -54,6 +56,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mContactController.getContactList(apiCall);
         mContactController.setConnectionCallback(this);
         BusProvider.getInstance().register(this);
+        //((ContactListMainActivity)getActivity()).activateContactListToolbar();
     }
 
     @Override

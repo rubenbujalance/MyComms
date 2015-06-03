@@ -33,20 +33,24 @@ android {
     compileSdkVersion 21
     buildToolsVersion '21.1.2'
 
-    defaultConfig {
-        applicationId "com.vodafone.mycomms"
-        minSdkVersion 15
-        targetSdkVersion 21
-        versionCode version_Code
-        versionName "0.1"
-        signingConfig signingConfigs.release
-    }
+       defaultConfig {
+           applicationId "com.vodafone.mycomms"
+           minSdkVersion 15
+           targetSdkVersion 21
+           versionCode version_Code
+           versionName "0.1"
+           signingConfig signingConfigs.release
+       }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
+            testCoverageEnabled = true
         }
     }
 
@@ -55,21 +59,30 @@ android {
             applicationId "com.vodafone.mycomms.i"
             resValue "string", "app_name", "MyComms-i"
             resValue "string", "app_scheme", "mycomms-i"
+            resValue "string", "xmpp_host", "int-msg.mycomms.com"
         }
         q {
             applicationId "com.vodafone.mycomms.q"
             resValue "string", "app_name", "MyComms-q"
             resValue "string", "app_scheme", "mycomms-qa"
+            resValue "string", "xmpp_host", "qa-msg.mycomms.com"
         }
         p {
             applicationId "com.vodafone.mycomms.p"
             resValue "string", "app_name", "MyComms"
             resValue "string", "app_scheme", "mycomms"
+            resValue "string", "xmpp_host", "msg.mycomms.com"
         }
     }
 
     testOptions {
         unitTests.returnDefaultValues = true
+    }
+
+    sourceSets {
+        androidTest {
+            setRoot('src/test')
+        }
     }
 }
 
@@ -82,6 +95,12 @@ repositories {
     maven {
         url 'http://clinker.47deg.com/nexus/content/groups/public'
     }
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/releases'
+    }
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots'
+    }
 }
 
 dependencies {
@@ -89,6 +108,13 @@ dependencies {
     //Unit testing
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.17'
+    testCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
+    testCompile 'org.robolectric:shadows-core:3.0-SNAPSHOT'
+    testCompile 'org.robolectric:shadows-httpclient:3.0-SNAPSHOT'
+    testCompile 'org.robolectric:shadows-support-v4:3.0-SNAPSHOT'
+    testCompile 'org.apache.httpcomponents:httpclient:4.3.5'
+    testCompile 'org.apache.httpcomponents:httpmime:4.3.5'
+    testCompile 'org.apache.httpcomponents:httpcore:4.3'
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.android.support:recyclerview-v7:21.0.+'
@@ -97,9 +123,44 @@ dependencies {
     compile 'com.squareup:otto:1.3.5'
     compile 'com.squareup.picasso:picasso:2.3.2'
     compile files('lib/gson-2.3.1.jar')
-    compile ('com.fortysevendeg.swipelistview:swipelistview:1.0-SNAPSHOT@aar') {
-        transitive = true
+    compile files('lib/android-framework-library.jar')
+
+    //Smack XMPP Library
+    compile "org.igniterealtime.smack:smack-android:4.1.0"
+    compile "org.igniterealtime.smack:smack-tcp:4.1.0"
+}
+
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "0.7.1.201405082137"
+}
+
+def coverageSourceDirs = [
+        'src/main/java'
+]
+
+task jacocoTestReport(type:JacocoReport, dependsOn: "testIRelease") {
+    group = "Reporting"
+
+    description = "Generate Jacoco coverage reports"
+
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/i/release',
+            excludes: ['**/R.class',
+                       '**/R$*.class',
+                       '**/*$ViewInjector*.*',
+                       '**/BuildConfig.*',
+                       '**/Manifest*.*']
+    )
+
+    additionalSourceDirs = files(coverageSourceDirs)
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files('build/jacoco/testIRelease.exec')
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
     }
 
-    compile files('lib/android-framework-library.jar')
 }

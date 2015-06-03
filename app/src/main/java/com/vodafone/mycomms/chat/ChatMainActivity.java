@@ -1,6 +1,9 @@
 package com.vodafone.mycomms.chat;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,35 +18,113 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
+import com.vodafone.mycomms.contacts.detail.RecentContactController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RefreshChatListEvent;
+import com.vodafone.mycomms.realm.RealmChatTransactions;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import model.Chat;
+import model.ChatMessage;
+import model.Contact;
 
-public class ChatMainActivity extends ToolbarActivity {
+public class ChatMainActivity extends ToolbarActivity implements IRecentContactConnectionCallback {
 
     private String LOG_TAG = ChatMainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private ChatRecyclerViewAdapter mChatRecyclerViewAdapter;
-    private EditText chatTextBox;
-    private String chatText = "";
-    private ArrayList<ChatListItem> chatList = new ArrayList<>();
-    private Realm realm;
+    private EditText etChatTextBox;
+    private TextView tvSendChat;
+    private ImageView ivAvatarImage;
+    private TextView tvAvatarText;
+
+//    private String _chatText = "";
+    private ArrayList<ChatMessage> _chatList = new ArrayList<>();
+    private Chat _chat;
+    private Contact _contact;
+    private Contact _profile;
+
+    private String previousView;
+
+    private Realm mRealm;
+    private RealmChatTransactions chatTransactions;
+    private RealmContactTransactions contactTransactions;
+    private RecentContactController mRecentController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //This prevents the view focusing on the edit text and opening the keyboard
-        getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
         setContentView(R.layout.activity_chat_main);
         activateToolbar();
         setToolbarBackground(R.drawable.toolbar_header);
-        setChatListeners(this);
+
+        mRealm = Realm.getInstance(this);
+        chatTransactions = new RealmChatTransactions(mRealm, this);
+        contactTransactions = new RealmContactTransactions(mRealm);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(layoutManager);
+        refreshAdapter();
+
+        etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
+        tvSendChat = (TextView) findViewById(R.id.chat_send);
+        ivAvatarImage = (ImageView) findViewById(R.id.companyLogo);
+        tvAvatarText = (TextView) findViewById(R.id.avatarText);
+
+        //Load chat from db
+        Intent in = getIntent();
+        String contact_id = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
+        previousView = in.getStringExtra(Constants.CHAT_PREVIOUS_VIEW);
+
+        if(contact_id==null || contact_id.length()==0) finish(); //Prevent from errors
+
+        //Contact and profile
+        _contact = contactTransactions.getContactById(contact_id);
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        if(sp==null)
+        {
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
+            finish();
+        }
+
+        String _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        _profile = contactTransactions.getContactById(_profile_id);
+
+        if(_profile_id == null)
+        {
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
+            finish();
+        }
+
+        //Chat listeners
+        setChatListeners(this, _contact);
+
+        //Load chat
+        _chat = chatTransactions.getChatById(contact_id);
+
+        //If there was no chat, create a new one, but not saved in db yet
+        //If chat exists, load all messages
+        if(_chat==null) _chat = chatTransactions.newChatInstance(contact_id);
+        else loadMessagesArray();
+
+        //This prevents the view focusing on the edit text and opening the keyboard
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         ImageView backButton = (ImageView) findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +133,33 @@ public class ChatMainActivity extends ToolbarActivity {
                 finish();
             }
         });
+
+        //Set avatar
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+_contact.getId()+".jpg");
+
+        if (_contact.getAvatar()!=null &&
+                _contact.getAvatar().length()>0 &&
+                _contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists()) {
+
+            tvAvatarText.setText(null);
+
+            Picasso.with(this)
+                    .load(avatarFile)
+                    .into(ivAvatarImage);
+
+        } else{
+            String initials = _contact.getFirstName().substring(0,1) +
+                    _contact.getLastName().substring(0,1);
+
+            ivAvatarImage.setImageResource(R.color.grey_middle);
+            tvAvatarText.setText(initials);
+        }
+
+        //Sent chat in grey by default
+        tvSendChat.setTextColor(Color.GRAY);
+        tvSendChat.setEnabled(false);
+
         /*Toolbar mToolbar = (Toolbar) findViewById(R.id.app_bar);
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,40 +168,31 @@ public class ChatMainActivity extends ToolbarActivity {
             }
         });*/
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, null);
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
-
-        chatTextBox = (EditText) findViewById(R.id.chat_text_box);
-        chatTextBox.addTextChangedListener(new TextWatcher() {
-
+        etChatTextBox.addTextChangedListener(new TextWatcher()
+        {
             @Override
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                try {
-                    chatText = cs.toString();
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "onTextChanged error: " + e.toString());
+                if(cs!=null && cs.length()>0)
+                {
+                    tvSendChat.setEnabled(true);
+                    tvSendChat.setTextColor(Color.parseColor("#02B1FF"));
+                }
+                else
+                {
+                    tvSendChat.setEnabled(false);
+                    tvSendChat.setTextColor(Color.GRAY);
                 }
             }
-
             @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
-            }
-
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,int arg3) {}
             @Override
-            public void afterTextChanged(Editable arg0) {
-            }
+            public void afterTextChanged(Editable arg0) {}
         });
 
-        TextView sendChat = (TextView) findViewById(R.id.chat_send);
-        sendChat.setOnClickListener(new View.OnClickListener() {
+        tvSendChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(LOG_TAG, "Sending text " + chatText);
+                Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());
                 sendText();
             }
         });
@@ -104,33 +203,55 @@ public class ChatMainActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 Log.i(LOG_TAG,"sendText()");
-                realm = Realm.getInstance(mContext);
-                realm.beginTransaction();
-                realm.clear(ChatListItem.class);
-                realm.commitTransaction();
-                mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
-                mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+                chatTransactions.deleteAllChatMessages(_chat.getContact_id());
+                refreshAdapter();
             }
         });
     }
 
-    private void sendText() {
-        // Obtain a Realm instance
-        realm = Realm.getInstance(this);
+    private void sendText()
+    {
+        String msg = etChatTextBox.getText().toString();
+        if(!XMPPTransactions.sendText(_contact.getId(), msg))
+            return;
 
-        realm.beginTransaction();
-        ChatListItem chatListItem = new ChatListItem(chatText, Constants.RIGHT_CHAT);
-        //ChatListItem chatItem = realm.createObject(ChatListItem.class); // Create a new object
-        //chatItem.setChatText(chatText);
-        //chatItem.setChatType(Constants.RIGHT_CHAT);
-        realm.copyToRealm(chatListItem);
-        realm.commitTransaction();
+        //Save to DB
+        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
+                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
 
-        chatList.add(chatListItem);
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, chatList);
+        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+
+        chatTransactions.insertChat(_chat);
+        chatTransactions.insertChatMessage(chatMsg);
+
+        RecentContactController mRecentContactController = new RecentContactController(this,mRealm);
+        String action = Constants.CONTACTS_ACTION_SMS;
+        mRecentContactController.insertRecent(_chat.getContact_id(), action);
+        mRecentContactController.setConnectionCallback(this);
+
+        //Refresh previous list view if necessary
+        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
+            BusProvider.getInstance().post(new RefreshChatListEvent());
+        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
+            //Recent List is refreshed onConnectionComplete
+        }
+
+        _chatList.add(chatMsg);
+        refreshAdapter();
+        etChatTextBox.setText("");
+    }
+
+    private void loadMessagesArray()
+    {
+        _chatList = chatTransactions.getAllChatMessages(_chat.getContact_id());
+        refreshAdapter();
+    }
+
+    private void refreshAdapter()
+    {
+        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList, _profile, _contact);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
-
-        chatTextBox.setText("");
     }
 
     @Override
@@ -158,8 +279,13 @@ public class ChatMainActivity extends ToolbarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (realm != null){
-            realm.close();
+        if (mRealm != null){
+            mRealm.close();
         }
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.e(Constants.TAG, "ChatMainActivity.onConnectionNotAvailable: ");
     }
 }

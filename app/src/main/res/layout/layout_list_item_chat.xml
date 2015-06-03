@@ -4,51 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:orientation="vertical"
-        android:id="@+id/back"
-        android:tag="back"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:background="@color/gold">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/fav_contact"
-            android:layout_alignParentEnd="false"
-            android:background="@drawable/abc_btn_rating_star_off_mtrl_alpha"
-            android:adjustViewBounds="true"
-            android:contentDescription="Favorite"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="15dp" />
-    </RelativeLayout>
-
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/front"
+        android:orientation="horizontal"
         android:tag="front"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffffff"
-        android:weightSum="1">
-    <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
-        android:layout_width="70dp"
-        android:layout_height = "70dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" />
-    <include android:id="@+id/layout_chatlist_item_content" layout="@layout/layout_chatlist_item_content"
-        android:layout_width="wrap_content"
-        android:layout_toRightOf="@id/layout_list_item_image"
-        android:layout_height="70dp"
-        android:layout_centerHorizontal="true"
-        android:layout_weight="1.30" />
-
-
-    <include android:id="@+id/layout_chatlist_item_status"
-        layout="@layout/layout_chatlist_item_status"
-        android:layout_width="wrap_content"
-        android:layout_height = "wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"/>
+        android:background="@drawable/simpleborder">
+        <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
+                 android:layout_width="70dp"
+                 android:layout_height = "70dp"
+                 android:layout_alignParentLeft="true"
+                 android:layout_alignParentTop="true" />
+        <include android:id="@+id/layout_chatlist_item_content" layout="@layout/layout_chatlist_item_content"
+                 android:layout_width="210dp"
+                 android:layout_toRightOf="@id/layout_list_item_image"
+                 android:layout_height="70dp"
+                 android:layout_centerHorizontal="true"/>
+        <include android:id="@+id/layout_chatlist_item_status"
+                 layout="@layout/layout_chatlist_item_status"
+                 android:layout_width="match_parent"
+                 android:layout_height = "wrap_content"
+                 android:layout_alignParentRight="true"
+                 android:layout_alignParentTop="true"/>
     </LinearLayout>
 </FrameLayout>

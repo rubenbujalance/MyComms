@@ -15,6 +15,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- *********** -->
     <!-- Appl -->
@@ -123,7 +124,7 @@
             android:windowSoftInputMode="stateAlwaysVisible|adjustPan" >
         </activity>
         <activity
-            android:name=".chatlist.ChatListActivity"
+            android:name=".chatlist.view.ChatListActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity

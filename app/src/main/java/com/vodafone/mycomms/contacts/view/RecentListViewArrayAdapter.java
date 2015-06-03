@@ -57,7 +57,9 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
 
         //Image avatar
         //File avatarFile = new File(mContext.getFilesDir(), "avatar_"+contact.getId()+".jpg");
-        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+        File avatarFile = null;
+        if (contact.getId()!=null)
+            avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
@@ -84,14 +86,14 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
 
         if(contact.getAction().equals("")) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_error_tooltip));
-        } else if (contact.getAction().equals("sms")) {
+        } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_SMS)) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_message));
-        } else if (contact.getAction().equals("email")) {
+        } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_EMAIL)) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.img_verify_email));
-        } else if (contact.getAction().equals("call")) {
+        } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_CALL)) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_phone));
         }
-        viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getActionTimeStamp()));
+        viewHolder.textViewTime.setText(Utils.getStringChatTimeDifference(contact.getTimestamp()));
 
         return convertView;
     }

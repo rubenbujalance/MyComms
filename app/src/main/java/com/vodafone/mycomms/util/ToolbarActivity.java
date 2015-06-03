@@ -16,9 +16,11 @@ import android.widget.TextView;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
-import com.vodafone.mycomms.chatlist.ChatListActivity;
+import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
+
+import model.Contact;
 
 public class ToolbarActivity extends ActionBarActivity {
 
@@ -32,6 +34,30 @@ public class ToolbarActivity extends ActionBarActivity {
                 setSupportActionBar(mToolbar);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
             }
+        }
+        return mToolbar;
+    }
+
+    public Toolbar activateContactListToolbar() {
+        mToolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_inbox);
+        if(mToolbar != null) {
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            mToolbar.setVisibility(View.VISIBLE);
+            goneToolbar.setVisibility(View.GONE);
+        }
+        return mToolbar;
+    }
+
+    public Toolbar activateChatListToolbar() {
+        mToolbar = (Toolbar) findViewById(R.id.app_inbox);
+        Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_bar);
+        if(mToolbar != null) {
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            mToolbar.setVisibility(View.VISIBLE);
+            goneToolbar.setVisibility(View.GONE);
         }
         return mToolbar;
     }
@@ -126,12 +152,14 @@ public class ToolbarActivity extends ActionBarActivity {
         });
     }
 
-    protected void setChatListeners(final Context context) {
-        ImageView imageContact = (ImageView) findViewById(R.id.user_img);
+    protected void setChatListeners(final Context context, final Contact contact) {
+        ImageView imageContact = (ImageView) findViewById(R.id.companyLogo);
         imageContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(context, ContactDetailMainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                in.putExtra(Constants.CONTACT_ID, contact.getId());
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
@@ -154,8 +182,8 @@ public class ToolbarActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 // set an exit transition
-                Intent in = new Intent(context, ChatMainActivity.class);
-                startActivity(in);
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
@@ -164,8 +192,29 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(context, ChatMainActivity.class);
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
+            }
+        });
+    }
+
+    protected void setChatListListeners(final Context context){
+        ImageView contactsProfile = (ImageView) mToolbar.findViewById(R.id.contacts_profile);
+        contactsProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(context, SettingsMainActivity.class);
                 startActivity(in);
+                //overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
+            }
+        });
+
+        ImageView contactsAdd = (ImageView) mToolbar.findViewById(R.id.chat_add);
+        contactsAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
             }
         });
     }

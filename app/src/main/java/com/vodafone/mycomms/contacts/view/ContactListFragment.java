@@ -7,18 +7,15 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.fortysevendeg.swipelistview.SwipeListView;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.util.Constants;
@@ -42,7 +39,7 @@ import model.RecentContact;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener{
+public class ContactListFragment extends ListFragment{
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
@@ -54,9 +51,7 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
     protected Handler handler = new Handler();
 
     private ContactListViewArrayAdapter adapter;
-    private SwipeListView swipeListView;
     private ListView listView;
-    private SwipeRefreshLayout refreshLayout;
     private Parcelable state;
     private TextView emptyText;
 
@@ -84,50 +79,8 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
-       refreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
-       listView = (ListView) refreshLayout.findViewById(android.R.id.list);
-       emptyText = (TextView) refreshLayout.findViewById(android.R.id.empty);
-       /*final SwipeListView swipeListView = (SwipeListView) v.findViewById(android.R.id.list);
-       swipeListView.setSwipeListViewListener(new BaseSwipeListViewListener() {
-           @Override
-           public void onOpened(int position, boolean toRight) {
-               View v = swipeListView.getChildAt(position);
-               swipeListView.getChildAt(position).setBackgroundColor(Color.CYAN);
-               final ImageView favContact = (ImageView) swipeListView.findViewById(R.id.fav_contact);
-               favContact.setOnClickListener((new View.OnClickListener() {
-                   @Override
-                   public void onClick(View v) {
-                       Log.i(Constants.TAG, "ContactListFragment.onClick: TESTING");
-                       favContact.setImageDrawable(getResources().getDrawable(R.drawable.abc_btn_rating_star_on_mtrl_alpha));
-                   }
-               }));
-           }
 
-           @Override
-           public void onClosed(int position, boolean fromRight) {
-           }
-
-           @Override
-           public void onListChanged() {
-           }
-       });*/
-       refreshLayout.setEnabled(false);
-       listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-           @Override
-           public void onScrollStateChanged(AbsListView absListView, int i) {
-
-           }
-
-           @Override
-           public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-               if (firstVisibleItem == 0)
-                   refreshLayout.setEnabled(true);
-               else
-                   refreshLayout.setEnabled(false);
-           }
-       });
-
-       return refreshLayout;
+       return v;
     }
 
     /**
@@ -183,27 +136,31 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
             } else if (mIndex == Constants.CONTACTS_RECENT) {
                 try {
                     String action = recentContactList.get(position).getAction();
-                    if (action.compareTo("call") == 0) {
+                    if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
                         String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null) {
                             JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
+                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
                             Utils.launchCall(phone, getActivity());
                         }
                     }
-                    else if (action.compareTo("sms") == 0) {
-                        String strPhones = recentContactList.get(position).getPhones();
+                    else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
+                        /*String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null) {
                             JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
+                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
                             Utils.launchSms(phone, getActivity());
-                        }
+                        }*/
+                        in = new Intent(getActivity(), ChatMainActivity.class);
+                        in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getId());
+                        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                        startActivity(in);
                     }
-                    else if (action.compareTo("email") == 0) {
+                    else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
                         String strEmails = recentContactList.get(position).getEmails();
                         if (strEmails != null) {
                             JSONArray jPhones = new JSONArray(strEmails);
-                            String email = (String)((JSONObject) jPhones.get(0)).get("email");
+                            String email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAILS);
                             Utils.launchEmail(email, getActivity());
                         }
                     }
@@ -217,21 +174,6 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
 
         }
     }
-
-    @Override
-    public void onRefresh() {
-        //TODO: Refresh function here. Filter tab
-        handler.postDelayed(testIsGood, 5000);
-        refreshLayout.setRefreshing(false);
-    }
-
-    public Runnable testIsGood = new Runnable() {
-        @Override
-        public void run() {
-            Log.wtf(Constants.TAG, "ContactListFragment.run: TEEEEESTINGGGG");
-            refreshLayout.setRefreshing(false);
-        }
-    };
 
     /**
      * This interface must be implemented by activities that contain this

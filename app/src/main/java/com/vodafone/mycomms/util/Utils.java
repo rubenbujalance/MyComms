@@ -10,11 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 
 import com.vodafone.mycomms.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.lang.reflect.Method;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,13 +25,18 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by str_rbm on 16/04/2015.
  */
-public final class Utils {
+public final class Utils extends Activity {
 
     private static HashMap<String, HashMap<String, String>> _countries = null;
 
@@ -59,12 +67,27 @@ public final class Utils {
         builder.show();
     }
 
-    public static String getTimeFromMillis(int millis){
+    public static String getTimeFromMillis(long millis){
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
         return formatter.format(calendar.getTime());
 
+    }
+
+    public static String getDateFromMillis(long millis){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd");
+        return formatter.format(calendar.getTime());
+
+    }
+
+    public static String dayStringFormat(long millis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE");
+        return formatter.format(calendar.getTime());
     }
 
     private static boolean loadCountriesHash(Context context)
@@ -171,5 +194,95 @@ public final class Utils {
         else if(minutes >=1) difference = minutes + " min";
 
         return difference;
+    }
+
+    /*
+    * Returns the unique device ID: IMEI for GSM and the MEID or ESN for CDMA phones.
+    */
+    public String getImei() {
+        TelephonyManager   telephonyManager  =  ( TelephonyManager
+                )getSystemService( Context.TELEPHONY_SERVICE );
+
+        String imeistring = telephonyManager.getDeviceId();
+
+
+        return imeistring;
+    }
+
+    /*
+    * Returns the unique device ID: IMSI for a GSM phone.
+    */
+    public String getImsi() {
+        TelephonyManager   telephonyManager  =  ( TelephonyManager
+                )getSystemService( Context.TELEPHONY_SERVICE );
+
+        String imsistring = telephonyManager.getSubscriberId();
+
+        return imsistring;
+    }
+
+    /*
+    * Returns the unique device ID: HardwareID
+    */
+    public String getHardWareId() {
+        String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
+
+        return hwID;
+    }
+
+    /*
+    * Returns the unique device ID: SerialNumber
+    */
+    public String getSerialId() {
+        String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
+
+        String serialnum = null;
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class, String.class );
+            serialnum = (String)(   get.invoke(c, "ro.serialno", "unknown" )  );
+        } catch (Exception ignored) {
+            serialnum = "none";
+        }
+
+        return serialnum;
+    }
+
+    /*
+    * Returns Settings.Secure.ANDROID_ID returns the unique DeviceID
+    */
+    public String getAndroidId() {
+        String androidId = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        return androidId;
+    }
+
+    /*
+    * Returns the unique DeviceID
+    */
+    public String getDeviceId() {
+        if (getImei() != null) {
+            return getImei();
+        } else if (getSerialId() != null) {
+            return getSerialId();
+        } else {
+            return getAndroidId();
+        }
+    }
+
+    public static String getStringChatTimeDifference(long millis){
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        long days = TimeUnit.MILLISECONDS.toDays(millis);
+        long currentTime = System.currentTimeMillis();
+        long currentHours = TimeUnit.MILLISECONDS.toHours(currentTime);
+        long currentDays = TimeUnit.MILLISECONDS.toDays(currentTime);
+        if( (currentHours-hours) < 24){
+            return getTimeFromMillis(millis);
+        } else if ( (currentDays - days) <= 7){
+            return dayStringFormat(millis) + " " + getTimeFromMillis(millis);
+        } else{
+            return getDateFromMillis(millis) + " " + getTimeFromMillis(millis);
+        }
     }
 }

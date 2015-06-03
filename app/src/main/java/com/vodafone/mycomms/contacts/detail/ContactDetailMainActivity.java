@@ -1,9 +1,9 @@
 package com.vodafone.mycomms.contacts.detail;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
+import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -41,6 +42,9 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private Realm realm;
     private Contact contact;
     private ContactDetailController controller;
+    private String contactId;
+    private String action;
+    private RecentContactController mRecentContactController;
 
     //Views
     private ImageView ivIconStatus;
@@ -54,6 +58,9 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private TextView tvEmail;
     private TextView tvOfficeLocation;
     private CircleImageView ivAvatar;
+    private int imageStarOn;
+    private int imageStarOff;
+    private TextView textAvatar;
 
     //Buttons
     private ImageView btSms;
@@ -63,6 +70,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ImageView btEmailBar;
     private ImageView btChatBar;
     private ImageView btCallBar;
+    private ImageView btFavourite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +79,10 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
         realm = Realm.getInstance(this);
+        mRecentContactController = new RecentContactController(this,realm);
 
         Intent intent = getIntent();
-        final String contactId = intent.getExtras().getString(Constants.CONTACT_ID);
+        contactId = intent.getExtras().getString(Constants.CONTACT_ID);
         controller = new ContactDetailController(this, realm);
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
@@ -90,6 +99,9 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
+        imageStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+        imageStarOff = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+        textAvatar = (TextView)findViewById(R.id.avatarText);
 
         //Buttons
         btSms = (ImageView)findViewById(R.id.bt_sms);
@@ -99,6 +111,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         btChatBar = (ImageView)findViewById(R.id.btchat);
         btEmailBar = (ImageView)findViewById(R.id.btemail);
         btCallBar = (ImageView)findViewById(R.id.btcall);
+        btFavourite = (ImageView)findViewById(R.id.btFavourite);
 
         btCall.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,9 +121,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
                     if (strPhones != null) {
                         JSONArray jPhones = new JSONArray(strPhones);
-                        String phone = (String)((JSONObject)jPhones.get(0)).get("phone");
+                        String phone = (String)((JSONObject)jPhones.get(0)).get(Constants.CONTACT_PHONE);
 
                         Utils.launchCall(phone, ContactDetailMainActivity.this);
+                        action = Constants.CONTACTS_ACTION_CALL;
+                        mRecentContactController.insertRecent(contactId, action);
                     }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
@@ -127,9 +142,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
                     if (strPhones != null) {
                         JSONArray jPhones = new JSONArray(strPhones);
-                        String phone = (String)((JSONObject)jPhones.get(0)).get("phone");
+                        String phone = (String)((JSONObject)jPhones.get(0)).get(Constants.CONTACT_PHONE);
 
                         Utils.launchCall(phone, ContactDetailMainActivity.this);
+
+                        action = Constants.CONTACTS_ACTION_CALL;
+                        mRecentContactController.insertRecent(contactId, action);
                     }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
@@ -146,9 +164,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
                     if (strEmails != null) {
                         JSONArray jPhones = new JSONArray(strEmails);
-                        String email = (String) ((JSONObject) jPhones.get(0)).get("email");
+                        String email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
 
                         Utils.launchEmail(email, ContactDetailMainActivity.this);
+
+                        action = Constants.CONTACTS_ACTION_EMAIL;
+                        mRecentContactController.insertRecent(contactId, action);
                     }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
@@ -165,9 +186,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
                     if (strPhones != null) {
                         JSONArray jPhones = new JSONArray(strPhones);
-                        String email = (String) ((JSONObject) jPhones.get(0)).get("email");
+                        String email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
 
                         Utils.launchEmail(email, ContactDetailMainActivity.this);
+
+                        action = Constants.CONTACTS_ACTION_EMAIL;
+                        mRecentContactController.insertRecent(contactId, action);
                     }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
@@ -184,9 +208,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
                     if (strPhones != null) {
                         JSONArray jPhones = new JSONArray(strPhones);
-                        String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
+                        String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
 
                         Utils.launchSms(phone, ContactDetailMainActivity.this);
+
+                        action = Constants.CONTACTS_ACTION_SMS;
+                        mRecentContactController.insertRecent(contactId, action);
                     }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
@@ -199,6 +226,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
+                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
+                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
                 startActivity(in);
             }
         });
@@ -207,7 +236,30 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
+                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
+                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
                 startActivity(in);
+            }
+        });
+
+        btFavourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this,realm);
+                favouriteController.manageFavourite(contactId);
+
+                if(btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
+                    Drawable imageStar = getResources().getDrawable(imageStarOn);
+                    btFavourite.setImageDrawable(imageStar);
+                    btFavourite.setTag("abc_btn_rating_star_on_mtrl_alpha.png");
+                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png"){
+                    Drawable imageStar = getResources().getDrawable(imageStarOff);
+                    btFavourite.setImageDrawable(imageStar);
+                    btFavourite.setTag("abc_btn_rating_star_off_mtrl_alpha.png");
+                }
+
+                Log.e(Constants.TAG, "TAG: "+btFavourite.getTag());
+
             }
         });
 
@@ -335,13 +387,27 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        Picasso.with(this)
-            .load(new File(getFilesDir(), "avatar_"+contact.getId()+".jpg"))
-            .error(R.drawable.cartoon_round_contact_image_example)
-            .into(ivAvatar);
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
 
-        ivAvatar.setBorderWidth(2);
-        ivAvatar.setBorderColor(Color.WHITE);
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0 &&
+                contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists()) {
+
+            textAvatar.setText(null);
+
+            Picasso.with(this)
+                    .load(avatarFile)
+                    .into(ivAvatar);
+
+        } else{
+            String initials = contact.getFirstName().substring(0,1) +
+                    contact.getLastName().substring(0,1);
+
+            ivAvatar.setImageResource(R.color.grey_middle);
+            textAvatar.setText(initials);
+        }
+
     }
 
     private void loadContactDetail()
@@ -354,15 +420,16 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
+        if (realm!=null)
+            realm.close();
     }
 
     public void loadContactInfo(){
         tvContactName.setText(contact.getFirstName() + " " + contact.getLastName());
         tvCompany.setText(contact.getCompany());
         tvPosition.setText(contact.getPosition());
-        tvPhoneNumber.setText(getElementFromJsonArrayString(contact.getPhones(), "phone"));
-        tvEmail.setText(getElementFromJsonArrayString(contact.getEmails(), "email"));
+        tvPhoneNumber.setText(getElementFromJsonArrayString(contact.getPhones(), Constants.CONTACT_PHONE));
+        tvEmail.setText(getElementFromJsonArrayString(contact.getEmails(), Constants.CONTACT_EMAIL));
         tvOfficeLocation.setText(contact.getOfficeLocation());
     }
 

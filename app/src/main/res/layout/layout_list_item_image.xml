@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content" android:layout_height="wrap_content"
-    android:padding="2dp"
-
-    >
+    android:layout_width="wrap_content" android:layout_height="wrap_content">
 
     <com.vodafone.mycomms.custom.CircleImageView
         android:id="@+id/companyLogo"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_alignParentLeft="true"
-        android:src="@color/grey_middle"
-        />
+        android:src="@drawable/cartoon_round_contact_image_example" />
 
     <TextView
         android:id="@+id/avatarText"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:textSize="25dp"
         android:textColor="@color/grey_dark"
         android:layout_gravity="center"

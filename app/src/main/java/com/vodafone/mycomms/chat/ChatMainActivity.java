@@ -91,14 +91,18 @@ public class ChatMainActivity extends ToolbarActivity {
 
         if(sp==null)
         {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
             finish();
         }
 
         String _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        //TODO RBM - Remove after testing
-        //_profile_id = "mc_555a0792121ef1695cc7c1c3";
         _profile = contactTransactions.getContactById(_profile_id);
+
+        if(_profile_id == null)
+        {
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
+            finish();
+        }
 
         //Chat listeners
         setChatListeners(this, _contact);

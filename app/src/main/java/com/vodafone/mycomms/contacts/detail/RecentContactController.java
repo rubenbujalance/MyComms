@@ -8,16 +8,17 @@ import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.contacts.connection.ContactController;
+import com.vodafone.mycomms.contacts.connection.RecentContactConnection;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONObject;
 
-import java.util.Calendar;
 import java.util.HashMap;
 
 import io.realm.Realm;
-import model.Contact;
 
 public class RecentContactController extends BaseController {
 
@@ -58,5 +59,7 @@ public class RecentContactController extends BaseController {
         String apiCall = Constants.CONTACT_API_GET_RECENTS;
         ContactController contactController = new ContactController(getActivity(), mRealm);
         contactController.getRecentList(apiCall);
+        //Refresh Recent List
+        BusProvider.getInstance().post(new SetContactListAdapterEvent());
     }
 }

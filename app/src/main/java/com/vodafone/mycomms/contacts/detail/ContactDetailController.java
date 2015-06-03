@@ -2,32 +2,20 @@ package com.vodafone.mycomms.contacts.detail;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.model.ConnectionResponse;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.contacts.connection.ContactConnection;
 import com.vodafone.mycomms.contacts.connection.ContactController;
-import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
+import com.vodafone.mycomms.contacts.connection.ContactDetailConnection;
+import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import model.Contact;
-import model.FavouriteContact;
-import model.RecentContact;
 
 /**
  * Created by STR_VIG on 21/05/2015.

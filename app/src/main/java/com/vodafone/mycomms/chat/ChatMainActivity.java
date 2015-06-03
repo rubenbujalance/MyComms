@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.detail.RecentContactController;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -52,6 +53,7 @@ public class ChatMainActivity extends ToolbarActivity {
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
     private RealmContactTransactions contactTransactions;
+    private RecentContactController mRecentController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +97,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
         String _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         //TODO RBM - Remove after testing
-        _profile_id = "mc_555a0792121ef1695cc7c1c3";
+        //_profile_id = "mc_555a0792121ef1695cc7c1c3";
         _profile = contactTransactions.getContactById(_profile_id);
 
         //Chat listeners

@@ -14,6 +14,7 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import model.Chat;
 import model.ChatMessage;
+import model.Contact;
 
 /**
  * Created by AMG on 12/05/2015.
@@ -34,8 +35,6 @@ public class RealmChatTransactions {
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        //TODO RBM - Remove after testing
-        _profile_id = "mc_555a0792121ef1695cc7c1c3";
     }
 
     /*
@@ -247,7 +246,9 @@ public class RealmChatTransactions {
 
     public Chat newChatInstance(String contact_id)
     {
-        Chat chat = new Chat(_profile_id, contact_id);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
+        Contact contact = realmContactTransactions.getContactById(contact_id);
+        Chat chat = new Chat(_profile_id, contact_id, contact.getFirstName(), contact.getLastName());
         return chat;
     }
 
@@ -295,6 +296,7 @@ public class RealmChatTransactions {
             RealmResults<Chat> result1 = query.findAll();
 
             if (result1 != null) {
+                result1.sort(Constants.CHAT_FIELD_LAST_MESSAGE_TIME, RealmResults.SORT_ORDER_DESCENDING);
                 for (Chat chatMessageListItem : result1) {
                     chatMessageArrayList.add(chatMessageListItem);
                 }

@@ -18,6 +18,7 @@ public class Constants {
     public static final int ACCOUNTS = 1;
     public static final int MY_PROFILE = 1;
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
+    public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
 
     //Footer Constants
     public static final int TOOLBAR_CONTACTS = 0;
@@ -60,6 +61,9 @@ public class Constants {
     public static final String CONTACT_PAGINATION_OFFSET = "offset";
     public static final String CONTACT_PAGINATION_PAGESIZE = "pageSize";
 
+    public static final String PROFILE_SETTINGS = "settings";
+    public static final String PROFILE_PLATFORMS = "platforms";
+
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
@@ -89,6 +93,7 @@ public class Constants {
     public static final String CHAT_FIELD_PROFILE_ID = "profile_id";
     public static final String CHAT_FIELD_CONTACT_ID = "contact_id";
     public static final String CHAT_FIELD_LAST_MESSAGE_ID = "lastMessage_id";
+    public static final String CHAT_FIELD_LAST_MESSAGE_TIME = "lastMessageTime";
 
     //Chat constants
     public static final int CHAT_MESSAGE_TYPE_TEXT = 0;

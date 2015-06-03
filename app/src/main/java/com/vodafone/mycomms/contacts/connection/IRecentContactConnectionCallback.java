@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.contacts.detail;
+package com.vodafone.mycomms.contacts.connection;
 
 import com.vodafone.mycomms.connection.IConnectionCallback;
 

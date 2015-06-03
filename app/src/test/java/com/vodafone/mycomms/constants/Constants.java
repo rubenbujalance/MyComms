@@ -1,12 +1,5 @@
 package com.vodafone.mycomms.constants;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHttpResponse;
-
 /**
  * Created by str_evc on 21/05/2015.
  */
@@ -20,6 +13,7 @@ public class Constants {
     public static final String FIRSTNAME = "firstname";
     public static final String LASTNAME = "lastname";
     public static final String PIN = "1234";
+    public static final int FORGOT_PASSWORD_ACTIVITY = 1;
     public static final String ACCESS_TOKEN = "c7n_CO-qva-s9vgLfbljwQKLqf9hQVhMFNvWgP-ula0O-SG0DYdXPgI6zt1cgdZuBfvLSFXdjc_T2hpGNJ_mv3M_IClqDYqUAUNCFeiLPtUJIvvoO5IKYXlPgYHkCZsZ0Maf6bGXhLXLIyZQcjPvLtovTLgEN0tQZIpfMIVFpG4";
     public static final String REFRESH_TOKEN = "RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKr8o99gutaENceAfVbeSPvcHeiQaiAeQmcZpxwEXj7aza8t7jjTlImw59f6sj6RVhokHtrokRCNIzxC7Jfe8qhJoGZ6WnSaEJlh1EFJFqag0M";
     public static final long EXPIRES_IN = 1000L;

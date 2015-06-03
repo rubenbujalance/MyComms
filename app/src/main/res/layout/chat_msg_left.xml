@@ -11,8 +11,8 @@
             android:id="@+id/sent_time"
             style="@style/ChatSent"
             android:visibility="gone"
-            android:text="Dijous 18:40 a.m"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_gravity="center_horizontal"
+            android:textSize="12dp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             android:paddingTop="3dp"
             android:paddingBottom="1dp"
             android:layout_marginLeft="5dp"
-            android:paddingLeft="5dp">
+            android:layout_marginRight="5dp">
             <TextView
                 android:id="@+id/chat_text"
                 android:layout_width="wrap_content"
@@ -31,18 +31,16 @@
                 Hello Hello!"
                 android:gravity="left"
                 android:background="@drawable/chat_bubble_grey_tail"
-                android:layout_toRightOf="@+id/chat_name"/>
-            <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:id="@+id/chat_name"
-                android:background="@drawable/cartoon_round_contact_image_example"
-                android:text="JB"
-                android:textColor="@color/grey_chat_name"
-                android:gravity="center"
-                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/layout_list_item_image"/>
+
+            <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
+                android:layout_width="35dp"
+                android:layout_height = "35dp"
+                android:layout_marginRight="5dp"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"/>
+                android:layout_alignParentStart="true"
+                android:layout_gravity="bottom"
+                android:layout_centerVertical="true" />
         </RelativeLayout>
         <TextView
             android:id="@+id/sent_text"

@@ -34,7 +34,7 @@ public class RealmChatTransactions {
         if(sp==null) return;
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        Log.i(Constants.TAG, "RealmChatTransactions.RealmChatTransactions: _profile_id " + _profile_id);
+
     }
 
     /*

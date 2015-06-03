@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
@@ -65,7 +67,7 @@ public final class Utils {
     public static String getTimeFromMillis(long millis){
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
         return formatter.format(calendar.getTime());
 
     }
@@ -73,9 +75,16 @@ public final class Utils {
     public static String getDateFromMillis(long millis){
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yy");
+        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd");
         return formatter.format(calendar.getTime());
 
+    }
+
+    public static String dayStringFormat(long millis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE");
+        return formatter.format(calendar.getTime());
     }
 
     private static boolean loadCountriesHash(Context context)
@@ -171,33 +180,6 @@ public final class Utils {
         context.startActivity(sendIntent);
     }
 
-    public static String dayStringFormat(long msecs) {
-        GregorianCalendar cal = new GregorianCalendar();
-
-        cal.setTime(new Date(msecs));
-
-        int dow = cal.get(Calendar.DAY_OF_WEEK);
-
-        switch (dow) {
-            case Calendar.MONDAY:
-                return "Monday";
-            case Calendar.TUESDAY:
-                return "Tuesday";
-            case Calendar.WEDNESDAY:
-                return "Wednesday";
-            case Calendar.THURSDAY:
-                return "Thursday";
-            case Calendar.FRIDAY:
-                return "Friday";
-            case Calendar.SATURDAY:
-                return "Saturday";
-            case Calendar.SUNDAY:
-                return "Sunday";
-        }
-
-        return "Unknown";
-    }
-
     public static String getStringTimeDifference(int millis){
         long timeDiffMilis = millis;
         long minutes = timeDiffMilis / 60000;
@@ -220,9 +202,9 @@ public final class Utils {
         if( (currentHours-hours) < 24){
             return getTimeFromMillis(millis);
         } else if ( (currentDays - days) <= 7){
-            return dayStringFormat(millis);
+            return dayStringFormat(millis) + " " + getTimeFromMillis(millis);
         } else{
-            return getDateFromMillis(millis);
+            return getDateFromMillis(millis) + " " + getTimeFromMillis(millis);
         }
     }
 }

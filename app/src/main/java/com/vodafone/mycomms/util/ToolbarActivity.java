@@ -213,8 +213,8 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(context, ChatMainActivity.class);
-                startActivity(in);
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
             }
         });
     }

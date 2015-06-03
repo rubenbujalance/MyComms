@@ -12,8 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RefreshChatListEvent;
+import com.vodafone.mycomms.events.RefreshContactListEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 
@@ -51,7 +55,6 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
        ArrayList<Chat> chatList = new ArrayList<>();
        chatList = mChatTransactions.getAllChats();
        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), chatList);
-       //TODO: GET CHAT LIST
        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
 
        mRecyclerView.addOnItemTouchListener(new ChatListRecyclerItemClickListener(getActivity(),
@@ -60,6 +63,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
            public void onItemClick(View view, int position) {
                Intent in = new Intent(getActivity(), ChatMainActivity.class);
                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, mChatRecyclerViewAdapter.getChat(position).getContact_id());
+               in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CHAT_LIST);
                startActivity(in);
 
            }
@@ -74,21 +78,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
         mRealm = Realm.getInstance(getActivity());
         mChatTransactions = new RealmChatTransactions(mRealm, getActivity());
-    }
-
-    private ArrayList<ChatListItem> loadFakeData() {
-        ArrayList<ChatListItem> mChatListItemList = new ArrayList<>();
-        mChatListItemList.add(new ChatListItem("mc_5535b2ac13be4b7975c51600", "mc_555a0792121ef1695cc7c1c3", "Bruce Banner", "Ruben Bujalance", "Oooolaaaa", "00:50"));
-        mChatListItemList.add(new ChatListItem("mc_5535d627c729d4430b9722e9", "mc_555a0792121ef1695cc7c1c3", "Darth Vader", "Ruben Bujalance", "Ola ke ase", "dl"));
-        mChatListItemList.add(new ChatListItem("mc_5536597eed882c9348ec77bf", "mc_555a0792121ef1695cc7c1c3", "Janos Big", "Ruben Bujalance", "Te aburre o ke ase", "dm"));
-        mChatListItemList.add(new ChatListItem("mc_553913669c2c1aaa5c794455", "mc_555a0792121ef1695cc7c1c3", "Jie Lee", "Ruben Bujalance", "Xatea o ke ase", "dc"));
-        mChatListItemList.add(new ChatListItem("mc_5535b16c13be4b7975c515fe", "mc_555a0792121ef1695cc7c1c3", "Nick Fury", "Ruben Bujalance", "Me porculea o ke ase", "dj"));
-        mChatListItemList.add(new ChatListItem("mc_5535b2ac13be4b7975c51600", "mc_555a0792121ef1695cc7c1c3", "Bruce Banner", "Ruben Bujalance", "Oooolaaaa", "00:50"));
-        mChatListItemList.add(new ChatListItem("mc_5535d627c729d4430b9722e9", "mc_555a0792121ef1695cc7c1c3", "Darth Vader", "Ruben Bujalance", "Ola ke ase", "dl"));
-        mChatListItemList.add(new ChatListItem("mc_5536597eed882c9348ec77bf", "mc_555a0792121ef1695cc7c1c3", "Janos Big", "Ruben Bujalance", "Te aburre o ke ase", "dm"));
-        mChatListItemList.add(new ChatListItem("mc_553913669c2c1aaa5c794455", "mc_555a0792121ef1695cc7c1c3", "Jie Lee", "Ruben Bujalance", "Xatea o ke ase", "dc"));
-        mChatListItemList.add(new ChatListItem("mc_5535b16c13be4b7975c515fe", "mc_555a0792121ef1695cc7c1c3", "Nick Fury", "Ruben Bujalance", "Me porculea o ke ase", "dj"));
-        return mChatListItemList;
+        BusProvider.getInstance().register(this);
     }
 
     @Override
@@ -99,7 +89,9 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mRealm.close();
+        if (mRealm!=null)
+            mRealm.close();
+        BusProvider.getInstance().unregister(this);
     }
 
     public Runnable testIsGood = new Runnable() {
@@ -109,5 +101,18 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
             Log.wtf(Constants.TAG, "ChatListFragment.run: TEEEEESTINGGGG");
         }
     };
+
+    public void refreshAdapter(){
+        ArrayList<Chat> chatList = new ArrayList<>();
+        chatList = mChatTransactions.getAllChats();
+        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), chatList);
+        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+    }
+
+    @Subscribe
+    public void refreshChatListEvent(RefreshChatListEvent event) {
+        Log.i(Constants.TAG, "ChatListFragment.refreshContactListEvent: ");
+        refreshAdapter();
+    }
 
 }

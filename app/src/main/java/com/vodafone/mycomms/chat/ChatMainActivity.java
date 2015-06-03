@@ -20,7 +20,11 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
 import com.vodafone.mycomms.contacts.detail.RecentContactController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RefreshChatListEvent;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -34,7 +38,7 @@ import model.Chat;
 import model.ChatMessage;
 import model.Contact;
 
-public class ChatMainActivity extends ToolbarActivity {
+public class ChatMainActivity extends ToolbarActivity implements IRecentContactConnectionCallback {
 
     private String LOG_TAG = ChatMainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
@@ -49,6 +53,8 @@ public class ChatMainActivity extends ToolbarActivity {
     private Chat _chat;
     private Contact _contact;
     private Contact _profile;
+
+    private String previousView;
 
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
@@ -80,6 +86,7 @@ public class ChatMainActivity extends ToolbarActivity {
         //Load chat from db
         Intent in = getIntent();
         String contact_id = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
+        previousView = in.getStringExtra(Constants.CHAT_PREVIOUS_VIEW);
 
         if(contact_id==null || contact_id.length()==0) finish(); //Prevent from errors
 
@@ -208,8 +215,22 @@ public class ChatMainActivity extends ToolbarActivity {
                 _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
                 Constants.CHAT_MESSAGE_TYPE_TEXT, etChatTextBox.getText().toString(), "");
 
+        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+
         chatTransactions.insertChat(_chat);
         chatTransactions.insertChatMessage(chatMsg);
+
+        RecentContactController mRecentContactController = new RecentContactController(this,mRealm);
+        String action = Constants.CONTACTS_ACTION_SMS;
+        mRecentContactController.insertRecent(_chat.getContact_id(), action);
+        mRecentContactController.setConnectionCallback(this);
+
+        //Refresh previous list view if necessary
+        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
+            BusProvider.getInstance().post(new RefreshChatListEvent());
+        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
+            //Recent List is refreshed onConnectionComplete
+        }
 
         _chatList.add(chatMsg);
         refreshAdapter();
@@ -256,5 +277,10 @@ public class ChatMainActivity extends ToolbarActivity {
         if (mRealm != null){
             mRealm.close();
         }
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.e(Constants.TAG, "ChatMainActivity.onConnectionNotAvailable: ");
     }
 }

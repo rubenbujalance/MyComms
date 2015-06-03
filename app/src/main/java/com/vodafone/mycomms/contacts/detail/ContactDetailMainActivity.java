@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
+import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -218,6 +219,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
                 in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
+                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
                 startActivity(in);
             }
         });
@@ -227,6 +229,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
                 in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
+                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
                 startActivity(in);
             }
         });

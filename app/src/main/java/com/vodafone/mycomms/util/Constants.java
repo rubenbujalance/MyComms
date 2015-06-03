@@ -106,4 +106,9 @@ public class Constants {
     public static final String CHAT_MESSAGE_STATUS_READ = "3";
     public static final String CHAT_MESSAGE_NOT_READ = "0";
     public static final String CHAT_MESSAGE_READ = "1";
+    public static final String CHAT_PREVIOUS_VIEW = "Chat_Previous_View";
+    public static final String CHAT_VIEW_CHAT_LIST = "Chat_List";
+    public static final String CHAT_VIEW_CONTACT_DETAIL = "Contact_Detail";
+    public static final String CHAT_VIEW_CONTACT_LIST = "Contact_List";
+
 }

@@ -248,8 +248,16 @@ public class RealmChatTransactions {
     {
         RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
         Contact contact = realmContactTransactions.getContactById(contact_id);
-        Chat chat = new Chat(_profile_id, contact_id, contact.getFirstName(), contact.getLastName());
+        Chat chat = new Chat(_profile_id, contact_id, contact.getFirstName(), contact.getLastName(),"","",0);
+
         return chat;
+    }
+
+
+    public Chat updatedChatInstance(Chat chat, ChatMessage chatMsg) {
+        Chat updatedChat = new Chat(_profile_id, chat.getContact_id(), chat.getContactName(), chat.getContactSurname(),
+                chatMsg.getId(), chatMsg.getText(), chatMsg.getTimestamp());
+        return updatedChat;
     }
 
     //INSERTS
@@ -434,5 +442,6 @@ public class RealmChatTransactions {
             Log.e(Constants.TAG, "RealmChatTransactions.deleteAllChats: ",e);
         }
     }
+
 }
 

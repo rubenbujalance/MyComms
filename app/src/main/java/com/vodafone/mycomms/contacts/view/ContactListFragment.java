@@ -200,6 +200,7 @@ public class ContactListFragment extends ListFragment implements SwipeRefreshLay
                         }*/
                         in = new Intent(getActivity(), ChatMainActivity.class);
                         in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getId());
+                        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
                         startActivity(in);
                     }
                     else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {

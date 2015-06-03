@@ -52,8 +52,8 @@ public class RecentContactController extends BaseController {
 
     @Override
     public void onConnectionComplete(ConnectionResponse response) {
-        Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: ");
         super.onConnectionComplete(response);
+        Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: ");
         String apiCall = Constants.CONTACT_API_GET_RECENTS;
         ContactController contactController = new ContactController(getActivity(), mRealm);
         contactController.getRecentList(apiCall);

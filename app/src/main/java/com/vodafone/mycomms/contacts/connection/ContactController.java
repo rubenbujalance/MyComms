@@ -473,7 +473,7 @@ public class ContactController extends BaseController {
         try {
             recentContact.setUniqueId(contact.getId() + jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setAction(jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
-            recentContact.setTimestamp(jsonObject.getInt(Constants.CONTACT_RECENTS_ACTION_TIME));
+            recentContact.setTimestamp(jsonObject.getLong(Constants.CONTACT_RECENTS_ACTION_TIME));
         } catch (JSONException e){
             Log.e(Constants.TAG, "ContactController.mapContactToRecent: " + e);
         }

@@ -176,4 +176,5 @@ public class Contact extends RealmObject{
     public void setPathAvatar(String pathAvatar) {
         this.pathAvatar = pathAvatar;
     }
+
 }

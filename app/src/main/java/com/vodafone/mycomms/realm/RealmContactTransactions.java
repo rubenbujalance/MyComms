@@ -88,7 +88,7 @@ public class RealmContactTransactions {
         try {
             mRealm.beginTransaction();
             for (int i = 0; i < size; i++) {
-                mRealm.copyToRealm(contactArrayList.get(i));
+                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -191,8 +191,8 @@ public class RealmContactTransactions {
         RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
         RealmResults<RecentContact> result1 = query.findAll();
         if (result1!=null){
-            result1.sort("actionTimeStamp"); // Sort ascending
-            result1.sort("actionTimeStamp", RealmResults.SORT_ORDER_DESCENDING);
+            result1.sort(Constants.CONTACT_RECENTS_ACTION_TIME); // Sort ascending
+            result1.sort(Constants.CONTACT_RECENTS_ACTION_TIME, RealmResults.SORT_ORDER_DESCENDING);
             for (RecentContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }

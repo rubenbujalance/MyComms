@@ -126,7 +126,6 @@ public class ContactController extends BaseController {
                         if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
                             ((IContactsConnectionCallback) this.getConnectionCallback()).onContactsResponse(realmContactList, morePages, offsetPaging);
                         }
-
                         // realmContactTransactions.getContactById("mc_55361a9cc729d4430b9722f3");
 
                     } catch (Exception e) {
@@ -142,6 +141,9 @@ public class ContactController extends BaseController {
 
                         if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
                             ((IContactsConnectionCallback) this.getConnectionCallback()).onRecentContactsResponse();
+                        } else{
+                            Log.i(Constants.TAG, "ContactController.onConnectionComplete: in BusProvider");
+                            BusProvider.getInstance().post(new SetContactListAdapterEvent());
                         }
                     } catch (Exception e) {
                         Log.e(Constants.TAG, "ContactController.onConnectionComplete: recents ", e);
@@ -310,7 +312,7 @@ public class ContactController extends BaseController {
                 }
             }
             if (contactList.size()!=0) {
-                realmContactTransactions.deleteAllRecentContacts();
+                //realmContactTransactions.deleteAllRecentContacts();
                 realmContactTransactions.insertRecentContactList(contactList);
                 Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: inserted RecentcontactList ");
             }
@@ -324,7 +326,6 @@ public class ContactController extends BaseController {
         Contact contact = new Contact();
         try {
             if (!jsonObject.isNull(Constants.CONTACT_ID)) contact.setId(jsonObject.getString(Constants.CONTACT_ID));
-            //if (!jsonObject.isNull(Constants.CONTACT_DATA)) contact.setId(jsonObject.getString(Constants.CONTACT_DATA));
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))
@@ -468,9 +469,9 @@ public class ContactController extends BaseController {
         recentContact.setPresence(contact.getPresence());
         recentContact.setCountry(contact.getCountry());
         try {
-            recentContact.setUniqueId(contact.getId()+jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
+            recentContact.setUniqueId(contact.getId() + jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setAction(jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
-            recentContact.setActionTimeStamp(jsonObject.getInt(Constants.CONTACT_RECENTS_ACTION_TIME));
+            recentContact.setTimestamp(jsonObject.getLong(Constants.CONTACT_RECENTS_ACTION_TIME));
         } catch (JSONException e){
             Log.e(Constants.TAG, "ContactController.mapContactToRecent: " + e);
         }

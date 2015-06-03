@@ -93,7 +93,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_CALL)) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_phone));
         }
-        viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getActionTimeStamp()));
+        viewHolder.textViewTime.setText(Utils.getStringChatTimeDifference(contact.getTimestamp()));
 
         return convertView;
     }

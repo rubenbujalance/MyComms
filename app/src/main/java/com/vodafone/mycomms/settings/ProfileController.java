@@ -15,8 +15,10 @@ import model.UserProfile;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
+import com.vodafone.mycomms.settings.connection.PasswordConnection;
 import com.vodafone.mycomms.settings.connection.ProfileConnection;
 import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
+import com.vodafone.mycomms.settings.connection.UpdateSettingsConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 
@@ -64,7 +66,7 @@ public class ProfileController extends BaseController {
             }else{
                 Log.e(Constants.TAG, "ProfileController.getProfile: realmContactTransactions is null");
             }
-            
+
             if (this.getConnectionCallback() != null && userProfileFromDB != null) {
                 Log.d(Constants.TAG, "ProfileController.getProfile: profile received from DB: " + printUserProfile(userProfileFromDB));
                 ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
@@ -92,36 +94,39 @@ public class ProfileController extends BaseController {
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
 
-        Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
+        Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl() + response.getUrl());
 
-        String result = response.getData().toString();
 
         UserProfile userProfile = null;
-        try {
+        if(response.getUrl() != null && !response.getUrl().contains(UpdateSettingsConnection.URL)) {
+            String result = response.getData().toString();
 
-            if(result != null && result.length() >= 0) {
-                JSONObject jsonResponse = new JSONObject(result);
+            try {
 
-//          String data = jsonResponse.getString(Constants.CONTACT_DATA);
-//          jsonResponse = new JSONObject(data.substring(1, data.length()-1 )); //Removing squared bracelets.
+                if (result != null && result.length() >= 0) {
+                    JSONObject jsonResponse = new JSONObject(result);
 
-                userProfile = mapUserProfile(jsonResponse);
-                realmContactTransactions.insertUserProfile(userProfile);
-                Log.d(Constants.TAG, "ProfileController.onConnectionComplete: UserProfile parsed:" + printUserProfile(userProfile));
-            }
+                    userProfile = mapUserProfile(jsonResponse);
+                    realmContactTransactions.insertUserProfile(userProfile);
+                    Log.d(Constants.TAG, "ProfileController.onConnectionComplete: UserProfile parsed:" + printUserProfile(userProfile));
+                }
 
-        } catch (Exception e){
-            Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception while parsing userProfile" , e);
-        }
-
-        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback && response.getUrl() !=null  && response.getUrl().contains(ProfileConnection.URL)){
-            if(userProfile != null) {
-                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
-            }else {
-                ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionCompleted();
+            } catch (Exception e) {
+                Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception while parsing userProfile", e);
             }
         }
 
+        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
+            if (response.getUrl() != null && response.getUrl().contains(ProfileConnection.URL)) {
+                if (userProfile != null) {
+                    ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
+                } else {
+                    ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionCompleted();
+                }
+            }else if (response.getUrl() != null && response.getUrl().contains(PasswordConnection.URL)){
+
+            }
+        }
 
 
 
@@ -131,13 +136,28 @@ public class ProfileController extends BaseController {
     public void onConnectionError(ConnectionException ex){
         super.onConnectionError(ex);
         Log.w(Constants.TAG, "ProfileController.onConnectionError: " + ex.getUrl() + "," + ex.getContent());
-        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback && ex.getUrl() !=null  && ex.getUrl().contains(ProfileConnection.URL)  ){
-            if(ex.getContent() != null && ex.getContent().contains("\"err\":\"incorrectData\"")){
-            //TODO It does not seems correct that the MyComms  Public API has two calls to "/api/me"  URLs and the only difference is that one is PUT and the pther is GET
-            //TODO Currently the Connectivity API is not prepared to retrieve the Method type (GET, PUT, DELETE) of the connection from the error, so no clean way of doing this.
-                ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionError();
-            }else {
-                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileConnectionError();
+        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback ) {
+            if (ex.getUrl() != null && ex.getUrl().contains(ProfileConnection.URL)) {
+                if (ex.getContent() != null && ex.getContent().contains("\"err\":\"incorrectData\"")) {
+                    //TODO It does not seems correct that the MyComms  Public API has two calls to "/api/me"  URLs and the only difference is that one is PUT and the pther is GET
+                    //TODO Currently the Connectivity API is not prepared to retrieve the Method type (GET, PUT, DELETE) of the connection from the error, so no clean way of doing this.
+                    ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionError();
+                } else {
+                    ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileConnectionError();
+                }
+            }else if (ex.getUrl() != null && ex.getUrl().contains(PasswordConnection.URL)){
+                JSONObject jsonResponse = null;
+                String error = "Unknown error while changing password";
+
+                try {
+                    jsonResponse = new JSONObject(ex.getContent());
+                    error = jsonResponse.getString("des");
+                } catch (JSONException e) {
+                    Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
+                }
+
+                ((IProfileConnectionCallback) this.getConnectionCallback()).onPasswordChangeError(error);
+
             }
         }
 
@@ -198,17 +218,38 @@ public class ProfileController extends BaseController {
         buf.append(userProfile.getPosition());
         buf.append(", officeLocation:");
         buf.append(userProfile.getOfficeLocation());
+        buf.append(", settings:");
+        buf.append(userProfile.getSettings());
+
+
 
         return buf.toString();
     }
 
 
-    public void updateContactData(String jsonString) {
-        //JSONObject json = new JSONObject(profileHashMap);
-        Log.d(Constants.TAG, "ProfileController.updateContactData: " + jsonString);
+    public void updateContactData(HashMap profileHashMap) {
+        JSONObject json = new JSONObject(profileHashMap);
+        Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
         UpdateProfileConnection updateProfileConnection = new UpdateProfileConnection(getContext(),this);
-        updateProfileConnection.setPayLoad(jsonString);
+        updateProfileConnection.setPayLoad(json.toString());
         updateProfileConnection.request();
+    }
+
+    public void updateSettingsData(HashMap settingsHashMap) {
+        JSONObject json = new JSONObject(settingsHashMap);
+        Log.d(Constants.TAG, "ProfileController.updateSettingsData: " + json.toString());
+        UpdateSettingsConnection updateSettingsConnection = new UpdateSettingsConnection(getContext(),this);
+        updateSettingsConnection.setPayLoad(json.toString());
+        updateSettingsConnection.request();
+    }
+
+    public void updatePassword(HashMap passwordHashMap){
+            JSONObject json = new JSONObject(passwordHashMap);
+            Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+            PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
+            passwordConnection.setPayLoad(json.toString());
+            passwordConnection.request();
+
     }
 
 

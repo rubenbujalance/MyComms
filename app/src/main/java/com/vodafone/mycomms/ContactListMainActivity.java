@@ -148,6 +148,14 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     }
 
     @Override
+    public void onPasswordChangeError(String error) {
+    }
+
+    @Override
+    public void onPasswordChangeCompleted() {
+    }
+
+    @Override
     public void onConnectionNotAvailable() {
         Log.w(Constants.TAG, "ContactListMainActivity.onConnectionNotAvailable: ");
     }

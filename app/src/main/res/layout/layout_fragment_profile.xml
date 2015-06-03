@@ -130,7 +130,9 @@
                         android:layout_below="@+id/contact_email"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"
-                        android:id="@+id/email1"/>
+                        android:id="@+id/email1"
+                        android:layout_alignRight="@+id/contact_email"
+                        android:layout_alignEnd="@+id/contact_email" />
 
                     <Spinner
                         android:layout_width="wrap_content"
@@ -250,7 +252,41 @@
                         android:lines="3"
                         android:id="@+id/contact_additional_info"/>
                 </LinearLayout>
-            </LinearLayout>x
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    style="@style/ProfileBox"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:id="@+id/password_layout"
+                    >
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/TextViewProfile"
+                        android:text="Password"/>
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/EditViewProfile"
+                        android:hint="Password"
+                        android:id="@+id/profile_password"
+                        android:inputType="textPassword"
+                        />
+
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/EditViewProfile"
+                        android:hint="Repeat Password"
+                        android:id="@+id/profile_password_repeat"
+                        android:inputType="textPassword"
+                        />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

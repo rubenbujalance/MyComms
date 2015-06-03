@@ -15,4 +15,9 @@ public interface IProfileConnectionCallback extends IConnectionCallback {
     void onUpdateProfileConnectionError();
 
     void onUpdateProfileConnectionCompleted();
+
+    void  onPasswordChangeError(String error);
+
+    void onPasswordChangeCompleted();
+
 }

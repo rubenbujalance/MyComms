@@ -310,7 +310,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageSelected(position);
             }
-            Log.i(Constants.TAG, "TabClickListener.onPageSelected: ");
+            Log.i(Constants.TAG, "SlidingTabLayout.onPageSelected: ");
             BusProvider.getInstance().post(new SetContactListAdapterEvent());
         }
 

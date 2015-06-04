@@ -46,7 +46,7 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
 
         //Initialize messaging server session (needs the profile_id saved)
         if(profile_id != null) //If null, do initialization in callback method
-            XMPPTransactions.initializeMsgServerSession(this);
+            XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
@@ -132,7 +132,8 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     public void onProfileReceived(model.UserProfile userProfile) {
         Log.i(Constants.TAG, "ContactListMainActivity.onProfileReceived: ");
         profileController.setProfileId(userProfile.getId());
-        XMPPTransactions.initializeMsgServerSession(this);
+
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 
     @Override
@@ -171,6 +172,6 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         BusProvider.getInstance().unregister(this);
 
         // Disconnect from the XMPP server
-        XMPPTransactions.getXmppConnection().disconnect();
+        XMPPTransactions.disconnectMsgServerSession();
     }
 }

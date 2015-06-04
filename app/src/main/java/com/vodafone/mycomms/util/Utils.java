@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.lang.reflect.Method;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -31,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -182,7 +184,7 @@ public final class Utils extends Activity {
 //                        sendIntent.putExtra("sms_body", x);
         context.startActivity(sendIntent);
     }
-
+    
     public static String getStringTimeDifference(int millis){
         long timeDiffMilis = millis;
         long minutes = timeDiffMilis / 60000;
@@ -284,5 +286,45 @@ public final class Utils extends Activity {
         } else{
             return getDateFromMillis(millis) + " " + getTimeFromMillis(millis);
         }
+    }
+
+
+    public static String getElementFromJsonArrayString(String jsonArrayString, String key){
+        Log.d(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonArrayString + ", key=" + key);
+        JSONObject jsonObject = null;
+        String result = null;
+        try {
+            JSONArray jsonArray = new JSONArray(jsonArrayString);
+            for(int i = 0; i < jsonArray.length() ; i++) {
+                jsonObject = jsonArray.getJSONObject(i);
+                if (!jsonObject.isNull(key)) {
+                    result = jsonObject.getString(key);
+                }
+            }
+
+            Log.d(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonObject != null ? jsonObject.toString() : "null" );
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "Utils.getElementFromJsonArrayString: " ,e);
+        }
+        return result;
+    }
+
+    public static boolean validateStringHashMap(HashMap hashMapToValidate){
+        Iterator it = hashMapToValidate.entrySet().iterator();
+        while (it.hasNext()) {
+            try {
+                Map.Entry pair = (Map.Entry) it.next();
+                String key = (String)pair.getKey();
+                String value = (String) pair.getValue();
+                if(key == null || key.length() <= 0 || value == null || value.length() <= 0){
+                    return false;
+                }
+              //  it.remove(); // avoids a ConcurrentModificationException
+            }catch(Exception e){
+                return false;
+            }
+        }
+        return true;
     }
 }

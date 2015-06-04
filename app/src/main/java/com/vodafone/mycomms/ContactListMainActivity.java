@@ -142,6 +142,16 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     }
 
     @Override
+    public void onUpdateProfileConnectionError() {
+
+    }
+
+    @Override
+    public void onUpdateProfileConnectionCompleted() {
+
+    }
+
+    @Override
     public void onConnectionNotAvailable() {
         Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
         finish();

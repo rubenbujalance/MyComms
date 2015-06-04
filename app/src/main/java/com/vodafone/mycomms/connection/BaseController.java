@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.caterpillar.connection.RemoteConnection;
 import com.framework.library.connection.HttpConnection;
@@ -94,5 +95,11 @@ public class BaseController extends Controller {
 
     public void setConnectionCallback(IConnectionCallback connectionCallback) {
         this.connectionCallback = connectionCallback;
+    }
+
+    public void showToast(String stringToShow) {
+        Log.i(Constants.TAG, "BaseController.showToast: " + stringToShow);
+        Toast toast = Toast.makeText(getContext(), stringToShow, Toast.LENGTH_LONG);
+        toast.show();
     }
 }

@@ -1,6 +1,8 @@
 package model;
 
 
+import java.util.HashMap;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -171,9 +173,7 @@ public class UserProfile extends RealmObject{
         this.country = country;
         this.settings = settings;
         this.platforms = platforms;
-
     }
-
 
 
     public String getSettings() {

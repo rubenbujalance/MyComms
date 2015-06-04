@@ -79,6 +79,8 @@ public class ContactListFragment extends ListFragment{
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+       listView = (ListView) v.findViewById(android.R.id.list);
+       emptyText = (TextView) v.findViewById(android.R.id.empty);
 
        return v;
     }
@@ -209,7 +211,12 @@ public class ContactListFragment extends ListFragment{
                 emptyText.setText("");
             recentContactList = mContactController.getAllRecentContacts();
             if (recentContactList!=null) {
-               setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList));
+                RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList);
+                if (listView != null) {
+                    state = listView.onSaveInstanceState();
+                    setListAdapter(recentAdapter);
+                    listView.onRestoreInstanceState(state);
+                }
             }
         }else if(mIndex == Constants.CONTACTS_ALL){
             if (emptyText!=null)

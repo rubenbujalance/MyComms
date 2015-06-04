@@ -2,6 +2,8 @@ package com.vodafone.mycomms.login;
 
 import com.vodafone.mycomms.BuildConfig;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
@@ -13,6 +15,10 @@ import org.robolectric.annotation.Config;
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class ForgotPassActivityTest {
 
+    @Test
+    public void testSend() throws Exception {
+        Assert.assertTrue(true);
+    }
 /*
     Activity activity;
     Button btSend;

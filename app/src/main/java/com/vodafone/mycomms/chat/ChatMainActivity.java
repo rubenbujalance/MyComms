@@ -241,6 +241,14 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
+    private void markAllAsRead()
+    {
+        for(int i=0; i<_chatList.size(); i++)
+            _chatList.get(i).setRead("1");
+
+        chatTransactions.insertChatMessageList(_chatList);
+    }
+
     private void checkXMPPConnection()
     {
         if(XMPPTransactions.getXmppConnection()!=null &&

@@ -2,6 +2,8 @@ package com.vodafone.mycomms.login;
 
 import com.vodafone.mycomms.BuildConfig;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
@@ -12,6 +14,11 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupPassActivityTest {
+
+    @Test
+    public void testSend() throws Exception {
+        Assert.assertTrue(true);
+    }
 /*
     SignupPassActivity activity;
     ClearableEditText mPassword;

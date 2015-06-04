@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -32,6 +33,12 @@ import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -125,10 +132,31 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
    }
 
     private boolean updateContactData() {
+        Log.d(Constants.TAG, "ProfileFragment.updateContactData: ");
         if(!BaseConnection.isConnected(this.getActivity())){
-            profileController.showToast("Not connected. Can`t save details.");
+            profileController.showToast("Not connected. Can't save details.");
             return false;
         }
+
+        String password = ((EditText) getActivity().findViewById(R.id.profile_password)).getText().toString();
+        String repeatPassword = ((EditText) getActivity().findViewById(R.id.profile_password_repeat)).getText().toString();
+
+        if((password != null && password.length() > 0) && (repeatPassword == null || repeatPassword.length() == 0)){
+            profileController.showToast("Passwords don't match");
+            return false;
+        }else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0)){
+            profileController.showToast("Passwords don't match");
+            return false;
+        }else if( password != null && password.length() >= 0 && repeatPassword != null && repeatPassword.length() >= 0 && !password.equals(repeatPassword)){
+            profileController.showToast("Passwords don't match");
+            return false;
+        }else if(password != null && password.length() >= 0 && repeatPassword != null && repeatPassword.length() >= 0  && password.equals(repeatPassword) ){
+            HashMap newPasswordHashMap = new HashMap<>();
+            newPasswordHashMap.put("password", password);
+            profileController.updatePassword(newPasswordHashMap);
+        }
+
+
         String name = ((EditText) getActivity().findViewById(R.id.profile_name)).getText().toString();
         String surname = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
 
@@ -148,15 +176,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         Log.d(Constants.TAG, "ProfileFragment.updateContactData:" + profileController.printUserProfile(newProfile));
 
-        //HashMap newProfileHashMap = profileController.getProfileHashMap(newProfile);
-
-
-        HashMap newProfileHashMap = new HashMap<>();
-        if(newProfile.getFirstName() != null) newProfileHashMap.put("firstName",newProfile.getFirstName() );
-        if(newProfile.getLastName()  != null) newProfileHashMap.put("lastName",newProfile.getLastName() );
-        if(newProfile.getCompany()  != null) newProfileHashMap.put("company",newProfile.getCompany() );
-        if(newProfile.getPosition() != null) newProfileHashMap.put("position",newProfile.getPosition());
-        if(newProfile.getOfficeLocation() != null) newProfileHashMap.put("officeLocation",newProfile.getOfficeLocation());
+        HashMap newProfileHashMap = profileController.getProfileHashMap(newProfile);
 
         boolean isValid  = Utils.validateStringHashMap(newProfileHashMap);
         if(!isValid) {
@@ -164,9 +184,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             return false;
         }
 
-        JSONObject json = new JSONObject(newProfileHashMap);
-
-        profileController.updateContactData(json.toString());
+        profileController.updateContactData(newProfileHashMap);
         return  true;
     }
 
@@ -175,12 +193,16 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
         profilePicture = (ImageView) getActivity().findViewById(R.id.profile_picture);
         TextView editPhoto = (TextView) getActivity().findViewById(R.id.edit_photo);
+        LinearLayout passwordLayout = (LinearLayout) getActivity().findViewById(R.id.password_layout);
         if (isEditing){
+            passwordLayout.setVisibility(View.VISIBLE);
             editProfile.setText("Done");
             editPhoto.setVisibility(View.VISIBLE);
+
         }else{
             editProfile.setText("Edit");
             editPhoto.setVisibility(View.GONE);
+            passwordLayout.setVisibility(View.GONE);
         }
         editPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,6 +231,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         profileOfficeLocation.setEnabled(isEditing);
 //        EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
 //        profileInfo.setEnabled(isEditing);
+
+        EditText password = (EditText) getActivity().findViewById(R.id.profile_password);
+        password.setEnabled(isEditing);
+        EditText repeatPassword = (EditText) getActivity().findViewById(R.id.profile_password_repeat);
+        repeatPassword.setEnabled(isEditing);
     }
 
     private void selectImage() {
@@ -327,6 +354,9 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     public void onResume(){
         super.onResume();
         Log.d(Constants.TAG, "ProfileFragment.onResume: ");
+//        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+//        editProfile.setVisibility(View.VISIBLE);
+
         profileController.getProfile();
     }
 
@@ -400,11 +430,22 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         isUpdating = false;
     }
 
+    @Override
+    public void onPasswordChangeError(String error) {
+        Log.d(Constants.TAG, "ProfileFragment.onPasswordChangeError: " + error);
+        profileController.showToast(error);
+    }
+
+    @Override
+    public void onPasswordChangeCompleted() {
+        Log.d(Constants.TAG, "ProfileFragment.onPasswordChangeCompleted: ");
+    }
+
 
     @Override
     public void onConnectionNotAvailable() {
         Log.w(Constants.TAG, "ProfileFragment.onConnectionNotAvailable: ");
-        Toast.makeText(getActivity().getApplicationContext(), "Connection not available", Toast.LENGTH_LONG);
+        Toast.makeText(getActivity().getApplicationContext(), "Connection not available" ,Toast.LENGTH_LONG);
         profileController.showToast("Connection not available");
     }
 

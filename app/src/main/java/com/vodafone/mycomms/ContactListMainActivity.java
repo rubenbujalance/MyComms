@@ -108,9 +108,9 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
         if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
             profileController = new ProfileController(this);
-            profileController.getProfile();
             profileController.setConnectionCallback(this);
-
+            profileController.getProfile();
+            
             return null;
         }
         else {
@@ -149,6 +149,14 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     @Override
     public void onUpdateProfileConnectionCompleted() {
 
+    }
+
+    @Override
+    public void onPasswordChangeError(String error) {
+    }
+
+    @Override
+    public void onPasswordChangeCompleted() {
     }
 
     @Override

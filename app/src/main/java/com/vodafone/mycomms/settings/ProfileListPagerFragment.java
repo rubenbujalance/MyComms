@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
@@ -50,11 +51,15 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
         @Override
         public Fragment getItem(int position) {
             Fragment fragment = null;
+            TextView editProfile = null;
             switch (position){
                 case Constants.PREFERENCES:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     PreferencesFragment preferencesFragment = PreferencesFragment.newInstance(position, "whatever");
                     fragment = preferencesFragment;
+                    editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+                    editProfile.setVisibility(View.INVISIBLE);
+
                     break;
                 /*case Constants.ACCOUNTS:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
@@ -65,6 +70,9 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     ProfileFragment profileFragment = ProfileFragment.newInstance(position, "whatever");
                     fragment = profileFragment;
+                    editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+                    editProfile.setVisibility(View.VISIBLE);
+
                     break;
                 default:
                     break;

@@ -20,16 +20,8 @@
 
         <TextView
             android:id="@android:id/empty"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/no_favourite_records"
-            android:textColor="@color/grey_chat_name"
-            android:layout_marginTop="50dp"
-            android:layout_marginBottom="50dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:clickable="false"/>
+            style="@style/NoRecordsTextView"/>
 
     </FrameLayout>
 </LinearLayout>

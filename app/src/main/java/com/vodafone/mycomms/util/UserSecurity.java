@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.vodafone.mycomms.R;
-
 import java.util.Calendar;
 
 /**
@@ -24,7 +22,7 @@ public final class UserSecurity {
     {
         try {
             _sharedPref = context.getSharedPreferences(
-                    context.getString(R.string.pref_file_tokens), Context.MODE_PRIVATE);
+                    Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
             if(_sharedPref == null)
             {

@@ -25,8 +25,13 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by str_rbm on 16/04/2015.
@@ -62,12 +67,27 @@ public final class Utils extends Activity {
         builder.show();
     }
 
-    public static String getTimeFromMillis(int millis){
+    public static String getTimeFromMillis(long millis){
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(millis);
-        SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
         return formatter.format(calendar.getTime());
 
+    }
+
+    public static String getDateFromMillis(long millis){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat("MMM dd");
+        return formatter.format(calendar.getTime());
+
+    }
+
+    public static String dayStringFormat(long millis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE");
+        return formatter.format(calendar.getTime());
     }
 
     private static boolean loadCountriesHash(Context context)
@@ -248,6 +268,21 @@ public final class Utils extends Activity {
             return getSerialId();
         } else {
             return getAndroidId();
+        }
+    }
+
+    public static String getStringChatTimeDifference(long millis){
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        long days = TimeUnit.MILLISECONDS.toDays(millis);
+        long currentTime = System.currentTimeMillis();
+        long currentHours = TimeUnit.MILLISECONDS.toHours(currentTime);
+        long currentDays = TimeUnit.MILLISECONDS.toDays(currentTime);
+        if( (currentHours-hours) < 24){
+            return getTimeFromMillis(millis);
+        } else if ( (currentDays - days) <= 7){
+            return dayStringFormat(millis) + " " + getTimeFromMillis(millis);
+        } else{
+            return getDateFromMillis(millis) + " " + getTimeFromMillis(millis);
         }
     }
 }

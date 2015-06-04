@@ -11,10 +11,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.util.Constants;
@@ -135,27 +137,25 @@ public class ContactListFragment extends ListFragment{
             } else if (mIndex == Constants.CONTACTS_RECENT) {
                 try {
                     String action = recentContactList.get(position).getAction();
-                    if (action.compareTo("call") == 0) {
+                    if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
                         String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null) {
                             JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
+                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
                             Utils.launchCall(phone, getActivity());
                         }
                     }
-                    else if (action.compareTo("sms") == 0) {
-                        String strPhones = recentContactList.get(position).getPhones();
-                        if (strPhones != null) {
-                            JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get("phone");
-                            Utils.launchSms(phone, getActivity());
-                        }
+                    else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
+                        in = new Intent(getActivity(), ChatMainActivity.class);
+                        in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getId());
+                        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                        startActivity(in);
                     }
-                    else if (action.compareTo("email") == 0) {
+                    else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
                         String strEmails = recentContactList.get(position).getEmails();
                         if (strEmails != null) {
                             JSONArray jPhones = new JSONArray(strEmails);
-                            String email = (String)((JSONObject) jPhones.get(0)).get("email");
+                            String email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAILS);
                             Utils.launchEmail(email, getActivity());
                         }
                     }

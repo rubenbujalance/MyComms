@@ -1,14 +1,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/white">
+    android:background="@drawable/istanbul_bg_blur">
 
-    <include android:id="@+id/app_bar" layout="@layout/toolbar_chat"/>
+    <include android:id="@+id/app_bar" layout="@layout/toolbar_chat"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
 
     <!--Empty ScrollView needed so the recyclerview doesn't hide the toolbar_chat-->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="false">
 
     </ScrollView>
 
@@ -18,15 +21,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="android.support.v7.widget.RecyclerView"
-        android:layout_above="@+id/message_layout"/>
+        android:layout_above="@+id/message_layout"
+        android:background="@color/white"
+        android:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/message_layout"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         android:layout_alignParentBottom="true"
         android:background="@color/grey_chat">
         <ImageView
@@ -49,6 +52,7 @@
             android:paddingRight="5dp"
             android:paddingLeft="5dp"
             android:hint="Type a message..."
+            android:textColorHint="@color/grey_middle"
             android:layout_weight="1"
             android:layout_gravity="center_vertical"/>
 
@@ -62,7 +66,9 @@
             android:layout_marginBottom="8dp"
             android:text="Send"
             android:textSize="18sp"
-            android:layout_gravity="center_vertical"/>
+            android:layout_gravity="center_vertical"
+            android:textColor="#02B1FF"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </RelativeLayout>

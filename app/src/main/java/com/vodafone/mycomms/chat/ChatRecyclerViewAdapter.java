@@ -6,57 +6,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
+import model.ChatMessage;
+import model.Contact;
 
 
 public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     private String LOG_TAG = ChatRecyclerViewAdapter.class.getSimpleName();
-    private ArrayList<ChatListItem> chatList = new ArrayList<>();
+    private ArrayList<ChatMessage> chatList = new ArrayList<>();
     private Context mContext;
+    private Contact _contact;
+    private Contact _profile;
 
-    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatListItem> chatListItem) {
+    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem, Contact profile, Contact contact) {
         mContext = context;
-        /*fakeDataLoad();
-        if (chatListItem != null) {
-            for (int i=0;i<chatListItem.size();i++){
-                chatList.add(chatListItem.get(i));
-            }
-        }*/
-        Realm realm = Realm.getInstance(mContext);
-        RealmQuery<ChatListItem> query = realm.where(ChatListItem.class);
+        this._contact = contact;
+        this._profile = profile;
 
-        // Execute the query:
-        RealmResults<ChatListItem> result1 = query.findAll();
-        if (result1!=null){
-            for (ChatListItem chatListItems : result1) {
+        if (chatListItem!=null){
+            for (ChatMessage chatListItems : chatListItem) {
                 chatList.add(chatListItems);
             }
         }
     }
 
-    private void fakeDataLoad() {
-        ChatListItem chatListItem;
-        for (int i=0;i<20;i++){
-            if ((i % 2) == 0){
-                chatListItem = new ChatListItem("You say goodbye", Constants.LEFT_CHAT);
-            } else {
-                chatListItem = new ChatListItem("And I say Hello. Hello Hello!", Constants.RIGHT_CHAT);
-            }
-            chatList.add(chatListItem);
-        }
-    }
-
     @Override
     public int getItemViewType(int position) {
-        return chatList.get(position).getChatType();
+        if(chatList.get(position).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_SENT)==0)
+            return Constants.RIGHT_CHAT;
+        else return Constants.LEFT_CHAT;
     }
 
     @Override
@@ -78,14 +64,64 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     @Override
     public void onBindViewHolder(ChatHolder chatHolder, int i) {
-        String test = chatList.get(i).getChatText();
-        chatHolder.chatTextView.setText(test);
-        //Fake data show
-        if (i==3 || i==9 || i==15 || i==17){
+
+        //Set text message
+        chatHolder.chatTextView.setText(chatList.get(i).getText());
+
+        //Set text status
+        if(chatList.get(i).getStatus().compareTo("0")==0)
+            chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
+        else if(chatList.get(i).getStatus().compareTo("1")==0)
+            chatHolder.chatSentText.setText(mContext.getString(R.string.status_sent));
+        else if(chatList.get(i).getStatus().compareTo("2")==0)
+            chatHolder.chatSentText.setText(mContext.getString(R.string.status_delivered));
+        else if(chatList.get(i).getStatus().compareTo("3")==0)
+            chatHolder.chatSentText.setText(mContext.getString(R.string.status_read));
+
+        //Set message time
+        long currentTimestamp = chatList.get(i).getTimestamp();
+        long previousTimestamp = 0;
+        if(i>0) previousTimestamp = chatList.get(i-1).getTimestamp();
+
+        long thirtyMinutesDiff = 30 * 60 * 1000;
+
+        if(currentTimestamp - previousTimestamp > thirtyMinutesDiff ||
+            previousTimestamp == 0)
+        {
             chatHolder.chatSentTime.setVisibility(View.VISIBLE);
+            chatHolder.chatSentTime.setText(Utils.getStringChatTimeDifference(currentTimestamp));
         }
-        if (i==chatList.size()-1){
-            chatHolder.chatSentText.setVisibility(View.VISIBLE);
+        else
+        {
+            chatHolder.chatSentTime.setVisibility(View.GONE);
+        }
+
+        //Set message avatar
+        Contact contact;
+
+        if(chatHolder.getItemViewType() == Constants.LEFT_CHAT)
+            contact = _contact;
+        else contact = _profile;
+
+        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0 &&
+                contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists()) {
+
+            chatHolder.chatAvatarText.setText(null);
+
+            Picasso.with(mContext)
+                    .load(avatarFile)
+                    .into(chatHolder.chatAvatarImage);
+
+        } else{
+            String initials = contact.getFirstName().substring(0,1) +
+                    contact.getLastName().substring(0,1);
+
+            chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
+            chatHolder.chatAvatarText.setText(initials);
         }
     }
 

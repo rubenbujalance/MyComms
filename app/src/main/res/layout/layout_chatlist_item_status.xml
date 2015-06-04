@@ -16,6 +16,6 @@
         android:layout_gravity="right"
         android:gravity="center"
         android:text="Tue"
-        android:textColor="@color/material_blue_grey_800"
+        android:textColor="@color/contact_soft_blue_text"
         />
 </LinearLayout>

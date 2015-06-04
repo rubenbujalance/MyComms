@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
              android:id="@+id/container"
              android:layout_width="match_parent"
-             android:layout_height="match_parent" >
+             android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -21,9 +22,23 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:id="@+id/profile_picture"
-                    android:src="@drawable/profile_picture"
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"/>
+                <TextView
+                    android:id="@+id/avatarText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="50sp"
+                    tools:text="MM"
+                    android:textColor="@color/grey_dark"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_alignRight="@+id/profile_picture"
+                    android:layout_alignEnd="@+id/profile_picture"
+                    android:layout_alignBottom="@+id/profile_picture"
+                    android:layout_alignLeft="@+id/profile_picture"
+                    android:layout_alignStart="@+id/profile_picture"
+                    android:layout_alignTop="@+id/profile_picture"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -58,7 +73,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:hint="Name"
-                        android:text="Andrew"
+                        tools:text="Andrew"
                         android:id="@+id/profile_name"/>
                     <View
                         android:layout_width="fill_parent"
@@ -72,7 +87,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:hint="Surname"
-                        android:text="Wiggins"
+                        tools:text="Wiggins"
                         android:id="@+id/profile_surname"/>
                 </LinearLayout>
                 <RelativeLayout
@@ -90,7 +105,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Phone Number"
-                        android:text="+34 684503080"
+                        tools:text="+34 684503080"
                         android:inputType="textEmailAddress"
                         android:ems="10"
                         android:layout_below="@+id/contact_phone_number"
@@ -125,7 +140,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Email"
-                        android:text="andrew.wiggin@vodafone.com"
+                        tools:text="andrew.wiggin@vodafone.com"
                         android:ems="10"
                         android:layout_below="@+id/contact_email"
                         android:layout_alignParentLeft="true"
@@ -162,7 +177,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Company name"
-                        android:text="Vodafone"
+                        tools:text="Vodafone"
                         android:id="@+id/contact_company"/>
                 </LinearLayout>
 
@@ -182,7 +197,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Position"
-                        android:text="Leader"
+                        tools:text="Leader"
                         android:id="@+id/contact_position"/>
                 </LinearLayout>
 
@@ -204,7 +219,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Department"
-                        android:text="Human Resources"
+                        tools:text="Human Resources"
                         android:id="@+id/department"/>
                 </LinearLayout>
 
@@ -225,7 +240,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Office"
-                        android:text="Barcelona"
+                        tools:text="Barcelona"
                         android:id="@+id/office_location"/>
                 </LinearLayout>
 
@@ -248,7 +263,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="Additional"
-                        android:text="That's me!"
+                        tools:text="That's me!"
                         android:lines="3"
                         android:id="@+id/contact_additional_info"/>
                 </LinearLayout>

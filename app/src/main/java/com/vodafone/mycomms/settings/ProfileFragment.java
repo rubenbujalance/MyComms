@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -19,36 +18,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
-import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
-import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 
 import model.UserProfile;
@@ -89,6 +73,9 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private boolean isUpdating = false;
 
     private ImageView profilePicture;
+    private TextView textAvatar;
+    private TextView editPhoto;
+    private TextView editProfile;
 
     // TODO: Rename and change types of parameters
     public static ProfileFragment newInstance(int index, String param2) {
@@ -105,27 +92,36 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        View v = inflater.inflate(R.layout.layout_fragment_profile, container, false);
 
        initSpinners(v);
-       TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+       editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
        editProfile.setVisibility(View.VISIBLE);
+       profilePicture = (ImageView) v.findViewById(R.id.profile_picture);
+       textAvatar = (TextView) v.findViewById(R.id.avatarText);
 
        Log.i(Constants.TAG, "ProfileFragment.onCreateView: ");
        editProfile.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
                Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile ");
-
+               profileEditMode(isEditing);
                if (isEditing && !isUpdating) {
                    //TODO verify if details have actually changed and send update accordingly
                    isUpdating = updateContactData();
                    if (!isUpdating) {
                        return;
                    }
-               }else if(!isEditing && !isUpdating){
+               } else if (!isEditing && !isUpdating) {
                    isEditing = !isEditing;
-                    profileEditMode(isEditing);
                }
+           }
+       });
 
-
+       editPhoto = (TextView) v.findViewById(R.id.edit_photo);
+       editPhoto.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               //TODO: Do things
+               //Take Picture or Camera Roll
+               //selectImage();
            }
        });
        return v;
@@ -147,15 +143,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0)){
             profileController.showToast("Passwords don't match");
             return false;
-        }else if( password != null && password.length() >= 0 && repeatPassword != null && repeatPassword.length() >= 0 && !password.equals(repeatPassword)){
+        }else if( password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0 && !password.equals(repeatPassword)){
             profileController.showToast("Passwords don't match");
             return false;
-        }else if(password != null && password.length() >= 0 && repeatPassword != null && repeatPassword.length() >= 0  && password.equals(repeatPassword) ){
+        }else if(password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0  && password.equals(repeatPassword) ){
             HashMap newPasswordHashMap = new HashMap<>();
             newPasswordHashMap.put("password", password);
             profileController.updatePassword(newPasswordHashMap);
         }
-
 
         String name = ((EditText) getActivity().findViewById(R.id.profile_name)).getText().toString();
         String surname = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
@@ -190,28 +185,19 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private void profileEditMode(boolean isEditing) {
         Log.i(Constants.TAG, "ProfileFragment.profileEditMode: " + isEditing);
-        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-        profilePicture = (ImageView) getActivity().findViewById(R.id.profile_picture);
-        TextView editPhoto = (TextView) getActivity().findViewById(R.id.edit_photo);
+
         LinearLayout passwordLayout = (LinearLayout) getActivity().findViewById(R.id.password_layout);
         if (isEditing){
             passwordLayout.setVisibility(View.VISIBLE);
-            editProfile.setText("Done");
+            editProfile.setText(getActivity().getString(R.string.profile_edit_mode_done));
             editPhoto.setVisibility(View.VISIBLE);
 
         }else{
-            editProfile.setText("Edit");
+            editProfile.setText(getActivity().getString(R.string.profile_edit_mode_edit));
             editPhoto.setVisibility(View.GONE);
             passwordLayout.setVisibility(View.GONE);
         }
-        editPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Do things
-                //Take Picture or Camera Roll
-                //selectImage();
-            }
-        });
+
         EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
         profileName.setEnabled(isEditing);
         EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
@@ -322,6 +308,25 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
     }
 
+    private void loadProfileImage(UserProfile userProfile) {
+        File avatarFile = null;
+        String profileId = userProfile.getId();
+
+        if (profileId!=null && !profileId.equals(""))
+            avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+profileId+".jpg");
+
+        if (avatarFile!= null && avatarFile.exists()) {
+            Picasso.with(getActivity())
+                    .load(avatarFile)
+                    .into(profilePicture);
+        } else{
+            String initials = userProfile.getFirstName().substring(0,1) +
+                    userProfile.getLastName().substring(0,1);
+            profilePicture.setImageResource(R.color.grey_middle);
+            textAvatar.setText(initials);
+        }
+    }
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -403,6 +408,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileOfficeLocation.setText(userProfile.getOfficeLocation());
 //            EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
 //            profileInfo.setText("????????");
+            loadProfileImage(userProfile);
         }
     }
 
@@ -445,7 +451,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     @Override
     public void onConnectionNotAvailable() {
         Log.w(Constants.TAG, "ProfileFragment.onConnectionNotAvailable: ");
-        Toast.makeText(getActivity().getApplicationContext(), "Connection not available" ,Toast.LENGTH_LONG);
+        Toast.makeText(getActivity().getApplicationContext(), "Connection not available", Toast.LENGTH_LONG);
         profileController.showToast("Connection not available");
     }
 

@@ -121,22 +121,6 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         }
     }
 
-    private void validateAccessToken(){
-        Log.i(Constants.TAG, "ContactListMainActivity.validateAccessToken: ");
-        String accessToken = UserSecurity.getAccessToken(this);
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
-        String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
-        if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
-            profileController = new ProfileController(this);
-            profileController.getProfile();
-            profileController.setConnectionCallback(this);
-        }
-        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        Log.i(Constants.TAG, "ContactListMainActivity.validateAccessToken: profileId: " + profileId);
-    }
-
     @Subscribe
     public void setNoConnectionLayoutVisibility(SetNoConnectionLayoutVisibility event){
         setConnectionLayoutVisibility(false);
@@ -179,29 +163,12 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     }
 
     @Override
-    public void onConnectionNotAvailable() {
-        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
-        finish();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
 
         // Disconnect from the XMPP server
         XMPPTransactions.getXmppConnection().disconnect();
-    }
-
-    @Override
-    public void onProfileReceived(model.UserProfile userProfile) {
-        Log.i(Constants.TAG, "ContactListMainActivity.onProfileReceived: ");
-        profileController.setProfileId(userProfile.getId());
-    }
-
-    @Override
-    public void onProfileConnectionError() {
-        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: error");
     }
 
     @Override

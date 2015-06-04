@@ -466,7 +466,6 @@ public class ContactController extends BaseController {
         recentContact.setCountry(contact.getCountry());
         try {
             recentContact.setUniqueId(contact.getId() + jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
-            recentContact.setUniqueId(contact.getId()+jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setAction(jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setTimestamp(jsonObject.getLong(Constants.CONTACT_RECENTS_ACTION_TIME));
         } catch (JSONException e){

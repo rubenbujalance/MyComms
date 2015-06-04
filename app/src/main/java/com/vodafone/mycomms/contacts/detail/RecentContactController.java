@@ -41,7 +41,6 @@ public class RecentContactController extends BaseController {
         RecentContactController recentContactController;
         int method = HttpConnection.POST;
         String apiCall = Constants.CONTACT_API_POST_RECENTS;
-        long timestamp = System.currentTimeMillis();
         long timestamp = Calendar.getInstance().getTimeInMillis();
         body.put(Constants.CONTACT_ID, contactId);
         body.put(Constants.CONTACT_RECENTS_ACTION, action);

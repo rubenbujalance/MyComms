@@ -222,10 +222,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         if(!XMPPTransactions.sendText(_contact.getId(), msg))
             return;
 
-        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
-                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                Constants.CHAT_MESSAGE_TYPE_TEXT, etChatTextBox.getText().toString(), "");
-
         //Save to DB
         ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
                 _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
@@ -290,8 +286,8 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (realm != null){
-            realm.close();
+        if (mRealm != null){
+            mRealm.close();
         }
     }
 

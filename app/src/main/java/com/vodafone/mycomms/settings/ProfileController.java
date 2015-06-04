@@ -9,15 +9,7 @@ import android.util.Log;
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
 
-import model.Contact;
-import model.UserProfile;
-import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.contacts.connection.ContactConnection;
-import com.vodafone.mycomms.contacts.connection.ContactController;
-import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
-import com.vodafone.mycomms.settings.connection.ProfileConnection;
 import io.realm.Realm;
-import model.Contact;
 import model.UserProfile;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -39,10 +31,6 @@ import java.util.HashMap;
  */
 public class ProfileController extends BaseController {
 
-    private ProfileConnection profileConnection;
-
-    public ProfileController(Fragment fragment) {
-        super(fragment);
     private RealmContactTransactions realmContactTransactions;
     private ProfileConnection profileConnection;
     private Realm realm;
@@ -104,32 +92,6 @@ public class ProfileController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-        Log.d(Constants.TAG, "ProfileController.onConnectionComplete: ");
-
-        String result = response.getData().toString();
-
-
-
-        UserProfile userProfile = null;
-        try {
-
-            JSONObject jsonResponse = new JSONObject(result);
-//            String data = jsonResponse.getString(Constants.CONTACT_DATA);
-//            jsonResponse = new JSONObject(data.substring(1, data.length()-1 )); //Removing squared bracelets.
-//
-
-            userProfile =  mapUserProfile(jsonResponse);
-            Log.d(Constants.TAG, "ProfileController.onConnectionComplete: UserProfile parsed:" + userProfile.getFirstName() + "," + userProfile.getLastName());
-        } catch (Exception e){
-            Log.e(Constants.TAG, "ProfileController.onConnectionComplete: Exception while parsing userProfile" , e);
-        }
-
-        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback && response.getUrl() !=null  && response.getUrl().contains(ProfileConnection.URL)){
-            ((IProfileConnectionCallback)this.getConnectionCallback()).onProfileReceived(userProfile);
-        }
-    }
-
-
 
         Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl() + response.getUrl());
 
@@ -164,15 +126,14 @@ public class ProfileController extends BaseController {
 
             }
         }
+
+
+
     }
 
     @Override
     public void onConnectionError(ConnectionException ex){
         super.onConnectionError(ex);
-        Log.w(Constants.TAG, "ProfileController.onConnectionError: ");
-        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback && ex.getUrl() !=null  && ex.getUrl().contains(ProfileConnection.URL)){
-            ((IProfileConnectionCallback)this.getConnectionCallback()).onProfileConnectionError();
-        }
         Log.w(Constants.TAG, "ProfileController.onConnectionError: " + ex.getUrl() + "," + ex.getContent());
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback ) {
             if (ex.getUrl() != null && ex.getUrl().contains(ProfileConnection.URL)) {
@@ -282,11 +243,11 @@ public class ProfileController extends BaseController {
     }
 
     public void updatePassword(HashMap passwordHashMap){
-            JSONObject json = new JSONObject(passwordHashMap);
-            Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
-            PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
-            passwordConnection.setPayLoad(json.toString());
-            passwordConnection.request();
+        JSONObject json = new JSONObject(passwordHashMap);
+        Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+        PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
+        passwordConnection.setPayLoad(json.toString());
+        passwordConnection.request();
 
     }
 

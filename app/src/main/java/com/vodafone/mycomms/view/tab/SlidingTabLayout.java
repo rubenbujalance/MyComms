@@ -42,7 +42,6 @@ import android.widget.TextView;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.RefreshContactListEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
 

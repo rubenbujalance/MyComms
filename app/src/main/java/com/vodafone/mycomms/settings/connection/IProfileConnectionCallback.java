@@ -20,7 +20,4 @@ public interface IProfileConnectionCallback extends IConnectionCallback {
 
     void onPasswordChangeCompleted();
 
-public interface IProfileConnectionCallback extends IConnectionCallback{
-    void onProfileReceived(UserProfile userProfile);
-    void onProfileConnectionError();
 }

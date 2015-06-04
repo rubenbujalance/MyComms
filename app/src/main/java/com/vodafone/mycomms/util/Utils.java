@@ -6,18 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
 
 import com.vodafone.mycomms.R;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.lang.reflect.Method;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,13 +22,11 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.concurrent.TimeUnit;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -185,7 +179,7 @@ public final class Utils extends Activity {
 //                        sendIntent.putExtra("sms_body", x);
         context.startActivity(sendIntent);
     }
-    
+
     public static String getStringTimeDifference(int millis){
         long timeDiffMilis = millis;
         long minutes = timeDiffMilis / 60000;
@@ -321,26 +315,11 @@ public final class Utils extends Activity {
                 if(key == null || key.length() <= 0 || value == null || value.length() <= 0){
                     return false;
                 }
-              //  it.remove(); // avoids a ConcurrentModificationException
+                //  it.remove(); // avoids a ConcurrentModificationException
             }catch(Exception e){
                 return false;
             }
         }
         return true;
-    }
-
-    public static String getStringChatTimeDifference(long millis){
-        long hours = TimeUnit.MILLISECONDS.toHours(millis);
-        long days = TimeUnit.MILLISECONDS.toDays(millis);
-        long currentTime = System.currentTimeMillis();
-        long currentHours = TimeUnit.MILLISECONDS.toHours(currentTime);
-        long currentDays = TimeUnit.MILLISECONDS.toDays(currentTime);
-        if( (currentHours-hours) < 24){
-            return getTimeFromMillis(millis);
-        } else if ( (currentDays - days) <= 7){
-            return dayStringFormat(millis) + " " + getTimeFromMillis(millis);
-        } else{
-            return getDateFromMillis(millis) + " " + getTimeFromMillis(millis);
-        }
     }
 }

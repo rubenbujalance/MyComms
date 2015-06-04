@@ -2,23 +2,14 @@ package com.vodafone.mycomms.login;
 
 import com.vodafone.mycomms.BuildConfig;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+//@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupPincodeActivityTest {
-
-    @Test
-    public void testSend() throws Exception {
-        Assert.assertTrue(true);
-    }
 /*
     SignupPincodeActivity activity;
     EditText etPin;

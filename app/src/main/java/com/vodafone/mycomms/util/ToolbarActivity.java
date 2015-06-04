@@ -134,8 +134,9 @@ public class ToolbarActivity extends ActionBarActivity {
         layoutDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent in = new Intent(context, ContactListMainActivity.class);
-                //startActivity(in);
+                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerProfile");
+                Intent in = new Intent(context, ContactListMainActivity.class);
+                startActivity(in);
             }
         });
 
@@ -174,17 +175,6 @@ public class ToolbarActivity extends ActionBarActivity {
                 Intent in = new Intent(context, SettingsMainActivity.class);
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
-            }
-        });
-
-        ImageView contactsSearch = (ImageView) findViewById(R.id.contacts_search);
-        contactsSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // set an exit transition
-                //Intent in = new Intent(context, ChatMainActivity.class);
-                //startActivity(in);
-                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
 
@@ -231,27 +221,45 @@ public class ToolbarActivity extends ActionBarActivity {
         switch (selected){
             case Constants.TOOLBAR_CONTACTS:
                 layoutContacts.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
+                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
                 layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.icon_create_event_date_time));
-                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.icon_tabbar_contacts_selected));
+                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.imessage));
+                    footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.land));
+                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btncontacts));
                 } else{
-                    footerRecents.setBackground(getResources().getDrawable(R.drawable.icon_create_event_date_time));
-                    footerContacts.setBackground(getResources().getDrawable(R.drawable.icon_tabbar_contacts_selected));
+                    footerRecents.setBackground(getResources().getDrawable(R.drawable.imessage));
+                    footerHome.setBackground(getResources().getDrawable(R.drawable.land));
+                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btncontacts));
                 }
                 break;
             case Constants.TOOLBAR_DASHBOARD:
+                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
+                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
+                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.imessage));
+                    footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.landselected));
+                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btncontacts));
+                } else{
+                    footerRecents.setBackground(getResources().getDrawable(R.drawable.imessage));
+                    footerHome.setBackground(getResources().getDrawable(R.drawable.landselected));
+                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btncontacts));
+                }
                 break;
             case Constants.TOOLBAR_RECENTS:
+                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
                 layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
                 layoutRecents.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.icon_tabbar_contacts_unselected));
-                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.icon_create_event_date_time_selected));
+                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btncontacts));
+                    footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.land));
+                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.imessage));
                 }else{
-                    footerContacts.setBackground(getResources().getDrawable(R.drawable.icon_tabbar_contacts_unselected));
-                    footerRecents.setBackground(getResources().getDrawable(R.drawable.icon_create_event_date_time_selected));
+                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btncontacts));
+                    footerHome.setBackground(getResources().getDrawable(R.drawable.land));
+                    footerRecents.setBackground(getResources().getDrawable(R.drawable.imessage));
                 }
                 break;
         }

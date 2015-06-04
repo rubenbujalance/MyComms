@@ -17,6 +17,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshChatListEvent;
+import com.vodafone.mycomms.events.RefreshContactListEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import model.Chat;
+import model.ChatListItem;
 
 public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 

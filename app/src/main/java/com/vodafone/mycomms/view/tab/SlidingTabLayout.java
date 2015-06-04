@@ -17,10 +17,15 @@ package com.vodafone.mycomms.view.tab;/*
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -28,12 +33,19 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.ContactListMainActivity;
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
+
+import static com.vodafone.mycomms.R.drawable.btnfavourite;
 
 /**
  * To be used with ViewPager to provide a tab indicator component which give constant feedback as to
@@ -208,34 +220,28 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     private void populateTabStrip() {
-        final PagerAdapter adapter = mViewPager.getAdapter();
         final OnClickListener tabClickListener = new TabClickListener();
 
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
 
-        for (int i = 0; i < adapter.getCount(); i++) {
-            View tabView = null;
-            TextView tabTitleView = null;
+        View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_favourites, mTabStrip, false);
+        tabView.setOnClickListener(tabClickListener);
+        mTabStrip.addView(tabView);
+        tabView.getLayoutParams().width = width/3;
 
-            if (mTabViewLayoutId != 0) {
-                // If there is a custom tab view layout id set, try and inflate it
-                tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
-                        false);
-                tabTitleView = (TextView) tabView.findViewById(mTabViewTextViewId);
-            }
+        tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_recents, mTabStrip, false);
+        tabView.setOnClickListener(tabClickListener);
+        mTabStrip.addView(tabView);
+        tabView.getLayoutParams().width = width/3;
 
-            if (tabView == null) {
-                tabView = createDefaultTabView(getContext());
-            }
-
-            if (tabTitleView == null && TextView.class.isInstance(tabView)) {
-                tabTitleView = (TextView) tabView;
-            }
-
-            tabTitleView.setText(adapter.getPageTitle(i));
-            tabView.setOnClickListener(tabClickListener);
-
-            mTabStrip.addView(tabView);
-        }
+        tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_contacts, mTabStrip, false);
+        tabView.setOnClickListener(tabClickListener);
+        mTabStrip.addView(tabView);
+        tabView.getLayoutParams().width = width/3;
     }
 
     @Override
@@ -326,7 +332,5 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
         }
     }
-
-
 
 }

@@ -20,6 +20,7 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
+import com.vodafone.mycomms.util.UserSecurity;
 
 public class ContactListMainActivity extends ToolbarActivity implements IProfileConnectionCallback, ContactListFragment.OnFragmentInteractionListener {
 
@@ -132,45 +133,21 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     public void onProfileReceived(model.UserProfile userProfile) {
         Log.i(Constants.TAG, "ContactListMainActivity.onProfileReceived: ");
         profileController.setProfileId(userProfile.getId());
-        XMPPTransactions.initializeMsgServerSession(this);
     }
 
     @Override
     public void onProfileConnectionError() {
-        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
-        finish();
-    }
-
-    @Override
-    public void onUpdateProfileConnectionError() {
-
-    }
-
-    @Override
-    public void onUpdateProfileConnectionCompleted() {
-
-    }
-
-    @Override
-    public void onPasswordChangeError(String error) {
-    }
-
-    @Override
-    public void onPasswordChangeCompleted() {
+        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: error");
     }
 
     @Override
     public void onConnectionNotAvailable() {
-        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
-        finish();
+        Log.w(Constants.TAG, "ContactListMainActivity.onConnectionNotAvailable: ");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-
-        // Disconnect from the XMPP server
-        XMPPTransactions.getXmppConnection().disconnect();
     }
 }

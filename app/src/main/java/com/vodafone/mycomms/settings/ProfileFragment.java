@@ -32,11 +32,6 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
-import java.io.File;
-import java.util.HashMap;
-
-import model.UserProfile;
-
 /**
  * A fragment representing a list of Items.
  * <p/>

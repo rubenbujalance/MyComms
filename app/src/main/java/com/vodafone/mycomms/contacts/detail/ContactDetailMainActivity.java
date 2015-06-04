@@ -1,8 +1,9 @@
 package com.vodafone.mycomms.contacts.detail;
 
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +19,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
+import com.vodafone.mycomms.contacts.view.ContactListSearchBarFragment;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -283,6 +285,9 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 favouriteController.manageFavourite(contactId);
             }
         });
+
+        //Added on 04/06/2015
+        //loadSearchBarFragment();
     }
 
     private void loadContactStatusInfo()
@@ -454,6 +459,15 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             buf.append("company:");
             buf.append(contact.getCompany());
         return buf.toString();
+    }
+
+    private void loadSearchBarFragment()
+    {
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        ContactListSearchBarFragment searchFragment = new ContactListSearchBarFragment();
+        fragmentTransaction.add(searchFragment,"Search");
+        fragmentTransaction.commit();
     }
 
     @Override

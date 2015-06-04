@@ -127,4 +127,9 @@
     <string name="toolbar_title_messages">Messages</string>
     <string name="toolbar_title_contact_list">My Contacts</string>
 
+    <!--Search bar content -->
+
+    <string name="search_bar_text">Search (name, company, email)</string>
+    <string name="search_bar_cancel_button">Cancel</string>
+
 </resources>

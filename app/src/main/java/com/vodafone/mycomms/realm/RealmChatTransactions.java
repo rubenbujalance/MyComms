@@ -70,7 +70,8 @@ public class RealmChatTransactions {
             //Update associated Chat with new last message
             Chat chat = getChatById(newChatMessage.getContact_id());
             chat.setLastMessage_id(newChatMessage.getId());
-
+            chat.setLastMessage(newChatMessage.getText());
+            chat.setLastMessageTime(newChatMessage.getTimestamp());
             mRealm.commitTransaction();
 
         } catch (Exception e){

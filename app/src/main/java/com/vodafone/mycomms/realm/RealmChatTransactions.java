@@ -56,8 +56,8 @@ public class RealmChatTransactions {
 
     //INSERTS
 
-    public void insertChatMessage (ChatMessage newChatMessage){
-        if(newChatMessage==null) return;
+    public boolean insertChatMessage (ChatMessage newChatMessage){
+        if(newChatMessage==null) return false;
 
         try {
             //Insert new chat message
@@ -73,7 +73,10 @@ public class RealmChatTransactions {
 
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ",e);
+            return false;
         }
+
+        return true;
     }
 
     public void insertChatMessageList (ArrayList<ChatMessage> chatMessageArrayList){

@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import org.jivesoftware.smack.SmackException;
@@ -19,16 +22,26 @@ import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
+import io.realm.Realm;
+import model.ChatMessage;
+
 /**
  * Created by str_rbm on 03/06/2015.
  */
 public final class XMPPTransactions {
     private static XMPPTCPConnection _xmppConnection = null;
+    private static Realm mRealm;
+    private static RealmChatTransactions chatTx;
 
     //Methods
 
     public static boolean initializeMsgServerSession(Context context)
     {
+        //Instantiate Realm and Transactions
+        mRealm = Realm.getInstance(context);
+        chatTx = new RealmChatTransactions(mRealm, context);
+
+        //Get profile_id
         SharedPreferences sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
@@ -120,6 +133,22 @@ public final class XMPPTransactions {
             @Override
             public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
                 Log.e(Constants.TAG, "XMPPTransactions.processPacket: " + packet.toString());
+
+                Message msg = (Message)packet;
+
+                if(msg.getTo().substring(0, msg.getTo().indexOf("@")).compareTo(
+                        _xmppConnection.getUser().substring(0, _xmppConnection.getUser().indexOf("@")))==0)
+                    return;
+
+                ChatMessage chatMsg = chatTx.newChatMessageInstance(
+                        msg.getFrom(),
+                        Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
+                        Constants.CHAT_MESSAGE_TYPE_TEXT,
+                        msg.getBody(),
+                        "");
+
+                saveMessageToDB(chatMsg);
+                notifyMessageReceived(chatMsg);
             }
         };
 
@@ -134,7 +163,16 @@ public final class XMPPTransactions {
         return _xmppConnection;
     }
 
-    public static void setXmppConnection(XMPPTCPConnection xmppConnection) {
-        _xmppConnection = xmppConnection;
+    private static boolean saveMessageToDB(ChatMessage chatMsg)
+    {
+        if(chatMsg==null) return false;
+        return chatTx.insertChatMessage(chatMsg);
+    }
+
+    private static void notifyMessageReceived(ChatMessage chatMsg)
+    {
+        ChatsReceivedEvent event = new ChatsReceivedEvent();
+        event.setMessage(chatMsg);
+        BusProvider.getInstance().post(event);
     }
 }

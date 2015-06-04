@@ -23,7 +23,8 @@
         class="android.support.v7.widget.RecyclerView"
         android:layout_above="@+id/message_layout"
         android:background="@color/white"
-        android:visibility="visible" />
+        android:visibility="visible"
+        android:paddingBottom="5dp" />
 
     <LinearLayout
         android:id="@+id/message_layout"

@@ -5,13 +5,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.filter.IQTypeFilter;
-import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -19,17 +20,33 @@ import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
+import io.realm.Realm;
+import model.ChatMessage;
+
 /**
  * Created by str_rbm on 03/06/2015.
  */
-public final class XMPPTransactions {
+public class XMPPTransactions {
     private static XMPPTCPConnection _xmppConnection = null;
+    private static Realm mRealm;
+    private static RealmChatTransactions _chatTx;
+    private static Context mContext;
 
     //Methods
 
-    public static boolean initializeMsgServerSession(Context context)
+    public static boolean initializeMsgServerSession(Context appContext)
     {
-        SharedPreferences sp = context.getSharedPreferences(
+        if(mContext!=null) return true;
+
+        //Save context
+        mContext = appContext;
+
+        //Instantiate Realm and Transactions
+        mRealm = Realm.getInstance(mContext);
+        _chatTx = new RealmChatTransactions(mRealm, mContext);
+
+        //Get profile_id
+        SharedPreferences sp = appContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
@@ -59,11 +76,29 @@ public final class XMPPTransactions {
         return true;
     }
 
+    public static boolean disconnectMsgServerSession()
+    {
+        try {
+            _xmppConnection.disconnect();
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: ", e);
+            return false;
+        }
+
+        Log.e(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: XMPP Server DISCONNECTED");
+        return true;
+    }
+
     public static boolean sendText(String contact_id, String text)
     {
+        //Check connection
+        if(_xmppConnection == null || _xmppConnection.isConnected())
+            initializeMsgServerSession(mContext);
+
         //Send text to the server
         ChatManager chatmanager = ChatManager.getInstanceFor(XMPPTransactions.getXmppConnection());
-        org.jivesoftware.smack.chat.Chat newChat = chatmanager.createChat(contact_id+Constants.XMPP_PARAM_DOMAIN);
+        org.jivesoftware.smack.chat.Chat newChat = chatmanager.createChat(contact_id+"@"+Constants.XMPP_PARAM_DOMAIN);
 
         try {
             newChat.sendMessage(text);
@@ -111,21 +146,33 @@ public final class XMPPTransactions {
 
     private static void xmppConnectionCallback(XMPPTCPConnection xmppTcpConnection)
     {
-        if(xmppTcpConnection != null)
-            Log.i(Constants.TAG, "XMPPOpenConnection.onPostExecute: XMPP Connection established");
-        else Log.i(Constants.TAG, "XMPPOpenConnection.onPostExecute: XMPP Connection NOT established");
+        if(xmppTcpConnection != null && xmppTcpConnection.isConnected()) {
+            Log.e(Constants.TAG, "XMPPOpenConnection.onPostExecute: XMPP Connection established with user " + xmppTcpConnection.getUser());
+        }
+        else {
+            Log.e(Constants.TAG, "XMPPOpenConnection.onPostExecute: XMPP Connection NOT established");
+            return;
+        }
 
         //Register the listener for incoming messages
         StanzaListener packetListener = new StanzaListener() {
             @Override
             public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
                 Log.e(Constants.TAG, "XMPPTransactions.processPacket: " + packet.toString());
+
+                Message msg = (Message)packet;
+
+                if(msg.getFrom().substring(0, msg.getFrom().indexOf("@")).compareTo(
+                        _xmppConnection.getUser().substring(0, _xmppConnection.getUser().indexOf("@")))!=0) {
+
+                    ChatMessage chatMsg = saveMessageToDB(msg);
+                    notifyMessageReceived(chatMsg);
+                }
             }
         };
 
         // Register the listener
-        StanzaFilter packetFilter = new OrFilter(IQTypeFilter.GET,
-                                    new StanzaTypeFilter(Message.class));
+        StanzaFilter packetFilter = new StanzaTypeFilter(Message.class);
         _xmppConnection.addAsyncStanzaListener(packetListener, packetFilter);
     }
 
@@ -134,7 +181,30 @@ public final class XMPPTransactions {
         return _xmppConnection;
     }
 
-    public static void setXmppConnection(XMPPTCPConnection xmppConnection) {
-        _xmppConnection = xmppConnection;
+    private static ChatMessage saveMessageToDB(Message msg)
+    {
+        if(msg==null) return null;
+
+        Realm r = Realm.getInstance(mContext);
+        RealmChatTransactions chatTx = new RealmChatTransactions(r, mContext);
+
+        ChatMessage newChatMessage = chatTx.newChatMessageInstance(
+                msg.getFrom().substring(0, msg.getFrom().indexOf("@")),
+                Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
+                Constants.CHAT_MESSAGE_TYPE_TEXT,
+                msg.getBody(),
+                "");
+
+        chatTx.insertChatMessage(newChatMessage);
+        r.close();
+
+        return newChatMessage;
+    }
+
+    private static void notifyMessageReceived(ChatMessage chatMsg)
+    {
+        ChatsReceivedEvent event = new ChatsReceivedEvent();
+        event.setMessage(chatMsg);
+        BusProvider.getInstance().post(event);
     }
 }

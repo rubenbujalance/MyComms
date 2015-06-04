@@ -267,6 +267,18 @@ public class SplashScreenActivity extends Activity {
         }
     }
 
+    //Async Tasks
+    private class RenewTokenAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+        @Override
+        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
+            return APIWrapper.httpPostAPI("/auth/renew", params[0], params[1], SplashScreenActivity.this);
+        }
+        @Override
+        protected void onPostExecute(HashMap<String,Object> result) {
+            callBackRenewToken(result);
+        }
+    }
+
     private class ProfileAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
         @Override
         protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {

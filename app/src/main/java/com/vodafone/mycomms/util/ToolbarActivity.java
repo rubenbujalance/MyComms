@@ -196,6 +196,10 @@ public class ToolbarActivity extends ActionBarActivity {
                 Intent in = new Intent(context, SettingsMainActivity.class);
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
+                // set an exit transition
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
+                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
 
@@ -203,6 +207,29 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
+            }
+        });
+    }
+
+    protected void setChatListListeners(final Context context){
+        ImageView contactsProfile = (ImageView) mToolbar.findViewById(R.id.contacts_profile);
+        contactsProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(context, SettingsMainActivity.class);
+                startActivity(in);
+                //overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
+            }
+        });
+
+        ImageView contactsAdd = (ImageView) mToolbar.findViewById(R.id.chat_add);
+        contactsAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Intent in = new Intent(context, ChatMainActivity.class);
+                //startActivity(in);
                 //Intent in = new Intent(context, ChatMainActivity.class);
                 //startActivity(in);
             }

@@ -80,6 +80,8 @@ public class ContactListFragment extends ListFragment{
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+       listView = (ListView) v.findViewById(android.R.id.list);
+       emptyText = (TextView) v.findViewById(android.R.id.empty);
 
        return v;
     }
@@ -146,6 +148,12 @@ public class ContactListFragment extends ListFragment{
                         }
                     }
                     else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
+                        /*String strPhones = recentContactList.get(position).getPhones();
+                        if (strPhones != null) {
+                            JSONArray jPhones = new JSONArray(strPhones);
+                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
+                            Utils.launchSms(phone, getActivity());
+                        }*/
                         in = new Intent(getActivity(), ChatMainActivity.class);
                         in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getId());
                         in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
@@ -204,7 +212,12 @@ public class ContactListFragment extends ListFragment{
                 emptyText.setText("");
             recentContactList = mContactController.getAllRecentContacts();
             if (recentContactList!=null) {
-               setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList));
+                RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList);
+                if (listView != null) {
+                    state = listView.onSaveInstanceState();
+                    setListAdapter(recentAdapter);
+                    listView.onRestoreInstanceState(state);
+                }
             }
         }else if(mIndex == Constants.CONTACTS_ALL){
             if (emptyText!=null)

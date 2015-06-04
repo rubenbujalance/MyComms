@@ -111,4 +111,44 @@ public class Constants {
     public static final String CHAT_VIEW_CONTACT_DETAIL = "Contact_Detail";
     public static final String CHAT_VIEW_CONTACT_LIST = "Contact_List";
 
+    //XMPP Constants
+    public static final int XMPP_PARAM_PORT = 5222;
+    public static final String XMPP_PARAM_HOST = "securejabber.me";
+    public static final String XMPP_PARAM_SERVICE_NAME = "securejabber.me";
+    public static final String XMPP_PARAM_DOMAIN = "securejabber.me";
+
+
+    //Chat BD Fields
+    public static final String CHAT_MESSAGE_FIELD_ID = "id";
+    public static final String CHAT_MESSAGE_FIELD_PROFILE_ID = "profile_id";
+    public static final String CHAT_MESSAGE_FIELD_CONTACT_ID = "contact_id";
+    public static final String CHAT_MESSAGE_FIELD_TIMESTAMP = "timestamp";
+    public static final String CHAT_MESSAGE_FIELD_DIRECTION = "direction";
+    public static final String CHAT_MESSAGE_FIELD_TYPE = "type";
+    public static final String CHAT_MESSAGE_FIELD_TEXT = "text";
+    public static final String CHAT_MESSAGE_FIELD_RESOURCE_URI = "resourceUri";
+    public static final String CHAT_MESSAGE_FIELD_READ = "read";
+    public static final String CHAT_MESSAGE_FIELD_STATUS = "status";
+    public static final String CHAT_FIELD_ID = "id";
+    public static final String CHAT_FIELD_PROFILE_ID = "profile_id";
+    public static final String CHAT_FIELD_CONTACT_ID = "contact_id";
+    public static final String CHAT_FIELD_LAST_MESSAGE_ID = "lastMessage_id";
+    public static final String CHAT_FIELD_LAST_MESSAGE_TIME = "lastMessageTime";
+
+    //Chat constants
+    public static final int CHAT_MESSAGE_TYPE_TEXT = 0;
+    public static final int CHAT_MESSAGE_TYPE_PICTURE = 1;
+    public static final String CHAT_MESSAGE_DIRECTION_SENT = "0";
+    public static final String CHAT_MESSAGE_DIRECTION_RECEIVED = "1";
+    public static final String CHAT_MESSAGE_STATUS_NOT_SENT = "0";
+    public static final String CHAT_MESSAGE_STATUS_SENT = "1";
+    public static final String CHAT_MESSAGE_STATUS_DELIVERED = "2";
+    public static final String CHAT_MESSAGE_STATUS_READ = "3";
+    public static final String CHAT_MESSAGE_NOT_READ = "0";
+    public static final String CHAT_MESSAGE_READ = "1";
+    public static final String CHAT_PREVIOUS_VIEW = "Chat_Previous_View";
+    public static final String CHAT_VIEW_CHAT_LIST = "Chat_List";
+    public static final String CHAT_VIEW_CONTACT_DETAIL = "Contact_Detail";
+    public static final String CHAT_VIEW_CONTACT_LIST = "Contact_List";
+
 }

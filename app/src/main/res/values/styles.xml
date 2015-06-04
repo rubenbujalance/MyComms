@@ -105,4 +105,5 @@
         <item name="android:layout_marginRight">20dp</item>
         <item name="android:clickable">false</item>
     </style>
+    
 </resources>

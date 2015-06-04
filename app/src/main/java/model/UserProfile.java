@@ -1,6 +1,8 @@
 package model;
 
 
+import java.util.HashMap;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 

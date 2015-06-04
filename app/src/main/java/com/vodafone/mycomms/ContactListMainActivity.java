@@ -19,6 +19,8 @@ import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
+import com.vodafone.mycomms.util.UserSecurity;
 
 public class ContactListMainActivity extends ToolbarActivity implements IProfileConnectionCallback, ContactListFragment.OnFragmentInteractionListener {
 
@@ -39,6 +41,13 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
 
         setFooterListeners(this);
         setContactsListeners(this);
+
+        //Save profile_id if accessToken has changed
+        String profile_id = validateAccessToken();
+
+        //Initialize messaging server session (needs the profile_id saved)
+        if(profile_id != null) //If null, do initialization in callback method
+            XMPPTransactions.initializeMsgServerSession(this);
 
         validateAccessToken();
 
@@ -85,17 +94,30 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         // TODO RBM - Upload avatar
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        BusProvider.getInstance().unregister(this);
-    }
-
     public void setConnectionLayoutVisibility(boolean connection){
         if (connection){
             noConnectionLayout.setVisibility(View.GONE);
         } else{
             noConnectionLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private String validateAccessToken(){
+        Log.i(Constants.TAG, "ContactListMainActivity.validateAccessToken: ");
+        String accessToken = UserSecurity.getAccessToken(this);
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
+        if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
+            profileController = new ProfileController(this);
+            profileController.setConnectionCallback(this);
+            profileController.getProfile();
+            
+            return null;
+        }
+        else {
+            return sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
     }
 
@@ -123,6 +145,52 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     @Subscribe
     public void setConnectionLayoutVisibility(SetConnectionLayoutVisibility event){
         setConnectionLayoutVisibility(true);
+    }
+
+    @Override
+    public void onProfileReceived(model.UserProfile userProfile) {
+        Log.i(Constants.TAG, "ContactListMainActivity.onProfileReceived: ");
+        profileController.setProfileId(userProfile.getId());
+        XMPPTransactions.initializeMsgServerSession(this);
+    }
+
+    @Override
+    public void onProfileConnectionError() {
+        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
+        finish();
+    }
+
+    @Override
+    public void onUpdateProfileConnectionError() {
+
+    }
+
+    @Override
+    public void onUpdateProfileConnectionCompleted() {
+
+    }
+
+    @Override
+    public void onPasswordChangeError(String error) {
+    }
+
+    @Override
+    public void onPasswordChangeCompleted() {
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+
+        // Disconnect from the XMPP server
+        XMPPTransactions.getXmppConnection().disconnect();
     }
 
     @Override

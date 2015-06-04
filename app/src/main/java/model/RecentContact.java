@@ -25,13 +25,13 @@ public class RecentContact extends RealmObject {
     private String id;
 
     private String action;
-    private int actionTimeStamp;
+    private long timestamp;
 
     public RecentContact(){
 
     }
 
-    public RecentContact(String uniqueId, int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country, String id, String action, int actionTimeStamp) {
+    public RecentContact(String uniqueId, int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country, String id, String action, int timestamp) {
         this.uniqueId = uniqueId;
         this.lastInteraction = lastInteraction;
         this.platform = platform;
@@ -50,7 +50,16 @@ public class RecentContact extends RealmObject {
         this.country = country;
         this.id = id;
         this.action = action;
-        this.actionTimeStamp = actionTimeStamp;
+        this.timestamp = timestamp;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+        this.timestamp = timestamp;
     }
 
     public String getUniqueId() {
@@ -197,11 +206,11 @@ public class RecentContact extends RealmObject {
         this.action = action;
     }
 
-    public int getActionTimeStamp() {
-        return actionTimeStamp;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setActionTimeStamp(int actionTimeStamp) {
-        this.actionTimeStamp = actionTimeStamp;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

@@ -10,12 +10,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
+import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+
+import model.UserProfile;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,7 +36,7 @@ import com.vodafone.mycomms.util.UserSecurity;
  * Use the {@link PreferencesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PreferencesFragment extends Fragment {
+public class PreferencesFragment extends Fragment implements IProfileConnectionCallback{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -36,6 +47,7 @@ public class PreferencesFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private ProfileController profileController;
 
     /**
      * Use this factory method to create a new instance of
@@ -76,22 +88,35 @@ public class PreferencesFragment extends Fragment {
             mParam1 = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        profileController = new ProfileController(this);
+        profileController.setConnectionCallback(this);
+
+
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.d(Constants.TAG, "PreferencesFragment.onResume: ");
+//        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+//        editProfile.setVisibility(View.INVISIBLE);
+
+        profileController.getProfile();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_preferences, container, false);
 
-        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-        //editProfile.setVisibility(View.INVISIBLE);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i(Constants.TAG, "PreferencesFragment.onClick: Logout");
-                
+
                 //Reset user security data
                 UserSecurity.resetTokens(getActivity());
 
@@ -104,7 +129,47 @@ public class PreferencesFragment extends Fragment {
             }
         });
 
+        Switch privateTimeZoneSwitch = (Switch) v.findViewById(R.id.setting_share_current_time_switch);
+        privateTimeZoneSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                shareCurrentTime(isChecked);
+            }
+        });
+
+        Switch doNotDisturbSwitch  = (Switch) v.findViewById(R.id.settings_do_not_disturb_switch);
+        doNotDisturbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                setDoNotDisturb(isChecked);
+            }
+        });
+
+
         return v;
+    }
+
+    private void shareCurrentTime(boolean isChecked) {
+        HashMap settingsHashMap = new HashMap<>();
+        if(isChecked) {
+            settingsHashMap.put("privateTimeZone", false);
+        }else{
+            settingsHashMap.put("privateTimeZone", true);
+        }
+
+        profileController.updateSettingsData(settingsHashMap);
+    }
+
+
+    private void setDoNotDisturb(boolean isChecked) {
+        HashMap settingsHashMap = new HashMap<>();
+        if(isChecked) {
+            settingsHashMap.put("doNotDisturb", true);
+        }else{
+            settingsHashMap.put("doNotDisturb", false);
+        }
+
+        profileController.updateSettingsData(settingsHashMap);
     }
 
     @Override
@@ -124,6 +189,79 @@ public class PreferencesFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onProfileReceived(UserProfile userProfile) {
+        Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: settings:" + userProfile.getSettings() );
+
+        JSONObject jsonSettings = null;
+        boolean privateTimeZone = false;
+        boolean doNotDisturb = false;
+
+        try {
+            if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
+                jsonSettings = new JSONObject(userProfile.getSettings());
+                privateTimeZone = jsonSettings.getBoolean("privateTimeZone");
+            }
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: " , e);
+        }
+
+        try {
+            if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0 && jsonSettings != null) {
+                doNotDisturb = jsonSettings.getBoolean("doNotDisturb");
+            }
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived, doNotDisturb: " , e);
+        }
+
+
+        if(privateTimeZone){
+            Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
+            shareCurrentTimeSwitch.setChecked(false);
+        }else {
+            Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
+            shareCurrentTimeSwitch.setChecked(true);
+        }
+
+        if(doNotDisturb){
+            Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
+            doNotDisturbSwitch.setChecked(true);
+        }else {
+            Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
+            doNotDisturbSwitch.setChecked(false);
+        }
+    }
+
+    @Override
+    public void onProfileConnectionError() {
+
+    }
+
+    @Override
+    public void onUpdateProfileConnectionError() {
+
+    }
+
+    @Override
+    public void onUpdateProfileConnectionCompleted() {
+
+    }
+
+    @Override
+    public void onPasswordChangeError(String error) {
+
+    }
+
+    @Override
+    public void onPasswordChangeCompleted() {
+
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -138,5 +276,7 @@ public class PreferencesFragment extends Fragment {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
+
+
 
 }

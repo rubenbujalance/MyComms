@@ -2,6 +2,7 @@ package com.vodafone.mycomms.realm;
 
 import android.util.Log;
 
+import model.UserProfile;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -27,6 +28,18 @@ public class RealmContactTransactions {
         try {
             mRealm.beginTransaction();
             mRealm.copyToRealmOrUpdate(newContact);
+
+            mRealm.commitTransaction();
+        } catch (IllegalArgumentException e){
+            Log.e(Constants.TAG, "RealmContactTransactions.insertContact: " + e.toString());
+        }
+    }
+
+    public void insertUserProfile(UserProfile userProfile){
+        Log.d(Constants.TAG, "RealmContactTransactions.insertUserProfile: ");
+        try {
+            mRealm.beginTransaction();
+            mRealm.copyToRealmOrUpdate(userProfile);
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -134,6 +147,24 @@ public class RealmContactTransactions {
             return result1.first();
         }else {
             return null;
+        }
+    }
+
+    public UserProfile getUserProfile(String contactId){
+        try {
+            RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);
+            query.equalTo(Constants.CONTACT_ID, contactId);
+
+            RealmResults<UserProfile> result1 = query.findAll();
+
+            if (result1 != null) {
+                return result1.first();
+            } else {
+                return null;
+            }
+        }catch (Exception e ){
+            Log.e(Constants.TAG, "RealmContactTransactions.getUserProfile: " , e);
+            return  null;
         }
     }
 

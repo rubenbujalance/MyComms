@@ -22,9 +22,11 @@ import model.Contact;
 public class RealmChatTransactions {
     private Realm mRealm;
     private String _profile_id;
+    private Context mContext;
 
     public RealmChatTransactions(Realm realm, Context context) {
 
+        mContext = context;
         mRealm = realm;
         _profile_id = null;
 
@@ -68,11 +70,12 @@ public class RealmChatTransactions {
             //Update associated Chat with new last message
             Chat chat = getChatById(newChatMessage.getContact_id());
             chat.setLastMessage_id(newChatMessage.getId());
+
             mRealm.commitTransaction();
-//            insertChat(chat); //Begins and commits the transaction itself
 
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ",e);
+            mRealm.cancelTransaction();
             return false;
         }
 
@@ -92,6 +95,7 @@ public class RealmChatTransactions {
         } catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessageList: ", e);
+            mRealm.cancelTransaction();
         }
     }
 
@@ -204,6 +208,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.deleteChatMessageByFilter: ",e);
+            mRealm.cancelTransaction();
         }
     }
 
@@ -221,6 +226,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.deleteChatMessageById: ",e);
+            mRealm.cancelTransaction();
         }
     }
 
@@ -238,6 +244,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.deleteAllChatMessages: ",e);
+            mRealm.cancelTransaction();
         }
     }
 
@@ -275,6 +282,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChat: ",e);
+            mRealm.cancelTransaction();
         }
     }
 
@@ -291,6 +299,7 @@ public class RealmChatTransactions {
         } catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatList: ", e);
+            mRealm.cancelTransaction();
         }
     }
 
@@ -391,6 +400,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.deleteChatByFilter: ",e);
+            mRealm.cancelTransaction();
         }
     }
 
@@ -416,6 +426,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.deleteChatById: ",e);
+            mRealm.cancelTransaction();
         }
     }
 
@@ -433,6 +444,7 @@ public class RealmChatTransactions {
                     deleteAllChatMessages(chat.getContact_id());
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "RealmChatTransactions.deleteAllChats: ",e);
+                    mRealm.cancelTransaction();
                 }
             }
 
@@ -443,6 +455,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.deleteAllChats: ",e);
+            mRealm.cancelTransaction();
         }
     }
 

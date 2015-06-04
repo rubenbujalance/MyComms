@@ -13,6 +13,7 @@ public class ChatListHolder extends RecyclerView.ViewHolder {
     protected TextView textViewTime;
     protected ImageView imageAvatar;
     protected TextView textAvatar;
+    protected TextView badgeUnread;
 
     public ChatListHolder(View view) {
         super(view);
@@ -21,5 +22,6 @@ public class ChatListHolder extends RecyclerView.ViewHolder {
         this.textViewTime = (TextView) view.findViewById(R.id.chat_list_item_last_event_day);
         this.imageAvatar = (ImageView) view.findViewById(R.id.companyLogo);
         this.textAvatar = (TextView) view.findViewById(R.id.avatarText);
+        this.badgeUnread = (TextView) view.findViewById(R.id.chat_list_item_badge_unread);
     }
 }

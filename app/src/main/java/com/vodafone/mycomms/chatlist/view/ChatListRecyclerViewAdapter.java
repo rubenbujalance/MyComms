@@ -45,6 +45,12 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         String timeDifference = Utils.getStringChatTimeDifference(mChat.get(i).getLastMessageTime());
         chatListHolder.textViewTime.setText(timeDifference);
 
+//        BadgeView badge = new BadgeView(mContext, chatListHolder.badgeUnread);
+//        badge.setText("3");
+//        badge.setBadgePosition(BadgeView.POSITION_CENTER);
+//        badge.setBadgeBackgroundColor(Color.parseColor("#0071FF"));
+//        badge.show();
+
         //Image avatar
         File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+mChat.get(i).getContact_id()+".jpg");
 

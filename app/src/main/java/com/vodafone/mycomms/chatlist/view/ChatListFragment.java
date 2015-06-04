@@ -16,6 +16,7 @@ import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshChatListEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -80,6 +81,12 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+    }
+
+    @Override
     public void onRefresh() {
         handler.postDelayed(testIsGood, 5000);
     }
@@ -111,6 +118,11 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     public void refreshChatListEvent(RefreshChatListEvent event) {
         Log.i(Constants.TAG, "ChatListFragment.refreshContactListEvent: ");
         refreshAdapter();
+    }
+
+    @Subscribe
+    public void onEventChatsReceived(ChatsReceivedEvent event){
+        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
 }

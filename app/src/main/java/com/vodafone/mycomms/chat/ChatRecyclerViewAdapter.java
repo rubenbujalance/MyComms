@@ -8,12 +8,14 @@ import android.view.ViewGroup;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import model.ChatMessage;
 import model.Contact;
 
@@ -25,9 +27,14 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     private Context mContext;
     private Contact _contact;
     private Contact _profile;
+    private Realm _realm;
+    private RealmChatTransactions _chatTx;
 
     public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem, Contact profile, Contact contact) {
         mContext = context;
+        _realm = Realm.getInstance(mContext);
+        _chatTx = new RealmChatTransactions(_realm, mContext);
+
         this._contact = contact;
         this._profile = profile;
 
@@ -123,6 +130,22 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
             chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
             chatHolder.chatAvatarText.setText(initials);
         }
+
+        //Set message as read
+        ChatMessage chatMsg = chatList.get(i);
+
+        if(chatMsg.getRead().compareTo("0")==0 &&
+                chatMsg.getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
+        {
+            _chatTx.setChatMessageAsRead(chatMsg);
+        }
     }
 
+    @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+
+        if(_realm!=null)
+            _realm.close();
+    }
 }

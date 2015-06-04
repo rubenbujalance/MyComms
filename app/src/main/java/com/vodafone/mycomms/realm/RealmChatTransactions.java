@@ -73,7 +73,7 @@ public class RealmChatTransactions {
 
             mRealm.commitTransaction();
 
-        } catch (IllegalArgumentException e){
+        } catch (Exception e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ",e);
             mRealm.cancelTransaction();
             return false;
@@ -92,9 +92,23 @@ public class RealmChatTransactions {
                 mRealm.copyToRealmOrUpdate(chatMessageArrayList.get(i));
             }
             mRealm.commitTransaction();
-        } catch (IllegalArgumentException e){
+        } catch (Exception e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessageList: ", e);
+            mRealm.cancelTransaction();
+        }
+    }
+
+    public void setChatMessageAsRead (ChatMessage chatMessage){
+        if(chatMessage==null) return;
+
+        try {
+            mRealm.beginTransaction();
+            chatMessage.setRead("1");
+            mRealm.commitTransaction();
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageAsRead: ", e);
             mRealm.cancelTransaction();
         }
     }
@@ -120,7 +134,7 @@ public class RealmChatTransactions {
                 }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getAllChatMessages: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.getAllChatMessages: ", e);
         }
 
         return chatMessageArrayList;
@@ -146,7 +160,7 @@ public class RealmChatTransactions {
                 }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getFilteredChatMessages: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.getFilteredChatMessages: ", e);
         }
 
         return chatMessageArrayList;
@@ -161,7 +175,7 @@ public class RealmChatTransactions {
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, chatMessageId);
             chatMessage = query.findFirst();
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ", e);
         }
 
         return chatMessage;
@@ -181,7 +195,7 @@ public class RealmChatTransactions {
             message = getChatMessageById(contact_id, timestamp);
 
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getLastChatMessage: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.getLastChatMessage: ", e);
         }
 
         return message;
@@ -280,7 +294,7 @@ public class RealmChatTransactions {
             mRealm.copyToRealmOrUpdate(newChat);
 
             mRealm.commitTransaction();
-        } catch (IllegalArgumentException e){
+        } catch (Exception e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChat: ",e);
             mRealm.cancelTransaction();
         }
@@ -296,7 +310,7 @@ public class RealmChatTransactions {
                 mRealm.copyToRealmOrUpdate(chatArrayList.get(i));
             }
             mRealm.commitTransaction();
-        } catch (IllegalArgumentException e){
+        } catch (Exception e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatList: ", e);
             mRealm.cancelTransaction();
@@ -322,7 +336,7 @@ public class RealmChatTransactions {
                 }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getAllChats: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.getAllChats: ", e);
         }
 
         return chatMessageArrayList;
@@ -344,7 +358,7 @@ public class RealmChatTransactions {
                 }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getFilteredChats: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.getFilteredChats: ", e);
         }
 
         return chatMessageArrayList;
@@ -359,7 +373,7 @@ public class RealmChatTransactions {
             query.equalTo(Constants.CHAT_FIELD_ID, chatId);
             chatMessage = query.findFirst();
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getChatById: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.getChatById: ", e);
         }
 
         return chatMessage;
@@ -375,6 +389,7 @@ public class RealmChatTransactions {
             count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
                     .count();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getChatMessagesCount: ",e);

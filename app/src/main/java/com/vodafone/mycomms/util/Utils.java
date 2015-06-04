@@ -179,7 +179,7 @@ public final class Utils extends Activity {
 //                        sendIntent.putExtra("sms_body", x);
         context.startActivity(sendIntent);
     }
-
+    
     public static String getStringTimeDifference(int millis){
         long timeDiffMilis = millis;
         long minutes = timeDiffMilis / 60000;
@@ -315,7 +315,7 @@ public final class Utils extends Activity {
                 if(key == null || key.length() <= 0 || value == null || value.length() <= 0){
                     return false;
                 }
-                //  it.remove(); // avoids a ConcurrentModificationException
+              //  it.remove(); // avoids a ConcurrentModificationException
             }catch(Exception e){
                 return false;
             }

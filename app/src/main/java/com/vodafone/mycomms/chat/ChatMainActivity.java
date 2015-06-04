@@ -24,13 +24,6 @@ import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback
 import com.vodafone.mycomms.contacts.detail.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshChatListEvent;
-import com.vodafone.mycomms.events.SetContactListAdapterEvent;
-import com.vodafone.mycomms.realm.RealmChatTransactions;
-import com.vodafone.mycomms.realm.RealmContactTransactions;
-import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
-import com.vodafone.mycomms.contacts.detail.RecentContactController;
-import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.RefreshChatListEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;

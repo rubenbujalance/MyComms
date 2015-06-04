@@ -20,7 +20,6 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
-import com.vodafone.mycomms.util.UserSecurity;
 
 public class ContactListMainActivity extends ToolbarActivity implements IProfileConnectionCallback, ContactListFragment.OnFragmentInteractionListener {
 
@@ -48,8 +47,6 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         //Initialize messaging server session (needs the profile_id saved)
         if(profile_id != null) //If null, do initialization in callback method
             XMPPTransactions.initializeMsgServerSession(this);
-
-        validateAccessToken();
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
@@ -163,16 +160,17 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     }
 
     @Override
+    public void onConnectionNotAvailable() {
+        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
+        finish();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
 
         // Disconnect from the XMPP server
         XMPPTransactions.getXmppConnection().disconnect();
-    }
-
-    @Override
-    public void onConnectionNotAvailable() {
-        Log.w(Constants.TAG, "ContactListMainActivity.onConnectionNotAvailable: ");
     }
 }

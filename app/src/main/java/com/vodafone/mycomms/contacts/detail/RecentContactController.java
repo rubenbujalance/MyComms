@@ -38,7 +38,6 @@ public class RecentContactController extends BaseController {
         Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
         JSONObject json = null;
         HashMap body = new HashMap<>();
-        RecentContactController recentContactController;
         int method = HttpConnection.POST;
         String apiCall = Constants.CONTACT_API_POST_RECENTS;
         long timestamp = Calendar.getInstance().getTimeInMillis();
@@ -53,16 +52,12 @@ public class RecentContactController extends BaseController {
 
     @Override
     public void onConnectionComplete(ConnectionResponse response) {
-        Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: ");
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: ");
-        String result = response.getData().toString();
-        Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: " + result);
         String apiCall = Constants.CONTACT_API_GET_RECENTS;
         ContactController contactController = new ContactController(getActivity(), mRealm);
         contactController.getRecentList(apiCall);
         //Refresh Recent List
         //BusProvider.getInstance().post(new SetContactListAdapterEvent());
-        BusProvider.getInstance().post(new SetContactListAdapterEvent());
     }
 }

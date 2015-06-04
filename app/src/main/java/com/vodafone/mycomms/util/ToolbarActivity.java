@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
@@ -196,10 +195,6 @@ public class ToolbarActivity extends ActionBarActivity {
                 Intent in = new Intent(context, SettingsMainActivity.class);
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
-                // set an exit transition
-                //Intent in = new Intent(context, ChatMainActivity.class);
-                //startActivity(in);
-                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
 

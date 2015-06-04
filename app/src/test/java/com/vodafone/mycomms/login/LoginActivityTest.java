@@ -1,38 +1,10 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.ContactListMainActivity;
-import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.main.SplashScreenActivity;
-import com.vodafone.mycomms.test.util.Util;
 
-import org.apache.http.HttpResponse;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.FakeHttp;
-import org.robolectric.shadows.ShadowActivity;
-import org.robolectric.shadows.ShadowAlertDialog;
-
-import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
-import static com.vodafone.mycomms.constants.Constants.INVALID_VERSION_RESPONSE;
-import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
-import static com.vodafone.mycomms.constants.Constants.PASSWORD;
-import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -40,7 +12,7 @@ import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class LoginActivityTest {
-
+/*
     Activity activity;
     Button btLoginSalesforce;
     Button btLogin;
@@ -158,5 +130,5 @@ public class LoginActivityTest {
         ivBack.performClick();
         Assert.assertTrue(activity.isFinishing());
     }
-
+*/
 }

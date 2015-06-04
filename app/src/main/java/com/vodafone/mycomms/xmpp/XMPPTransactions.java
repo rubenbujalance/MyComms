@@ -29,7 +29,7 @@ import model.ChatMessage;
 public class XMPPTransactions {
     private static XMPPTCPConnection _xmppConnection = null;
     private static Realm mRealm;
-    private static RealmChatTransactions chatTx;
+    private static RealmChatTransactions _chatTx;
     private static Context mContext;
 
     //Methods
@@ -42,8 +42,8 @@ public class XMPPTransactions {
         mContext = appContext;
 
         //Instantiate Realm and Transactions
-        mRealm = Realm.getInstance(appContext);
-        chatTx = new RealmChatTransactions(mRealm, appContext);
+        mRealm = Realm.getInstance(mContext);
+        _chatTx = new RealmChatTransactions(mRealm, mContext);
 
         //Get profile_id
         SharedPreferences sp = appContext.getSharedPreferences(
@@ -54,10 +54,6 @@ public class XMPPTransactions {
         {
             Log.e(Constants.TAG, "ContactListMainActivity.initializeMsgServerSession: No profile_id found");
             return false;
-        }
-        else
-        {
-            Log.e(Constants.TAG, "ContactListMainActivity.initializeMsgServerSession: Connecting to XMPP server with user " + profile_id);
         }
 
         //Configuration for the connection
@@ -96,6 +92,10 @@ public class XMPPTransactions {
 
     public static boolean sendText(String contact_id, String text)
     {
+        //Check connection
+        if(_xmppConnection == null || _xmppConnection.isConnected())
+            initializeMsgServerSession(mContext);
+
         //Send text to the server
         ChatManager chatmanager = ChatManager.getInstanceFor(XMPPTransactions.getXmppConnection());
         org.jivesoftware.smack.chat.Chat newChat = chatmanager.createChat(contact_id+"@"+Constants.XMPP_PARAM_DOMAIN);
@@ -165,15 +165,7 @@ public class XMPPTransactions {
                 if(msg.getFrom().substring(0, msg.getFrom().indexOf("@")).compareTo(
                         _xmppConnection.getUser().substring(0, _xmppConnection.getUser().indexOf("@")))!=0) {
 
-                    ChatMessage chatMsg = chatTx.newChatMessageInstance(
-                            msg.getFrom(),
-                            Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
-                            Constants.CHAT_MESSAGE_TYPE_TEXT,
-                            msg.getBody(),
-                            "");
-
-
-                    saveMessageToDB(msg);
+                    ChatMessage chatMsg = saveMessageToDB(msg);
                     notifyMessageReceived(chatMsg);
                 }
             }
@@ -189,17 +181,24 @@ public class XMPPTransactions {
         return _xmppConnection;
     }
 
-    private static boolean saveMessageToDB(Message msg)
+    private static ChatMessage saveMessageToDB(Message msg)
     {
-        ChatMessage chatMsg = chatTx.newChatMessageInstance(
-                msg.getFrom(),
+        if(msg==null) return null;
+
+        Realm r = Realm.getInstance(mContext);
+        RealmChatTransactions chatTx = new RealmChatTransactions(r, mContext);
+
+        ChatMessage newChatMessage = chatTx.newChatMessageInstance(
+                msg.getFrom().substring(0, msg.getFrom().indexOf("@")),
                 Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                 Constants.CHAT_MESSAGE_TYPE_TEXT,
                 msg.getBody(),
                 "");
 
-        if(chatMsg==null) return false;
-        return chatTx.insertChatMessage(chatMsg);
+        chatTx.insertChatMessage(newChatMessage);
+        r.close();
+
+        return newChatMessage;
     }
 
     private static void notifyMessageReceived(ChatMessage chatMsg)

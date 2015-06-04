@@ -1,39 +1,10 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.UserProfile;
-import com.vodafone.mycomms.custom.CircleImageView;
-import com.vodafone.mycomms.custom.ClearableEditText;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
-import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowActivity;
-import org.robolectric.shadows.ShadowAlertDialog;
-
-import java.io.File;
-import java.util.Date;
-
-import static com.vodafone.mycomms.constants.Constants.FIRSTNAME;
-import static com.vodafone.mycomms.constants.Constants.LASTNAME;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -41,7 +12,7 @@ import static com.vodafone.mycomms.constants.Constants.LASTNAME;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupNameActivityTest {
-
+/*
     SignupNameActivity activity;
     CircleImageView mPhoto;
     ClearableEditText mFirstName;
@@ -143,5 +114,5 @@ public class SignupNameActivityTest {
         Intent expectedIntent = new Intent(activity, SignupCompanyActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
-
+*/
 }

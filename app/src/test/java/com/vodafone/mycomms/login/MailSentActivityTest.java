@@ -1,23 +1,44 @@
 package com.vodafone.mycomms.login;
 
-import com.vodafone.mycomms.BuildConfig;
+import android.content.Intent;
+import android.view.KeyEvent;
+import android.widget.Button;
+import android.widget.TextView;
 
+import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.test.util.Util;
+
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.FakeHttp;
+
+import static com.vodafone.mycomms.constants.Constants.CHECK_PHONE_OK_RESPONSE;
+import static com.vodafone.mycomms.constants.Constants.PIN;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
-//@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class MailSentActivityTest {
-/*
+
     MailSentActivity activity;
     TextView mWeSent;
     Button mResendEmail;
 
 
     @Before
-      public void setUp() {
+    public void setUp() {
         Intent intent = new Intent();
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("pin",PIN);
@@ -27,12 +48,12 @@ public class MailSentActivityTest {
     }
 
     @Test
-     public void testCheckMessage() {
+    public void testCheckMessage() {
         Assert.assertTrue(mWeSent.getText().toString().startsWith(activity.getString(R.string.we_sent_an_email_to)));
     }
 
     @Test
-     public void testResendEmail() throws Exception {
+    public void testResendEmail() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, CHECK_PHONE_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         mResendEmail.performClick();
@@ -51,5 +72,5 @@ public class MailSentActivityTest {
         expectedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
-*/
+
 }

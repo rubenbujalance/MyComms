@@ -6,7 +6,6 @@ import android.widget.EditText;
 
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
@@ -19,12 +18,16 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.FakeHttp;
 
+import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
+import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
+
 /**
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class ForgotPassActivityTest {
+
 
     Activity activity;
     Button btSend;
@@ -45,11 +48,11 @@ public class ForgotPassActivityTest {
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.oops_wrong_email), btSend.getText());
         //Invalid e-mail
-        etEmail.setText(Constants.INVALID_EMAIL);
+        etEmail.setText(INVALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.oops_wrong_email), btSend.getText());
         //Valid e-mail
-        etEmail.setText(Constants.VALID_EMAIL);
+        etEmail.setText(VALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
         Assert.assertTrue(activity.isFinishing());
@@ -60,7 +63,7 @@ public class ForgotPassActivityTest {
         HttpResponse httpResponse = Util.buildResponse(500);
         FakeHttp.addPendingHttpResponse(httpResponse);
         //Valid e-mail
-        etEmail.setText(Constants.VALID_EMAIL);
+        etEmail.setText(VALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
     }

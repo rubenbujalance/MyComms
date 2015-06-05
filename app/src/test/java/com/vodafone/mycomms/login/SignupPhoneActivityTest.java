@@ -1,16 +1,33 @@
 package com.vodafone.mycomms.login;
 
-import com.vodafone.mycomms.BuildConfig;
+import android.content.Intent;
+import android.widget.EditText;
+import android.widget.ImageView;
 
+import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
+import com.vodafone.mycomms.custom.ClearableEditText;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+
+import static com.vodafone.mycomms.constants.Constants.PHONE;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
-//@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupPhoneActivityTest {
-/*
+
     SignupPhoneActivity activity;
     ClearableEditText mPhone;
     AutoCompleteTVSelectOnly mCountry;
@@ -18,7 +35,7 @@ public class SignupPhoneActivityTest {
     ImageView ivBtBack;
 
     @Before
-      public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupPhoneActivity.class);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
@@ -27,7 +44,7 @@ public class SignupPhoneActivityTest {
     }
 
     @Test
-     public void testForwardNoCountrySelected() {
+    public void testForwardNoCountrySelected() {
         mCountry.setText("");
         mCountry.setCodeSelected("");
         ivBtFwd.performClick();
@@ -69,5 +86,5 @@ public class SignupPhoneActivityTest {
         ivBtBack.performClick();
         Assert.assertTrue(activity.isFinishing());
     }
-*/
+
 }

@@ -1,16 +1,30 @@
 package com.vodafone.mycomms.login;
 
-import com.vodafone.mycomms.BuildConfig;
+import android.content.Intent;
+import android.widget.ImageView;
 
+import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
+import com.vodafone.mycomms.custom.ClearableEditText;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
-//@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupCompanyActivityTest {
-/*
+
     SignupCompanyActivity activity;
     ImageView ivBtFwd;
     AutoCompleteTVSelectOnly mCompany;
@@ -19,7 +33,7 @@ public class SignupCompanyActivityTest {
 
 
     @Before
-      public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupCompanyActivity.class);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         mCompany = activity.mCompany;
@@ -28,7 +42,7 @@ public class SignupCompanyActivityTest {
     }
 
     @Test
-     public void testForwardEmptyCompany() {
+    public void testForwardEmptyCompany() {
         ivBtFwd.performClick();
         Assert.assertTrue(mCompany.getError().equals(activity.getString(R.string.select_your_company_to_continue)));
     }
@@ -40,13 +54,13 @@ public class SignupCompanyActivityTest {
         mCompany.setText(companyName);
         mCompany.setCodeSelected(companyCode);
         mCompany.callOnClick();
-//        mCompany.setListSelection(0);
-//        mCompany.setSelection(0);
-//        mCompany.isPopupShowing();
-//        mCompany.callOnClick();
-//        mCompany.getAdapter();
-//        Shadows.shadowOf(mCompany.getDropDownBackground());
-//        Shadows.shadowOf(mCompany).checkedPerformClick();
+        /*mCompany.setListSelection(0);
+        mCompany.setSelection(0);
+        mCompany.isPopupShowing();
+        mCompany.callOnClick();
+        mCompany.getAdapter();
+        Shadows.shadowOf(mCompany.getDropDownBackground());
+        Shadows.shadowOf(mCompany).checkedPerformClick();*/
         ivBtFwd.performClick();
         Assert.assertTrue(companyName.equals(UserProfile.getCompanyName()));
         Intent expectedIntent = new Intent(activity, SignupPassActivity.class);
@@ -59,5 +73,5 @@ public class SignupCompanyActivityTest {
         ivBtBack.performClick();
         Assert.assertTrue(activity.isFinishing());
     }
-*/
+
 }

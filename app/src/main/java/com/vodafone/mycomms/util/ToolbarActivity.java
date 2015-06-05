@@ -2,6 +2,8 @@ package com.vodafone.mycomms.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -13,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
@@ -134,7 +137,7 @@ public class ToolbarActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerProfile");
-                Intent in = new Intent(context, ContactListMainActivity.class);
+                Intent in = new Intent(context, DashBoardActivity.class);
                 startActivity(in);
             }
         });
@@ -223,27 +226,30 @@ public class ToolbarActivity extends ActionBarActivity {
                 layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
                 layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.imessage));
+                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat));
+
                     footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.land));
-                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btncontacts));
+                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btnuser_on));
                 } else{
-                    footerRecents.setBackground(getResources().getDrawable(R.drawable.imessage));
+                    footerRecents.setBackground(getResources().getDrawable(R.drawable.chat));
+
                     footerHome.setBackground(getResources().getDrawable(R.drawable.land));
-                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btncontacts));
+                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btnuser_on));
                 }
                 break;
             case Constants.TOOLBAR_DASHBOARD:
-                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
                 layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
                 layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.imessage));
+                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat));
+
                     footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.landselected));
-                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btncontacts));
+                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btnuser));
                 } else{
-                    footerRecents.setBackground(getResources().getDrawable(R.drawable.imessage));
+                    footerRecents.setBackground(getResources().getDrawable(R.drawable.chat));
+
                     footerHome.setBackground(getResources().getDrawable(R.drawable.landselected));
-                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btncontacts));
+                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btnuser));
                 }
                 break;
             case Constants.TOOLBAR_RECENTS:
@@ -252,13 +258,15 @@ public class ToolbarActivity extends ActionBarActivity {
                 layoutRecents.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btncontacts));
+                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btnuser));
                     footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.land));
-                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.imessage));
+                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat_on));
+
                 }else{
-                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btncontacts));
+                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btnuser));
                     footerHome.setBackground(getResources().getDrawable(R.drawable.land));
-                    footerRecents.setBackground(getResources().getDrawable(R.drawable.imessage));
+                    footerRecents.setBackground(getResources().getDrawable(R.drawable.chat_on));
+
                 }
                 break;
         }

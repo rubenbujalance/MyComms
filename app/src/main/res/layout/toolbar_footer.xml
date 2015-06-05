@@ -32,9 +32,9 @@
 
                 <ImageView
                     android:id="@+id/footer_contacts"
-                    android:layout_width="28dp"
+                    android:layout_width="24dp"
                     android:layout_height="28dp"
-                    android:background="@drawable/btncontacts"
+                    android:background="@drawable/btnuser"
                     />
 
                 <TextView
@@ -79,8 +79,9 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:id="@+id/footer_recents"
-                    android:background="@drawable/imessage"
-                    android:focusable="false" />
+                    android:background="@drawable/chat"
+                    android:focusable="false"
+                    android:backgroundTint="#ff808080" />
 
                 <TextView
                     android:layout_width="wrap_content"

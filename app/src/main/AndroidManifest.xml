@@ -28,6 +28,10 @@
         android:theme="@style/AppTheme" >
 
         <activity
+            android:name=".main.DashBoardActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".ContactListMainActivity"
             android:screenOrientation="portrait" >
         </activity>

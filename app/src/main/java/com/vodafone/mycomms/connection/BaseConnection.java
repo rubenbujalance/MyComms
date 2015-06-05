@@ -153,6 +153,17 @@ public class BaseConnection extends DefaultConnection {
         return isConnected;
     }
 
+    public static boolean isConnected(Context context) {
+        boolean isConnected = false;
+        if (context != null) {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+            isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        }
+        Log.d(Constants.TAG, "BaseConnection.isConnected: " + isConnected);
+        return isConnected;
+    }
+
     public Context getContext() {
         return context;
     }

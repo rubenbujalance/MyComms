@@ -46,7 +46,7 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
 
         //Initialize messaging server session (needs the profile_id saved)
         if(profile_id != null) //If null, do initialization in callback method
-            XMPPTransactions.initializeMsgServerSession(this);
+            XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
@@ -108,9 +108,9 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
         if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
             profileController = new ProfileController(this);
-            profileController.getProfile();
             profileController.setConnectionCallback(this);
-
+            profileController.getProfile();
+            
             return null;
         }
         else {
@@ -132,13 +132,32 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
     public void onProfileReceived(model.UserProfile userProfile) {
         Log.i(Constants.TAG, "ContactListMainActivity.onProfileReceived: ");
         profileController.setProfileId(userProfile.getId());
-        XMPPTransactions.initializeMsgServerSession(this);
+
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 
     @Override
     public void onProfileConnectionError() {
         Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
         finish();
+    }
+
+    @Override
+    public void onUpdateProfileConnectionError() {
+
+    }
+
+    @Override
+    public void onUpdateProfileConnectionCompleted() {
+
+    }
+
+    @Override
+    public void onPasswordChangeError(String error) {
+    }
+
+    @Override
+    public void onPasswordChangeCompleted() {
     }
 
     @Override
@@ -153,6 +172,6 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         BusProvider.getInstance().unregister(this);
 
         // Disconnect from the XMPP server
-        XMPPTransactions.getXmppConnection().disconnect();
+        XMPPTransactions.disconnectMsgServerSession();
     }
 }

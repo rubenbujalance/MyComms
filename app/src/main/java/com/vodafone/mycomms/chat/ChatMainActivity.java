@@ -277,6 +277,23 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(XMPPTransactions.getXmppConnection()!=null &&
+                XMPPTransactions.getXmppConnection().isConnected())
+        {
+            tvSendChat.setEnabled(true);
+            tvSendChat.setTextColor(Color.parseColor("#02B1FF"));
+        }
+        else
+        {
+            tvSendChat.setEnabled(false);
+            tvSendChat.setTextColor(Color.GRAY);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (mRealm != null){
@@ -287,5 +304,8 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     @Override
     public void onConnectionNotAvailable() {
         Log.e(Constants.TAG, "ChatMainActivity.onConnectionNotAvailable: ");
+
+        tvSendChat.setEnabled(false);
+        tvSendChat.setTextColor(Color.GRAY);
     }
 }

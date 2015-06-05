@@ -17,7 +17,7 @@ public class FavouriteContact extends RealmObject {
     private String position;
     private String company;
     private String timezone;
-    private int lastSeen;
+    private long lastSeen;
     private String officeLocation;
     private String availability;
     private String presence;
@@ -29,7 +29,7 @@ public class FavouriteContact extends RealmObject {
     public FavouriteContact() {
     }
 
-    public FavouriteContact(String id, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country) {
+    public FavouriteContact(String id, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, long lastSeen, String officeLocation, String availability, String presence, String country) {
         this.id = id;
         this.platform = platform;
         this.firstName = firstName;
@@ -111,11 +111,11 @@ public class FavouriteContact extends RealmObject {
         this.timezone = timezone;
     }
 
-    public int getLastSeen() {
+    public long getLastSeen() {
         return lastSeen;
     }
 
-    public void setLastSeen(int lastSeen) {
+    public void setLastSeen(long lastSeen) {
         this.lastSeen = lastSeen;
     }
 

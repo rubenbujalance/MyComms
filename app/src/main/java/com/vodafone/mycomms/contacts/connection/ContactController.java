@@ -334,7 +334,7 @@ public class ContactController extends BaseController {
             if (!jsonObject.isNull(Constants.CONTACT_COMPANY)) contact.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
             if (!jsonObject.isNull(Constants.CONTACT_TIMEZONE))
                 contact.setTimezone(jsonObject.getString(Constants.CONTACT_TIMEZONE));
-            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) contact.setLastSeen(jsonObject.getInt(Constants.CONTACT_LASTSEEN));
+            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) contact.setLastSeen(jsonObject.getLong(Constants.CONTACT_LASTSEEN));
             if (!jsonObject.isNull(Constants.CONTACT_OFFICE_LOC))
                 contact.setOfficeLocation(jsonObject.getString(Constants.CONTACT_OFFICE_LOC));
             if (!jsonObject.isNull(Constants.CONTACT_PHONES))

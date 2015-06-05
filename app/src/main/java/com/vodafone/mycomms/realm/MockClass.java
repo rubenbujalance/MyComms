@@ -83,7 +83,7 @@ public class MockClass {
                 if (!jsonObject.isNull("position")) contact.setPosition(jsonObject.getString("position"));
                 if (!jsonObject.isNull("company")) contact.setCompany(jsonObject.getString("company"));
                 if (!jsonObject.isNull("timezone")) contact.setTimezone(jsonObject.getString("timezone"));
-                if (!jsonObject.isNull("lastSeen")) contact.setLastSeen(jsonObject.getInt("lastSeen"));
+                if (!jsonObject.isNull("lastSeen")) contact.setLastSeen(jsonObject.getLong("lastSeen"));
                 if (!jsonObject.isNull("officeLocation")) contact.setOfficeLocation(jsonObject.getString("officeLocation"));
 
                 if (!jsonObject.isNull("phones")) contact.setPhones(jsonObject.getJSONArray("phones").toString());
@@ -101,7 +101,7 @@ public class MockClass {
                 if (!jsonObject.isNull("position")) favouriteContact.setPosition(jsonObject.getString("position"));
                 if (!jsonObject.isNull("company")) favouriteContact.setCompany(jsonObject.getString("company"));
                 if (!jsonObject.isNull("timezone")) favouriteContact.setTimezone(jsonObject.getString("timezone"));
-                if (!jsonObject.isNull("lastSeen")) favouriteContact.setLastSeen(jsonObject.getInt("lastSeen"));
+                if (!jsonObject.isNull("lastSeen")) favouriteContact.setLastSeen(jsonObject.getLong("lastSeen"));
                 if (!jsonObject.isNull("officeLocation")) favouriteContact.setOfficeLocation(jsonObject.getString("officeLocation"));
 
                 if (!jsonObject.isNull("phones")) favouriteContact.setPhones(jsonObject.getJSONArray("phones").toString());
@@ -119,7 +119,7 @@ public class MockClass {
                 if (!jsonObject.isNull("position")) recentContact.setPosition(jsonObject.getString("position"));
                 if (!jsonObject.isNull("company")) recentContact.setCompany(jsonObject.getString("company"));
                 if (!jsonObject.isNull("timezone")) recentContact.setTimezone(jsonObject.getString("timezone"));
-                if (!jsonObject.isNull("lastSeen")) recentContact.setLastSeen(jsonObject.getInt("lastSeen"));
+                if (!jsonObject.isNull("lastSeen")) recentContact.setLastSeen(jsonObject.getLong("lastSeen"));
                 if (!jsonObject.isNull("officeLocation")) recentContact.setOfficeLocation(jsonObject.getString("officeLocation"));
 
                 if (!jsonObject.isNull("phones")) recentContact.setPhones(jsonObject.getJSONArray("phones").toString());

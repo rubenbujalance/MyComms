@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="3dp"
-            android:paddingBottom="1dp"
+            android:paddingBottom="3dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_gravity="bottom">
@@ -33,18 +33,16 @@
                 android:gravity="right"
                 android:background="@drawable/chat_bubble_blue_tail"
                 android:textColor="@android:color/white"
-                android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/layout_list_item_image"
                 android:layout_toStartOf="@+id/layout_list_item_image"/>
 
-            <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
+            <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image_little"
                 android:layout_width="35dp"
                 android:layout_height = "35dp"
-                android:layout_marginRight="5dp"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="bottom"
-                android:layout_centerVertical="true" />
+                     android:layout_gravity="bottom"
+                     android:layout_alignBottom="@+id/chat_text"
+                     android:layout_alignParentRight="true"
+                     android:layout_alignParentEnd="true"/>
         </RelativeLayout>
         <TextView
             android:id="@+id/sent_text"

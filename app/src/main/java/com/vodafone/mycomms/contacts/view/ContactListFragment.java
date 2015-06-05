@@ -142,7 +142,7 @@ public class ContactListFragment extends ListFragment{
                         String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null) {
                             JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
+                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
                             Utils.launchCall(phone, getActivity());
                         }
                     }
@@ -162,7 +162,7 @@ public class ContactListFragment extends ListFragment{
                         String strEmails = recentContactList.get(position).getEmails();
                         if (strEmails != null) {
                             JSONArray jPhones = new JSONArray(strEmails);
-                            String email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAILS);
+                            String email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
                             Utils.launchEmail(email, getActivity());
                         }
                     }

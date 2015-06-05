@@ -71,7 +71,6 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(APIWrapper.checkConnectionAndAlert(LoginActivity.this))
                     callPassCheck();
             }
         });
@@ -283,6 +282,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
     @Override
     public void onConnectionNotAvailable() {
         Log.w(Constants.TAG, "LoginActivity.onConnectionNotAvailable: ");
+        onLoginError(getString(R.string.connection_error));
     }
 
     @Override

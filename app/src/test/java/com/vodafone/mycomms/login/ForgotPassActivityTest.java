@@ -1,16 +1,31 @@
 package com.vodafone.mycomms.login;
 
-import com.vodafone.mycomms.BuildConfig;
+import android.app.Activity;
+import android.widget.Button;
+import android.widget.EditText;
 
+import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.constants.Constants;
+import com.vodafone.mycomms.test.util.Util;
+
+import org.apache.http.HttpResponse;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.FakeHttp;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
-//@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class ForgotPassActivityTest {
-/*
+
     Activity activity;
     Button btSend;
     EditText etEmail;
@@ -30,11 +45,11 @@ public class ForgotPassActivityTest {
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.oops_wrong_email), btSend.getText());
         //Invalid e-mail
-        etEmail.setText(INVALID_EMAIL);
+        etEmail.setText(Constants.INVALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.oops_wrong_email), btSend.getText());
         //Valid e-mail
-        etEmail.setText(VALID_EMAIL);
+        etEmail.setText(Constants.VALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
         Assert.assertTrue(activity.isFinishing());
@@ -45,9 +60,9 @@ public class ForgotPassActivityTest {
         HttpResponse httpResponse = Util.buildResponse(500);
         FakeHttp.addPendingHttpResponse(httpResponse);
         //Valid e-mail
-        etEmail.setText(VALID_EMAIL);
+        etEmail.setText(Constants.VALID_EMAIL);
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
     }
-*/
+
 }

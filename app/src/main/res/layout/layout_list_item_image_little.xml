@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/cartoon_round_contact_image_example" />
+        tools:src="@drawable/cartoon_round_contact_image_example" />
 
     <TextView
         android:id="@+id/avatarText"

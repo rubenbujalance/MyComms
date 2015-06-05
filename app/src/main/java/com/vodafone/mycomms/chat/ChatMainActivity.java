@@ -161,8 +161,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         }
 
         //Sent chat in grey by default
-        tvSendChat.setTextColor(Color.GRAY);
-        tvSendChat.setEnabled(false);
+        setSendEnabled(false);
 
         etChatTextBox.addTextChangedListener(new TextWatcher()
         {
@@ -296,7 +295,9 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     protected void onResume() {
         super.onResume();
 
-        checkXMPPConnection();
+        if(etChatTextBox.getText().toString()!=null &&
+                etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
+        else setSendEnabled(false);
     }
 
     @Override

@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:text="Contacts"
                     android:id="@+id/textView9"
-                    android:textColor="@color/grey_light" />
+                    android:textColor="@color/grey_middle" />
 
             </LinearLayout>
         </LinearLayout>
@@ -88,7 +88,7 @@
                     android:layout_height="wrap_content"
                     android:text="Chat"
                     android:id="@+id/textView10"
-                    android:textColor="@color/grey_light" />
+                    android:textColor="@color/grey_middle" />
 
             </LinearLayout>
         </LinearLayout>

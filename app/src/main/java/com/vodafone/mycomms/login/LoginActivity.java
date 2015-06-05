@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -24,15 +23,11 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
-
-import org.json.JSONObject;
-
-import java.util.HashMap;
 
 public class LoginActivity extends ActionBarActivity implements ILoginConnectionCallback {
 
@@ -71,7 +66,9 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(BaseConnection.isConnected(LoginActivity.this))
                     callPassCheck();
+                else onConnectionError();
             }
         });
 

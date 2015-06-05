@@ -16,7 +16,7 @@
         android:id="@+id/avatarText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="25sp"
+        android:textSize="15sp"
         tools:text="AM"
         android:textColor="@color/grey_dark"
         android:layout_gravity="center"

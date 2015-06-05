@@ -33,7 +33,7 @@
                 android:background="@drawable/chat_bubble_grey_tail"
                 android:layout_toRightOf="@+id/layout_list_item_image"/>
 
-            <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
+            <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image_little"
             android:layout_width="35dp"
             android:layout_height = "35dp"
             android:layout_marginRight="5dp"

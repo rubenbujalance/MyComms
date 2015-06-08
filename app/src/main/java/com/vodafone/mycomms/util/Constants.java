@@ -20,6 +20,12 @@ public class Constants {
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
 
+    //Profile API & BD
+    public static final String PROFILE_PRIVATE_TIMEZONE = "privateTimeZone";
+    public static final String PROFILE_DONOTDISTURB = "doNotDisturb";
+    public static final String PROFILE_PHONE = "phone";
+    public static final String PROFILE_EMAIL = "email";
+
     //Footer Constants
     public static final int TOOLBAR_CONTACTS = 0;
     public static final int TOOLBAR_DASHBOARD = 1;

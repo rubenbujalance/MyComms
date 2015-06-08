@@ -38,7 +38,7 @@ public class MailSentActivityTest {
 
 
     @Before
-      public void setUp() {
+    public void setUp() {
         Intent intent = new Intent();
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("pin",PIN);
@@ -48,12 +48,12 @@ public class MailSentActivityTest {
     }
 
     @Test
-     public void testCheckMessage() {
+    public void testCheckMessage() {
         Assert.assertTrue(mWeSent.getText().toString().startsWith(activity.getString(R.string.we_sent_an_email_to)));
     }
 
     @Test
-     public void testResendEmail() throws Exception {
+    public void testResendEmail() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, CHECK_PHONE_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         mResendEmail.performClick();

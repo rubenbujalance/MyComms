@@ -34,7 +34,7 @@ public class SignupPassActivityTest {
     ImageView ivBtBack;
 
     @Before
-      public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupPassActivity.class);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
@@ -43,7 +43,7 @@ public class SignupPassActivityTest {
     }
 
     @Test
-     public void testForwardBadPassword() {
+    public void testForwardBadPassword() {
         ivBtFwd.performClick();
         EditText innerPassword = (EditText)mPassword.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPassword.getError().equals(activity.getString(R.string.incorrect_format)));

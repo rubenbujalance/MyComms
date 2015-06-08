@@ -44,7 +44,7 @@ public class SignupMailActivityTest {
     ImageView ivBtBack;
 
     @Before
-     public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupMailActivity.class);
         etEmail = (ClearableEditText)activity.findViewById(R.id.etSignupEmail);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
@@ -52,7 +52,7 @@ public class SignupMailActivityTest {
     }
 
     @Test
-     public void testForwardEmptyEmail() {
+    public void testForwardEmptyEmail() {
         etEmail.setText("");
         ivBtFwd.performClick();
         EditText innerEtEmail = (EditText)etEmail.findViewById(R.id.clearable_edit);

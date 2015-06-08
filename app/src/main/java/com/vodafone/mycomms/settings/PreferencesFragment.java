@@ -1,7 +1,9 @@
 package com.vodafone.mycomms.settings;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -116,6 +118,15 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
                 //Reset user security data
                 UserSecurity.resetTokens(getActivity());
+
+                //Reset profile data
+                SharedPreferences sp = getActivity().getSharedPreferences(
+                        Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+                SharedPreferences.Editor editor = sp.edit();
+                editor.remove(Constants.ACCESS_TOKEN_SHARED_PREF);
+                editor.remove(Constants.PROFILE_ID_SHARED_PREF);
+                editor.commit();
 
                 //Go to login page as a new task
                 Intent in = new Intent(getActivity(), LoginSignupActivity.class);

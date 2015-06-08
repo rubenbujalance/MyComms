@@ -8,27 +8,18 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.test.util.Util;
 
-
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static com.vodafone.mycomms.constants.Constants.*;
-import static org.mockito.Mockito.*;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.FakeHttp;
-import org.robolectric.shadows.ShadowActivity;
+
+import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
+import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 
 /**
  * Created by str_evc on 18/05/2015.

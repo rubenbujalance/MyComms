@@ -44,7 +44,7 @@ public class SignupPincodeActivityTest {
     View lnPin1;
 
     @Before
-      public void setUp() throws Exception {
+    public void setUp() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SignupPincodeActivity.class);

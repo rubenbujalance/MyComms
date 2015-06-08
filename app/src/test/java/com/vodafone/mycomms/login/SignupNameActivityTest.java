@@ -51,7 +51,7 @@ public class SignupNameActivityTest {
     ImageView ivBtFwd;
 
     @Before
-      public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupNameActivity.class);
         mFirstName = activity.mFirstName;
         mLastName = activity.mLastName;
@@ -59,7 +59,7 @@ public class SignupNameActivityTest {
     }
 
     @Test
-     public void testForwardEmptyName() {
+    public void testForwardEmptyName() {
         mFirstName.setText("");
         mLastName.setText("");
         ivBtFwd.performClick();
@@ -70,7 +70,7 @@ public class SignupNameActivityTest {
     }
 
     @Test
-        public void testForwardEmptyPictureTakeAPhoto() {
+    public void testForwardEmptyPictureTakeAPhoto() {
         mFirstName.setText(FIRSTNAME);
         mLastName.setText(LASTNAME);
         ivBtFwd.performClick();
@@ -92,7 +92,7 @@ public class SignupNameActivityTest {
     }
 
     @Test
-         public void testForwardEmptyPictureChooseAPhoto() {
+    public void testForwardEmptyPictureChooseAPhoto() {
         mFirstName.setText(FIRSTNAME);
         mLastName.setText(LASTNAME);
         ivBtFwd.performClick();

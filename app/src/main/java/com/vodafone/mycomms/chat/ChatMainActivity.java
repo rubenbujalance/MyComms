@@ -18,11 +18,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
 import com.vodafone.mycomms.contacts.detail.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshChatListEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -48,7 +50,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private ImageView ivAvatarImage;
     private TextView tvAvatarText;
 
-//    private String _chatText = "";
     private ArrayList<ChatMessage> _chatList = new ArrayList<>();
     private Chat _chat;
     private Contact _contact;
@@ -67,6 +68,9 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         setContentView(R.layout.activity_chat_main);
         activateToolbar();
         setToolbarBackground(R.drawable.toolbar_header);
+
+        //Register Otto bus to listen to events
+        BusProvider.getInstance().register(this);
 
         mRealm = Realm.getInstance(this);
         chatTransactions = new RealmChatTransactions(mRealm, this);
@@ -157,31 +161,14 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         }
 
         //Sent chat in grey by default
-        tvSendChat.setTextColor(Color.GRAY);
-        tvSendChat.setEnabled(false);
-
-        /*Toolbar mToolbar = (Toolbar) findViewById(R.id.app_bar);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });*/
+        setSendEnabled(false);
 
         etChatTextBox.addTextChangedListener(new TextWatcher()
         {
             @Override
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                if(cs!=null && cs.length()>0)
-                {
-                    tvSendChat.setEnabled(true);
-                    tvSendChat.setTextColor(Color.parseColor("#02B1FF"));
-                }
-                else
-                {
-                    tvSendChat.setEnabled(false);
-                    tvSendChat.setTextColor(Color.GRAY);
-                }
+                if(cs!=null && cs.length()>0) checkXMPPConnection();
+                else setSendEnabled(false);
             }
             @Override
             public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,int arg3) {}
@@ -197,16 +184,15 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             }
         });
 
-        final Context mContext = this;
-        ImageView clearText = (ImageView) findViewById(R.id.send_image);
-        clearText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(LOG_TAG,"sendText()");
-                chatTransactions.deleteAllChatMessages(_chat.getContact_id());
-                refreshAdapter();
-            }
-        });
+//        ImageView clearText = (ImageView) findViewById(R.id.send_image);
+//        clearText.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.i(LOG_TAG,"sendText()");
+//                chatTransactions.deleteAllChatMessages(_chat.getContact_id());
+//                refreshAdapter();
+//            }
+//        });
     }
 
     private void sendText()
@@ -254,6 +240,35 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
+    private void markAllAsRead()
+    {
+        for(int i=0; i<_chatList.size(); i++)
+            _chatList.get(i).setRead("1");
+
+        chatTransactions.insertChatMessageList(_chatList);
+    }
+
+    private void checkXMPPConnection()
+    {
+        if(XMPPTransactions.getXmppConnection()!=null &&
+                XMPPTransactions.getXmppConnection().isConnected())
+            setSendEnabled(true);
+        else
+            setSendEnabled(false);
+    }
+
+    private void setSendEnabled(boolean enable)
+    {
+        if(!enable) {
+            tvSendChat.setEnabled(false);
+            tvSendChat.setTextColor(Color.GRAY);
+        }
+        else {
+            tvSendChat.setEnabled(true);
+            tvSendChat.setTextColor(Color.parseColor("#02B1FF"));
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -280,17 +295,9 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     protected void onResume() {
         super.onResume();
 
-        if(XMPPTransactions.getXmppConnection()!=null &&
-                XMPPTransactions.getXmppConnection().isConnected())
-        {
-            tvSendChat.setEnabled(true);
-            tvSendChat.setTextColor(Color.parseColor("#02B1FF"));
-        }
-        else
-        {
-            tvSendChat.setEnabled(false);
-            tvSendChat.setTextColor(Color.GRAY);
-        }
+        if(etChatTextBox.getText().toString()!=null &&
+                etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
+        else setSendEnabled(false);
     }
 
     @Override
@@ -307,5 +314,15 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
         tvSendChat.setEnabled(false);
         tvSendChat.setTextColor(Color.GRAY);
+    }
+
+    @Subscribe
+    public void onEventChatsReceived(ChatsReceivedEvent event){
+        ChatMessage chatMsg = event.getMessage();
+        if(chatMsg!=null)
+        {
+            _chatList.add(chatMsg);
+            refreshAdapter();
+        }
     }
 }

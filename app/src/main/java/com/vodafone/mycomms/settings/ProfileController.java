@@ -155,7 +155,7 @@ public class ProfileController extends BaseController {
                     Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
                 }
 
-                ((IProfileConnectionCallback) this.getConnectionCallback()).onPasswordChangeError(error);
+//                ((IProfileConnectionCallback) this.getConnectionCallback()).onPasswordChangeError(error);
 
             }
         }

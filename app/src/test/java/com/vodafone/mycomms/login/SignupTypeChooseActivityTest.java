@@ -38,14 +38,14 @@ public class SignupTypeChooseActivityTest {
     }
 
     @Test
-     public void testSignupTypeChooseToSignupMail() throws Exception {
+    public void testSignupTypeChooseToSignupMail() throws Exception {
         mSignupEmail.performClick();
         Intent expectedIntent = new Intent(activity, SignupMailActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
     @Test
-     public void testSignupTypeChooseToSignupOAuth() throws Exception {
+    public void testSignupTypeChooseToSignupOAuth() throws Exception {
         mSignupSalesforce.performClick();
         Intent expectedIntent = new Intent(activity, OAuthActivity.class);
         expectedIntent.putExtra("oauth", "sf");

@@ -35,7 +35,7 @@ public class SignupPhoneActivityTest {
     ImageView ivBtBack;
 
     @Before
-      public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupPhoneActivity.class);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
@@ -44,7 +44,7 @@ public class SignupPhoneActivityTest {
     }
 
     @Test
-     public void testForwardNoCountrySelected() {
+    public void testForwardNoCountrySelected() {
         mCountry.setText("");
         mCountry.setCodeSelected("");
         ivBtFwd.performClick();

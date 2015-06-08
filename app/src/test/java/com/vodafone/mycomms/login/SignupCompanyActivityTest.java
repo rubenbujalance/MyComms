@@ -33,7 +33,7 @@ public class SignupCompanyActivityTest {
 
 
     @Before
-      public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupCompanyActivity.class);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         mCompany = activity.mCompany;
@@ -42,7 +42,7 @@ public class SignupCompanyActivityTest {
     }
 
     @Test
-     public void testForwardEmptyCompany() {
+    public void testForwardEmptyCompany() {
         ivBtFwd.performClick();
         Assert.assertTrue(mCompany.getError().equals(activity.getString(R.string.select_your_company_to_continue)));
     }

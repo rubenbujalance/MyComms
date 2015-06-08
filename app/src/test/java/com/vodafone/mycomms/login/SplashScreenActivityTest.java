@@ -52,7 +52,7 @@ public class SplashScreenActivityTest {
     }
 
     @Test
-        public void testCheckVersionUserLoggedOk() throws Exception {
+    public void testCheckVersionUserLoggedOk() throws Exception {
         UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN, RuntimeEnvironment.application);
         HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -91,7 +91,7 @@ public class SplashScreenActivityTest {
     }
 
     @Test
-     public void testCheckVersionUserLoggedRenewTokenOk() throws Exception {
+    public void testCheckVersionUserLoggedRenewTokenOk() throws Exception {
         UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 0, RuntimeEnvironment.application);
         HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -117,7 +117,7 @@ public class SplashScreenActivityTest {
     }
 
     @Test
-      public void testInvalidVersionResponse() throws Exception {
+    public void testInvalidVersionResponse() throws Exception {
         RobolectricPackageManager rpm = (RobolectricPackageManager)Shadows.shadowOf(RuntimeEnvironment.application).getPackageManager();
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -141,7 +141,7 @@ public class SplashScreenActivityTest {
         Assert.assertTrue(activity.isFinishing());
     }
 
-//    @Test
+    @Test
     public void testEmailLink() throws Exception {
         //String link = "<a href=\"intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\">Link to MyComms</a>";
         Uri uri = Uri.parse("intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\\");

@@ -129,4 +129,7 @@
     <string name="profile_edit_mode_done">Done</string>
     <string name="profile_edit_mode_edit">Edit</string>
 
+    <!-- Chat Strings -->
+    <string name="chat_me_text">"Me: "</string>
+
 </resources>

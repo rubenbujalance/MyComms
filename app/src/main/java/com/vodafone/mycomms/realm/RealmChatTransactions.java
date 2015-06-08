@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -16,9 +17,6 @@ import model.Chat;
 import model.ChatMessage;
 import model.Contact;
 
-/**
- * Created by AMG on 12/05/2015.
- */
 public class RealmChatTransactions {
     private Realm mRealm;
     private String _profile_id;
@@ -70,7 +68,10 @@ public class RealmChatTransactions {
             //Update associated Chat with new last message
             Chat chat = getChatById(newChatMessage.getContact_id());
             chat.setLastMessage_id(newChatMessage.getId());
-            chat.setLastMessage(newChatMessage.getText());
+            if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
+                chat.setLastMessage(mContext.getResources().getString(R.string.chat_me_text) + newChatMessage.getText());
+            else
+                chat.setLastMessage(newChatMessage.getText());
             chat.setLastMessageTime(newChatMessage.getTimestamp());
             mRealm.commitTransaction();
 
@@ -289,7 +290,6 @@ public class RealmChatTransactions {
 
     public void insertChat (Chat newChat){
         if(newChat==null) return;
-
         try {
             mRealm.beginTransaction();
             mRealm.copyToRealmOrUpdate(newChat);

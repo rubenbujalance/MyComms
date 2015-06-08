@@ -8,10 +8,6 @@ import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
-
-import io.realm.Realm;
-import model.Contact;
-import model.UserProfile;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
@@ -26,6 +22,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+
+import io.realm.Realm;
+import model.UserProfile;
 
 /**
  * Created by str_vig on 26/05/2015.

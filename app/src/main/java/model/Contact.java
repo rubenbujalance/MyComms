@@ -30,6 +30,26 @@ public class Contact extends RealmObject{
     public Contact() {
     }
 
+    public Contact(String initString)
+    {
+        this.id = initString;
+        this.platform = initString;
+        this.firstName = initString;
+        this.lastName = initString;
+        this.avatar = initString;
+        this.setPathAvatar(pathAvatar);
+        this.phones = initString;
+        this.emails = initString;
+        this.position = initString;
+        this.company = initString;
+        this.timezone = initString;
+        this.lastSeen = 0;
+        this.officeLocation = initString;
+        this.availability = initString;
+        this.presence = initString;
+        this.country = initString;
+    }
+
     public Contact(String id, String platform, String firstName, String lastName, String avatar, String pathAvatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country) {
         this.id = id;
         this.platform = platform;

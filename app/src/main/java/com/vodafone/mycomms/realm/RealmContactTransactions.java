@@ -2,7 +2,6 @@ package com.vodafone.mycomms.realm;
 
 import android.util.Log;
 
-import model.UserProfile;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import io.realm.RealmResults;
 import model.Contact;
 import model.FavouriteContact;
 import model.RecentContact;
+import model.UserProfile;
 
 /**
  * Created by AMG on 12/05/2015.
@@ -117,6 +117,29 @@ public class RealmContactTransactions {
         if (result1!=null){
             result1.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
             for (Contact contactListItem : result1) {
+                contactArrayList.add(contactListItem);
+            }
+        }
+        return contactArrayList;
+    }
+
+    public ArrayList<Contact> getContactsByKeyWord(String keyWord)
+    {
+        ArrayList<Contact> contactArrayList = new ArrayList<>();
+        RealmResults<Contact> result = mRealm.where(Contact.class)
+                                            .contains(Constants.CONTACT_FNAME, keyWord)
+                                            .or()
+                                            .contains(Constants.CONTACT_LNAME, keyWord)
+                                            .or()
+                                            .contains(Constants.CONTACT_COMPANY, keyWord)
+                                            .or()
+                                            .contains(Constants.CONTACT_EMAILS, keyWord)
+                                            .findAll();
+
+        if (result!=null){
+            result.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
+            for (Contact contactListItem : result)
+            {
                 contactArrayList.add(contactListItem);
             }
         }

@@ -6,18 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
 
 import com.vodafone.mycomms.R;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.lang.reflect.Method;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,8 +22,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;

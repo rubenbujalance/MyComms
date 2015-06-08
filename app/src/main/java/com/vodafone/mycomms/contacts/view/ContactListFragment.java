@@ -7,10 +7,17 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import io.realm.Realm;
 import model.Contact;
@@ -54,6 +62,9 @@ public class ContactListFragment extends ListFragment{
     private ListView listView;
     private Parcelable state;
     private TextView emptyText;
+    private EditText searchView;
+    private Button cancelButton;
+    private LinearLayout layCancel;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -79,7 +90,8 @@ public class ContactListFragment extends ListFragment{
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
-
+       initiateComponentsForSearchView(v);
+       setSearchBarEvents(v);
        return v;
     }
 
@@ -101,7 +113,6 @@ public class ContactListFragment extends ListFragment{
         }
 
         setListAdapterTabs();
-        
     }
 
     @Override
@@ -196,6 +207,160 @@ public class ContactListFragment extends ListFragment{
         realm.close();
     }
 
+    private void initiateComponentsForSearchView(View view)
+    {
+        searchView = (EditText) view.findViewById(R.id.et_search);
+        cancelButton = (Button) view.findViewById(R.id.btn_cancel);
+        layCancel = (LinearLayout) view.findViewById(R.id.lay_cancel);
+
+        layCancel.setVisibility(View.GONE);
+    }
+
+    private void setSearchBarEvents(View view)
+    {
+        final int drLeft = R.drawable.btn_nav_bar_search;
+        final int drRight = R.drawable.ic_action_remove;
+        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
+
+
+        searchView.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                final int DRAWABLE_LEFT = 0;
+                final int DRAWABLE_TOP = 1;
+                final int DRAWABLE_RIGHT = 2;
+                final int DRAWABLE_BOTTOM = 3;
+
+                searchView.setFocusable(true);
+                showKeyboard(v);
+                cancelButton.setVisibility(View.VISIBLE);
+
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    if (null != searchView.getCompoundDrawables()[DRAWABLE_RIGHT] && event.getRawX() >= (searchView.getRight() - searchView.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        Log.d("onTouch() -> ", "You have pressed right drawable!");
+                        searchView.setText("");
+                        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
+                        return true;
+                    }
+                    else
+                    {
+                        Log.d("onTouch() -> ", "You have pressed other part of ET!");
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        });
+
+        searchView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                Log.i(this.getClass().getSimpleName() + " -> onTextChanged", "Input is: " + searchView.getText().toString());
+                if (searchView.getText().length() == 1)
+                {
+                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, drRight, 0);
+                    layCancel.setVisibility(View.VISIBLE);
+                }
+                else if (searchView.getText().length() == 0)
+                {
+                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
+                }
+
+                if(null != contactList)
+                {
+                    contactList.clear();
+                }
+
+                contactList = loadAllContactsFromBD(searchView.getText().toString());
+                contactList.addAll(loadLocalContacts(searchView.getText().toString()));
+                reloadAdapter();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layCancel.setVisibility(View.GONE);
+                searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
+                searchView.setText("");
+                hideKeyboard(v);
+
+            }
+        });
+
+    }
+
+    private void showKeyboard(View view)
+    {
+        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(view.getContext().INPUT_METHOD_SERVICE);
+        imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    private void hideKeyboard(View view)
+    {
+        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(view.getContext().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+    }
+
+
+
+    private void reloadAdapter()
+    {
+        adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+        if (contactList!=null) {
+            if (listView!=null)
+                state = listView.onSaveInstanceState();
+            if (adapter != null){
+                setListAdapter(adapter);
+                if (state!=null)
+                    listView.onRestoreInstanceState(state);
+            } else {
+                adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+                setListAdapter(adapter);
+                if (state!=null)
+                    listView.onRestoreInstanceState(state);
+            }
+        }
+    }
+
+    //TODO Implement this part in case Server Search is needed;
+    private void searchContactsFromServer(String keyWord)
+    {
+        HashMap<String, Object> header = null;
+        HashMap<String, Object> body = new HashMap<>();
+        body.put("p", "mc");
+        body.put("o", "0");
+
+        if(null != keyWord)
+        {
+            if(keyWord.length() > 0)
+            {
+                //new DownloadContactsFromServer().execute(header,body);
+            }
+            else
+            {
+                loadAllContactsFromBD();
+            }
+        }
+    }
+
     public void setListAdapterTabs(){
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
@@ -214,23 +379,63 @@ public class ContactListFragment extends ListFragment{
         }else if(mIndex == Constants.CONTACTS_ALL){
             if (emptyText!=null)
                 emptyText.setText("");
-            contactList = mContactController.getAllContacts();
-            adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
-            if (contactList!=null) {
-                if (listView!=null)
-                    state = listView.onSaveInstanceState();
-                if (adapter != null){
-                    setListAdapter(adapter);
-                    if (state!=null)
-                        listView.onRestoreInstanceState(state);
-                } else {
-                    adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
-                    setListAdapter(adapter);
-                    if (state!=null)
-                        listView.onRestoreInstanceState(state);
-                }
-            }
+            contactList = loadAllContactsFromBD(null);
+            reloadAdapter();
         }
     }
+
+
+    private ArrayList<Contact> loadAllContactsFromBD(String keyWord)
+    {
+        ArrayList<Contact> contactArrayList;
+        if(null == keyWord)
+        {
+            contactArrayList = mContactController.getAllContacts();
+        }
+        else
+        {
+            contactArrayList = mContactController.getContactsByKeyWord(keyWord);
+        }
+
+        return contactArrayList;
+    }
+
+    private void loadAllContactsFromBD()
+    {
+        loadAllContactsFromBD(null);
+    }
+
+    private ArrayList<Contact> loadLocalContacts(String keyWord)
+    {
+        ArrayList<Contact> contactArrayList = new ArrayList<>();
+        if(keyWord.length() >= 3)
+        {
+            contactArrayList = mContactController.getLocalContactsByKeyWord(keyWord);
+        }
+        return contactArrayList;
+    }
+
+
+
+    private void loadAllContactsFromServer(HashMap<String,Object> contactObjects)
+    {
+
+    }
+
+    /**
+    private class DownloadContactsFromServer extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+        @Override
+        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params)
+        {
+            return APIWrapper.httpPostAPI("/api/profile", params[0], params[1], getActivity());
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<String,Object> result)
+        {
+            loadAllContactsFromServer(result);
+        }
+    }
+     **/
 
 }

@@ -17,16 +17,10 @@ import android.widget.Toast;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
-import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
-import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 

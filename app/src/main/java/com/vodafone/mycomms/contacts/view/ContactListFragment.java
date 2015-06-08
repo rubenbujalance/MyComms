@@ -147,11 +147,11 @@ public class ContactListFragment extends ListFragment{
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
             Intent in;
-            if (contactList.get(position).getId()!=null && contactList.get(position).getId().equals(profileId))
-                in = new Intent(getActivity(), SettingsMainActivity.class);
-            else
-                in = new Intent(getActivity(), ContactDetailMainActivity.class);
+
+            in = new Intent(getActivity(), ContactDetailMainActivity.class);
             if(mIndex == Constants.CONTACTS_ALL) {
+                if (contactList.get(position).getId()!=null && contactList.get(position).getId().equals(profileId))
+                    in = new Intent(getActivity(), SettingsMainActivity.class);
                 in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId() );
                 startActivity(in);
             } else if (mIndex == Constants.CONTACTS_RECENT) {
@@ -189,6 +189,8 @@ public class ContactListFragment extends ListFragment{
                     Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);
                 }
             } else if (mIndex == Constants.CONTACTS_FAVOURITE) { {
+                if (favouriteContactList.get(position).getId()!=null && favouriteContactList.get(position).getId().equals(profileId))
+                    in = new Intent(getActivity(), SettingsMainActivity.class);
                 in.putExtra(Constants.CONTACT_ID,favouriteContactList.get(position).getId() );
                 startActivity(in);
             }}

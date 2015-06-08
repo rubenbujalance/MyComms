@@ -15,7 +15,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Contacts"
+        android:text="@string/Contacts"
         android:id="@+id/textView7"
         android:textColor="@color/grey_light" />
 

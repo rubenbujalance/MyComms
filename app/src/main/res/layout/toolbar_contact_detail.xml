@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:background="@drawable/imessage"
-                android:contentDescription="Button Chat"
+                android:contentDescription="@string/ButtonChat"
                 android:layout_marginRight="10dp" />
         </LinearLayout>
         <LinearLayout
@@ -65,7 +65,7 @@
                 android:background="@drawable/ic_enrroll_mail_white"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:contentDescription="Email Button" />
+                android:contentDescription="@string/emailbutton" />
         </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.Toolbar>

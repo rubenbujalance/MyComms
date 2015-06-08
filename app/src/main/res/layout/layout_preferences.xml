@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AVAILABILITY"
+            android:text="@string/Availability"
             android:id="@+id/textView3"
             android:autoText="false" />
 
@@ -20,13 +20,13 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vacation Time"
+            android:text="@string/VacationTime"
             android:id="@+id/button2" />
 
         <Switch
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Do Not Disturb"
+            android:text="@string/DoNotDisturb"
             android:id="@+id/settings_do_not_disturb_switch"
             android:checked="false"
             android:enabled="true" />
@@ -46,14 +46,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SHARING SETTINGS"
+            android:text="@string/SharingSettings"
             android:id="@+id/textView5"
             android:autoText="false" />
 
         <Switch
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Share current time"
+            android:text="@string/sharecurrenttime"
             android:id="@+id/setting_share_current_time_switch"
             android:checked="true"
             android:enabled="true" />
@@ -68,7 +68,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ABOUT"
+            android:text="@string/ABOUT"
             android:id="@+id/textView6"
             android:autoText="false" />
 
@@ -76,7 +76,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="About MyContacts"
+            android:text="@string/aboutmycontacts"
             android:id="@+id/button3" />
     </LinearLayout>
 
@@ -88,7 +88,7 @@
         <Button
             android:layout_width="198dp"
             android:layout_height="35dp"
-            android:text="Logout"
+            android:text="@string/Logout"
             android:id="@+id/btLogout"
             android:background="#ffff452b"
             android:singleLine="false"

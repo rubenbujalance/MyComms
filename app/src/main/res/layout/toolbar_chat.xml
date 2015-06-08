@@ -40,7 +40,7 @@
                 android:id="@+id/usr_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Jack Sheppard"
+                android:text="@string/dummyUser2"
                 android:visibility="gone"
                 android:textStyle="bold"
                 android:textSize="14sp"
@@ -50,8 +50,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:text="Seen long time ago"
-                android:textSize="11sp"
+                android:text="@string/dummylastseen2"
+                android:textSize="12sp"
                 android:textColor="@color/white"/>
         </LinearLayout>
     </RelativeLayout>

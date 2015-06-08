@@ -72,7 +72,7 @@
                         android:layout_marginBottom="10dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
-                        android:hint="Name"
+                        android:hint="@string/name"
                         tools:text="Andrew"
                         android:id="@+id/profile_name"/>
                     <View
@@ -86,7 +86,7 @@
                         android:layout_marginBottom="10dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
-                        android:hint="Surname"
+                        android:hint="@string/Surname"
                         tools:text="Wiggins"
                         android:id="@+id/profile_surname"/>
                 </LinearLayout>
@@ -97,14 +97,14 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Phone"
+                        android:text="@string/Phone"
                         style="@style/TextViewProfile"
                         android:id="@+id/contact_phone_number"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Phone Number"
+                        android:hint="@string/phoneNumber"
                         tools:text="+34 684503080"
                         android:inputType="textEmailAddress"
                         android:ems="10"
@@ -132,14 +132,14 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Email"
+                        android:text="@string/email"
                         style="@style/TextViewProfile"
                         android:id="@+id/contact_email"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Email"
+                        android:hint="@string/email"
                         tools:text="andrew.wiggin@vodafone.com"
                         android:ems="10"
                         android:layout_below="@+id/contact_email"
@@ -171,12 +171,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Company"/>
+                        android:text="@string/company"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Company name"
+                        android:hint="@string/companyname"
                         tools:text="Vodafone"
                         android:id="@+id/contact_company"/>
                 </LinearLayout>
@@ -191,12 +191,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Position"/>
+                        android:text="@string/position"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Position"
+                        android:hint="@string/position"
                         tools:text="Leader"
                         android:id="@+id/contact_position"/>
                 </LinearLayout>
@@ -213,12 +213,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Department"/>
+                        android:text="@string/Loremipsum"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Department"
+                        android:hint="@string/department"
                         tools:text="Human Resources"
                         android:id="@+id/department"/>
                 </LinearLayout>
@@ -234,12 +234,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Office Location"/>
+                        android:text="@string/officelocation"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Office"
+                        android:hint="@string/Office"
                         tools:text="Barcelona"
                         android:id="@+id/office_location"/>
                 </LinearLayout>
@@ -257,12 +257,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Additional Information"/>
+                        android:text="@string/additionalinformation"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Additional"
+                        android:hint="@string/additional"
                         tools:text="That's me!"
                         android:lines="3"
                         android:id="@+id/contact_additional_info"/>
@@ -282,12 +282,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Password"/>
+                        android:text="@string/password"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Password"
+                        android:hint="@string/password"
                         android:id="@+id/profile_password"
                         android:inputType="textPassword"
                         />
@@ -296,7 +296,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Repeat Password"
+                        android:hint="@string/repeatPassword"
                         android:id="@+id/profile_password_repeat"
                         android:inputType="textPassword"
                         />

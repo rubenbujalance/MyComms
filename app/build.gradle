@@ -142,7 +142,7 @@ def coverageSourceDirs = [
         'src/main/java'
 ]
 
-task jacocoTestReport(type:JacocoReport, dependsOn: "testIRelease") {
+task jacocoTestReport(type:JacocoReport) {
     group = "Reporting"
 
     description = "Generate Jacoco coverage reports"

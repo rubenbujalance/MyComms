@@ -31,6 +31,7 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
         mViewPager.setAdapter(new ProfileListPagerAdapter(getFragmentManager()));
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+        //This sets default tab
         mViewPager.setCurrentItem(Constants.MY_PROFILE);
     }
 

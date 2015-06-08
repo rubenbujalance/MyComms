@@ -1,16 +1,32 @@
 package com.vodafone.mycomms.login;
 
-import com.vodafone.mycomms.BuildConfig;
+import android.content.Intent;
+import android.widget.EditText;
+import android.widget.ImageView;
 
+import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.custom.ClearableEditText;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+
+import static com.vodafone.mycomms.constants.Constants.*;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
-//@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupPassActivityTest {
-/*
+
     SignupPassActivity activity;
     ClearableEditText mPassword;
     ClearableEditText mConfirmPass;
@@ -18,7 +34,7 @@ public class SignupPassActivityTest {
     ImageView ivBtBack;
 
     @Before
-      public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupPassActivity.class);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
@@ -27,7 +43,7 @@ public class SignupPassActivityTest {
     }
 
     @Test
-     public void testForwardBadPassword() {
+    public void testForwardBadPassword() {
         ivBtFwd.performClick();
         EditText innerPassword = (EditText)mPassword.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPassword.getError().equals(activity.getString(R.string.incorrect_format)));
@@ -58,5 +74,5 @@ public class SignupPassActivityTest {
         ivBtBack.performClick();
         Assert.assertTrue(activity.isFinishing());
     }
-*/
+
 }

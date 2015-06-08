@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -19,6 +20,7 @@ import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 public class ContactListMainActivity extends ToolbarActivity implements IProfileConnectionCallback, ContactListFragment.OnFragmentInteractionListener {
@@ -43,6 +45,10 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
 
         //Save profile_id if accessToken has changed
         String profile_id = validateAccessToken();
+
+        TelephonyManager telephonyManager = (TelephonyManager
+                )getSystemService( Context.TELEPHONY_SERVICE );
+        String deviceId = Utils.getDeviceId(getContentResolver(), telephonyManager);
 
         //Initialize messaging server session (needs the profile_id saved)
         if(profile_id != null) //If null, do initialization in callback method

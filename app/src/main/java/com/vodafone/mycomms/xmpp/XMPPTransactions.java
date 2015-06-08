@@ -93,12 +93,12 @@ public class XMPPTransactions {
         //Configuration for the connection
         XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = XMPPTCPConnectionConfiguration.builder();
 
-        //TODO RBM - Use this config when integrating with mycomms.com
         xmppConfigBuilder.setUsernameAndPassword(profile_id, UserSecurity.getAccessToken(appContext));
         xmppConfigBuilder.setServiceName(appContext.getString(R.string.xmpp_host));
         xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
         xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
 
+//        TEST CONFIGURATION (securejabber.me)
 //        xmppConfigBuilder.setUsernameAndPassword(profile_id, "Stratesys123");
 //        xmppConfigBuilder.setServiceName(Constants.XMPP_PARAM_SERVICE_NAME);
 //        xmppConfigBuilder.setHost(Constants.XMPP_PARAM_HOST);

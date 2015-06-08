@@ -119,8 +119,8 @@ public class Constants {
 
     //XMPP Constants
     public static final int XMPP_PARAM_PORT = 5222;
-    public static final String XMPP_PARAM_HOST = "securejabber.me";
-    public static final String XMPP_PARAM_SERVICE_NAME = "securejabber.me";
-    public static final String XMPP_PARAM_DOMAIN = "securejabber.me";
+//    public static final String XMPP_PARAM_DUMMY_HOST = "securejabber.me";
+//    public static final String XMPP_PARAM_DUMMY_SERVICE_NAME = "securejabber.me";
+    public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
 
 }

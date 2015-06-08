@@ -27,29 +27,6 @@ import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smackx.address.provider.MultipleAddressesProvider;
-import org.jivesoftware.smackx.bytestreams.ibb.provider.CloseIQProvider;
-import org.jivesoftware.smackx.bytestreams.ibb.provider.DataPacketProvider;
-import org.jivesoftware.smackx.bytestreams.ibb.provider.OpenIQProvider;
-import org.jivesoftware.smackx.bytestreams.socks5.provider.BytestreamsProvider;
-import org.jivesoftware.smackx.chatstates.packet.ChatStateExtension;
-import org.jivesoftware.smackx.delay.provider.DelayInformationProvider;
-import org.jivesoftware.smackx.disco.provider.DiscoverInfoProvider;
-import org.jivesoftware.smackx.disco.provider.DiscoverItemsProvider;
-import org.jivesoftware.smackx.iqlast.packet.LastActivity;
-import org.jivesoftware.smackx.iqprivate.PrivateDataManager;
-import org.jivesoftware.smackx.muc.packet.GroupChatInvitation;
-import org.jivesoftware.smackx.muc.provider.MUCAdminProvider;
-import org.jivesoftware.smackx.muc.provider.MUCOwnerProvider;
-import org.jivesoftware.smackx.muc.provider.MUCUserProvider;
-import org.jivesoftware.smackx.offline.packet.OfflineMessageInfo;
-import org.jivesoftware.smackx.offline.packet.OfflineMessageRequest;
-import org.jivesoftware.smackx.search.UserSearch;
-import org.jivesoftware.smackx.sharedgroups.packet.SharedGroupsInfo;
-import org.jivesoftware.smackx.si.provider.StreamInitiationProvider;
-import org.jivesoftware.smackx.vcardtemp.provider.VCardProvider;
-import org.jivesoftware.smackx.xdata.provider.DataFormProvider;
-import org.jivesoftware.smackx.xhtmlim.provider.XHTMLExtensionProvider;
 
 import io.realm.Realm;
 import model.ChatMessage;
@@ -97,6 +74,8 @@ public class XMPPTransactions {
         xmppConfigBuilder.setServiceName(appContext.getString(R.string.xmpp_host));
         xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
         xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
+        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
+        xmppConfigBuilder.setSendPresence(true);
 
 //        TEST CONFIGURATION (securejabber.me)
 //        xmppConfigBuilder.setUsernameAndPassword(profile_id, "Stratesys123");
@@ -127,7 +106,7 @@ public class XMPPTransactions {
     public static boolean sendText(String contact_id, String text)
     {
         //Check connection
-        if(_xmppConnection == null || _xmppConnection.isConnected())
+        if(_xmppConnection == null || !_xmppConnection.isConnected())
             initializeMsgServerSession(mContext);
 
         //Send text to the server
@@ -147,6 +126,7 @@ public class XMPPTransactions {
 
     private static void configure(ProviderManager pm)
     {
+        /*
         //  Private Data Storage
         pm.addIQProvider("query","jabber:iq:private", new PrivateDataManager.PrivateDataIQProvider());
 
@@ -214,6 +194,7 @@ public class XMPPTransactions {
         pm.addIQProvider("sharedgroup","http://www.jivesoftware.org/protocol/sharedgroup", new SharedGroupsInfo.Provider());
         //  JEP-33: Extended Stanza Addressing
         pm.addExtensionProvider("addresses","http://jabber.org/protocol/address", new MultipleAddressesProvider());
+        */
     }
 
     //Classes
@@ -252,7 +233,7 @@ public class XMPPTransactions {
     private static void xmppConnectionCallback(XMPPTCPConnection xmppConnection)
     {
         if(xmppConnection != null && xmppConnection.isConnected()) {
-            Log.w(Constants.TAG, "XMPPTransactions.xmppConnectionCallback" + xmppConnection.getUser());
+            Log.w(Constants.TAG, "XMPPTransactions.xmppConnectionCallback: XMPP Connection established with user " + xmppConnection.getUser());
         }
         else {
             Log.e(Constants.TAG, "XMPPTransactions.xmppConnectionCallback: XMPP Connection NOT established");

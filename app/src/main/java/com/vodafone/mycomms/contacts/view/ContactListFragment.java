@@ -1,7 +1,9 @@
 package com.vodafone.mycomms.contacts.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -18,6 +20,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
+import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
@@ -55,6 +58,8 @@ public class ContactListFragment extends ListFragment{
     private Parcelable state;
     private TextView emptyText;
 
+    private String profileId;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -79,6 +84,8 @@ public class ContactListFragment extends ListFragment{
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+       listView = (ListView) v.findViewById(android.R.id.list);
+       emptyText = (TextView) v.findViewById(android.R.id.empty);
 
        return v;
     }
@@ -98,6 +105,16 @@ public class ContactListFragment extends ListFragment{
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+
+        SharedPreferences sp = getActivity().getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        if(sp==null){
+            Log.e(Constants.TAG, "contactListFragment.onCreate: error loading Shared Preferences");
+            profileId = "";
+        }else{
+            profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
 
         setListAdapterTabs();
@@ -129,7 +146,11 @@ public class ContactListFragment extends ListFragment{
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
-            Intent in = new Intent(getActivity(), ContactDetailMainActivity.class);
+            Intent in;
+            if (contactList.get(position).getId()!=null && contactList.get(position).getId().equals(profileId))
+                in = new Intent(getActivity(), SettingsMainActivity.class);
+            else
+                in = new Intent(getActivity(), ContactDetailMainActivity.class);
             if(mIndex == Constants.CONTACTS_ALL) {
                 in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId() );
                 startActivity(in);
@@ -140,7 +161,7 @@ public class ContactListFragment extends ListFragment{
                         String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null) {
                             JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
+                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
                             Utils.launchCall(phone, getActivity());
                         }
                     }
@@ -160,7 +181,7 @@ public class ContactListFragment extends ListFragment{
                         String strEmails = recentContactList.get(position).getEmails();
                         if (strEmails != null) {
                             JSONArray jPhones = new JSONArray(strEmails);
-                            String email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAILS);
+                            String email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
                             Utils.launchEmail(email, getActivity());
                         }
                     }
@@ -209,7 +230,12 @@ public class ContactListFragment extends ListFragment{
                 emptyText.setText("");
             recentContactList = mContactController.getAllRecentContacts();
             if (recentContactList!=null) {
-               setListAdapter(new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList));
+                RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList);
+                if (listView != null) {
+                    state = listView.onSaveInstanceState();
+                    setListAdapter(recentAdapter);
+                    listView.onRestoreInstanceState(state);
+                }
             }
         }else if(mIndex == Constants.CONTACTS_ALL){
             if (emptyText!=null)

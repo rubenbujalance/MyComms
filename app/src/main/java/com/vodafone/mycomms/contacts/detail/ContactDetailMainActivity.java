@@ -2,7 +2,6 @@ package com.vodafone.mycomms.contacts.detail;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -330,9 +329,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             if(contact.getLastSeen() != 0)
             {
                 String lastSeenStr = null;
+                long currentTime = System.currentTimeMillis();
+                long lastSeen = contact.getLastSeen();
 
-                long timeDiffMilis = contact.getLastSeen();
-                long minutes = timeDiffMilis / 60000;
+                long timeDifference = currentTime - lastSeen;
+                long minutes = timeDifference / 60000;
                 long hours = minutes / 60;
                 long days = hours / 24;
 

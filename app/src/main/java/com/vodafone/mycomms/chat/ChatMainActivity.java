@@ -60,7 +60,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
     private RealmContactTransactions contactTransactions;
-    private RecentContactController mRecentController;
+    private RecentContactController mRecentContactController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         chatTransactions = new RealmChatTransactions(mRealm, this);
         contactTransactions = new RealmContactTransactions(mRealm);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
+        mRecentContactController = new RecentContactController(this,mRealm);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -211,7 +211,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         chatTransactions.insertChat(_chat);
         chatTransactions.insertChatMessage(chatMsg);
 
-        RecentContactController mRecentContactController = new RecentContactController(this,mRealm);
         String action = Constants.CONTACTS_ACTION_SMS;
         mRecentContactController.insertRecent(_chat.getContact_id(), action);
         mRecentContactController.setConnectionCallback(this);
@@ -322,6 +321,8 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         if(chatMsg!=null)
         {
             _chatList.add(chatMsg);
+            mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
+            mRecentContactController.setConnectionCallback(this);
             refreshAdapter();
         }
     }

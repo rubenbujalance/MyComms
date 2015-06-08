@@ -2,7 +2,6 @@ package com.vodafone.mycomms.realm;
 
 import android.util.Log;
 
-import model.UserProfile;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -13,10 +12,8 @@ import io.realm.RealmResults;
 import model.Contact;
 import model.FavouriteContact;
 import model.RecentContact;
+import model.UserProfile;
 
-/**
- * Created by AMG on 12/05/2015.
- */
 public class RealmContactTransactions {
     private Realm mRealm;
 

@@ -18,8 +18,6 @@ import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -74,8 +72,8 @@ public class XMPPTransactions {
         xmppConfigBuilder.setServiceName(appContext.getString(R.string.xmpp_host));
         xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
         xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
-        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
-        xmppConfigBuilder.setSendPresence(true);
+        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"SSLv3"});
+//        xmppConfigBuilder.setDebuggerEnabled(true);
 
 //        TEST CONFIGURATION (securejabber.me)
 //        xmppConfigBuilder.setUsernameAndPassword(profile_id, "Stratesys123");
@@ -208,7 +206,7 @@ public class XMPPTransactions {
             try {
                 XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = params[0];
                 conn = new XMPPTCPConnection(xmppConfigBuilder.build());
-                // Connect to the server
+                // Conneect to the server
                 conn.connect();
                 //Log into the server
                 conn.login();
@@ -258,8 +256,10 @@ public class XMPPTransactions {
         };
 
         // Register the listener
-        StanzaFilter packetFilter = new AndFilter(new StanzaTypeFilter(Message.class),
-                                    new OrFilter(MessageTypeFilter.CHAT));
+//        StanzaFilter packetFilter = new AndFilter(new StanzaTypeFilter(Message.class),
+//                                    new OrFilter(MessageTypeFilter.CHAT));
+
+        StanzaFilter packetFilter = new AndFilter(new StanzaTypeFilter(Message.class));
         _xmppConnection.addAsyncStanzaListener(packetListener, packetFilter);
     }
 

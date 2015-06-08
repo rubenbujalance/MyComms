@@ -138,6 +138,7 @@ public class ToolbarActivity extends ActionBarActivity {
             public void onClick(View v) {
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerProfile");
                 Intent in = new Intent(context, DashBoardActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(in);
             }
         });

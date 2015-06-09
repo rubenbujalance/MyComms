@@ -59,19 +59,19 @@ android {
             applicationId "com.vodafone.mycomms.i"
             resValue "string", "app_name", "MyComms-i"
             resValue "string", "app_scheme", "mycomms-i"
-            resValue "string", "xmpp_host", "int-msg.mycomms.com"
+            resValue "string", "xmpp_host", "int-msg.my-comms.com"
         }
         q {
             applicationId "com.vodafone.mycomms.q"
             resValue "string", "app_name", "MyComms-q"
             resValue "string", "app_scheme", "mycomms-qa"
-            resValue "string", "xmpp_host", "qa-msg.mycomms.com"
+            resValue "string", "xmpp_host", "qa-msg.my-comms.com"
         }
         p {
             applicationId "com.vodafone.mycomms.p"
             resValue "string", "app_name", "MyComms"
             resValue "string", "app_scheme", "mycomms"
-            resValue "string", "xmpp_host", "msg.mycomms.com"
+            resValue "string", "xmpp_host", "msg.my-comms.com"
         }
     }
 
@@ -128,7 +128,9 @@ dependencies {
     compile files('lib/android-framework-library.jar')
 
     //Smack XMPP Library
-    compile "org.igniterealtime.smack:smack-android:4.1.0"
+    compile "org.igniterealtime.smack:smack-android-extensions:4.1.0"
+//    compile ("org.igniterealtime.smack:smack-bosh:4.1.0")
+//    compile "org.igniterealtime.smack:smack-android:4.1.0"
     compile "org.igniterealtime.smack:smack-tcp:4.1.0"
 }
 

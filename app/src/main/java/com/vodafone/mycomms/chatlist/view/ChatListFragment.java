@@ -122,7 +122,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+        refreshAdapter();
     }
 
 }

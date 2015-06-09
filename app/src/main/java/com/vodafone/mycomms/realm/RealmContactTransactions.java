@@ -14,9 +14,6 @@ import model.FavouriteContact;
 import model.RecentContact;
 import model.UserProfile;
 
-/**
- * Created by AMG on 12/05/2015.
- */
 public class RealmContactTransactions {
     private Realm mRealm;
 

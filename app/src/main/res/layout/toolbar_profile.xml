@@ -8,7 +8,6 @@
     mycomms:contentInsetStart="0dp"
     mycomms:theme="@style/ActionBarThemeOverlay"
     android:gravity="top"
-    android:background="@color/grey_toolbar"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
     <RelativeLayout
         android:layout_width="match_parent"

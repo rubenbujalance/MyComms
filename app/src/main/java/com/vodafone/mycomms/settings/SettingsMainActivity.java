@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.settings;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -58,5 +59,10 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

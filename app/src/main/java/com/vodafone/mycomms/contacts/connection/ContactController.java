@@ -145,7 +145,6 @@ public class ContactController extends BaseController {
                         if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
                             ((IContactsConnectionCallback) this.getConnectionCallback()).onRecentContactsResponse();
                         } else{
-                            Log.i(Constants.TAG, "ContactController.onConnectionComplete: in BusProvider");
                             BusProvider.getInstance().post(new SetContactListAdapterEvent());
                         }
                     } catch (Exception e) {
@@ -205,7 +204,6 @@ public class ContactController extends BaseController {
             RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
             ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getId());
             if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                Log.i(Constants.TAG, "ContactController.updateContactAvatar: TESTING");
                 String filename = "avatar_" + contact.getId() + ".jpg";
 
                 new DownloadAvatars().execute(contact.getAvatar(), filename);
@@ -301,7 +299,6 @@ public class ContactController extends BaseController {
             if (contactList.size()!=0) {
                 realmContactTransactions.deleteAllFavouriteContacts();
                 realmContactTransactions.insertFavouriteContactList(contactList);
-                Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: inserted contactList ");
                 //BusProvider.getInstance().post(new SetContactListAdapterEvent());
             }
         } catch (JSONException e) {
@@ -327,7 +324,6 @@ public class ContactController extends BaseController {
             if (contactList.size()!=0) {
                 //realmContactTransactions.deleteAllRecentContacts();
                 realmContactTransactions.insertRecentContactList(contactList);
-                Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: inserted RecentcontactList ");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -351,7 +347,7 @@ public class ContactController extends BaseController {
             if (!jsonObject.isNull(Constants.CONTACT_COMPANY)) contact.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
             if (!jsonObject.isNull(Constants.CONTACT_TIMEZONE))
                 contact.setTimezone(jsonObject.getString(Constants.CONTACT_TIMEZONE));
-            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) contact.setLastSeen(jsonObject.getInt(Constants.CONTACT_LASTSEEN));
+            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) contact.setLastSeen(jsonObject.getLong(Constants.CONTACT_LASTSEEN));
             if (!jsonObject.isNull(Constants.CONTACT_OFFICE_LOC))
                 contact.setOfficeLocation(jsonObject.getString(Constants.CONTACT_OFFICE_LOC));
             if (!jsonObject.isNull(Constants.CONTACT_PHONES))

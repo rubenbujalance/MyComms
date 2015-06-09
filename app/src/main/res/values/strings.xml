@@ -126,6 +126,11 @@
     <!--Toolbar titles-->
     <string name="toolbar_title_messages">Messages</string>
     <string name="toolbar_title_contact_list">My Contacts</string>
+    <string name="profile_edit_mode_done">Done</string>
+    <string name="profile_edit_mode_edit">Edit</string>
+
+    <!-- Chat Strings -->
+    <string name="chat_me_text">"Me: "</string>
 
     <!--Search bar content -->
 

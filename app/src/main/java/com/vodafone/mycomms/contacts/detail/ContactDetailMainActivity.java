@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.contacts.detail;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -8,9 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
@@ -245,20 +242,20 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         btFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this,realm);
+                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm);
                 favouriteController.manageFavourite(contactId);
 
-                if(btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
+                if (btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
                     Drawable imageStar = getResources().getDrawable(imageStarOn);
                     btFavourite.setImageDrawable(imageStar);
                     btFavourite.setTag("abc_btn_rating_star_on_mtrl_alpha.png");
-                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png"){
+                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png") {
                     Drawable imageStar = getResources().getDrawable(imageStarOff);
                     btFavourite.setImageDrawable(imageStar);
                     btFavourite.setTag("abc_btn_rating_star_off_mtrl_alpha.png");
                 }
 
-                Log.e(Constants.TAG, "TAG: "+btFavourite.getTag());
+                Log.e(Constants.TAG, "TAG: " + btFavourite.getTag());
 
             }
         });
@@ -272,17 +269,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         });
 
         loadContactDetail();
-
-        final Activity activity = this;
-        LinearLayout favouriteTesting = (LinearLayout) findViewById(R.id.office_location_layout);
-        favouriteTesting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Inserting favourite", Toast.LENGTH_LONG).show();
-                FavouriteController favouriteController = new FavouriteController(activity,realm);
-                favouriteController.manageFavourite(contactId);
-            }
-        });
     }
 
     private void loadContactStatusInfo()

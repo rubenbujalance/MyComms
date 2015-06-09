@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.test.util.Util;
@@ -28,7 +27,11 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.FakeHttp;
 import org.robolectric.shadows.ShadowAlertDialog;
 
-import static com.vodafone.mycomms.constants.Constants.*;
+import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
+import static com.vodafone.mycomms.constants.Constants.INVALID_VERSION_RESPONSE;
+import static com.vodafone.mycomms.constants.Constants.USER_ALREADY_EXISTS_RESPONSE;
+import static com.vodafone.mycomms.constants.Constants.USER_DOMAIN_NOT_ALLOWED_RESPONSE;
+import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 
 /**
  * Created by str_evc on 18/05/2015.

@@ -187,4 +187,9 @@
     <string name="Delivered">Delivered</string>
     <string name="editphoto">edit photo</string>
 
+    <!--Search bar content -->
+
+    <string name="search_bar_text">Search (name, company, email)</string>
+    <string name="search_bar_cancel_button">Cancel</string>
+
 </resources>

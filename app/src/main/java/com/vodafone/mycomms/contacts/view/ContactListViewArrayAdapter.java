@@ -73,8 +73,17 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 .into(viewHolder.imageAvatar);
 
         } else{
-            String initials = contact.getFirstName().substring(0,1) +
-                                contact.getLastName().substring(0,1);
+            String initials = "";
+            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            {
+                initials = contact.getFirstName().substring(0,1);
+
+                if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                {
+                    initials = initials + contact.getLastName().substring(0,1);
+                }
+
+            }
 
             viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
             viewHolder.textAvatar.setText(initials);
@@ -85,7 +94,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         viewHolder.textViewPosition.setText(contact.getPosition());
 
         //Icon
-        String icon = null;
+        String icon = "";
         try {
             icon = new JSONObject(contact.getPresence()).getString("icon");
         } catch (JSONException e) {
@@ -100,7 +109,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         //viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getLastSeen()));
 
         //Local time
-        String presenceDetail = null;
+        String presenceDetail = "";
 
         try {
             presenceDetail = new JSONObject(contact.getPresence()).getString("detail");

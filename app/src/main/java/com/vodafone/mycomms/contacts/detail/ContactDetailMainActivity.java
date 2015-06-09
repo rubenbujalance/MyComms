@@ -279,7 +279,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Inserting favourite", Toast.LENGTH_LONG).show();
-                FavouriteController favouriteController = new FavouriteController(activity,realm);
+                FavouriteController favouriteController = new FavouriteController(activity, realm);
                 favouriteController.manageFavourite(contactId);
             }
         });
@@ -457,6 +457,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             buf.append(contact.getCompany());
         return buf.toString();
     }
+
 
     @Override
     public void onContactDetailReceived(Contact contact) {

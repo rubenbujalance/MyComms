@@ -74,6 +74,7 @@ public class Constants {
 
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
+    public static final String CONTACT_API_GET_SEARCH_CONTACTS = "/api/me/contact?p=mc&t=";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_RECENTS = "/api/me/recents";
@@ -124,5 +125,7 @@ public class Constants {
 //    public static final String XMPP_PARAM_DUMMY_HOST = "securejabber.me";
 //    public static final String XMPP_PARAM_DUMMY_SERVICE_NAME = "securejabber.me";
     public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
+
+    public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
 
 }

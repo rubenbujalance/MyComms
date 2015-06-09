@@ -196,6 +196,9 @@ public class InternalContactSearch
                 }
                 while(cursor.moveToNext());
             }
+
+            cursor.close();
+
             return contact;
         }
         catch (Exception ex)

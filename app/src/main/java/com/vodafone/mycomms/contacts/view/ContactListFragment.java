@@ -26,6 +26,8 @@ import android.widget.TextView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
+import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
+import com.vodafone.mycomms.contacts.connection.SearchController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
@@ -36,7 +38,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
@@ -50,12 +54,13 @@ import model.RecentContact;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends ListFragment{
+public class ContactListFragment extends ListFragment implements ISearchConnectionCallback{
 
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private Realm realm;
     private ContactController mContactController;
+    private SearchController mSearchController;
     private ArrayList<Contact> contactList;
     private ArrayList<FavouriteContact> favouriteContactList;
     private ArrayList<RecentContact> recentContactList;
@@ -68,6 +73,7 @@ public class ContactListFragment extends ListFragment{
     private EditText searchView;
     private Button cancelButton;
     private LinearLayout layCancel;
+    private String apiCall;
 
     private boolean isSearchBarFocused = false;
 
@@ -84,6 +90,11 @@ public class ContactListFragment extends ListFragment{
 
     private OnFragmentInteractionListener mListener;
 
+
+    private List<Contact> serverContacts = new ArrayList<>();
+    private List<Contact> internalContacts = new ArrayList<>();
+    private List<Contact> realmContacts = new ArrayList<>();
+
     // TODO: Rename and change types of parameters
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
@@ -97,10 +108,12 @@ public class ContactListFragment extends ListFragment{
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
-       initiateComponentsForSearchView(v);
-       setSearchBarEvents(v);
+
        listView = (ListView) v.findViewById(android.R.id.list);
        emptyText = (TextView) v.findViewById(android.R.id.empty);
+
+       initiateComponentsForSearchView(v);
+       setSearchBarEvents(v);
 
        return v;
     }
@@ -118,6 +131,7 @@ public class ContactListFragment extends ListFragment{
         super.onCreate(savedInstanceState);
         realm = Realm.getInstance(getActivity());
         mContactController = new ContactController(getActivity(),realm);
+        mSearchController = new SearchController(getActivity(), realm);
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -135,6 +149,8 @@ public class ContactListFragment extends ListFragment{
         }
 
         setListAdapterTabs();
+
+
     }
 
     @Override
@@ -212,6 +228,33 @@ public class ContactListFragment extends ListFragment{
             }}
 
         }
+    }
+
+    @Override
+    public void onSearchContactsResponse(ArrayList<Contact> contactList, boolean morePages, int
+            offsetPaging)
+    {
+        Log.i(Constants.TAG, "onSearchContactsResponse: " + apiCall);
+
+        if(null == serverContacts)
+        {
+            this.serverContacts = contactList;
+        }
+        else
+        {
+            this.serverContacts.addAll(contactList);
+        }
+
+        if (morePages)
+        {
+            mSearchController.getContactList(apiCall + "&o=" + offsetPaging);
+        }
+    }
+
+    @Override
+    public void onConnectionNotAvailable()
+    {
+        Log.d(Constants.TAG, "ContactListFragment.onConnectionNotAvailable: ");
     }
 
     /**
@@ -311,14 +354,15 @@ public class ContactListFragment extends ListFragment{
                     searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
                 }
 
-                if(null != contactList)
-                {
-                    contactList.clear();
-                }
+                //contactList = loadAllContactsFromBD(searchView.getText().toString());
+                //contactList.addAll(loadLocalContacts(searchView.getText().toString()));
+                //reloadAdapter();
 
-                contactList = loadAllContactsFromBD(searchView.getText().toString());
-                contactList.addAll(loadLocalContacts(searchView.getText().toString()));
-                reloadAdapter();
+                searchAllContacts(searchView.getText().length());
+
+
+
+
             }
 
             @Override
@@ -338,6 +382,30 @@ public class ContactListFragment extends ListFragment{
             }
         });
 
+    }
+
+    private void searchAllContacts(int minChars)
+    {
+        if(minChars >= 3)
+        {
+            loadAllContactsFromServer(searchView.getText().toString());
+        }
+        else
+        {
+            contactList = loadAllContactsFromBD();
+            reloadAdapter();
+        }
+    }
+
+    private void sortContacts(List<Contact> contactList)
+    {
+        Collections.sort(contactList, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact lhs, Contact rhs)
+            {
+                return 0;
+            }
+        });
     }
 
     private void showKeyboard(View view)
@@ -367,30 +435,18 @@ public class ContactListFragment extends ListFragment{
             } else {
                 adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
                 setListAdapter(adapter);
-                if (state!=null)
+                if (state!= null)
                     listView.onRestoreInstanceState(state);
             }
         }
     }
 
-    //TODO Implement this part in case Server Search is needed;
-    private void searchContactsFromServer(String keyWord)
+    private void reloadAdapter2()
     {
-        HashMap<String, Object> header = null;
-        HashMap<String, Object> body = new HashMap<>();
-        body.put("p", "mc");
-        body.put("o", "0");
-
-        if(null != keyWord)
+        adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+        if (contactList!=null)
         {
-            if(keyWord.length() > 0)
-            {
-                //new DownloadContactsFromServer().execute(header,body);
-            }
-            else
-            {
-                loadAllContactsFromBD();
-            }
+            setListAdapter(adapter);
         }
     }
 
@@ -438,9 +494,9 @@ public class ContactListFragment extends ListFragment{
         return contactArrayList;
     }
 
-    private void loadAllContactsFromBD()
+    private ArrayList<Contact> loadAllContactsFromBD()
     {
-        loadAllContactsFromBD(null);
+        return loadAllContactsFromBD(null);
     }
 
     private ArrayList<Contact> loadLocalContacts(String keyWord)
@@ -465,10 +521,19 @@ public class ContactListFragment extends ListFragment{
     }
 
 
-    private void loadAllContactsFromServer(HashMap<String,Object> contactObjects)
+    private void loadAllContactsFromServer(String keyWord)
     {
+        serverContacts = null;
 
+        apiCall = Constants.CONTACT_API_GET_SEARCH_CONTACTS + keyWord;
+        mSearchController.getContactList(apiCall);
+        mSearchController.setConnectionCallback(this);
     }
+
+
+
+
+
 
     /**
     private class DownloadContactsFromServer extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

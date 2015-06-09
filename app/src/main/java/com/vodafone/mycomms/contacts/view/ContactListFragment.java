@@ -91,9 +91,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private OnFragmentInteractionListener mListener;
 
 
-    private List<Contact> serverContacts = new ArrayList<>();
-    private List<Contact> internalContacts = new ArrayList<>();
-    private List<Contact> realmContacts = new ArrayList<>();
+    private ArrayList<Contact> serverContacts = new ArrayList<>();
+    private ArrayList<Contact> internalContacts = new ArrayList<>();
+    private ArrayList<Contact> realmContacts = new ArrayList<>();
 
     // TODO: Rename and change types of parameters
     public static ContactListFragment newInstance(int index, String param2) {
@@ -358,10 +358,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                 //contactList.addAll(loadLocalContacts(searchView.getText().toString()));
                 //reloadAdapter();
 
-                searchAllContacts(searchView.getText().length());
-
-
-
+                searchAllContacts(searchView.getText().toString());
+                reloadAdapter();
 
             }
 
@@ -384,17 +382,33 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     }
 
-    private void searchAllContacts(int minChars)
+    private void searchAllContacts(String keyWord)
     {
-        if(minChars >= 3)
-        {
-            loadAllContactsFromServer(searchView.getText().toString());
-        }
-        else
+        if(keyWord.length() == 0)
         {
             contactList = loadAllContactsFromBD();
-            reloadAdapter();
         }
+        else if(keyWord.length() > 0 && keyWord.length() < 3)
+        {
+            realmContacts = loadAllContactsFromBD(keyWord);
+            contactList = realmContacts;
+
+            sortContacts(contactList);
+        }
+        else if(keyWord.length() >= 3)
+        {
+            loadAllContactsFromServer(keyWord);
+            realmContacts = loadAllContactsFromBD(keyWord);
+            internalContacts = loadLocalContacts(keyWord);
+
+            contactList = serverContacts;
+            contactList.addAll(realmContacts);
+            contactList.addAll(internalContacts);
+
+            sortContacts(contactList);
+
+        }
+
     }
 
     private void sortContacts(List<Contact> contactList)
@@ -403,8 +417,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             @Override
             public int compare(Contact lhs, Contact rhs)
             {
-                return 0;
-
+                String name1 = lhs.getFirstName()+lhs.getLastName();
+                String name2 = rhs.getFirstName()+rhs.getLastName();
+                return name1.compareTo(name2);
             }
         });
     }
@@ -524,7 +539,11 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private void loadAllContactsFromServer(String keyWord)
     {
-        serverContacts = null;
+        if(null != serverContacts)
+        {
+            serverContacts.clear();
+        }
+
 
         apiCall = Constants.CONTACT_API_GET_SEARCH_CONTACTS + keyWord;
         mSearchController.getContactList(apiCall);

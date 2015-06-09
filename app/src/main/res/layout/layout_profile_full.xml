@@ -24,7 +24,7 @@
             <ImageView
                 android:layout_width="47dp"
                 android:layout_height="50dp"
-                android:id="@+id/btClose"
+                android:id="@+id/btnClose"
                 android:src="@drawable/abc_ic_clear_mtrl_alpha" />
 
             <LinearLayout

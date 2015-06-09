@@ -66,6 +66,8 @@ public class ContactListFragment extends ListFragment{
     private Button cancelButton;
     private LinearLayout layCancel;
 
+    private boolean isSearchBarFocused = false;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -103,7 +105,8 @@ public class ContactListFragment extends ListFragment{
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         realm = Realm.getInstance(getActivity());
         mContactController = new ContactController(getActivity(),realm);
@@ -112,6 +115,7 @@ public class ContactListFragment extends ListFragment{
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+        checkBundle(savedInstanceState);
         setListAdapterTabs();
     }
 
@@ -214,6 +218,11 @@ public class ContactListFragment extends ListFragment{
         layCancel = (LinearLayout) view.findViewById(R.id.lay_cancel);
 
         layCancel.setVisibility(View.GONE);
+
+        if(isSearchBarFocused)
+        {
+            showKeyboard(view);
+        }
     }
 
     private void setSearchBarEvents(View view)
@@ -414,7 +423,17 @@ public class ContactListFragment extends ListFragment{
         }
         return contactArrayList;
     }
+    private void checkBundle(Bundle bundle)
+    {
+        if(null != bundle)
+        {
+            if(bundle.getBoolean(Constants.BUNDLE_DASHBOARD_ACTIVITY))
+            {
+                isSearchBarFocused = true;
+            }
+        }
 
+    }
 
 
     private void loadAllContactsFromServer(HashMap<String,Object> contactObjects)

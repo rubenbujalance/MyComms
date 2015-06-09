@@ -117,4 +117,6 @@ public class Constants {
     public static final String XMPP_PARAM_SERVICE_NAME = "securejabber.me";
     public static final String XMPP_PARAM_DOMAIN = "securejabber.me";
 
+    public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
+
 }

@@ -404,6 +404,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             public int compare(Contact lhs, Contact rhs)
             {
                 return 0;
+
             }
         });
     }

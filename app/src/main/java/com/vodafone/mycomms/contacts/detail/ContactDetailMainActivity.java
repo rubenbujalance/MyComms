@@ -17,6 +17,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;

@@ -206,7 +206,7 @@ public class XMPPTransactions {
             try {
                 XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = params[0];
                 conn = new XMPPTCPConnection(xmppConfigBuilder.build());
-                // Conneect to the server
+                // Connect to the server
                 conn.connect();
                 //Log into the server
                 conn.login();

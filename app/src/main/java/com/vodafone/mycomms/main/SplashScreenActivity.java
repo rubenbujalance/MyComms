@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
@@ -27,6 +28,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -42,6 +45,7 @@ public class SplashScreenActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.splash_screen);
         mContext = this;

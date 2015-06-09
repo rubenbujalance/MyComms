@@ -185,5 +185,6 @@
     <string name="SharingSettings">SHARING SETTINGS</string>
     <string name="ButtonChat">Button Chat</string>
     <string name="Delivered">Delivered</string>
+    <string name="editphoto">edit photo</string>
 
 </resources>

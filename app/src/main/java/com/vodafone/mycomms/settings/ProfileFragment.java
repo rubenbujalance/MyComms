@@ -391,10 +391,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
             profileSurname.setText(userProfile.getLastName());
             EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
-            String phone = Utils.getElementFromJsonArrayString(userProfile.getPhones(), "phone");
+            String phone = Utils.getElementFromJsonArrayString(userProfile.getPhones(), Constants.PROFILE_PHONE);
             profilePhoneNumber.setText(phone);
             EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
-            String email = Utils.getElementFromJsonArrayString(userProfile.getEmails(), "email");
+            String email = Utils.getElementFromJsonArrayString(userProfile.getEmails(), Constants.PROFILE_EMAIL);
             profileEmail.setText(email);
             EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
             profileCompany.setText(userProfile.getCompany());

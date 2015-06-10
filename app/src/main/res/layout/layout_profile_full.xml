@@ -22,10 +22,11 @@
             android:id="@+id/Content">
 
             <ImageView
-                android:layout_width="47dp"
-                android:layout_height="50dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:id="@+id/btnClose"
-                android:src="@drawable/abc_ic_clear_mtrl_alpha" />
+                android:src="@mipmap/icon_cross_grey"
+                android:padding="15dp" />
 
             <LinearLayout
                 android:orientation="horizontal"

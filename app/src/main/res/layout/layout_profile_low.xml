@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/profile_layout"
+    android:background="@drawable/istanbul_bg_blur"
+    android:backgroundTint="#c8484b57"
+    android:backgroundTintMode="src_over">
+
+    <FrameLayout
+        android:id="@+id/sample_content_fragment"
+        android:layout_weight="2"
+        android:layout_width="match_parent"
+        android:layout_height="0px" >
+
+    </FrameLayout>
+
+<LinearLayout
+android:id="@+id/no_connection_layout"
+android:visibility="gone"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:gravity="center_horizontal"
+android:background="@android:color/holo_red_light">
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:text="@string/no_internet_connection"/>
+</LinearLayout>
+    <!-- Footer -->
+<RelativeLayout android:id="@+id/footer"
+android:layout_width="fill_parent" android:orientation="horizontal"
+android:layout_alignParentBottom="true"
+android:layout_height="wrap_content">
+
+</RelativeLayout>
+
+    </LinearLayout>

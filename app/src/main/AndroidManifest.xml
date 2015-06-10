@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- *********** -->
     <!-- Appl -->
@@ -29,6 +30,10 @@
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="5ff28bd1f7390464604822907b5a1dc19845d74c" />
+        <activity
+            android:name=".main.DashBoardActivity"
+            android:screenOrientation="portrait" >
+        </activity>
         <activity
             android:name=".ContactListMainActivity"
             android:screenOrientation="portrait" >

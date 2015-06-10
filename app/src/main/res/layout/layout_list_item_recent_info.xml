@@ -24,7 +24,7 @@
         android:textSize="10dip"
         android:orientation="vertical"
         android:layout_gravity="right"
-        android:text="12:30"
+        android:text="@string/dummyHour"
         android:textColor="@color/contact_soft_blue_text"
         />
 

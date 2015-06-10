@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.contacts.detail;
 
 import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -9,7 +10,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
@@ -105,7 +108,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
         imageStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
-        imageStarOff = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+        imageStarOff = R.drawable.abc_btn_rating_star_off_mtrl_alpha;
         textAvatar = (TextView)findViewById(R.id.avatarText);
 
         //Buttons

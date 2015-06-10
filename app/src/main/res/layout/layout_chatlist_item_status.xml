@@ -14,13 +14,13 @@
         android:layout_alignParentTop="true"
         android:paddingTop="10dp"
         android:layout_centerHorizontal="true"
-        android:text="badge" />
+        android:text="@string/badge" />
 
     <TextView android:id="@+id/chat_list_item_last_event_day"
         android:layout_height="match_parent"
         android:layout_width="70dp"
         android:textSize="10dip"
-        android:text="Tue"
+        android:text="@string/dummyShortDay"
         android:textColor="@color/contact_soft_blue_text"
         android:layout_gravity="center_horizontal"
         android:gravity="top|center"

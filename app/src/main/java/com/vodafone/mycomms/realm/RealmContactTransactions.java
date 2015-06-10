@@ -121,7 +121,7 @@ public class RealmContactTransactions {
     public UserProfile getUserProfile(String contactId){
         try {
             RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);
-            query.equalTo(Constants.CONTACT_CONTACT_ID, contactId);
+            query.equalTo(Constants.CONTACT_ID, contactId);
                  //.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
             RealmResults<UserProfile> result1 = query.findAll();
 

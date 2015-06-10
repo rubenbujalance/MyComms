@@ -39,7 +39,7 @@ public class RecentContactController extends BaseController {
         int method = HttpConnection.POST;
         String apiCall = Constants.CONTACT_API_POST_RECENTS;
         long timestamp = Calendar.getInstance().getTimeInMillis();
-        body.put(Constants.CONTACT_CONTACT_ID, contactId);
+        body.put(Constants.CONTACT_ID, contactId);
         body.put(Constants.CONTACT_RECENTS_ACTION, action);
         body.put(Constants.CONTACT_RECENTS_ACTION_TIME, timestamp);
         json = new JSONObject(body);

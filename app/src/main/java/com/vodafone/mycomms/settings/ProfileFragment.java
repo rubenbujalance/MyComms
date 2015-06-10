@@ -202,10 +202,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         profileName.setEnabled(isEditing);
         EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
         profileSurname.setEnabled(isEditing);
-        EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
-        profilePhoneNumber.setEnabled(isEditing);
-        EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
-        profileEmail.setEnabled(isEditing);
+       // EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
+       // profilePhoneNumber.setEnabled(isEditing);
+       // EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
+      //  profileEmail.setEnabled(isEditing);
         EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
         profileCompany.setEnabled(isEditing);
         EditText profilePosition = (EditText) getActivity().findViewById(R.id.contact_position);

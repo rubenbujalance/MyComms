@@ -46,19 +46,19 @@ public class SearchController extends BaseController
     private int offsetPaging = 0;
 
 
-    public SearchController(Activity activity, Realm realm) {
+    public SearchController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
         internalContactSearch = new InternalContactSearch(activity);
     }
 
-    public SearchController(Fragment fragment, Realm realm) {
+    public SearchController(Fragment fragment, Realm realm, String profileId) {
         super(fragment);
         this.mRealm = realm;
         this.mContext = fragment.getActivity();
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
 

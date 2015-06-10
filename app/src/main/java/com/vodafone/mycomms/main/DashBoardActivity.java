@@ -1,11 +1,7 @@
 package com.vodafone.mycomms.main;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.View;
 import android.widget.LinearLayout;
 
 import com.vodafone.mycomms.R;

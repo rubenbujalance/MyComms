@@ -2,8 +2,6 @@ package com.vodafone.mycomms.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -15,11 +13,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
+import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
 import model.Contact;

@@ -27,8 +27,8 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
-import com.vodafone.mycomms.contacts.connection.SearchController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
+import com.vodafone.mycomms.contacts.connection.SearchController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
@@ -130,9 +130,10 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(getActivity(),realm);
-        mSearchController = new SearchController(getActivity(), realm);
+        mContactController = new ContactController(getActivity(),realm, profileId);
+        mSearchController = new SearchController(getActivity(), realm, profileId);
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -147,6 +148,14 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             profileId = "";
         }else{
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        }
+
+        realm = Realm.getInstance(getActivity());
+        mContactController = new ContactController(getActivity(),realm, profileId);
+
+        if (getArguments() != null) {
+            mIndex = getArguments().getInt(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
         setListAdapterTabs();

@@ -231,15 +231,7 @@ public class ContactController extends BaseController {
         return realmContactTransactions.getAllContacts();
     }
 
-    public ArrayList<Contact> getLocalContactsByKeyWord(String keyWord) {
-        Log.d(Constants.TAG, "ContactController.getLocalContactsByKeyWord: ");
-        return internalContactSearch.getLocalContactsByKeyWord(keyWord);
-    }
 
-    public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
-        Log.d(Constants.TAG, "ContactController.getContactsByKeyWord: ");
-        return realmContactTransactions.getContactsByKeyWord(keyWord);
-    }
 
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
         Log.i(Constants.TAG, "ContactController.getAllFavouriteContacts: ");

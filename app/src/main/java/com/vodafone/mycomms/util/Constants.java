@@ -68,6 +68,7 @@ public class Constants {
     public static final String CONTACT_PAGINATION_MORE_PAGES = "morePages";
     public static final String CONTACT_PAGINATION_OFFSET = "offset";
     public static final String CONTACT_PAGINATION_PAGESIZE = "pageSize";
+    public static final String CONTACT_LOCAL_CONTENT= "local_contact";
 
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";

@@ -81,7 +81,10 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
             finish();
         }
-        _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        mRealm = Realm.getInstance(this);
+        chatTransactions = new RealmChatTransactions(mRealm, this);
+        _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        contactTransactions = new RealmContactTransactions(mRealm,_profile_id);
         _profile = contactTransactions.getContactById(_profile_id);
 
         if(_profile_id == null)
@@ -89,10 +92,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
             finish();
         }
-
-        mRealm = Realm.getInstance(this);
-        chatTransactions = new RealmChatTransactions(mRealm, this);
-        contactTransactions = new RealmContactTransactions(mRealm,_profile_id);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecentContactController = new RecentContactController(this,mRealm,_profile_id);

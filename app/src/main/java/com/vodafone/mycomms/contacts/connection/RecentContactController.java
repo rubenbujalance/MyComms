@@ -2,6 +2,7 @@ package com.vodafone.mycomms.contacts.connection;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
@@ -28,6 +29,14 @@ public class RecentContactController extends BaseController {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(mRealm, mProfileId);
+    }
+
+    public RecentContactController(Fragment fragment, Realm realm, String profileId) {
+        super(fragment);
+        this.mRealm = realm;
+        this.mContext = fragment.getActivity();
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(mRealm, mProfileId);
     }

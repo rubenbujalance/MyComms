@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
@@ -186,6 +187,10 @@ public class ContactListFragment extends ListFragment{
                             Utils.launchEmail(email, getActivity());
                         }
                     }
+                    //ADD RECENT
+                    RecentContactController recentController = new RecentContactController(this,realm,profileId);
+                    recentController.insertRecent(recentContactList.get(position).getContactId(), action);
+                    setListAdapterTabs();
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);
                 }

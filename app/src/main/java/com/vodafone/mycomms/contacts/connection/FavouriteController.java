@@ -2,7 +2,6 @@ package com.vodafone.mycomms.contacts.connection;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
@@ -11,11 +10,8 @@ import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshFavouritesEvent;
-import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
 
 import org.json.JSONObject;
 
@@ -29,19 +25,22 @@ public class FavouriteController  extends BaseController {
     private RealmContactTransactions realmContactTransactions;
     private FavouriteConnection mFavouriteConnection;
     private String apiCall;
+    private String mProfileId;
 
-    public FavouriteController(Activity activity, Realm realm) {
+    public FavouriteController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
-    public FavouriteController(Fragment fragment, Realm realm) {
+    public FavouriteController(Fragment fragment, Realm realm, String profileId) {
         super(fragment);
         this.mRealm = realm;
         this.mContext = fragment.getActivity();
-        realmContactTransactions = new RealmContactTransactions(realm);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
     public void manageFavourite(String contactId){

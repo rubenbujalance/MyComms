@@ -11,6 +11,8 @@ public class Contact extends RealmObject{
     @PrimaryKey
     private String id;
 
+    private String contactId;
+    private String profileId;
     private String platform;
     private String firstName;
     private String lastName;
@@ -30,8 +32,10 @@ public class Contact extends RealmObject{
     public Contact() {
     }
 
-    public Contact(String id, String platform, String firstName, String lastName, String avatar, String pathAvatar, String phones, String emails, String position, String company, String timezone, long lastSeen, String officeLocation, String availability, String presence, String country) {
+    public Contact(String id, String profileId, String contactId, String platform, String firstName, String lastName, String avatar, String pathAvatar, String phones, String emails, String position, String company, String timezone, long lastSeen, String officeLocation, String availability, String presence, String country) {
         this.id = id;
+        this.profileId = profileId;
+        this.contactId = contactId;
         this.platform = platform;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -55,6 +59,22 @@ public class Contact extends RealmObject{
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getContactId() {
+        return contactId;
+    }
+
+    public void setContactId(String contactId) {
+        this.contactId = contactId;
+    }
+
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
     }
 
     public String getPlatform() {

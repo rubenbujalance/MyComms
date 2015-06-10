@@ -22,12 +22,14 @@ public class RecentContactController extends BaseController {
     private final Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private String mProfileId;
 
-    public RecentContactController(Activity activity, Realm realm) {
+    public RecentContactController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(mRealm);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(mRealm, mProfileId);
     }
 
     public void insertRecent(String contactId, String action){
@@ -37,7 +39,7 @@ public class RecentContactController extends BaseController {
         int method = HttpConnection.POST;
         String apiCall = Constants.CONTACT_API_POST_RECENTS;
         long timestamp = Calendar.getInstance().getTimeInMillis();
-        body.put(Constants.CONTACT_ID, contactId);
+        body.put(Constants.CONTACT_CONTACT_ID, contactId);
         body.put(Constants.CONTACT_RECENTS_ACTION, action);
         body.put(Constants.CONTACT_RECENTS_ACTION_TIME, timestamp);
         json = new JSONObject(body);
@@ -51,9 +53,7 @@ public class RecentContactController extends BaseController {
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: ");
         String apiCall = Constants.CONTACT_API_GET_RECENTS;
-        ContactController contactController = new ContactController(getActivity(), mRealm);
+        ContactController contactController = new ContactController(getActivity(), mRealm, mProfileId);
         contactController.getRecentList(apiCall);
-        //Refresh Recent List
-        //BusProvider.getInstance().post(new SetContactListAdapterEvent());
     }
 }

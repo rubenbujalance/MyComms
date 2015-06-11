@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.contacts.detail;
+package com.vodafone.mycomms.contacts.connection;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,10 +7,6 @@ import android.util.Log;
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.contacts.connection.ContactController;
-import com.vodafone.mycomms.contacts.connection.RecentContactConnection;
-import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 

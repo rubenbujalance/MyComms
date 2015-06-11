@@ -17,6 +17,7 @@ import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.InternalContactSearch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +47,7 @@ public class ContactController extends BaseController {
     private Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private InternalContactSearch internalContactSearch;
     private String apiCall;
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
@@ -55,6 +57,7 @@ public class ContactController extends BaseController {
         this.mRealm = realm;
         this.mContext = activity;
         realmContactTransactions = new RealmContactTransactions(realm);
+        internalContactSearch = new InternalContactSearch(activity);
     }
 
     public ContactController(Fragment fragment, Realm realm) {
@@ -226,6 +229,16 @@ public class ContactController extends BaseController {
     public ArrayList<Contact> getAllContacts() {
         Log.d(Constants.TAG, "ContactController.getAllContacts: ");
         return realmContactTransactions.getAllContacts();
+    }
+
+    public ArrayList<Contact> getLocalContactsByKeyWord(String keyWord) {
+        Log.d(Constants.TAG, "ContactController.getLocalContactsByKeyWord: ");
+        return internalContactSearch.getLocalContactsByKeyWord(keyWord);
+    }
+
+    public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
+        Log.d(Constants.TAG, "ContactController.getContactsByKeyWord: ");
+        return realmContactTransactions.getContactsByKeyWord(keyWord);
     }
 
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){

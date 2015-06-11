@@ -19,7 +19,7 @@ public class ProfileConnection extends BaseConnection{
     private static final int method = HttpConnection.GET;
 
     public ProfileConnection(Context context, ConnectionInterfaces.ConnectionListener listener){
-        super(URL, context, listener, method);
+        super(URL, context, listener, method, false);
         Log.d(Constants.TAG, "ProfileConnection.ProfileConnection: ");
        // getConnection().setTree(new UserProfile());
     }

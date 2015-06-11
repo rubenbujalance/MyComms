@@ -22,7 +22,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
-import com.vodafone.mycomms.contacts.detail.RecentContactController;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshChatListEvent;

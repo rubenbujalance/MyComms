@@ -17,7 +17,7 @@ public class UpdateSettingsConnection extends BaseConnection {
     private static final int method = HttpConnection.PUT;
 
     public UpdateSettingsConnection(Context context, ConnectionInterfaces.ConnectionListener listener) {
-        super(URL, context, listener, method);
+        super(URL, context, listener, method, false);
         Log.d(Constants.TAG, "UpdateSettingsConnection.UpdateSettingsConnection: ");
         // getConnection().setTree(new UserProfile());
     }

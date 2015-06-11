@@ -2,15 +2,18 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?android:attr/selectableItemBackground">
 
     <LinearLayout
         android:id="@+id/front"
         android:tag="front"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffffff"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:clickable="false">
     <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
         android:layout_width="60dp"
         android:layout_height = "60dp"

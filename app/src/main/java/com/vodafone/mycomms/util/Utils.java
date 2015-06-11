@@ -2,6 +2,7 @@ package com.vodafone.mycomms.util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -196,12 +197,8 @@ public final class Utils extends Activity {
     /*
     * Returns the unique device ID: IMEI for GSM and the MEID or ESN for CDMA phones.
     */
-    public String getImei() {
-        TelephonyManager   telephonyManager  =  ( TelephonyManager
-                )getSystemService( Context.TELEPHONY_SERVICE );
-
+    public static String getImei(TelephonyManager telephonyManager) {
         String imeistring = telephonyManager.getDeviceId();
-
 
         return imeistring;
     }
@@ -221,7 +218,7 @@ public final class Utils extends Activity {
     /*
     * Returns the unique device ID: HardwareID
     */
-    public String getHardWareId() {
+    public static String getHardWareId() {
         String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
 
         return hwID;
@@ -230,7 +227,7 @@ public final class Utils extends Activity {
     /*
     * Returns the unique device ID: SerialNumber
     */
-    public String getSerialId() {
+    public static String getSerialId() {
         String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
 
         String serialnum = null;
@@ -248,8 +245,8 @@ public final class Utils extends Activity {
     /*
     * Returns Settings.Secure.ANDROID_ID returns the unique DeviceID
     */
-    public String getAndroidId() {
-        String androidId = Settings.Secure.getString(getContentResolver(),
+    public static String getAndroidId(ContentResolver contentResolver) {
+        String androidId = Settings.Secure.getString(contentResolver,
                 Settings.Secure.ANDROID_ID);
 
         return androidId;
@@ -258,13 +255,13 @@ public final class Utils extends Activity {
     /*
     * Returns the unique DeviceID
     */
-    public String getDeviceId() {
-        if (getImei() != null) {
-            return getImei();
+    public static String getDeviceId(ContentResolver contentResolver, TelephonyManager telephonyManager) {
+        if (getImei(telephonyManager) != null) {
+            return getImei(telephonyManager);
         } else if (getSerialId() != null) {
             return getSerialId();
         } else {
-            return getAndroidId();
+            return getAndroidId(contentResolver);
         }
     }
 

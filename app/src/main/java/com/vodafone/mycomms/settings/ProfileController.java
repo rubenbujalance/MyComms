@@ -252,5 +252,4 @@ public class ProfileController extends BaseController {
         if(userProfile.getOfficeLocation() != null) body.put("officeLocation",userProfile.getOfficeLocation());
         return body;
     }
-
 }

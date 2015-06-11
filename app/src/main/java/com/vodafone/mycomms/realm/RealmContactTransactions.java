@@ -120,6 +120,29 @@ public class RealmContactTransactions {
         return contactArrayList;
     }
 
+    public ArrayList<Contact> getContactsByKeyWord(String keyWord)
+    {
+        ArrayList<Contact> contactArrayList = new ArrayList<>();
+        RealmResults<Contact> result = mRealm.where(Contact.class)
+                                            .contains(Constants.CONTACT_FNAME, keyWord)
+                                            .or()
+                                            .contains(Constants.CONTACT_LNAME, keyWord)
+                                            .or()
+                                            .contains(Constants.CONTACT_COMPANY, keyWord)
+                                            .or()
+                                            .contains(Constants.CONTACT_EMAILS, keyWord)
+                                            .findAll();
+
+        if (result!=null){
+            result.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
+            for (Contact contactListItem : result)
+            {
+                contactArrayList.add(contactListItem);
+            }
+        }
+        return contactArrayList;
+    }
+
     public ArrayList<Contact> getFilteredContacts(String field, String filter){
         ArrayList<Contact> contactArrayList = new ArrayList<>();
         RealmQuery<Contact> query = mRealm.where(Contact.class);
@@ -200,6 +223,21 @@ public class RealmContactTransactions {
         }
         return null;
     }
+
+    /*public boolean isFavouriteContact(String contactId){
+        ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
+        RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
+        RealmResults<FavouriteContact> result1 = query.findAll();
+        if (result1 != null){
+            result1.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
+            for (FavouriteContact contactListItem : result1) {
+                contactArrayList.add(contactListItem);
+            }
+            return false;
+            return true;
+        }
+        return false;
+    }*/
 
     public ArrayList<FavouriteContact> getFilteredFavouriteContacts(String field, String filter){
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();

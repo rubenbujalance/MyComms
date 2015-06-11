@@ -6,6 +6,11 @@
     android:layout_height="match_parent"
     android:clickable="false"
     >
+
+    <include android:id="@+id/app_bar" layout="@layout/layout_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"

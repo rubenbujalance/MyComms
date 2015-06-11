@@ -18,7 +18,8 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 
-import static com.vodafone.mycomms.constants.Constants.*;
+import static com.vodafone.mycomms.constants.Constants.ANOTHER_PASSWORD;
+import static com.vodafone.mycomms.constants.Constants.PASSWORD;
 
 /**
  * Created by str_evc on 18/05/2015.

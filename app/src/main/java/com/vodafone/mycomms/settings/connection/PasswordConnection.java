@@ -17,7 +17,7 @@ public class PasswordConnection extends BaseConnection {
     private static final int method = HttpConnection.PUT;
 
     public PasswordConnection(Context context, ConnectionInterfaces.ConnectionListener listener) {
-        super(URL, context, listener, method);
+        super(URL, context, listener, method, false);
         Log.d(Constants.TAG, "PasswordConnection.PasswordConnection: ");
 
     }

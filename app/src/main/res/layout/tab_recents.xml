@@ -17,6 +17,6 @@
         android:layout_height="wrap_content"
         android:text="Recents"
         android:id="@+id/textView4"
-        android:textColor="@color/grey_middle" />
+        android:textColor="@color/grey_light" />
 
 </LinearLayout>

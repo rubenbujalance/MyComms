@@ -14,7 +14,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:weightSum="3"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@color/grey_dark">
         <LinearLayout
             android:id="@+id/footer_contacts_layout"
             android:layout_width="wrap_content"
@@ -31,9 +32,9 @@
 
                 <ImageView
                     android:id="@+id/footer_contacts"
-                    android:layout_width="28dp"
+                    android:layout_width="24dp"
                     android:layout_height="28dp"
-                    android:background="@drawable/btncontacts"
+                    android:background="@drawable/btnuser"
                     />
 
                 <TextView
@@ -41,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:text="Contacts"
                     android:id="@+id/textView9"
-                    android:textColor="@color/grey_light" />
+                    android:textColor="@color/grey_middle" />
 
             </LinearLayout>
         </LinearLayout>
@@ -78,15 +79,16 @@
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:id="@+id/footer_recents"
-                    android:background="@drawable/imessage"
-                    android:focusable="false" />
+                    android:background="@drawable/chat"
+                    android:focusable="false"
+                    android:backgroundTint="#ff808080" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chat"
                     android:id="@+id/textView10"
-                    android:textColor="@color/grey_light" />
+                    android:textColor="@color/grey_middle" />
 
             </LinearLayout>
         </LinearLayout>

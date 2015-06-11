@@ -1,16 +1,42 @@
 package com.vodafone.mycomms.login;
 
-import com.vodafone.mycomms.BuildConfig;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.ContactListMainActivity;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.test.util.Util;
+
+import org.apache.http.HttpResponse;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.FakeHttp;
+import org.robolectric.shadows.ShadowAlertDialog;
+
+import static com.vodafone.mycomms.constants.Constants.*;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
-//@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupMailActivityTest {
-/*
+
     Activity activity;
     ClearableEditText etEmail;
     Drawable errorIcon;
@@ -18,7 +44,7 @@ public class SignupMailActivityTest {
     ImageView ivBtBack;
 
     @Before
-     public void setUp() {
+    public void setUp() {
         activity = Robolectric.setupActivity(SignupMailActivity.class);
         etEmail = (ClearableEditText)activity.findViewById(R.id.etSignupEmail);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
@@ -26,7 +52,7 @@ public class SignupMailActivityTest {
     }
 
     @Test
-     public void testForwardEmptyEmail() {
+    public void testForwardEmptyEmail() {
         etEmail.setText("");
         ivBtFwd.performClick();
         EditText innerEtEmail = (EditText)etEmail.findViewById(R.id.clearable_edit);
@@ -99,5 +125,5 @@ public class SignupMailActivityTest {
         Button okButton = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
         okButton.performClick();
     }
-*/
+
 }

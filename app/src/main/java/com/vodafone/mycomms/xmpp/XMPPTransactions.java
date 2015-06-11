@@ -13,6 +13,9 @@ import com.vodafone.mycomms.util.Constants;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.MessageTypeFilter;
+import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -172,7 +175,8 @@ public class XMPPTransactions {
         };
 
         // Register the listener
-        StanzaFilter packetFilter = new StanzaTypeFilter(Message.class);
+        StanzaFilter packetFilter = new AndFilter(new StanzaTypeFilter(Message.class),
+                                    new OrFilter(MessageTypeFilter.CHAT, MessageTypeFilter.NORMAL));
         _xmppConnection.addAsyncStanzaListener(packetListener, packetFilter);
     }
 

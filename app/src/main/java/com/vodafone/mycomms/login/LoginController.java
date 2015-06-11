@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.login.connection.LoginConnection;
@@ -73,17 +74,13 @@ public class LoginController extends BaseController {
 
             UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this.getContext());
 
-
-
         } catch (Exception e){
             Log.e(Constants.TAG, "LoginController.onConnectionComplete: Exception while processing json: " , e);
         }
 
-
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof ILoginConnectionCallback && response.getUrl() !=null  && response.getUrl().contains(LoginConnection.URL)){
             ((ILoginConnectionCallback)this.getConnectionCallback()).onLoginSuccess();
         }
-
 
     }
 
@@ -92,7 +89,7 @@ public class LoginController extends BaseController {
         super.onConnectionError(ex);
         Log.w(Constants.TAG, "LoginController.onConnectionError: ");
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof ILoginConnectionCallback && ex.getUrl() !=null  && ex.getUrl().contains(LoginConnection.URL)){
-            ((ILoginConnectionCallback)this.getConnectionCallback()).onConnectionError();
+            ((ILoginConnectionCallback)this.getConnectionCallback()).onLoginError(getContext().getString(R.string.oops_wrong_email));
         }
     }
 

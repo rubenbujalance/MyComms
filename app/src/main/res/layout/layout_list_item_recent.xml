@@ -11,8 +11,7 @@
         android:layout_height="wrap_content"
         android:background="#ffffffff"
         android:weightSum="1"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp">
+        android:padding="10dp">
     <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
         android:layout_width="60dp"
         android:layout_height = "60dp"

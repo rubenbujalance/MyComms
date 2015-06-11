@@ -21,8 +21,28 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vacation Time"
-            android:id="@+id/button2" />
+            android:id="@+id/button_settings_vacation_time">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_vacation_time_activity_title"
+                    android:id="@+id/settings_preferences_vacation_time_label"
+                    android:autoText="false"
+                    android:gravity="left"
+                    android:layout_weight="1"
+                    />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_label_vacation_time_not_set"
+                    android:gravity="right"
+                    android:id="@+id/settings_preferences_vacation_time_value"
+                    android:layout_weight="1"
+                     />
+
+        </LinearLayout>
 
         <Switch
             android:layout_width="match_parent"

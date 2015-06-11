@@ -137,9 +137,6 @@ public class Constants {
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
 
-
     public static final String DATE_DISPLAY_FORMAT = "MMM d, yyyy";
     public final static SimpleDateFormat SIMPLE_DATE_FORMAT_DISPLAY = new SimpleDateFormat (DATE_DISPLAY_FORMAT);
-
-    //prova
 }

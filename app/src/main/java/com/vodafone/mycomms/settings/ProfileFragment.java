@@ -422,7 +422,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileOfficeLocation.setText(userProfile.getOfficeLocation());
 //            EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
 //            profileInfo.setText("????????");
-
+            loadProfileImage(userProfile);
         }
     }
 

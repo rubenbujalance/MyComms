@@ -12,13 +12,11 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 
-import org.igniterealtime.jbosh.BOSHClientConnEvent;
-import org.igniterealtime.jbosh.BOSHClientConnListener;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
-import org.jivesoftware.smack.bosh.BOSHConfiguration;
-import org.jivesoftware.smack.bosh.XMPPBOSHConnection;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
@@ -26,6 +24,8 @@ import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 import io.realm.Realm;
 import model.ChatMessage;
@@ -34,7 +34,7 @@ import model.ChatMessage;
  * Created by str_rbm on 03/06/2015.
  */
 public class XMPPTransactions {
-    private static XMPPBOSHConnection _xmppConnection = null;
+    private static XMPPTCPConnection _xmppConnection = null;
     private static Realm mRealm;
     private static RealmChatTransactions _chatTx;
     private static Context mContext;
@@ -69,7 +69,7 @@ public class XMPPTransactions {
 //        XMPPConnection.configure(ProviderManager.getInstance());
 
         //Configuration for the connection
-        BOSHConfiguration.Builder xmppConfigBuilder = BOSHConfiguration.builder();
+        XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = XMPPTCPConnectionConfiguration.builder();
 
         accessToken = UserSecurity.getAccessToken(appContext);
         xmppConfigBuilder.setUsernameAndPassword(profile_id, accessToken);
@@ -87,7 +87,7 @@ public class XMPPTransactions {
 //        xmppConfigBuilder.setHost(Constants.XMPP_PARAM_HOST);
 //        xmppConfigBuilder.setPort(5222);
 //        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
-        new BOSHXMPPOpenConnectionTask().execute(xmppConfigBuilder);
+        new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
 
         return true;
     }
@@ -202,21 +202,19 @@ public class XMPPTransactions {
 
     //Classes
 
-    static final class BOSHXMPPOpenConnectionTask extends AsyncTask<BOSHConfiguration.Builder, Void, XMPPBOSHConnection> {
+    static final class XMPPOpenConnectionTask extends AsyncTask<XMPPTCPConnectionConfiguration.Builder, Void, XMPPTCPConnection> {
         @Override
-        protected XMPPBOSHConnection doInBackground(BOSHConfiguration.Builder[] params)
+        protected XMPPTCPConnection doInBackground(XMPPTCPConnectionConfiguration.Builder[] params)
         {
-            XMPPBOSHConnection conn = null;
+            XMPPTCPConnection conn = null;
 
             try {
-                BOSHConfiguration.Builder xmppConfigBuilder = params[0];
-                conn = new XMPPBOSHConnection(xmppConfigBuilder.build());
+                XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = params[0];
+                conn = new XMPPTCPConnection(xmppConfigBuilder.build());
                 // Connect to the server
                 conn.connect();
                 //Log into the server
-                //conn.login();
-                conn.login(profile_id, accessToken);
-                Log.i(Constants.TAG, "BOSHXMPPOpenConnectionTask.doInBackground: Connected");
+                conn.login();
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "XMPPOpenConnection.doInBackground: Error opening XMPP server connection", e);
@@ -230,18 +228,18 @@ public class XMPPTransactions {
         }
 
         @Override
-        protected void onPostExecute(XMPPBOSHConnection xmppConnection) {
-            xmppBoshConnectionCallback(xmppConnection);
+        protected void onPostExecute(XMPPTCPConnection xmppConnection) {
+            xmppConnectionCallback(xmppConnection);
         }
     }
 
-    private static void xmppBoshConnectionCallback(XMPPBOSHConnection xmppBoshConnection)
+    private static void xmppConnectionCallback(XMPPTCPConnection xmppConnection)
     {
-        if(xmppBoshConnection != null && xmppBoshConnection.isConnected()) {
-            Log.w(Constants.TAG, "XMPPTransactions.xmppBoshConnectionCallback: XMPP Connection established with user " + xmppBoshConnection.getUser());
+        if(xmppConnection != null && xmppConnection.isConnected()) {
+            Log.w(Constants.TAG, "XMPPTransactions.xmppConnectionCallback: XMPP Connection established with user " + xmppConnection.getUser());
         }
         else {
-            Log.e(Constants.TAG, "XMPPTransactions.xmppBoshConnectionCallback: XMPP Connection NOT established");
+            Log.e(Constants.TAG, "XMPPTransactions.xmppConnectionCallback: XMPP Connection NOT established");
             return;
         }
 
@@ -270,30 +268,17 @@ public class XMPPTransactions {
         _xmppConnection.addAsyncStanzaListener(packetListener, packetFilter);
     }
 
-    private static BOSHClientConnListener getConnectionListener()
+    private static ConnectionListener getConnectionListener()
     {
-        BOSHClientConnListener listener = new BOSHClientConnListener() {
+        ConnectionListener listener = new ConnectionListener() {
             @Override
-            public void connectionEvent(BOSHClientConnEvent connEvent) {
-                if (connEvent.isConnected()){
-                    Log.w(Constants.TAG, "BOSHConnection.connected");
-                } else{
-                    Log.w(Constants.TAG, "BOSHConnection.authenticated");
-                }
-
-                if (connEvent.isError()){
-
-                }
-            }
-
-            /*@Override
-            public void connected(XMPPBOSHConnection connection) {
-                Log.w(Constants.TAG, "BOSHConnection.connected");
+            public void connected(XMPPConnection connection) {
+                Log.w(Constants.TAG, "XMPPTransactions.connected");
             }
 
             @Override
-            public void authenticated(XMPPBOSHConnection connection, boolean resumed) {
-                Log.w(Constants.TAG, "BOSHConnection.authenticated");
+            public void authenticated(XMPPConnection connection, boolean resumed) {
+                Log.w(Constants.TAG, "XMPPTransactions.authenticated");
             }
 
             @Override
@@ -321,14 +306,14 @@ public class XMPPTransactions {
             public void reconnectionFailed(Exception e) {
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectionFailed: Trying manually");
                 initializeMsgServerSession(mContext);
-            }*/
+            }
         };
 
         return listener;
     }
 
     //Getters and Setters
-    public static XMPPBOSHConnection getXmppConnection() {
+    public static XMPPTCPConnection getXmppConnection() {
         return _xmppConnection;
     }
 

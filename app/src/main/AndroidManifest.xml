@@ -139,6 +139,11 @@
             android:label="@string/title_activity_oauth_web"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".settings.VacationTimeSetterActivity"
+            android:label="VACAAAAAATTTIIOOONNTIMMEEEEE"
+            android:screenOrientation="portrait" >
+        </activity>
     </application>
 
 </manifest>

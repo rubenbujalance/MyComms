@@ -1,5 +1,7 @@
 package com.vodafone.mycomms.util;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Created by str_vig on 22/04/2015.
  */
@@ -27,6 +29,10 @@ public class Constants {
     public static final String PROFILE_PHONE = "phone";
     public static final String PROFILE_EMAIL = "email";
     public static final String PROFILE_DEVICE_ID = "deviceId";
+    public static final String PROFILE_HOLIDAY_END_DATE = "holidayEndDate";
+    public static final String PROFILE_HOLIDAY = "holiday";
+
+
 
     //Footer Constants
     public static final int TOOLBAR_CONTACTS = 0;
@@ -131,4 +137,7 @@ public class Constants {
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
 
+
+    public static final String DATE_DISPLAY_FORMAT = "MMM d, yyyy";
+    public final static SimpleDateFormat SIMPLE_DATE_FORMAT_DISPLAY = new SimpleDateFormat (DATE_DISPLAY_FORMAT);
 }

@@ -13,7 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
@@ -99,6 +101,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 //        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
 //        editProfile.setVisibility(View.INVISIBLE);
 
+        profileController.setConnectionCallback(this);
         profileController.getProfile();
     }
 
@@ -132,6 +135,15 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                         Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(in);
                 getActivity().finish();
+            }
+        });
+
+        LinearLayout vacationTimeButton = (LinearLayout) v.findViewById(R.id.button_settings_vacation_time);
+        vacationTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(getActivity(), VacationTimeSetterActivity.class);
+                startActivity(in);
             }
         });
 
@@ -199,13 +211,34 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         mListener = null;
     }
 
+    public void onStop(){
+        super.onStop();
+    }
+
+
     @Override
     public void onProfileReceived(UserProfile userProfile) {
         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: settings:" + userProfile.getSettings() );
 
+
         JSONObject jsonSettings = null;
         boolean privateTimeZone = false;
         boolean doNotDisturb = false;
+
+        try{
+            if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
+                jsonSettings = new JSONObject(userProfile.getSettings());
+                String holidayEndDate = jsonSettings.getString(Constants.PROFILE_HOLIDAY_END_DATE);
+                Boolean isOnHoliday = jsonSettings.getBoolean(Constants.PROFILE_HOLIDAY);
+
+                TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+                if(holidayEndDate != null && holidayEndDate.length() >0){
+                   vacationTimeEnds.setText(Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate));
+                }
+            }
+        } catch (Exception e){
+            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: ");
+        }
 
         try {
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
@@ -297,6 +330,12 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         public void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public void onPause(){
+        super.onPause();
+        profileController.setConnectionCallback(null);
+        Log.d(Constants.TAG, "PreferencesFragment.onPause: ");
 
+    }
 
 }

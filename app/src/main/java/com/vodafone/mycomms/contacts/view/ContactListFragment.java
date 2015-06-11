@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.SearchController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
@@ -152,6 +153,14 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
 
+        realm = Realm.getInstance(getActivity());
+        mContactController = new ContactController(getActivity(),realm, profileId);
+
+        if (getArguments() != null) {
+            mIndex = getArguments().getInt(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+
         setListAdapterTabs();
 
 
@@ -186,8 +195,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
             in = new Intent(getActivity(), ContactDetailMainActivity.class);
             if(mIndex == Constants.CONTACTS_ALL) {
-                if (contactList.get(position).getId()!=null && contactList.get(position).getId().equals(profileId))
+                if (contactList.get(position).getContactId()!=null && contactList.get(position).getContactId().equals(profileId))
                     in = new Intent(getActivity(), SettingsMainActivity.class);
+                in.putExtra(Constants.CONTACT_CONTACT_ID,contactList.get(position).getContactId() );
                 in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId());
                 startActivity(in);
             } else if (mIndex == Constants.CONTACTS_RECENT) {
@@ -209,7 +219,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                             Utils.launchSms(phone, getActivity());
                         }*/
                         in = new Intent(getActivity(), ChatMainActivity.class);
-                        in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getId());
+                        in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
                         in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
                         startActivity(in);
                     }
@@ -221,13 +231,17 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                             Utils.launchEmail(email, getActivity());
                         }
                     }
+                    //ADD RECENT
+                    RecentContactController recentController = new RecentContactController(this,realm,profileId);
+                    recentController.insertRecent(recentContactList.get(position).getContactId(), action);
+                    setListAdapterTabs();
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);
                 }
             } else if (mIndex == Constants.CONTACTS_FAVOURITE) { {
-                if (favouriteContactList.get(position).getId()!=null && favouriteContactList.get(position).getId().equals(profileId))
+                if (favouriteContactList.get(position).getContactId()!=null && favouriteContactList.get(position).getContactId().equals(profileId))
                     in = new Intent(getActivity(), SettingsMainActivity.class);
-                in.putExtra(Constants.CONTACT_ID,favouriteContactList.get(position).getId() );
+                in.putExtra(Constants.CONTACT_CONTACT_ID,favouriteContactList.get(position).getContactId() );
                 startActivity(in);
             }}
 

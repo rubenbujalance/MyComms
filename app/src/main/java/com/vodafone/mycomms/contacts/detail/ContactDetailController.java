@@ -27,12 +27,14 @@ public class ContactDetailController extends BaseController {
     private IContactDetailConnectionCallback contactDetailConnectionCallback;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private String profileId;
 
-    public ContactDetailController(Activity activity, Realm realm) {
+    public ContactDetailController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm);
+        this.profileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
 
     }
 
@@ -53,7 +55,7 @@ public class ContactDetailController extends BaseController {
             jsonResponse = new JSONObject(result);
             String data = jsonResponse.getString(Constants.CONTACT_DATA);
             jsonResponse = new JSONObject(data.substring(1, data.length()-1 )); //Removing squared bracelets.
-            contact = ContactController.mapContact(jsonResponse);
+            contact = ContactController.mapContact(jsonResponse, profileId);
 
             if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactDetailConnectionCallback){
                 ((IContactDetailConnectionCallback)this.getConnectionCallback()).onContactDetailReceived(contact);

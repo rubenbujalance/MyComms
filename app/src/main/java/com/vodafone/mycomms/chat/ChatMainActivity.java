@@ -22,7 +22,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
-import com.vodafone.mycomms.contacts.detail.RecentContactController;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshChatListEvent;
@@ -54,6 +54,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private Chat _chat;
     private Contact _contact;
     private Contact _profile;
+    private String _profile_id;
 
     private String previousView;
 
@@ -72,11 +73,28 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        if(sp==null)
+        {
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
+            finish();
+        }
         mRealm = Realm.getInstance(this);
         chatTransactions = new RealmChatTransactions(mRealm, this);
-        contactTransactions = new RealmContactTransactions(mRealm);
+        _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        contactTransactions = new RealmContactTransactions(mRealm,_profile_id);
+        _profile = contactTransactions.getContactById(_profile_id);
+
+        if(_profile_id == null)
+        {
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
+            finish();
+        }
+
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecentContactController = new RecentContactController(this,mRealm);
+        mRecentContactController = new RecentContactController(this,mRealm,_profile_id);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -96,24 +114,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
         //Contact and profile
         _contact = contactTransactions.getContactById(contact_id);
-
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
-        if(sp==null)
-        {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
-            finish();
-        }
-
-        String _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        _profile = contactTransactions.getContactById(_profile_id);
-
-        if(_profile_id == null)
-        {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
-            finish();
-        }
 
         //Chat listeners
         setChatListeners(this, _contact);
@@ -139,7 +139,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         });
 
         //Set avatar
-        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+_contact.getId()+".jpg");
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+_contact.getContactId()+".jpg");
 
         if (_contact.getAvatar()!=null &&
                 _contact.getAvatar().length()>0 &&
@@ -198,7 +198,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private void sendText()
     {
         String msg = etChatTextBox.getText().toString();
-        if(!XMPPTransactions.sendText(_contact.getId(), msg))
+        if(!XMPPTransactions.sendText(_contact.getContactId(), msg))
             return;
 
         //Save to DB

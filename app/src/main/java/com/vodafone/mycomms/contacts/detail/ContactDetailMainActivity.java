@@ -1,22 +1,22 @@
 package com.vodafone.mycomms.contacts.detail;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -43,6 +43,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ContactDetailController controller;
     private String contactId;
     private String action;
+    private String mProfileId;
     private RecentContactController mRecentContactController;
 
     //Views
@@ -77,12 +78,17 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
         realm = Realm.getInstance(this);
-        mRecentContactController = new RecentContactController(this,realm);
+        mRecentContactController = new RecentContactController(this,realm,mProfileId);
 
         Intent intent = getIntent();
-        contactId = intent.getExtras().getString(Constants.CONTACT_ID);
-        controller = new ContactDetailController(this, realm);
+        contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
+        controller = new ContactDetailController(this, realm, mProfileId);
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
 
@@ -244,20 +250,20 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         btFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this,realm);
+                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
                 favouriteController.manageFavourite(contactId);
 
-                if(btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
+                if (btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
                     Drawable imageStar = getResources().getDrawable(imageStarOn);
                     btFavourite.setImageDrawable(imageStar);
                     btFavourite.setTag("abc_btn_rating_star_on_mtrl_alpha.png");
-                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png"){
+                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png") {
                     Drawable imageStar = getResources().getDrawable(imageStarOff);
                     btFavourite.setImageDrawable(imageStar);
                     btFavourite.setTag("abc_btn_rating_star_off_mtrl_alpha.png");
                 }
 
-                Log.e(Constants.TAG, "TAG: "+btFavourite.getTag());
+                Log.e(Constants.TAG, "TAG: " + btFavourite.getTag());
 
             }
         });
@@ -271,17 +277,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         });
 
         loadContactDetail();
-
-        final Activity activity = this;
-        LinearLayout favouriteTesting = (LinearLayout) findViewById(R.id.office_location_layout);
-        favouriteTesting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Inserting favourite", Toast.LENGTH_LONG).show();
-                FavouriteController favouriteController = new FavouriteController(activity, realm);
-                favouriteController.manageFavourite(contactId);
-            }
-        });
     }
 
     private void loadContactStatusInfo()
@@ -388,7 +383,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
@@ -435,8 +430,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private Contact getContact(String contactId){
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm);
-        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_ID, contactId);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_CONTACT_ID, contactId);
 
         Contact contact = contactList.get(0);
         Log.d(Constants.TAG, "ContactDetailMainActivity.getContact: " + printContact(contact));
@@ -456,7 +451,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             buf.append(contact.getCompany());
         return buf.toString();
     }
-
 
     @Override
     public void onContactDetailReceived(Contact contact) {

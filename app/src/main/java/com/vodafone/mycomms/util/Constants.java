@@ -44,6 +44,8 @@ public class Constants {
     //Contacts API and BD Fields
     public static final String CONTACT_DATA = "data";
     public static final String CONTACT_ID = "id";
+    public static final String CONTACT_PROFILE_ID = "profileId";
+    public static final String CONTACT_CONTACT_ID = "contactId";
     public static final String CONTACT_PLATFORM = "platform";
     public static final String CONTACT_FNAME = "firstName";
     public static final String CONTACT_LNAME = "lastName";

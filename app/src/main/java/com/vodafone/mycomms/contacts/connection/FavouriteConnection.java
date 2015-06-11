@@ -12,7 +12,7 @@ public class FavouriteConnection extends BaseConnection {
     //private static final int method = HttpConnection.POST;
 
     public FavouriteConnection(Context context, ConnectionInterfaces.ConnectionListener listener, String apiCall, int method){
-        super(apiCall, context, listener, method);
+        super(apiCall, context, listener, method, false);
         Log.i(Constants.TAG, "FavouriteConnection.ContactConnection: " + apiCall);
     }
 }

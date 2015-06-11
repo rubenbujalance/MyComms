@@ -44,8 +44,6 @@ public class Constants {
     //Contacts API and BD Fields
     public static final String CONTACT_DATA = "data";
     public static final String CONTACT_ID = "id";
-    public static final String CONTACT_PROFILE_ID = "profileId";
-    public static final String CONTACT_CONTACT_ID = "contactId";
     public static final String CONTACT_PLATFORM = "platform";
     public static final String CONTACT_FNAME = "firstName";
     public static final String CONTACT_LNAME = "lastName";
@@ -74,6 +72,9 @@ public class Constants {
 
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";
+
+    //Contacts API Calls
+    public static final String NEWS_API_GET = "/api/news";
 
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";

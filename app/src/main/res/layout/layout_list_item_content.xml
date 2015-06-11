@@ -16,7 +16,7 @@ android:orientation="vertical"
     android:paddingBottom="2dip"
     android:lines="1"
     android:textSize="16dip"
-    android:text="Captain Planet"
+    android:text="@string/dummyUser"
     android:textColor="@color/contact_strong_blue_text"
 
     />
@@ -28,7 +28,7 @@ android:orientation="vertical"
     android:paddingBottom="2dip"
     android:lines="1"
     android:textSize="12dip"
-    android:text="Saviour of the Planet"
+    android:text="@string/dummyPhrase"
     android:textColor="@color/contact_soft_blue_text"
     />
 
@@ -52,7 +52,7 @@ android:orientation="vertical"
               android:lines="1"
         android:orientation="vertical"
         android:layout_gravity="center_vertical"
-        android:text="Planet Earth Company "
+        android:text="@string/dummyCompany2"
         android:textColor="@color/contact_soft_blue_text"
         />
 

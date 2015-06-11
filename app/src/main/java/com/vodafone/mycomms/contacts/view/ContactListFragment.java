@@ -304,11 +304,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }
     }
 
-    /**
-     * Sets events to search bar. Makes response on touch, onKey and on text change.
-     * @author str_oan
-     */
-    private void setSearchBarEvents()
+    private void setSearchBarEvents(View view)
     {
         final int drLeft = android.R.drawable.ic_menu_search;
         final int drRight = R.drawable.ic_action_remove;

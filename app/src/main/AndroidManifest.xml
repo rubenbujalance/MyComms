@@ -31,6 +31,10 @@
             android:name="com.crashlytics.ApiKey"
             android:value="5ff28bd1f7390464604822907b5a1dc19845d74c" />
         <activity
+            android:name=".main.DashBoardActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".ContactListMainActivity"
             android:screenOrientation="portrait" >
         </activity>

@@ -6,9 +6,12 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.AboutActivity;
+import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 /**
@@ -26,7 +29,6 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.layout_profile_activity);
         activateToolbar();
-        //setToolbarTitle("Andrew Wiggins");
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
@@ -43,6 +45,7 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
                 finish();
             }
         });
+
     }
 
     @Override

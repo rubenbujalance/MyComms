@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+import com.vodafone.mycomms.main.DashBoardActivity;
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
@@ -72,7 +73,7 @@ public class SplashScreenActivity extends Activity {
             if (!APIWrapper.isConnected(this)) {
                 if (UserSecurity.isUserLogged(this)) {
                     if (!UserSecurity.hasExpired(this)) {
-                        Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                         startActivity(in);
                         finish();
                     }
@@ -118,7 +119,7 @@ public class SplashScreenActivity extends Activity {
                     if (UserSecurity.hasExpired(this)) {
                         renewToken();
                     } else {
-                        Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                         startActivity(in);
                         finish();
                     }
@@ -195,7 +196,7 @@ public class SplashScreenActivity extends Activity {
                 UserSecurity.setTokens(accessToken, null, expiresIn, this);
 
                 //Go to app
-                Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                 startActivity(in);
                 finish();
             }

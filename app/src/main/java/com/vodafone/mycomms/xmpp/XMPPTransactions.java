@@ -12,7 +12,6 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 
-import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
@@ -38,8 +37,6 @@ public class XMPPTransactions {
     private static Realm mRealm;
     private static RealmChatTransactions _chatTx;
     private static Context mContext;
-    private static String accessToken;
-    private static String profile_id;
 
     //Methods
 
@@ -57,7 +54,7 @@ public class XMPPTransactions {
         //Get profile_id
         SharedPreferences sp = appContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
         if(profile_id == null)
         {
@@ -71,14 +68,11 @@ public class XMPPTransactions {
         //Configuration for the connection
         XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = XMPPTCPConnectionConfiguration.builder();
 
-        accessToken = UserSecurity.getAccessToken(appContext);
-        xmppConfigBuilder.setUsernameAndPassword(profile_id, accessToken);
+        xmppConfigBuilder.setUsernameAndPassword(profile_id, UserSecurity.getAccessToken(appContext));
         xmppConfigBuilder.setServiceName(appContext.getString(R.string.xmpp_host));
         xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
         xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
         xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"SSLv3"});
-        xmppConfigBuilder.setDebuggerEnabled(true);
-        xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
 //        xmppConfigBuilder.setDebuggerEnabled(true);
 
 //        TEST CONFIGURATION (securejabber.me)
@@ -87,6 +81,7 @@ public class XMPPTransactions {
 //        xmppConfigBuilder.setHost(Constants.XMPP_PARAM_HOST);
 //        xmppConfigBuilder.setPort(5222);
 //        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
+
         new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
 
         return true;

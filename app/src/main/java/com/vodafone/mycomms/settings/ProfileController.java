@@ -31,28 +31,28 @@ public class ProfileController extends BaseController {
     private RealmContactTransactions realmContactTransactions;
     private ProfileConnection profileConnection;
     private Realm realm;
-    private String profileId;
 
     public ProfileController(Fragment fragment) {
         super(fragment);
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
         realm = Realm.getInstance(getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        realmContactTransactions = new RealmContactTransactions(realm);
     }
 
     public ProfileController(Activity activity) {
         super(activity);
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
         realm = Realm.getInstance(getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        realmContactTransactions = new RealmContactTransactions(realm);
     }
 
     public void getProfile(){
         Log.d(Constants.TAG, "ProfileController.getProfile: ");
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileId = null;
+
+        if(sharedPreferences != null) {
+            profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        }
 
         if(profileId != null && profileId.length() > 0) {
             Log.d(Constants.TAG, "ProfileController.getProfile: retrieving profile with profileID:" + profileId);

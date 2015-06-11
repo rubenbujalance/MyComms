@@ -8,8 +8,6 @@ import io.realm.annotations.PrimaryKey;
  */
 public class FavouriteContact extends RealmObject {
 
-    private String contactId;
-    private String profileId;
     private String platform;
     private String firstName;
     private String lastName;
@@ -31,10 +29,8 @@ public class FavouriteContact extends RealmObject {
     public FavouriteContact() {
     }
 
-    public FavouriteContact(String profileId, String contactId, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, long lastSeen, String officeLocation, String availability, String presence, String country) {
-        this.id = profileId + "_" + contactId;
-        this.profileId = profileId;
-        this.contactId = contactId;
+    public FavouriteContact(String id, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, long lastSeen, String officeLocation, String availability, String presence, String country) {
+        this.id = id;
         this.platform = platform;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -57,22 +53,6 @@ public class FavouriteContact extends RealmObject {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getContactId() {
-        return contactId;
-    }
-
-    public void setContactId(String contactId) {
-        this.contactId = contactId;
-    }
-
-    public String getProfileId() {
-        return profileId;
-    }
-
-    public void setProfileId(String profileId) {
-        this.profileId = profileId;
     }
 
     public String getPlatform() {

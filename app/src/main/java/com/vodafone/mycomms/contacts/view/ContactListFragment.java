@@ -147,7 +147,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
-
+        realm = Realm.getInstance(getActivity());
         mContactController = new ContactController(getActivity(),realm, profileId);
         mSearchController = new SearchController(getActivity(), realm, profileId);
 

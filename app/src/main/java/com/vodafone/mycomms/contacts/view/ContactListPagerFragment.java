@@ -55,9 +55,9 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         realm = Realm.getInstance(getActivity());
         mContactController = new ContactController(this,realm, mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        //mContactController.getContactList(apiCall);
-        //mContactController.setConnectionCallback(this);
-        //BusProvider.getInstance().register(this);
+        mContactController.getContactList(apiCall);
+        mContactController.setConnectionCallback(this);
+        BusProvider.getInstance().register(this);
         //((ContactListMainActivity)getActivity()).activateContactListToolbar();
     }
 
@@ -155,6 +155,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
                 mContactController.getRecentList(apiCall);
             }
         }else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
+
             setListsAdapter();
             apiCall = Constants.CONTACT_API_GET_FAVOURITES;
             mContactController.getFavouritesList(apiCall);

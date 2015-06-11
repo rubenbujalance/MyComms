@@ -44,21 +44,24 @@ public class SearchController extends BaseController
     private String apiCall;
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
+    private String mProfileId;
 
 
-    public SearchController(Activity activity, Realm realm) {
+    public SearchController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
         internalContactSearch = new InternalContactSearch(activity);
+        this.mProfileId = profileId;
     }
 
-    public SearchController(Fragment fragment, Realm realm) {
+    public SearchController(Fragment fragment, Realm realm, String profileId) {
         super(fragment);
         this.mRealm = realm;
         this.mContext = fragment.getActivity();
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        this.mProfileId = profileId;
     }
 
 
@@ -137,12 +140,11 @@ public class SearchController extends BaseController
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject);
+                contact = mapContact(jsonObject, mProfileId);
                 realmContactList.add(contact);
                 doRefreshAdapter = (i==jsonArray.length()-1);
                 updateContactAvatar(contact, doRefreshAdapter);
             }
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
             realmContactTransactions.insertContactList(realmContactList);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -247,10 +249,15 @@ public class SearchController extends BaseController
         return true;
     }
 
-    public static Contact mapContact(JSONObject jsonObject){
+    public static Contact mapContact(JSONObject jsonObject, String profileId){
         Contact contact = new Contact();
         try {
-            if (!jsonObject.isNull(Constants.CONTACT_ID)) contact.setId(jsonObject.getString(Constants.CONTACT_ID));
+            contact.setProfileId(profileId);
+            if (!jsonObject.isNull(Constants.CONTACT_ID)){
+                contact.setContactId(jsonObject.getString(Constants.CONTACT_ID));
+                contact.setId(profileId + "_" + jsonObject.getString(Constants.CONTACT_ID));
+                Log.w(Constants.TAG,"SearchController -> mapContact() has value: "+profileId);
+            }
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))

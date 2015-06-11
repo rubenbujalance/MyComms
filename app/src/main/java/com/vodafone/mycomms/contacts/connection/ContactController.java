@@ -57,7 +57,7 @@ public class ContactController extends BaseController {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
         internalContactSearch = new InternalContactSearch(activity);
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);

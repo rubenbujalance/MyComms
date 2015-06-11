@@ -335,8 +335,18 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 if(days >= 1) lastSeenStr = days + "d";
                 else if(hours >=1) lastSeenStr = hours + "h";
                 else if(minutes >=1) lastSeenStr = minutes + "m";
+                else if(minutes < 1) lastSeenStr = "less then a minute";
 
-                tvLastSeen.setText("Seen " + lastSeenStr + " ago");
+                if(null == lastSeenStr)
+                {
+                    tvLastSeen.setText("");
+                }
+                else
+                {
+                    tvLastSeen.setText("Seen " + lastSeenStr + " ago");
+                }
+
+
             }
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);

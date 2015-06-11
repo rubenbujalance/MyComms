@@ -73,7 +73,22 @@ public class Constants {
     public static final String PROFILE_PLATFORMS = "platforms";
 
     //Contacts API Calls
+    public static final String NEWS_DATA = "data";
     public static final String NEWS_API_GET = "/api/news";
+    public static final String NEWS_PAGINATION = "pagination";
+    public static final String NEWS_PAGINATION_MORE_PAGES = "morePages";
+    public static final String NEWS_PAGINATION_OFFSET = "offset";
+    public static final String NEWS_PAGINATION_PAGESIZE = "pageSize";
+    public static final String NEWS_UUID = "uuid";
+    public static final String NEWS_TITLE = "title";
+    public static final String NEWS_HTML = "html";
+    public static final String NEWS_IMAGE = "image";
+    public static final String NEWS_LINK = "link";
+    public static final String NEWS_AUTHOR_NAME = "author_name";
+    public static final String NEWS_AUTHOR_AVATAR = "author_avatar";
+    public static final String NEWS_CREATED_AT = "created_at";
+    public static final String NEWS_UPDATED_AT = "updated_at";
+    public static final String NEWS_PUBLISHED_AT = "published_at";
 
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
@@ -130,5 +145,4 @@ public class Constants {
     public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
-
 }

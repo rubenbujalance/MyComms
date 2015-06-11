@@ -88,8 +88,9 @@ public class BaseController extends Controller {
         return connectionCallback;
     }
 
-    public void setConnectionCallback(IConnectionCallback connectionCallback) {
+    public String setConnectionCallback(IConnectionCallback connectionCallback) {
         this.connectionCallback = connectionCallback;
+        return null;
     }
 
     public void showToast(String stringToShow) {

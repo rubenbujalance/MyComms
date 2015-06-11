@@ -1,10 +1,13 @@
 package com.vodafone.mycomms.main;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.connection.BaseConnection;
+import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.events.BusProvider;
@@ -30,7 +33,10 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
         mNewsController = new NewsController(this);
         apiCall = Constants.NEWS_API_GET;
         mNewsController.getNewsList(apiCall);
+
         mNewsController.setConnectionCallback(this);
+
+        Log.d(Constants.TAG, "###news###");
 
         BusProvider.getInstance().register(this);
         setContentView(R.layout.layout_dashboard);
@@ -71,6 +77,10 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
     @Override
     public void onNewsResponse(ArrayList newsList, boolean morePages, int offsetPaging) {
         Log.i(Constants.TAG, "onNewsResponse: " + apiCall);
+
+        if (morePages){
+            mNewsController.getNewsList(apiCall + "&o=" + offsetPaging);
+        }
     }
 
     @Override

@@ -42,8 +42,9 @@ public class NewsController extends BaseController {
     public void onConnectionComplete(ConnectionResponse response) {
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "NewsController.onConnectionComplete: ");
-        String apiCall = Constants.NEWS_API_GET;
+        /*String apiCall = Constants.NEWS_API_GET;
         NewsController newsController = new NewsController(getActivity());
-        newsController.getNewsList(apiCall);
+        newsController.getNewsList(apiCall);*/
+        String result = response.getData().toString();
     }
 }

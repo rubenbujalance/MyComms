@@ -16,7 +16,7 @@ public class ContactDetailConnection extends BaseConnection{
     private static final int method = HttpConnection.GET;
 
     public ContactDetailConnection(Context context, ConnectionInterfaces.ConnectionListener listener, String contactId){
-        super(URL+contactId, context, listener, method);
+        super(URL+contactId, context, listener, method, false);
         Log.i(Constants.TAG, "ContactDetailConnection.ContactDetailConnection");
     }
 }

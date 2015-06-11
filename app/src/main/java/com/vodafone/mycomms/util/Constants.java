@@ -73,6 +73,9 @@ public class Constants {
     public static final String PROFILE_PLATFORMS = "platforms";
 
     //Contacts API Calls
+    public static final String NEWS_API_GET = "/api/news";
+
+    //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_SEARCH_CONTACTS = "/api/me/contact?p=mc&t=";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";

@@ -99,8 +99,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
-        imageStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
-        imageStarOff = R.drawable.abc_btn_rating_star_off_mtrl_alpha;
+        imageStarOn = R.mipmap.icon_favorite_colour;
+        imageStarOff = R.mipmap.icon_favorite_grey;
         textAvatar = (TextView)findViewById(R.id.avatarText);
 
         //Buttons
@@ -248,17 +248,15 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm);
                 favouriteController.manageFavourite(contactId);
 
-                if (btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
+                if (btFavourite.getTag().equals("icon_favorite_colour")) {
                     Drawable imageStar = getResources().getDrawable(imageStarOn);
                     btFavourite.setImageDrawable(imageStar);
-                    btFavourite.setTag("abc_btn_rating_star_on_mtrl_alpha.png");
-                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png") {
+                    btFavourite.setTag("icon_favorite_grey");
+                } else if (btFavourite.getTag().equals("icon_favorite_grey")) {
                     Drawable imageStar = getResources().getDrawable(imageStarOff);
                     btFavourite.setImageDrawable(imageStar);
-                    btFavourite.setTag("abc_btn_rating_star_off_mtrl_alpha.png");
+                    btFavourite.setTag("icon_favorite_colour");
                 }
-
-                Log.e(Constants.TAG, "TAG: " + btFavourite.getTag());
 
             }
         });
@@ -279,10 +277,13 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Inserting favourite", Toast.LENGTH_LONG).show();
-                FavouriteController favouriteController = new FavouriteController(activity,realm);
+                FavouriteController favouriteController = new FavouriteController(activity, realm);
                 favouriteController.manageFavourite(contactId);
             }
         });
+
+
+        Log.e(Constants.TAG, "TAG: " + contact.getId());
     }
 
     private void loadContactStatusInfo()

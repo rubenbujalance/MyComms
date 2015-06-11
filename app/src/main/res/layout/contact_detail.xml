@@ -50,8 +50,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/btFavourite"
-                        android:tag="abc_btn_rating_star_off_mtrl_alpha.png"
-                        android:src="@drawable/abc_btn_rating_star_off_mtrl_alpha"
+                        android:tag="icon_favorite_grey"
+                        android:src="@mipmap/icon_favorite_grey"
                         android:layout_marginTop="40dp"
                         android:layout_marginLeft="60dp"
                         android:clickable="true" />

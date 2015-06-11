@@ -12,7 +12,7 @@ public class SessionConnection extends BaseConnection{
     public static final String URL = "/api/me/session";
 
     public SessionConnection(Context context, ConnectionInterfaces.ConnectionListener listener, int method){
-        super(URL, context, listener, method);
+        super(URL, context, listener, method, false);
         Log.i(Constants.TAG, "SessionConnection.SessionConnection: ");
     }
 }

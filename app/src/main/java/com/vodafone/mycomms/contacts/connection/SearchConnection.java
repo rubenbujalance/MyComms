@@ -17,7 +17,7 @@ public class SearchConnection extends BaseConnection {
      public SearchConnection(Context context, ConnectionInterfaces.ConnectionListener listener,
                              String apiCall)
     {
-        super(apiCall, context, listener, method);
+        super(apiCall, context, listener, method, false);
         Log.i(Constants.TAG, "SearchConnection.SearchConnection: " + apiCall);
     }
 }

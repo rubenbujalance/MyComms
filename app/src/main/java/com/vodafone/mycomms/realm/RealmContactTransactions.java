@@ -224,6 +224,21 @@ public class RealmContactTransactions {
         return null;
     }
 
+    public boolean isFavouriteContact(String contactId){
+        ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
+        RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
+        RealmResults<FavouriteContact> result1 = query.findAll();
+        if (result1 != null){
+            /*result1.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
+            for (FavouriteContact contactListItem : result1) {
+                contactArrayList.add(contactListItem);
+            }DAVIDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD*/
+            return false;
+            return true;
+        }
+        return false;
+    }
+
     public ArrayList<FavouriteContact> getFilteredFavouriteContacts(String field, String filter){
         ArrayList<FavouriteContact> contactArrayList = new ArrayList<>();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);

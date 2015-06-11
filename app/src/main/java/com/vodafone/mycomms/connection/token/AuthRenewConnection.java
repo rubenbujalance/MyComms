@@ -23,7 +23,7 @@ public class AuthRenewConnection  extends BaseConnection{
     public static String URL = "/auth/renew";
 
     public AuthRenewConnection(Context context, ConnectionInterfaces.ConnectionListener listener){
-        super( URL, context , listener , HttpConnection.GET);
+        super( URL, context , listener , HttpConnection.GET, false);
         Log.d(Constants.TAG, "AuthRenewConnection.AuthRenewConnection: ");
 
 

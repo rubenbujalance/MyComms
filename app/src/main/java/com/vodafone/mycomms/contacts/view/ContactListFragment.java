@@ -131,9 +131,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     {
         super.onCreate(savedInstanceState);
 
-        realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(getActivity(),realm, profileId);
-        mSearchController = new SearchController(getActivity(), realm, profileId);
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -149,9 +146,11 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }else{
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
+        Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
 
         realm = Realm.getInstance(getActivity());
         mContactController = new ContactController(getActivity(),realm, profileId);
+        mSearchController = new SearchController(getActivity(), realm, profileId);
 
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);

@@ -26,6 +26,9 @@ import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.bytestreams.ibb.provider.DataPacketProvider;
+import org.jivesoftware.smackx.pubsub.Subscription;
+import org.xmlpull.v1.XmlPullParser;
 
 import io.realm.Realm;
 import model.ChatMessage;
@@ -210,8 +213,12 @@ public class XMPPTransactions {
 
             try {
                 XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = params[0];
+
                 conn = new XMPPTCPConnection(xmppConfigBuilder.build());
                 // Connect to the server
+
+                ProviderManager.addExtensionProvider("element", "namespace", new SubscriptionProvider());
+                // Add Custom Provider
                 conn.connect();
                 //Log into the server
                 conn.login();
@@ -343,4 +350,122 @@ public class XMPPTransactions {
         event.setMessage(chatMsg);
         BusProvider.getInstance().post(event);
     }
+
+    static class SubscriptionProvider extends DataPacketProvider.PacketExtensionProvider {
+        public static NewSubscription parseExtension(XmlPullParser parser) throws Exception {
+            Log.i(Constants.TAG, "SubscriptionProvider.parseExtension: ");
+            String jid = parser.getAttributeValue(null, "jid");
+            String nodeId = parser.getAttributeValue(null, "node");
+            String subId = parser.getAttributeValue(null, "subid");
+            String state = parser.getAttributeValue(null, "subscription");
+
+            String type = parser.getAttributeValue(null, "type");
+            String to = parser.getAttributeValue(null, "to");
+            String id = parser.getAttributeValue(null, "id");
+            String mediaType = parser.getAttributeValue(null, "mediaType");
+            String from = parser.getAttributeValue(null, "from");
+            String status = parser.getAttributeValue(null, "status");
+            String sent = parser.getAttributeValue(null, "sent");//TODO: Carefull, it's a long!
+            String xmlns_stream = parser.getAttributeValue(null, "xmlns:stream");
+
+
+            boolean isRequired = false;
+
+            int tag = parser.next();
+
+            if ((tag == XmlPullParser.START_TAG) && parser.getName().equals("subscribe-options")) {
+                tag = parser.next();
+
+                if ((tag == XmlPullParser.START_TAG) && parser.getName().equals("required"))
+                    isRequired = true;
+
+                while (parser.next() != XmlPullParser.END_TAG && parser.getName() != "subscribe-options");
+            }
+            while (parser.getEventType() != XmlPullParser.END_TAG) parser.next();
+            //return new Subscription(jid, nodeId, subId, (state == null ? null : Subscription.State.valueOf(state)), isRequired);
+            return new NewSubscription(type, to, id, mediaType, from, status, sent, xmlns_stream,
+                    jid, nodeId, subId, (mediaType == null ? null : Subscription.State.valueOf(state)), isRequired);
+        }
+    }
+
+    static class NewSubscription extends org.jivesoftware.smackx.pubsub.Subscription {
+        String type;
+        String to;
+        String id;
+        String mediaType;
+        String from;
+        String status;
+        String sent;
+        String xmlns_stream;
+        public NewSubscription(String type, String to, String id, String mediaType, String from, String status, String sent,
+                               String xmlns_stream, String jid, String nodeId, String subscriptionId, State state, boolean configRequired) {
+            super(jid, nodeId, subscriptionId, state, configRequired);
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getTo() {
+            return to;
+        }
+
+        public void setTo(String to) {
+            this.to = to;
+        }
+
+        @Override
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getMediaType() {
+            return mediaType;
+        }
+
+        public void setMediaType(String mediaType) {
+            this.mediaType = mediaType;
+        }
+
+        public String getFrom() {
+            return from;
+        }
+
+        public void setFrom(String from) {
+            this.from = from;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public String getSent() {
+            return sent;
+        }
+
+        public void setSent(String sent) {
+            this.sent = sent;
+        }
+
+        public String getXmlns_stream() {
+            return xmlns_stream;
+        }
+
+        public void setXmlns_stream(String xmlns_stream) {
+            this.xmlns_stream = xmlns_stream;
+        }
+    }
+
 }

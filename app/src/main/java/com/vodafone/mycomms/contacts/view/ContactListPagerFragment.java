@@ -155,6 +155,7 @@ Log.i(Constants.TAG, "ContactListPagerFragment.onCreate: profileId " + mProfileI
                 mContactController.getRecentList(apiCall);
             }
         }else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
+
             setListsAdapter();
             apiCall = Constants.CONTACT_API_GET_FAVOURITES;
             mContactController.getFavouritesList(apiCall);

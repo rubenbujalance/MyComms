@@ -7,9 +7,17 @@
     android:clickable="false"
     >
 
-    <include android:id="@+id/app_bar" layout="@layout/layout_search_bar"
-        android:layout_width="match_parent"
-        android:layout_height="60dp" />
+    <LinearLayout
+        android:id="@+id/lay_search_bar_container"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp">
+
+        <include android:id="@+id/app_bar" layout="@layout/layout_search_bar"
+                 android:layout_width="fill_parent"
+                 android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
 
     <FrameLayout
         android:layout_width="match_parent"

@@ -614,36 +614,40 @@ public class PacketParserUtils {
         outerloop: while (true) {
             int eventType = parser.next();
 
-            switch (eventType) {
-                case XmlPullParser.START_TAG:
-                    String elementName = parser.getName();
-                    String namespace = parser.getNamespace();
-                    switch(elementName) {
-                        case "error":
-                            error = PacketParserUtils.parseError(parser);
-                            break;
-                        // Otherwise, see if there is a registered provider for
-                        // this element name and namespace.
-                        default:
-                            IQProvider<IQ> provider = ProviderManager.getIQProvider(elementName, namespace);
-                            if (provider != null) {
-                                iqPacket = provider.parse(parser);
-                            }
-                            // Note that if we reach this code, it is guranteed that the result IQ contained a child element
-                            // (RFC 6120 § 8.2.3 6) because otherwhise we would have reached the END_TAG first.
-                            else {
-                                // No Provider found for the IQ stanza, parse it to an UnparsedIQ instance
-                                // so that the content of the IQ can be examined later on
-                                iqPacket = new UnparsedIQ(elementName, namespace, parseElement(parser));
-                            }
-                            break;
-                    }
-                    break;
-                case XmlPullParser.END_TAG:
-                    if (parser.getDepth() == initialDepth) {
-                        break outerloop;
-                    }
-                    break;
+            if(eventType == XmlPullParser.START_TAG ||
+                    (eventType == XmlPullParser.END_TAG && type == IQ.Type.pendingmessages) ) {
+
+                String elementName = parser.getName();
+                String namespace = parser.getNamespace();
+
+                switch (elementName) {
+                    case "error":
+                        error = PacketParserUtils.parseError(parser);
+                        break;
+                    // Otherwise, see if there is a registered provider for
+                    // this element name and namespace.
+                    default:
+                        IQProvider<IQ> provider = ProviderManager.getIQProvider(elementName, namespace);
+                        if (provider != null) {
+                            iqPacket = provider.parse(parser);
+                        }
+                        // Note that if we reach this code, it is guranteed that the result IQ contained a child element
+                        // (RFC 6120 8.2.3 6) because otherwhise we would have reached the END_TAG first.
+                        else {
+                            // No Provider found for the IQ stanza, parse it to an UnparsedIQ instance
+                            // so that the content of the IQ can be examined later on
+                            iqPacket = new UnparsedIQ(elementName, namespace, parseElement(parser));
+                        }
+                        break;
+                }
+            }
+            else if(eventType == XmlPullParser.END_TAG)
+            {
+//              Log.e(Constants.TAG, "PacketParserUtils.parseIQ: END_TAG > Id-"+id+"; Type-"+type+"; eventType-"+eventType+";");
+
+                if (parser.getDepth() == initialDepth) {
+                    break outerloop;
+                }
             }
         }
         // Decide what to do when an IQ packet was not understood

@@ -3,6 +3,7 @@ package com.vodafone.mycomms.main;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Layout;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.realm.Realm;
 
@@ -95,7 +98,6 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
             }
         });
 
-        Log.d(Constants.TAG, "DashBoardActivity.onCreate: "+ date + " - " + time);
     }
 
     //Prevent of going from main screen back to login
@@ -136,4 +138,5 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
     public void onConnectionNotAvailable() {
 
     }
+
 }

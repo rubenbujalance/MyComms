@@ -1,13 +1,19 @@
 package com.vodafone.mycomms.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.events.BusProvider;
@@ -46,6 +52,29 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
         setFooterListeners(this);
 
         activateFooterSelected(Constants.TOOLBAR_DASHBOARD);
+
+        ImageView btMagnifier = (ImageView) findViewById(R.id.magnifier);
+        btMagnifier.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //Start Contacts activity
+                Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(in);
+                finish();
+            }
+        });
+
+        TextView btFavourite = (TextView) findViewById(R.id.btFavourite);
+        btFavourite.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                //Start Favourites activity
+                Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
+                in.putExtra(Constants.toolbar, false);
+                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                startActivity(in);
+                finish();
+            }
+        });
 
     }
 

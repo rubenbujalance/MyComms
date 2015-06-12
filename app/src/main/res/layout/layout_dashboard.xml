@@ -50,7 +50,7 @@
                     android:layout_width="80dp"
                     android:layout_height="55dp"
                     android:id="@+id/magnifier"
-                    android:src="@drawable/abc_ic_search_api_mtrl_alpha"
+                    android:src="@mipmap/icon_search_white"
                     android:layout_weight="0.10"
                     android:background="#2affffff"
                     android:paddingLeft="15dp"
@@ -114,13 +114,28 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/Slider2"
                 android:layout_marginTop="45dp"
-                android:background="#1cffffff">
+                android:background="#1cffffff"
+                android:weightSum="1">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/Recents"
                     android:id="@+id/titleRecents"
+                    android:textColor="@color/white"
+                    android:padding="15dp"
+                    android:textSize="16dp" />
+
+                <Space
+                    android:layout_width="154dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1.12" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/Favourites"
+                    android:id="@+id/btFavourite"
                     android:textColor="@color/white"
                     android:padding="15dp"
                     android:textSize="16dp" />

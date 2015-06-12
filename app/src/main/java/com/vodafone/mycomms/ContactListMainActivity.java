@@ -44,7 +44,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
 
         //Initialize messaging server session (needs the profile_id saved)
         //if(profile_id != null) //If null, do initialization in callback method
-        //    XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+            XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;

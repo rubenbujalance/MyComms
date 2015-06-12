@@ -17,7 +17,10 @@ import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatManagerListener;
+import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
@@ -48,6 +51,7 @@ public class XMPPTransactions {
 
     public static boolean initializeMsgServerSession(Context appContext)
     {
+        Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: ");
         if(mContext!=null) return true;
 
         //Save context
@@ -82,7 +86,6 @@ public class XMPPTransactions {
         xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"SSLv3"});
         xmppConfigBuilder.setDebuggerEnabled(true);
         xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-//        xmppConfigBuilder.setDebuggerEnabled(true);
 
 //        TEST CONFIGURATION (securejabber.me)
 //        xmppConfigBuilder.setUsernameAndPassword(profile_id, "Stratesys123");
@@ -117,12 +120,24 @@ public class XMPPTransactions {
 
         //Send text to the server
         ChatManager chatmanager = ChatManager.getInstanceFor(XMPPTransactions.getXmppConnection());
-        org.jivesoftware.smack.chat.Chat newChat = chatmanager.createChat(contact_id+"@"+Constants.XMPP_PARAM_DOMAIN);
+        //org.jivesoftware.smack.chat.Chat newChat = chatmanager.createChat(contact_id + "@" + Constants.XMPP_PARAM_DOMAIN);
+        /*
+        att:
+            type: "chat"
+            to: "mc_user2Id@my-comms.com"
+            id: "message1Id"
+            mediaType: "text"
+            from: "mc_user1Id@my-comms.com/device"
+            xmlns:stream: "http://etherx.jabber.org/streams"
+            body: "Hello world"
+         */
+
+        Chat newChat = chatmanager.createChat(contact_id + "@" + Constants.XMPP_PARAM_DOMAIN);
 
         try {
             newChat.sendMessage(text);
         }
-        catch (Exception e) {
+        catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
             return false;
         }
@@ -209,6 +224,7 @@ public class XMPPTransactions {
         @Override
         protected XMPPTCPConnection doInBackground(XMPPTCPConnectionConfiguration.Builder[] params)
         {
+            Log.i(Constants.TAG, "XMPPOpenConnectionTask.doInBackground: ");
             XMPPTCPConnection conn = null;
 
             try {
@@ -217,6 +233,7 @@ public class XMPPTransactions {
                 conn = new XMPPTCPConnection(xmppConfigBuilder.build());
                 // Connect to the server
 
+                //TODO: Find Element and Namespace
                 ProviderManager.addExtensionProvider("element", "namespace", new SubscriptionProvider());
                 // Add Custom Provider
                 conn.connect();
@@ -266,6 +283,23 @@ public class XMPPTransactions {
                 }
             }
         };
+
+        //TESTING: Versión alternativa del Incoming chat
+        ChatManager chatmanager = ChatManager.getInstanceFor(XMPPTransactions.getXmppConnection());
+        chatmanager.addChatListener(new ChatManagerListener() {
+                    @Override
+                    public void chatCreated(Chat chat, boolean createdLocally)
+                    {
+                        Log.i(Constants.TAG, "XMPPTransactions.chatCreated: ");
+                        if (!createdLocally)
+                            chat.addMessageListener(new ChatMessageListener(){
+                                @Override
+                                public void processMessage(Chat chat, Message message) {
+                                    Log.i(Constants.TAG, "XMPPTransactions.processMessage: ");
+                                }
+                            });
+                    }
+                });
 
         // Register the listener
 //        StanzaFilter packetFilter = new AndFilter(new StanzaTypeFilter(Message.class),
@@ -365,7 +399,7 @@ public class XMPPTransactions {
             String mediaType = parser.getAttributeValue(null, "mediaType");
             String from = parser.getAttributeValue(null, "from");
             String status = parser.getAttributeValue(null, "status");
-            String sent = parser.getAttributeValue(null, "sent");//TODO: Carefull, it's a long!
+            String sent = parser.getAttributeValue(null, "sent");//TODO: Careful, it's a long!
             String xmlns_stream = parser.getAttributeValue(null, "xmlns:stream");
 
 

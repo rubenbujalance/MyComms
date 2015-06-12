@@ -45,7 +45,7 @@
             android:id="@+id/sent_text"
             style="@style/ChatSent"
             android:visibility="gone"
-            android:text="Sent"
+            android:text="@string/Sent"
             android:paddingTop="0dp"
             android:layout_marginLeft="12dp"
             android:layout_gravity="left"/>

@@ -99,7 +99,7 @@
                     <TextView
                         android:layout_width="50dp"
                         android:layout_height="20dp"
-                        android:text="20:46"
+                        android:text="@string/dummyHour"
                         android:id="@+id/contact_local_time"
                         android:textColor="#ffffffff"
                         android:gravity="right"
@@ -109,7 +109,7 @@
                     <TextView
                         android:layout_width="100dp"
                         android:layout_height="20dp"
-                        android:text="United States"
+                        android:text="@string/DummyCountry"
                         android:id="@+id/contact_country"
                         android:textColor="#cccccc"
                         android:textSize="12dp"
@@ -120,7 +120,7 @@
                     <TextView
                         android:layout_width="100dp"
                         android:layout_height="20dp"
-                        android:text="Seen 2d ago"
+                        android:text="@string/dummylastseen"
                         android:id="@+id/contact_last_seen"
                         android:textColor="#cccccc"
                         android:textSize="12dp"
@@ -157,7 +157,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Smith Doe, John"
+                            android:text="@string/dummyUserfull"
                             android:id="@+id/contact_contact_name"
                             android:textIsSelectable="false"
                             android:textSize="@dimen/abc_text_size_large_material"
@@ -170,7 +170,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="25dp"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="Senior Enterprise Manager"
+                            android:text="@string/dummyPosition"
                             android:id="@+id/contact_position"
                             android:textColor="#aaaaaa"
                             android:textAlignment="gravity"
@@ -182,7 +182,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="20dp"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="Vodafone Global Enterprise"
+                            android:text="@string/dummyCompany"
                             android:id="@+id/contact_company"
                             android:textColor="#aaaaaa"
                             android:textAlignment="gravity"
@@ -233,7 +233,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="20dp"
-                        android:text="Phone"
+                        android:text="@string/phoneNumber"
                         style="@style/TextViewProfile"
                         android:id="@+id/phone_number_label"
                         android:textSize="16dp" />
@@ -248,8 +248,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             style="@style/EditViewProfile"
-                            android:hint="Phone Number"
-                            android:text="+34 684503080"
+                            android:hint="@string/phoneNumber"
+                            android:text="@string/dummyPhone"
                             android:inputType="textEmailAddress"
                             android:id="@+id/contact_phone_number"
                             android:enabled="false"
@@ -297,7 +297,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="20dp"
-                        android:text="Email"
+                        android:text="@string/email"
                         style="@style/TextViewProfile"
                         android:id="@+id/contact_email_label"
                         android:textSize="16dp" />
@@ -312,8 +312,8 @@
                             style="@style/EditViewProfile"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:hint="Phone Number"
-                            android:text="ruben_bujalance@stratesys-ts.com"
+                            android:hint="@string/PhoneNumber"
+                            android:text="@string/dummyEmail"
                             android:inputType="textEmailAddress"
                             android:id="@+id/contact_email"
                             android:enabled="false"
@@ -363,13 +363,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Office Location"
+                        android:text="@string/officelocation"
                         android:textSize="16dp" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="742, Evergreen Terrace"
+                        android:hint="@string/dummyAddress"
                         android:id="@+id/contact_office_location"
                         android:textSize="14dp" />
                 </LinearLayout>

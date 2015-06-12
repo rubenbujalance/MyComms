@@ -14,31 +14,31 @@ import com.vodafone.mycomms.util.UserSecurity;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.filter.StanzaTypeFilter;
+import org.jivesoftware.smack.packet.DefaultExtensionElement;
+import org.jivesoftware.smack.packet.ExtensionElement;
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.provider.ExtensionElementProvider;
 import org.jivesoftware.smack.provider.IQProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smack.util.StringUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.jivesoftware.smackx.bytestreams.ibb.provider.DataPacketProvider;
-import org.jivesoftware.smackx.pubsub.Subscription;
-import org.xmlpull.v1.XmlPullParser;
 
 import java.io.IOException;
 
@@ -148,18 +148,6 @@ public class XMPPTransactions {
         }
 
         return true;
-    }
-
-    private static void xmppConnectionCallback(XMPPTCPConnection xmppConnection)
-    {
-        if(xmppConnection != null && xmppConnection.isConnected()) {
-            Log.w(Constants.TAG, "XMPPTransactions.xmppConnectionCallback: XMPP Connection established with user " + xmppConnection.getUser());
-        }
-        else {
-            Log.e(Constants.TAG, "XMPPTransactions.xmppConnectionCallback: XMPP Connection NOT established");
-            return;
-        }
-
     }
 
     private static ChatMessage saveMessageToDB(Message msg)
@@ -318,7 +306,14 @@ public class XMPPTransactions {
                 // Connect to the server
 
                 //TODO: Find Element and Namespace
-                ProviderManager.addExtensionProvider("element", "namespace", new SubscriptionProvider());
+                ProviderManager.addExtensionProvider("element", "namespace", new ExtensionElementProvider<ExtensionElement>() {
+                    @Override
+                    public DefaultExtensionElement parse(XmlPullParser parser,int initialDepth) throws org.xmlpull.v1.XmlPullParserException,
+                            IOException {
+                        String json = parser.nextText();
+                        return new TestPacketExtension(json);
+                    }
+                });
                 // Add Custom Provider
                 configure(conn);
                 conn.setPacketReplyTimeout(15000);
@@ -342,6 +337,37 @@ public class XMPPTransactions {
             xmppConnectionCallback(xmppConnection);
         }
     }
+
+    /**
+     * XMPP Packet Extension for GCM Cloud Connection Server. UNDER TESTING
+     */
+    private static final class TestPacketExtension extends DefaultExtensionElement   {
+
+        private final String json;
+
+        public TestPacketExtension(String json) {
+            super("element", "name");
+            this.json = json;
+        }
+
+        public String getJson() {
+            return json;
+        }
+
+        @Override
+        public String toXML() {
+            return String.format("<%s xmlns=\"%s\">%s</%s>",
+                    "element", "name",
+                    StringUtils.escapeForXML(json), "element");
+        }
+
+        public Stanza toPacket() {
+            Message message = new Message();
+            message.addExtension(this);
+            return message;
+        }
+    }
+
 
     private static void xmppConnectionCallback(XMPPTCPConnection xmppConnection)
     {
@@ -486,44 +512,49 @@ public class XMPPTransactions {
         return _xmppConnection;
     }
 
-    static class SubscriptionProvider extends DataPacketProvider.PacketExtensionProvider {
+    /*static class SubscriptionProvider extends ExtensionElementProvider {
         public static NewSubscription parseExtension(XmlPullParser parser) throws Exception {
-            Log.i(Constants.TAG, "SubscriptionProvider.parseExtension: ");
-            String jid = parser.getAttributeValue(null, "jid");
-            String nodeId = parser.getAttributeValue(null, "node");
-            String subId = parser.getAttributeValue(null, "subid");
-            String state = parser.getAttributeValue(null, "subscription");
 
-            String type = parser.getAttributeValue(null, "type");
-            String to = parser.getAttributeValue(null, "to");
-            String id = parser.getAttributeValue(null, "id");
-            String mediaType = parser.getAttributeValue(null, "mediaType");
-            String from = parser.getAttributeValue(null, "from");
-            String status = parser.getAttributeValue(null, "status");
-            String sent = parser.getAttributeValue(null, "sent");//TODO: Careful, it's a long!
-            String xmlns_stream = parser.getAttributeValue(null, "xmlns:stream");
+        }
+
+        @Override
+        public Element parse(XmlPullParser xmlPullParser, int i) throws XmlPullParserException, IOException, SmackException {
+            Log.i(Constants.TAG, "SubscriptionProvider.parseExtension: ");
+            String jid = xmlPullParser.getAttributeValue(null, "jid");
+            String nodeId = xmlPullParser.getAttributeValue(null, "node");
+            String subId = xmlPullParser.getAttributeValue(null, "subid");
+            String state = xmlPullParser.getAttributeValue(null, "subscription");
+
+            String type = xmlPullParser.getAttributeValue(null, "type");
+            String to = xmlPullParser.getAttributeValue(null, "to");
+            String id = xmlPullParser.getAttributeValue(null, "id");
+            String mediaType = xmlPullParser.getAttributeValue(null, "mediaType");
+            String from = xmlPullParser.getAttributeValue(null, "from");
+            String status = xmlPullParser.getAttributeValue(null, "status");
+            String sent = xmlPullParser.getAttributeValue(null, "sent");//TODO: Careful, it's a long!
+            String xmlns_stream = xmlPullParser.getAttributeValue(null, "xmlns:stream");
 
 
             boolean isRequired = false;
 
-            int tag = parser.next();
+            int tag = xmlPullParser.next();
 
-            if ((tag == XmlPullParser.START_TAG) && parser.getName().equals("subscribe-options")) {
-                tag = parser.next();
+            if ((tag == XmlPullParser.START_TAG) && xmlPullParser.getName().equals("subscribe-options")) {
+                tag = xmlPullParser.next();
 
-                if ((tag == XmlPullParser.START_TAG) && parser.getName().equals("required"))
+                if ((tag == XmlPullParser.START_TAG) && xmlPullParser.getName().equals("required"))
                     isRequired = true;
 
-                while (parser.next() != XmlPullParser.END_TAG && parser.getName() != "subscribe-options");
+                while (xmlPullParser.next() != XmlPullParser.END_TAG && xmlPullParser.getName() != "subscribe-options");
             }
-            while (parser.getEventType() != XmlPullParser.END_TAG) parser.next();
+            while (xmlPullParser.getEventType() != XmlPullParser.END_TAG) xmlPullParser.next();
             //return new Subscription(jid, nodeId, subId, (state == null ? null : Subscription.State.valueOf(state)), isRequired);
             return new NewSubscription(type, to, id, mediaType, from, status, sent, xmlns_stream,
                     jid, nodeId, subId, (mediaType == null ? null : Subscription.State.valueOf(state)), isRequired);
         }
-    }
+    }*/
 
-    static class NewSubscription extends org.jivesoftware.smackx.pubsub.Subscription {
+    /*static class NewSubscription extends Subscription {
         String type;
         String to;
         String id;
@@ -601,7 +632,7 @@ public class XMPPTransactions {
         public void setXmlns_stream(String xmlns_stream) {
             this.xmlns_stream = xmlns_stream;
         }
-    }
+    }*/
 
 
 }

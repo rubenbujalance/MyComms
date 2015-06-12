@@ -5,6 +5,9 @@ import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.R;
@@ -85,16 +88,21 @@ public class NewsController extends BaseController {
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.NEWS_DATA);
             News news;
 
+            getActivity().setContentView(R.layout.layout_dashboard);
+
+            FrameLayout contenedor = (FrameLayout) getActivity().findViewById(R.id.list_news);
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
                 news = mapNews(jsonObject);
                 newsList.add(news);
 
-                Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
+                View child = inflater.inflate(R.layout.layout_news_dashboard, contenedor, false);
 
-                LayoutInflater inflater = LayoutInflater.from(getContext());
-                View inflatedLayout= inflater.inflate(R.layout.layout_dashboard, null, false);
-                //inflatedLayout.addView(inflatedLayout);
+                contenedor.addView(child);
+               //Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
+
             }
 
         } catch (JSONException e) {

@@ -17,10 +17,10 @@
 
 package org.jivesoftware.smack.packet;
 
-import java.util.Locale;
-
 import org.jivesoftware.smack.util.Objects;
 import org.jivesoftware.smack.util.XmlStringBuilder;
+
+import java.util.Locale;
 
 /**
  * The base IQ (Info/Query) packet. IQ packets are used to get and set information
@@ -277,19 +277,24 @@ public abstract class IQ extends Stanza {
          * The IQ stanza reports an error that has occurred regarding processing or delivery of a get or set request.
          */
         error,
+
+        /**
+         * The IQ stanza reports an error that has occurred regarding processing or delivery of a get or set request.
+         */
+        pendingmessages,
         ;
 
         /**
          * Converts a String into the corresponding types. Valid String values
          * that can be converted to types are: "get", "set", "result", and "error".
          *
-         * @param string the String value to covert.
+         * @param str the String value to covert.
          * @return the corresponding Type.
          * @throws IllegalArgumentException when not able to parse the string parameter
          * @throws NullPointerException if the string is null
          */
-        public static Type fromString(String string) {
-            return Type.valueOf(string.toLowerCase(Locale.US));
+        public static Type fromString(String str) {
+            return Type.valueOf(str.toLowerCase(Locale.US));
         }
     }
 

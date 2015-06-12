@@ -2,8 +2,6 @@ package com.vodafone.mycomms.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -15,11 +13,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
+import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
 import model.Contact;
@@ -163,7 +161,7 @@ public class ToolbarActivity extends ActionBarActivity {
             public void onClick(View v) {
                 Intent in = new Intent(context, ContactDetailMainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                in.putExtra(Constants.CONTACT_ID, contact.getId());
+                in.putExtra(Constants.CONTACT_CONTACT_ID, contact.getContactId());
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }

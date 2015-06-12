@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
@@ -35,7 +36,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
 
         if(convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -59,7 +60,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         Contact contact = getItem(position);
 
         //Image avatar
-        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+        final File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                "avatar_"+contact.getContactId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
@@ -69,10 +71,26 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.textAvatar.setText(null);
 
             Picasso.with(mContext)
-                .load(avatarFile)
-                .into(viewHolder.imageAvatar);
+                    .load(avatarFile) // thumbnail url goes here
+                    .placeholder(R.drawable.ic_circle_contact_photo)
+                    .fit().centerCrop()
+                    .into(viewHolder.imageAvatar, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            Picasso.with(mContext)
+                                    .load(avatarFile) // image url goes here
+                                    .fit().centerCrop()
+                                    .placeholder(viewHolder.imageAvatar.getDrawable())
+                                    .into(viewHolder.imageAvatar);
+                        }
 
-        } else{
+                        @Override
+                        public void onError() {
+                        }
+                    });
+        }
+        else
+        {
             String initials = "";
             if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
             {
@@ -157,4 +175,5 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         ImageView imageAvatar;
         TextView textAvatar;
     }
+
 }

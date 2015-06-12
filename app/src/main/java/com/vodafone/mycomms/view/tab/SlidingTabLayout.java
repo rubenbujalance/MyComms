@@ -216,20 +216,40 @@ public class SlidingTabLayout extends HorizontalScrollView {
         display.getSize(size);
         int width = size.x;
 
-        View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_favourites, mTabStrip, false);
-        tabView.setOnClickListener(tabClickListener);
-        mTabStrip.addView(tabView);
-        tabView.getLayoutParams().width = width/3;
+        String actividad = String.valueOf(getContext());
+        String[] auxactivity = actividad.split("@");
 
-        tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_recents, mTabStrip, false);
-        tabView.setOnClickListener(tabClickListener);
-        mTabStrip.addView(tabView);
-        tabView.getLayoutParams().width = width/3;
+        Log.i(Constants.TAG, "###" + auxactivity[0]);
 
-        tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_contacts, mTabStrip, false);
-        tabView.setOnClickListener(tabClickListener);
-        mTabStrip.addView(tabView);
-        tabView.getLayoutParams().width = width/3;
+        if (auxactivity[0].equals("com.vodafone.mycomms.ContactListMainActivity")) {
+
+            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_favourites, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 3;
+
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_recents, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 3;
+
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_contacts, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 3;
+
+        } else if (auxactivity[0].equals("com.vodafone.mycomms.settings.SettingsMainActivity")) {
+            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_profile, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 2;
+
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_settings, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 2;
+        }
+
     }
 
     @Override

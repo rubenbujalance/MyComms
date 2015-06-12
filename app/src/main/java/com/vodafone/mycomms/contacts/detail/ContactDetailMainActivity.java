@@ -1,6 +1,8 @@
 package com.vodafone.mycomms.contacts.detail;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,6 +43,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ContactDetailController controller;
     private String contactId;
     private String action;
+    private String mProfileId;
     private RecentContactController mRecentContactController;
 
     //Views
@@ -75,12 +78,17 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
         realm = Realm.getInstance(this);
-        mRecentContactController = new RecentContactController(this,realm);
+        mRecentContactController = new RecentContactController(this,realm,mProfileId);
 
         Intent intent = getIntent();
-        contactId = intent.getExtras().getString(Constants.CONTACT_ID);
-        controller = new ContactDetailController(this, realm);
+        contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
+        controller = new ContactDetailController(this, realm, mProfileId);
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
 
@@ -97,7 +105,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
         imageStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
-        imageStarOff = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+        imageStarOff = R.drawable.abc_btn_rating_star_off_mtrl_alpha;
         textAvatar = (TextView)findViewById(R.id.avatarText);
 
         //Buttons
@@ -242,7 +250,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         btFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm);
+                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
                 favouriteController.manageFavourite(contactId);
 
                 if (btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
@@ -327,8 +335,18 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 if(days >= 1) lastSeenStr = days + "d";
                 else if(hours >=1) lastSeenStr = hours + "h";
                 else if(minutes >=1) lastSeenStr = minutes + "m";
+                else if(minutes < 1) lastSeenStr = "less then a minute";
 
-                tvLastSeen.setText("Seen " + lastSeenStr + " ago");
+                if(null == lastSeenStr)
+                {
+                    tvLastSeen.setText("");
+                }
+                else
+                {
+                    tvLastSeen.setText("Seen " + lastSeenStr + " ago");
+                }
+
+
             }
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
@@ -375,7 +393,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
@@ -422,8 +440,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private Contact getContact(String contactId){
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm);
-        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_ID, contactId);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_CONTACT_ID, contactId);
 
         Contact contact = contactList.get(0);
         Log.d(Constants.TAG, "ContactDetailMainActivity.getContact: " + printContact(contact));

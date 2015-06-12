@@ -21,11 +21,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.main.DashBoardActivity;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
+import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;

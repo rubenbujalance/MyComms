@@ -43,22 +43,16 @@ public class VacationTimeSetterActivity extends ToolbarActivity implements IConn
         Log.d(Constants.TAG, "VacationTimeSetterActivity.onCreate: ");
         super.onCreate(savedInstanceState);
 
-        activateToolbar();
-        setTitle(getString(R.string.settings_vacation_time_activity_title));
-//        datePickerFragment = new MyCommsDatePickerFragment();
-//        datePickerFragment.setOnDateSetListener(onDateSetListener);
-//        datePickerFragment.setOnCancelListener(onCancelListener);
+        setContentView(R.layout.activity_vacation_time);
 
+        activateToolbar();
+        setToolbarTitle(getString(R.string.settings_vacation_time_activity_title));
 
         profileController = new ProfileController(this);
         profileController.setConnectionCallback(this);
 
-
-        setContentView(R.layout.activity_vacation_time);
-
         Switch vacationTimeSwitch = (Switch) findViewById(R.id.switch_vacation_time);
         vacationTimeSwitch.setOnClickListener(new View.OnClickListener() {
-
 
             @Override
             public void onClick(View v) {

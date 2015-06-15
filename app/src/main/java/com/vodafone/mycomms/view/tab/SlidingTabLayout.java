@@ -14,7 +14,6 @@ package com.vodafone.mycomms.view.tab;/*
  * limitations under the License.
  */
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -240,12 +239,12 @@ public class SlidingTabLayout extends HorizontalScrollView {
             tabView.getLayoutParams().width = width / 3;
 
         } else if (auxactivity[0].equals("com.vodafone.mycomms.settings.SettingsMainActivity")) {
-            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_profile, mTabStrip, false);
+            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_settings, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 2;
 
-            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_settings, mTabStrip, false);
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_profile, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 2;

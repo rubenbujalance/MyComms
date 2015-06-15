@@ -116,7 +116,7 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
         if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
             profileController.setConnectionCallback(this);
-            profileController.getProfile();
+            profileController.getProfile(false);
             
             return null;
         }

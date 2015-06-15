@@ -10,8 +10,12 @@
     android:background="@color/grey_profile_background"
     >
 
-
-    <include android:id="@+id/app_bar" layout="@layout/toolbar_profile"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:layout_gravity="center"
+        android:text="@string/settings_vacation_time_activity_title"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -21,10 +25,7 @@
         android:layout_marginBottom="20dp"
         android:layout_gravity="left">
 
-
     </LinearLayout>
-
-
 
     <LinearLayout
         android:layout_width="match_parent"

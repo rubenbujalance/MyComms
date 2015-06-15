@@ -1,14 +1,11 @@
 package com.vodafone.mycomms.settings;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
-import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -39,6 +36,8 @@ public class VacationTimeSetterActivity extends ToolbarActivity implements IConn
         Log.d(Constants.TAG, "VacationTimeSetterActivity.onCreate: ");
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_vacation_time);
+
         activateToolbar();
         setTitle(getString(R.string.settings_vacation_time_activity_title));
 //        datePickerFragment = new MyCommsDatePickerFragment();
@@ -48,9 +47,6 @@ public class VacationTimeSetterActivity extends ToolbarActivity implements IConn
 
         profileController = new ProfileController(this);
         profileController.setConnectionCallback(this);
-
-
-        setContentView(R.layout.activity_vacation_time);
 
         Switch vacationTimeSwitch = (Switch) findViewById(R.id.switch_vacation_time);
         vacationTimeSwitch.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +101,7 @@ public class VacationTimeSetterActivity extends ToolbarActivity implements IConn
             }
         }
 
-
+/*
         TextView textViewEdit = (TextView) findViewById(R.id.edit_profile);
         textViewEdit.setVisibility(View.GONE);
 
@@ -123,9 +119,7 @@ public class VacationTimeSetterActivity extends ToolbarActivity implements IConn
                 setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             }
-        });
-
-
+        });*/
     }
 
     private DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {

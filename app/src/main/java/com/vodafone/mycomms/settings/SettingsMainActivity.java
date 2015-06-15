@@ -6,9 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
@@ -47,13 +45,13 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
             transaction.commit();
         }
 
-        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
+        /*ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
-        });
+        });*/
 
     }
 

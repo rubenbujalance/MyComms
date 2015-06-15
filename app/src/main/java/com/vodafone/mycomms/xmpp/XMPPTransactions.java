@@ -15,19 +15,18 @@ import com.vodafone.mycomms.util.UserSecurity;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.chat.ChatManagerListener;
-import org.jivesoftware.smack.chat.ChatMessageListener;
+import org.jivesoftware.smack.filter.StanzaFilter;
+import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.DefaultExtensionElement;
-import org.jivesoftware.smack.packet.ExtensionElement;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
-import org.jivesoftware.smack.provider.ExtensionElementProvider;
 import org.jivesoftware.smack.provider.IQProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.roster.Roster;
@@ -45,7 +44,7 @@ import model.ChatMessage;
 /**
  * Created by str_rbm on 03/06/2015.
  */
-public class XMPPTransactions {
+public final class XMPPTransactions {
     private static XMPPTCPConnection _xmppConnection = null;
     private static Realm mRealm;
     private static RealmChatTransactions _chatTx;
@@ -53,6 +52,8 @@ public class XMPPTransactions {
     private static ProviderManager provManager;
     private static String accessToken;
     private static String profile_id;
+    private static boolean isConnecting = false;
+    private static ChatManager _chatManager;
 
     /*
      * Methods
@@ -60,6 +61,7 @@ public class XMPPTransactions {
 
     public static boolean initializeMsgServerSession(Context appContext)
     {
+        isConnecting = true;
         Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: ");
         if(mContext!=null) return true;
 
@@ -91,9 +93,11 @@ public class XMPPTransactions {
         xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
         xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
         xmppConfigBuilder.setDebuggerEnabled(true);
-//        xmppConfigBuilder.setSendPresence(true);
+//        xmppConfigBuilder.setSendPresence(false);
         xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
         xmppConfigBuilder.setCompressionEnabled(false);
+//        SASLMechanism mechanism = new SASLPlainMechanism();
+//        SASLAuthentication.registerSASLMechanism(new SASLPlainMechanism());
 
         new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
 
@@ -121,23 +125,11 @@ public class XMPPTransactions {
             initializeMsgServerSession(mContext);
 
         //Send text to the server
-        ChatManager chatmanager = ChatManager.getInstanceFor(XMPPTransactions.getXmppConnection());
-        //org.jivesoftware.smack.chat.Chat newChat = chatmanager.createChat(contact_id + "@" + Constants.XMPP_PARAM_DOMAIN);
-        /*
-        att:
-            type: "chat"
-            to: "mc_user2Id@my-comms.com"
-            id: "message1Id"
-            mediaType: "text"
-            from: "mc_user1Id@my-comms.com/device"
-            xmlns:stream: "http://etherx.jabber.org/streams"
-            body: "Hello world"
-         */
-
-        Chat newChat = chatmanager.createChat(contact_id + "@" + Constants.XMPP_PARAM_DOMAIN);
+        Chat newChat = _chatManager.createChat(contact_id + "@" + Constants.XMPP_PARAM_DOMAIN);
 
         try {
             newChat.sendMessage(text);
+
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
@@ -274,7 +266,6 @@ public class XMPPTransactions {
                 XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = params[0];
                 conn = new XMPPTCPConnection(xmppConfigBuilder.build());
 
-                //Register the listener
                 //Register the listener for incoming messages
                 StanzaListener packetListener = new StanzaListener() {
                     @Override
@@ -283,13 +274,13 @@ public class XMPPTransactions {
                         if(packet instanceof IQ)
                         {
                             IQ iq = (IQ)packet;
-                            Log.w(Constants.TAG, "XMPPTransactions.processPacket (IQ packet): Type-"+iq.getType()
+                            Log.w(Constants.TAG, "XMPPTransactions.processPacket (IQ): Type-"+iq.getType()
                                     +"; From-"+iq.getFrom()+"; To-"+iq.getTo());
                         }
                         else
                         {
                             Message msg = (Message)packet;
-                            Log.w(Constants.TAG, "XMPPTransactions.processPacket (IQ packet): Type-"+msg.getType()
+                            Log.w(Constants.TAG, "XMPPTransactions.processPacket (Message): Type-"+msg.getType()
                                     +"; From-"+msg.getFrom()+"; To-"+msg.getTo()+"; Text-"+msg.getBody());
                         }
 
@@ -302,25 +293,17 @@ public class XMPPTransactions {
                     }
                 };
 
-                //TESTING: Version alternativa del Incoming chat
-                ChatManager chatmanager = ChatManager.getInstanceFor(XMPPTransactions.getXmppConnection());
-                chatmanager.addChatListener(new ChatManagerListener() {
+                _chatManager = ChatManager.getInstanceFor(conn);
+                StanzaFilter packetFilter = new StanzaTypeFilter(Message.class);
+                _chatManager.addOutgoingMessageInterceptor(new MessageListener() {
                     @Override
-                    public void chatCreated(Chat chat, boolean createdLocally)
-                    {
-                        Log.i(Constants.TAG, "XMPPTransactions.chatCreated: ");
-                        if (!createdLocally)
-                            chat.addMessageListener(new ChatMessageListener(){
-                                @Override
-                                public void processMessage(Chat chat, Message message) {
-                                    Log.i(Constants.TAG, "XMPPTransactions.processMessage: ");
-                                }
-                            });
+                    public void processMessage(Message message) {
+                        Log.w(Constants.TAG, "XMPPOpenConnectionTask.processMessage: "+message.getBody());
                     }
-                });
+                }, packetFilter);
 
-//        StanzaFilter packetFilter = new AndFilter(new StanzaTypeFilter(Message.class),
-//                                    new OrFilter(MessageTypeFilter.CHAT));
+//              StanzaFilter packetFilter = new AndFilter(new StanzaTypeFilter(Message.class),
+//                                          new OrFilter(MessageTypeFilter.CHAT));
 
                 conn.addAsyncStanzaListener(packetListener, null);
 
@@ -328,15 +311,19 @@ public class XMPPTransactions {
                 ProviderManager.addIQProvider("iq", "jabber:client", new MyIQProvider());
 
                 //Add Message (extension) provider
-                //TODO: Find Element and Namespace
-                ProviderManager.addExtensionProvider("element", "namespace", new ExtensionElementProvider<ExtensionElement>() {
-                    @Override
-                    public DefaultExtensionElement parse(XmlPullParser parser,int initialDepth) throws org.xmlpull.v1.XmlPullParserException,
-                            IOException {
-                        String json = parser.nextText();
-                        return new TestPacketExtension(json);
-                    }
-                });
+//                //TODO: Find Element and Namespace
+//                ProviderManager.addExtensionProvider("message", "jabber:client", new ExtensionElementProvider<ExtensionElement>() {
+//                    @Override
+//                    public DefaultExtensionElement parse(XmlPullParser parser,int initialDepth) throws org.xmlpull.v1.XmlPullParserException,
+//                            IOException {
+//                        Log.w(Constants.TAG, "XMPPOpenConnectionTask.parse: Name-"+parser.getName()+
+//                                "; Namespace-"+parser.getNamespace()+
+//                                "; Id-"+parser.getAttributeValue("","id")+
+//                                "; Text-"+parser.getText());
+//                        String json = parser.nextText();
+//                        return new TestPacketExtension(json);
+//                    }
+//                });
 
                 // Connect to the server
                 configure(conn);
@@ -358,6 +345,7 @@ public class XMPPTransactions {
 
         @Override
         protected void onPostExecute(XMPPTCPConnection xmppConnection) {
+            isConnecting = false;
             xmppConnectionCallback(xmppConnection);
         }
     }
@@ -434,13 +422,24 @@ public class XMPPTransactions {
     //IQ extended class
     static class MyIQ extends IQ
     {
-        private int pendingMsgs = 0;
+        public static final String IQ_STATUS_SENT = "sent";
+        public static final String IQ_STATUS_DELIVERED = "delivered";
+        public static final String IQ_STATUS_READ = "read";
 
-        public MyIQ(IQ iq) {
-            super(iq);
-        }
+        private int pendingMessages = 0;
+        private String status;
+
+        public MyIQ(IQ iq) {super(iq);}
         protected MyIQ(String childElementName) {
             super(childElementName);
+        }
+
+        public MyIQ(String id, String from, String to, String status) {
+            super("iq");
+            setStanzaId(id);
+            setFrom(from);
+            setTo(to);
+            setStatus(status);
         }
 
         @Override
@@ -448,15 +447,18 @@ public class XMPPTransactions {
             return null;
         }
 
-        public int getPendingMsgs() {return pendingMsgs;}
-        public void setPendingMsgs(int pendingMsgs) {this.pendingMsgs = pendingMsgs;}
+        public int getPendingMessages() {return pendingMessages;}
+        public void setPendingMessages(int pendingMessages) {this.pendingMessages = pendingMessages;}
+
+        public String getStatus() {return status;}
+        public void setStatus(String status) {this.status = status;}
     }
 
     //Provider for IQ Packets
     static class MyIQProvider extends IQProvider<MyIQ> {
         @Override
         public MyIQ parse(XmlPullParser parser, int initialDepth) throws XmlPullParserException, IOException, SmackException {
-            Log.e(Constants.TAG, "MyIQProvider.parse: hola parserrrrrr");
+            Log.e(Constants.TAG, "MyIQProvider.parse: "+parser.getText());
 
             MyIQ iq = new MyIQ(parser.getName());
             iq.setType(IQ.Type.fromString(parser.getAttributeValue("", "type")));
@@ -464,7 +466,7 @@ public class XMPPTransactions {
             iq.setTo(parser.getAttributeValue("", "to"));
 
             try {
-                iq.setPendingMsgs(Integer.valueOf(parser.getAttributeValue("","pending")));
+                iq.setPendingMessages(Integer.valueOf(parser.getAttributeValue("", "pending")));
             } catch (Exception e) {}
 
             return iq;

@@ -600,6 +600,8 @@ public class PacketParserUtils {
      * @throws IOException
      * @throws SmackException
      */
+
+    //RBM - This method has to be modified according to  MyComms protocol
     public static IQ parseIQ(XmlPullParser parser) throws XmlPullParserException, IOException, SmackException {
         ParserUtils.assertAtStartTag(parser);
         final int initialDepth = parser.getDepth();
@@ -614,8 +616,11 @@ public class PacketParserUtils {
         outerloop: while (true) {
             int eventType = parser.next();
 
+            //MyComms IQ packet, since it does not contains any body and is a closing xml tag,
+            //it is received as END_TAG. So this condition has to accept this types of IQ
             if(eventType == XmlPullParser.START_TAG ||
-                    (eventType == XmlPullParser.END_TAG && type == IQ.Type.pendingmessages) ) {
+                    (eventType == XmlPullParser.END_TAG && type == IQ.Type.pendingmessages) ||
+                    (eventType == XmlPullParser.END_TAG && type == IQ.Type.chat)) {
 
                 String elementName = parser.getName();
                 String namespace = parser.getNamespace();

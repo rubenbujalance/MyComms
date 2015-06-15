@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.view.tab.SlidingTabLayout;
+import com.vodafone.mycomms.view.tab.SlidingTabLayoutPreferences;
 
 public class ProfileListPagerFragment extends Fragment implements ProfileFragment.OnFragmentInteractionListener {
 
-    private SlidingTabLayout mSlidingTabLayout;
+    private SlidingTabLayoutPreferences mSlidingTabLayout;
     private ViewPager mViewPager;
 
     @Override
@@ -29,7 +29,7 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         mViewPager.setAdapter(new ProfileListPagerAdapter(getFragmentManager()));
-        mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout = (SlidingTabLayoutPreferences) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
         //This sets default tab
         mViewPager.setCurrentItem(Constants.MY_PROFILE);

@@ -1,6 +1,8 @@
 package com.vodafone.mycomms.settings;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -9,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 /**
@@ -25,7 +28,14 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.layout_profile_activity);
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileFullName = sp.getString(Constants.PROFILE_FULLNAME_SHARED_PREF, "");
+
         activateToolbar();
+
+        setToolbarTitle(profileFullName);
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;

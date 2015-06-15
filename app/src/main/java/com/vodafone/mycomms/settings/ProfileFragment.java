@@ -24,9 +24,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.EnableEditProfileEvent;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -89,6 +92,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+       BusProvider.getInstance().register(this);
+
        View v = inflater.inflate(R.layout.layout_fragment_profile, container, false);
 
        initSpinners(v);
@@ -392,8 +397,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     }
 
-
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+    }
 
     @Override
     public void onProfileReceived(UserProfile userProfile) {
@@ -481,6 +489,16 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
+    }
+
+    @Subscribe
+    public void enableEditProfile(EnableEditProfileEvent event) {
+        boolean enable = event.getEnable();
+        if (enable){
+            editProfile.setVisibility(View.VISIBLE);
+        } else{
+            editProfile.setVisibility(View.GONE);
+        }
     }
 
 }

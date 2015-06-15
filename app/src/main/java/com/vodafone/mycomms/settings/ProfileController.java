@@ -76,13 +76,23 @@ public class ProfileController extends BaseController {
         profileConnection.request();
     }
 
-    public void setProfileId(String profileId){
+    public void setUserProfile(String profileId, String profileFullName){
         Log.i(Constants.TAG, "ProfileController.setProfileId: ");
         SharedPreferences sp = getContext().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(Constants.PROFILE_ID_SHARED_PREF, profileId);
+        editor.putString(Constants.PROFILE_FULLNAME_SHARED_PREF, profileFullName);
         editor.putString(Constants.ACCESS_TOKEN_SHARED_PREF, UserSecurity.getAccessToken(getContext()));
+        editor.apply();
+    }
+
+    public void setUserProfileName(String profileFullName) {
+        Log.i(Constants.TAG, "ProfileController.setUserProfileName: ");
+        SharedPreferences sp = getContext().getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.PROFILE_FULLNAME_SHARED_PREF, profileId);
         editor.apply();
     }
 

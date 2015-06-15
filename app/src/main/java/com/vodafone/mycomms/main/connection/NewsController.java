@@ -9,7 +9,6 @@ import android.view.View;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
-
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;

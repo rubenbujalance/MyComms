@@ -29,7 +29,6 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
-import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.connection.SearchController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;

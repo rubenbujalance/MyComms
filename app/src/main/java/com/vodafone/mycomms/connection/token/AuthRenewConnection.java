@@ -5,10 +5,7 @@ import android.util.Log;
 
 import com.framework.library.connection.ConnectionInterfaces;
 import com.framework.library.connection.HttpConnection;
-import com.framework.library.model.IModel;
-import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseConnection;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 

@@ -3,7 +3,6 @@ package com.vodafone.mycomms.settings;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;

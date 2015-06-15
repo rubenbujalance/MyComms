@@ -1,23 +1,18 @@
 package com.vodafone.mycomms.main;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.connection.BaseConnection;
-import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
-import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.util.ArrayList;
-
-import io.realm.Realm;
 
 public class DashBoardActivity extends ToolbarActivity implements INewsConnectionCallback {
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";

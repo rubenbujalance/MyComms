@@ -282,9 +282,9 @@ public class XMPPTransactions {
                     {
                         if(packet instanceof IQ)
                         {
-                            IQ iq = (IQ)packet;
+                            /*IQ iq = (IQ)packet;
                             Log.w(Constants.TAG, "XMPPTransactions.processPacket (IQ packet): Type-"+iq.getType()
-                                    +"; From-"+iq.getFrom()+"; To-"+iq.getTo());
+                                    +"; From-"+iq.getFrom()+"; To-"+iq.getTo());*/
                         }
                         else
                         {

@@ -8,8 +8,6 @@ import com.framework.library.connection.HttpConnection;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.util.Constants;
 
-import model.UserProfile;
-
 /**
  * Created by str_vig on 26/05/2015.
  */

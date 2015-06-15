@@ -8,7 +8,7 @@
     mycomms:contentInsetStart="0dp"
     android:gravity="top"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText"
-    android:background="@color/toolbar_selected_item"
+    android:background="@color/grey_profile_background"
     mycomms:theme="@style/ActionBarThemeOverlay">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -35,8 +35,7 @@
             android:textSize="22sp"
             android:gravity="center"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:textColor="@color/white" />
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/edit_profile"
@@ -48,8 +47,7 @@
             android:textSize="22sp"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:textColor="@color/white" />
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 </android.support.v7.widget.Toolbar>

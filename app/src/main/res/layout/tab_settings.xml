@@ -4,13 +4,12 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:padding="10dp"
-    android:background="@color/toolbar_selected_item">
+    android:background="@color/grey_profile_background">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Settings"
-        android:id="@+id/textView4"
-        android:textColor="@color/grey_light" />
+        android:id="@+id/textView4" />
 
 </LinearLayout>

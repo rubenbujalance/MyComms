@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Looper;
 import android.telephony.TelephonyManager;
 import android.os.Handler;
 import android.text.Layout;
@@ -51,29 +52,34 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
         super.onCreate(savedInstanceState);
 
         // Fill News slider
-        mNewsController = new NewsController(this);
+        /*mNewsController = new NewsController(this);
         apiCall = Constants.NEWS_API_GET;
         mNewsController.getNewsList(apiCall);
 
-        mNewsController.setConnectionCallback(this);
+        mNewsController.setConnectionCallback(this);*/
 
         // Footer layout
         BusProvider.getInstance().register(this);
         setContentView(R.layout.layout_dashboard);
 
-        // Set Time line
-        DateFormat tf = new SimpleDateFormat("HH:mm");
-        String time = tf.format(Calendar.getInstance().getTime());
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            public void run() {
+                // Set Time line
+                DateFormat tf = new SimpleDateFormat("HH:mm");
+                String time = tf.format(Calendar.getInstance().getTime());
 
-        TextView timeText = (TextView) findViewById(R.id.timeDashboard);
-        timeText.setText(time);
+                TextView timeText = (TextView) findViewById(R.id.timeDashboard);
+                timeText.setText(time);
 
-        // Set Date line
-        DateFormat df = new SimpleDateFormat("EEEE, d MMMM");
-        String date = df.format(Calendar.getInstance().getTime());
+                // Set Date line
+                DateFormat df = new SimpleDateFormat("EEEE, d MMMM");
+                String date = df.format(Calendar.getInstance().getTime());
 
-        TextView dateText = (TextView) findViewById(R.id.dateDashboard);
-        dateText.setText(date);
+                TextView dateText = (TextView) findViewById(R.id.dateDashboard);
+                dateText.setText(date);
+            }
+        });
 
         noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
         activateFooter();

@@ -139,11 +139,22 @@ dependencies {
     compile files('lib/android-framework-library.jar')
 
     //Smack XMPP Library
-    compile files('lib/smack-core-4.1.1.jar')
-    compile files('lib/smack-android-4.1.1.jar')
-    compile files('lib/smack-android-extensions-4.1.1.jar')
-    compile files('lib/smack-im-4.1.1.jar')
-    compile files('lib/smack-tcp-4.1.1.jar')
+    compile "org.igniterealtime.smack:smack-android-extensions:4.1.0"
+//    compile ("org.igniterealtime.smack:smack-bosh:4.1.0")
+//    compile "org.igniterealtime.smack:smack-android:4.1.0"
+    compile "org.igniterealtime.smack:smack-tcp:4.1.0"
+//    compile files('lib/smack-core-4.1.1.jar')
+//    compile files('lib/smack-android-4.1.1.jar')
+//    compile files('lib/smack-android-extensions-4.1.1.jar')
+//    compile files('lib/smack-im-4.1.1.jar')
+//    compile files('lib/smack-tcp-4.1.1.jar')
+//    compile files('lib/smack-sasl-javax-4.1.1.jar')
+//    compile files('lib/smack-sasl-provided-4.1.1.jar')
+//    compile files('lib/jxmpp-core-0.4.1.jar')
+//    compile files('lib/jxmpp-util-cache-0.4.1.jar')
+//    compile files('lib/jxmpp-jid-0.4.1.jar')
+//    compile files('lib/jxmpp-stringprep-libidn-0.4.1.jar')
+
 
     // Crashlytics Kit
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {

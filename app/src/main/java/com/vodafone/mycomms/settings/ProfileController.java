@@ -233,11 +233,11 @@ public class ProfileController extends BaseController {
     }
 
     public void updatePassword(HashMap passwordHashMap){
-            JSONObject json = new JSONObject(passwordHashMap);
-            Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
-            PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
-            passwordConnection.setPayLoad(json.toString());
-            passwordConnection.request();
+        JSONObject json = new JSONObject(passwordHashMap);
+        Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+        PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
+        passwordConnection.setPayLoad(json.toString());
+        passwordConnection.request();
 
     }
 

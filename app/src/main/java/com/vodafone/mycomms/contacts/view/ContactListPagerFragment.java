@@ -8,11 +8,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
@@ -66,8 +68,18 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mViewPager.setAdapter(new ContactListPagerAdapter(getFragmentManager()));
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+
         //This sets default tab
-        mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+        if (savedInstanceState == null) {
+            Bundle extras = getActivity().getIntent().getExtras();
+            if(extras == null) {
+                mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+            } else {
+                mViewPager.setCurrentItem(Constants.CONTACTS_FAVOURITE);
+            }
+        } else {
+            mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+        }
     }
 
     @Override

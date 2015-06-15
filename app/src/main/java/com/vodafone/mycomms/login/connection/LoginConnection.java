@@ -23,7 +23,7 @@ public class LoginConnection extends BaseConnection{
     private static final int method = HttpConnection.POST;
 
     public LoginConnection(Context context, ConnectionListener listener){
-        super(URL, context, listener, method);
+        super(URL, context, listener, method, false);
         Log.d(Constants.TAG, "LoginConnection.LoginConnection: ");
     }
 

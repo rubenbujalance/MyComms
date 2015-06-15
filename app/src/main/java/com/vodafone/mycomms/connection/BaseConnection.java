@@ -47,10 +47,16 @@ public class BaseConnection extends DefaultConnection {
      * @param context
      * @param listener
      * @param method   HTTP
+     * @param news
      */
-    protected BaseConnection(String URL, Context context, ConnectionListener listener, int method) {
+    protected BaseConnection(String URL, Context context, ConnectionListener listener, int method, boolean news) {
 
-        setUrl(APIWrapper.getHttpProtocol() + EndpointWrapper.getBaseURL() + URL);
+        if (news == true) {
+            setUrl(APIWrapper.getHttpProtocol() + EndpointWrapper.getBaseNewsURL() + URL);
+        } else {
+            setUrl(APIWrapper.getHttpProtocol() + EndpointWrapper.getBaseURL() + URL);
+        }
+
         this.listener = listener;
         setConnectionHandler(new ConnectionHandler(this, listener));
 

@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -101,7 +102,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        editProfile.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile ");
+               Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
                profileEditMode(isEditing);
                if (isEditing && !isUpdating) {
                    //TODO verify if details have actually changed and send update accordingly
@@ -111,6 +112,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                    }
                } else if (!isEditing && !isUpdating) {
                    isEditing = !isEditing;
+                   profileEditMode(isEditing);
                }
            }
        });
@@ -362,6 +364,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 //        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
 //        editProfile.setVisibility(View.VISIBLE);
 
+        profileController.setConnectionCallback(this);
         profileController.getProfile();
     }
 
@@ -381,6 +384,17 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         super.onDetach();
         mListener = null;
     }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        profileController.setConnectionCallback(null);
+        Log.d(Constants.TAG, "ProfileFragment.onPause: ");
+
+    }
+
+
+
 
     @Override
     public void onProfileReceived(UserProfile userProfile) {

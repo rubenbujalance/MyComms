@@ -32,7 +32,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/dummyHour"
-                    android:id="@+id/clock"
+                    android:id="@+id/timeDashboard"
                     android:textColor="#ffffffff"
                     android:textSize="38dp"
                     android:paddingTop="5dp"
@@ -50,7 +50,7 @@
                     android:layout_width="80dp"
                     android:layout_height="55dp"
                     android:id="@+id/magnifier"
-                    android:src="@drawable/abc_ic_search_api_mtrl_alpha"
+                    android:src="@mipmap/icon_search_white"
                     android:layout_weight="0.10"
                     android:background="#2affffff"
                     android:paddingLeft="15dp"
@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/dummyday"
-                    android:id="@+id/textView11"
+                    android:id="@+id/dateDashboard"
                     android:textColor="@color/white"
                     android:textSize="22dp"
                     android:background="#2affffff"
@@ -84,19 +84,38 @@
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/Slider1"
                 android:layout_marginTop="45dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/latestNews"
-                    android:id="@+id/titleLatestNews"
-                    android:textColor="@color/white"
-                    android:padding="15dp"
-                    android:textSize="16dp" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/latestNews"
+                        android:id="@+id/titleLatestNews"
+                        android:textColor="@color/white"
+                        android:padding="15dp"
+                        android:textSize="16dp" />
+
+                    <HorizontalScrollView
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:id="@+id/scroll"
+                        android:background="#2affffff">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/list_news"></FrameLayout>
+                    </HorizontalScrollView>
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -106,7 +125,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/Slider2"
                 android:layout_marginTop="45dp"
-                android:background="#1cffffff">
+                android:background="#2affffff"
+                android:weightSum="1">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -116,6 +136,39 @@
                     android:textColor="@color/white"
                     android:padding="15dp"
                     android:textSize="16dp" />
+
+                <Space
+                    android:layout_width="154dp"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1.12" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/LayoutFavourite">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Favourites"
+                        android:id="@+id/btFavourite"
+                        android:textColor="@color/white"
+                        android:textSize="16dp"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="15dp"
+                        android:paddingBottom="15dp" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/imageView13"
+                        android:src="@mipmap/icon_right_grey"
+                        android:paddingTop="15dp"
+                        android:paddingRight="10dp"
+                        android:paddingBottom="15dp" />
+                </LinearLayout>
+
             </LinearLayout>
 
         </LinearLayout>

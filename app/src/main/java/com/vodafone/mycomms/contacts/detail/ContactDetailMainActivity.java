@@ -363,7 +363,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 jsonObject = jsonArray.getJSONObject(i);
                 if (!jsonObject.isNull(key)) {
 
-                   result = jsonObject.getString(key);
+                    result = jsonObject.getString(key);
                 }
             }
 
@@ -451,14 +451,14 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private String printContact(Contact contact){
-            StringBuffer buf = new StringBuffer();
-            buf.append("Contact[");
-            buf.append(contact.getFirstName());
-            buf.append(",");
-            buf.append(contact.getLastName());
-            buf.append("]");
-            buf.append("company:");
-            buf.append(contact.getCompany());
+        StringBuffer buf = new StringBuffer();
+        buf.append("Contact[");
+        buf.append(contact.getFirstName());
+        buf.append(",");
+        buf.append(contact.getLastName());
+        buf.append("]");
+        buf.append("company:");
+        buf.append(contact.getCompany());
         return buf.toString();
     }
 

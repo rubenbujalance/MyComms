@@ -44,12 +44,12 @@ public class RealmChatTransactions {
     //CONSTRUCTORS
 
     public ChatMessage newChatMessageInstance(String contact_id, String direction,
-                                       int type, String text, String resourceUri)
+                                              int type, String text, String resourceUri)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,timestamp,
-                                    direction,type,text,resourceUri,"0","0");
+                direction,type,text,resourceUri,"0","0");
 
         return chatMessage;
     }
@@ -272,7 +272,7 @@ public class RealmChatTransactions {
 
     public Chat newChatInstance(String contact_id)
     {
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, mProfileId);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, _profile_id);
         Contact contact = realmContactTransactions.getContactById(contact_id);
         Chat chat = new Chat(_profile_id, contact_id, contact.getFirstName(), contact.getLastName(),"","",0);
 
@@ -476,4 +476,3 @@ public class RealmChatTransactions {
     }
 
 }
-

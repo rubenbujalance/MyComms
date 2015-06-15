@@ -7,7 +7,10 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -62,7 +65,10 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -84,7 +90,10 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -107,11 +116,11 @@
         android:layout_height="fill_parent">
 
         <Button
-            android:layout_width="198dp"
-            android:layout_height="35dp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
             android:text="@string/Logout"
             android:id="@+id/btLogout"
-            android:background="#ffff452b"
+            android:background="@drawable/logout_button"
             android:singleLine="false"
             android:textColor="#ffffff"
             android:layout_margin="20dp" />

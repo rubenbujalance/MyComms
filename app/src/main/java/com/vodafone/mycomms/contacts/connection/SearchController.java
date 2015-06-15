@@ -44,21 +44,24 @@ public class SearchController extends BaseController
     private String apiCall;
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
+    private String mProfileId;
 
 
-    public SearchController(Activity activity, Realm realm) {
+    public SearchController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
         internalContactSearch = new InternalContactSearch(activity);
+        this.mProfileId = profileId;
     }
 
-    public SearchController(Fragment fragment, Realm realm) {
+    public SearchController(Fragment fragment, Realm realm, String profileId) {
         super(fragment);
         this.mRealm = realm;
         this.mContext = fragment.getActivity();
-        realmContactTransactions = new RealmContactTransactions(realm);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
 
@@ -88,9 +91,7 @@ public class SearchController extends BaseController
                     search = Constants.CONTACTS_ALL;
                 }
 
-                realmContactList = getSearchedContacts(jsonResponse);
-
-
+                realmContactList = insertContactListInRealm(jsonResponse);
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "SearchController.onConnectionComplete: contacts ", e);
@@ -129,29 +130,27 @@ public class SearchController extends BaseController
         searchConnection.request();
     }
 
-    private ArrayList<Contact> getSearchedContacts(JSONObject jsonObject)
-    {
+
+    private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
         ArrayList<Contact> realmContactList = new ArrayList<>();
 
-        try
-        {
-            Log.i(Constants.TAG, "SearchController.getSearchedContacts: ");
+        try {
+            Log.i(Constants.TAG, "ContactController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
             Contact contact;
             boolean doRefreshAdapter;
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject);
+                contact = mapContact(jsonObject, mProfileId);
                 realmContactList.add(contact);
                 doRefreshAdapter = (i==jsonArray.length()-1);
                 updateContactAvatar(contact, doRefreshAdapter);
             }
-        }
-        catch (JSONException e)
-        {
+            realmContactTransactions.insertContactList(realmContactList);
+        } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(Constants.TAG, "SearchController.getSearchedContacts: " + e.toString());
+            Log.e(Constants.TAG, "SearchController.insertContactListInRealm: " + e.toString());
             return null;
         }
         return realmContactList;
@@ -215,47 +214,52 @@ public class SearchController extends BaseController
         }
     }
 
-        public boolean downloadFile(final String path, String dir, String avatarFileName) {
-            try {
-                URL url = new URL(path);
+    public boolean downloadFile(final String path, String dir, String avatarFileName) {
+        try {
+            URL url = new URL(path);
 
-                URLConnection ucon = url.openConnection();
-                ucon.setReadTimeout(5000);
-                ucon.setConnectTimeout(10000);
+            URLConnection ucon = url.openConnection();
+            ucon.setReadTimeout(5000);
+            ucon.setConnectTimeout(10000);
 
-                InputStream is = ucon.getInputStream();
-                BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
+            InputStream is = ucon.getInputStream();
+            BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
 
-                File file = new File(mContext.getFilesDir() + dir + avatarFileName);
+            File file = new File(mContext.getFilesDir() + dir + avatarFileName);
 
-                if (file.exists()) {
-                    file.delete();
-                }
-                file.createNewFile();
-
-                FileOutputStream outStream = new FileOutputStream(file);
-                byte[] buff = new byte[5 * 1024];
-
-                int len;
-                while ((len = inStream.read(buff)) != -1) {
-                    outStream.write(buff, 0, len);
-                }
-                outStream.flush();
-                outStream.close();
-                inStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e(Constants.TAG, "DownloadAvatars.downloadFile: " + e.toString());
-                return false;
+            if (file.exists()) {
+                file.delete();
             }
+            file.createNewFile();
 
-            return true;
+            FileOutputStream outStream = new FileOutputStream(file);
+            byte[] buff = new byte[5 * 1024];
+
+            int len;
+            while ((len = inStream.read(buff)) != -1) {
+                outStream.write(buff, 0, len);
+            }
+            outStream.flush();
+            outStream.close();
+            inStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "DownloadAvatars.downloadFile: " + e.toString());
+            return false;
         }
 
-    public static Contact mapContact(JSONObject jsonObject){
+        return true;
+    }
+
+    public static Contact mapContact(JSONObject jsonObject, String profileId){
         Contact contact = new Contact();
         try {
-            if (!jsonObject.isNull(Constants.CONTACT_ID)) contact.setId(jsonObject.getString(Constants.CONTACT_ID));
+            contact.setProfileId(profileId);
+            if (!jsonObject.isNull(Constants.CONTACT_ID)){
+                contact.setContactId(jsonObject.getString(Constants.CONTACT_ID));
+                contact.setId(profileId + "_" + jsonObject.getString(Constants.CONTACT_ID));
+                Log.w(Constants.TAG,"SearchController -> mapContact() has value: "+profileId);
+            }
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))
@@ -288,34 +292,13 @@ public class SearchController extends BaseController
         return contact;
     }
 
-
-
-    /*
-    private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
-        ArrayList<Contact> realmContactList = new ArrayList<>();
-
-        try {
-            Log.i(Constants.TAG, "ContactController.insertContactListInRealm: ");
-            JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
-            Contact contact;
-            boolean doRefreshAdapter;
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject);
-                realmContactList.add(contact);
-                doRefreshAdapter = (i==jsonArray.length()-1);
-                updateContactAvatar(contact, doRefreshAdapter);
-            }
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
-            realmContactTransactions.insertContactList(realmContactList);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "ContactController.insertContactListInRealm: " + e.toString());
-            return null;
-        }
-        return realmContactList;
+    public ArrayList<Contact> getLocalContactsByKeyWord(String keyWord) {
+        Log.d(Constants.TAG, "SearchController.getLocalContactsByKeyWord: ");
+        return internalContactSearch.getLocalContactsByKeyWord(keyWord);
     }
-    */
 
+    public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
+        Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
+        return realmContactTransactions.getContactsByKeyWord(keyWord);
+    }
 }

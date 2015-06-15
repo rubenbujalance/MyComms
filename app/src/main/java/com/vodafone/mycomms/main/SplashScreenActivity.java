@@ -15,9 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
-import com.vodafone.mycomms.main.DashBoardActivity;
 import com.crashlytics.android.Crashlytics;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.util.APIWrapper;

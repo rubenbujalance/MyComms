@@ -45,6 +45,8 @@ public class Constants {
     //Contacts API and BD Fields
     public static final String CONTACT_DATA = "data";
     public static final String CONTACT_ID = "id";
+    public static final String CONTACT_PROFILE_ID = "profileId";
+    public static final String CONTACT_CONTACT_ID = "contactId";
     public static final String CONTACT_PLATFORM = "platform";
     public static final String CONTACT_FNAME = "firstName";
     public static final String CONTACT_LNAME = "lastName";
@@ -69,6 +71,7 @@ public class Constants {
     public static final String CONTACT_PAGINATION_MORE_PAGES = "morePages";
     public static final String CONTACT_PAGINATION_OFFSET = "offset";
     public static final String CONTACT_PAGINATION_PAGESIZE = "pageSize";
+    public static final String CONTACT_LOCAL_CONTENT= "local_contact";
 
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";

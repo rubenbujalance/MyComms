@@ -172,6 +172,14 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             }
         });
 
+        TextView aboutButton = (TextView) v.findViewById(R.id.btnAbout);
+        aboutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AboutActivity.class);
+                startActivity(intent);
+            }
+        });
         return v;
     }
 

@@ -32,7 +32,7 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
         mSlidingTabLayout = (SlidingTabLayoutPreferences) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
         //This sets default tab
-        mViewPager.setCurrentItem(Constants.MY_PROFILE);
+        mViewPager.setCurrentItem(Constants.MY_SETTINGS);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
             Fragment fragment = null;
             TextView editProfile = null;
             switch (position){
-                case Constants.PREFERENCES:
+                case Constants.MY_SETTINGS:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     PreferencesFragment preferencesFragment = PreferencesFragment.newInstance(position, "whatever");
                     fragment = preferencesFragment;
@@ -78,7 +78,7 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if(position == Constants.PREFERENCES)
+            if(position == Constants.MY_SETTINGS)
                 return getString(R.string.profile_list_tab_preferences);
             //else if (position == Constants.ACCOUNTS)
             //    return getString(R.string.profile_list_tab_accounts);

@@ -172,7 +172,7 @@
     <string name="Chat">Chat</string>
     <string name="Surname">Surname</string>
     <string name="office">office</string>
-    <string name="aboutmycontacts">About MyContacts</string>
+    <string name="about_my_comms">About MyComms</string>
     <string name="name">Name</string>
     <string name="dummyday">Tuesday 28th April</string>
     <string name="ABOUT">ABOUT</string>
@@ -202,5 +202,7 @@
     <string name="settings_vacation_time_text"> Scheduling Vacation Time will ask that you set the start and end dates for your vacation. At the time of your return trip your status will return to normal. </string>
     <string name="settings_label_vacation_time_ends">Ends</string>
     <string name="settings_label_vacation_time_not_set">Not Set</string>
+    <string name="about_version">"version "</string>
+    <string name="about_build">"build "</string>
 
 </resources>

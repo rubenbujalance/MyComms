@@ -41,6 +41,7 @@
         <activity
             android:name=".main.SplashScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/AppFullScreenTheme"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -142,6 +143,12 @@
         <activity
             android:name=".settings.VacationTimeSetterActivity"
             android:label="VACAAAAAATTTIIOOONNTIMMEEEEE"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".settings.AboutActivity"
+            android:label="@string/about_my_comms"
+            android:theme="@style/AppFullScreenTheme"
             android:screenOrientation="portrait" >
         </activity>
     </application>

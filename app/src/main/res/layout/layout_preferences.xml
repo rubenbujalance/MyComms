@@ -97,7 +97,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/aboutmycontacts"
+            android:text="@string/about_my_comms"
             android:id="@+id/btnAbout" />
     </LinearLayout>
 

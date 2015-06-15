@@ -1,7 +1,9 @@
 package com.vodafone.mycomms.settings;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -12,6 +14,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.connection.IConnectionCallback;
+import com.vodafone.mycomms.settings.connection.ProfileConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
@@ -19,14 +23,20 @@ import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+
+import io.fabric.sdk.android.services.settings.SettingsController;
 
 /**
  * Created by str_vig on 10/06/2015.
  */
-public class VacationTimeSetterActivity extends ToolbarActivity {
+public class VacationTimeSetterActivity extends ToolbarActivity implements IConnectionCallback {
     private MyCommsDatePickerFragment datePickerFragment;
     public static final String EXTRA_HOLIDAY_END_DATE = "EXTRA_VACATION_TIME_ID";
     private long holidayEndDate;
+    public boolean isOnHoliday = true;
+
+    private ProfileController profileController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +50,16 @@ public class VacationTimeSetterActivity extends ToolbarActivity {
 //        datePickerFragment.setOnCancelListener(onCancelListener);
 
 
+        profileController = new ProfileController(this);
+        profileController.setConnectionCallback(this);
+
+
         setContentView(R.layout.activity_vacation_time);
 
         Switch vacationTimeSwitch = (Switch) findViewById(R.id.switch_vacation_time);
         vacationTimeSwitch.setOnClickListener(new View.OnClickListener() {
+
+
             @Override
             public void onClick(View v) {
                 Switch vacationTimeSwitch = (Switch) v;
@@ -68,6 +84,8 @@ public class VacationTimeSetterActivity extends ToolbarActivity {
                 } else {
                     VacationTimeSetterActivity.this.findViewById(R.id.settings_textview_vacation_time).setVisibility(View.VISIBLE);
                     VacationTimeSetterActivity.this.findViewById(R.id.vacation_time_ends_layout).setVisibility(View.GONE);
+                    isOnHoliday = false;
+                    updateHolidayData();
                     //datePickerFragment.setCalendar(Calendar.getInstance());
                 }
             }
@@ -92,10 +110,21 @@ public class VacationTimeSetterActivity extends ToolbarActivity {
         }
 
 
+        TextView textViewEdit = (TextView) findViewById(R.id.edit_profile);
+        textViewEdit.setVisibility(View.GONE);
+
+
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent resultIntent = new Intent();
+                if(isOnHoliday) {
+                    resultIntent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, holidayEndDate);
+                }else{
+                    resultIntent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, 0L);
+                }
+                setResult(Activity.RESULT_OK, resultIntent);
                 finish();
             }
         });
@@ -110,6 +139,7 @@ public class VacationTimeSetterActivity extends ToolbarActivity {
             updateDateText(datePickerFragment.getCalendar().getTime());
             VacationTimeSetterActivity.this.findViewById(R.id.settings_textview_vacation_time).setVisibility(View.GONE);
             VacationTimeSetterActivity.this.findViewById(R.id.vacation_time_ends_layout).setVisibility(View.VISIBLE);
+            updateHolidayData();
         }
     };
 
@@ -118,13 +148,34 @@ public class VacationTimeSetterActivity extends ToolbarActivity {
         public void onCancel(DialogInterface dialog) {
             Log.d(Constants.TAG, "VacationTimeSetterActivity.onCancel: ");
             ((Switch)VacationTimeSetterActivity.this.findViewById(R.id.switch_vacation_time)).setChecked(false);
+
         }
     };
 
     private void updateDateText(Date date){
+        holidayEndDate = date.getTime();
         Log.d(Constants.TAG, "VacationTimeSetterActivity.updateDateText: " + date);
         TextView endDateTextView  =  (TextView)findViewById(R.id.vacation_setter_vacation_date_ends_text);
         endDateTextView.setText(Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(date));
+
     }
 
+
+    public void updateHolidayData(){
+        Log.d(Constants.TAG, "VacationTimeSetterActivity.updateHolidayData: ");
+        HashMap settingsHashMap = new HashMap<>();
+        if(holidayEndDate > 0 && isOnHoliday){
+            settingsHashMap.put(Constants.PROFILE_HOLIDAY, true);
+            settingsHashMap.put(Constants.PROFILE_HOLIDAY_END_DATE,  holidayEndDate);
+        }else {
+            settingsHashMap.put(Constants.PROFILE_HOLIDAY, false);
+        }
+        profileController.updateSettingsData(settingsHashMap);
+    }
+
+    @Override
+    public void onConnectionNotAvailable() {
+        Log.d(Constants.TAG, "VacationTimeSetterActivity.onConnectionNotAvailable: ");
+        profileController.showToast(getString(R.string.no_internet_connection));
+    }
 }

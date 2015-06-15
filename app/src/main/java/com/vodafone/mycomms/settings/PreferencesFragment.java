@@ -147,7 +147,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), VacationTimeSetterActivity.class);
                 intent.putExtra(VacationTimeSetterActivity.EXTRA_HOLIDAY_END_DATE, holidayEndDate);
-                startActivity(intent);
+                startActivityForResult(intent, SettingsMainActivity.VACATION_TIME_SETTER_ID);
             }
         });
 
@@ -232,9 +232,10 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         try{
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
                 jsonSettings = new JSONObject(userProfile.getSettings());
-                this.holidayEndDate = jsonSettings.getLong(Constants.PROFILE_HOLIDAY_END_DATE);
+
                 this.isOnHoliday = jsonSettings.getBoolean(Constants.PROFILE_HOLIDAY);
 
+                this.holidayEndDate = jsonSettings.getLong(Constants.PROFILE_HOLIDAY_END_DATE);
                 TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
 
                 if(holidayEndDate > 0){
@@ -343,6 +344,38 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         profileController.setConnectionCallback(null);
         Log.d(Constants.TAG, "PreferencesFragment.onPause: ");
 
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ");
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (SettingsMainActivity.VACATION_TIME_SETTER_ID) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ");
+                    long holidayEndDate = data.getLongExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, 0L);
+                    updateHolidayText(holidayEndDate);
+                }
+                break;
+            }
+        }
+    }
+
+    void updateHolidayText(long holidayEndDate){
+        this.holidayEndDate = holidayEndDate;
+        TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+
+        String holidayDateToSet = null;
+        if(holidayEndDate > 0){
+            holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
+        }else {
+            holidayDateToSet = getString(R.string.settings_label_vacation_time_not_set);
+        }
+
+        Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: setting holidayDate to:" + holidayDateToSet);
+        vacationTimeEnds.setText(holidayDateToSet);
     }
 
 }

@@ -35,13 +35,13 @@ public class ProfileController extends BaseController {
     public ProfileController(Fragment fragment) {
         super(fragment);
         realm = Realm.getInstance(getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
     public ProfileController(Activity activity) {
         super(activity);
         realm = Realm.getInstance(getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
     public void getProfile(){

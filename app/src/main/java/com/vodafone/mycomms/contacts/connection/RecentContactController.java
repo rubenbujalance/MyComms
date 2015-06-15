@@ -2,6 +2,7 @@ package com.vodafone.mycomms.contacts.connection;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
@@ -22,12 +23,22 @@ public class RecentContactController extends BaseController {
     private final Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private String mProfileId;
 
-    public RecentContactController(Activity activity, Realm realm) {
+    public RecentContactController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(mRealm);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(mRealm, mProfileId);
+    }
+
+    public RecentContactController(Fragment fragment, Realm realm, String profileId) {
+        super(fragment);
+        this.mRealm = realm;
+        this.mContext = fragment.getActivity();
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(mRealm, mProfileId);
     }
 
     public void insertRecent(String contactId, String action){
@@ -51,9 +62,7 @@ public class RecentContactController extends BaseController {
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: ");
         String apiCall = Constants.CONTACT_API_GET_RECENTS;
-        ContactController contactController = new ContactController(getActivity(), mRealm);
+        ContactController contactController = new ContactController(getActivity(), mRealm, mProfileId);
         contactController.getRecentList(apiCall);
-        //Refresh Recent List
-        //BusProvider.getInstance().post(new SetContactListAdapterEvent());
     }
 }

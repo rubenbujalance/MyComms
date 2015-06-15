@@ -17,7 +17,7 @@ import model.UserProfile;
 public class RealmContactTransactions {
     private Realm mRealm;
 
-    public RealmContactTransactions(Realm realm) {
+    public RealmContactTransactions(Realm realm, String mProfileId) {
         mRealm = realm;
     }
 

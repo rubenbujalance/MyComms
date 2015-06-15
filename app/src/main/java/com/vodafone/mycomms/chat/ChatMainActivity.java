@@ -74,7 +74,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
         mRealm = Realm.getInstance(this);
         chatTransactions = new RealmChatTransactions(mRealm, this);
-        contactTransactions = new RealmContactTransactions(mRealm);
+        contactTransactions = new RealmContactTransactions(mRealm, mProfileId);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecentContactController = new RecentContactController(this,mRealm);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);

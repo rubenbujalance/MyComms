@@ -17,9 +17,6 @@ import org.json.JSONObject;
 import io.realm.Realm;
 import model.Contact;
 
-/**
- * Created by STR_VIG on 21/05/2015.
- */
 public class ContactDetailController extends BaseController {
 
     private final Realm mRealm;
@@ -28,11 +25,11 @@ public class ContactDetailController extends BaseController {
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
 
-    public ContactDetailController(Activity activity, Realm realm) {
+    public ContactDetailController(Activity activity, Realm realm, String mProfileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
 
     }
 

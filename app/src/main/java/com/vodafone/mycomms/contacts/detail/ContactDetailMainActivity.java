@@ -1,7 +1,6 @@
 package com.vodafone.mycomms.contacts.detail;
 
 import android.content.Context;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -105,8 +104,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
-        imageStarOn = R.mipmap.icon_favorite_colour;
-        imageStarOff = R.mipmap.icon_favorite_grey;
+        imageStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
+        imageStarOff = R.drawable.abc_btn_rating_star_off_mtrl_alpha;
         textAvatar = (TextView)findViewById(R.id.avatarText);
 
         //Buttons
@@ -148,7 +147,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
                     if (strPhones != null) {
                         JSONArray jPhones = new JSONArray(strPhones);
-                        String phone = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                        String phone = (String)((JSONObject)jPhones.get(0)).get(Constants.CONTACT_PHONE);
 
                         Utils.launchCall(phone, ContactDetailMainActivity.this);
 
@@ -254,15 +253,17 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
                 favouriteController.manageFavourite(contactId);
 
-                if (btFavourite.getTag().equals("icon_favorite_colour")) {
+                if (btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
                     Drawable imageStar = getResources().getDrawable(imageStarOn);
                     btFavourite.setImageDrawable(imageStar);
-                    btFavourite.setTag("icon_favorite_grey");
-                } else if (btFavourite.getTag().equals("icon_favorite_grey")) {
+                    btFavourite.setTag("abc_btn_rating_star_on_mtrl_alpha.png");
+                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png") {
                     Drawable imageStar = getResources().getDrawable(imageStarOff);
                     btFavourite.setImageDrawable(imageStar);
-                    btFavourite.setTag("icon_favorite_colour");
+                    btFavourite.setTag("abc_btn_rating_star_off_mtrl_alpha.png");
                 }
+
+                Log.e(Constants.TAG, "TAG: " + btFavourite.getTag());
 
             }
         });
@@ -362,7 +363,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 jsonObject = jsonArray.getJSONObject(i);
                 if (!jsonObject.isNull(key)) {
 
-                   result = jsonObject.getString(key);
+                    result = jsonObject.getString(key);
                 }
             }
 
@@ -450,14 +451,14 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private String printContact(Contact contact){
-            StringBuffer buf = new StringBuffer();
-            buf.append("Contact[");
-            buf.append(contact.getFirstName());
-            buf.append(",");
-            buf.append(contact.getLastName());
-            buf.append("]");
-            buf.append("company:");
-            buf.append(contact.getCompany());
+        StringBuffer buf = new StringBuffer();
+        buf.append("Contact[");
+        buf.append(contact.getFirstName());
+        buf.append(",");
+        buf.append(contact.getLastName());
+        buf.append("]");
+        buf.append("company:");
+        buf.append(contact.getCompany());
         return buf.toString();
     }
 

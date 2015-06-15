@@ -98,6 +98,14 @@
                     android:padding="15dp"
                     android:textSize="16dp" />
 
+                <HorizontalScrollView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/list_news"
+                    android:background="#1cffffff">
+
+                </HorizontalScrollView>
+
             </LinearLayout>
 
             <LinearLayout

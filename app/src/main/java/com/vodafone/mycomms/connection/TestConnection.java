@@ -15,7 +15,7 @@ public class TestConnection extends BaseConnection {
     private static final int method = HttpConnection.GET;
 
     public TestConnection(Context context, ConnectionInterfaces.ConnectionListener listener){
-        super(URL, context, listener, method);
+        super(URL, context, listener, method, false);
         Log.d(Constants.TAG, "TestConnection.TestConnection: ");
     }
 

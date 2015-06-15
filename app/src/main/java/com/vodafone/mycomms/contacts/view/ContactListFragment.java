@@ -219,10 +219,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                             Utils.launchEmail(email, getActivity());
                         }
                     }
-                    //ADD RECENT
-                    RecentContactController recentController = new RecentContactController(this,realm,profileId);
-                    recentController.insertRecent(recentContactList.get(position).getContactId(), action);
-                    setListAdapterTabs();
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);
                 }

@@ -192,7 +192,9 @@
     <string name="search_bar_text">Search (name, company, email)</string>
     <string name="search_bar_cancel_button">Cancel</string>
     <string name="Settings">Settings</string>
+    <string name="toolbar_preferences">Preferences</string>
     <string name="Profile">Profile</string>
+    <string name="toolbar_my_profile">My Profile</string>
 
     <!-- Settings and Profile-->
     <string name="settings_vacation_time_activity_title">"Vacation Time"</string>

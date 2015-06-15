@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/Settings"
+        android:text="@string/toolbar_preferences"
         android:id="@+id/textView4" />
 
 </LinearLayout>

@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.settings;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,16 +8,11 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.main.AboutActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by amg on 05/05/2015.

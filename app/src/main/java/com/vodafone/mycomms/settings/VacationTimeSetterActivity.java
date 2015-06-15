@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.IConnectionCallback;
-import com.vodafone.mycomms.settings.connection.ProfileConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
@@ -23,8 +22,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-
-import io.fabric.sdk.android.services.settings.SettingsController;
 
 /**
  * Created by str_vig on 10/06/2015.

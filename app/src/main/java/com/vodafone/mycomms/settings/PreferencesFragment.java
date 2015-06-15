@@ -51,6 +51,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private ProfileController profileController;
     private boolean isSourceDB = true;
 
+    private long holidayEndDate = 0L;
+    private boolean isOnHoliday=false;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -142,8 +145,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         vacationTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(getActivity(), VacationTimeSetterActivity.class);
-                startActivity(in);
+                Intent intent = new Intent(getActivity(), VacationTimeSetterActivity.class);
+                intent.putExtra(VacationTimeSetterActivity.EXTRA_HOLIDAY_END_DATE, holidayEndDate);
+                startActivity(intent);
             }
         });
 
@@ -228,12 +232,15 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         try{
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
                 jsonSettings = new JSONObject(userProfile.getSettings());
-                String holidayEndDate = jsonSettings.getString(Constants.PROFILE_HOLIDAY_END_DATE);
-                Boolean isOnHoliday = jsonSettings.getBoolean(Constants.PROFILE_HOLIDAY);
+                this.holidayEndDate = jsonSettings.getLong(Constants.PROFILE_HOLIDAY_END_DATE);
+                this.isOnHoliday = jsonSettings.getBoolean(Constants.PROFILE_HOLIDAY);
 
                 TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
-                if(holidayEndDate != null && holidayEndDate.length() >0){
-                   vacationTimeEnds.setText(Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate));
+
+                if(holidayEndDate > 0){
+                    String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
+                    Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: setting holidayDate to:" + holidayDateToSet);
+                    vacationTimeEnds.setText(holidayDateToSet);
                 }
             }
         } catch (Exception e){

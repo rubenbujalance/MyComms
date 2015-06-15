@@ -165,9 +165,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         shareCurrentTimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (!isSourceDB) {
-                    shareCurrentTime(isChecked);
-                }
+                shareCurrentTime(isChecked);
+
             }
         });
 
@@ -175,10 +174,10 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         doNotDisturbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (!isSourceDB) {
+               // if (!isSourceDB) {
                     setDoNotDisturb(isChecked);
-                }
-                isSourceDB = false;
+                //}
+                //isSourceDB = false;
 
             }
         });

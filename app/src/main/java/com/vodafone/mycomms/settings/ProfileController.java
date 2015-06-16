@@ -54,13 +54,11 @@ public class ProfileController extends BaseController {
 
 
     /**
-     * Get Profile, uses DB and Network also. (First loads from DB by a callback then starts network connection.)
-     * @param useOnlyNetworkData in case this is true wont use DB data this is for reloading DB from network calls e.g.: after settings changes.
+     * Get Profile, uses DB and Network also. (First loads from DB by a callback then starts network connection.
      */
-    public void getProfile(boolean useOnlyNetworkData){
+    public void getProfile(){
         Log.d(Constants.TAG, "ProfileController.getProfile: ");
 
-        //if(!useOnlyNetworkData) {
             SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
             String profileId = null;
 
@@ -82,7 +80,7 @@ public class ProfileController extends BaseController {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
                 }
             }
-        //}
+
 
         if(profileConnection != null){
             profileConnection.cancel();
@@ -91,28 +89,28 @@ public class ProfileController extends BaseController {
         profileConnection.request();
     }
 
-    public void updateUserProfileInDB(boolean privateLocation, boolean privateTimezone, boolean holiday, long holidayEndDate, boolean doNotDisturb) {
-        Log.d(Constants.TAG, "ProfileController.updateUserProfileInDB: privateLocation= " + privateLocation + ", privateTimezone= " + privateTimezone + ", holiday=" + holiday + ", holidayEndDate=" + holidayEndDate +  ", doNotDisturb=" + doNotDisturb );
-//        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-//        String profileId = null;
-//
-//        if (sharedPreferences != null) {
-//            profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-//        }
-//
-//        UserProfile userProfile = null;
-//        if (profileId != null && profileId.length() > 0) {
-//            Log.d(Constants.TAG, "ProfileController.getProfile: retrieving profile with profileID:" + profileId);
-//
-//            if (realmContactTransactions != null) {
-//                userProfile = realmContactTransactions.getUserProfile(profileId);
-//
-//            } else {
-//                Log.e(Constants.TAG, "ProfileController.getProfile: realmContactTransactions is null");
-//            }
-//        }
+    public boolean isUserProfileChanged(String firstName, String lastName, String company, String position, String officeLocation) {
+        if(userProfile.getFirstName().equals(firstName) && userProfile.getLastName().equals(lastName)
+                && userProfile.getCompany().equals(company) && userProfile.getPosition().equals(position)
+                && userProfile.getOfficeLocation().equals(officeLocation) ) {
+            return false;
+        }
+        return true;
+    }
+    public void updateUserProfileInDB(String firstName, String lastName, String company, String position, String officeLocation){
+        Log.d(Constants.TAG, "ProfileController.updateUserProfileInDB: ");
+        if(userProfile != null){
+            userProfile.setFirstName(firstName);
+            userProfile.setLastName(lastName);
+            userProfile.setCompany(company);
+            userProfile.setPosition(position);
+            userProfile.setOfficeLocation(officeLocation);
+            realmContactTransactions.insertUserProfile(userProfile);
+        }
+    }
 
-
+    public void updateUserProfileSettingsInDB(boolean privateLocation, boolean privateTimezone, boolean holiday, long holidayEndDate, boolean doNotDisturb) {
+        Log.d(Constants.TAG, "ProfileController.updateUserProfileSettingsInDB: privateLocation= " + privateLocation + ", privateTimezone= " + privateTimezone + ", holiday=" + holiday + ", holidayEndDate=" + holidayEndDate + ", doNotDisturb=" + doNotDisturb);
         if(userProfile != null){
             HashMap body = new HashMap<>();
 
@@ -124,12 +122,12 @@ public class ProfileController extends BaseController {
 
 
             JSONObject json = new JSONObject(body);
-            Log.d(Constants.TAG, "ProfileController.updateUserProfileInDB: " + json.toString());
+            Log.d(Constants.TAG, "ProfileController.updateUserProfileSettingsInDB: " + json.toString());
             userProfile.setSettings(json.toString());
+            realmContactTransactions.insertUserProfile(userProfile);
         }
 
 
-        realmContactTransactions.insertUserProfile(userProfile);
     }
 
     public void setUserProfile(String profileId, String profileFullName){
@@ -148,7 +146,7 @@ public class ProfileController extends BaseController {
         super.onConnectionComplete(response);
         Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl() + response.getUrl());
 
-        //UserProfile userProfile = null;
+        boolean isUserProfileReceived = false;
         if(response.getUrl() != null && !response.getUrl().contains(UpdateSettingsConnection.URL)) {
             String result = response.getData().toString();
 
@@ -161,16 +159,19 @@ public class ProfileController extends BaseController {
 
                     realmContactTransactions.insertUserProfile(userProfile);
                     Log.d(Constants.TAG, "ProfileController.onConnectionComplete: UserProfile parsed:" + printUserProfile(userProfile));
+                    if(userProfile != null) {
+                        isUserProfileReceived = true;
+                    }
                 }
 
             } catch (Exception e) {
-                Log.e(Constants.TAG, "ProfileController.onConnectionComplete: Exception while parsing userProfile", e);
+                Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile" + e.getMessage());
             }
         }
 
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
             if (response.getUrl() != null && response.getUrl().contains(ProfileConnection.URL)) {
-                if (userProfile != null) {
+                if (isUserProfileReceived) {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
                 } else {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionCompleted();

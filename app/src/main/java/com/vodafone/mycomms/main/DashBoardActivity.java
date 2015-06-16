@@ -77,7 +77,7 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
         String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
         if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
             profileController.setConnectionCallback(this);
-            profileController.getProfile(false);
+            profileController.getProfile();
 
             return null;
         }

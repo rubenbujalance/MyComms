@@ -110,12 +110,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 //        editProfile.setVisibility(View.INVISIBLE);
 
         profileController.setConnectionCallback(this);
-        if(isFirstLoad) {
-            profileController.getProfile(false);
-            isFirstLoad = false;
-        }else {
-            profileController.getProfile(true);
-        }
+        profileController.getProfile();
+
     }
 
 
@@ -174,11 +170,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         doNotDisturbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-               // if (!isSourceDB) {
-                    setDoNotDisturb(isChecked);
-                //}
-                //isSourceDB = false;
-
+                setDoNotDisturb(isChecked);
             }
         });
 
@@ -382,13 +374,16 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         switch(requestCode) {
             case (SettingsMainActivity.VACATION_TIME_SETTER_ID) : {
                 if (resultCode == Activity.RESULT_OK) {
-                    Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ");
+                    Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ACTIVITY_RESULT_OK");
                     this.holidayEndDate = data.getLongExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, 0L);
                     if(holidayEndDate > 0L){
                         isOnHoliday = true;
+                    }else{
+                        isOnHoliday = false;
                     }
                     updateHolidayText(holidayEndDate);
                     updateProfileInDb();
+
 
                 }
                 break;
@@ -397,6 +392,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     }
 
     void updateHolidayText(long holidayEndDate){
+        Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: " + holidayEndDate);
         this.holidayEndDate = holidayEndDate;
         TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
 
@@ -414,7 +410,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
 
     void updateProfileInDb(){
-        this.profileController.updateUserProfileInDB(false, this.privateTimeZone, this.isOnHoliday, this.holidayEndDate, this.doNotDisturb);
+        this.profileController.updateUserProfileSettingsInDB(false, this.privateTimeZone, this.isOnHoliday, this.holidayEndDate, this.doNotDisturb);
     }
 
 }

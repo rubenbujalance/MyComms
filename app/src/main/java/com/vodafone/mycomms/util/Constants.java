@@ -144,9 +144,14 @@ public class Constants {
 
     //XMPP Constants
     public static final int XMPP_PARAM_PORT = 5222;
-//    public static final String XMPP_PARAM_DUMMY_HOST = "securejabber.me";
-//    public static final String XMPP_PARAM_DUMMY_SERVICE_NAME = "securejabber.me";
     public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
+    public static final String XMPP_MESSAGE_MEDIATYPE_TEXT = "text";
+    public static final String XMPP_MESSAGE_TYPE_CHAT = "chat";
+    public static final String XMPP_IQ_TYPE_CHAT = "chat";
+    public static final String XMPP_IQ_STATUS_SENT = "sent";
+    public static final String XMPP_IQ_STATUS_DELIVERED = "delivered";
+    public static final String XMPP_IQ_STATUS_READ = "read";
+
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
 

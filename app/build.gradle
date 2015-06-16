@@ -150,10 +150,6 @@ dependencies {
         exclude module: 'smack-core'
     }
 
-    //JXMPP2 Libraries
-    compile files('lib/jaxmpp-core-3.0.0.jar')
-    compile files('lib/jaxmpp-j2se-3.0.0.jar')
-
     // Crashlytics Kit
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
         transitive = true

@@ -31,6 +31,7 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
         mViewPager.setAdapter(new ProfileListPagerAdapter(getFragmentManager()));
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+        //This sets default tab
         mViewPager.setCurrentItem(Constants.MY_PROFILE);
     }
 
@@ -61,11 +62,6 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
                     editProfile.setVisibility(View.INVISIBLE);
 
                     break;
-                /*case Constants.ACCOUNTS:
-                    Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
-                    ProfileFragment profileFragment3 = ProfileFragment.newInstance(position, "whatever");
-                    fragment = profileFragment3;
-                    break;*/
                 case Constants.MY_PROFILE:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     ProfileFragment profileFragment = ProfileFragment.newInstance(position, "whatever");

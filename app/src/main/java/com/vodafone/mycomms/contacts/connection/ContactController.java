@@ -17,6 +17,7 @@ import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.InternalContactSearch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,22 +47,27 @@ public class ContactController extends BaseController {
     private Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private InternalContactSearch internalContactSearch;
     private String apiCall;
+    private String mProfileId;
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
 
-    public ContactController(Activity activity, Realm realm) {
+    public ContactController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        internalContactSearch = new InternalContactSearch(activity);
     }
 
-    public ContactController(Fragment fragment, Realm realm) {
+    public ContactController(Fragment fragment, Realm realm, String profileId) {
         super(fragment);
         this.mRealm = realm;
         this.mContext = fragment.getActivity();
-        realmContactTransactions = new RealmContactTransactions(realm);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
     public void getContactList(String api){
@@ -84,7 +90,7 @@ public class ContactController extends BaseController {
         contactConnection.request();
     }
 
-    public void getRecentList(String api){
+    public void getRecentList(String api) {
         Log.i(Constants.TAG, "ContactController.getRecentList: ");
         if(contactConnection != null){
             contactConnection.cancel();
@@ -142,7 +148,6 @@ public class ContactController extends BaseController {
                         if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
                             ((IContactsConnectionCallback) this.getConnectionCallback()).onRecentContactsResponse();
                         } else{
-                            Log.i(Constants.TAG, "ContactController.onConnectionComplete: in BusProvider");
                             BusProvider.getInstance().post(new SetContactListAdapterEvent());
                         }
                     } catch (Exception e) {
@@ -178,12 +183,11 @@ public class ContactController extends BaseController {
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject);
+                contact = mapContact(jsonObject, mProfileId);
                 realmContactList.add(contact);
                 doRefreshAdapter = (i==jsonArray.length()-1);
                 updateContactAvatar(contact, doRefreshAdapter);
             }
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
             realmContactTransactions.insertContactList(realmContactList);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -200,16 +204,15 @@ public class ContactController extends BaseController {
                 return;
 
             RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
-            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getId());
+            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
             if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                Log.i(Constants.TAG, "ContactController.updateContactAvatar: TESTING");
-                String filename = "avatar_" + contact.getId() + ".jpg";
+                String filename = "avatar_" + contact.getContactId() + ".jpg";
 
                 new DownloadAvatars().execute(contact.getAvatar(), filename);
 
                 if (avatar == null)
                 {
-                    avatar = new ContactAvatar(contact.getId(), contact.getAvatar(), filename);
+                    avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), filename);
                 }
                 else
                 {
@@ -230,6 +233,16 @@ public class ContactController extends BaseController {
         return realmContactTransactions.getAllContacts();
     }
 
+    public ArrayList<Contact> getLocalContactsByKeyWord(String keyWord) {
+        Log.d(Constants.TAG, "ContactController.getLocalContactsByKeyWord: ");
+        return internalContactSearch.getLocalContactsByKeyWord(keyWord);
+    }
+
+    public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
+        Log.d(Constants.TAG, "ContactController.getContactsByKeyWord: ");
+        return realmContactTransactions.getContactsByKeyWord(keyWord);
+    }
+
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
         Log.i(Constants.TAG, "ContactController.getAllFavouriteContacts: ");
         ArrayList<FavouriteContact> favList = new ArrayList<>();
@@ -242,33 +255,6 @@ public class ContactController extends BaseController {
         ArrayList<RecentContact> recentList = new ArrayList<>();
         recentList = realmContactTransactions.getAllRecentContacts();
         return recentList;
-    }
-
-    public void insertContactsInRealm(JSONObject json){
-        JSONObject jsonObject = null;
-        JSONArray jsonArray = null;
-        try {
-            jsonObject = new JSONObject(json.toString());
-            jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDBController.insertContactsInRealm: " + e.toString());
-        }
-        Contact contact;
-        ArrayList<Contact> contactList = new ArrayList<>();
-        try {
-            for (int i = 0; i < jsonArray.length(); i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject);
-                if (contact != null) {
-                    contactList.add(contact);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDBController.insertContactsInRealm: " + e.toString());
-        }
-        realmContactTransactions.insertContactList(contactList);
     }
 
     public void insertFavouriteContactInRealm(JSONObject json){
@@ -288,7 +274,6 @@ public class ContactController extends BaseController {
             if (contactList.size()!=0) {
                 realmContactTransactions.deleteAllFavouriteContacts();
                 realmContactTransactions.insertFavouriteContactList(contactList);
-                Log.i(Constants.TAG, "ContactController.insertFavouriteContactInRealm: inserted contactList ");
                 //BusProvider.getInstance().post(new SetContactListAdapterEvent());
             }
         } catch (JSONException e) {
@@ -305,7 +290,7 @@ public class ContactController extends BaseController {
             Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
-                contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString("id"));
+                contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID));
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
                     updateContactAvatar(contact, i == jsonArray.length() - 1);
@@ -314,7 +299,6 @@ public class ContactController extends BaseController {
             if (contactList.size()!=0) {
                 //realmContactTransactions.deleteAllRecentContacts();
                 realmContactTransactions.insertRecentContactList(contactList);
-                Log.i(Constants.TAG, "ContactController.insertRecentContactInRealm: inserted RecentcontactList ");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -322,10 +306,14 @@ public class ContactController extends BaseController {
         }
     }
 
-    public static Contact mapContact(JSONObject jsonObject){
+    public static Contact mapContact(JSONObject jsonObject, String profileId){
         Contact contact = new Contact();
         try {
-            if (!jsonObject.isNull(Constants.CONTACT_ID)) contact.setId(jsonObject.getString(Constants.CONTACT_ID));
+            contact.setProfileId(profileId);
+            if (!jsonObject.isNull(Constants.CONTACT_ID)){
+                contact.setContactId(jsonObject.getString(Constants.CONTACT_ID));
+                contact.setId(profileId + "_" + jsonObject.getString(Constants.CONTACT_ID));
+            }
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))
@@ -338,7 +326,7 @@ public class ContactController extends BaseController {
             if (!jsonObject.isNull(Constants.CONTACT_COMPANY)) contact.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
             if (!jsonObject.isNull(Constants.CONTACT_TIMEZONE))
                 contact.setTimezone(jsonObject.getString(Constants.CONTACT_TIMEZONE));
-            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) contact.setLastSeen(jsonObject.getInt(Constants.CONTACT_LASTSEEN));
+            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) contact.setLastSeen(jsonObject.getLong(Constants.CONTACT_LASTSEEN));
             if (!jsonObject.isNull(Constants.CONTACT_OFFICE_LOC))
                 contact.setOfficeLocation(jsonObject.getString(Constants.CONTACT_OFFICE_LOC));
             if (!jsonObject.isNull(Constants.CONTACT_PHONES))
@@ -361,7 +349,11 @@ public class ContactController extends BaseController {
     public FavouriteContact mapFavouriteContact(JSONObject jsonObject){
         FavouriteContact contact = new FavouriteContact();
         try {
-            if (!jsonObject.isNull(Constants.CONTACT_ID)) contact.setId(jsonObject.getString(Constants.CONTACT_ID));
+            contact.setContactId(mProfileId);
+            if (!jsonObject.isNull(Constants.CONTACT_ID)){
+                contact.setContactId(jsonObject.getString(Constants.CONTACT_ID));
+                contact.setId(mProfileId + "_" + jsonObject.getString(Constants.CONTACT_ID));
+            }
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))
@@ -397,6 +389,8 @@ public class ContactController extends BaseController {
     public FavouriteContact mapContactToFavourite(Contact contact){
         FavouriteContact favoriteContact = new FavouriteContact();
         favoriteContact.setId(contact.getId());
+        favoriteContact.setProfileId(contact.getProfileId());
+        favoriteContact.setContactId(contact.getContactId());
         favoriteContact.setPlatform(contact.getPlatform());
         favoriteContact.setFirstName(contact.getFirstName());
         favoriteContact.setLastName(contact.getLastName());
@@ -417,7 +411,11 @@ public class ContactController extends BaseController {
     public RecentContact mapRecentContact(JSONObject jsonObject){
         RecentContact contact = new RecentContact();
         try {
-            if (!jsonObject.isNull(Constants.CONTACT_ID)) contact.setId(jsonObject.getString(Constants.CONTACT_ID));
+            contact.setProfileId(mProfileId);
+            if (!jsonObject.isNull(Constants.CONTACT_ID)){
+                contact.setContactId(jsonObject.getString(Constants.CONTACT_ID));
+                contact.setId(mProfileId + "_" + jsonObject.getString(Constants.CONTACT_ID));
+            }
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))
@@ -454,6 +452,8 @@ public class ContactController extends BaseController {
     public RecentContact mapContactToRecent(Contact contact, JSONObject jsonObject){
         RecentContact recentContact = new RecentContact();
         recentContact.setId(contact.getId());
+        recentContact.setProfileId(contact.getProfileId());
+        recentContact.setContactId(contact.getContactId());
         recentContact.setPlatform(contact.getPlatform());
         recentContact.setFirstName(contact.getFirstName());
         recentContact.setLastName(contact.getLastName());
@@ -469,7 +469,7 @@ public class ContactController extends BaseController {
         recentContact.setPresence(contact.getPresence());
         recentContact.setCountry(contact.getCountry());
         try {
-            recentContact.setUniqueId(contact.getId() + jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
+            recentContact.setUniqueId(contact.getContactId() + "_" + mProfileId +  jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setAction(jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setTimestamp(jsonObject.getLong(Constants.CONTACT_RECENTS_ACTION_TIME));
         } catch (JSONException e){

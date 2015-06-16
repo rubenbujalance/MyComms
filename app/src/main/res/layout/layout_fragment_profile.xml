@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
              android:id="@+id/container"
              android:layout_width="match_parent"
-             android:layout_height="match_parent" >
+             android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -21,16 +22,30 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:id="@+id/profile_picture"
-                    android:src="@drawable/profile_picture"
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"/>
+                <TextView
+                    android:id="@+id/avatarText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="50sp"
+                    tools:text="MM"
+                    android:textColor="@color/grey_dark"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_alignRight="@+id/profile_picture"
+                    android:layout_alignEnd="@+id/profile_picture"
+                    android:layout_alignBottom="@+id/profile_picture"
+                    android:layout_alignLeft="@+id/profile_picture"
+                    android:layout_alignStart="@+id/profile_picture"
+                    android:layout_alignTop="@+id/profile_picture"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/edit_photo"
                     android:layout_marginTop="5dp"
-                    android:text="edit photo"
+                    android:text="@string/editphoto"
                     android:visibility="gone"
                     android:textColor="@android:color/white"
                     android:layout_below="@+id/profile_picture"
@@ -57,8 +72,8 @@
                         android:layout_marginBottom="10dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
-                        android:hint="Name"
-                        android:text="Andrew"
+                        android:hint="@string/name"
+                        tools:text="Andrew"
                         android:id="@+id/profile_name"/>
                     <View
                         android:layout_width="fill_parent"
@@ -71,8 +86,8 @@
                         android:layout_marginBottom="10dp"
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
-                        android:hint="Surname"
-                        android:text="Wiggins"
+                        android:hint="@string/Surname"
+                        tools:text="Wiggins"
                         android:id="@+id/profile_surname"/>
                 </LinearLayout>
                 <RelativeLayout
@@ -82,15 +97,15 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Phone"
+                        android:text="@string/Phone"
                         style="@style/TextViewProfile"
                         android:id="@+id/contact_phone_number"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Phone Number"
-                        android:text="+34 684503080"
+                        android:hint="@string/phoneNumber"
+                        tools:text="+34 684503080"
                         android:inputType="textEmailAddress"
                         android:ems="10"
                         android:layout_below="@+id/contact_phone_number"
@@ -117,15 +132,15 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Email"
+                        android:text="@string/email"
                         style="@style/TextViewProfile"
                         android:id="@+id/contact_email"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Email"
-                        android:text="andrew.wiggin@vodafone.com"
+                        android:hint="@string/email"
+                        tools:text="andrew.wiggin@vodafone.com"
                         android:ems="10"
                         android:layout_below="@+id/contact_email"
                         android:layout_alignParentLeft="true"
@@ -156,13 +171,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Company"/>
+                        android:text="@string/company"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Company name"
-                        android:text="Vodafone"
+                        android:hint="@string/companyname"
+                        tools:text="Vodafone"
                         android:id="@+id/contact_company"/>
                 </LinearLayout>
 
@@ -176,13 +191,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Position"/>
+                        android:text="@string/position"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Position"
-                        android:text="Leader"
+                        android:hint="@string/position"
+                        tools:text="Leader"
                         android:id="@+id/contact_position"/>
                 </LinearLayout>
 
@@ -198,13 +213,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Department"/>
+                        android:text="@string/Loremipsum"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Department"
-                        android:text="Human Resources"
+                        android:hint="@string/department"
+                        tools:text="Human Resources"
                         android:id="@+id/department"/>
                 </LinearLayout>
 
@@ -219,13 +234,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Office Location"/>
+                        android:text="@string/officelocation"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Office"
-                        android:text="Barcelona"
+                        android:hint="@string/Office"
+                        tools:text="Barcelona"
                         android:id="@+id/office_location"/>
                 </LinearLayout>
 
@@ -242,13 +257,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Additional Information"/>
+                        android:text="@string/additionalinformation"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Additional"
-                        android:text="That's me!"
+                        android:hint="@string/additional"
+                        tools:text="That's me!"
                         android:lines="3"
                         android:id="@+id/contact_additional_info"/>
                 </LinearLayout>
@@ -267,12 +282,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         style="@style/TextViewProfile"
-                        android:text="Password"/>
+                        android:text="@string/password"/>
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Password"
+                        android:hint="@string/password"
                         android:id="@+id/profile_password"
                         android:inputType="textPassword"
                         />
@@ -281,7 +296,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
-                        android:hint="Repeat Password"
+                        android:hint="@string/repeatPassword"
                         android:id="@+id/profile_password_repeat"
                         android:inputType="textPassword"
                         />

@@ -1,8 +1,7 @@
 package com.vodafone.mycomms.util;
 
-/**
- * Created by str_vig on 22/04/2015.
- */
+import java.text.SimpleDateFormat;
+
 public class Constants {
     public static final String TAG = "MyComms";
 
@@ -19,6 +18,16 @@ public class Constants {
     public static final int MY_PROFILE = 1;
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
+    public static final String DEVICE_ID_SHARED_PREF = "device_Id" ;
+
+    //Profile API & BD
+    public static final String PROFILE_PRIVATE_TIMEZONE = "privateTimeZone";
+    public static final String PROFILE_DONOTDISTURB = "doNotDisturb";
+    public static final String PROFILE_PHONE = "phone";
+    public static final String PROFILE_EMAIL = "email";
+    public static final String PROFILE_DEVICE_ID = "deviceId";
+    public static final String PROFILE_HOLIDAY_END_DATE = "holidayEndDate";
+    public static final String PROFILE_HOLIDAY = "holiday";
 
     //Footer Constants
     public static final int TOOLBAR_CONTACTS = 0;
@@ -36,6 +45,8 @@ public class Constants {
     //Contacts API and BD Fields
     public static final String CONTACT_DATA = "data";
     public static final String CONTACT_ID = "id";
+    public static final String CONTACT_PROFILE_ID = "profileId";
+    public static final String CONTACT_CONTACT_ID = "contactId";
     public static final String CONTACT_PLATFORM = "platform";
     public static final String CONTACT_FNAME = "firstName";
     public static final String CONTACT_LNAME = "lastName";
@@ -60,12 +71,32 @@ public class Constants {
     public static final String CONTACT_PAGINATION_MORE_PAGES = "morePages";
     public static final String CONTACT_PAGINATION_OFFSET = "offset";
     public static final String CONTACT_PAGINATION_PAGESIZE = "pageSize";
+    public static final String CONTACT_LOCAL_CONTENT= "local_contact";
 
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";
 
     //Contacts API Calls
+    public static final String NEWS_DATA = "data";
+    public static final String NEWS_API_GET = "/api/news";
+    public static final String NEWS_PAGINATION = "pagination";
+    public static final String NEWS_PAGINATION_MORE_PAGES = "morePages";
+    public static final String NEWS_PAGINATION_OFFSET = "offset";
+    public static final String NEWS_PAGINATION_PAGESIZE = "pageSize";
+    public static final String NEWS_UUID = "uuid";
+    public static final String NEWS_TITLE = "title";
+    public static final String NEWS_HTML = "html";
+    public static final String NEWS_IMAGE = "image";
+    public static final String NEWS_LINK = "link";
+    public static final String NEWS_AUTHOR_NAME = "author_name";
+    public static final String NEWS_AUTHOR_AVATAR = "author_avatar";
+    public static final String NEWS_CREATED_AT = "created_at";
+    public static final String NEWS_UPDATED_AT = "updated_at";
+    public static final String NEWS_PUBLISHED_AT = "published_at";
+
+    //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
+    public static final String CONTACT_API_GET_SEARCH_CONTACTS = "/api/me/contact?p=mc&t=";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_RECENTS = "/api/me/recents";
@@ -113,8 +144,13 @@ public class Constants {
 
     //XMPP Constants
     public static final int XMPP_PARAM_PORT = 5222;
-    public static final String XMPP_PARAM_HOST = "securejabber.me";
-    public static final String XMPP_PARAM_SERVICE_NAME = "securejabber.me";
-    public static final String XMPP_PARAM_DOMAIN = "securejabber.me";
+//    public static final String XMPP_PARAM_DUMMY_HOST = "securejabber.me";
+//    public static final String XMPP_PARAM_DUMMY_SERVICE_NAME = "securejabber.me";
+    public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
 
+    public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
+
+    public static final String DATE_DISPLAY_FORMAT = "MMM d, yyyy";
+    public final static SimpleDateFormat SIMPLE_DATE_FORMAT_DISPLAY = new SimpleDateFormat (DATE_DISPLAY_FORMAT);
+    public static String toolbar = "toolbar";
 }

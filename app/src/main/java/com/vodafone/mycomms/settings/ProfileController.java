@@ -26,36 +26,33 @@ import java.util.HashMap;
 import io.realm.Realm;
 import model.UserProfile;
 
-/**
- * Created by str_vig on 26/05/2015.
- */
 public class ProfileController extends BaseController {
 
     private RealmContactTransactions realmContactTransactions;
     private ProfileConnection profileConnection;
     private Realm realm;
+    private String profileId;
 
     public ProfileController(Fragment fragment) {
         super(fragment);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
         realm = Realm.getInstance(getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
     public ProfileController(Activity activity) {
         super(activity);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
         realm = Realm.getInstance(getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
     public void getProfile(){
         Log.d(Constants.TAG, "ProfileController.getProfile: ");
-
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        String profileId = null;
-
-        if(sharedPreferences != null) {
-            profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        }
 
         if(profileId != null && profileId.length() > 0) {
             Log.d(Constants.TAG, "ProfileController.getProfile: retrieving profile with profileID:" + profileId);
@@ -92,9 +89,7 @@ public class ProfileController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-
         Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl() + response.getUrl());
-
 
         UserProfile userProfile = null;
         if(response.getUrl() != null && !response.getUrl().contains(UpdateSettingsConnection.URL)) {
@@ -111,7 +106,7 @@ public class ProfileController extends BaseController {
                 }
 
             } catch (Exception e) {
-                Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception while parsing userProfile", e);
+                Log.e(Constants.TAG, "ProfileController.onConnectionComplete: Exception while parsing userProfile", e);
             }
         }
 
@@ -126,19 +121,16 @@ public class ProfileController extends BaseController {
 
             }
         }
-
-
-
     }
 
     @Override
     public void onConnectionError(ConnectionException ex){
         super.onConnectionError(ex);
-        Log.w(Constants.TAG, "ProfileController.onConnectionError: " + ex.getUrl() + "," + ex.getContent());
+        Log.e(Constants.TAG, "ProfileController.onConnectionError: " + ex.getUrl() + "," + ex.getContent());
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback ) {
             if (ex.getUrl() != null && ex.getUrl().contains(ProfileConnection.URL)) {
                 if (ex.getContent() != null && ex.getContent().contains("\"err\":\"incorrectData\"")) {
-                    //TODO It does not seems correct that the MyComms  Public API has two calls to "/api/me"  URLs and the only difference is that one is PUT and the pther is GET
+                    //TODO It does not seem correct that the MyComms  Public API has two calls to "/api/me"  URLs and the only difference is that one is PUT and the other is GET
                     //TODO Currently the Connectivity API is not prepared to retrieve the Method type (GET, PUT, DELETE) of the connection from the error, so no clean way of doing this.
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionError();
                 } else {
@@ -155,12 +147,10 @@ public class ProfileController extends BaseController {
                     Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
                 }
 
-//                ((IProfileConnectionCallback) this.getConnectionCallback()).onPasswordChangeError(error);
-
+                //TODO: Commented due to "BaseController.onConnectionError: {"err":"auth_proxy_error","des":"invalid body request"}
+                //((IProfileConnectionCallback) this.getConnectionCallback()).onPasswordChangeError(error);
             }
         }
-
-
     }
 
     public static UserProfile mapUserProfile(JSONObject jsonObject){
@@ -243,11 +233,11 @@ public class ProfileController extends BaseController {
     }
 
     public void updatePassword(HashMap passwordHashMap){
-            JSONObject json = new JSONObject(passwordHashMap);
-            Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
-            PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
-            passwordConnection.setPayLoad(json.toString());
-            passwordConnection.request();
+        JSONObject json = new JSONObject(passwordHashMap);
+        Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+        PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
+        passwordConnection.setPayLoad(json.toString());
+        passwordConnection.request();
 
     }
 
@@ -262,5 +252,4 @@ public class ProfileController extends BaseController {
         if(userProfile.getOfficeLocation() != null) body.put("officeLocation",userProfile.getOfficeLocation());
         return body;
     }
-
 }

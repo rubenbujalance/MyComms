@@ -11,6 +11,8 @@ public class Contact extends RealmObject{
     @PrimaryKey
     private String id;
 
+    private String contactId;
+    private String profileId;
     private String platform;
     private String firstName;
     private String lastName;
@@ -21,7 +23,7 @@ public class Contact extends RealmObject{
     private String position;
     private String company;
     private String timezone;
-    private int lastSeen;
+    private long lastSeen;
     private String officeLocation;
     private String availability;
     private String presence;
@@ -30,8 +32,10 @@ public class Contact extends RealmObject{
     public Contact() {
     }
 
-    public Contact(String id, String platform, String firstName, String lastName, String avatar, String pathAvatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country) {
+    public Contact(String id, String profileId, String contactId, String platform, String firstName, String lastName, String avatar, String pathAvatar, String phones, String emails, String position, String company, String timezone, long lastSeen, String officeLocation, String availability, String presence, String country) {
         this.id = id;
+        this.profileId = profileId;
+        this.contactId = contactId;
         this.platform = platform;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -49,12 +53,50 @@ public class Contact extends RealmObject{
         this.country = country;
     }
 
+    public Contact(String initString)
+    {
+        this.id = initString;
+        this.profileId = initString;
+        this.contactId = initString;
+        this.platform = initString;
+        this.firstName = initString;
+        this.lastName = initString;
+        this.avatar = initString;
+        this.setPathAvatar(pathAvatar);
+        this.phones = initString;
+        this.emails = initString;
+        this.position = initString;
+        this.company = initString;
+        this.timezone = initString;
+        this.lastSeen = 0;
+        this.officeLocation = initString;
+        this.availability = initString;
+        this.presence = initString;
+        this.country = initString;
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getContactId() {
+        return contactId;
+    }
+
+    public void setContactId(String contactId) {
+        this.contactId = contactId;
+    }
+
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
     }
 
     public String getPlatform() {
@@ -113,11 +155,11 @@ public class Contact extends RealmObject{
         this.timezone = timezone;
     }
 
-    public int getLastSeen() {
+    public long getLastSeen() {
         return lastSeen;
     }
 
-    public void setLastSeen(int lastSeen) {
+    public void setLastSeen(long lastSeen) {
         this.lastSeen = lastSeen;
     }
 

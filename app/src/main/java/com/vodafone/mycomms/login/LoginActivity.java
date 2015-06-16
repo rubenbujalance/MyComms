@@ -21,10 +21,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
+import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -240,7 +240,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
 
         //Start Main activity
-        Intent in = new Intent(LoginActivity.this, ContactListMainActivity.class);
+        Intent in = new Intent(LoginActivity.this, DashBoardActivity.class);
 
         in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(in);

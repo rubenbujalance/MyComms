@@ -1,6 +1,4 @@
 <resources>
-    <!--<string name="app_name">MyComms</string>-->
-
     <string name="hello_world">MyComms is great!</string>
     <string name="action_settings">Settings</string>
     <string name="login">Login</string>
@@ -126,5 +124,81 @@
     <!--Toolbar titles-->
     <string name="toolbar_title_messages">Messages</string>
     <string name="toolbar_title_contact_list">My Contacts</string>
+    <string name="profile_edit_mode_done">Done</string>
+    <string name="profile_edit_mode_edit">Edit</string>
+
+    <!-- Chat Strings -->
+    <string name="chat_me_text">"Me: "</string>
+    <string name="DummyTime">Thursday 18:40 a.m</string>
+    <string name="Availability">AVAILABILITY</string>
+    <string name="DummyCountry">United States</string>
+    <string name="badge">badge</string>
+    <string name="dummyUser">Captain Planet</string>
+    <string name="Contacts">Contacts</string>
+    <string name="Recents">Recents</string>
+    <string name="Favourites">Favourites</string>
+    <string name="dummyShortDay">Tue</string>
+    <string name="VacationTime">Vacation Time</string>
+    <string name="DoNotDisturb">Do Not Disturb</string>
+    <string name="dummyHour">12:30</string>
+    <string name="dummyOneMore">+1</string>
+    <string name="dummyChat1">Me: And I say Hello. Hello Hello!</string>
+    <string name="dummyPhrase">Saviour of the Planet</string>
+    <string name="dummyUser2">Jack Sheppard</string>
+    <string name="Edit">Edit</string>
+    <string name="Sent">Sent</string>
+    <string name="dummyAddress">742, Evergreen Terrace</string>
+    <string name="officelocation">Office Location</string>
+    <string name="dummyEmail">ruben_bujalance@stratesys-ts.com</string>
+    <string name="PhoneNumber">Phone Number</string>
+    <string name="repeatPassword">Repeat Password</string>
+    <string name="additional">Additional</string>
+    <string name="additionalinformation">Additional Information</string>
+    <string name="dummyPhone">+34 684503080</string>
+    <string name="phoneNumber">Phone Number</string>
+    <string name="Loremipsum">Lorem Ipsum</string>
+    <string name="Office">Office</string>
+    <string name="department">Department</string>
+    <string name="skype">skype</string>
+    <string name="dummyCompany">Vodafone Global Enterprise</string>
+    <string name="companyname">Company name</string>
+    <string name="dummyPosition">Senior Enterprise Manager</string>
+    <string name="dummyUserfull">Smith Doe, John</string>
+    <string name="dummylastseen">Seen 2d ago</string>
+    <string name="mobile">mobile</string>
+    <string name="Phone">Phone</string>
+    <string name="latestNews">Latest News</string>
+    <string name="Logout">Logout</string>
+    <string name="Chat">Chat</string>
+    <string name="Surname">Surname</string>
+    <string name="office">office</string>
+    <string name="aboutmycontacts">About MyContacts</string>
+    <string name="name">Name</string>
+    <string name="dummyday">Tuesday 28th April</string>
+    <string name="ABOUT">ABOUT</string>
+    <string name="emailbutton">Email Button</string>
+    <string name="Send">Send</string>
+    <string name="sharecurrenttime">Share current time</string>
+    <string name="dummyCompany2">Planet Earth Company</string>
+    <string name="typemessage">Type a message...</string>
+    <string name="dummylastseen2">Seen long time ago</string>
+    <string name="SharingSettings">SHARING SETTINGS</string>
+    <string name="ButtonChat">Button Chat</string>
+    <string name="Delivered">Delivered</string>
+    <string name="editphoto">edit photo</string>
+
+    <!--Search bar content -->
+
+    <string name="search_bar_text">Search (name, company, email)</string>
+    <string name="search_bar_cancel_button">Cancel</string>
+    <string name="Settings">Settings</string>
+    <string name="Profile">Profile</string>
+
+    <!-- Settings and Profile-->
+    <string name="settings_vacation_time_activity_title">"Vacation Time"</string>
+    <string name="settings_switch_label_schedule">"Schedule"</string>
+    <string name="settings_vacation_time_text"> Scheduling Vacation Time will ask that you set the start and end dates for your vacation. At the time of your return trip your status will return to normal. </string>
+    <string name="settings_label_vacation_time_ends">Ends</string>
+    <string name="settings_label_vacation_time_not_set">Not Set</string>
 
 </resources>

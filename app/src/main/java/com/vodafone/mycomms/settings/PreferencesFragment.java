@@ -13,7 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
@@ -47,6 +49,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
     private OnFragmentInteractionListener mListener;
     private ProfileController profileController;
+    private boolean isSourceDB = true;
 
     /**
      * Use this factory method to create a new instance of
@@ -89,8 +92,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         }
         profileController = new ProfileController(this);
         profileController.setConnectionCallback(this);
-
-
     }
 
     @Override
@@ -100,6 +101,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 //        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
 //        editProfile.setVisibility(View.INVISIBLE);
 
+        profileController.setConnectionCallback(this);
         profileController.getProfile();
     }
 
@@ -108,7 +110,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_preferences, container, false);
-
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {
@@ -137,11 +138,22 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             }
         });
 
+        LinearLayout vacationTimeButton = (LinearLayout) v.findViewById(R.id.button_settings_vacation_time);
+        vacationTimeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(getActivity(), VacationTimeSetterActivity.class);
+                startActivity(in);
+            }
+        });
+
         Switch privateTimeZoneSwitch = (Switch) v.findViewById(R.id.setting_share_current_time_switch);
         privateTimeZoneSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                shareCurrentTime(isChecked);
+                if (!isSourceDB) {
+                    shareCurrentTime(isChecked);
+                }
             }
         });
 
@@ -149,10 +161,12 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         doNotDisturbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                setDoNotDisturb(isChecked);
+                if (!isSourceDB) {
+                    setDoNotDisturb(isChecked);
+                }
+                isSourceDB = false;
             }
         });
-
 
         return v;
     }
@@ -160,9 +174,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private void shareCurrentTime(boolean isChecked) {
         HashMap settingsHashMap = new HashMap<>();
         if(isChecked) {
-            settingsHashMap.put("privateTimeZone", false);
+            settingsHashMap.put(Constants.PROFILE_PRIVATE_TIMEZONE, false);
         }else{
-            settingsHashMap.put("privateTimeZone", true);
+            settingsHashMap.put(Constants.PROFILE_PRIVATE_TIMEZONE, true);
         }
 
         profileController.updateSettingsData(settingsHashMap);
@@ -172,9 +186,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private void setDoNotDisturb(boolean isChecked) {
         HashMap settingsHashMap = new HashMap<>();
         if(isChecked) {
-            settingsHashMap.put("doNotDisturb", true);
+            settingsHashMap.put(Constants.PROFILE_DONOTDISTURB, true);
         }else{
-            settingsHashMap.put("doNotDisturb", false);
+            settingsHashMap.put(Constants.PROFILE_DONOTDISTURB, false);
         }
 
         profileController.updateSettingsData(settingsHashMap);
@@ -197,26 +211,57 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         mListener = null;
     }
 
+    public void onStop(){
+        super.onStop();
+    }
+
+
     @Override
     public void onProfileReceived(UserProfile userProfile) {
         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: settings:" + userProfile.getSettings() );
+
 
         JSONObject jsonSettings = null;
         boolean privateTimeZone = false;
         boolean doNotDisturb = false;
 
+        try{
+            if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
+                jsonSettings = new JSONObject(userProfile.getSettings());
+                String holidayEndDate = jsonSettings.getString(Constants.PROFILE_HOLIDAY_END_DATE);
+                Boolean isOnHoliday = jsonSettings.getBoolean(Constants.PROFILE_HOLIDAY);
+
+                TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+                if(holidayEndDate != null && holidayEndDate.length() >0){
+                   vacationTimeEnds.setText(Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate));
+                }
+            }
+        } catch (Exception e){
+            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: ");
+        }
+
         try {
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
                 jsonSettings = new JSONObject(userProfile.getSettings());
-                privateTimeZone = jsonSettings.getBoolean("privateTimeZone");
+                if (jsonSettings.isNull(Constants.PROFILE_PRIVATE_TIMEZONE)){
+                    privateTimeZone = true;
+                } else{
+                    //TODO: Check if this is False (if true is null according To Apiary
+                    privateTimeZone = jsonSettings.getBoolean(Constants.PROFILE_PRIVATE_TIMEZONE);
+                }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: " , e);
+            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: timezone " , e);
         }
 
         try {
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0 && jsonSettings != null) {
-                doNotDisturb = jsonSettings.getBoolean("doNotDisturb");
+                if (jsonSettings.isNull(Constants.PROFILE_DONOTDISTURB)){
+                    doNotDisturb = true;
+                } else{
+                    //TODO: Check if this is False (if true is null according To Apiary
+                    doNotDisturb = jsonSettings.getBoolean(Constants.PROFILE_DONOTDISTURB);
+                }
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived, doNotDisturb: " , e);
@@ -285,6 +330,12 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         public void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public void onPause(){
+        super.onPause();
+        profileController.setConnectionCallback(null);
+        Log.d(Constants.TAG, "PreferencesFragment.onPause: ");
 
+    }
 
 }

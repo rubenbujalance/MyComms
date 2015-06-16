@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.settings;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -25,7 +26,7 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.layout_profile_activity);
         activateToolbar();
-        //setToolbarTitle("Andrew Wiggins");
+        setToolbarTitle("Settings");
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
@@ -42,6 +43,7 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
                 finish();
             }
         });
+
     }
 
     @Override
@@ -58,5 +60,10 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
 
     @Override
     public void onFragmentInteraction(Uri uri) {
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -18,7 +18,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -31,8 +30,8 @@ import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.RefreshContactListEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
 
@@ -209,34 +208,48 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     private void populateTabStrip() {
-        final PagerAdapter adapter = mViewPager.getAdapter();
         final OnClickListener tabClickListener = new TabClickListener();
 
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
 
-        for (int i = 0; i < adapter.getCount(); i++) {
-            View tabView = null;
-            TextView tabTitleView = null;
+        String actividad = String.valueOf(getContext());
+        String[] auxactivity = actividad.split("@");
 
-            if (mTabViewLayoutId != 0) {
-                // If there is a custom tab view layout id set, try and inflate it
-                tabView = LayoutInflater.from(getContext()).inflate(mTabViewLayoutId, mTabStrip,
-                        false);
-                tabTitleView = (TextView) tabView.findViewById(mTabViewTextViewId);
-            }
+        Log.i(Constants.TAG, "###" + auxactivity[0]);
 
-            if (tabView == null) {
-                tabView = createDefaultTabView(getContext());
-            }
+        if (auxactivity[0].equals("com.vodafone.mycomms.ContactListMainActivity")) {
 
-            if (tabTitleView == null && TextView.class.isInstance(tabView)) {
-                tabTitleView = (TextView) tabView;
-            }
-
-            tabTitleView.setText(adapter.getPageTitle(i));
+            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_favourites, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
-
             mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 3;
+
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_recents, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 3;
+
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_contacts, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 3;
+
+        } else if (auxactivity[0].equals("com.vodafone.mycomms.settings.SettingsMainActivity")) {
+            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_profile, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 2;
+
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_settings, mTabStrip, false);
+            tabView.setOnClickListener(tabClickListener);
+            mTabStrip.addView(tabView);
+            tabView.getLayoutParams().width = width / 2;
         }
+
     }
 
     @Override
@@ -327,7 +340,5 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
         }
     }
-
-
 
 }

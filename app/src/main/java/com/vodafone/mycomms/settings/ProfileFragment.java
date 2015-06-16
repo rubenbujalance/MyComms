@@ -1,7 +1,15 @@
 package com.vodafone.mycomms.settings;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -9,25 +17,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
-import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
-import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.File;
 import java.util.HashMap;
 
 import model.UserProfile;
@@ -49,6 +55,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private final int REQUEST_CAMERA = 0;
+    private final int SELECT_FILE = 1;
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static int RESULT_LOAD_IMAGE = 1;
+    private static int TAKE_OR_PICK = 0;
+    private static int RESULT_OK = 1;
+
     // TODO: Rename and change types of parameters
     private int mIndex;
     private String mParam2;
@@ -58,6 +72,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private OnFragmentInteractionListener mListener;
     private ProfileController profileController;
     private boolean isUpdating = false;
+
+    private ImageView profilePicture;
+    private TextView textAvatar;
+    private TextView editPhoto;
+    private TextView editProfile;
 
     // TODO: Rename and change types of parameters
     public static ProfileFragment newInstance(int index, String param2) {
@@ -74,27 +93,37 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        View v = inflater.inflate(R.layout.layout_fragment_profile, container, false);
 
        initSpinners(v);
-       TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+       editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
        editProfile.setVisibility(View.VISIBLE);
+       profilePicture = (ImageView) v.findViewById(R.id.profile_picture);
+       textAvatar = (TextView) v.findViewById(R.id.avatarText);
 
        Log.i(Constants.TAG, "ProfileFragment.onCreateView: ");
        editProfile.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile ");
-
+               Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
+               profileEditMode(isEditing);
                if (isEditing && !isUpdating) {
                    //TODO verify if details have actually changed and send update accordingly
                    isUpdating = updateContactData();
                    if (!isUpdating) {
                        return;
                    }
-               }else if(!isEditing && !isUpdating){
+               } else if (!isEditing && !isUpdating) {
                    isEditing = !isEditing;
-                    profileEditMode(isEditing);
+                   profileEditMode(isEditing);
                }
+           }
+       });
 
-
+       editPhoto = (TextView) v.findViewById(R.id.edit_photo);
+       editPhoto.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               //TODO: Do things
+               //Take Picture or Camera Roll
+               //selectImage();
            }
        });
        return v;
@@ -116,15 +145,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0)){
             profileController.showToast("Passwords don't match");
             return false;
-        }else if( password != null && password.length() >= 0 && repeatPassword != null && repeatPassword.length() >= 0 && !password.equals(repeatPassword)){
+        }else if( password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0 && !password.equals(repeatPassword)){
             profileController.showToast("Passwords don't match");
             return false;
-        }else if(password != null && password.length() >= 0 && repeatPassword != null && repeatPassword.length() >= 0  && password.equals(repeatPassword) ){
+        }else if(password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0  && password.equals(repeatPassword) ){
             HashMap newPasswordHashMap = new HashMap<>();
             newPasswordHashMap.put("password", password);
             profileController.updatePassword(newPasswordHashMap);
         }
-
 
         String name = ((EditText) getActivity().findViewById(R.id.profile_name)).getText().toString();
         String surname = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
@@ -159,27 +187,27 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private void profileEditMode(boolean isEditing) {
         Log.i(Constants.TAG, "ProfileFragment.profileEditMode: " + isEditing);
-        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-        TextView editPhoto = (TextView) getActivity().findViewById(R.id.edit_photo);
+
         LinearLayout passwordLayout = (LinearLayout) getActivity().findViewById(R.id.password_layout);
         if (isEditing){
             passwordLayout.setVisibility(View.VISIBLE);
-            editProfile.setText("Done");
+            editProfile.setText(getActivity().getString(R.string.profile_edit_mode_done));
             editPhoto.setVisibility(View.VISIBLE);
 
         }else{
-            editProfile.setText("Edit");
+            editProfile.setText(getActivity().getString(R.string.profile_edit_mode_edit));
             editPhoto.setVisibility(View.GONE);
             passwordLayout.setVisibility(View.GONE);
         }
+
         EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
         profileName.setEnabled(isEditing);
         EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
         profileSurname.setEnabled(isEditing);
-        EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
-        profilePhoneNumber.setEnabled(isEditing);
-        EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
-        profileEmail.setEnabled(isEditing);
+       // EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
+       // profilePhoneNumber.setEnabled(isEditing);
+       // EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
+      //  profileEmail.setEnabled(isEditing);
         EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
         profileCompany.setEnabled(isEditing);
         EditText profilePosition = (EditText) getActivity().findViewById(R.id.contact_position);
@@ -196,6 +224,66 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         password.setEnabled(isEditing);
         EditText repeatPassword = (EditText) getActivity().findViewById(R.id.profile_password_repeat);
         repeatPassword.setEnabled(isEditing);
+    }
+
+    private void selectImage() {
+        final CharSequence[] items = { "Take Photo", "Choose from Library",
+                "Cancel" };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Add Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals("Take Photo")) {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, REQUEST_CAMERA);
+                } else if (items[item].equals("Choose from Library")) {
+                    /*Intent intent = new Intent(
+                            Intent.ACTION_PICK,
+                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image*//*");
+                    startActivityForResult(
+                            Intent.createChooser(intent, "Select File"),
+                            SELECT_FILE);*/
+                    String IMAGE_TYPE = "image/*";
+                    Intent intent = new Intent();
+                    intent.setType(IMAGE_TYPE);
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent,
+                            "Select Picture"), RESULT_LOAD_IMAGE);
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // if taking
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode != 0) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            // my ImageView
+            profilePicture.setImageBitmap(imageBitmap);
+
+            // if choosing
+        } else if (requestCode == RESULT_LOAD_IMAGE && resultCode != 0) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+            Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            // my ImageView
+            profilePicture.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+        }
     }
 
     private void initSpinners(View v) {
@@ -219,6 +307,25 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // Apply the adapter to the spinner
             spinnerEmail.setAdapter(adapter);
+        }
+    }
+
+    private void loadProfileImage(UserProfile userProfile) {
+        File avatarFile = null;
+        String profileId = userProfile.getId();
+
+        if (profileId!=null && !profileId.equals(""))
+            avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+profileId+".jpg");
+
+        if (avatarFile!= null && avatarFile.exists()) {
+            Picasso.with(getActivity())
+                    .load(avatarFile)
+                    .into(profilePicture);
+        } else{
+            String initials = userProfile.getFirstName().substring(0,1) +
+                    userProfile.getLastName().substring(0,1);
+            profilePicture.setImageResource(R.color.grey_middle);
+            textAvatar.setText(initials);
         }
     }
 
@@ -257,6 +364,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 //        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
 //        editProfile.setVisibility(View.VISIBLE);
 
+        profileController.setConnectionCallback(this);
         profileController.getProfile();
     }
 
@@ -278,6 +386,17 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     }
 
     @Override
+    public void onPause(){
+        super.onPause();
+        profileController.setConnectionCallback(null);
+        Log.d(Constants.TAG, "ProfileFragment.onPause: ");
+
+    }
+
+
+
+
+    @Override
     public void onProfileReceived(UserProfile userProfile) {
         if(userProfile != null) {
             Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
@@ -286,10 +405,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
             profileSurname.setText(userProfile.getLastName());
             EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
-            String phone = Utils.getElementFromJsonArrayString(userProfile.getPhones(), "phone");
+            String phone = Utils.getElementFromJsonArrayString(userProfile.getPhones(), Constants.PROFILE_PHONE);
             profilePhoneNumber.setText(phone);
             EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
-            String email = Utils.getElementFromJsonArrayString(userProfile.getEmails(), "email");
+            String email = Utils.getElementFromJsonArrayString(userProfile.getEmails(), Constants.PROFILE_EMAIL);
             profileEmail.setText(email);
             EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
             profileCompany.setText(userProfile.getCompany());
@@ -303,6 +422,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileOfficeLocation.setText(userProfile.getOfficeLocation());
 //            EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
 //            profileInfo.setText("????????");
+            loadProfileImage(userProfile);
         }
     }
 
@@ -345,7 +465,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     @Override
     public void onConnectionNotAvailable() {
         Log.w(Constants.TAG, "ProfileFragment.onConnectionNotAvailable: ");
-        Toast.makeText(getActivity().getApplicationContext(), "Connection not available" ,Toast.LENGTH_LONG);
+        Toast.makeText(getActivity().getApplicationContext(), "Connection not available", Toast.LENGTH_LONG);
         profileController.showToast("Connection not available");
     }
 

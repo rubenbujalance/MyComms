@@ -1,29 +1,28 @@
 package com.vodafone.mycomms.contacts.view;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshContactListEvent;
 import com.vodafone.mycomms.events.RefreshFavouritesEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
-import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import java.util.ArrayList;
@@ -41,6 +40,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     private ContactListFragment contactListFragment;
     private ContactListFragment contactRecentListFragment;
     private ContactListFragment contactFavouritesListFragment;
+    private String mProfileId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -50,8 +50,11 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sp = getActivity().getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(this,realm);
+        mContactController = new ContactController(this,realm, mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
         mContactController.getContactList(apiCall);
         mContactController.setConnectionCallback(this);
@@ -65,6 +68,18 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mViewPager.setAdapter(new ContactListPagerAdapter(getFragmentManager()));
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
+
+        //This sets default tab
+        if (savedInstanceState == null) {
+            Bundle extras = getActivity().getIntent().getExtras();
+            if(extras == null) {
+                mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+            } else {
+                mViewPager.setCurrentItem(Constants.CONTACTS_FAVOURITE);
+            }
+        } else {
+            mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+        }
     }
 
     @Override
@@ -151,6 +166,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
                 mContactController.getRecentList(apiCall);
             }
         }else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
+
             setListsAdapter();
             apiCall = Constants.CONTACT_API_GET_FAVOURITES;
             mContactController.getFavouritesList(apiCall);

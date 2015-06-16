@@ -1,27 +1,21 @@
 package com.vodafone.mycomms;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.SetConnectionLayoutVisibility;
-import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
 import com.vodafone.mycomms.settings.ProfileController;
-import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
+import com.vodafone.mycomms.settings.connection.ISessionConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
-import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
-public class ContactListMainActivity extends ToolbarActivity implements IProfileConnectionCallback, ContactListFragment.OnFragmentInteractionListener {
+public class ContactListMainActivity extends ToolbarActivity implements ContactListFragment.OnFragmentInteractionListener, ISessionConnectionCallback {
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     private LinearLayout noConnectionLayout;
@@ -35,17 +29,21 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         setContentView(R.layout.layout_main_activity);
         noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
         activateContactListToolbar();
-        setToolbarTitle("Contacts");
+        setToolbarTitle("Username");
         activateFooter();
 
         setFooterListeners(this);
         setContactsListeners(this);
 
+        //profileController = new ProfileController(this);
+
         //Save profile_id if accessToken has changed
-        String profile_id = validateAccessToken();
+        //String profile_id = validateAccessToken();
+
+        //String deviceId = setDeviceId();
 
         //Initialize messaging server session (needs the profile_id saved)
-        if(profile_id != null) //If null, do initialization in callback method
+        //if(profile_id != null) //If null, do initialization in callback method
             XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if (savedInstanceState == null) {
@@ -97,67 +95,6 @@ public class ContactListMainActivity extends ToolbarActivity implements IProfile
         } else{
             noConnectionLayout.setVisibility(View.VISIBLE);
         }
-    }
-
-    private String validateAccessToken(){
-        Log.i(Constants.TAG, "ContactListMainActivity.validateAccessToken: ");
-        String accessToken = UserSecurity.getAccessToken(this);
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
-        String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
-        if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
-            profileController = new ProfileController(this);
-            profileController.setConnectionCallback(this);
-            profileController.getProfile();
-            
-            return null;
-        }
-        else {
-            return sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        }
-    }
-
-    @Subscribe
-    public void setNoConnectionLayoutVisibility(SetNoConnectionLayoutVisibility event){
-        setConnectionLayoutVisibility(false);
-    }
-
-    @Subscribe
-    public void setConnectionLayoutVisibility(SetConnectionLayoutVisibility event){
-        setConnectionLayoutVisibility(true);
-    }
-
-    @Override
-    public void onProfileReceived(model.UserProfile userProfile) {
-        Log.i(Constants.TAG, "ContactListMainActivity.onProfileReceived: ");
-        profileController.setProfileId(userProfile.getId());
-
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
-    }
-
-    @Override
-    public void onProfileConnectionError() {
-        Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
-        finish();
-    }
-
-    @Override
-    public void onUpdateProfileConnectionError() {
-
-    }
-
-    @Override
-    public void onUpdateProfileConnectionCompleted() {
-
-    }
-
-    @Override
-    public void onPasswordChangeError(String error) {
-    }
-
-    @Override
-    public void onPasswordChangeCompleted() {
     }
 
     @Override

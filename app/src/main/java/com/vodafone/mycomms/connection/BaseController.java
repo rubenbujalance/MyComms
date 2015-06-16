@@ -6,18 +6,13 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.caterpillar.connection.RemoteConnection;
-import com.framework.library.connection.HttpConnection;
 import com.framework.library.controller.Controller;
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.token.AuthRenewConnection;
 import com.vodafone.mycomms.login.LoginActivity;
-import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
-
-import org.json.JSONObject;
 
 /**
  * Created by str_vig on 14/05/2015.
@@ -93,8 +88,9 @@ public class BaseController extends Controller {
         return connectionCallback;
     }
 
-    public void setConnectionCallback(IConnectionCallback connectionCallback) {
+    public String setConnectionCallback(IConnectionCallback connectionCallback) {
         this.connectionCallback = connectionCallback;
+        return null;
     }
 
     public void showToast(String stringToShow) {

@@ -15,7 +15,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
-import com.vodafone.mycomms.ContactListMainActivity;
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.util.APIWrapper;
@@ -27,6 +27,8 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -42,6 +44,7 @@ public class SplashScreenActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         setContentView(R.layout.splash_screen);
         mContext = this;
@@ -68,7 +71,7 @@ public class SplashScreenActivity extends Activity {
             if (!APIWrapper.isConnected(this)) {
                 if (UserSecurity.isUserLogged(this)) {
                     if (!UserSecurity.hasExpired(this)) {
-                        Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                         startActivity(in);
                         finish();
                     }
@@ -114,7 +117,7 @@ public class SplashScreenActivity extends Activity {
                     if (UserSecurity.hasExpired(this)) {
                         renewToken();
                     } else {
-                        Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                         startActivity(in);
                         finish();
                     }
@@ -191,7 +194,7 @@ public class SplashScreenActivity extends Activity {
                 UserSecurity.setTokens(accessToken, null, expiresIn, this);
 
                 //Go to app
-                Intent in = new Intent(SplashScreenActivity.this, ContactListMainActivity.class);
+                Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                 startActivity(in);
                 finish();
             }
@@ -257,6 +260,17 @@ public class SplashScreenActivity extends Activity {
 
     //Async Tasks
     private class RenewTokenAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+        @Override
+        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
+            return APIWrapper.httpPostAPI("/auth/renew", params[0], params[1], SplashScreenActivity.this);
+        }
+        @Override
+        protected void onPostExecute(HashMap<String,Object> result) {
+            callBackRenewToken(result);
+        }
+    }
+
+    private class ProfileAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
         @Override
         protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
             return APIWrapper.httpPostAPI("/auth/renew", params[0], params[1], SplashScreenActivity.this);

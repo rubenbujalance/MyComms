@@ -17,12 +17,14 @@ public class RecentContact extends RealmObject {
     private String position;
     private String company;
     private String timezone;
-    private int lastSeen;
+    private long lastSeen;
     private String officeLocation;
     private String availability;
     private String presence;
     private String country;
     private String id;
+    private String profileId;
+    private String contactId;
 
     private String action;
     private long timestamp;
@@ -31,8 +33,10 @@ public class RecentContact extends RealmObject {
 
     }
 
-    public RecentContact(String uniqueId, int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country, String id, String action, int timestamp) {
+    public RecentContact(String uniqueId, String profileId, String contactId, int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, long lastSeen, String officeLocation, String availability, String presence, String country, String action, int timestamp) {
         this.uniqueId = uniqueId;
+        this.profileId = profileId;
+        this.contactId = contactId;
         this.lastInteraction = lastInteraction;
         this.platform = platform;
         this.firstName = firstName;
@@ -48,7 +52,6 @@ public class RecentContact extends RealmObject {
         this.availability = availability;
         this.presence = presence;
         this.country = country;
-        this.id = id;
         this.action = action;
         this.timestamp = timestamp;
     }
@@ -59,6 +62,22 @@ public class RecentContact extends RealmObject {
 
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
+    }
+
+    public String getProfileId() {
+        return profileId;
+    }
+
+    public void setProfileId(String profileId) {
+        this.profileId = profileId;
+    }
+
+    public String getContactId() {
+        return contactId;
+    }
+
+    public void setContactId(String contactId) {
+        this.contactId = contactId;
     }
 
     public int getLastInteraction() {
@@ -141,11 +160,11 @@ public class RecentContact extends RealmObject {
         this.timezone = timezone;
     }
 
-    public int getLastSeen() {
+    public long getLastSeen() {
         return lastSeen;
     }
 
-    public void setLastSeen(int lastSeen) {
+    public void setLastSeen(long lastSeen) {
         this.lastSeen = lastSeen;
     }
 

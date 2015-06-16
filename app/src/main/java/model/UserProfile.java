@@ -1,14 +1,8 @@
 package model;
 
-
-import java.util.HashMap;
-
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-/**
- * Created by str_vig on 27/05/2015.
- */
 public class UserProfile extends RealmObject{
     private String settings;
     private String platforms;
@@ -173,7 +167,9 @@ public class UserProfile extends RealmObject{
         this.country = country;
         this.settings = settings;
         this.platforms = platforms;
+
     }
+
 
 
     public String getSettings() {

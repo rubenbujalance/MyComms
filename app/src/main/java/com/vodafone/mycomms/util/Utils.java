@@ -2,22 +2,19 @@ package com.vodafone.mycomms.util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
 
 import com.vodafone.mycomms.R;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.lang.reflect.Method;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,8 +23,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -184,7 +180,7 @@ public final class Utils extends Activity {
 //                        sendIntent.putExtra("sms_body", x);
         context.startActivity(sendIntent);
     }
-
+    
     public static String getStringTimeDifference(int millis){
         long timeDiffMilis = millis;
         long minutes = timeDiffMilis / 60000;
@@ -201,12 +197,8 @@ public final class Utils extends Activity {
     /*
     * Returns the unique device ID: IMEI for GSM and the MEID or ESN for CDMA phones.
     */
-    public String getImei() {
-        TelephonyManager   telephonyManager  =  ( TelephonyManager
-                )getSystemService( Context.TELEPHONY_SERVICE );
-
+    public static String getImei(TelephonyManager telephonyManager) {
         String imeistring = telephonyManager.getDeviceId();
-
 
         return imeistring;
     }
@@ -226,7 +218,7 @@ public final class Utils extends Activity {
     /*
     * Returns the unique device ID: HardwareID
     */
-    public String getHardWareId() {
+    public static String getHardWareId() {
         String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
 
         return hwID;
@@ -235,7 +227,7 @@ public final class Utils extends Activity {
     /*
     * Returns the unique device ID: SerialNumber
     */
-    public String getSerialId() {
+    public static String getSerialId() {
         String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
 
         String serialnum = null;
@@ -253,8 +245,8 @@ public final class Utils extends Activity {
     /*
     * Returns Settings.Secure.ANDROID_ID returns the unique DeviceID
     */
-    public String getAndroidId() {
-        String androidId = Settings.Secure.getString(getContentResolver(),
+    public static String getAndroidId(ContentResolver contentResolver) {
+        String androidId = Settings.Secure.getString(contentResolver,
                 Settings.Secure.ANDROID_ID);
 
         return androidId;
@@ -263,13 +255,13 @@ public final class Utils extends Activity {
     /*
     * Returns the unique DeviceID
     */
-    public String getDeviceId() {
-        if (getImei() != null) {
-            return getImei();
+    public static String getDeviceId(ContentResolver contentResolver, TelephonyManager telephonyManager) {
+        if (getImei(telephonyManager) != null) {
+            return getImei(telephonyManager);
         } else if (getSerialId() != null) {
             return getSerialId();
         } else {
-            return getAndroidId();
+            return getAndroidId(contentResolver);
         }
     }
 

@@ -14,7 +14,7 @@ import com.vodafone.mycomms.util.Constants;
 public class RecentContactConnection extends BaseConnection{
 
     public RecentContactConnection(Context context, ConnectionInterfaces.ConnectionListener listener, int method, String URL){
-        super(URL, context, listener, method);
+        super(URL, context, listener, method, false);
         Log.i(Constants.TAG, "RecentContactConnection.RecentContactConnection: ");
     }
 }

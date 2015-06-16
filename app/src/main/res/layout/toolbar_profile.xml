@@ -6,10 +6,10 @@
     android:layout_height="?actionBarSize"
     mycomms:contentInsetEnd="0dp"
     mycomms:contentInsetStart="0dp"
-    mycomms:theme="@style/ActionBarThemeOverlay"
     android:gravity="top"
-    android:background="@color/grey_toolbar"
-    mycomms:titleTextAppearance="@style/ActionBar.TitleText">
+    mycomms:titleTextAppearance="@style/ActionBar.TitleText"
+    android:background="@color/toolbar_selected_item"
+    mycomms:theme="@style/ActionBarThemeOverlay">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -35,19 +35,21 @@
             android:textSize="22sp"
             android:gravity="center"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/edit_profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
-            android:text="Edit"
+            android:text="@string/Edit"
             android:background="@android:color/transparent"
             android:textSize="22sp"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/white" />
     </RelativeLayout>
 
 </android.support.v7.widget.Toolbar>

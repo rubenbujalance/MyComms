@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -16,9 +17,6 @@ import model.Chat;
 import model.ChatMessage;
 import model.Contact;
 
-/**
- * Created by AMG on 12/05/2015.
- */
 public class RealmChatTransactions {
     private Realm mRealm;
     private String _profile_id;
@@ -46,12 +44,12 @@ public class RealmChatTransactions {
     //CONSTRUCTORS
 
     public ChatMessage newChatMessageInstance(String contact_id, String direction,
-                                       int type, String text, String resourceUri)
+                                              int type, String text, String resourceUri)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,timestamp,
-                                    direction,type,text,resourceUri,"0","0");
+                direction,type,text,resourceUri,"0","0");
 
         return chatMessage;
     }
@@ -70,7 +68,10 @@ public class RealmChatTransactions {
             //Update associated Chat with new last message
             Chat chat = getChatById(newChatMessage.getContact_id());
             chat.setLastMessage_id(newChatMessage.getId());
-            chat.setLastMessage(newChatMessage.getText());
+            if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
+                chat.setLastMessage(mContext.getResources().getString(R.string.chat_me_text) + newChatMessage.getText());
+            else
+                chat.setLastMessage(newChatMessage.getText());
             chat.setLastMessageTime(newChatMessage.getTimestamp());
             mRealm.commitTransaction();
 
@@ -271,7 +272,7 @@ public class RealmChatTransactions {
 
     public Chat newChatInstance(String contact_id)
     {
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, _profile_id);
         Contact contact = realmContactTransactions.getContactById(contact_id);
         Chat chat = new Chat(_profile_id, contact_id, contact.getFirstName(), contact.getLastName(),"","",0);
 
@@ -289,7 +290,6 @@ public class RealmChatTransactions {
 
     public void insertChat (Chat newChat){
         if(newChat==null) return;
-
         try {
             mRealm.beginTransaction();
             mRealm.copyToRealmOrUpdate(newChat);
@@ -476,4 +476,3 @@ public class RealmChatTransactions {
     }
 
 }
-

@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.view.tab.SlidingTabLayout;
+import com.vodafone.mycomms.view.tab.SlidingTabLayoutPreferences;
 
 public class ProfileListPagerFragment extends Fragment implements ProfileFragment.OnFragmentInteractionListener {
 
-    private SlidingTabLayout mSlidingTabLayout;
+    private SlidingTabLayoutPreferences mSlidingTabLayout;
     private ViewPager mViewPager;
 
     @Override
@@ -29,10 +29,10 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mViewPager = (ViewPager) view.findViewById(R.id.viewpager);
         mViewPager.setAdapter(new ProfileListPagerAdapter(getFragmentManager()));
-        mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
+        mSlidingTabLayout = (SlidingTabLayoutPreferences) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
         //This sets default tab
-        mViewPager.setCurrentItem(Constants.MY_PROFILE);
+        mViewPager.setCurrentItem(Constants.MY_SETTINGS);
     }
 
     @Override
@@ -54,20 +54,16 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
             Fragment fragment = null;
             TextView editProfile = null;
             switch (position){
-                case Constants.PREFERENCES:
+                case Constants.MY_SETTINGS:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     PreferencesFragment preferencesFragment = PreferencesFragment.newInstance(position, "whatever");
                     fragment = preferencesFragment;
-                    editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-                    editProfile.setVisibility(View.INVISIBLE);
 
                     break;
                 case Constants.MY_PROFILE:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     ProfileFragment profileFragment = ProfileFragment.newInstance(position, "whatever");
                     fragment = profileFragment;
-                    editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-                    editProfile.setVisibility(View.VISIBLE);
 
                     break;
                 default:
@@ -78,7 +74,7 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if(position == Constants.PREFERENCES)
+            if(position == Constants.MY_SETTINGS)
                 return getString(R.string.profile_list_tab_preferences);
             //else if (position == Constants.ACCOUNTS)
             //    return getString(R.string.profile_list_tab_accounts);

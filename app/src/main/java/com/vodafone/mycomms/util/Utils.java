@@ -312,7 +312,6 @@ public final class Utils extends Activity {
                 if(key == null || key.length() <= 0 || value == null || value.length() <= 0){
                     return false;
                 }
-              //  it.remove(); // avoids a ConcurrentModificationException
             }catch(Exception e){
                 return false;
             }

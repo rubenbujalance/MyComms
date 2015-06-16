@@ -1,11 +1,11 @@
-package com.vodafone.mycomms.main;
+package com.vodafone.mycomms.settings;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.util.Constants;
@@ -22,22 +22,20 @@ public class AboutActivity  extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         BusProvider.getInstance().register(this);
         setContentView(R.layout.layout_about);
+        ;
         noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
-
-        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
-        ivBtBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
+        TextView textVersion = (TextView) findViewById(R.id.text_version);
+        textVersion.setText(getResources().getString(R.string.about_version) + BuildConfig.VERSION_NAME);
+        TextView textBuild = (TextView) findViewById(R.id.text_build);
+        String versionCode = String.valueOf(BuildConfig.VERSION_CODE);
+        textBuild.setText(getResources().getString(R.string.about_build) + versionCode);
     }
 
     //Prevent of going from main screen back to login
     @Override
     public void onBackPressed() {
-        moveTaskToBack(true);
+        //moveTaskToBack(true);
+        finish();
     }
 
     @Override
@@ -58,4 +56,5 @@ public class AboutActivity  extends ToolbarActivity {
         // Disconnect from the XMPP server
         XMPPTransactions.disconnectMsgServerSession();
     }
+
 }

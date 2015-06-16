@@ -29,7 +29,6 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
-import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.connection.SearchController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
@@ -130,7 +129,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        
+
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -219,10 +218,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                             Utils.launchEmail(email, getActivity());
                         }
                     }
-                    //ADD RECENT
-                    RecentContactController recentController = new RecentContactController(this,realm,profileId);
-                    recentController.insertRecent(recentContactList.get(position).getContactId(), action);
-                    setListAdapterTabs();
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);
                 }

@@ -32,7 +32,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.SetContactListAdapterEvent;
+import com.vodafone.mycomms.events.EnableEditProfileEvent;
 import com.vodafone.mycomms.util.Constants;
 
 /**
@@ -41,7 +41,7 @@ import com.vodafone.mycomms.util.Constants;
  * <p>
  * To use the component, simply add it to your view hierarchy. Then in your
  * {@link android.app.Activity} or {@link android.support.v4.app.Fragment} call
- * {@link #setViewPager(android.support.v4.view.ViewPager)} providing it the ViewPager this layout is being used for.
+ * {@link #setViewPager(ViewPager)} providing it the ViewPager this layout is being used for.
  * <p>
  * The colors can be customized in two ways. The first and simplest is to provide an array of colors
  * via {@link #setSelectedIndicatorColors(int...)} and {@link #setDividerColors(int...)}. The
@@ -51,7 +51,7 @@ import com.vodafone.mycomms.util.Constants;
  * The views used as tabs can be customized by calling {@link #setCustomTabView(int, int)},
  * providing the layout ID of your custom layout.
  */
-public class SlidingTabLayout extends HorizontalScrollView {
+public class SlidingTabLayoutPreferences extends HorizontalScrollView {
 
     /**
      * Allows complete control over the colors drawn in the tab layout. Set with
@@ -83,17 +83,17 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
 
-    private final SlidingTabStrip mTabStrip;
+    private final SlidingTabStripPreferences mTabStrip;
 
-    public SlidingTabLayout(Context context) {
+    public SlidingTabLayoutPreferences(Context context) {
         this(context, null);
     }
 
-    public SlidingTabLayout(Context context, AttributeSet attrs) {
+    public SlidingTabLayoutPreferences(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public SlidingTabLayout(Context context, AttributeSet attrs, int defStyle) {
+    public SlidingTabLayoutPreferences(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
         // Disable the Scroll Bar
@@ -103,7 +103,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         mTitleOffset = (int) (TITLE_OFFSET_DIPS * getResources().getDisplayMetrics().density);
 
-        mTabStrip = new SlidingTabStrip(context);
+        mTabStrip = new SlidingTabStripPreferences(context);
         addView(mTabStrip, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
     }
 
@@ -135,11 +135,11 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
     /**
-     * Set the {@link android.support.v4.view.ViewPager.OnPageChangeListener}. When using {@link SlidingTabLayout} you are
-     * required to set any {@link android.support.v4.view.ViewPager.OnPageChangeListener} through this method. This is so
+     * Set the {@link ViewPager.OnPageChangeListener}. When using {@link SlidingTabLayoutPreferences} you are
+     * required to set any {@link ViewPager.OnPageChangeListener} through this method. This is so
      * that the layout can update it's scroll position correctly.
      *
-     * @see android.support.v4.view.ViewPager#setOnPageChangeListener(android.support.v4.view.ViewPager.OnPageChangeListener)
+     * @see ViewPager#setOnPageChangeListener(ViewPager.OnPageChangeListener)
      */
     public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
         mViewPagerPageChangeListener = listener;
@@ -149,7 +149,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
      * Set the custom layout to be inflated for the tab views.
      *
      * @param layoutResId Layout id to be inflated
-     * @param textViewId id of the {@link android.widget.TextView} in the inflated view
+     * @param textViewId id of the {@link TextView} in the inflated view
      */
     public void setCustomTabView(int layoutResId, int textViewId) {
         mTabViewLayoutId = layoutResId;
@@ -223,7 +223,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         if (auxactivity[0].equals("com.vodafone.mycomms.ContactListMainActivity")) {
 
-            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_favourites, mTabStrip, false);
+            /*View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_favourites, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 3;
@@ -236,7 +236,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_contacts, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
-            tabView.getLayoutParams().width = width / 3;
+            tabView.getLayoutParams().width = width / 3;*/
 
         } else if (auxactivity[0].equals("com.vodafone.mycomms.settings.SettingsMainActivity")) {
             View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_settings, mTabStrip, false);
@@ -323,8 +323,16 @@ public class SlidingTabLayout extends HorizontalScrollView {
             if (mViewPagerPageChangeListener != null) {
                 mViewPagerPageChangeListener.onPageSelected(position);
             }
-            Log.i(Constants.TAG, "SlidingTabLayout.onPageSelected: ");
-            BusProvider.getInstance().post(new SetContactListAdapterEvent());
+            boolean enable = false;
+            if (position == 0){
+                enable = false;
+            } else if (position == 1){
+                enable = true;
+            }
+            EnableEditProfileEvent event = new EnableEditProfileEvent();
+            event.setMessage(enable);
+            BusProvider.getInstance().post(event);
+
         }
 
     }

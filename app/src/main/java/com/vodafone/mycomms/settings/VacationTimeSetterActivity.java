@@ -1,7 +1,9 @@
 package com.vodafone.mycomms.settings;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -92,28 +94,21 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
                 ((Switch)VacationTimeSetterActivity.this.findViewById(R.id.switch_vacation_time)).setChecked(false);
             }
         }
-
-/*
-        TextView textViewEdit = (TextView) findViewById(R.id.edit_profile);
-        textViewEdit.setVisibility(View.GONE);
-
-
-        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
-        ivBtBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent resultIntent = new Intent();
-                if(isOnHoliday) {
-                    resultIntent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, holidayEndDate);
-                }else{
-                    resultIntent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, 0L);
-                }
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
-            }
-        });*/
     }
 
+    @Override
+    public void onBackPressed(){
+        Log.d(Constants.TAG, "VacationTimeSetterActivity.onBackPressed: ");
+        Intent resultIntent = new Intent();
+        if(isOnHoliday) {
+            resultIntent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, holidayEndDate);
+        }else{
+            resultIntent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, 0L);
+        }
+        setResult(Activity.RESULT_OK, resultIntent);
+        super.onBackPressed();
+    }
+    
     private DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {

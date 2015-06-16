@@ -15,6 +15,7 @@ import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -96,8 +97,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onProfileReceived(model.UserProfile userProfile) {
         Log.i(Constants.TAG, "MycommsApp.onProfileReceived: ");
         profileController.setUserProfile(userProfile.getId(), userProfile.getFirstName() + " " + userProfile.getLastName());
-        //XMPPTransactions.initializeMsgServerSession(getApplicationContext());
         new DownloadContactsAsyncTask().execute(mContext);
+
+        XMPPTransactions.initializeMsgServerSession(this);
     }
 
     @Override

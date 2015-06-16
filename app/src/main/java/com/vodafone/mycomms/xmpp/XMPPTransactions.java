@@ -20,13 +20,12 @@ import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.NotFilter;
+import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
-import org.jivesoftware.smack.filter.StanzaTypeFilter;
+import org.jivesoftware.smack.filter.ToFilter;
 import org.jivesoftware.smack.packet.DefaultExtensionElement;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.IQProvider;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -52,6 +51,7 @@ public final class XMPPTransactions {
     private static boolean _isConnecting = false;
     private static Context _appContext;
     private static StanzaListener _packetListener;
+    private static StanzaFilter _stanzaFilter;
     private static ConnectionListener _connectionListener;
     private static String _device_id;
 
@@ -110,7 +110,6 @@ public final class XMPPTransactions {
     public static boolean disconnectMsgServerSession()
     {
         try {
-            _xmppConnection.sendStanza(new Presence(Presence.Type.unavailable));
             _xmppConnection.disconnect();
 
         } catch (Exception e) {
@@ -249,14 +248,6 @@ public final class XMPPTransactions {
             //Save connection
             _xmppConnection = conn;
 
-            //Send presence
-            try {
-                _xmppConnection.sendStanza(new Presence(Presence.Type.available));
-            } catch (SmackException.NotConnectedException e) {
-                Log.e(Constants.TAG, "XMPPOpenConnectionTask.doInBackground: ",e);
-                return null;
-            }
-
             //Register the listener for incoming messages
             _packetListener = new StanzaListener() {
                 @Override
@@ -264,21 +255,24 @@ public final class XMPPTransactions {
                 {
                     Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener]: "+packet.getFrom());
 
-                    if(packet instanceof IQ) {
-                        IQ iq = (IQ)packet;
-                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener] (IQ): Type-"+iq.getType()
-                                +"; From-"+iq.getFrom()+"; To-"+iq.getTo());
+//                    if(packet instanceof IQ) {
+//                        IQ iq = (IQ)packet;
+//                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener] (IQ): Type-"+iq.getType()
+//                                +"; From-"+iq.getFrom()+"; To-"+iq.getTo());
+//                    }
+//                    else {
+//                        Message msg = (Message)packet;
+//                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener] (Message): Type-"+msg.getType()
+//                                +"; From-"+msg.getFrom()+"; To-"+msg.getTo()+"; Text-"+msg.getBody());
+//                    }
+
+                    try {
+                        Message msg2 = (Message) packet;
+
+                        Log.w("XMPPClient", "Got text [" + msg2.getBody() + "] from [" + msg2.getFrom() + "]");
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "XMPPOpenConnectionTask.processPacket: ",e);
                     }
-                    else {
-                        Message msg = (Message)packet;
-                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener] (Message): Type-"+msg.getType()
-                                +"; From-"+msg.getFrom()+"; To-"+msg.getTo()+"; Text-"+msg.getBody());
-                    }
-
-                    Message msg2 = (Message)packet;
-
-                    Log.w("XMPPClient", "Got text [" + msg2.getBody() + "] from [" + msg2.getFrom() + "]");
-
 //                        if(msg.getFrom().substring(0, msg.getFrom().indexOf("@")).compareTo(
 //                                _xmppConnection.getUser().substring(0, _xmppConnection.getUser().indexOf("@")))!=0) {
 //
@@ -288,8 +282,9 @@ public final class XMPPTransactions {
                 }
             };
 
-            StanzaFilter filter = new NotFilter(new StanzaTypeFilter(IQ.class));
-            conn.addSyncStanzaListener(_packetListener, filter);
+            _stanzaFilter = new OrFilter(new ToFilter("mc_555a0792121ef1695cc7c1c3"),
+                    new ToFilter("mc_555a0792121ef1695cc7c1c3@my-comms.com"));
+            _xmppConnection.addPacketInterceptor(_packetListener, null);
 
 //            //Add IQ Provider
 //            ProviderManager.addIQProvider("iq", "jabber:client", new MyIQProvider());
@@ -299,7 +294,7 @@ public final class XMPPTransactions {
 //                _extensionProvider = new TestPacketExtension("message", "jabber:client","Prueba de extension");
 //                ProviderManager.addExtensionProvider("message", "jabber:client", _extensionProvider);
 
-            return conn;
+            return _xmppConnection;
         }
 
         @Override

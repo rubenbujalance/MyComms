@@ -8,13 +8,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.squareup.otto.Subscribe;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
@@ -145,7 +143,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
 
     @Override
     public void onContactsResponse(ArrayList<Contact> responseContactList, boolean morePages, int offsetPaging) {
-        Log.i(Constants.TAG, "onContactsResponse: " + apiCall);
+        Log.i(Constants.TAG, "onContactsResponse: " + apiCall + "&o=" + offsetPaging);
 
         if(apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)) {
             setListsAdapter();

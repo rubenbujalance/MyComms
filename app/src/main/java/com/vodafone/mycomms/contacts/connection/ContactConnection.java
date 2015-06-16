@@ -8,12 +8,14 @@ import com.framework.library.connection.HttpConnection;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.util.Constants;
 
+/**
+ * Created by AMG on 18/05/2015.
+ */
 public class ContactConnection extends BaseConnection {
-    private static final String URL = "/api/me/contact?p=mc";
     private static final int method = HttpConnection.GET;
 
     public ContactConnection(Context context, ConnectionInterfaces.ConnectionListener listener, String apiCall){
-        super(URL, context, listener, method, false);
-        Log.i(Constants.TAG, "ContactConnection.ContactConnection");
+        super(apiCall, context, listener, method, false);
+        Log.i(Constants.TAG, "ContactConnection.ContactConnection: " + apiCall);
     }
 }

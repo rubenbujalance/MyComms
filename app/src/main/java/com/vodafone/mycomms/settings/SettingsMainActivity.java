@@ -34,7 +34,6 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
         String profileFullName = sp.getString(Constants.PROFILE_FULLNAME_SHARED_PREF, "");
 
         activateToolbar();
-        setToolbarTitle("Settings");
 
         setToolbarTitle(profileFullName);
 

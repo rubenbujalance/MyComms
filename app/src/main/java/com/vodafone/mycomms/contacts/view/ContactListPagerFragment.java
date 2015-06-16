@@ -66,18 +66,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mViewPager.setAdapter(new ContactListPagerAdapter(getFragmentManager()));
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
-
         //This sets default tab
-        if (savedInstanceState == null) {
-            Bundle extras = getActivity().getIntent().getExtras();
-            if(extras == null) {
-                mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
-            } else {
-                mViewPager.setCurrentItem(Constants.CONTACTS_FAVOURITE);
-            }
-        } else {
-            mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
-        }
+        mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
     }
 
     @Override

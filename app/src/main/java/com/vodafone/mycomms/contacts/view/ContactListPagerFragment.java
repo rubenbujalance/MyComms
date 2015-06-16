@@ -200,6 +200,4 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         setListsAdapter();
     }
 
-
-
 }

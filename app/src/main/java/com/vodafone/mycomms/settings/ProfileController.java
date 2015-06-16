@@ -39,7 +39,7 @@ public class ProfileController extends BaseController {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        realm = Realm.getInstance(getActivity());
+        realm = Realm.getInstance(fragment.getActivity());
         realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
@@ -48,7 +48,16 @@ public class ProfileController extends BaseController {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        realm = Realm.getInstance(getActivity());
+        realm = Realm.getInstance(activity);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+    }
+
+    public ProfileController(Context context) {
+        super(context);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+        realm = Realm.getInstance(context);
         realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 

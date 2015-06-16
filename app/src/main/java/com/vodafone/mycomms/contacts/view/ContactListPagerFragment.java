@@ -54,8 +54,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         realm = Realm.getInstance(getActivity());
         mContactController = new ContactController(this,realm, mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        mContactController.getContactList(apiCall);
-        mContactController.setConnectionCallback(this);
+        //mContactController.getContactList(apiCall);
+        //mContactController.setConnectionCallback(this);
         BusProvider.getInstance().register(this);
         //((ContactListMainActivity)getActivity()).activateContactListToolbar();
     }

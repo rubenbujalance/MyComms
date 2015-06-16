@@ -70,6 +70,14 @@ public class ContactController extends BaseController {
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
+    public ContactController(Context context, Realm realm, String profileId) {
+        super(context);
+        this.mRealm = realm;
+        this.mContext = context;
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+    }
+
     public void getContactList(String api){
         Log.i(Constants.TAG, "ContactController.getContactList: " + api);
         if(contactConnection != null){
@@ -120,8 +128,9 @@ public class ContactController extends BaseController {
                         jsonResponse = new JSONObject(result);
                         JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
                         if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
+                            int pageSize = jsonPagination.getInt(Constants.CONTACT_PAGINATION_PAGESIZE);
                             morePages = true;
-                            offsetPaging = offsetPaging + 1;
+                            offsetPaging = offsetPaging + pageSize;
                             search = Constants.CONTACTS_ALL;
                         } else {
                             search = Constants.CONTACTS_RECENT;

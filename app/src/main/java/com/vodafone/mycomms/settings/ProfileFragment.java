@@ -99,7 +99,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
        initSpinners(v);
        editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-       editProfile.setVisibility(View.VISIBLE);
+       //editProfile.setVisibility(View.VISIBLE);
        profilePicture = (ImageView) v.findViewById(R.id.profile_picture);
        textAvatar = (TextView) v.findViewById(R.id.avatarText);
 

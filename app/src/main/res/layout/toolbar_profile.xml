@@ -43,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:text="@string/Edit"
+            android:visibility="invisible"
             android:background="@android:color/transparent"
             android:textSize="22sp"
             android:layout_centerVertical="true"

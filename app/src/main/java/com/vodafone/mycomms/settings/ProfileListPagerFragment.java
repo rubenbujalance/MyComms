@@ -58,16 +58,12 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     PreferencesFragment preferencesFragment = PreferencesFragment.newInstance(position, "whatever");
                     fragment = preferencesFragment;
-                    editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-                    editProfile.setVisibility(View.INVISIBLE);
 
                     break;
                 case Constants.MY_PROFILE:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
                     ProfileFragment profileFragment = ProfileFragment.newInstance(position, "whatever");
                     fragment = profileFragment;
-                    editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-                    editProfile.setVisibility(View.VISIBLE);
 
                     break;
                 default:

@@ -1,16 +1,21 @@
 package com.vodafone.mycomms.settings;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.IConnectionCallback;
+import com.vodafone.mycomms.settings.connection.ProfileConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
@@ -19,6 +24,8 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+
+import io.fabric.sdk.android.services.settings.SettingsController;
 
 /**
  * Created by str_vig on 10/06/2015.
@@ -39,18 +46,13 @@ public class VacationTimeSetterActivity extends ToolbarActivity implements IConn
         setContentView(R.layout.activity_vacation_time);
 
         activateToolbar();
-        setTitle(getString(R.string.settings_vacation_time_activity_title));
-//        datePickerFragment = new MyCommsDatePickerFragment();
-//        datePickerFragment.setOnDateSetListener(onDateSetListener);
-//        datePickerFragment.setOnCancelListener(onCancelListener);
-
+        setToolbarTitle(getString(R.string.settings_vacation_time_activity_title));
 
         profileController = new ProfileController(this);
         profileController.setConnectionCallback(this);
 
         Switch vacationTimeSwitch = (Switch) findViewById(R.id.switch_vacation_time);
         vacationTimeSwitch.setOnClickListener(new View.OnClickListener() {
-
 
             @Override
             public void onClick(View v) {

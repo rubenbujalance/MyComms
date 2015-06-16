@@ -23,8 +23,16 @@ public class RealmContactTransactions {
         mProfileId = profileId;
     }
 
+
+
+
     public void insertUserProfile(UserProfile userProfile){
-        Log.d(Constants.TAG, "RealmContactTransactions.insertUserProfile: ");
+        Log.d(Constants.TAG, "RealmContactTransactions.insertUserProfile: " + userProfile);
+        if(userProfile == null){
+            Log.e(Constants.TAG, "RealmContactTransactions.insertUserProfile: UserProfile is null!!!!" );
+            return;
+        }
+
         try {
             mRealm.beginTransaction();
             mRealm.copyToRealmOrUpdate(userProfile);

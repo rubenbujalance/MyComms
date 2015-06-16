@@ -79,6 +79,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private TextView textAvatar;
     private TextView editPhoto;
     private TextView editProfile;
+    private boolean isFirstLoad = true;
 
     // TODO: Rename and change types of parameters
     public static ProfileFragment newInstance(int index, String param2) {
@@ -369,7 +370,12 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 //        editProfile.setVisibility(View.VISIBLE);
 
         profileController.setConnectionCallback(this);
-        profileController.getProfile();
+        if(isFirstLoad) {
+            profileController.getProfile(false);
+            isFirstLoad = false;
+        }else {
+            profileController.getProfile(true);
+        }
     }
 
     @Override

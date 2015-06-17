@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
@@ -37,14 +38,7 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
         super.onCreate(savedInstanceState);
 
         BusProvider.getInstance().post(new InitProfileAndContacts());
-
-        mNewsController = new NewsController(this);
-        apiCall = Constants.NEWS_API_GET;
-        //mNewsController.getNewsList(apiCall);
-
-        //mNewsController.setConnectionCallback(this);
-
-        Log.d(Constants.TAG, "###news###");
+        BusProvider.getInstance().post(new InitNews());
 
         BusProvider.getInstance().register(this);
         setContentView(R.layout.layout_dashboard);

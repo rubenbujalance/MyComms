@@ -130,7 +130,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        realm = Realm.getInstance(getActivity());
 
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
@@ -147,11 +146,13 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }else{
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
-
+        Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
+        realm = Realm.getInstance(getActivity());
         mContactController = new ContactController(getActivity(),realm, profileId);
         mSearchController = new SearchController(getActivity(), realm, profileId);
 
         setListAdapterTabs();
+        
     }
 
     @Override
@@ -186,7 +187,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                 if (contactList.get(position).getContactId()!=null && contactList.get(position).getContactId().equals(profileId))
                     in = new Intent(getActivity(), SettingsMainActivity.class);
                 in.putExtra(Constants.CONTACT_CONTACT_ID,contactList.get(position).getContactId() );
-                in.putExtra(Constants.CONTACT_ID,contactList.get(position).getId());
                 startActivity(in);
             } else if (mIndex == Constants.CONTACTS_RECENT) {
                 try {
@@ -220,8 +220,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                         }
                     }
                     //ADD RECENT
-                    RecentContactController recentController = new RecentContactController(getActivity(),
-                            realm,profileId);
+                    RecentContactController recentController = new RecentContactController(this,realm,profileId);
                     recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                     setListAdapterTabs();
                 } catch (Exception ex) {
@@ -521,7 +520,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     private void loadAllContactsFromServer(String keyWord)
     {
-        apiCall = Constants.CONTACT_API_GET_SEARCH_CONTACTS_SF + keyWord;
+        apiCall = Constants.CONTACT_API_GET_SEARCH_CONTACTS + keyWord;
         mSearchController.getContactList(apiCall);
         mSearchController.setConnectionCallback(this);
     }
@@ -564,7 +563,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private void showKeyboard()
     {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity
-                ().INPUT_METHOD_SERVICE);
+            ().INPUT_METHOD_SERVICE);
         imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
 
     }
@@ -576,7 +575,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private void hideKeyboard()
     {
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
-                ().INPUT_METHOD_SERVICE);
+          ().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
     }
 

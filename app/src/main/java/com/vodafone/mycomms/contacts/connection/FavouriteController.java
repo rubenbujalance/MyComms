@@ -25,19 +25,22 @@ public class FavouriteController  extends BaseController {
     private RealmContactTransactions realmContactTransactions;
     private FavouriteConnection mFavouriteConnection;
     private String apiCall;
+    private String mProfileId;
 
     public FavouriteController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm,profileId);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
     public FavouriteController(Fragment fragment, Realm realm, String profileId) {
         super(fragment);
         this.mRealm = realm;
         this.mContext = fragment.getActivity();
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
     public void manageFavourite(String contactId){

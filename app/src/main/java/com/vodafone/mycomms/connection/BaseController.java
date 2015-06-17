@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.connection;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -29,6 +30,9 @@ public class BaseController extends Controller {
         super(fragment);
     }
 
+    public BaseController(Context context) {
+        super(context);
+    }
 
     @Override
     public void onConnectionStart(ConnectionResponse response) {
@@ -88,8 +92,9 @@ public class BaseController extends Controller {
         return connectionCallback;
     }
 
-    public void setConnectionCallback(IConnectionCallback connectionCallback) {
+    public String setConnectionCallback(IConnectionCallback connectionCallback) {
         this.connectionCallback = connectionCallback;
+        return null;
     }
 
     public void showToast(String stringToShow) {

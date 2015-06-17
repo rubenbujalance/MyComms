@@ -1,6 +1,6 @@
 package com.vodafone.mycomms.contacts.detail;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -9,9 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
@@ -45,6 +43,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ContactDetailController controller;
     private String contactId;
     private String action;
+    private String mProfileId;
     private RecentContactController mRecentContactController;
 
     //Views
@@ -62,8 +61,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private int imageStarOn;
     private int imageStarOff;
     private TextView textAvatar;
-    private String profileId;
-
 
     //Buttons
     private ImageView btSms;
@@ -75,24 +72,23 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ImageView btCallBar;
     private ImageView btFavourite;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
         realm = Realm.getInstance(this);
-
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants
-                .MYCOMMS_SHARED_PREFS, this.MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
-        mRecentContactController = new RecentContactController(this,realm,profileId);
+        mRecentContactController = new RecentContactController(this,realm,mProfileId);
 
         Intent intent = getIntent();
-        contactId = intent.getExtras().getString(Constants.CONTACT_ID);
-        controller = new ContactDetailController(this, realm, profileId);
+        contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
+        controller = new ContactDetailController(this, realm, mProfileId);
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
 
@@ -115,7 +111,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         //Buttons
         btSms = (ImageView)findViewById(R.id.bt_sms);
         btEmail = (ImageView)findViewById(R.id.bt_email);
-        btChat = (ImageView)findViewById(R.id.bt_chat);
         btCall = (ImageView)findViewById(R.id.bt_call);
         btChatBar = (ImageView)findViewById(R.id.btchat);
         btEmailBar = (ImageView)findViewById(R.id.btemail);
@@ -231,7 +226,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
-        btChat.setOnClickListener(new View.OnClickListener() {
+        /*btChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
@@ -239,7 +234,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
                 startActivity(in);
             }
-        });
+        });*/
 
         btChatBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -254,8 +249,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         btFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FavouriteController favouriteController = new FavouriteController
-                        (ContactDetailMainActivity.this, realm, profileId);
+                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
                 favouriteController.manageFavourite(contactId);
 
                 if (btFavourite.getTag().equals("icon_favorite_colour")) {
@@ -280,21 +274,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         });
 
         loadContactDetail();
-
-        final Activity activity = this;
-        LinearLayout favouriteTesting = (LinearLayout) findViewById(R.id.office_location_layout);
-        favouriteTesting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Inserting favourite", Toast.LENGTH_LONG).show();
-                FavouriteController favouriteController = new FavouriteController(activity,
-                        realm, profileId);
-                favouriteController.manageFavourite(contactId);
-            }
-        });
-
-
-        Log.e(Constants.TAG, "TAG: " + contact.getId());
     }
 
     private void loadContactStatusInfo()
@@ -381,7 +360,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 jsonObject = jsonArray.getJSONObject(i);
                 if (!jsonObject.isNull(key)) {
 
-                   result = jsonObject.getString(key);
+                    result = jsonObject.getString(key);
                 }
             }
 
@@ -411,7 +390,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
@@ -458,8 +437,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private Contact getContact(String contactId){
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, profileId);
-        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_ID, contactId);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_CONTACT_ID, contactId);
 
         Contact contact = contactList.get(0);
         Log.d(Constants.TAG, "ContactDetailMainActivity.getContact: " + printContact(contact));
@@ -469,14 +448,14 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private String printContact(Contact contact){
-            StringBuffer buf = new StringBuffer();
-            buf.append("Contact[");
-            buf.append(contact.getFirstName());
-            buf.append(",");
-            buf.append(contact.getLastName());
-            buf.append("]");
-            buf.append("company:");
-            buf.append(contact.getCompany());
+        StringBuffer buf = new StringBuffer();
+        buf.append("Contact[");
+        buf.append(contact.getFirstName());
+        buf.append(",");
+        buf.append(contact.getLastName());
+        buf.append("]");
+        buf.append("company:");
+        buf.append(contact.getCompany());
         return buf.toString();
     }
 

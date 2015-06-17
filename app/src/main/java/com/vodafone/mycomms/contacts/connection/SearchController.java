@@ -60,8 +60,8 @@ public class SearchController extends BaseController
         super(fragment);
         this.mRealm = realm;
         this.mContext = fragment.getActivity();
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
         this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
 
@@ -79,6 +79,7 @@ public class SearchController extends BaseController
 
         if (result != null && result.trim().length()>0)
         {
+
             try
             {
                 jsonResponse = new JSONObject(result);
@@ -95,6 +96,7 @@ public class SearchController extends BaseController
             } catch (Exception e) {
                 Log.e(Constants.TAG, "SearchController.onConnectionComplete: contacts ", e);
             }
+
         }
 
         if (this.getConnectionCallback() != null && this.getConnectionCallback()

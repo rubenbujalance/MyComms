@@ -8,7 +8,7 @@
     mycomms:contentInsetStart="0dp"
     android:gravity="top"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText"
-    android:background="@color/toolbar_selected_item"
+    android:background="@color/grey_profile_background"
     mycomms:theme="@style/ActionBarThemeOverlay">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,14 +17,14 @@
         android:background="@android:color/transparent"
         android:orientation="horizontal">
 
-        <ImageView
+        <!--<ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ivBtBack"
             android:src="@drawable/btn_back_white"
             android:background="@android:color/transparent"
             android:layout_centerVertical="true"
-            android:paddingLeft="10dp"/>
+            android:paddingLeft="10dp"/>-->
 
         <TextView
             android:id="@+id/toolbar_title"
@@ -35,8 +35,7 @@
             android:textSize="22sp"
             android:gravity="center"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:textColor="@color/white" />
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:id="@+id/edit_profile"
@@ -44,12 +43,12 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:text="@string/Edit"
+            android:visibility="invisible"
             android:background="@android:color/transparent"
             android:textSize="22sp"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:textColor="@color/white" />
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 </android.support.v7.widget.Toolbar>

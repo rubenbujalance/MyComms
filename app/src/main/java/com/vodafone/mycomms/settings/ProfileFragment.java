@@ -27,11 +27,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.settings.connection.AvatarPushToServerController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.EnableEditProfileEvent;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -68,6 +71,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private final int REQUEST_CAMERA = 0;
     private final int SELECT_FILE = 1;
 
+    static final int REQUEST_IMAGE_CAPTURE = 1;
     private static int RESULT_LOAD_IMAGE = 1;
     private static int TAKE_OR_PICK = 0;
     private static int RESULT_OK = 1;
@@ -112,6 +116,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+       BusProvider.getInstance().register(this);
+
        View v = inflater.inflate(R.layout.layout_fragment_profile, container, false);
 
        initSpinners(v);
@@ -124,16 +130,17 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        editProfile.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile ");
+               Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
                profileEditMode(isEditing);
                if (isEditing && !isUpdating) {
-                   //TODO verify if details have actually changed and send update accordingly
+
                    isUpdating = updateContactData();
                    if (!isUpdating) {
                        return;
                    }
                } else if (!isEditing && !isUpdating) {
-                   isEditing = !isEditing;
+                   isEditing = true;
+                   profileEditMode(isEditing);
                }
            }
        });
@@ -181,9 +188,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileController.updatePassword(newPasswordHashMap);
         }
 
-        String name = ((EditText) getActivity().findViewById(R.id.profile_name)).getText().toString();
-        String surname = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
+        String firstName = ((EditText) getActivity().findViewById(R.id.profile_name)).getText().toString();
+        String lastName = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
 
+        ((SettingsMainActivity)getActivity()).setMainActivityTitle(firstName + " " + lastName);
 //      EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
 //      EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
 
@@ -191,14 +199,24 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         String position = ((EditText) getActivity().findViewById(R.id.contact_position)).getText().toString();
         String officeLocation = ((EditText) getActivity().findViewById(R.id.office_location)).getText().toString();
 
+
+        if(!profileController.isUserProfileChanged(firstName, lastName, company, position, officeLocation)){
+            Log.d(Constants.TAG, "ProfileFragment.updateContactData: profile details not changed");
+            isEditing = false;
+            profileEditMode(isEditing);
+            return false;
+        }
+
         UserProfile newProfile = new UserProfile();
-        newProfile.setFirstName(name);
-        newProfile.setLastName(surname);
+        newProfile.setFirstName(firstName);
+        newProfile.setLastName(lastName);
         newProfile.setCompany(company);
         newProfile.setPosition(position);
         newProfile.setOfficeLocation(officeLocation);
 
         Log.d(Constants.TAG, "ProfileFragment.updateContactData:" + profileController.printUserProfile(newProfile));
+
+        profileController.updateUserProfileInDB(firstName, lastName, company, position, officeLocation);
 
         HashMap newProfileHashMap = profileController.getProfileHashMap(newProfile);
 
@@ -465,6 +483,19 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
     }
 
+    public void onPause(){
+        super.onPause();
+        profileController.setConnectionCallback(null);
+        Log.d(Constants.TAG, "ProfileFragment.onPause: ");
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+    }
+
     @Override
     public void onProfileConnectionError() {
         Log.d(Constants.TAG, "ProfileFragment.onProfileConnectionError: ");
@@ -705,6 +736,16 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             Log.d(Constants.TAG, "AvatarPushToServerController.sendFile: Response content: " + result);
 
             //saveImage();
+        }
+    }
+
+    @Subscribe
+    public void enableEditProfile(EnableEditProfileEvent event) {
+        boolean enable = event.getEnable();
+        if (enable){
+            editProfile.setVisibility(View.VISIBLE);
+        } else{
+            editProfile.setVisibility(View.GONE);
         }
     }
 

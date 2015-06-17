@@ -54,9 +54,9 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private Chat _chat;
     private Contact _contact;
     private Contact _profile;
+    private String _profile_id;
 
     private String previousView;
-    private String profileId;
 
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
@@ -73,14 +73,28 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
+        if(sp==null)
+        {
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
+            finish();
+        }
         mRealm = Realm.getInstance(this);
         chatTransactions = new RealmChatTransactions(mRealm, this);
-        contactTransactions = new RealmContactTransactions(mRealm, profileId);
+        _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        contactTransactions = new RealmContactTransactions(mRealm,_profile_id);
+        _profile = contactTransactions.getContactById(_profile_id);
+
+        if(_profile_id == null)
+        {
+            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
+            finish();
+        }
+
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecentContactController = new RecentContactController(this,mRealm,profileId);
+        mRecentContactController = new RecentContactController(this,mRealm,_profile_id);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -100,24 +114,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
         //Contact and profile
         _contact = contactTransactions.getContactById(contact_id);
-
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
-        if(sp==null)
-        {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
-            finish();
-        }
-
-        String _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        _profile = contactTransactions.getContactById(_profile_id);
-
-        if(_profile_id == null)
-        {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
-            finish();
-        }
 
         //Chat listeners
         setChatListeners(this, _contact);
@@ -143,7 +139,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         });
 
         //Set avatar
-        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+_contact.getId()+".jpg");
+        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+_contact.getContactId()+".jpg");
 
         if (_contact.getAvatar()!=null &&
                 _contact.getAvatar().length()>0 &&
@@ -202,8 +198,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private void sendText()
     {
         String msg = etChatTextBox.getText().toString();
-        if(!XMPPTransactions.sendText(_contact.getId(), msg))
-            return;
 
         //Save to DB
         ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
@@ -215,6 +209,12 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         chatTransactions.insertChat(_chat);
         chatTransactions.insertChatMessage(chatMsg);
 
+        //Send through XMPP
+        if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_MESSAGE_TYPE_CHAT,
+                chatMsg.getId(), Constants.XMPP_MESSAGE_MEDIATYPE_TEXT, msg))
+            return;
+
+        //Insert in recents
         String action = Constants.CONTACTS_ACTION_SMS;
         mRecentContactController.insertRecent(_chat.getContact_id(), action);
         mRecentContactController.setConnectionCallback(this);
@@ -297,6 +297,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     @Override
     protected void onResume() {
         super.onResume();
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if(etChatTextBox.getText().toString()!=null &&
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();

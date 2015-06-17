@@ -57,16 +57,23 @@ public class ContactController extends BaseController {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
-        internalContactSearch = new InternalContactSearch(activity);
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        internalContactSearch = new InternalContactSearch(activity);
     }
 
     public ContactController(Fragment fragment, Realm realm, String profileId) {
         super(fragment);
         this.mRealm = realm;
         this.mContext = fragment.getActivity();
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+    }
+
+    public ContactController(Context context, Realm realm, String profileId) {
+        super(context);
+        this.mRealm = realm;
+        this.mContext = context;
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
@@ -91,7 +98,7 @@ public class ContactController extends BaseController {
         contactConnection.request();
     }
 
-    public void getRecentList(String api){
+    public void getRecentList(String api) {
         Log.i(Constants.TAG, "ContactController.getRecentList: ");
         if(contactConnection != null){
             contactConnection.cancel();
@@ -121,8 +128,9 @@ public class ContactController extends BaseController {
                         jsonResponse = new JSONObject(result);
                         JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
                         if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
+                            int pageSize = jsonPagination.getInt(Constants.CONTACT_PAGINATION_PAGESIZE);
                             morePages = true;
-                            offsetPaging = offsetPaging + 1;
+                            offsetPaging = offsetPaging + pageSize;
                             search = Constants.CONTACTS_ALL;
                         } else {
                             search = Constants.CONTACTS_RECENT;
@@ -184,11 +192,12 @@ public class ContactController extends BaseController {
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject, mProfileId);
+                contact = mapContact(jsonObject);
                 realmContactList.add(contact);
                 doRefreshAdapter = (i==jsonArray.length()-1);
                 updateContactAvatar(contact, doRefreshAdapter);
             }
+            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm);
             realmContactTransactions.insertContactList(realmContactList);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -205,9 +214,9 @@ public class ContactController extends BaseController {
                 return;
 
             RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
-            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
+            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getId());
             if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                String filename = "avatar_" + contact.getContactId() + ".jpg";
+                String filename = "avatar_" + contact.getId() + ".jpg";
 
                 new DownloadAvatars().execute(contact.getAvatar(), filename);
 
@@ -233,7 +242,17 @@ public class ContactController extends BaseController {
         Log.d(Constants.TAG, "ContactController.getAllContacts: ");
         return realmContactTransactions.getAllContacts();
     }
-    
+
+    public ArrayList<Contact> getLocalContactsByKeyWord(String keyWord) {
+        Log.d(Constants.TAG, "ContactController.getLocalContactsByKeyWord: ");
+        return internalContactSearch.getLocalContactsByKeyWord(keyWord);
+    }
+
+    public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
+        Log.d(Constants.TAG, "ContactController.getContactsByKeyWord: ");
+        return realmContactTransactions.getContactsByKeyWord(keyWord);
+    }
+
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){
         Log.i(Constants.TAG, "ContactController.getAllFavouriteContacts: ");
         ArrayList<FavouriteContact> favList = new ArrayList<>();

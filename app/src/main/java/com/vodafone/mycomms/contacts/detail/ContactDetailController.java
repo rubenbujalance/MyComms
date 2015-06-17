@@ -28,6 +28,7 @@ public class ContactDetailController extends BaseController {
     private Context mContext;
     private String profileId;
     private RealmContactTransactions realmContactTransactions;
+    private String profileId;
 
     public ContactDetailController(Activity activity, Realm realm, String profileId) {
         super(activity);

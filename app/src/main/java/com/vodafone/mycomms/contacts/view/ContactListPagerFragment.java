@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.contacts.view;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,7 +38,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     private ContactListFragment contactListFragment;
     private ContactListFragment contactRecentListFragment;
     private ContactListFragment contactFavouritesListFragment;
-    private String profileId;
+    private String mProfileId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -47,14 +48,14 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sp = getActivity().getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realm = Realm.getInstance(getActivity());
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Constants
-                .MYCOMMS_SHARED_PREFS, getActivity().MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        mContactController = new ContactController(this,realm, profileId);
+        mContactController = new ContactController(this,realm, mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        mContactController.getContactList(apiCall);
-        mContactController.setConnectionCallback(this);
+        //mContactController.getContactList(apiCall);
+        //mContactController.setConnectionCallback(this);
         BusProvider.getInstance().register(this);
         //((ContactListMainActivity)getActivity()).activateContactListToolbar();
     }
@@ -66,7 +67,16 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mSlidingTabLayout = (SlidingTabLayout) view.findViewById(R.id.sliding_tabs);
         mSlidingTabLayout.setViewPager(mViewPager);
         //This sets default tab
-        mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+        if (savedInstanceState == null) {
+            Bundle extras = getActivity().getIntent().getExtras();
+            if(extras == null) {
+                mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+            } else {
+                mViewPager.setCurrentItem(Constants.CONTACTS_FAVOURITE);
+            }
+        } else {
+            mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+        }
     }
 
     @Override
@@ -132,7 +142,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
 
     @Override
     public void onContactsResponse(ArrayList<Contact> responseContactList, boolean morePages, int offsetPaging) {
-        Log.i(Constants.TAG, "onContactsResponse: " + apiCall);
+        Log.i(Constants.TAG, "onContactsResponse: " + apiCall + "&o=" + offsetPaging);
 
         if(apiCall.equals(Constants.CONTACT_API_GET_FAVOURITES)) {
             setListsAdapter();
@@ -198,7 +208,5 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mContactController.getFavouritesList(apiCall);
         setListsAdapter();
     }
-
-
 
 }

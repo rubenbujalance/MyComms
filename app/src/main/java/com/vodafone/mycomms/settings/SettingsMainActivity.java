@@ -1,14 +1,15 @@
 package com.vodafone.mycomms.settings;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 /**
@@ -17,6 +18,8 @@ import com.vodafone.mycomms.util.ToolbarActivity;
 public class SettingsMainActivity extends ToolbarActivity implements ProfileFragment.OnFragmentInteractionListener, PreferencesFragment.OnFragmentInteractionListener{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
+    public static final int VACATION_TIME_SETTER_ID = 1 ;
+    public static final String VACATION_TIME_END_VALUE = "vacationTimeEndValue";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,7 +28,14 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.layout_profile_activity);
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileFullName = sp.getString(Constants.PROFILE_FULLNAME_SHARED_PREF, "");
+
         activateToolbar();
+
+        setToolbarTitle(profileFullName);
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
@@ -35,14 +45,19 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
             transaction.commit();
         }
 
-        ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
+        /*ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
-        });
+        });*/
 
+    }
+
+
+    public void setMainActivityTitle(String title){
+        this.setToolbarTitle(title);
     }
 
     @Override
@@ -61,8 +76,18 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
     public void onFragmentInteraction(Uri uri) {
     }
 
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+//        switch(requestCode) {
+//            case (VACATION_TIME_SETTER_ID) : {
+//                if (resultCode == Activity.RESULT_OK) {
+//                    String newText = data.getStringExtra(VACATION_TIME_END_VALUE);
+//
+//                }
+//                break;
+//            }
+//        }
     }
 }

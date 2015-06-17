@@ -7,6 +7,7 @@ import android.util.Log;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 /**
  * Created by str_vig on 21/04/2015.
@@ -43,5 +44,11 @@ public class ChatListActivity extends ToolbarActivity{
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 }

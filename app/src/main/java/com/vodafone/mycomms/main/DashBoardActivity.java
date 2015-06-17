@@ -139,4 +139,10 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
     public void onConnectionNotAvailable() {
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+    }
 }

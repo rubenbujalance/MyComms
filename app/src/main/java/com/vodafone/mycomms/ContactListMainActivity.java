@@ -111,4 +111,10 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         // Disconnect from the XMPP server
         XMPPTransactions.disconnectMsgServerSession();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+    }
 }

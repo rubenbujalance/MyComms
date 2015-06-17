@@ -297,6 +297,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     @Override
     protected void onResume() {
         super.onResume();
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if(etChatTextBox.getText().toString()!=null &&
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();

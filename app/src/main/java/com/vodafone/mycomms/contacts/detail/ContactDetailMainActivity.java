@@ -226,16 +226,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
-        /*btChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
-                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
-                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
-                startActivity(in);
-            }
-        });*/
-
         btChatBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -84,12 +84,21 @@ public class AvatarPushToServerController extends BaseController
 
     public String convertResponseToString()
     {
-        String output = "Request: "+response.request().toString()+"\n" +
-                "Body: "+response.body().toString()+"" +
-                "Headers: "+response.headers().toString()+"" +
-                "Message: "+response.message();
+        try
+        {
+            String output = "Request: "+response.request().toString()+"\n" +
+                    "Body: "+response.body().string()+"" +
+                    "Headers: "+response.headers().toString()+"" +
+                    "Message: "+response.message();
 
-        return output;
+            return output;
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "AvatarPushToServerController.convertResponseToString: ERROR "+e.toString());
+            return "Wrong response!";
+        }
+
     }
 
     private String getVersionName()
@@ -122,6 +131,20 @@ public class AvatarPushToServerController extends BaseController
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    public String getAvatarURL()
+    {
+        try
+        {
+            return response.body().string();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "AvatarPushToServerController.getAvatarURL: ERROR "+e.toString());
+            return "Wrong BODY!";
+        }
+
     }
 
     public Response getResponse()

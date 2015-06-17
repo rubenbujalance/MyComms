@@ -39,7 +39,10 @@ import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -94,6 +97,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private UserProfile userProfile;
     private File multiPartFile;
+    private boolean isFirstLoadNeed = true;
 
 
     // TODO: Rename and change types of parameters
@@ -138,14 +142,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        editPhoto.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo),null);
+               dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
            }
        });
 
        profilePicture.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo),null);
+               dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
            }
        });
 
@@ -320,6 +324,54 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
     }
 
+    private void saveImage()
+    {
+        File avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                "avatar_"+userProfile.getId()+".jpg");
+        if (avatarFile.exists())
+        {
+            avatarFile.delete();
+        }
+
+
+        File avatarFile2 = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                "avatar_"+userProfile.getId()+".jpg");
+        try
+        {
+            avatarFile2.createNewFile();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "ProfileFragment -> saveImage() ERROR: "+e.toString());
+        }
+
+        copy(multiPartFile,avatarFile2);
+    }
+
+    private void copy(File src, File dst)
+    {
+        try
+        {
+            InputStream in = new FileInputStream(src);
+            OutputStream out = new FileOutputStream(dst);
+
+            // Transfer bytes from in to out
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            in.close();
+            out.close();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "ProfileFragment -> copy() ERROR: "+e.toString());
+        }
+
+    }
+
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -378,32 +430,38 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     @Override
     public void onProfileReceived(UserProfile userProfile)
     {
-        if(userProfile != null) {
-            this.userProfile = userProfile;
-            Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
-            EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
-            profileName.setText(userProfile.getFirstName());
-            EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
-            profileSurname.setText(userProfile.getLastName());
-            EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
-            String phone = Utils.getElementFromJsonArrayString(userProfile.getPhones(), Constants.PROFILE_PHONE);
-            profilePhoneNumber.setText(phone);
-            EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
-            String email = Utils.getElementFromJsonArrayString(userProfile.getEmails(), Constants.PROFILE_EMAIL);
-            profileEmail.setText(email);
-            EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
-            profileCompany.setText(userProfile.getCompany());
-            EditText profilePosition = (EditText) getActivity().findViewById(R.id.contact_position);
-            profilePosition.setText(userProfile.getPosition());
+        if(userProfile != null)
+        {
+            if(isFirstLoadNeed)
+            {
+                this.userProfile = userProfile;
+                Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
+                EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
+                profileName.setText(userProfile.getFirstName());
+                EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
+                profileSurname.setText(userProfile.getLastName());
+                EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
+                String phone = Utils.getElementFromJsonArrayString(userProfile.getPhones(), Constants.PROFILE_PHONE);
+                profilePhoneNumber.setText(phone);
+                EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
+                String email = Utils.getElementFromJsonArrayString(userProfile.getEmails(), Constants.PROFILE_EMAIL);
+                profileEmail.setText(email);
+                EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
+                profileCompany.setText(userProfile.getCompany());
+                EditText profilePosition = (EditText) getActivity().findViewById(R.id.contact_position);
+                profilePosition.setText(userProfile.getPosition());
 
 //          EditText profileDepartment = (EditText) getActivity().findViewById(R.id.department);
 //          profileDepartment.setText("????????");
 
-            EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.office_location);
-            profileOfficeLocation.setText(userProfile.getOfficeLocation());
+                EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.office_location);
+                profileOfficeLocation.setText(userProfile.getOfficeLocation());
 //            EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
 //            profileInfo.setText("????????");
-            loadProfileImage();
+                loadProfileImage();
+
+                isFirstLoadNeed = false;
+            }
         }
     }
 
@@ -567,13 +625,24 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         try
         {
             //create a file to write bitmap data
-            multiPartFile = new File(getActivity().getCacheDir(), Constants.CONTACT_AVATAR);
+            multiPartFile = new File(getActivity().getCacheDir(), Constants
+                    .CONTACT_AVATAR + "avatar_"+userProfile.getId()+".jpg");
             multiPartFile.createNewFile();
+
+            File avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                    "avatar_"+userProfile.getId()+".jpg");
+
+            avatarFile.delete();
+
+            avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                    "avatar_"+userProfile.getId()+".jpg");
+
+            avatarFile.createNewFile();
 
             //Convert bitmap to byte array
             Bitmap bitmap = photoBitmap;
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, bos);
             byte[] bitmapdata = bos.toByteArray();
 
             //write the bytes in file
@@ -581,6 +650,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             fos.write(bitmapdata);
             fos.flush();
             fos.close();
+
+            FileOutputStream fos2 = new FileOutputStream(avatarFile);
+            fos2.write(bitmapdata);
+            fos2.flush();
+            fos2.close();
 
             new sendFile().execute();
         }
@@ -625,14 +699,12 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
 
         @Override
-        protected void onPostExecute(String result)
-        {
+        protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            if(pdia.isShowing())pdia.dismiss();
+            if(pdia.isShowing()) pdia.dismiss();
             Log.d(Constants.TAG, "AvatarPushToServerController.sendFile: Response content: " + result);
 
-            loadProfileImage();
-            profilePicture.setImageBitmap(photoBitmap);
+            //saveImage();
         }
     }
 

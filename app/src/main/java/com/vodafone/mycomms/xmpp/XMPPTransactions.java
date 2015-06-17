@@ -23,14 +23,12 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.filter.ToFilter;
-import org.jivesoftware.smack.packet.DefaultExtensionElement;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.IQProvider;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smack.util.StringUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -61,7 +59,6 @@ public final class XMPPTransactions {
 
     public static boolean initializeMsgServerSession(Context appContext)
     {
-        _isConnecting = true;
         Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: ");
 
         if(_xmppConnection == null) {
@@ -88,21 +85,24 @@ public final class XMPPTransactions {
                     (TelephonyManager) _appContext.getSystemService(Service.TELEPHONY_SERVICE));
         }
 
-        //Configuration for the connection
-        XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = XMPPTCPConnectionConfiguration.builder();
+        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() || !_xmppConnection.isConnected()) {
+            _isConnecting = true;
+            //Configuration for the connection
+            XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = XMPPTCPConnectionConfiguration.builder();
 
-        accessToken = UserSecurity.getAccessToken(appContext);
-        xmppConfigBuilder.setUsernameAndPassword(_profile_id, accessToken);
-        xmppConfigBuilder.setServiceName(Constants.XMPP_PARAM_DOMAIN);
-        xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
-        xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
+            accessToken = UserSecurity.getAccessToken(appContext);
+            xmppConfigBuilder.setUsernameAndPassword(_profile_id, accessToken);
+            xmppConfigBuilder.setServiceName(Constants.XMPP_PARAM_DOMAIN);
+            xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
+            xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
 //        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
-        xmppConfigBuilder.setDebuggerEnabled(true);
-        xmppConfigBuilder.setSendPresence(false);
-        xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        xmppConfigBuilder.setCompressionEnabled(false);
+            xmppConfigBuilder.setDebuggerEnabled(true);
+            xmppConfigBuilder.setSendPresence(false);
+            xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+            xmppConfigBuilder.setCompressionEnabled(false);
 
-        new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
+            new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
+        }
 
         return true;
     }
@@ -124,18 +124,6 @@ public final class XMPPTransactions {
     public static boolean sendText(final String contact_id, final String type, final String id,
                                    final String mediaType, final String text)
     {
-        //Check connection
-        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() || !_xmppConnection.isConnected())
-            initializeMsgServerSession(_appContext);
-
-        while(_isConnecting) {}
-
-        if(_xmppConnection == null || !_xmppConnection.isConnected())
-        {
-            Log.e(Constants.TAG, "XMPPTransactions.sendText: Connection not available");
-            return false;
-        }
-
         try {
             Stanza st = new Stanza() {
                 @Override
@@ -302,34 +290,13 @@ public final class XMPPTransactions {
             _isConnecting = false;
             xmppConnectionCallback(xmppConnection);
         }
-    }
-
-    private static final class TestPacketExtension extends DefaultExtensionElement   {
-
-        private final String json;
-
-        public TestPacketExtension(String elementName, String namespace, String json) {
-            super(elementName, namespace);
-            this.json = json;
-        }
-
-        public String getJson() {
-            return json;
-        }
 
         @Override
-        public String toXML() {
-            Log.w(Constants.TAG, "TestPacketExtension.toXML: "+getValue("body"));
-            return String.format("<%s xmlns=\"%s\">%s</%s>",
-                    "element", "name",
-                    StringUtils.escapeForXML(json), "element");
+        protected void onCancelled(XMPPTCPConnection xmppConnection) {
+            super.onCancelled();
+            _isConnecting = false;
+            xmppConnectionCallback(xmppConnection);
         }
-//
-//        public Stanza toPacket() {
-//            Message message = new Message();
-//            message.addExtension(this);
-//            return message;
-//        }
     }
 
     private static ConnectionListener getConnectionListener()

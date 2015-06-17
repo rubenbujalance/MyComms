@@ -3,9 +3,6 @@ package model;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-/**
- * Created by AMG on 12/05/2015.
- */
 public class FavouriteContact extends RealmObject {
 
     private String contactId;

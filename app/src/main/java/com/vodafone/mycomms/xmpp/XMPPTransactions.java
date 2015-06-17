@@ -20,9 +20,8 @@ import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.OrFilter;
 import org.jivesoftware.smack.filter.StanzaFilter;
-import org.jivesoftware.smack.filter.ToFilter;
+import org.jivesoftware.smack.filter.StanzaTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
@@ -57,9 +56,11 @@ public final class XMPPTransactions {
      * Methods
      */
 
-    public static boolean initializeMsgServerSession(Context appContext)
+    public static void initializeMsgServerSession(Context appContext)
     {
         Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: ");
+
+        if(_isConnecting) return;
 
         if(_xmppConnection == null) {
 
@@ -73,7 +74,7 @@ public final class XMPPTransactions {
 
             if (_profile_id == null) {
                 Log.e(Constants.TAG, "ContactListMainActivity.initializeMsgServerSession: No profile_id found");
-                return false;
+                return;
             }
 
             //Instantiate Realm and Transactions
@@ -96,15 +97,13 @@ public final class XMPPTransactions {
             xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
             xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
 //        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
-            xmppConfigBuilder.setDebuggerEnabled(true);
+            xmppConfigBuilder.setDebuggerEnabled(false);
             xmppConfigBuilder.setSendPresence(false);
             xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             xmppConfigBuilder.setCompressionEnabled(false);
 
             new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
         }
-
-        return true;
     }
 
     public static boolean disconnectMsgServerSession()
@@ -132,6 +131,7 @@ public final class XMPPTransactions {
                     return message;
                 }
             };
+
             _xmppConnection.sendStanza(st);
         }
         catch (SmackException.NotConnectedException e) {
@@ -212,36 +212,17 @@ public final class XMPPTransactions {
         protected XMPPTCPConnection doInBackground(XMPPTCPConnectionConfiguration.Builder[] params)
         {
             Log.i(Constants.TAG, "XMPPOpenConnectionTask.doInBackground: ");
-            XMPPTCPConnection conn = null;
 
             try {
                 XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = params[0];
-                conn = new XMPPTCPConnection(xmppConfigBuilder.build());
+                _xmppConnection = new XMPPTCPConnection(xmppConfigBuilder.build());
 
-                // Connect to the server
-                conn.addConnectionListener(getConnectionListener());
-                conn.connect();
-                //Log into the server
-                conn.login();
-
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "XMPPOpenConnection.doInBackground: Error opening XMPP server connection", e);
-                return null;
-            }
-
-            //**********************
-            //CONNECTION SUCCESSFUL
-            //**********************
-
-            //Save connection
-            _xmppConnection = conn;
-
-            //Register the listener for incoming messages
-            _packetListener = new StanzaListener() {
-                @Override
-                public void processPacket(Stanza packet)
-                {
-                    Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener]: "+packet.getFrom());
+                //Packet listener for incoming messages
+                _packetListener = new StanzaListener() {
+                    @Override
+                    public void processPacket(Stanza packet)
+                    {
+                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[PACKET LISTENER]: "+packet.getFrom());
 
 //                    if(packet instanceof IQ) {
 //                        IQ iq = (IQ)packet;
@@ -253,26 +234,33 @@ public final class XMPPTransactions {
 //                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener] (Message): Type-"+msg.getType()
 //                                +"; From-"+msg.getFrom()+"; To-"+msg.getTo()+"; Text-"+msg.getBody());
 //                    }
-
-                    try {
-                        Message msg2 = (Message) packet;
-
-                        Log.w("XMPPClient", "Got text [" + msg2.getBody() + "] from [" + msg2.getFrom() + "]");
-                    } catch (Exception e) {
-                        Log.e(Constants.TAG, "XMPPOpenConnectionTask.processPacket: ",e);
-                    }
 //                        if(msg.getFrom().substring(0, msg.getFrom().indexOf("@")).compareTo(
 //                                _xmppConnection.getUser().substring(0, _xmppConnection.getUser().indexOf("@")))!=0) {
 //
 //                            ChatMessage chatMsg = saveMessageToDB(msg);
 //                            notifyMessageReceived(chatMsg);
 //                        }
-                }
-            };
+                    }
+                };
 
-            _stanzaFilter = new OrFilter(new ToFilter("mc_555a0792121ef1695cc7c1c3"),
-                    new ToFilter("mc_555a0792121ef1695cc7c1c3@my-comms.com"));
-            _xmppConnection.addPacketInterceptor(_packetListener, null);
+                _stanzaFilter = StanzaTypeFilter.MESSAGE;
+                _xmppConnection.addAsyncStanzaListener(_packetListener, _stanzaFilter);
+
+                // Connect to the server
+                _xmppConnection.addConnectionListener(getConnectionListener());
+                _xmppConnection.connect();
+                //Log into the server
+                _xmppConnection.login();
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "XMPPOpenConnection.doInBackground: Error opening XMPP server connection", e);
+                _xmppConnection = null;
+                return null;
+            }
+
+            //**********************
+            //CONNECTION SUCCESSFUL
+            //**********************
 
 //            //Add IQ Provider
 //            ProviderManager.addIQProvider("iq", "jabber:client", new MyIQProvider());

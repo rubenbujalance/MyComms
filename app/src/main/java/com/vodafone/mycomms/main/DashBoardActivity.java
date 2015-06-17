@@ -7,7 +7,6 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,12 +17,9 @@ import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
-import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
-import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
@@ -34,25 +30,27 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import model.ChatMessage;
 import model.News;
 
-public class DashBoardActivity extends ToolbarActivity implements INewsConnectionCallback {
+public class DashBoardActivity extends ToolbarActivity{
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     private LinearLayout noConnectionLayout;
-    private NewsController mNewsController;
-    private String apiCall;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(Constants.TAG, "DashBoardActivity.onCreate: ");
         super.onCreate(savedInstanceState);
-
-        BusProvider.getInstance().post(new InitProfileAndContacts());
-        BusProvider.getInstance().post(new InitNews());
+        Log.d(Constants.TAG, "DashBoardActivity.onCreate: ");
 
         BusProvider.getInstance().register(this);
+
         setContentView(R.layout.layout_dashboard);
+        initALL();
+        BusProvider.getInstance().post(new InitNews());
+        BusProvider.getInstance().post(new InitProfileAndContacts());
+    }
+
+    private void initALL(){
+
 
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
@@ -103,7 +101,6 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
                 finish();
             }
         });
-
     }
 
     //Prevent of going from main screen back to login
@@ -132,20 +129,6 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
     }
 
     @Override
-    public void onNewsResponse(ArrayList newsList, boolean morePages, int offsetPaging) {
-        Log.i(Constants.TAG, "onNewsResponse: " + apiCall);
-
-        if (morePages){
-            mNewsController.getNewsList(apiCall + "&o=" + offsetPaging);
-        }
-    }
-
-    @Override
-    public void onConnectionNotAvailable() {
-
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext());
@@ -168,10 +151,10 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
                     contenedor.addView(child);
                     child.setPadding(10, 10, 10, 10);
 
-                    /*ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
+                    ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
                     Picasso.with(this)
-                            .load("https://"+EndpointWrapper.getBaseNewsURL()+news.get(i).getImage())
-                            .into(newsImage);*/
+                            .load("https://"+ EndpointWrapper.getBaseNewsURL()+news.get(i).getImage())
+                            .into(newsImage);
 
                     TextView title = (TextView) child.findViewById(R.id.notice_title);
                     title.setText(news.get(i).getTitle());
@@ -180,6 +163,7 @@ public class DashBoardActivity extends ToolbarActivity implements INewsConnectio
                     date.setText(Utils.getStringChatTimeDifference(news.get(i).getPublished_at()));
 
                 }
+                initALL();
             } catch (Exception e) {
                 Log.e(Constants.TAG, "Load news error: " + e);
             }

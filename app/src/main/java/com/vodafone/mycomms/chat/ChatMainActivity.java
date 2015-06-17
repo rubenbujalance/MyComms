@@ -56,6 +56,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private Contact _profile;
 
     private String previousView;
+    private String profileId;
 
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
@@ -72,11 +73,14 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
         mRealm = Realm.getInstance(this);
         chatTransactions = new RealmChatTransactions(mRealm, this);
-        contactTransactions = new RealmContactTransactions(mRealm);
+        contactTransactions = new RealmContactTransactions(mRealm, profileId);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecentContactController = new RecentContactController(this,mRealm);
+        mRecentContactController = new RecentContactController(this,mRealm,profileId);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);

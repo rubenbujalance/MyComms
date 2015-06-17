@@ -31,17 +31,22 @@ public class ProfileController extends BaseController {
     private RealmContactTransactions realmContactTransactions;
     private ProfileConnection profileConnection;
     private Realm realm;
+    private String profileId;
 
     public ProfileController(Fragment fragment) {
         super(fragment);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         realm = Realm.getInstance(getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
     public ProfileController(Activity activity) {
         super(activity);
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         realm = Realm.getInstance(getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm);
+        realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
     public void getProfile(){

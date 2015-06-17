@@ -4,15 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
-import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.main.connection.NewsConnection;
-import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
-
 import com.vodafone.mycomms.util.Constants;
-
-import org.json.JSONObject;
 
 public class NewsController extends BaseController {
     private Context mContext;

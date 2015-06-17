@@ -2,6 +2,7 @@ package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,8 +31,10 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.settings.connection.AvatarPushToServerController;
 import com.vodafone.mycomms.util.Constants;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -51,6 +54,9 @@ public class SignupNameActivity extends Activity {
     ClearableEditText mLastName;
     Bitmap photoBitmap = null;
     String photoPath = null;
+
+    private AvatarPushToServerController avatarPushToServerController;
+    private File multiPartFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,28 +206,12 @@ public class SignupNameActivity extends Activity {
 
             //Reset avatar from user profile
             UserProfile.setAvatar(null);
+            sendAvatarToServer();
         }
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK)
         {
             Uri selectedImage = data.getData();
             photoPath = getRealPathFromURI(selectedImage);
-//            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-//            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-//            Bitmap bitmap = null;
-//
-//            if (cursor.moveToFirst()) {
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                String filePath = cursor.getString(columnIndex);
-//                bitmap = BitmapFactory.decodeFile(filePath);
-//            }
-//            cursor.close();
-//
-//            //Set bitmap to CircleImageView
-//            mPhoto.setImageBitmap(bitmap);
-//            mPhoto.setBorderWidth(2);
-//            mPhoto.setBorderColor(Color.WHITE);
-//            photoBitmap = bitmap;
-
             photoBitmap = decodeFile(photoPath);
             mPhoto.setImageBitmap(photoBitmap);
             mPhoto.setBorderWidth(2);
@@ -229,12 +219,15 @@ public class SignupNameActivity extends Activity {
 
             //Reset avatar from user profile
             UserProfile.setAvatar(null);
+            sendAvatarToServer();
         }
     }
 
-    public Uri setImageUri() {
+    public Uri setImageUri()
+    {
         // Store image in dcim
-        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new Date().getTime() + ".jpg");
+        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new
+                Date().getTime() + ".png");
         Uri imgUri = Uri.fromFile(file);
         photoPath = file.getAbsolutePath();
         return imgUri;
@@ -345,7 +338,7 @@ public class SignupNameActivity extends Activity {
             return null;
         }
 
-        Log.i("filepath:"," " + filepath) ;
+        Log.i("filepath:", " " + filepath) ;
 
         return filepath;
     }
@@ -396,15 +389,78 @@ public class SignupNameActivity extends Activity {
         UserProfile.setPhotoPath(photoPath);
     }
 
-    private class LoadAvatarFromUrl extends AsyncTask<String, Void, String> {
+    private void sendAvatarToServer()
+    {
+        try
+        {
+            //create a file to write bitmap data
+            multiPartFile = new File(getApplicationContext().getCacheDir(), Constants.CONTACT_AVATAR);
+            multiPartFile.createNewFile();
+
+            //Convert bitmap to byte array
+            Bitmap bitmap = photoBitmap;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(multiPartFile);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+
+            new sendFile().execute();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "ProfileFragment -> sentAvatarToServer() ERROR: "+e.toString());
+        }
+    }
+
+
+    private class sendFile extends AsyncTask<Void, Void, String> {
+        private ProgressDialog pdia;
+
+
+
         @Override
-        protected String doInBackground(String[] params) {
-            return saveImageFromUrl(params[0]);
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getApplicationContext());
+            pdia.setMessage(getApplicationContext().getString(R.string.progress_dialog_uploading_file));
+            pdia.show();
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            loadAvatarFromUrl(result);
+        protected String doInBackground(Void... params) {
+            try
+            {
+
+                avatarPushToServerController =  new AvatarPushToServerController
+                        (SignupNameActivity.this);
+                avatarPushToServerController.setFile_to_send(multiPartFile);
+
+                avatarPushToServerController.sendImageRequest();
+
+                String response = avatarPushToServerController.executeRequest();
+                return response;
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "AvatarPushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            super.onPostExecute(result);
+            if(pdia.isShowing())pdia.dismiss();
+            Log.d(Constants.TAG, "AvatarPushToServerController.sendFile: Response content: " + result);
+
+            mPhoto.setImageBitmap(photoBitmap);
+
         }
     }
 }

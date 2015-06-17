@@ -22,12 +22,14 @@ public class RecentContactController extends BaseController {
     private final Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private String profileId;
 
-    public RecentContactController(Activity activity, Realm realm) {
+    public RecentContactController(Activity activity, Realm realm, String profileId) {
         super(activity);
         this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(mRealm);
+        this.profileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(mRealm, profileId);
     }
 
     public void insertRecent(String contactId, String action){
@@ -51,7 +53,8 @@ public class RecentContactController extends BaseController {
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: ");
         String apiCall = Constants.CONTACT_API_GET_RECENTS;
-        ContactController contactController = new ContactController(getActivity(), mRealm);
+        ContactController contactController = new ContactController(getActivity(), mRealm,
+                profileId);
         contactController.getRecentList(apiCall);
         //Refresh Recent List
         //BusProvider.getInstance().post(new SetContactListAdapterEvent());

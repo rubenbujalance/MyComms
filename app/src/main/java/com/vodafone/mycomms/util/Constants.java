@@ -44,6 +44,8 @@ public class Constants {
     //Contacts API and BD Fields
     public static final String CONTACT_DATA = "data";
     public static final String CONTACT_ID = "id";
+    public static final String CONTACT_CONTACT_ID = "contactId";
+    public static final String CONTACT_PROFILE_ID = "profileId";
     public static final String CONTACT_PLATFORM = "platform";
     public static final String CONTACT_FNAME = "firstName";
     public static final String CONTACT_LNAME = "lastName";
@@ -79,11 +81,13 @@ public class Constants {
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_SEARCH_CONTACTS = "/api/me/contact?p=mc&t=";
+    public static final String CONTACT_API_GET_SEARCH_CONTACTS_SF = "/api/me/contact?p=sf&t=";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_FAVOURITE = "/api/me/favourites";
     public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
+    public static final String CONTACT_API_POST_AVATAR = "https://int.my-comms.com/api/me/avatar";
 
     //Contact Avatar BD Fields
     public static final String AVATAR_CONTACT_ID = "contactId";
@@ -131,5 +135,9 @@ public class Constants {
     public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
+
+    //Kind of files to send as multipart;
+    public static final String IMAGE_FILE_TO_SEND = "image_file";
+    public static final String SIMPLE_FILE_TO_SEND = "simple_file";
 
 }

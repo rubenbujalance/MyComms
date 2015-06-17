@@ -2,13 +2,17 @@ package com.vodafone.mycomms.settings;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -18,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -27,12 +30,17 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
+import com.vodafone.mycomms.custom.CircleImageView;
+import com.vodafone.mycomms.settings.connection.AvatarPushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Date;
 import java.util.HashMap;
 
 import model.UserProfile;
@@ -57,7 +65,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private final int REQUEST_CAMERA = 0;
     private final int SELECT_FILE = 1;
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
     private static int RESULT_LOAD_IMAGE = 1;
     private static int TAKE_OR_PICK = 0;
     private static int RESULT_OK = 1;
@@ -72,10 +79,22 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private ProfileController profileController;
     private boolean isUpdating = false;
 
-    private ImageView profilePicture;
+    private CircleImageView profilePicture;
     private TextView textAvatar;
     private TextView editPhoto;
     private TextView editProfile;
+
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_IMAGE_GALLERY = 2;
+
+    private String photoPath = null;
+    private Bitmap photoBitmap = null;
+
+    private AvatarPushToServerController avatarPushToServerController;
+
+    private UserProfile userProfile;
+    private File multiPartFile;
+
 
     // TODO: Rename and change types of parameters
     public static ProfileFragment newInstance(int index, String param2) {
@@ -94,7 +113,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        initSpinners(v);
        editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
        editProfile.setVisibility(View.VISIBLE);
-       profilePicture = (ImageView) v.findViewById(R.id.profile_picture);
+       profilePicture = (CircleImageView) v.findViewById(R.id.profile_picture);
        textAvatar = (TextView) v.findViewById(R.id.avatarText);
 
        Log.i(Constants.TAG, "ProfileFragment.onCreateView: ");
@@ -119,11 +138,17 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        editPhoto.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               //TODO: Do things
-               //Take Picture or Camera Roll
-               //selectImage();
+               dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo),null);
            }
        });
+
+       profilePicture.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo),null);
+           }
+       });
+
        return v;
    }
 
@@ -224,63 +249,30 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         repeatPassword.setEnabled(isEditing);
     }
 
-    private void selectImage() {
-        final CharSequence[] items = { "Take Photo", "Choose from Library",
-                "Cancel" };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_CAMERA);
-                } else if (items[item].equals("Choose from Library")) {
-                    /*Intent intent = new Intent(
-                            Intent.ACTION_PICK,
-                            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image*//*");
-                    startActivityForResult(
-                            Intent.createChooser(intent, "Select File"),
-                            SELECT_FILE);*/
-                    String IMAGE_TYPE = "image/*";
-                    Intent intent = new Intent();
-                    intent.setType(IMAGE_TYPE);
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                    startActivityForResult(Intent.createChooser(intent,
-                            "Select Picture"), RESULT_LOAD_IMAGE);
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
-
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // if taking
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode != 0) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
 
-            // my ImageView
-            profilePicture.setImageBitmap(imageBitmap);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
+        {
+            photoBitmap = decodeFile(photoPath);
+            profilePicture.setImageBitmap(photoBitmap);
+            profilePicture.setBorderWidth(2);
+            profilePicture.setBorderColor(Color.WHITE);
 
-            // if choosing
-        } else if (requestCode == RESULT_LOAD_IMAGE && resultCode != 0) {
+            sendAvatarToServer();
+        }
+
+        else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
+        {
             Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-            Cursor cursor = getActivity().getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
+            photoPath = getRealPathFromURI(selectedImage);
+            photoBitmap = decodeFile(photoPath);
+            profilePicture.setImageBitmap(photoBitmap);
+            profilePicture.setBorderWidth(2);
+            profilePicture.setBorderColor(Color.WHITE);
 
-            // my ImageView
-            profilePicture.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            sendAvatarToServer();
         }
     }
 
@@ -308,20 +300,21 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
     }
 
-    private void loadProfileImage(UserProfile userProfile) {
+    private void loadProfileImage() {
         File avatarFile = null;
-        String profileId = userProfile.getId();
+        String profileId = this.userProfile.getId();
 
         if (profileId!=null && !profileId.equals(""))
-            avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+profileId+".jpg");
+            avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                    "avatar_"+profileId+".jpg");
 
         if (avatarFile!= null && avatarFile.exists()) {
             Picasso.with(getActivity())
                     .load(avatarFile)
                     .into(profilePicture);
         } else{
-            String initials = userProfile.getFirstName().substring(0,1) +
-                    userProfile.getLastName().substring(0,1);
+            String initials = this.userProfile.getFirstName().substring(0,1) +
+                    this.userProfile.getLastName().substring(0,1);
             profilePicture.setImageResource(R.color.grey_middle);
             textAvatar.setText(initials);
         }
@@ -383,8 +376,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     }
 
     @Override
-    public void onProfileReceived(UserProfile userProfile) {
+    public void onProfileReceived(UserProfile userProfile)
+    {
         if(userProfile != null) {
+            this.userProfile = userProfile;
             Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
             EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
             profileName.setText(userProfile.getFirstName());
@@ -408,7 +403,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileOfficeLocation.setText(userProfile.getOfficeLocation());
 //            EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
 //            profileInfo.setText("????????");
-            loadProfileImage(userProfile);
+            loadProfileImage();
         }
     }
 
@@ -468,6 +463,177 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
+    }
+
+
+    private void dispatchTakePictureIntent(String title, String subtitle)
+    {
+
+        //Build the alert dialog to let the user choose the origin of the picture
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(title);
+
+        if(subtitle != null) {
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View view = inflater.inflate(R.layout.cv_title_subtitle, null);
+            ((TextView) view.findViewById(R.id.tvTitle)).setText(title);
+            ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
+            builder.setCustomTitle(view);
+        }
+        else
+        {
+            builder.setTitle(title);
+        }
+
+        builder.setItems(R.array.add_photo_chooser, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+                Intent in;
+
+                if(which == 0)
+                {
+                    in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    in.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
+                    startActivityForResult(in, REQUEST_IMAGE_CAPTURE);
+                }
+                else if(which == 1)
+                {
+                    in = new Intent();
+                    in.setType("image/*");
+                    in.setAction(Intent.ACTION_PICK);
+
+                    startActivityForResult(in, REQUEST_IMAGE_GALLERY);
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create();
+        builder.show();
+    }
+
+    public Uri setImageUri()
+    {
+        // Store image in dcim
+        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new
+                Date().getTime() + ".png");
+        Uri imgUri = Uri.fromFile(file);
+        photoPath = file.getAbsolutePath();
+        return imgUri;
+    }
+
+    public Bitmap decodeFile(String path)
+    {
+        try
+        {
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, o);
+            return BitmapFactory.decodeFile(path);
+        }
+        catch (Throwable e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    private String getRealPathFromURI(Uri contentURI)
+    {
+        String result;
+        Cursor cursor = getActivity().getContentResolver().query(contentURI, null, null, null,
+                null);
+        if (cursor == null) {
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
+    }
+
+    private void sendAvatarToServer()
+    {
+        try
+        {
+            //create a file to write bitmap data
+            multiPartFile = new File(getActivity().getCacheDir(), Constants.CONTACT_AVATAR);
+            multiPartFile.createNewFile();
+
+            //Convert bitmap to byte array
+            Bitmap bitmap = photoBitmap;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(multiPartFile);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+
+            new sendFile().execute();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "ProfileFragment -> sentAvatarToServer() ERROR: "+e.toString());
+        }
+    }
+
+
+    private class sendFile extends AsyncTask<Void, Void, String> {
+        private ProgressDialog pdia;
+
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage(getActivity().getString(R.string.progress_dialog_uploading_file));
+            pdia.show();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            try
+            {
+
+                avatarPushToServerController =  new AvatarPushToServerController(getActivity());
+                avatarPushToServerController.setFile_to_send(multiPartFile);
+
+                avatarPushToServerController.sendImageRequest();
+
+                String response = avatarPushToServerController.executeRequest();
+                return response;
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "AvatarPushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            super.onPostExecute(result);
+            if(pdia.isShowing())pdia.dismiss();
+            Log.d(Constants.TAG, "AvatarPushToServerController.sendFile: Response content: " + result);
+
+            loadProfileImage();
+            profilePicture.setImageBitmap(photoBitmap);
+        }
     }
 
 }

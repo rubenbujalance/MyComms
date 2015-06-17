@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.contacts.view;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +37,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     private ContactListFragment contactListFragment;
     private ContactListFragment contactRecentListFragment;
     private ContactListFragment contactFavouritesListFragment;
+    private String profileId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -46,7 +48,10 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(this,realm);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Constants
+                .MYCOMMS_SHARED_PREFS, getActivity().MODE_PRIVATE);
+        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        mContactController = new ContactController(this,realm, profileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
         mContactController.getContactList(apiCall);
         mContactController.setConnectionCallback(this);

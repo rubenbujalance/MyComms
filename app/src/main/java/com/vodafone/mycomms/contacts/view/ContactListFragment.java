@@ -108,15 +108,15 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         return fragment;
     }
 
-   @Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-       View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
-       listView = (ListView) v.findViewById(android.R.id.list);
-       emptyText = (TextView) v.findViewById(android.R.id.empty);
+        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+        listView = (ListView) v.findViewById(android.R.id.list);
+        emptyText = (TextView) v.findViewById(android.R.id.empty);
 
-       loadSearchBarComponentsAndEvents(v);
+        loadSearchBarComponentsAndEvents(v);
 
-       return v;
+        return v;
     }
 
     /**
@@ -220,7 +220,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                         }
                     }
                     //ADD RECENT
-                    RecentContactController recentController = new RecentContactController(this,realm,profileId);
+                    RecentContactController recentController = new RecentContactController(getActivity(),
+                            realm,profileId);
                     recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                     setListAdapterTabs();
                 } catch (Exception ex) {
@@ -304,7 +305,11 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }
     }
 
-    private void setSearchBarEvents(View view)
+    /**
+     * Sets events to search bar. Makes response on touch, onKey and on text change.
+     * @author str_oan
+     */
+    private void setSearchBarEvents()
     {
         final int drLeft = android.R.drawable.ic_menu_search;
         final int drRight = R.drawable.ic_action_remove;
@@ -422,7 +427,10 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             if (emptyText!=null)
                 emptyText.setText("");
             contactList = loadAllContactsFromDB();
-            reloadAdapter();
+            if(null != contactList)
+            {
+                reloadAdapter();
+            }
         }
     }
 
@@ -513,7 +521,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     private void loadAllContactsFromServer(String keyWord)
     {
-        apiCall = Constants.CONTACT_API_GET_SEARCH_CONTACTS + keyWord;
+        apiCall = Constants.CONTACT_API_GET_SEARCH_CONTACTS_SF + keyWord;
         mSearchController.getContactList(apiCall);
         mSearchController.setConnectionCallback(this);
     }
@@ -556,7 +564,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private void showKeyboard()
     {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity
-            ().INPUT_METHOD_SERVICE);
+                ().INPUT_METHOD_SERVICE);
         imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
 
     }
@@ -568,7 +576,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private void hideKeyboard()
     {
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
-          ().INPUT_METHOD_SERVICE);
+                ().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
     }
 

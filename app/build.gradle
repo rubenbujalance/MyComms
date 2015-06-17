@@ -94,6 +94,12 @@ android {
             setRoot('src/test')
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
 }
 
 repositories {
@@ -124,9 +130,9 @@ dependencies {
     testCompile 'org.robolectric:shadows-httpclient:3.0-SNAPSHOT'
     testCompile 'org.robolectric:shadows-support-v4:3.0-SNAPSHOT'
     testCompile 'org.apache.maven:maven-ant-tasks:2.1.3'
-    testCompile 'org.apache.httpcomponents:httpclient:4.3.5'
-    testCompile 'org.apache.httpcomponents:httpmime:4.3.5'
-    testCompile 'org.apache.httpcomponents:httpcore:4.3'
+    //testCompile 'org.apache.httpcomponents:httpclient:4.3.5'
+    //testCompile 'org.apache.httpcomponents:httpmime:4.3.5'
+    //testCompile 'org.apache.httpcomponents:httpcore:4.3'
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.android.support:recyclerview-v7:21.0.+'
@@ -137,6 +143,14 @@ dependencies {
     compile files('lib/gson-2.3.1.jar')
     compile files('lib/android-viewbadger.jar')
     compile files('lib/android-framework-library.jar')
+    compile 'org.apache.httpcomponents:httpcore:4.2.4'
+    compile 'org.apache.httpcomponents:httpmime:4.3'
+    //compile 'org.apache.httpcomponents:httpclient:4.5'
+    //compile 'org.apache.httpcomponents:httpmime:4.5'
+    //compile 'org.apache.httpcomponents:httpcore:4.4.1'
+
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.4.0'
 
     //Smack XMPP Library
     compile "org.igniterealtime.smack:smack-android-extensions:4.1.0"

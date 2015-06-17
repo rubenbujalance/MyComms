@@ -2,6 +2,7 @@ package com.vodafone.mycomms.contacts.detail;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -61,6 +62,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private int imageStarOn;
     private int imageStarOff;
     private TextView textAvatar;
+    private String profileId;
+
 
     //Buttons
     private ImageView btSms;
@@ -72,6 +75,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ImageView btCallBar;
     private ImageView btFavourite;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,11 +83,16 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
         realm = Realm.getInstance(this);
-        mRecentContactController = new RecentContactController(this,realm);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants
+                .MYCOMMS_SHARED_PREFS, this.MODE_PRIVATE);
+        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+        mRecentContactController = new RecentContactController(this,realm,profileId);
 
         Intent intent = getIntent();
         contactId = intent.getExtras().getString(Constants.CONTACT_ID);
-        controller = new ContactDetailController(this, realm);
+        controller = new ContactDetailController(this, realm, profileId);
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
 
@@ -245,7 +254,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         btFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm);
+                FavouriteController favouriteController = new FavouriteController
+                        (ContactDetailMainActivity.this, realm, profileId);
                 favouriteController.manageFavourite(contactId);
 
                 if (btFavourite.getTag().equals("icon_favorite_colour")) {
@@ -277,7 +287,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 Toast.makeText(getApplicationContext(), "Inserting favourite", Toast.LENGTH_LONG).show();
-                FavouriteController favouriteController = new FavouriteController(activity, realm);
+                FavouriteController favouriteController = new FavouriteController(activity,
+                        realm, profileId);
                 favouriteController.manageFavourite(contactId);
             }
         });
@@ -447,7 +458,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private Contact getContact(String contactId){
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, profileId);
         List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_ID, contactId);
 
         Contact contact = contactList.get(0);

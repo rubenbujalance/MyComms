@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/recents"
+              android:orientation="horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="?android:attr/selectableItemBackground">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="106dp"
+        android:layout_height="100dp"
+        android:id="@+id/recent_content"
+        android:layout_gravity="right" android:gravity="center">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.vodafone.mycomms.custom.CircleImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:id="@+id/recent_avatar"
+                tools:background="@color/grey_light"
+                tools:src="@drawable/cartoon_round_contact_image_example"
+                android:layout_marginTop="5dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"/>
+
+            <TextView
+                android:id="@+id/avatarText"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:textSize="15sp"
+                tools:text="AM"
+                android:textColor="@color/grey_dark"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="5dp"
+                android:layout_alignParentTop="true" android:layout_alignLeft="@+id/recent_avatar"
+                android:layout_alignStart="@+id/recent_avatar"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Andrew"
+                android:id="@+id/recent_firstname"
+                android:textColor="#ffffffff"
+                android:layout_below="@+id/recent_avatar" android:layout_centerHorizontal="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Wiggins"
+                android:id="@+id/recent_lastname"
+                android:textColor="#ffffffff"
+                android:layout_below="@+id/recent_firstname"
+                android:layout_alignLeft="@+id/recent_firstname"
+                android:layout_alignStart="@+id/recent_firstname"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout >

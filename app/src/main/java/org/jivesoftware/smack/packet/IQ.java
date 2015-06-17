@@ -279,9 +279,14 @@ public abstract class IQ extends Stanza {
         error,
 
         /**
-         * The IQ stanza reports an error that has occurred regarding processing or delivery of a get or set request.
+         * RBM - Type added to MyComms. This type contains the number pending messages when user just connect to server
          */
         pendingmessages,
+
+        /**
+         * RBM - Type added to MyComms. This type indicates the status of a message in chat
+         */
+        chat,
         ;
 
         /**

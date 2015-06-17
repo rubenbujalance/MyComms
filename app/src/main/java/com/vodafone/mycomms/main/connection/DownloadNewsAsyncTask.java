@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -40,7 +43,13 @@ public class DownloadNewsAsyncTask extends AsyncTask<Context, Void, Void> implem
 
         if (morePages){
             mNewsController.getNewsList(apiCall + "&o=" + offsetPaging);
+        } else {
+            RefreshNewsEvent event = new RefreshNewsEvent();
+            event.setNews(newsList);
+            BusProvider.getInstance().post(event);
         }
+
+        //Log.i(Constants.TAG, "ShowNewsList: " + newsList.toString());
     }
 
     @Override

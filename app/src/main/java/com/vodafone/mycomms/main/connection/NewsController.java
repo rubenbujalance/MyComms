@@ -25,6 +25,7 @@ public class NewsController extends BaseController {
     private Context mContext;
     private NewsConnection newsConnection;
     private INewsConnectionCallback newsConnectionCallback;
+    private ArrayList<News> newsList;
 
     private String apiCall;
 
@@ -33,6 +34,7 @@ public class NewsController extends BaseController {
     public NewsController(Context context) {
         super(context);
         this.mContext = context;
+        newsList = new ArrayList<>();
     }
 
     public void getNewsList(String api) {
@@ -67,7 +69,6 @@ public class NewsController extends BaseController {
                     offsetPaging = 0;
                 }
 
-                ArrayList<News> newsList = new ArrayList<>();
                 newsList = loadNews(jsonResponse);
                 if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof INewsConnectionCallback) {
                     ((INewsConnectionCallback) this.getConnectionCallback()).onNewsResponse(newsList, morePages, offsetPaging);
@@ -80,7 +81,6 @@ public class NewsController extends BaseController {
     }
 
     private ArrayList<News> loadNews(JSONObject jsonObject) {
-        ArrayList<News> newsList = new ArrayList<>();
 
         try {
             Log.i(Constants.TAG, "NewsController.loadNews: ");

@@ -51,6 +51,14 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private ProfileController profileController;
     private boolean isSourceDB = true;
 
+    private long holidayEndDate = 0L;
+    private boolean isOnHoliday=false;
+
+
+    private boolean isFirstLoad = true;
+    private boolean doNotDisturb = false;
+    private boolean privateTimeZone = false;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -103,6 +111,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
         profileController.setConnectionCallback(this);
         profileController.getProfile();
+
     }
 
 
@@ -142,18 +151,18 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         vacationTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(getActivity(), VacationTimeSetterActivity.class);
-                startActivity(in);
+                Intent intent = new Intent(getActivity(), VacationTimeSetterActivity.class);
+                intent.putExtra(VacationTimeSetterActivity.EXTRA_HOLIDAY_END_DATE, holidayEndDate);
+                startActivityForResult(intent, SettingsMainActivity.VACATION_TIME_SETTER_ID);
             }
         });
 
-        Switch privateTimeZoneSwitch = (Switch) v.findViewById(R.id.setting_share_current_time_switch);
-        privateTimeZoneSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        Switch shareCurrentTimeSwitch = (Switch) v.findViewById(R.id.setting_share_current_time_switch);
+        shareCurrentTimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (!isSourceDB) {
-                    shareCurrentTime(isChecked);
-                }
+                shareCurrentTime(isChecked);
+
             }
         });
 
@@ -161,17 +170,26 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         doNotDisturbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (!isSourceDB) {
-                    setDoNotDisturb(isChecked);
-                }
-                isSourceDB = false;
+                setDoNotDisturb(isChecked);
             }
         });
 
+        TextView aboutButton = (TextView) v.findViewById(R.id.btnAbout);
+        aboutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AboutActivity.class);
+                startActivity(intent);
+            }
+        });
         return v;
     }
 
     private void shareCurrentTime(boolean isChecked) {
+        this.privateTimeZone = !isChecked;
+
+        updateProfileInDb();
+
         HashMap settingsHashMap = new HashMap<>();
         if(isChecked) {
             settingsHashMap.put(Constants.PROFILE_PRIVATE_TIMEZONE, false);
@@ -184,6 +202,10 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
 
     private void setDoNotDisturb(boolean isChecked) {
+        this.doNotDisturb = isChecked;
+
+        updateProfileInDb();
+
         HashMap settingsHashMap = new HashMap<>();
         if(isChecked) {
             settingsHashMap.put(Constants.PROFILE_DONOTDISTURB, true);
@@ -228,12 +250,16 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         try{
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
                 jsonSettings = new JSONObject(userProfile.getSettings());
-                String holidayEndDate = jsonSettings.getString(Constants.PROFILE_HOLIDAY_END_DATE);
-                Boolean isOnHoliday = jsonSettings.getBoolean(Constants.PROFILE_HOLIDAY);
 
+                this.isOnHoliday = jsonSettings.getBoolean(Constants.PROFILE_HOLIDAY);
+
+                this.holidayEndDate = jsonSettings.getLong(Constants.PROFILE_HOLIDAY_END_DATE);
                 TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
-                if(holidayEndDate != null && holidayEndDate.length() >0){
-                   vacationTimeEnds.setText(Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate));
+
+                if(holidayEndDate > 0){
+                    String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
+                    Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: setting holidayDate to:" + holidayDateToSet);
+                    vacationTimeEnds.setText(holidayDateToSet);
                 }
             }
         } catch (Exception e){
@@ -244,9 +270,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
                 jsonSettings = new JSONObject(userProfile.getSettings());
                 if (jsonSettings.isNull(Constants.PROFILE_PRIVATE_TIMEZONE)){
-                    privateTimeZone = true;
+                    privateTimeZone = false;
                 } else{
-                    //TODO: Check if this is False (if true is null according To Apiary
                     privateTimeZone = jsonSettings.getBoolean(Constants.PROFILE_PRIVATE_TIMEZONE);
                 }
             }
@@ -257,9 +282,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         try {
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0 && jsonSettings != null) {
                 if (jsonSettings.isNull(Constants.PROFILE_DONOTDISTURB)){
-                    doNotDisturb = true;
+                    doNotDisturb = false;
                 } else{
-                    //TODO: Check if this is False (if true is null according To Apiary
                     doNotDisturb = jsonSettings.getBoolean(Constants.PROFILE_DONOTDISTURB);
                 }
             }
@@ -267,6 +291,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived, doNotDisturb: " , e);
         }
 
+        this.doNotDisturb = doNotDisturb;
+        this.privateTimeZone = privateTimeZone;
 
         if(privateTimeZone){
             Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
@@ -276,7 +302,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             shareCurrentTimeSwitch.setChecked(true);
         }
 
+
         if(doNotDisturb){
+
             Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
             doNotDisturbSwitch.setChecked(true);
         }else {
@@ -336,6 +364,53 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         profileController.setConnectionCallback(null);
         Log.d(Constants.TAG, "PreferencesFragment.onPause: ");
 
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ");
+        super.onActivityResult(requestCode, resultCode, data);
+        switch(requestCode) {
+            case (SettingsMainActivity.VACATION_TIME_SETTER_ID) : {
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ACTIVITY_RESULT_OK");
+                    this.holidayEndDate = data.getLongExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, 0L);
+                    if(holidayEndDate > 0L){
+                        isOnHoliday = true;
+                    }else{
+                        isOnHoliday = false;
+                    }
+                    updateHolidayText(holidayEndDate);
+                    updateProfileInDb();
+
+
+                }
+                break;
+            }
+        }
+    }
+
+    void updateHolidayText(long holidayEndDate){
+        Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: " + holidayEndDate);
+        this.holidayEndDate = holidayEndDate;
+        TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+
+        String holidayDateToSet = null;
+        if(holidayEndDate > 0){
+            holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
+        }else {
+            holidayDateToSet = getString(R.string.settings_label_vacation_time_not_set);
+        }
+
+        Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: setting holidayDate to:" + holidayDateToSet);
+        vacationTimeEnds.setText(holidayDateToSet);
+    }
+
+
+
+    void updateProfileInDb(){
+        this.profileController.updateUserProfileSettingsInDB(false, this.privateTimeZone, this.isOnHoliday, this.holidayEndDate, this.doNotDisturb);
     }
 
 }

@@ -130,7 +130,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        
+
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);

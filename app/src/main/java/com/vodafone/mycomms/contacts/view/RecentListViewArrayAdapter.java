@@ -59,7 +59,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         //Image avatar
         File avatarFile = null;
         if (contact.getId()!=null)
-            avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getId()+".jpg");
+            avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&

@@ -102,6 +102,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewPosition.setText(contact.getPosition());
+
         //Icon
         String icon = null;
         try {

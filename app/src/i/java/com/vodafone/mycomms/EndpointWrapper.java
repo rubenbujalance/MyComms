@@ -6,7 +6,6 @@ package com.vodafone.mycomms;
 public class EndpointWrapper {
 
     private static final String baseURL = "int.my-comms.com";
-
     private static final String baseNewsURL = "int-news.my-comms.com";
 
     public static String getBaseURL() {

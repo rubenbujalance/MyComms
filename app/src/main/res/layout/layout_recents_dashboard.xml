@@ -54,7 +54,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:visibility="gone"
-                android:background="@mipmap/icon_notification_chat_grey" />
+                android:background="@mipmap/icon_notification_chat_grey"
+                android:longClickable="false" />
 
             <TextView
                 android:id="@+id/avatarText"

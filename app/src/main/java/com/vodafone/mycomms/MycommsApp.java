@@ -104,7 +104,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Override
     public void onProfileReceived(model.UserProfile userProfile) {
         Log.i(Constants.TAG, "MycommsApp.onProfileReceived: ");
-        profileController.setUserProfile(userProfile.getId(), userProfile.getFirstName() + " " + userProfile.getLastName());
+        profileController.setUserProfile(userProfile.getId(),
+                userProfile.getFirstName() + " " + userProfile.getLastName(),
+                userProfile.getPlatforms());
         new DownloadContactsAsyncTask().execute(mContext);
 
         XMPPTransactions.initializeMsgServerSession(this);

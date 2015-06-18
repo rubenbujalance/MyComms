@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.framework.library.connection.ConnectionInterfaces;
-import com.framework.library.connection.HttpConnection;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.util.Constants;
 

@@ -13,10 +13,11 @@ public class Constants {
     public static final int RIGHT_CHAT = 1;
 
     //Profile Constants
-    public static final int PREFERENCES = 0;
-    public static final int ACCOUNTS = 1;
+    public static final int MY_SETTINGS = 0;
     public static final int MY_PROFILE = 1;
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
+    public static final String PROFILE_PLATFORMS_SHARED_PREF = "mycomms_profile_platforms";
+    public static final String PROFILE_FULLNAME_SHARED_PREF = "mycomms_profile_fullname";
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
     public static final String DEVICE_ID_SHARED_PREF = "device_Id" ;
 
@@ -144,9 +145,14 @@ public class Constants {
 
     //XMPP Constants
     public static final int XMPP_PARAM_PORT = 5222;
-//    public static final String XMPP_PARAM_DUMMY_HOST = "securejabber.me";
-//    public static final String XMPP_PARAM_DUMMY_SERVICE_NAME = "securejabber.me";
     public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
+    public static final String XMPP_MESSAGE_MEDIATYPE_TEXT = "text";
+    public static final String XMPP_MESSAGE_TYPE_CHAT = "chat";
+    public static final String XMPP_IQ_TYPE_CHAT = "chat";
+    public static final String XMPP_IQ_STATUS_SENT = "sent";
+    public static final String XMPP_IQ_STATUS_DELIVERED = "delivered";
+    public static final String XMPP_IQ_STATUS_READ = "read";
+
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
 

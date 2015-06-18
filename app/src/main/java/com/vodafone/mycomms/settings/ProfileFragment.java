@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,9 +24,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.EnableEditProfileEvent;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -77,6 +79,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private TextView textAvatar;
     private TextView editPhoto;
     private TextView editProfile;
+    private boolean isFirstLoad = true;
 
     // TODO: Rename and change types of parameters
     public static ProfileFragment newInstance(int index, String param2) {
@@ -90,11 +93,13 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+       BusProvider.getInstance().register(this);
+
        View v = inflater.inflate(R.layout.layout_fragment_profile, container, false);
 
        initSpinners(v);
        editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-       editProfile.setVisibility(View.VISIBLE);
+       //editProfile.setVisibility(View.VISIBLE);
        profilePicture = (ImageView) v.findViewById(R.id.profile_picture);
        textAvatar = (TextView) v.findViewById(R.id.avatarText);
 
@@ -105,13 +110,13 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
                profileEditMode(isEditing);
                if (isEditing && !isUpdating) {
-                   //TODO verify if details have actually changed and send update accordingly
+
                    isUpdating = updateContactData();
                    if (!isUpdating) {
                        return;
                    }
                } else if (!isEditing && !isUpdating) {
-                   isEditing = !isEditing;
+                   isEditing = true;
                    profileEditMode(isEditing);
                }
            }
@@ -129,6 +134,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        return v;
    }
 
+    /**
+     *
+     * @return true, if update network process is started.
+     */
     private boolean updateContactData() {
         Log.d(Constants.TAG, "ProfileFragment.updateContactData: ");
         if(!BaseConnection.isConnected(this.getActivity())){
@@ -154,9 +163,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileController.updatePassword(newPasswordHashMap);
         }
 
-        String name = ((EditText) getActivity().findViewById(R.id.profile_name)).getText().toString();
-        String surname = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
+        String firstName = ((EditText) getActivity().findViewById(R.id.profile_name)).getText().toString();
+        String lastName = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
 
+        ((SettingsMainActivity)getActivity()).setMainActivityTitle(firstName + " " + lastName);
 //      EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
 //      EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
 
@@ -164,14 +174,24 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         String position = ((EditText) getActivity().findViewById(R.id.contact_position)).getText().toString();
         String officeLocation = ((EditText) getActivity().findViewById(R.id.office_location)).getText().toString();
 
+
+        if(!profileController.isUserProfileChanged(firstName, lastName, company, position, officeLocation)){
+            Log.d(Constants.TAG, "ProfileFragment.updateContactData: profile details not changed");
+            isEditing = false;
+            profileEditMode(isEditing);
+            return false;
+        }
+
         UserProfile newProfile = new UserProfile();
-        newProfile.setFirstName(name);
-        newProfile.setLastName(surname);
+        newProfile.setFirstName(firstName);
+        newProfile.setLastName(lastName);
         newProfile.setCompany(company);
         newProfile.setPosition(position);
         newProfile.setOfficeLocation(officeLocation);
 
         Log.d(Constants.TAG, "ProfileFragment.updateContactData:" + profileController.printUserProfile(newProfile));
+
+        profileController.updateUserProfileInDB(firstName, lastName, company, position, officeLocation);
 
         HashMap newProfileHashMap = profileController.getProfileHashMap(newProfile);
 
@@ -364,7 +384,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 //        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
 //        editProfile.setVisibility(View.VISIBLE);
 
-        profileController.setConnectionCallback(this);
+        profileController.getProfile();
         profileController.getProfile();
     }
 
@@ -393,8 +413,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     }
 
-
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+    }
 
     @Override
     public void onProfileReceived(UserProfile userProfile) {
@@ -404,6 +427,9 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileName.setText(userProfile.getFirstName());
             EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
             profileSurname.setText(userProfile.getLastName());
+
+            ((SettingsMainActivity)getActivity()).setMainActivityTitle(userProfile.getFirstName() + " " + userProfile.getLastName());
+
             EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
             String phone = Utils.getElementFromJsonArrayString(userProfile.getPhones(), Constants.PROFILE_PHONE);
             profilePhoneNumber.setText(phone);
@@ -482,6 +508,16 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
+    }
+
+    @Subscribe
+    public void enableEditProfile(EnableEditProfileEvent event) {
+        boolean enable = event.getEnable();
+        if (enable){
+            editProfile.setVisibility(View.VISIBLE);
+        } else{
+            editProfile.setVisibility(View.GONE);
+        }
     }
 
 }

@@ -29,7 +29,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         setContentView(R.layout.layout_main_activity);
         noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
         activateContactListToolbar();
-        setToolbarTitle("Username");
+        setToolbarTitle("Contacts");
         activateFooter();
 
         setFooterListeners(this);
@@ -44,7 +44,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
 
         //Initialize messaging server session (needs the profile_id saved)
         //if(profile_id != null) //If null, do initialization in callback method
-            XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+            //XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
@@ -110,5 +110,11 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
 
         // Disconnect from the XMPP server
         XMPPTransactions.disconnectMsgServerSession();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 }

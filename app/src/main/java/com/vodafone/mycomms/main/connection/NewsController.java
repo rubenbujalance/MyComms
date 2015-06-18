@@ -6,13 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
 
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
-
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;

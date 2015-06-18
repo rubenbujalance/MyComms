@@ -330,13 +330,6 @@
                             <ImageView
                                 android:layout_width="35dp"
                                 android:layout_height="35dp"
-                                android:id="@+id/bt_chat"
-                                android:layout_toLeftOf="@+id/bt_chat"
-                                android:src="@mipmap/btn_contact_messaging" />
-
-                            <ImageView
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
                                 android:id="@+id/bt_email"
                                 android:layout_alignParentEnd="true"
                                 android:layout_alignParentRight="true"

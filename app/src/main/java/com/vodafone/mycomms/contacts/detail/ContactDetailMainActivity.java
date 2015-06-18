@@ -104,14 +104,13 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
-        imageStarOn = R.drawable.abc_btn_rating_star_on_mtrl_alpha;
-        imageStarOff = R.drawable.abc_btn_rating_star_off_mtrl_alpha;
+        imageStarOn = R.mipmap.icon_favorite_colour;
+        imageStarOff = R.mipmap.icon_favorite_grey;
         textAvatar = (TextView)findViewById(R.id.avatarText);
 
         //Buttons
         btSms = (ImageView)findViewById(R.id.bt_sms);
         btEmail = (ImageView)findViewById(R.id.bt_email);
-        btChat = (ImageView)findViewById(R.id.bt_chat);
         btCall = (ImageView)findViewById(R.id.bt_call);
         btChatBar = (ImageView)findViewById(R.id.btchat);
         btEmailBar = (ImageView)findViewById(R.id.btemail);
@@ -227,7 +226,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
-        btChat.setOnClickListener(new View.OnClickListener() {
+        /*btChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
@@ -235,7 +234,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
                 startActivity(in);
             }
-        });
+        });*/
 
         btChatBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -253,17 +252,15 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
                 favouriteController.manageFavourite(contactId);
 
-                if (btFavourite.getTag() == "abc_btn_rating_star_off_mtrl_alpha.png") {
+                if (btFavourite.getTag().equals("icon_favorite_colour")) {
                     Drawable imageStar = getResources().getDrawable(imageStarOn);
                     btFavourite.setImageDrawable(imageStar);
-                    btFavourite.setTag("abc_btn_rating_star_on_mtrl_alpha.png");
-                } else if (btFavourite.getTag() == "abc_btn_rating_star_on_mtrl_alpha.png") {
+                    btFavourite.setTag("icon_favorite_grey");
+                } else if (btFavourite.getTag().equals("icon_favorite_grey")) {
                     Drawable imageStar = getResources().getDrawable(imageStarOff);
                     btFavourite.setImageDrawable(imageStar);
-                    btFavourite.setTag("abc_btn_rating_star_off_mtrl_alpha.png");
+                    btFavourite.setTag("icon_favorite_colour");
                 }
-
-                Log.e(Constants.TAG, "TAG: " + btFavourite.getTag());
 
             }
         });

@@ -417,9 +417,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             if (recentContactList!=null) {
                 RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList);
                 if (listView != null) {
-                    state = listView.onSaveInstanceState();
                     setListAdapter(recentAdapter);
-                    listView.onRestoreInstanceState(state);
                 }
             }
         }else if(mIndex == Constants.CONTACTS_ALL){

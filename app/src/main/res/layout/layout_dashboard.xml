@@ -172,14 +172,15 @@
             </LinearLayout>
             <HorizontalScrollView
                 android:layout_width="fill_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:id="@+id/scroll_recents"
                 android:background="#2affffff">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/list_recents"></LinearLayout>
+                    android:id="@+id/list_recents"
+                    android:orientation="horizontal"></LinearLayout>
             </HorizontalScrollView>
 
         </LinearLayout>

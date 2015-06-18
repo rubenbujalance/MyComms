@@ -54,7 +54,7 @@ public class DashBoardActivity extends ToolbarActivity{
         BusProvider.getInstance().post(new InitNews());
         BusProvider.getInstance().post(new InitProfileAndContacts());
 
-        //loadRecents();
+        loadRecents();
     }
 
     private void initALL(){
@@ -108,6 +108,8 @@ public class DashBoardActivity extends ToolbarActivity{
                 finish();
             }
         });
+
+        loadRecents();
     }
 
     private void loadRecents(){
@@ -116,20 +118,23 @@ public class DashBoardActivity extends ToolbarActivity{
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
             String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
             ArrayList<RecentContact> recentList = new ArrayList<>();
+
             Realm realm = Realm.getInstance(this);
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, profileId);
             recentList = realmContactTransactions.getAllRecentContacts();
-            LinearLayout contenedor = (LinearLayout) findViewById(R.id.list_recents);
+
+            LinearLayout recentscontenedor = (LinearLayout) findViewById(R.id.list_recents);
             LayoutInflater inflater = LayoutInflater.from(this);
 
             for (int i = 0; i < recentList.size(); i++) {
-                View child = inflater.inflate(R.layout.layout_recents_dashboard, contenedor, false);
+                View childrecents = inflater.inflate(R.layout.layout_recents_dashboard, recentscontenedor, false);
 
-                contenedor.addView(child);
-                child.setPadding(10, 10, 10, 10);
+                recentscontenedor.addView(childrecents);
+                childrecents.setPadding(10,20,10,20);
 
-                ImageView recentAvatar = (ImageView) child.findViewById(R.id.recent_avatar);
+                ImageView recentAvatar = (ImageView) childrecents.findViewById(R.id.recent_avatar);
                 File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
                         "avatar_"+recentList.get(i).getContactId()+".jpg");
 
@@ -149,21 +154,21 @@ public class DashBoardActivity extends ToolbarActivity{
                         }
 
                     }
-                    TextView avatarText = (TextView) child.findViewById(R.id.avatarText);
+                    TextView avatarText = (TextView) childrecents.findViewById(R.id.avatarText);
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(initials);
                 }
 
-                TextView firstName = (TextView) child.findViewById(R.id.recent_firstname);
+                TextView firstName = (TextView) childrecents.findViewById(R.id.recent_firstname);
                 firstName.setText(recentList.get(i).getFirstName());
 
-                TextView lastName = (TextView) child.findViewById(R.id.recent_lastname);
+                TextView lastName = (TextView) childrecents.findViewById(R.id.recent_lastname);
                 lastName.setText(recentList.get(i).getLastName());
 
             }
             //initALL();
         } catch (Exception e) {
-            Log.e(Constants.TAG, "Load news error: " + e);
+            Log.e(Constants.TAG, "Load recents error: " + e);
         }
     }
 

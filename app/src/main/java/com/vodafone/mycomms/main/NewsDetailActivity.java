@@ -33,9 +33,16 @@ public class NewsDetailActivity  extends ToolbarActivity {
         title.setText(intent.getExtras().getString(Constants.NEWS_TITLE));
 
         ImageView avatar = (ImageView) findViewById(R.id.avatar);
-        Picasso.with(this)
-                .load("https://"+ EndpointWrapper.getBaseURL()+intent.getExtras().getString(Constants.NEWS_AUTHOR_AVATAR))
-                .into(avatar);
+
+        if(intent.getExtras().getString(Constants.NEWS_AUTHOR_AVATAR) == null){
+            Picasso.with(this)
+                    .load(R.mipmap.icon_account_white)
+                    .into(avatar);
+        } else {
+            Picasso.with(this)
+                    .load("https://" + EndpointWrapper.getBaseURL() + intent.getExtras().getString(Constants.NEWS_AUTHOR_AVATAR))
+                    .into(avatar);
+        }
 
         TextView author = (TextView) findViewById(R.id.author);
         author.setText(intent.getExtras().getString(Constants.NEWS_AUTHOR_NAME));

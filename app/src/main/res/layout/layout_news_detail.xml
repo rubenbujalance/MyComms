@@ -20,12 +20,26 @@
             android:layout_height="match_parent"
             android:id="@+id/content">
 
-            <ImageView
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/picture"
-                android:src="@drawable/sample_3"
-                android:scaleType="centerCrop"/>
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/picture"
+                    android:src="@drawable/sample_3"
+                    android:scaleType="centerCrop" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/diagonal"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentBottom="true"
+                    android:background="@mipmap/diagonalnews" />
+            </RelativeLayout>
 
             <TextView
                 android:layout_width="fill_parent"
@@ -54,7 +68,10 @@
                     android:layout_height="60dp"
                     android:id="@+id/avatar"
                     android:src="@drawable/cartoon_round_contact_image_example"
-                    android:padding="10dp" />
+                    android:paddingLeft="5dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="10dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -83,12 +100,18 @@
                     android:textSize="16dp" />
             </LinearLayout>
 
-            <WebView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/newstext"
-                android:background="#ffffffff"
-                android:padding="15dp" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="15dp">
+
+                <WebView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/newstext"
+                    android:background="#ffffffff"
+                    android:padding="30dp" />
+            </FrameLayout>
 
 
         </LinearLayout>

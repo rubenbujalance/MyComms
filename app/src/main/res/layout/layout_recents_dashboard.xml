@@ -28,16 +28,6 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/type_recent"
-                android:src="@mipmap/icon_notification_chat_white"
-                android:layout_alignTop="@+id/recent_avatar"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:visibility="gone" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -45,11 +35,25 @@
                 android:id="@+id/unreaded_messages"
                 android:textColor="#ffffffff"
                 android:padding="5dp"
-                android:visibility="gone"
-                android:background="@drawable/bt_blue_unread"
+                android:layout_gravity="right|top"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="18dp"
+                android:layout_marginEnd="18dp"
+                android:background="@color/blue_dark"
+                android:autoText="false"
                 android:layout_alignTop="@+id/recent_avatar"
-                android:layout_toRightOf="@+id/recent_firstname"
-                android:layout_toEndOf="@+id/recent_firstname" />
+                android:visibility="gone" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/type_recent"
+                android:layout_alignTop="@+id/recent_avatar"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:visibility="gone"
+                android:background="@mipmap/icon_notification_chat_grey" />
 
             <TextView
                 android:id="@+id/avatarText"

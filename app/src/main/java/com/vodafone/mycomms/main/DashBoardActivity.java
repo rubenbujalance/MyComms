@@ -184,7 +184,6 @@ public class DashBoardActivity extends ToolbarActivity{
                     TextView unreaded_messages = (TextView) childrecents.findViewById(R.id.unreaded_messages);
                     unreaded_messages.setVisibility(View.VISIBLE);
                     unreaded_messages.setText(String.valueOf(count));
-                    unreaded_messages.setBackground(getResources().getDrawable(R.drawable.bt_blue_unread));
                 } else {
                     ImageView typerecent = (ImageView) childrecents.findViewById(R.id.type_recent);
                     typerecent.setVisibility(View.VISIBLE);
@@ -192,11 +191,11 @@ public class DashBoardActivity extends ToolbarActivity{
                     String action = recentList.get(i).getAction();
 
                     if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
-                        typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                        typerecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
                     } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
-                        typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                        typerecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
                     } else {
-                        typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                        typerecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
                     }
                 }
             }

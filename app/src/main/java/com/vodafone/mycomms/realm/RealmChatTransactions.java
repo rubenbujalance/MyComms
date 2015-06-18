@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,7 +50,7 @@ public class RealmChatTransactions {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,timestamp,
-                direction,type,text,resourceUri,"0","0");
+                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,"0");
 
         return chatMessage;
     }
@@ -60,7 +61,7 @@ public class RealmChatTransactions {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,timestamp,
-                direction,type,text,resourceUri,"0","0", id);
+                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,"0", id);
 
         return chatMessage;
     }
@@ -112,18 +113,45 @@ public class RealmChatTransactions {
         }
     }
 
-    public void setChatMessageAsRead (ChatMessage chatMessage){
+    public void setChatMessageReceivedAsRead (ChatMessage chatMessage){
+        //Sets a received message as read
         if(chatMessage==null) return;
 
         try {
             mRealm.beginTransaction();
-            chatMessage.setRead("1");
+            chatMessage.setRead(Constants.CHAT_MESSAGE_READ);
             mRealm.commitTransaction();
         } catch (Exception e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageAsRead: ", e);
             mRealm.cancelTransaction();
         }
+    }
+
+    public boolean setChatMessageSentStatus (String id, String status){
+        //Sets a received message as read
+        if(id==null || status==null) return false;
+        boolean changed = false;
+
+        try {
+            mRealm.beginTransaction();
+            //Update associated Chat with new last message
+            ChatMessage chatMessage = getChatMessageById(id);
+            if(XMPPTransactions.getXMPPStatusOrder(chatMessage.getStatus()) <
+                    XMPPTransactions.getXMPPStatusOrder(status)) {
+                chatMessage.setStatus(status);
+                changed = true;
+            }
+
+            mRealm.commitTransaction();
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageAsRead: ", e);
+            mRealm.cancelTransaction();
+            changed = false;
+        }
+
+        return changed;
     }
 
     //GETS
@@ -140,11 +168,22 @@ public class RealmChatTransactions {
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id);
 
+//            RealmResults<ChatMessage> result1 = query.findAllSorted("timestamp");
             RealmResults<ChatMessage> result1 = query.findAll();
+
             if (result1 != null) {
-                for (ChatMessage chatMessageListItem : result1) {
-                    chatMessageArrayList.add(chatMessageListItem);
+
+                for(ChatMessage chatMessage : result1)
+                {
+                    chatMessageArrayList.add(chatMessage);
                 }
+//                int count = 0;
+//
+//                for (int i=result1.size()-1; i>=0; i--) {
+//                    if(count>=50) break;
+//                    chatMessageArrayList.add(result1.get(i));
+//                    count++;
+//                }
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getAllChatMessages: ", e);
@@ -177,6 +216,20 @@ public class RealmChatTransactions {
         }
 
         return chatMessageArrayList;
+    }
+
+    public ChatMessage getChatMessageById(String id){
+        ChatMessage chatMessage = null;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, id);
+            chatMessage = query.findFirst();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ", e);
+        }
+
+        return chatMessage;
     }
 
     public ChatMessage getChatMessageById(String contact_id, long timestamp){

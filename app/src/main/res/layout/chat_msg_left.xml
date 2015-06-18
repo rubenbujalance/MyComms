@@ -45,10 +45,10 @@
             android:id="@+id/sent_text"
             style="@style/ChatSent"
             android:visibility="gone"
-            android:text="@string/Sent"
+            android:text="Delivered"
             android:paddingTop="0dp"
-            android:layout_marginLeft="12dp"
-            android:layout_gravity="left"/>
+            android:layout_gravity="left"
+            android:layout_marginLeft="5dp" />
     </LinearLayout>
 
 </RelativeLayout>

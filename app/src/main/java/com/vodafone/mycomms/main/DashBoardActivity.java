@@ -219,7 +219,7 @@ public class DashBoardActivity extends ToolbarActivity{
                     View child = inflater.inflate(R.layout.layout_news_dashboard, contenedor, false);
 
                     contenedor.addView(child);
-                    child.setPadding(10, 10, 10, 10);
+                    child.setPadding(10, 20, 10, 20);
 
                     ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
                     Picasso.with(this)
@@ -230,7 +230,19 @@ public class DashBoardActivity extends ToolbarActivity{
                     title.setText(news.get(i).getTitle());
 
                     TextView date = (TextView) child.findViewById(R.id.notice_date);
-                    date.setText(Utils.getStringChatTimeDifference(news.get(i).getPublished_at()));
+                    Long current = Calendar.getInstance().getTimeInMillis();
+                    date.setText(Utils.getShortStringTimeDifference(current - news.get(i).getPublished_at()));
+
+                    LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
+                    btnews.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            //Start Contacts activity
+                            Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
+                            in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            startActivity(in);
+                            finish();
+                        }
+                    });
 
                 }
                 initALL();

@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.contacts.view;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +54,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
             viewHolder.textViewPosition = (TextView) convertView.findViewById(R.id.list_item_content_position);
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_status_local_time);
+            viewHolder.textViewCountry = (TextView) convertView.findViewById(R.id.list_item_status_local_country);
             viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
             convertView.setTag(viewHolder);
         } else {
@@ -102,6 +105,24 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewPosition.setText(contact.getPosition());
+
+        String country = "";
+        try {
+            if (contact.getCountry() != null && contact.getCountry().length() > 0) {
+                if (Utils.getCountry(contact.getCountry(), mContext).get("is_special") != null) {
+                    if (Utils.getCountry(contact.getCountry(), mContext).get("is_special").equals("Yes")) {
+                        country = Utils.getCountry(contact.getCountry(), mContext).get("FIPS");
+                    } else {
+                        country = Utils.getCountry(contact.getCountry(), mContext).get("name");
+                    }
+                } else {
+                    country = Utils.getCountry(contact.getCountry(), mContext).get("name");
+                }
+            }
+        } catch (NullPointerException e){
+            Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: NullPointerException " + e);
+        }
+        viewHolder.textViewCountry.setText(country);
 
         //Icon
         String icon = null;
@@ -162,6 +183,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         TextView textViewPosition;
         TextView textViewCompany;
         TextView textViewTime;
+        TextView textViewCountry;
         ImageView imageViewDayNight;
         ImageView imageAvatar;
         TextView textAvatar;

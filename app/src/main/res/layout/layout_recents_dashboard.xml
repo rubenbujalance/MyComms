@@ -36,14 +36,15 @@
                 android:textColor="#ffffffff"
                 android:padding="5dp"
                 android:layout_gravity="right|top"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginRight="18dp"
-                android:layout_marginEnd="18dp"
-                android:background="@drawable/blue_rounded"
+                android:layout_marginRight="6dp"
+                android:layout_marginEnd="6dp"
+                android:background="@mipmap/blue"
                 android:autoText="false"
+                android:visibility="gone"
+                android:gravity="center_vertical|center_horizontal"
                 android:layout_alignTop="@+id/recent_avatar"
-                android:visibility="gone" />
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -53,7 +54,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
                 android:visibility="gone"
-                android:background="@mipmap/icon_notification_chat_grey" />
+                android:background="@mipmap/icon_notification_chat_grey"
+                android:longClickable="false" />
 
             <TextView
                 android:id="@+id/avatarText"

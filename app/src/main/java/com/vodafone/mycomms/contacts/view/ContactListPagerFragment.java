@@ -180,7 +180,12 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
 
     private void setListsAdapter() {
         if (contactListFragment!=null)
+        {
+            contactListFragment.hideSearchBarContent();
+            contactListFragment.hideKeyboard();
             contactListFragment.setListAdapterTabs();
+        }
+
         if (contactRecentListFragment!=null)
             contactRecentListFragment.setListAdapterTabs();
         if (contactFavouritesListFragment!=null)
@@ -208,5 +213,6 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mContactController.getFavouritesList(apiCall);
         setListsAdapter();
     }
+
 
 }

@@ -10,8 +10,8 @@ import android.net.Uri;
 import android.widget.Button;
 
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -58,7 +58,7 @@ public class SplashScreenActivityTest {
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());
-        Intent expectedIntent = new Intent(activity, ContactListMainActivity.class);
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
@@ -72,7 +72,7 @@ public class SplashScreenActivityTest {
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());
-        Intent expectedIntent = new Intent(activity, ContactListMainActivity.class);
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
@@ -99,7 +99,7 @@ public class SplashScreenActivityTest {
         FakeHttp.addPendingHttpResponse(httpResponseRenewToken);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());
-        Intent expectedIntent = new Intent(activity, ContactListMainActivity.class);
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
@@ -153,7 +153,7 @@ public class SplashScreenActivityTest {
         FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());
-        Intent expectedIntent = new Intent(activity, ContactListMainActivity.class);
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 

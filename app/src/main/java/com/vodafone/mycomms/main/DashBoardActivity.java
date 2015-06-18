@@ -90,6 +90,7 @@ public class DashBoardActivity extends ToolbarActivity{
         btMagnifier.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //Start Contacts activity
+                Constants.isSearchBarFocusRequested = true;
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(in);

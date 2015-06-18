@@ -76,6 +76,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ImageView btCallBar;
     private ImageView btFavourite;
 
+    private boolean contactIsFavorite;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,9 +129,15 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 try {
                     String strPhones = contact.getPhones();
 
-                    if (strPhones != null) {
-                        JSONArray jPhones = new JSONArray(strPhones);
-                        String phone = (String)((JSONObject)jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                    if (strPhones != null)
+                    {
+                        String phone = strPhones;
+                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
+                        {
+                            JSONArray jPhones = new JSONArray(strPhones);
+                            phone = (String)((JSONObject)jPhones.get(0)).get(Constants
+                                    .CONTACT_PHONE);
+                        }
 
                         Utils.launchCall(phone, ContactDetailMainActivity.this);
                         action = Constants.CONTACTS_ACTION_CALL;
@@ -148,9 +156,15 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 try {
                     String strPhones = contact.getPhones();
 
-                    if (strPhones != null) {
-                        JSONArray jPhones = new JSONArray(strPhones);
-                        String phone = (String)((JSONObject)jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                    if (strPhones != null)
+                    {
+                        String phone = strPhones;
+                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
+                        {
+                            JSONArray jPhones = new JSONArray(strPhones);
+                            phone = (String)((JSONObject)jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                        }
+
 
                         Utils.launchCall(phone, ContactDetailMainActivity.this);
 
@@ -170,9 +184,14 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 try {
                     String strEmails = contact.getEmails();
 
-                    if (strEmails != null) {
-                        JSONArray jPhones = new JSONArray(strEmails);
-                        String email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                    if (strEmails != null)
+                    {
+                        String email = strEmails;
+                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
+                        {
+                            JSONArray jPhones = new JSONArray(strEmails);
+                            email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                        }
 
                         Utils.launchEmail(email, ContactDetailMainActivity.this);
 
@@ -190,11 +209,16 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             @Override
             public void onClick(View v) {
                 try {
-                    String strPhones = contact.getEmails();
+                    String strEmails = contact.getEmails();
 
-                    if (strPhones != null) {
-                        JSONArray jPhones = new JSONArray(strPhones);
-                        String email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                    if (strEmails != null)
+                    {
+                        String email = strEmails;
+                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
+                        {
+                            JSONArray jPhones = new JSONArray(strEmails);
+                            email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                        }
 
                         Utils.launchEmail(email, ContactDetailMainActivity.this);
 
@@ -214,11 +238,17 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 try {
                     String strPhones = contact.getPhones();
 
-                    if (strPhones != null) {
-                        JSONArray jPhones = new JSONArray(strPhones);
-                        String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                    if (strPhones != null)
+                    {
+                        String sms = strPhones;
+                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
+                        {
+                            JSONArray jPhones = new JSONArray(strPhones);
+                            sms = (String)((JSONObject) jPhones.get(0)).get(Constants
+                                    .CONTACT_PHONE);
+                        }
 
-                        Utils.launchSms(phone, ContactDetailMainActivity.this);
+                        Utils.launchSms(sms, ContactDetailMainActivity.this);
 
                         action = Constants.CONTACTS_ACTION_SMS;
                         mRecentContactController.insertRecent(contactId, action);
@@ -259,6 +289,9 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
+        Bundle bundle = getIntent().getExtras();
+        contactIsFavorite = bundle.getBoolean(Constants.CONTACT_IS_FAVORITE);
+
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -268,6 +301,63 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         });
 
         loadContactDetail();
+
+        setButtonsVisibility();
+    }
+
+    private void setButtonsVisibility()
+    {
+        if(contactIsFavorite)
+        {
+            Drawable imageStar = getResources().getDrawable(imageStarOn);
+            btFavourite.setImageDrawable(imageStar);
+        }
+        else
+        {
+            Drawable imageStar = getResources().getDrawable(imageStarOff);
+            btFavourite.setImageDrawable(imageStar);
+        }
+        if(null != contact.getPlatform() )
+        {
+            if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL) || contact
+                    .getPlatform().equals(Constants.PLATFORM_SALES_FORCE))
+            {
+                btChatBar.setVisibility(View.GONE);
+            }
+
+            //PLATFORM_LOCAL view controller
+            if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
+            {
+
+                if(null == contact.getPhones() || contact.getPhones().length() <= 0)
+                {
+                    btCall.setVisibility(View.GONE);
+                    btCallBar.setVisibility(View.GONE);
+
+                    btSms.setVisibility(View.GONE);
+                    btChatBar.setVisibility(View.GONE);
+
+                    tvPhoneNumber.setVisibility(View.GONE);
+                }
+
+                if(null == contact.getEmails() || contact.getEmails().length() <= 0)
+                {
+                    btEmail.setVisibility(View.GONE);
+                    btEmailBar.setVisibility(View.GONE);
+
+                    tvEmail.setVisibility(View.GONE);
+                }
+
+                if(null == contact.getOfficeLocation() || contact.getOfficeLocation().length() <= 0)
+                {
+                    tvOfficeLocation.setVisibility(View.GONE);
+                }
+
+                tvLocalTime.setVisibility(View.GONE);
+                tvCountry.setVisibility(View.GONE);
+                tvLastSeen.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void loadContactStatusInfo()
@@ -398,8 +488,17 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     .into(ivAvatar);
 
         } else{
-            String initials = contact.getFirstName().substring(0,1) +
-                    contact.getLastName().substring(0,1);
+            String initials = "";
+            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            {
+                initials = initials + contact.getFirstName().substring(0,1);
+
+            }
+
+            if(null != contact.getLastName() && contact.getLastName().length() > 0)
+            {
+                initials = initials + contact.getLastName().substring(0,1);
+            }
 
             ivAvatar.setImageResource(R.color.grey_middle);
             textAvatar.setText(initials);
@@ -469,8 +568,17 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvContactName.setText(contact.getFirstName() + " " + contact.getLastName());
         tvCompany.setText(contact.getCompany());
         tvPosition.setText(contact.getPosition());
-        tvPhoneNumber.setText(getElementFromJsonArrayString(contact.getPhones(), Constants.CONTACT_PHONE));
-        tvEmail.setText(getElementFromJsonArrayString(contact.getEmails(), Constants.CONTACT_EMAIL));
+        if(!contact.getPlatform().equals("local"))
+        {
+            tvPhoneNumber.setText(getElementFromJsonArrayString(contact.getPhones(), Constants.CONTACT_PHONE));
+            tvEmail.setText(getElementFromJsonArrayString(contact.getEmails(), Constants.CONTACT_EMAIL));
+        }
+        else
+        {
+            tvPhoneNumber.setText(contact.getPhones());
+            tvEmail.setText(contact.getEmails());
+        }
+
         tvOfficeLocation.setText(contact.getOfficeLocation());
     }
 
@@ -481,7 +589,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         Contact contact = contactList.get(0);
         Log.d(Constants.TAG, "ContactDetailMainActivity.getContact: " + printContact(contact));
 
-        controller.getContactDetail(contactId);
+        if(!contact.getPlatform().equals("local"))
+        {
+            controller.getContactDetail(contactId);
+        }
+
         return contact;
     }
 

@@ -20,24 +20,19 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.StanzaListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.StanzaFilter;
 import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.IQProvider;
-import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smackx.bytestreams.ibb.packet.DataPacketExtension;
-import org.jivesoftware.smackx.bytestreams.ibb.provider.DataPacketProvider;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 
 import io.realm.Realm;
+import model.Chat;
 import model.ChatMessage;
 
 /**
@@ -45,14 +40,10 @@ import model.ChatMessage;
  */
 public final class XMPPTransactions {
     private static XMPPTCPConnection _xmppConnection = null;
-    private static Realm mRealm;
-    private static RealmChatTransactions _chatTx;
     private static String accessToken;
     private static String _profile_id;
     private static boolean _isConnecting = false;
     private static Context _appContext;
-    private static StanzaListener _packetListener;
-    private static StanzaFilter _stanzaFilter;
     private static ConnectionListener _connectionListener;
     private static String _device_id;
 
@@ -78,10 +69,6 @@ public final class XMPPTransactions {
                 Log.e(Constants.TAG, "ContactListMainActivity.initializeMsgServerSession: No profile_id found");
                 return;
             }
-
-            //Instantiate Realm and Transactions
-            mRealm = Realm.getInstance(_appContext);
-            _chatTx = new RealmChatTransactions(mRealm, _appContext);
 
             //Device ID
             _device_id = Utils.getDeviceId(_appContext.getContentResolver(),
@@ -181,31 +168,56 @@ public final class XMPPTransactions {
         }
     }
 
-    private static ChatMessage saveMessageToDB(Message msg)
+    public static boolean saveAndNotifyMessageReceived(XmlPullParser parser)
     {
-        if(msg==null) return null;
+        Realm realm = null;
 
-        Realm r = Realm.getInstance(_appContext);
-        RealmChatTransactions chatTx = new RealmChatTransactions(r, _appContext);
+        try {
+            String from = parser.getAttributeValue("", "from");
+            String to = parser.getAttributeValue("", "to");
+            String id = parser.getAttributeValue("", "id");
 
-        ChatMessage newChatMessage = chatTx.newChatMessageInstance(
-                msg.getFrom().substring(0, msg.getFrom().indexOf("@")),
-                Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
-                Constants.CHAT_MESSAGE_TYPE_TEXT,
-                msg.getBody(),
-                "");
+            if (from == null || id == null ||
+                    parser.getName().compareTo("message") != 0) return false;
 
-        chatTx.insertChatMessage(newChatMessage);
-        r.close();
+            int event = parser.next();
+            if (event != XmlPullParser.START_TAG) return false;
 
-        return newChatMessage;
-    }
+            String text = parser.nextText();
+            from = from.substring(0, from.indexOf("@"));
+            to = to.substring(0, to.indexOf("@"));
 
-    private static void notifyMessageReceived(ChatMessage chatMsg)
-    {
-        ChatsReceivedEvent event = new ChatsReceivedEvent();
-        event.setMessage(chatMsg);
-        BusProvider.getInstance().post(event);
+            if(to.compareTo(_profile_id)!=0) return false;
+
+            realm = Realm.getInstance(_appContext);
+            RealmChatTransactions chatTx = new RealmChatTransactions(realm, _appContext);
+
+            ChatMessage newChatMessage = chatTx.newChatMessageInstance(from,
+                    Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
+                    Constants.CHAT_MESSAGE_TYPE_TEXT,
+                    text, "", id);
+
+            //Load chat and create if it didn't exist
+            Chat chat = chatTx.getChatById(from);
+            if(chat==null) chat = chatTx.newChatInstance(from);
+            chat = chatTx.updatedChatInstance(chat, newChatMessage);
+
+            chatTx.insertChat(chat);
+            chatTx.insertChatMessage(newChatMessage);
+
+            ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
+            chatEvent.setMessage(newChatMessage);
+            BusProvider.getInstance().post(chatEvent);
+
+            realm.close();
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
+            if(realm!=null) realm.close();
+            return false;
+        }
+
+        return true;
     }
 
     private static void notifyXMPPConnecting(boolean isConnecting)
@@ -229,46 +241,6 @@ public final class XMPPTransactions {
                 XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = params[0];
                 _xmppConnection = new XMPPTCPConnection(xmppConfigBuilder.build());
 
-//                //Packet listener for incoming messages
-//                _packetListener = new StanzaListener() {
-//                    @Override
-//                    public void processPacket(Stanza packet)
-//                    {
-//                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[PACKET LISTENER]: "+packet.getFrom());
-//
-////                    if(packet instanceof IQ) {
-////                        IQ iq = (IQ)packet;
-////                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener] (IQ): Type-"+iq.getType()
-////                                +"; From-"+iq.getFrom()+"; To-"+iq.getTo());
-////                    }
-////                    else {
-////                        Message msg = (Message)packet;
-////                        Log.w(Constants.TAG, "XMPPTransactions.processPacket[packetListener] (Message): Type-"+msg.getType()
-////                                +"; From-"+msg.getFrom()+"; To-"+msg.getTo()+"; Text-"+msg.getBody());
-////                    }
-////                        if(msg.getFrom().substring(0, msg.getFrom().indexOf("@")).compareTo(
-////                                _xmppConnection.getUser().substring(0, _xmppConnection.getUser().indexOf("@")))!=0) {
-////
-////                            ChatMessage chatMsg = saveMessageToDB(msg);
-////                            notifyMessageReceived(chatMsg);
-////                        }
-//                    }
-//                };
-
-                final StanzaListener packetListener = new StanzaListener() {
-                    @Override
-                    public void processPacket(Stanza packet) throws SmackException.NotConnectedException {
-                        try {
-                            Log.w(Constants.TAG, "XMPPTransactions.processPacket[PACKET LISTENER]: " + packet.getFrom());
-                        }
-                        catch (Exception e) {
-                            Log.e(Constants.TAG, "XMPPOpenConnectionTask.processPacket: ",e);
-                        }
-                    }
-                };
-
-                _xmppConnection.addAsyncStanzaListener(packetListener, null);
-
                 // Connect to the server
                 _xmppConnection.addConnectionListener(getConnectionListener());
                 _xmppConnection.connect();
@@ -287,20 +259,6 @@ public final class XMPPTransactions {
 
 //            //Add IQ Provider
 //            ProviderManager.addIQProvider("iq", "jabber:client", new MyIQProvider());
-
-
-//              //TODO RBM: Find Element and Namespace
-//                _extensionProvider = new TestPacketExtension("message", "jabber:client","Prueba de extension");
-//                ProviderManager.addExtensionProvider("message", "jabber:client", _extensionProvider);
-
-            //Add Message (extension) provider
-            ProviderManager.addExtensionProvider("message","jabber:client",new DataPacketProvider.PacketExtensionProvider(){
-                @Override
-                public DataPacketExtension parse(XmlPullParser parser, int initialDepth) throws XmlPullParserException, IOException {
-                    Log.w(Constants.TAG, "XMPPOpenConnectionTask.parse [PACKET EXTENSION PROVIDER]: ");
-                    return super.parse(parser, initialDepth);
-                }
-            });
 
             //Reconnection manager
             ReconnectionManager reconnectionMgr = ReconnectionManager.getInstanceFor(_xmppConnection);
@@ -322,6 +280,7 @@ public final class XMPPTransactions {
             super.onCancelled();
             _isConnecting = false;
             notifyXMPPConnecting(false);
+            _xmppConnection = null;
             xmppConnectionCallback(xmppConnection);
         }
     }
@@ -342,11 +301,14 @@ public final class XMPPTransactions {
             @Override
             public void connectionClosed() {
                 Log.w(Constants.TAG, "XMPPTransactions.connectionClosed");
+
+                _xmppConnection = null;
             }
 
             @Override
             public void connectionClosedOnError(Exception e) {
                 Log.w(Constants.TAG, "XMPPTransactions.connectionClosedOnError");
+
                 _xmppConnection = null;
                 initializeMsgServerSession(_appContext);
             }
@@ -364,6 +326,8 @@ public final class XMPPTransactions {
             @Override
             public void reconnectionFailed(Exception e) {
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectionFailed: Trying manually");
+
+                _xmppConnection = null;
             }
         };
 
@@ -424,7 +388,6 @@ public final class XMPPTransactions {
         }
     }
 
-
     /*
      * Getters and Setters
      */
@@ -432,122 +395,5 @@ public final class XMPPTransactions {
     public static XMPPTCPConnection getXmppConnection() {
         return _xmppConnection;
     }
-
-//    static class SubscriptionProvider extends DataPacketProvider.PacketExtensionProvider {
-//        public static NewSubscription parseExtension(XmlPullParser parser) throws Exception {
-//            Log.i(Constants.TAG, "SubscriptionProvider.parseExtension: ");
-//            String jid = parser.getAttributeValue(null, "jid");
-//            String nodeId = parser.getAttributeValue(null, "node");
-//            String subId = parser.getAttributeValue(null, "subid");
-//            String state = parser.getAttributeValue(null, "subscription");
-//
-//            String type = parser.getAttributeValue(null, "type");
-//            String to = parser.getAttributeValue(null, "to");
-//            String id = parser.getAttributeValue(null, "id");
-//            String mediaType = parser.getAttributeValue(null, "mediaType");
-//            String from = parser.getAttributeValue(null, "from");
-//            String status = parser.getAttributeValue(null, "status");
-//            String sent = parser.getAttributeValue(null, "sent");//TODO: Careful, it's a long!
-//            String xmlns_stream = parser.getAttributeValue(null, "xmlns:stream");
-//
-//
-//            boolean isRequired = false;
-//
-//            int tag = parser.next();
-//
-//            if ((tag == XmlPullParser.START_TAG) && parser.getName().equals("subscribe-options")) {
-//                tag = parser.next();
-//
-//                if ((tag == XmlPullParser.START_TAG) && parser.getName().equals("required"))
-//                    isRequired = true;
-//
-//                while (parser.next() != XmlPullParser.END_TAG && parser.getName() != "subscribe-options");
-//            }
-//            while (parser.getEventType() != XmlPullParser.END_TAG) parser.next();
-//            //return new Subscription(jid, nodeId, subId, (state == null ? null : Subscription.State.valueOf(state)), isRequired);
-//            return new NewSubscription(type, to, id, mediaType, from, status, sent, xmlns_stream,
-//                    jid, nodeId, subId, (mediaType == null ? null : Subscription.State.valueOf(state)), isRequired);
-//        }
-//    }
-
-//    static class NewSubscription extends org.jivesoftware.smackx.pubsub.Subscription {
-//        String type;
-//        String to;
-//        String id;
-//        String mediaType;
-//        String from;
-//        String status;
-//        String sent;
-//        String xmlns_stream;
-//        public NewSubscription(String type, String to, String id, String mediaType, String from, String status, String sent,
-//                               String xmlns_stream, String jid, String nodeId, String subscriptionId, State state, boolean configRequired) {
-//            super(jid, nodeId, subscriptionId, state, configRequired);
-//        }
-//
-//        public String getType() {
-//            return type;
-//        }
-//
-//        public void setType(String type) {
-//            this.type = type;
-//        }
-//
-//        public String getTo() {
-//            return to;
-//        }
-//
-//        public void setTo(String to) {
-//            this.to = to;
-//        }
-//
-//        @Override
-//        public String getId() {
-//            return id;
-//        }
-//
-//        public void setId(String id) {
-//            this.id = id;
-//        }
-//
-//        public String getMediaType() {
-//            return mediaType;
-//        }
-//
-//        public void setMediaType(String mediaType) {
-//            this.mediaType = mediaType;
-//        }
-//
-//        public String getFrom() {
-//            return from;
-//        }
-//
-//        public void setFrom(String from) {
-//            this.from = from;
-//        }
-//
-//        public String getStatus() {
-//            return status;
-//        }
-//
-//        public void setStatus(String status) {
-//            this.status = status;
-//        }
-//
-//        public String getSent() {
-//            return sent;
-//        }
-//
-//        public void setSent(String sent) {
-//            this.sent = sent;
-//        }
-//
-//        public String getXmlns_stream() {
-//            return xmlns_stream;
-//        }
-//
-//        public void setXmlns_stream(String xmlns_stream) {
-//            this.xmlns_stream = xmlns_stream;
-//        }
-//    }
 
 }

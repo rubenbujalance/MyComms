@@ -82,7 +82,8 @@ public class RealmContactTransactions {
 
     public ArrayList<Contact> getAllContacts(){
         ArrayList<Contact> contactArrayList = new ArrayList<>();
-        RealmQuery<Contact> query = mRealm.where(Contact.class);
+        RealmQuery<Contact> query = mRealm.where(Contact.class).not().equalTo(Constants
+                .CONTACT_PLATFORM,Constants.PLATFORM_LOCAL);
         query.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
         RealmResults<Contact> result1 = query.findAll();
 
@@ -127,13 +128,16 @@ public class RealmContactTransactions {
     {
         ArrayList<Contact> contactArrayList = new ArrayList<>();
         RealmResults<Contact> result = mRealm.where(Contact.class)
-                                            .contains(Constants.CONTACT_FNAME, keyWord)
-                                            .or()
-                                            .contains(Constants.CONTACT_LNAME, keyWord)
-                                            .or()
-                                            .contains(Constants.CONTACT_COMPANY, keyWord)
-                                            .or()
-                                            .contains(Constants.CONTACT_EMAILS, keyWord)
+                                            .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId)
+                                            .beginGroup()
+                                                .contains(Constants.CONTACT_FNAME, keyWord, false)
+                                                .or()
+                                                .contains(Constants.CONTACT_LNAME, keyWord, false)
+                                                .or()
+                                                .contains(Constants.CONTACT_COMPANY, keyWord, false)
+                                                .or()
+                                                .contains(Constants.CONTACT_EMAILS, keyWord, false)
+                                            .endGroup()
                                             .findAll();
 
         if (result!=null){

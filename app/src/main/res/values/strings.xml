@@ -207,4 +207,8 @@
     <string name="about_build">"build "</string>
     <string name="Mycomms">MyComms</string>
 
+    <!--Progress dialog-->
+
+    <string name="progress_dialog_uploading_file">Uploading file. Please wait...</string>
+
 </resources>

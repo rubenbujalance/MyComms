@@ -54,6 +54,17 @@ public class RealmChatTransactions {
         return chatMessage;
     }
 
+    public ChatMessage newChatMessageInstance(String contact_id, String direction, int type,
+                                              String text, String resourceUri, String id)
+    {
+        long timestamp = Calendar.getInstance().getTimeInMillis();
+
+        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,timestamp,
+                direction,type,text,resourceUri,"0","0", id);
+
+        return chatMessage;
+    }
+
     //INSERTS
 
     public boolean insertChatMessage (ChatMessage newChatMessage){
@@ -76,7 +87,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
 
         } catch (Exception e){
-            Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ", e);
             mRealm.cancelTransaction();
             return false;
         }
@@ -278,7 +289,6 @@ public class RealmChatTransactions {
 
         return chat;
     }
-
 
     public Chat updatedChatInstance(Chat chat, ChatMessage chatMsg) {
         Chat updatedChat = new Chat(_profile_id, chat.getContact_id(), chat.getContactName(), chat.getContactSurname(),

@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.webkit.WebView;
 
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
@@ -51,7 +51,7 @@ public class OAuthActivityTest {
         ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
         Assert.assertTrue(didOverrideUrl);
-        Intent expectedIntent = new Intent(activity, ContactListMainActivity.class);
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         expectedIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }

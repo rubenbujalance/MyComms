@@ -1,6 +1,8 @@
 package com.vodafone.mycomms.main;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -20,17 +22,21 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import io.realm.Realm;
 import model.News;
+import model.RecentContact;
 
 public class DashBoardActivity extends ToolbarActivity{
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
@@ -47,10 +53,11 @@ public class DashBoardActivity extends ToolbarActivity{
         initALL();
         BusProvider.getInstance().post(new InitNews());
         BusProvider.getInstance().post(new InitProfileAndContacts());
+
+        //loadRecents();
     }
 
     private void initALL(){
-
 
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
@@ -103,6 +110,63 @@ public class DashBoardActivity extends ToolbarActivity{
         });
     }
 
+    private void loadRecents(){
+        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: ");
+        try {
+            SharedPreferences sp = getSharedPreferences(
+                    Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+            ArrayList<RecentContact> recentList = new ArrayList<>();
+            Realm realm = Realm.getInstance(this);
+            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, profileId);
+            recentList = realmContactTransactions.getAllRecentContacts();
+            LinearLayout contenedor = (LinearLayout) findViewById(R.id.list_recents);
+            LayoutInflater inflater = LayoutInflater.from(this);
+
+            for (int i = 0; i < recentList.size(); i++) {
+                View child = inflater.inflate(R.layout.layout_recents_dashboard, contenedor, false);
+
+                contenedor.addView(child);
+                child.setPadding(10, 10, 10, 10);
+
+                ImageView recentAvatar = (ImageView) child.findViewById(R.id.recent_avatar);
+                File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                        "avatar_"+recentList.get(i).getContactId()+".jpg");
+
+                if (avatarFile.exists()) {
+                    Picasso.with(this)
+                            .load(avatarFile)
+                            .into(recentAvatar);
+                } else {
+                    String initials = "";
+                    if(null != recentList.get(i).getFirstName() && recentList.get(i).getFirstName().length() > 0)
+                    {
+                        initials = recentList.get(i).getFirstName().substring(0,1);
+
+                        if(null != recentList.get(i).getLastName() && recentList.get(i).getLastName().length() > 0)
+                        {
+                            initials = initials + recentList.get(i).getLastName().substring(0,1);
+                        }
+
+                    }
+                    TextView avatarText = (TextView) child.findViewById(R.id.avatarText);
+                    recentAvatar.setImageResource(R.color.grey_middle);
+                    avatarText.setText(initials);
+                }
+
+                TextView firstName = (TextView) child.findViewById(R.id.recent_firstname);
+                firstName.setText(recentList.get(i).getFirstName());
+
+                TextView lastName = (TextView) child.findViewById(R.id.recent_lastname);
+                lastName.setText(recentList.get(i).getLastName());
+
+            }
+            //initALL();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "Load news error: " + e);
+        }
+    }
+
     //Prevent of going from main screen back to login
     @Override
     public void onBackPressed() {
@@ -140,6 +204,7 @@ public class DashBoardActivity extends ToolbarActivity{
         if(news != null)
         {
             try {
+                //TODO: Is this necessary?
                 setContentView(R.layout.layout_dashboard);
 
                 LinearLayout contenedor = (LinearLayout) findViewById(R.id.list_news);

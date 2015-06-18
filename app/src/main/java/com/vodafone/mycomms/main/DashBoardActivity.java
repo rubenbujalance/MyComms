@@ -256,7 +256,7 @@ public class DashBoardActivity extends ToolbarActivity{
                     ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
                     Picasso.with(this)
                             .load("https://"+ EndpointWrapper.getBaseNewsURL()+news.get(i).getImage())
-                            .resize(100,100)
+                            .resize(300,300)
                             .centerInside()
                             .into(newsImage);
 

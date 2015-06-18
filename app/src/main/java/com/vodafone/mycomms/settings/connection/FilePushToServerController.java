@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.squareup.okhttp.MediaType;
@@ -17,17 +18,20 @@ import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by str_oan on 12/06/2015.
  */
-public class AvatarPushToServerController extends BaseController
+public class FilePushToServerController extends BaseController
 {
 
     private final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
     private Context mContext;
-    private File file_to_send;
     private String authorization = "Authorization";
     private String version_token = "x-mycomms-version";
     private String ACCESS_TOKEN = "Bearer ";
@@ -37,27 +41,27 @@ public class AvatarPushToServerController extends BaseController
     private Request request;
     private Response response;
 
-    public AvatarPushToServerController(Activity activity)
+    public FilePushToServerController(Activity activity)
     {
         super(activity);
         this.mContext = activity;
     }
 
-    public void sendImageRequest()
+    public void sendImageRequest(String URL, String multipartFileName, File fileToSend)
     {
         client = new OkHttpClient();
 
         requestBody = new MultipartBuilder()
                 .type(MultipartBuilder.FORM)
-                .addFormDataPart(Constants.CONTACT_AVATAR, file_to_send.getName(),
-                        RequestBody.create(MEDIA_TYPE_PNG, file_to_send))
+                .addFormDataPart(multipartFileName, fileToSend.getName(),
+                        RequestBody.create(MEDIA_TYPE_PNG, fileToSend))
                 .build();
 
         request = new Request.Builder()
                 .addHeader(authorization, ACCESS_TOKEN+UserSecurity.getAccessToken
                         (mContext))
                 .addHeader(version_token, getVersionName())
-                .url(Constants.CONTACT_API_POST_AVATAR)
+                .url(URL)
                 .post(requestBody)
                 .build();
     }
@@ -72,30 +76,25 @@ public class AvatarPushToServerController extends BaseController
         try
         {
             response = client.newCall(request).execute();
-            return convertResponseToString();
+            return responseToString();
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, "AvatarPushToServerController.executeRequest: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.executeRequest: ERROR "+e.toString());
             return null;
         }
 
     }
 
-    public String convertResponseToString()
+    public String responseToString()
     {
         try
         {
-            String output = "Request: "+response.request().toString()+"\n" +
-                    "Body: "+response.body().string()+"" +
-                    "Headers: "+response.headers().toString()+"" +
-                    "Message: "+response.message();
-
-            return output;
+            return "Body: "+response.body().string();
         }
         catch(Exception e)
         {
-            Log.e(Constants.TAG, "AvatarPushToServerController.convertResponseToString: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.convertResponseToString: ERROR "+e.toString());
             return "Wrong response!";
         }
 
@@ -113,7 +112,7 @@ public class AvatarPushToServerController extends BaseController
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, "AvatarPushToServerController.getVersionName: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.getVersionName: ERROR "+e.toString());
             return "";
         }
     }
@@ -141,8 +140,41 @@ public class AvatarPushToServerController extends BaseController
         }
         catch(Exception e)
         {
-            Log.e(Constants.TAG, "AvatarPushToServerController.getAvatarURL: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.getAvatarURL: ERROR "+e.toString());
             return "Wrong BODY!";
+        }
+
+    }
+
+    public File prepareFileToSend(File inputFile, Bitmap fileBitmap, Context context, String
+            multipartName)
+    {
+        try
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            String currentDateandTime = sdf.format(new Date());
+
+            inputFile = new File(context.getCacheDir(), multipartName+"_"+currentDateandTime);
+            inputFile.createNewFile();
+
+            //Convert bitmap to byte array
+            Bitmap bitmap = fileBitmap;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, bos);
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(inputFile);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+
+            return inputFile;
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: ERROR "+e.toString());
+            return inputFile;
         }
 
     }
@@ -181,13 +213,6 @@ public class AvatarPushToServerController extends BaseController
         this.requestBody = requestBody;
     }
 
-    public File getFile_to_send() {
-        return file_to_send;
-    }
-
-    public void setFile_to_send(File file_to_send) {
-        this.file_to_send = file_to_send;
-    }
 }
 
 

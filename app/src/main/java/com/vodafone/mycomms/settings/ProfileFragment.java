@@ -32,15 +32,14 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.custom.CircleImageView;
-import com.vodafone.mycomms.settings.connection.AvatarPushToServerController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.EnableEditProfileEvent;
+import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -71,7 +70,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private final int REQUEST_CAMERA = 0;
     private final int SELECT_FILE = 1;
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
     private static int RESULT_LOAD_IMAGE = 1;
     private static int TAKE_OR_PICK = 0;
     private static int RESULT_OK = 1;
@@ -97,7 +95,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private String photoPath = null;
     private Bitmap photoBitmap = null;
 
-    private AvatarPushToServerController avatarPushToServerController;
+    private FilePushToServerController filePushToServerController;
 
     private UserProfile userProfile;
     private File multiPartFile;
@@ -149,14 +147,21 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        editPhoto.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+               if(isEditing)
+               {
+                   dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+               }
            }
        });
 
        profilePicture.setOnClickListener(new View.OnClickListener() {
            @Override
-           public void onClick(View v) {
-               dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+           public void onClick(View v)
+           {
+               if(isEditing)
+               {
+                   dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+               }
            }
        });
 
@@ -282,7 +287,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profilePicture.setBorderWidth(2);
             profilePicture.setBorderColor(Color.WHITE);
 
-            sendAvatarToServer();
+            new sendFile().execute();
         }
 
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
@@ -294,7 +299,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profilePicture.setBorderWidth(2);
             profilePicture.setBorderColor(Color.WHITE);
 
-            sendAvatarToServer();
+            new sendFile().execute();
         }
     }
 
@@ -651,55 +656,9 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         return result;
     }
 
-    private void sendAvatarToServer()
+    public class sendFile extends AsyncTask<Void, Void, String>
     {
-        try
-        {
-            //create a file to write bitmap data
-            multiPartFile = new File(getActivity().getCacheDir(), Constants
-                    .CONTACT_AVATAR + "avatar_"+userProfile.getId()+".jpg");
-            multiPartFile.createNewFile();
-
-            File avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                    "avatar_"+userProfile.getId()+".jpg");
-
-            avatarFile.delete();
-
-            avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                    "avatar_"+userProfile.getId()+".jpg");
-
-            avatarFile.createNewFile();
-
-            //Convert bitmap to byte array
-            Bitmap bitmap = photoBitmap;
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, bos);
-            byte[] bitmapdata = bos.toByteArray();
-
-            //write the bytes in file
-            FileOutputStream fos = new FileOutputStream(multiPartFile);
-            fos.write(bitmapdata);
-            fos.flush();
-            fos.close();
-
-            FileOutputStream fos2 = new FileOutputStream(avatarFile);
-            fos2.write(bitmapdata);
-            fos2.flush();
-            fos2.close();
-
-            new sendFile().execute();
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "ProfileFragment -> sentAvatarToServer() ERROR: "+e.toString());
-        }
-    }
-
-
-    private class sendFile extends AsyncTask<Void, Void, String> {
         private ProgressDialog pdia;
-
-
 
         @Override
         protected void onPreExecute() {
@@ -710,21 +669,21 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected String doInBackground(Void... params)
+        {
             try
             {
+                filePushToServerController =  new FilePushToServerController(getActivity());
+                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
+                        photoBitmap, getActivity(), Constants.MULTIPART_AVATAR);
+                filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_AVATAR,
+                        Constants.MULTIPART_AVATAR, multiPartFile);
 
-                avatarPushToServerController =  new AvatarPushToServerController(getActivity());
-                avatarPushToServerController.setFile_to_send(multiPartFile);
-
-                avatarPushToServerController.sendImageRequest();
-
-                String response = avatarPushToServerController.executeRequest();
-                return response;
+                return  filePushToServerController.executeRequest();
             }
             catch (Exception e)
             {
-                Log.e(Constants.TAG, "AvatarPushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                Log.e(Constants.TAG, "ProfileFragment -> pushFileInBackground ERROR",e);
                 return null;
             }
         }
@@ -733,11 +692,13 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if(pdia.isShowing()) pdia.dismiss();
-            Log.d(Constants.TAG, "AvatarPushToServerController.sendFile: Response content: " + result);
+            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
 
             //saveImage();
         }
     }
+
+
 
     @Subscribe
     public void enableEditProfile(EnableEditProfileEvent event) {

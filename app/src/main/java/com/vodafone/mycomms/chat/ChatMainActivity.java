@@ -1,15 +1,27 @@
 package com.vodafone.mycomms.chat;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,12 +40,14 @@ import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshChatListEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.realm.Realm;
 import model.Chat;
@@ -48,6 +62,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private EditText etChatTextBox;
     private TextView tvSendChat;
     private ImageView ivAvatarImage;
+    private ImageView sendFileImage;
     private TextView tvAvatarText;
 
     private ArrayList<ChatMessage> _chatList = new ArrayList<>();
@@ -55,6 +70,13 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private Contact _contact;
     private Contact _profile;
     private String _profile_id;
+
+    private String photoPath = null;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_IMAGE_GALLERY = 2;
+    private Bitmap photoBitmap = null;
+    private File multiPartFile;
+    private FilePushToServerController filePushToServerController;
 
     private String previousView;
 
@@ -103,6 +125,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
         tvSendChat = (TextView) findViewById(R.id.chat_send);
         ivAvatarImage = (ImageView) findViewById(R.id.companyLogo);
+        sendFileImage = (ImageView) findViewById(R.id.send_image);
         tvAvatarText = (TextView) findViewById(R.id.avatarText);
 
         //Load chat from db
@@ -153,8 +176,17 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
                     .into(ivAvatarImage);
 
         } else{
-            String initials = _contact.getFirstName().substring(0,1) +
-                    _contact.getLastName().substring(0,1);
+            String initials = "";
+            if(null != _contact.getFirstName() && _contact.getFirstName().length() > 0)
+            {
+                initials = _contact.getFirstName().substring(0,1);
+
+                if(null != _contact.getLastName() && _contact.getLastName().length() > 0)
+                {
+                    initials = initials + _contact.getLastName().substring(0,1);
+                }
+
+            }
 
             ivAvatarImage.setImageResource(R.color.grey_middle);
             tvAvatarText.setText(initials);
@@ -163,17 +195,20 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         //Sent chat in grey by default
         setSendEnabled(false);
 
-        etChatTextBox.addTextChangedListener(new TextWatcher()
-        {
+        etChatTextBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                if(cs!=null && cs.length()>0) checkXMPPConnection();
+                if (cs != null && cs.length() > 0) checkXMPPConnection();
                 else setSendEnabled(false);
             }
+
             @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,int arg3) {}
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+
             @Override
-            public void afterTextChanged(Editable arg0) {}
+            public void afterTextChanged(Editable arg0) {
+            }
         });
 
         tvSendChat.setOnClickListener(new View.OnClickListener() {
@@ -181,6 +216,14 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             public void onClick(View v) {
                 Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());
                 sendText();
+            }
+        });
+
+        sendFileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
 
@@ -331,4 +374,162 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             refreshAdapter();
         }
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
+        {
+            photoBitmap = decodeFile(photoPath);
+            new sendFile().execute();
+        }
+
+        else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
+        {
+            Uri selectedImage = data.getData();
+            photoPath = getRealPathFromURI(selectedImage);
+            photoBitmap = decodeFile(photoPath);
+
+            new sendFile().execute();
+        }
+    }
+
+    private void dispatchTakePictureIntent(String title, String subtitle)
+    {
+
+        //Build the alert dialog to let the user choose the origin of the picture
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ChatMainActivity.this);
+        builder.setTitle(title);
+
+        if(subtitle != null) {
+            LayoutInflater inflater = ChatMainActivity.this.getLayoutInflater();
+            View view = inflater.inflate(R.layout.cv_title_subtitle, null);
+            ((TextView) view.findViewById(R.id.tvTitle)).setText(title);
+            ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
+            builder.setCustomTitle(view);
+        }
+        else
+        {
+            builder.setTitle(title);
+        }
+
+        builder.setItems(R.array.add_photo_chooser, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+                Intent in;
+
+                if(which == 0)
+                {
+                    in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    in.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
+                    startActivityForResult(in, REQUEST_IMAGE_CAPTURE);
+                }
+                else if(which == 1)
+                {
+                    in = new Intent();
+                    in.setType("image/*");
+                    in.setAction(Intent.ACTION_PICK);
+
+                    startActivityForResult(in, REQUEST_IMAGE_GALLERY);
+                }
+            }
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create();
+        builder.show();
+    }
+
+    public Uri setImageUri()
+    {
+        // Store image in dcim
+        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new
+                Date().getTime() + ".png");
+        Uri imgUri = Uri.fromFile(file);
+        photoPath = file.getAbsolutePath();
+        return imgUri;
+    }
+
+    public Bitmap decodeFile(String path)
+    {
+        try
+        {
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, o);
+            return BitmapFactory.decodeFile(path);
+        }
+        catch (Throwable e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String getRealPathFromURI(Uri contentURI)
+    {
+        String result;
+        Cursor cursor = ChatMainActivity.this.getContentResolver().query(contentURI, null, null, null,
+                null);
+        if (cursor == null) {
+            result = contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            result = cursor.getString(idx);
+            cursor.close();
+        }
+        return result;
+    }
+
+    private class sendFile extends AsyncTask<Void, Void, String> {
+        private ProgressDialog pdia;
+
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(ChatMainActivity.this);
+            pdia.setMessage(ChatMainActivity.this.getString(R.string.progress_dialog_uploading_file));
+            pdia.show();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            try
+            {
+                filePushToServerController =  new FilePushToServerController(ChatMainActivity.this);
+                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
+                        photoBitmap, ChatMainActivity.this, Constants.MULTIPART_FILE);
+                filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_FILE,
+                        Constants.MULTIPART_FILE, multiPartFile);
+
+                String response = filePushToServerController.executeRequest();
+                return response;
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "FilePushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if(pdia.isShowing()) pdia.dismiss();
+            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
+        }
+    }
+
+
 }

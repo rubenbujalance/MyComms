@@ -147,7 +147,7 @@ public class ProfileController extends BaseController {
         editor.putString(Constants.PROFILE_ID_SHARED_PREF, profileId);
         editor.putString(Constants.PROFILE_FULLNAME_SHARED_PREF, profileFullName);
         editor.putString(Constants.ACCESS_TOKEN_SHARED_PREF, UserSecurity.getAccessToken(getContext()));
-        editor.putString(Constants.PROFILE_PLATFORMS_SHARED_PREF, platforms);
+        editor.putString(Constants.PLATFORMS_SHARED_PREF, platforms);
         editor.apply();
     }
 

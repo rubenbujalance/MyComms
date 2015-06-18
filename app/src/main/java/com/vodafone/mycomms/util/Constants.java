@@ -18,6 +18,7 @@ public class Constants {
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
     public static final String PROFILE_FULLNAME_SHARED_PREF = "mycomms_profile_fullname";
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
+    public static final String PLATFORMS_SHARED_PREF = "mycomms_profile_platforms";
     public static final String DEVICE_ID_SHARED_PREF = "device_Id" ;
 
     //Profile API & BD
@@ -73,6 +74,17 @@ public class Constants {
     public static final String CONTACT_PAGINATION_PAGESIZE = "pageSize";
     public static final String CONTACT_LOCAL_CONTENT= "local_contact";
 
+    public static final String CONTACT_IS_FAVORITE = "contactIsFavorite";
+
+    public static final String MULTIPART_AVATAR = "avatar";
+    public static final String MULTIPART_FILE = "file";
+
+
+    public static final String PLATFORM_SALES_FORCE = "sf";
+    public static final String PLATFORM_LOCAL = "local";
+    public static final String PLATFORM_MY_COMMS = "mc";
+
+
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";
 
@@ -96,14 +108,14 @@ public class Constants {
 
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
-    public static final String CONTACT_API_GET_SEARCH_CONTACTS = "/api/me/contact?p=mc&t=";
-    public static final String CONTACT_API_GET_SEARCH_CONTACTS_SF = "/api/me/contact?p=sf&t=";
+    public static final String CONTACT_API_GET_CONTACTS_BASIC_CALL = "/api/me/contact?p=";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_FAVOURITE = "/api/me/favourites";
     public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
     public static final String CONTACT_API_POST_AVATAR = "https://int.my-comms.com/api/me/avatar";
+    public static final String CONTACT_API_POST_FILE = "https://int.my-comms.com/api/uploadFile";
 
     //Contact Avatar BD Fields
     public static final String AVATAR_CONTACT_ID = "contactId";
@@ -164,4 +176,6 @@ public class Constants {
     public static final String DATE_DISPLAY_FORMAT = "MMM d, yyyy";
     public final static SimpleDateFormat SIMPLE_DATE_FORMAT_DISPLAY = new SimpleDateFormat (DATE_DISPLAY_FORMAT);
     public static String toolbar = "toolbar";
+
+    public static boolean isSearchBarFocusRequested = false;
 }

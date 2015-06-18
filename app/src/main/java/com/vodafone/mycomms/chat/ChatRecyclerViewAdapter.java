@@ -124,8 +124,17 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                     .into(chatHolder.chatAvatarImage);
 
         } else{
-            String initials = contact.getFirstName().substring(0,1) +
-                    contact.getLastName().substring(0,1);
+            String initials = "";
+            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            {
+                initials = contact.getFirstName().substring(0,1);
+
+                if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                {
+                    initials = initials + contact.getLastName().substring(0,1);
+                }
+
+            }
 
             chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
             chatHolder.chatAvatarText.setText(initials);

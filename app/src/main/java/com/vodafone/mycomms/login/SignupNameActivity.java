@@ -31,10 +31,9 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
-import com.vodafone.mycomms.settings.connection.AvatarPushToServerController;
+import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.Constants;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -55,7 +54,7 @@ public class SignupNameActivity extends Activity {
     Bitmap photoBitmap = null;
     String photoPath = null;
 
-    private AvatarPushToServerController avatarPushToServerController;
+    private FilePushToServerController filePushToServerController;
     private File multiPartFile;
 
     @Override
@@ -206,7 +205,7 @@ public class SignupNameActivity extends Activity {
 
             //Reset avatar from user profile
             UserProfile.setAvatar(null);
-            sendAvatarToServer();
+            new sendFile().execute();
         }
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK)
         {
@@ -219,7 +218,7 @@ public class SignupNameActivity extends Activity {
 
             //Reset avatar from user profile
             UserProfile.setAvatar(null);
-            sendAvatarToServer();
+            new sendFile().execute();
         }
     }
 
@@ -349,8 +348,8 @@ public class SignupNameActivity extends Activity {
 
         Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
         errorIcon.setBounds(new Rect(0, 0,
-                (int)(errorIcon.getIntrinsicWidth()*0.5),
-                (int)(errorIcon.getIntrinsicHeight()*0.5)));
+                (int) (errorIcon.getIntrinsicWidth() * 0.5),
+                (int) (errorIcon.getIntrinsicHeight() * 0.5)));
 
         if(mLastName.getText().toString().trim().length() <= 0)
         {
@@ -389,35 +388,6 @@ public class SignupNameActivity extends Activity {
         UserProfile.setPhotoPath(photoPath);
     }
 
-    private void sendAvatarToServer()
-    {
-        try
-        {
-            //create a file to write bitmap data
-            multiPartFile = new File(getApplicationContext().getCacheDir(), Constants.CONTACT_AVATAR);
-            multiPartFile.createNewFile();
-
-            //Convert bitmap to byte array
-            Bitmap bitmap = photoBitmap;
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
-            byte[] bitmapdata = bos.toByteArray();
-
-            //write the bytes in file
-            FileOutputStream fos = new FileOutputStream(multiPartFile);
-            fos.write(bitmapdata);
-            fos.flush();
-            fos.close();
-
-            new sendFile().execute();
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "ProfileFragment -> sentAvatarToServer() ERROR: "+e.toString());
-        }
-    }
-
-
     private class sendFile extends AsyncTask<Void, Void, String> {
         private ProgressDialog pdia;
 
@@ -435,19 +405,19 @@ public class SignupNameActivity extends Activity {
         protected String doInBackground(Void... params) {
             try
             {
-
-                avatarPushToServerController =  new AvatarPushToServerController
+                filePushToServerController =  new FilePushToServerController
                         (SignupNameActivity.this);
-                avatarPushToServerController.setFile_to_send(multiPartFile);
+                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
+                        photoBitmap, SignupNameActivity.this, Constants.MULTIPART_AVATAR);
+                filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_AVATAR,
+                        Constants.MULTIPART_AVATAR, multiPartFile);
 
-                avatarPushToServerController.sendImageRequest();
-
-                String response = avatarPushToServerController.executeRequest();
+                String response = filePushToServerController.executeRequest();
                 return response;
             }
             catch (Exception e)
             {
-                Log.e(Constants.TAG, "AvatarPushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                Log.e(Constants.TAG, "FilePushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
                 return null;
             }
         }
@@ -457,7 +427,7 @@ public class SignupNameActivity extends Activity {
         {
             super.onPostExecute(result);
             if(pdia.isShowing())pdia.dismiss();
-            Log.d(Constants.TAG, "AvatarPushToServerController.sendFile: Response content: " + result);
+            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
 
             mPhoto.setImageBitmap(photoBitmap);
 

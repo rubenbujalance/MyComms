@@ -26,7 +26,6 @@ public class ContactDetailController extends BaseController {
     private ContactDetailConnection contactDetailConnection;
     private IContactDetailConnectionCallback contactDetailConnectionCallback;
     private Context mContext;
-    private String profileId;
     private RealmContactTransactions realmContactTransactions;
     private String profileId;
 

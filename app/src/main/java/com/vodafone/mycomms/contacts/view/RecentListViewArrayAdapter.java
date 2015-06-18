@@ -47,6 +47,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
             viewHolder.imageViewRecentType = (ImageView) convertView.findViewById(R.id.list_item_recent_type_image);
             viewHolder.textViewRecentItemTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
+            viewHolder.imageCompanyLogo = (ImageView) convertView.findViewById(R.id.list_item_content_companylogo);
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
@@ -55,6 +56,16 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
 
         // update the item view
         RecentContact contact = getItem(position);
+
+        if(null != contact.getPlatform() && contact.getPlatform()
+                .equals(Constants.PLATFORM_LOCAL))
+        {
+            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
+        }
+        else
+        {
+            viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
+        }
 
         //Image avatar
         File avatarFile = null;
@@ -90,8 +101,17 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
                     });
 
         } else{
-            String initials = contact.getFirstName().substring(0,1) +
-                    contact.getLastName().substring(0,1);
+            String initials = "";
+            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            {
+                initials = contact.getFirstName().substring(0,1);
+
+                if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                {
+                    initials = initials + contact.getLastName().substring(0,1);
+                }
+
+            }
 
             viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
             viewHolder.textAvatar.setText(initials);
@@ -126,6 +146,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         TextView textViewRecentItemTime;
         ImageView imageViewRecentType;
         ImageView imageAvatar;
+        ImageView imageCompanyLogo;
         TextView textAvatar;
     }
 }

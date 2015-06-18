@@ -215,7 +215,7 @@ public class ContactController extends BaseController {
             RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
             ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getId());
             if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                String filename = "avatar_" + contact.getId() + ".jpg";
+                String filename = "avatar_" + contact.getContactId() + ".jpg";
 
                 new DownloadAvatars().execute(contact.getAvatar(), filename);
 

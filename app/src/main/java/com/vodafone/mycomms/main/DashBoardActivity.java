@@ -3,6 +3,7 @@ package com.vodafone.mycomms.main;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,15 +14,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
+import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -41,6 +45,9 @@ import model.RecentContact;
 public class DashBoardActivity extends ToolbarActivity{
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     private LinearLayout noConnectionLayout;
+    private Context mContext;
+    private Realm _realm;
+    private RealmChatTransactions _chatTx;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -165,6 +172,32 @@ public class DashBoardActivity extends ToolbarActivity{
                 TextView lastName = (TextView) childrecents.findViewById(R.id.recent_lastname);
                 lastName.setText(recentList.get(i).getLastName());
 
+                // Badges
+                _realm = Realm.getInstance(this);
+                _chatTx = new RealmChatTransactions(_realm, this);
+
+                ChatListHolder chatHolder = new ChatListHolder(childrecents);
+
+                long count =_chatTx.getChatPendingMessagesCount(recentList.get(i).getContactId());
+
+                if(count > 0) {
+                    TextView unreaded_messages = (TextView) childrecents.findViewById(R.id.unreaded_messages);
+                    unreaded_messages.setVisibility(View.VISIBLE);
+                    unreaded_messages.setText(String.valueOf(count));
+                } else {
+                    ImageView typerecent = (ImageView) childrecents.findViewById(R.id.type_recent);
+                    typerecent.setVisibility(View.VISIBLE);
+
+                    String action = recentList.get(i).getAction();
+
+                    if (action == "call") {
+                        typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                    } else if (action == "email") {
+                        typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                    } else {
+                        typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                    }
+                }
             }
             //initALL();
         } catch (Exception e) {
@@ -261,7 +294,6 @@ public class DashBoardActivity extends ToolbarActivity{
             } catch (Exception e) {
                 Log.e(Constants.TAG, "Load news error: " + e);
             }
-            Log.e(Constants.TAG, "NEWS SIZE: " + news.size());
         }
     }
 }

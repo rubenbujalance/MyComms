@@ -270,22 +270,34 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
+        //Initialization of favourite icon
+        FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
+
+        if (favouriteController.contactIsFavourite(contactId)) {
+            Drawable imageStar = getResources().getDrawable(imageStarOn);
+            btFavourite.setImageDrawable(imageStar);
+            btFavourite.setTag("icon_favorite_colour");
+        } else {
+            Drawable imageStar = getResources().getDrawable(imageStarOff);
+            btFavourite.setImageDrawable(imageStar);
+            btFavourite.setTag("icon_favorite_grey");
+        }
+
         btFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
-                favouriteController.manageFavourite(contactId);
-
                 if (btFavourite.getTag().equals("icon_favorite_colour")) {
-                    Drawable imageStar = getResources().getDrawable(imageStarOn);
+                    Drawable imageStar = getResources().getDrawable(imageStarOff);
                     btFavourite.setImageDrawable(imageStar);
                     btFavourite.setTag("icon_favorite_grey");
                 } else if (btFavourite.getTag().equals("icon_favorite_grey")) {
-                    Drawable imageStar = getResources().getDrawable(imageStarOff);
+                    Drawable imageStar = getResources().getDrawable(imageStarOn);
                     btFavourite.setImageDrawable(imageStar);
                     btFavourite.setTag("icon_favorite_colour");
                 }
 
+                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
+                favouriteController.manageFavourite(contactId);
             }
         });
 
@@ -377,18 +389,22 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         }
         try {
             //Local time
-            TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+            if(contact.getTimezone()!=null) {
+                TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
 
-            SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
-            sourceFormat.setTimeZone(currentCal.getTimeZone());
-            Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY)+":"+currentCal.get(Calendar.MINUTE));
+                SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
+                sourceFormat.setTimeZone(currentCal.getTimeZone());
+                Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE));
 
-            SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
-            destFormat.setTimeZone(tz);
+                SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
+                destFormat.setTimeZone(tz);
 
-            String result = destFormat.format(parsed);
+                String result = destFormat.format(parsed);
 
-            tvLocalTime.setText(result);
+                tvLocalTime.setText(result);
+            } else {
+                tvLocalTime.setText("");
+            }
 
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);

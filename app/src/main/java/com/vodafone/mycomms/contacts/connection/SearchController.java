@@ -163,15 +163,15 @@ public class SearchController extends BaseController
                 return;
 
             RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
-            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getId());
+            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
             if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                String filename = "avatar_" + contact.getId() + ".jpg";
+                String filename = "avatar_" + contact.getContactId() + ".jpg";
 
                 new DownloadAvatars().execute(contact.getAvatar(), filename);
 
                 if (avatar == null)
                 {
-                    avatar = new ContactAvatar(contact.getId(), contact.getAvatar(), filename);
+                    avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), filename);
                 }
                 else
                 {

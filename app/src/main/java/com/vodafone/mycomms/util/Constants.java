@@ -147,10 +147,10 @@ public class Constants {
     public static final int CHAT_MESSAGE_TYPE_PICTURE = 1;
     public static final String CHAT_MESSAGE_DIRECTION_SENT = "0";
     public static final String CHAT_MESSAGE_DIRECTION_RECEIVED = "1";
-    public static final String CHAT_MESSAGE_STATUS_NOT_SENT = "0";
-    public static final String CHAT_MESSAGE_STATUS_SENT = "1";
-    public static final String CHAT_MESSAGE_STATUS_DELIVERED = "2";
-    public static final String CHAT_MESSAGE_STATUS_READ = "3";
+    public static final String CHAT_MESSAGE_STATUS_NOT_SENT = "not_sent";
+    public static final String CHAT_MESSAGE_STATUS_SENT = "sent";
+    public static final String CHAT_MESSAGE_STATUS_DELIVERED = "delivered";
+    public static final String CHAT_MESSAGE_STATUS_READ = "read";
     public static final String CHAT_MESSAGE_NOT_READ = "0";
     public static final String CHAT_MESSAGE_READ = "1";
     public static final String CHAT_PREVIOUS_VIEW = "Chat_Previous_View";
@@ -164,9 +164,6 @@ public class Constants {
     public static final String XMPP_MESSAGE_MEDIATYPE_TEXT = "text";
     public static final String XMPP_MESSAGE_TYPE_CHAT = "chat";
     public static final String XMPP_IQ_TYPE_CHAT = "chat";
-    public static final String XMPP_IQ_STATUS_SENT = "sent";
-    public static final String XMPP_IQ_STATUS_DELIVERED = "delivered";
-    public static final String XMPP_IQ_STATUS_READ = "read";
 
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";

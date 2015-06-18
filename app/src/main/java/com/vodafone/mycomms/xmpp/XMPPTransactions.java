@@ -10,6 +10,7 @@ import android.util.Log;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.MessageSentStatusChanged;
 import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -21,15 +22,10 @@ import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Stanza;
-import org.jivesoftware.smack.provider.IQProvider;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 
 import io.realm.Realm;
 import model.Chat;
@@ -46,6 +42,7 @@ public final class XMPPTransactions {
     private static Context _appContext;
     private static ConnectionListener _connectionListener;
     private static String _device_id;
+    private static Realm _realm;
 
     /*
      * Methods
@@ -59,6 +56,7 @@ public final class XMPPTransactions {
 
             //Save context
             _appContext = appContext;
+            _realm = Realm.getInstance(_appContext);
 
             //Get profile_id
             SharedPreferences sp = appContext.getSharedPreferences(
@@ -102,6 +100,7 @@ public final class XMPPTransactions {
     {
         try {
             _xmppConnection.disconnect();
+            if(_realm != null)_realm.close();
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: ", e);
@@ -134,7 +133,7 @@ public final class XMPPTransactions {
         return true;
     }
 
-    private static String buildIQStanza(String type, String id, String contactId, String status)
+    private static String buildIQStanza(String type, String id, String contactId, final String status)
     {
         String iq = "<iq type=\""+type+"\" " +
                 "to=\""+contactId+"@my-comms.com\" " +
@@ -168,7 +167,73 @@ public final class XMPPTransactions {
         }
     }
 
-    public static boolean saveAndNotifyMessageReceived(XmlPullParser parser)
+    public static boolean saveAndNotifyStanzaReceived(XmlPullParser parser)
+    {
+        try {
+            String from = parser.getAttributeValue("", "from");
+            String to = parser.getAttributeValue("", "to");
+            String id = parser.getAttributeValue("", "id");
+
+            if (from == null || id == null || to==null) return false;
+
+            to = to.substring(0, to.indexOf("@"));
+            if(to.compareTo(_profile_id)!=0) return false;
+
+            if (parser.getName().compareTo("message") == 0)
+                return saveAndNotifyMessageReceived(parser);
+//            else if (parser.getName().compareTo("iq") == 0)
+//                return saveAndNotifyIQReceived(parser);
+            else return false;
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyStanzaReceived: ",e);
+        }
+
+        return true;
+    }
+
+    private static boolean saveAndNotifyIQReceived(XmlPullParser parser)
+    {
+        Realm realm = null;
+
+        try {
+            //Check the stanza
+            String from = parser.getAttributeValue("", "from");
+            String to = parser.getAttributeValue("", "to");
+            String id = parser.getAttributeValue("", "id");
+            String status = parser.getAttributeValue("", "status");
+
+            to = to.substring(0, to.indexOf("@"));
+            from = from.substring(0, from.indexOf("@"));
+
+            String text = parser.nextText();
+
+            //Instantiate Realm
+            realm = Realm.getInstance(_appContext);
+            RealmChatTransactions chatTx = new RealmChatTransactions(realm, _appContext);
+
+            //Save to DB
+            boolean changed = chatTx.setChatMessageSentStatus(id, status);
+            realm.close();
+
+            if(changed) {
+                //Notify to app
+                MessageSentStatusChanged statusEvent = new MessageSentStatusChanged();
+                statusEvent.setId(id);
+                statusEvent.setStatus(status);
+                BusProvider.getInstance().post(statusEvent);
+            }
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
+            if(realm!=null) realm.close();
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean saveAndNotifyMessageReceived(XmlPullParser parser)
     {
         Realm realm = null;
 
@@ -177,7 +242,10 @@ public final class XMPPTransactions {
             String to = parser.getAttributeValue("", "to");
             String id = parser.getAttributeValue("", "id");
 
-            if (from == null || id == null ||
+            if (from == null || id == null || to==null) return false;
+
+            to = to.substring(0, to.indexOf("@"));
+            if(to.compareTo(_profile_id)!=0 ||
                     parser.getName().compareTo("message") != 0) return false;
 
             int event = parser.next();
@@ -185,9 +253,6 @@ public final class XMPPTransactions {
 
             String text = parser.nextText();
             from = from.substring(0, from.indexOf("@"));
-            to = to.substring(0, to.indexOf("@"));
-
-            if(to.compareTo(_profile_id)!=0) return false;
 
             realm = Realm.getInstance(_appContext);
             RealmChatTransactions chatTx = new RealmChatTransactions(realm, _appContext);
@@ -205,11 +270,11 @@ public final class XMPPTransactions {
             chatTx.insertChat(chat);
             chatTx.insertChatMessage(newChatMessage);
 
+            realm.close();
+
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
             BusProvider.getInstance().post(chatEvent);
-
-            realm.close();
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
@@ -225,6 +290,38 @@ public final class XMPPTransactions {
         XMPPConnectingEvent event = new XMPPConnectingEvent();
         event.setConnecting(isConnecting);
         BusProvider.getInstance().post(event);
+    }
+
+    public static boolean notifyIQMessageStatus(final ChatMessage chatMsg, final String status)
+    {
+        //Sends the IQ stanza to notify
+        try {
+            Stanza st = new Stanza() {
+                @Override
+                public CharSequence toXML() {
+                    String message = buildIQStanza(Constants.XMPP_IQ_TYPE_CHAT,
+                            chatMsg.getId(), chatMsg.getContact_id(), status);
+
+                    return message;
+                }
+            };
+
+            _xmppConnection.sendStanza(st);
+        }
+        catch (SmackException.NotConnectedException e) {
+            Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static int getXMPPStatusOrder(String xmppStatus)
+    {
+        if(xmppStatus.compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT)==0) return 0;
+        else if(xmppStatus.compareTo(Constants.CHAT_MESSAGE_STATUS_SENT)==0) return 1;
+        else if(xmppStatus.compareTo(Constants.CHAT_MESSAGE_STATUS_DELIVERED)==0) return 2;
+        else return 3; //Read
     }
 
     /*
@@ -303,6 +400,7 @@ public final class XMPPTransactions {
                 Log.w(Constants.TAG, "XMPPTransactions.connectionClosed");
 
                 _xmppConnection = null;
+                if(_realm != null)_realm.close();
             }
 
             @Override
@@ -310,7 +408,7 @@ public final class XMPPTransactions {
                 Log.w(Constants.TAG, "XMPPTransactions.connectionClosedOnError");
 
                 _xmppConnection = null;
-                initializeMsgServerSession(_appContext);
+                if(_realm != null)_realm.close();
             }
 
             @Override
@@ -328,65 +426,66 @@ public final class XMPPTransactions {
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectionFailed: Trying manually");
 
                 _xmppConnection = null;
+                if(_realm != null)_realm.close();
             }
         };
 
         return _connectionListener;
     }
 
-    //IQ extended class
-    static class MyIQ extends IQ
-    {
-        public static final String IQ_STATUS_SENT = "sent";
-        public static final String IQ_STATUS_DELIVERED = "delivered";
-        public static final String IQ_STATUS_READ = "read";
-
-        private int pendingMessages = 0;
-        private String status;
-
-        public MyIQ(IQ iq) {super(iq);}
-        protected MyIQ(String childElementName) {
-            super(childElementName);
-        }
-
-        public MyIQ(String id, String from, String to, String status) {
-            super("iq");
-            setStanzaId(id);
-            setFrom(from);
-            setTo(to);
-            setStatus(status);
-        }
-
-        @Override
-        protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
-            return null;
-        }
-
-        public int getPendingMessages() {return pendingMessages;}
-        public void setPendingMessages(int pendingMessages) {this.pendingMessages = pendingMessages;}
-
-        public String getStatus() {return status;}
-        public void setStatus(String status) {this.status = status;}
-    }
-
-    //Provider for IQ Packets
-    static class MyIQProvider extends IQProvider<MyIQ> {
-        @Override
-        public MyIQ parse(XmlPullParser parser, int initialDepth) throws XmlPullParserException, IOException, SmackException {
-            Log.e(Constants.TAG, "MyIQProvider.parse: "+parser.getText());
-
-            MyIQ iq = new MyIQ(parser.getName());
-            iq.setType(IQ.Type.fromString(parser.getAttributeValue("", "type")));
-            iq.setFrom(parser.getAttributeValue("", "from"));
-            iq.setTo(parser.getAttributeValue("", "to"));
-
-            try {
-                iq.setPendingMessages(Integer.valueOf(parser.getAttributeValue("", "pending")));
-            } catch (Exception e) {}
-
-            return iq;
-        }
-    }
+//    //IQ extended class
+//    static class MyIQ extends IQ
+//    {
+//        public static final String IQ_STATUS_SENT = "sent";
+//        public static final String IQ_STATUS_DELIVERED = "delivered";
+//        public static final String IQ_STATUS_READ = "read";
+//
+//        private int pendingMessages = 0;
+//        private String status;
+//
+//        public MyIQ(IQ iq) {super(iq);}
+//        protected MyIQ(String childElementName) {
+//            super(childElementName);
+//        }
+//
+//        public MyIQ(String id, String from, String to, String status) {
+//            super("iq");
+//            setStanzaId(id);
+//            setFrom(from);
+//            setTo(to);
+//            setStatus(status);
+//        }
+//
+//        @Override
+//        protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
+//            return null;
+//        }
+//
+//        public int getPendingMessages() {return pendingMessages;}
+//        public void setPendingMessages(int pendingMessages) {this.pendingMessages = pendingMessages;}
+//
+//        public String getStatus() {return status;}
+//        public void setStatus(String status) {this.status = status;}
+//    }
+//
+//    //Provider for IQ Packets
+//    static class MyIQProvider extends IQProvider<MyIQ> {
+//        @Override
+//        public MyIQ parse(XmlPullParser parser, int initialDepth) throws XmlPullParserException, IOException, SmackException {
+//            Log.e(Constants.TAG, "MyIQProvider.parse: "+parser.getText());
+//
+//            MyIQ iq = new MyIQ(parser.getName());
+//            iq.setType(IQ.Type.fromString(parser.getAttributeValue("", "type")));
+//            iq.setFrom(parser.getAttributeValue("", "from"));
+//            iq.setTo(parser.getAttributeValue("", "to"));
+//
+//            try {
+//                iq.setPendingMessages(Integer.valueOf(parser.getAttributeValue("", "pending")));
+//            } catch (Exception e) {}
+//
+//            return iq;
+//        }
+//    }
 
     /*
      * Getters and Setters

@@ -10,7 +10,7 @@
         <TextView
             android:id="@+id/sent_time"
             style="@style/ChatSent"
-            android:text="@string/DummyTime"
+            android:text="Tue 10:56"
             android:layout_gravity="center_horizontal"
             android:textSize="12dp" />
 
@@ -48,9 +48,9 @@
             android:id="@+id/sent_text"
             style="@style/ChatSent"
             android:visibility="gone"
-            android:text="@string/Delivered"
+            android:text="Delivered"
             android:paddingTop="0dp"
-            android:layout_marginRight="12dp"
+            android:layout_marginRight="5dp"
             android:layout_gravity="right"/>
     </LinearLayout>
 

@@ -196,13 +196,13 @@ public class RealmContactTransactions {
         }
     }
 
-    public boolean favouriteContactIsInRealm(String contactId){
+    public boolean deleteFavouriteContact(String contactId){
         //Checks if the Contact is favourite. If it is, it deletes it and returns false to send it to the API
-        Log.i(Constants.TAG, "RealmContactTransactions.favouriteContactIsInRealm: ");
+        Log.i(Constants.TAG, "RealmContactTransactions.deleteFavouriteContact: ");
         mRealm.beginTransaction();
         RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
         query.equalTo(Constants.CONTACT_CONTACT_ID, contactId)
-             .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
+                .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
         RealmResults<FavouriteContact> result1 = query.findAll();
 
         if (result1!=null && result1.size()!=0){
@@ -211,6 +211,21 @@ public class RealmContactTransactions {
             return true;
         }else {
             mRealm.cancelTransaction();
+            return false;
+        }
+    }
+
+    public boolean favouriteContactIsInRealm(String contactId){
+        //Checks if the Contact is favourite. If it is, it deletes it and returns false to send it to the API
+        Log.i(Constants.TAG, "RealmContactTransactions.favouriteContactIsInRealm: ");
+        RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
+        query.equalTo(Constants.CONTACT_CONTACT_ID, contactId)
+             .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
+        RealmResults<FavouriteContact> result1 = query.findAll();
+
+        if (result1!=null && result1.size()!=0){
+            return true;
+        }else {
             return false;
         }
     }

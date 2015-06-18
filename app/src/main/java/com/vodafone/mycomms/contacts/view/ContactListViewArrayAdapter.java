@@ -86,7 +86,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         final File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
                 "avatar_"+contact.getContactId()+".jpg");
 
-        if (!avatarFile.exists()){
+        //TODO RBM - Review download avatars
+        if (!avatarFile.exists() && contact.getAvatar()!=null && contact.getAvatar().length()>0){
             String filename = "avatar_" + contact.getContactId() + ".jpg";
             Log.i(Constants.TAG, "ContactListViewArrayAdapter.getView: AVATAR " + filename + " does not exist");
             new DownloadAvatars().execute(contact.getAvatar(), filename);

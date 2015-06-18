@@ -45,7 +45,7 @@
                 android:id="@+id/unreaded_messages"
                 android:textColor="#ffffffff"
                 android:padding="5dp"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:radius="80dp"
                 android:background="@drawable/bt_blue_unread"
                 android:layout_alignTop="@+id/recent_avatar"

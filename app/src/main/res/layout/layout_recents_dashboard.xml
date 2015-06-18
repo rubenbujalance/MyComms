@@ -29,6 +29,33 @@
                 android:layout_centerHorizontal="true"/>
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/unreaded_messages"
+                android:textColor="#ffffffff"
+                android:padding="5dp"
+                android:layout_gravity="right|top"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="18dp"
+                android:layout_marginEnd="18dp"
+                android:background="@drawable/blue_rounded"
+                android:autoText="false"
+                android:layout_alignTop="@+id/recent_avatar"
+                android:visibility="gone" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/type_recent"
+                android:layout_alignTop="@+id/recent_avatar"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:visibility="gone"
+                android:background="@mipmap/icon_notification_chat_grey" />
+
+            <TextView
                 android:id="@+id/avatarText"
                 android:layout_width="60dp"
                 android:layout_height="60dp"

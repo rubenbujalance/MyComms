@@ -16,6 +16,12 @@
  */
 package org.jivesoftware.smack.util;
 
+import android.util.Log;
+
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.util.Constants;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.compress.packet.Compress;
 import org.jivesoftware.smack.packet.DefaultExtensionElement;
@@ -43,6 +49,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -50,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import model.ChatMessage;
 
 /**
  * Utility class that helps to parse packets. Any parsing packets method that must be shared
@@ -366,7 +375,44 @@ public class PacketParserUtils {
                                             boolean fullNamespaces) throws XmlPullParserException,
             IOException {
         assert (parser.getEventType() == XmlPullParser.START_TAG);
+        notifyMessageReceived(parser);
         return parseContentDepth(parser, parser.getDepth(), fullNamespaces);
+    }
+
+    public static void notifyMessageReceived(XmlPullParser parser)
+    {
+        try {
+            XmlPullParser p = parser;
+            p.next();
+            String from = parser.getAttributeValue("", "from");
+            String to = parser.getAttributeValue("", "to");
+            String id = parser.getAttributeValue("", "id");
+
+            if(from==null || to==null || id==null) return;
+            int event = parser.next();
+
+            if (event != XmlPullParser.START_TAG ||
+                    parser.getName().compareTo("message")!=0) return;
+
+            String text = parser.nextText();
+
+            long timestamp = Calendar.getInstance().getTimeInMillis();
+            to = to.substring(0, to.indexOf("@"));
+            from = from.substring(0, from.indexOf("@"));
+
+
+            ChatMessage chatMessage = new ChatMessage(to, from, timestamp,
+                    Constants.CHAT_MESSAGE_DIRECTION_RECEIVED, Constants.CHAT_MESSAGE_TYPE_TEXT,
+                    text, "", "0", "0", id);
+
+            ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
+            chatEvent.setMessage(chatMessage);
+            BusProvider.getInstance().post(chatEvent);
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "PacketParserUtils.notifyMessageReceived: ",e);
+            return;
+        }
     }
 
     /**

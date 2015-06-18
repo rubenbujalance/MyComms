@@ -29,7 +29,8 @@ public class ChatMessage extends RealmObject{
 
     public ChatMessage() {}
 
-    public ChatMessage(String profile_id, String contact_id, long timestamp, String direction, int type, String text, String resourceUri, String read, String status)
+    public ChatMessage(String profile_id, String contact_id, long timestamp, String direction,
+                       int type, String text, String resourceUri, String read, String status)
     {
         this.setProfile_id(profile_id);
         this.setContact_id(contact_id);
@@ -42,6 +43,22 @@ public class ChatMessage extends RealmObject{
         this.setStatus(status);
 
         this.setId(profile_id + "_" + contact_id + "_" + timestamp);
+    }
+
+    public ChatMessage(String profile_id, String contact_id, long timestamp, String direction,
+                       int type, String text, String resourceUri, String read, String status, String id)
+    {
+        this.setProfile_id(profile_id);
+        this.setContact_id(contact_id);
+        this.setTimestamp(timestamp);
+        this.setDirection(direction);
+        this.setType(type);
+        this.setText(text);
+        this.setResourceUri(resourceUri);
+        this.setRead(read);
+        this.setStatus(status);
+
+        this.setId(id);
     }
 
     public String getId() {

@@ -3,52 +3,76 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/notice"
               android:orientation="horizontal"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+              android:layout_width="140dp"
+              android:layout_height="120dp"
               android:background="?android:attr/selectableItemBackground">
 
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="106dp"
-        android:layout_height="100dp"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:id="@+id/notice_content"
         android:layout_gravity="right">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:gravity="bottom">
 
             <ImageView
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:scaleType="fitXY"
+                android:scaleType="centerCrop"
                 android:id="@+id/notice_image"
                 android:background="@color/grey_light"
                 tools:src="@drawable/sample_10" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1h ago"
-                android:id="@+id/notice_date"
-                android:textColor="#ffffffff"
-                android:layout_below="@+id/notice_title"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:padding="5dp" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="1">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lorem ipsum"
-                android:id="@+id/notice_title"
-                android:textColor="#ffffffff"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:padding="5dp"
-                android:textSize="10dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:text="Lorem ipsumZ"
+                    android:id="@+id/notice_title"
+                    android:textColor="#ffffffff"
+                    android:padding="5dp"
+                    android:textSize="12dp"
+                    android:textStyle="bold"
+                    android:layout_alignTop="@+id/notice_date"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_weight="1.04"
+                    android:layout_gravity="bottom"
+                    android:gravity="bottom"
+                    android:shadowColor="#000000"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="15" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:text="1h ago"
+                    android:id="@+id/notice_date"
+                    android:textColor="#ffffffff"
+                    android:padding="5dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:textSize="10dp"
+                    android:layout_gravity="bottom"
+                    android:gravity="bottom"
+                    android:shadowColor="#000000"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="15" />
+
+            </LinearLayout>
 
         </RelativeLayout>
 

@@ -54,7 +54,7 @@ public class DashBoardActivity extends ToolbarActivity{
         BusProvider.getInstance().post(new InitNews());
         BusProvider.getInstance().post(new InitProfileAndContacts());
 
-        //loadRecents();
+        loadRecents();
     }
 
     private void initALL(){
@@ -108,6 +108,8 @@ public class DashBoardActivity extends ToolbarActivity{
                 finish();
             }
         });
+
+        loadRecents();
     }
 
     private void loadRecents(){
@@ -116,20 +118,23 @@ public class DashBoardActivity extends ToolbarActivity{
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
             String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
             ArrayList<RecentContact> recentList = new ArrayList<>();
+
             Realm realm = Realm.getInstance(this);
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, profileId);
             recentList = realmContactTransactions.getAllRecentContacts();
-            LinearLayout contenedor = (LinearLayout) findViewById(R.id.list_recents);
+
+            LinearLayout recentscontenedor = (LinearLayout) findViewById(R.id.list_recents);
             LayoutInflater inflater = LayoutInflater.from(this);
 
             for (int i = 0; i < recentList.size(); i++) {
-                View child = inflater.inflate(R.layout.layout_recents_dashboard, contenedor, false);
+                View childrecents = inflater.inflate(R.layout.layout_recents_dashboard, recentscontenedor, false);
 
-                contenedor.addView(child);
-                child.setPadding(10, 10, 10, 10);
+                recentscontenedor.addView(childrecents);
+                childrecents.setPadding(10,20,10,20);
 
-                ImageView recentAvatar = (ImageView) child.findViewById(R.id.recent_avatar);
+                ImageView recentAvatar = (ImageView) childrecents.findViewById(R.id.recent_avatar);
                 File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
                         "avatar_"+recentList.get(i).getContactId()+".jpg");
 
@@ -149,21 +154,21 @@ public class DashBoardActivity extends ToolbarActivity{
                         }
 
                     }
-                    TextView avatarText = (TextView) child.findViewById(R.id.avatarText);
+                    TextView avatarText = (TextView) childrecents.findViewById(R.id.avatarText);
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(initials);
                 }
 
-                TextView firstName = (TextView) child.findViewById(R.id.recent_firstname);
+                TextView firstName = (TextView) childrecents.findViewById(R.id.recent_firstname);
                 firstName.setText(recentList.get(i).getFirstName());
 
-                TextView lastName = (TextView) child.findViewById(R.id.recent_lastname);
+                TextView lastName = (TextView) childrecents.findViewById(R.id.recent_lastname);
                 lastName.setText(recentList.get(i).getLastName());
 
             }
             //initALL();
         } catch (Exception e) {
-            Log.e(Constants.TAG, "Load news error: " + e);
+            Log.e(Constants.TAG, "Load recents error: " + e);
         }
     }
 
@@ -200,7 +205,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
     @Subscribe
     public void onEventNewsReceived(RefreshNewsEvent event){
-        ArrayList<News> news = event.getNews();
+        final ArrayList<News> news = event.getNews();
         if(news != null)
         {
             try {
@@ -214,7 +219,7 @@ public class DashBoardActivity extends ToolbarActivity{
                     View child = inflater.inflate(R.layout.layout_news_dashboard, contenedor, false);
 
                     contenedor.addView(child);
-                    child.setPadding(10, 10, 10, 10);
+                    child.setPadding(10, 20, 10, 20);
 
                     ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
                     Picasso.with(this)
@@ -223,11 +228,35 @@ public class DashBoardActivity extends ToolbarActivity{
                             .centerInside()
                             .into(newsImage);
 
-                    TextView title = (TextView) child.findViewById(R.id.notice_title);
+                    final TextView title = (TextView) child.findViewById(R.id.notice_title);
                     title.setText(news.get(i).getTitle());
 
                     TextView date = (TextView) child.findViewById(R.id.notice_date);
-                    date.setText(Utils.getStringChatTimeDifference(news.get(i).getPublished_at()));
+                    Long current = Calendar.getInstance().getTimeInMillis();
+                    date.setText(Utils.getShortStringTimeDifference(current - news.get(i).getPublished_at()));
+
+                    final String detailImage = news.get(i).getImage();
+                    final String detailTitle = news.get(i).getTitle();
+                    final String detailAvatar = news.get(i).getAuthor_avatar();
+                    final String detailAuthor = news.get(i).getAuthor_name();
+                    final String detailPublished = Utils.getShortStringTimeDifference(current - news.get(i).getPublished_at());
+                    final String detailHtml = news.get(i).getHtml();
+
+                    LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
+                    btnews.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            Intent in = new Intent(DashBoardActivity.this, NewsDetailActivity.class);
+                            in.putExtra(Constants.NEWS_IMAGE, detailImage);
+                            in.putExtra(Constants.NEWS_TITLE, detailTitle);
+                            in.putExtra(Constants.NEWS_AUTHOR_AVATAR, detailAvatar);
+                            in.putExtra(Constants.NEWS_AUTHOR_NAME, detailAuthor);
+                            in.putExtra(Constants.NEWS_PUBLISHED_AT, detailPublished);
+                            in.putExtra(Constants.NEWS_HTML, detailHtml);
+                            in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            startActivity(in);
+                            finish();
+                        }
+                    });
 
                 }
                 initALL();

@@ -205,5 +205,6 @@
     <string name="settings_label_vacation_time_not_set">Not Set</string>
     <string name="about_version">"version "</string>
     <string name="about_build">"build "</string>
+    <string name="Mycomms">MyComms</string>
 
 </resources>

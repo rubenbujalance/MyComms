@@ -92,7 +92,7 @@ public class NewsController extends BaseController {
                 news = mapNews(jsonObject);
                 newsList.add(news);
 
-               Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
+               //Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
 
             }
 

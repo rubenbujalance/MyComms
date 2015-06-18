@@ -40,7 +40,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginRight="18dp"
                 android:layout_marginEnd="18dp"
-                android:background="@color/blue_dark"
+                android:background="@drawable/blue_rounded"
                 android:autoText="false"
                 android:layout_alignTop="@+id/recent_avatar"
                 android:visibility="gone" />

@@ -184,6 +184,7 @@ public class DashBoardActivity extends ToolbarActivity{
                     TextView unreaded_messages = (TextView) childrecents.findViewById(R.id.unreaded_messages);
                     unreaded_messages.setVisibility(View.VISIBLE);
                     unreaded_messages.setText(String.valueOf(count));
+                    unreaded_messages.setBackgroundDrawable(getResources().getDrawable(R.drawable.bt_blue_unread));
                 } else {
                     ImageView typerecent = (ImageView) childrecents.findViewById(R.id.type_recent);
                     typerecent.setVisibility(View.VISIBLE);

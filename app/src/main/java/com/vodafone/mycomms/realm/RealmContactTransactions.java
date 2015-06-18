@@ -93,7 +93,35 @@ public class RealmContactTransactions {
                 contactArrayList.add(contactListItem);
             }
         }
-        return contactArrayList;
+        return sortContacts(contactArrayList);
+    }
+
+    public ArrayList<Contact> sortContacts(ArrayList<Contact> contactsArrayList){
+        int size = contactsArrayList.size();
+        int notLettersStart = 0;
+        ArrayList<Contact> noLettersContactsArrayList = new ArrayList<>();
+        ArrayList<Contact> lettersContactsArrayList = new ArrayList<>();
+        for (int i=0; i < size; i++){
+            Character.isLetter(contactsArrayList.get(i).getFirstName().charAt(0));
+            if (Character.isLetter(contactsArrayList.get(i).getFirstName().charAt(0))){
+                lettersContactsArrayList.add(contactsArrayList.get(i));
+            }else{
+                notLettersStart = notLettersStart + 1;
+                noLettersContactsArrayList.add(contactsArrayList.get(i));
+            }
+        }
+        int notLetters = 0;
+        ArrayList<Contact> sortedContactsArrayList = new ArrayList<>();
+        for (int i=0; i < size; i++){
+            if (i<lettersContactsArrayList.size()){
+                sortedContactsArrayList.add(lettersContactsArrayList.get(i));
+            }else{
+                sortedContactsArrayList.add(noLettersContactsArrayList.get(notLetters));
+                notLetters = notLetters+1;
+            }
+        }
+        return sortedContactsArrayList;
+
     }
 
     public ArrayList<Contact> getContactsByKeyWord(String keyWord)
@@ -199,9 +227,37 @@ public class RealmContactTransactions {
             for (FavouriteContact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }
-            return contactArrayList;
+            return sortFavouriteContacts(contactArrayList);
         }
         return null;
+    }
+
+    public ArrayList<FavouriteContact> sortFavouriteContacts(ArrayList<FavouriteContact> favouriteContactsArrayList){
+        int size = favouriteContactsArrayList.size();
+        int notLettersStart = 0;
+        ArrayList<FavouriteContact> noLettersFavouriteContactsArrayList = new ArrayList<>();
+        ArrayList<FavouriteContact> lettersFavouriteContactsArrayList = new ArrayList<>();
+        for (int i=0; i < size; i++){
+            Character.isLetter(favouriteContactsArrayList.get(i).getFirstName().charAt(0));
+            if (Character.isLetter(favouriteContactsArrayList.get(i).getFirstName().charAt(0))){
+                lettersFavouriteContactsArrayList.add(favouriteContactsArrayList.get(i));
+            }else{
+                notLettersStart = notLettersStart + 1;
+                noLettersFavouriteContactsArrayList.add(favouriteContactsArrayList.get(i));
+            }
+        }
+        int notLetters = 0;
+        ArrayList<FavouriteContact> sortedFavouriteContactsArrayList = new ArrayList<>();
+        for (int i=0; i < size; i++){
+            if (i<lettersFavouriteContactsArrayList.size()){
+                sortedFavouriteContactsArrayList.add(lettersFavouriteContactsArrayList.get(i));
+            }else{
+                sortedFavouriteContactsArrayList.add(noLettersFavouriteContactsArrayList.get(notLetters));
+                notLetters = notLetters+1;
+            }
+        }
+        return sortedFavouriteContactsArrayList;
+
     }
 
     public ArrayList<RecentContact> getAllRecentContacts(){

@@ -19,7 +19,8 @@
     "currency_minor_unit":2,
     "currency_name":"US Dollar",
     "currency_numeric_code":"840",
-    "is_independent":"Yes"
+    "is_independent":"Yes",
+    "is_special":"Yes"
   },
   {
     "name":"United Kingdom",
@@ -41,7 +42,8 @@
     "currency_minor_unit":2,
     "currency_name":"Pound Sterling",
     "currency_numeric_code":"826",
-    "is_independent":"Yes"
+    "is_independent":"Yes",
+    "is_special":"Yes"
   },
   {
     "name":"Afghanistan",

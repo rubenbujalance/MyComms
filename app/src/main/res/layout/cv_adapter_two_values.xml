@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:textSize="18dp"
         android:textColor="#000000"
-        android:text="@string/DummyCountry"
+        android:text="@string/dummyCountry"
         android:layout_weight="25" />
 
     <TextView

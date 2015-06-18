@@ -1,6 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/container"
+    android:background="#ffffffff">
+
+    <include android:id="@+id/app_bar" layout="@layout/toolbar_news_detail"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollContent" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/content">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/picture"
+                android:src="@drawable/sample_3"
+                android:scaleType="centerCrop"/>
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Title"
+                android:id="@+id/title"
+                android:textStyle="bold"
+                android:textSize="25dp"
+                android:gravity="center_horizontal"
+                android:textColor="@color/grey_dark"
+                android:padding="10dp"
+                android:background="@color/grey_light" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:weightSum="1"
+                android:background="@color/grey_light">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:id="@+id/avatar"
+                    android:src="@drawable/cartoon_round_contact_image_example"
+                    android:padding="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Author"
+                    android:id="@+id/author"
+                    android:textSize="16dp"
+                    android:textIsSelectable="false"
+                    android:layout_weight="0.99" />
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:id="@+id/imageView14"
+                    android:src="@drawable/icon_create_event_date_time"
+                    android:paddingLeft="18dp"
+                    android:paddingTop="18dp"
+                    android:paddingBottom="18dp"
+                    android:paddingRight="0dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2 days ago"
+                    android:id="@+id/published"
+                    android:textSize="16dp" />
+            </LinearLayout>
+
+            <WebView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/newstext"
+                android:background="#ffffffff"
+                android:padding="15dp" />
+
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

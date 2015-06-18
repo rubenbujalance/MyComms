@@ -205,7 +205,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
     @Subscribe
     public void onEventNewsReceived(RefreshNewsEvent event){
-        ArrayList<News> news = event.getNews();
+        final ArrayList<News> news = event.getNews();
         if(news != null)
         {
             try {
@@ -226,18 +226,30 @@ public class DashBoardActivity extends ToolbarActivity{
                             .load("https://"+ EndpointWrapper.getBaseNewsURL()+news.get(i).getImage())
                             .into(newsImage);
 
-                    TextView title = (TextView) child.findViewById(R.id.notice_title);
+                    final TextView title = (TextView) child.findViewById(R.id.notice_title);
                     title.setText(news.get(i).getTitle());
 
                     TextView date = (TextView) child.findViewById(R.id.notice_date);
                     Long current = Calendar.getInstance().getTimeInMillis();
                     date.setText(Utils.getShortStringTimeDifference(current - news.get(i).getPublished_at()));
 
+                    final String detailImage = news.get(i).getImage();
+                    final String detailTitle = news.get(i).getTitle();
+                    final String detailAvatar = news.get(i).getAuthor_avatar();
+                    final String detailAuthor = news.get(i).getAuthor_name();
+                    final String detailPublished = Utils.getShortStringTimeDifference(current - news.get(i).getPublished_at());
+                    final String detailHtml = news.get(i).getHtml();
+
                     LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
                     btnews.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
-                            //Start Contacts activity
-                            Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
+                            Intent in = new Intent(DashBoardActivity.this, NewsDetailActivity.class);
+                            in.putExtra(Constants.NEWS_IMAGE, detailImage);
+                            in.putExtra(Constants.NEWS_TITLE, detailTitle);
+                            in.putExtra(Constants.NEWS_AUTHOR_AVATAR, detailAvatar);
+                            in.putExtra(Constants.NEWS_AUTHOR_NAME, detailAuthor);
+                            in.putExtra(Constants.NEWS_PUBLISHED_AT, detailPublished);
+                            in.putExtra(Constants.NEWS_HTML, detailHtml);
                             in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                             startActivity(in);
                             finish();

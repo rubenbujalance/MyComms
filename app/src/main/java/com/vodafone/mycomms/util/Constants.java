@@ -78,6 +78,7 @@ public class Constants {
     public static final String PROFILE_PLATFORMS = "platforms";
 
     //Contacts API Calls
+    public static final String NEWS = "news";
     public static final String NEWS_DATA = "data";
     public static final String NEWS_API_GET = "/api/news";
     public static final String NEWS_PAGINATION = "pagination";

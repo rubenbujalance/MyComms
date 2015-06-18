@@ -164,9 +164,7 @@
                         android:layout_height="match_parent"
                         android:id="@+id/imageView13"
                         android:src="@mipmap/icon_right_white"
-                        android:paddingTop="15dp"
-                        android:paddingRight="10dp"
-                        android:paddingBottom="15dp" />
+                        android:padding="15dp" />
                 </LinearLayout>
 
             </LinearLayout>

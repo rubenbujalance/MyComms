@@ -273,7 +273,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         }
 
         _chatList.add(chatMsg);
-        if(_chatList.size()>50) _chatList.remove(0);
+//        if(_chatList.size()>50) _chatList.remove(0);
         refreshAdapter();
         etChatTextBox.setText("");
     }

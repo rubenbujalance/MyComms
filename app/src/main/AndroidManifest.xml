@@ -35,6 +35,10 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name=".main.NewsDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name=".ContactListMainActivity"
             android:screenOrientation="portrait" >
         </activity>

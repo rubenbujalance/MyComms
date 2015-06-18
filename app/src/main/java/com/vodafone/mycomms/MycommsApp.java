@@ -9,13 +9,20 @@ import android.util.Log;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.contacts.connection.DownloadContactsAsyncTask;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
+import com.vodafone.mycomms.main.connection.DownloadNewsAsyncTask;
+import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
+
+import java.util.ArrayList;
+
+import model.News;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -27,6 +34,7 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 public class MycommsApp extends Application implements IProfileConnectionCallback {
 
     private ProfileController profileController;
+    private NewsController newsController;
     private Context mContext;
 
     @Override
@@ -138,5 +146,16 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void initProfileAndContacts(InitProfileAndContacts event){
         Log.i(Constants.TAG, "MyCommsApp.InitProfileAndContacts: ");
         getProfileIdAndAccessToken();
+    }
+
+    @Subscribe
+    public void initNews(InitNews event){
+        Log.i(Constants.TAG, "MyCommsApp.InitNews: ");
+        getNews();
+    }
+
+    public void getNews() {
+        Log.i(Constants.TAG, "MycommsApp.getNews: ");
+        new DownloadNewsAsyncTask().execute(this);
     }
 }

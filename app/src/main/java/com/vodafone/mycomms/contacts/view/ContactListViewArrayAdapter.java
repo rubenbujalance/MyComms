@@ -57,6 +57,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.textViewPosition = (TextView) convertView.findViewById(R.id.list_item_content_position);
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_status_local_time);
             viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
+            viewHolder.imageCompanyLogo = (ImageView) convertView.findViewById(R.id.list_item_content_companylogo);
+
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
@@ -65,6 +67,18 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
         // update the item view
         Contact contact = getItem(position);
+
+        if(null != contact.getPlatform() && contact.getPlatform()
+                .equals(Constants.PLATFORM_LOCAL))
+        {
+            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
+            viewHolder.imageViewDayNight.setVisibility(View.GONE);
+        }
+        else
+        {
+            viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
+            viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
+        }
 
         //Image avatar
         final File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
@@ -186,6 +200,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         TextView textViewTime;
         ImageView imageViewDayNight;
         ImageView imageAvatar;
+        ImageView imageCompanyLogo;
         TextView textAvatar;
     }
 

@@ -17,6 +17,7 @@ import model.Contact;
 public class InternalContactSearch
 {
     private Context context;
+    private String profileId;
 
 
     public InternalContactSearch()
@@ -24,9 +25,10 @@ public class InternalContactSearch
         this.context = null;
     }
 
-    public  InternalContactSearch(Context context)
+    public  InternalContactSearch(Context context, String profileId)
     {
         this.context = context;
+        this.profileId = profileId;
     }
 
     /**
@@ -44,6 +46,9 @@ public class InternalContactSearch
         {
             contact = new Contact("");
             contact.setId("local_contact_"+id);
+            contact.setContactId("local_contact_" + id);
+            contact.setPlatform(Constants.PLATFORM_LOCAL);
+            contact.setProfileId(profileId);
             contact = setContactsCompanyDataByContactsIds(id, contact);
             contact = setContactsBasicDataByContactsIds(id, contact);
             contact = setContactsEmailDataByContactsIds(id, contact);
@@ -176,7 +181,9 @@ public class InternalContactSearch
             {
                 do
                 {
-                    contact.setPhones(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+                    String phone = cursor.getString(cursor.getColumnIndex(ContactsContract
+                            .CommonDataKinds.Phone.NORMALIZED_NUMBER)).replace(" ", "");
+                    contact.setPhones(phone);
                 }
                 while(cursor.moveToNext());
             }
@@ -211,7 +218,7 @@ public class InternalContactSearch
             do
             {
                 String id = cursorByName
-                        .getString(cursorByName.getColumnIndex(ContactsContract.Contacts._ID));
+                        .getString(cursorByName.getColumnIndex(ContactsContract.Data.CONTACT_ID));
                 if(!distinctIds.contains(id))
                 {
                     distinctIds.add(id);
@@ -278,19 +285,19 @@ public class InternalContactSearch
         ContentResolver cr = this.context.getContentResolver();
         try
         {
-            Uri uri = ContactsContract.Contacts.CONTENT_URI;
+            Uri uri = ContactsContract.Data.CONTENT_URI;
             String[] projection = new String[]
                     {
-                            ContactsContract.Contacts._ID
+                            ContactsContract.Data.CONTACT_ID
                     };
 
-            String selection = ContactsContract.Contacts.DISPLAY_NAME
+            String selection = ContactsContract.Data.DISPLAY_NAME
                     + " like '%"+keyWord+"%' "
-                    + " AND "+ContactsContract.Contacts.HAS_PHONE_NUMBER+" = 1"
-                    + " AND "+ContactsContract.Contacts.IN_VISIBLE_GROUP+" = '1'"
+                    + " AND "+ContactsContract.Data.HAS_PHONE_NUMBER+" = 1"
+                    + " AND "+ContactsContract.Data.IN_VISIBLE_GROUP+" = '1'"
                     ;
 
-            return cr.query(uri, projection, selection, null, ContactsContract.Contacts._ID+" ASC");
+            return cr.query(uri, projection, selection, null, ContactsContract.Data.CONTACT_ID+" ASC");
         }
         catch (Exception ex)
         {
@@ -427,15 +434,15 @@ public class InternalContactSearch
     private Cursor getContactBasicDataByContactId(String id)
     {
         ContentResolver cr = this.context.getContentResolver();
-        Uri uri = ContactsContract.Contacts.CONTENT_URI;
+        Uri uri = ContactsContract.Data.CONTENT_URI;
         String[] projection = new String[]
                 {
-                          ContactsContract.Contacts.DISPLAY_NAME
-                        , ContactsContract.Contacts.LAST_TIME_CONTACTED
-                        , ContactsContract.Contacts.TIMES_CONTACTED
+                          ContactsContract.Data.DISPLAY_NAME
+                        , ContactsContract.Data.LAST_TIME_CONTACTED
+                        , ContactsContract.Data.TIMES_CONTACTED
                 };
 
-        String selection = ContactsContract.Contacts._ID +" =? ";
+        String selection = ContactsContract.Data.CONTACT_ID +" =? ";
 
         String[] selectionArgs = new String[]
                 {
@@ -447,7 +454,7 @@ public class InternalContactSearch
                         , projection
                         , selection
                         , selectionArgs
-                        , ContactsContract.Contacts._ID + " ASC"
+                        , ContactsContract.Data.CONTACT_ID + " ASC"
                 );
     }
 
@@ -496,7 +503,7 @@ public class InternalContactSearch
         Uri uri = ContactsContract.Data.CONTENT_URI;
         String[] projection = new String[]
                 {
-                          ContactsContract.CommonDataKinds.Phone.NUMBER
+                          ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER
                 };
 
         String selection = ContactsContract.Data.CONTACT_ID +" =? "

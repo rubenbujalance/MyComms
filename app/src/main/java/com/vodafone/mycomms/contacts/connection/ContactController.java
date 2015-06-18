@@ -59,7 +59,7 @@ public class ContactController extends BaseController {
         this.mContext = activity;
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
-        internalContactSearch = new InternalContactSearch(activity);
+        internalContactSearch = new InternalContactSearch(activity, profileId);
     }
 
     public ContactController(Fragment fragment, Realm realm, String profileId) {
@@ -213,9 +213,9 @@ public class ContactController extends BaseController {
                 return;
 
             RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
-            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
+            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getId());
             if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                String filename = "avatar_" + contact.getContactId() + ".jpg";
+                String filename = "avatar_" + contact.getId() + ".jpg";
 
                 new DownloadAvatars().execute(contact.getAvatar(), filename);
 
@@ -240,16 +240,6 @@ public class ContactController extends BaseController {
     public ArrayList<Contact> getAllContacts() {
         Log.d(Constants.TAG, "ContactController.getAllContacts: ");
         return realmContactTransactions.getAllContacts();
-    }
-
-    public ArrayList<Contact> getLocalContactsByKeyWord(String keyWord) {
-        Log.d(Constants.TAG, "ContactController.getLocalContactsByKeyWord: ");
-        return internalContactSearch.getLocalContactsByKeyWord(keyWord);
-    }
-
-    public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
-        Log.d(Constants.TAG, "ContactController.getContactsByKeyWord: ");
-        return realmContactTransactions.getContactsByKeyWord(keyWord);
     }
 
     public ArrayList<FavouriteContact> getAllFavouriteContacts(){

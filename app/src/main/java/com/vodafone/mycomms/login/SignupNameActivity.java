@@ -2,6 +2,7 @@ package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +31,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.Constants;
 
 import java.io.File;
@@ -51,6 +53,9 @@ public class SignupNameActivity extends Activity {
     ClearableEditText mLastName;
     Bitmap photoBitmap = null;
     String photoPath = null;
+
+    private FilePushToServerController filePushToServerController;
+    private File multiPartFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,28 +205,12 @@ public class SignupNameActivity extends Activity {
 
             //Reset avatar from user profile
             UserProfile.setAvatar(null);
+            new sendFile().execute();
         }
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK)
         {
             Uri selectedImage = data.getData();
             photoPath = getRealPathFromURI(selectedImage);
-//            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-//            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-//            Bitmap bitmap = null;
-//
-//            if (cursor.moveToFirst()) {
-//                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//                String filePath = cursor.getString(columnIndex);
-//                bitmap = BitmapFactory.decodeFile(filePath);
-//            }
-//            cursor.close();
-//
-//            //Set bitmap to CircleImageView
-//            mPhoto.setImageBitmap(bitmap);
-//            mPhoto.setBorderWidth(2);
-//            mPhoto.setBorderColor(Color.WHITE);
-//            photoBitmap = bitmap;
-
             photoBitmap = decodeFile(photoPath);
             mPhoto.setImageBitmap(photoBitmap);
             mPhoto.setBorderWidth(2);
@@ -229,12 +218,15 @@ public class SignupNameActivity extends Activity {
 
             //Reset avatar from user profile
             UserProfile.setAvatar(null);
+            new sendFile().execute();
         }
     }
 
-    public Uri setImageUri() {
+    public Uri setImageUri()
+    {
         // Store image in dcim
-        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new Date().getTime() + ".jpg");
+        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new
+                Date().getTime() + ".png");
         Uri imgUri = Uri.fromFile(file);
         photoPath = file.getAbsolutePath();
         return imgUri;
@@ -345,7 +337,7 @@ public class SignupNameActivity extends Activity {
             return null;
         }
 
-        Log.i("filepath:"," " + filepath) ;
+        Log.i("filepath:", " " + filepath) ;
 
         return filepath;
     }
@@ -356,8 +348,8 @@ public class SignupNameActivity extends Activity {
 
         Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
         errorIcon.setBounds(new Rect(0, 0,
-                (int)(errorIcon.getIntrinsicWidth()*0.5),
-                (int)(errorIcon.getIntrinsicHeight()*0.5)));
+                (int) (errorIcon.getIntrinsicWidth() * 0.5),
+                (int) (errorIcon.getIntrinsicHeight() * 0.5)));
 
         if(mLastName.getText().toString().trim().length() <= 0)
         {
@@ -396,15 +388,49 @@ public class SignupNameActivity extends Activity {
         UserProfile.setPhotoPath(photoPath);
     }
 
-    private class LoadAvatarFromUrl extends AsyncTask<String, Void, String> {
+    private class sendFile extends AsyncTask<Void, Void, String> {
+        private ProgressDialog pdia;
+
+
+
         @Override
-        protected String doInBackground(String[] params) {
-            return saveImageFromUrl(params[0]);
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getApplicationContext());
+            pdia.setMessage(getApplicationContext().getString(R.string.progress_dialog_uploading_file));
+            pdia.show();
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            loadAvatarFromUrl(result);
+        protected String doInBackground(Void... params) {
+            try
+            {
+                filePushToServerController =  new FilePushToServerController
+                        (SignupNameActivity.this);
+                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
+                        photoBitmap, SignupNameActivity.this, Constants.MULTIPART_AVATAR);
+                filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_AVATAR,
+                        Constants.MULTIPART_AVATAR, multiPartFile);
+
+                String response = filePushToServerController.executeRequest();
+                return response;
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "FilePushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            super.onPostExecute(result);
+            if(pdia.isShowing())pdia.dismiss();
+            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
+
+            mPhoto.setImageBitmap(photoBitmap);
+
         }
     }
 }

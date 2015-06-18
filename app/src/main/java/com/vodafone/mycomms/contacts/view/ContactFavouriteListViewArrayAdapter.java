@@ -53,6 +53,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             viewHolder.textViewPosition = (TextView) convertView.findViewById(R.id.list_item_content_position);
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_status_local_time);
             viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
+            viewHolder.imageCompanyLogo = (ImageView) convertView.findViewById(R.id.list_item_content_companylogo);
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
@@ -61,6 +62,18 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
 
         // update the item view
         FavouriteContact contact = getItem(position);
+
+        if(null != contact.getPlatform() && contact.getPlatform()
+                .equals(Constants.PLATFORM_LOCAL))
+        {
+            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
+            viewHolder.imageViewDayNight.setVisibility(View.GONE);
+        }
+        else
+        {
+            viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
+            viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
+        }
 
         //Image avatar
         final File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
@@ -92,8 +105,17 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
                     });
 
         } else{
-            String initials = contact.getFirstName().substring(0,1) +
-                    contact.getLastName().substring(0,1);
+            String initials = "";
+            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            {
+                initials = contact.getFirstName().substring(0,1);
+
+                if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                {
+                    initials = initials + contact.getLastName().substring(0,1);
+                }
+
+            }
 
             viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
             viewHolder.textAvatar.setText(initials);
@@ -111,10 +133,17 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             e.printStackTrace();
         }
 
-        if(icon.compareTo("dnd")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_notdisturb);
-        else if(icon.compareTo("vacation")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_vacation);
-        else if(icon.compareTo("moon")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_moon);
-        else viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
+        if(null != icon)
+        {
+            if(icon.compareTo("dnd")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_notdisturb);
+            else if(icon.compareTo("vacation")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_vacation);
+            else if(icon.compareTo("moon")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_moon);
+            else viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
+        }
+        else
+        {
+            viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
+        }
 
         //viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getLastSeen()));
 
@@ -129,7 +158,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
 
         try {
             assert null != presenceDetail;
-            if (presenceDetail.equals("#LOCAL_TIME#")) {
+            if (null != presenceDetail && presenceDetail.equals("#LOCAL_TIME#")) {
                 TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
                 Calendar currentCal = Calendar.getInstance();
 
@@ -164,6 +193,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         TextView textViewTime;
         ImageView imageViewDayNight;
         ImageView imageAvatar;
+        ImageView imageCompanyLogo;
         TextView textAvatar;
     }
 }

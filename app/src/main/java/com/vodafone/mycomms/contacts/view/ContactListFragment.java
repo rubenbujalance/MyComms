@@ -79,8 +79,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private LinearLayout laySearchBar;
     private String apiCall;
 
-    private boolean isSearchBarFocused = false;
-
     private String profileId;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -98,6 +96,11 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private ArrayList<Contact> internalContacts = new ArrayList<>();
     private ArrayList<Contact> realmContacts = new ArrayList<>();
 
+    private SharedPreferences sp;
+
+    private final int drLeft = android.R.drawable.ic_menu_search;
+    private final int drRight = R.drawable.ic_action_remove;
+
     // TODO: Rename and change types of parameters
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
@@ -108,15 +111,15 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         return fragment;
     }
 
-   @Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-       View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
-       listView = (ListView) v.findViewById(android.R.id.list);
-       emptyText = (TextView) v.findViewById(android.R.id.empty);
+        View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
+        listView = (ListView) v.findViewById(android.R.id.list);
+        emptyText = (TextView) v.findViewById(android.R.id.empty);
 
-       loadSearchBarComponentsAndEvents(v);
+        loadSearchBarComponentsAndEvents(v);
 
-       return v;
+        return v;
     }
 
     /**
@@ -136,8 +139,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        checkBundle(savedInstanceState);
-        SharedPreferences sp = getActivity().getSharedPreferences(
+        sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         if(sp==null){
@@ -183,39 +185,82 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             Intent in;
 
             in = new Intent(getActivity(), ContactDetailMainActivity.class);
+
+            if(mIndex == Constants.CONTACTS_FAVOURITE)
+            {
+                in.putExtra(Constants.CONTACT_IS_FAVORITE, true);
+            }
+            else
+            {
+                in.putExtra(Constants.CONTACT_IS_FAVORITE, false);
+            }
+
             if(mIndex == Constants.CONTACTS_ALL) {
                 if (contactList.get(position).getContactId()!=null && contactList.get(position).getContactId().equals(profileId))
                     in = new Intent(getActivity(), SettingsMainActivity.class);
                 in.putExtra(Constants.CONTACT_CONTACT_ID,contactList.get(position).getContactId() );
                 startActivity(in);
-            } else if (mIndex == Constants.CONTACTS_RECENT) {
+            }
+            else if (mIndex == Constants.CONTACTS_RECENT)
+            {
                 try {
                     String action = recentContactList.get(position).getAction();
                     if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
                         String strPhones = recentContactList.get(position).getPhones();
-                        if (strPhones != null) {
-                            JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                        if (strPhones != null)
+                        {
+                            String phone = strPhones;
+                            if(!recentContactList.get(position).getPlatform().equals(Constants
+                                    .PLATFORM_LOCAL))
+                            {
+                                JSONArray jPhones = new JSONArray(strPhones);
+                                phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                            }
+
                             Utils.launchCall(phone, getActivity());
                         }
                     }
-                    else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
+                    else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
+                    {
                         /*String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null) {
                             JSONArray jPhones = new JSONArray(strPhones);
                             String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
                             Utils.launchSms(phone, getActivity());
                         }*/
-                        in = new Intent(getActivity(), ChatMainActivity.class);
-                        in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
-                        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
-                        startActivity(in);
+
+                        // This is LOCAL contact, then in this case the action will be Send SMS
+                        // message
+                        if(null != recentContactList.get(position).getPlatform() && recentContactList.get
+                            (position).getPlatform().equals(Constants.PLATFORM_LOCAL))
+                        {
+                            String phone = recentContactList.get(position).getPhones();
+                            if(null != phone)
+                            {
+                                Utils.launchSms(phone, getActivity());
+                            }
+                        }
+                        else
+                        {
+                            in = new Intent(getActivity(), ChatMainActivity.class);
+                            in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
+                            in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                            startActivity(in);
+                        }
+
                     }
                     else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
                         String strEmails = recentContactList.get(position).getEmails();
-                        if (strEmails != null) {
-                            JSONArray jPhones = new JSONArray(strEmails);
-                            String email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                        if (strEmails != null)
+                        {
+                            String email = strEmails;
+                            if(!recentContactList.get(position).getPlatform().equals(Constants
+                                    .PLATFORM_LOCAL))
+                            {
+                                JSONArray jPhones = new JSONArray(strEmails);
+                                email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                            }
+
                             Utils.launchEmail(email, getActivity());
                         }
                     }
@@ -238,8 +283,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     @Override
     public void onSearchContactsResponse(ArrayList<Contact> contactList, boolean morePages, int
-            offsetPaging)
-    {
+            offsetPaging) {
         Log.i(Constants.TAG, "onSearchContactsResponse: " + apiCall);
 
         if (morePages)
@@ -290,17 +334,15 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         if(mIndex != Constants.CONTACTS_ALL)
         {
             laySearchBar.setVisibility(View.GONE);
+            hideSearchBarContent();
         }
 
         layCancel.setVisibility(View.GONE);
 
-        if(isSearchBarFocused)
+        if(mIndex == Constants.CONTACTS_ALL && Constants.isSearchBarFocusRequested)
         {
             showKeyboard();
-        }
-        else
-        {
-            hideKeyboard();
+            //Constants.isSearchBarFocusRequested = false;
         }
     }
 
@@ -310,8 +352,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     private void setSearchBarEvents()
     {
-        final int drLeft = android.R.drawable.ic_menu_search;
-        final int drRight = R.drawable.ic_action_remove;
+
         searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
 
 
@@ -329,23 +370,18 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                 showKeyboard();
                 cancelButton.setVisibility(View.VISIBLE);
 
-                if (event.getAction() == MotionEvent.ACTION_UP)
-                {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     // Will hide X button for delete searched text
                     if (null != searchView.getCompoundDrawables()[DRAWABLE_RIGHT] && event.getRawX() >= (searchView.getRight() - searchView.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
                         Log.d("onTouch() -> ", "You have pressed right drawable!");
                         searchView.setText("");
                         searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
                         return true;
-                    }
-                    else
-                    {
+                    } else {
                         Log.d("onTouch() -> ", "You have pressed other part of ET!");
                         return true;
                     }
-                }
-                else
-                {
+                } else {
                     return true;
                 }
             }
@@ -380,8 +416,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         searchView.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER)
-                {
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
                     hideKeyboard();
                 }
                 return false;
@@ -391,14 +426,19 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                layCancel.setVisibility(View.GONE);
-                searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-                searchView.setText("");
+                hideSearchBarContent();
                 hideKeyboard();
 
             }
         });
 
+    }
+
+    public void hideSearchBarContent()
+    {
+        layCancel.setVisibility(View.GONE);
+        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
+        searchView.setText("");
     }
 
     public void setListAdapterTabs()
@@ -426,7 +466,10 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             if (emptyText!=null)
                 emptyText.setText("");
             contactList = loadAllContactsFromDB();
-            reloadAdapter();
+            if(null != contactList)
+            {
+                reloadAdapter();
+            }
         }
     }
 
@@ -475,10 +518,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         else if(keyWord.length() >= 3)
         {
             loadAllContactsFromServer(keyWord);
+            loadLocalContacts(keyWord);
             return loadAllContactsFromDB(keyWord);
-            //TODO Here we should add some another kind Local Searching
-            //internalContacts = loadLocalContacts(keyWord);
-            //contactList.addAll(internalContacts);
         }
         return null;
     }
@@ -517,9 +558,22 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     private void loadAllContactsFromServer(String keyWord)
     {
-        apiCall = Constants.CONTACT_API_GET_SEARCH_CONTACTS + keyWord;
+        buildRequestForSearchContacts(keyWord);
         mSearchController.getContactList(apiCall);
         mSearchController.setConnectionCallback(this);
+    }
+
+    /**
+     * Builds request string for search the contacts
+     * @author str_oan
+     * @param keyWord (String) -> key word for make search;
+     */
+    private void buildRequestForSearchContacts(String keyWord)
+    {
+        String basicCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+        String content = sp.getString(Constants.PLATFORMS_SHARED_PREF, "mc");
+        content = content.replace("[","").replace("]","").replace("\"","");
+        apiCall = basicCall+content+"&t="+keyWord;
     }
 
     /**
@@ -530,37 +584,18 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     private ArrayList<Contact> loadLocalContacts(String keyWord)
     {
-        ArrayList<Contact> contactArrayList = new ArrayList<>();
-        contactArrayList = mSearchController.getLocalContactsByKeyWord(keyWord);
+        ArrayList<Contact> contactArrayList = mSearchController.getLocalContactsByKeyWord(keyWord);
+        mSearchController.storeContactsIntoRealm(contactArrayList);
         return contactArrayList;
-    }
-
-
-
-    /**
-     * Force focus to search bar is previous Activity was Dashboard
-     * @author str_oan
-     * @param bundle (Bundle) params from previous Activity
-     */
-    private void checkBundle(Bundle bundle)
-    {
-        if(null != bundle)
-        {
-            if(bundle.getBoolean(Constants.BUNDLE_DASHBOARD_ACTIVITY))
-            {
-                isSearchBarFocused = true;
-            }
-        }
     }
 
     /**
      * Force to show keyboard in current View
      * @author str_oan
      */
-    private void showKeyboard()
+    public void showKeyboard()
     {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getActivity
-            ().INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
 
     }
@@ -569,7 +604,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      * Force to hide keyboard in current activity
      * @author str_oan
      */
-    private void hideKeyboard()
+    public void hideKeyboard()
     {
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
           ().INPUT_METHOD_SERVICE);
@@ -594,8 +629,17 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private void loadSearchBarComponentsAndEvents(View v)
     {
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
-                .SOFT_INPUT_STATE_HIDDEN);
+        if(mIndex == Constants.CONTACTS_ALL && Constants.isSearchBarFocusRequested)
+        {
+            showKeyboard();
+            Constants.isSearchBarFocusRequested = false;
+        }
+        else if(mIndex == Constants.CONTACTS_ALL && !Constants.isSearchBarFocusRequested)
+        {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
+                    .SOFT_INPUT_STATE_HIDDEN);
+
+        }
         initiateComponentsForSearchView(v);
         setSearchBarEvents();
     }

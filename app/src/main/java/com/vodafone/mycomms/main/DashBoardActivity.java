@@ -3,7 +3,6 @@ package com.vodafone.mycomms.main;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.ContactListMainActivity;
@@ -244,7 +242,7 @@ public class DashBoardActivity extends ToolbarActivity{
         {
             try {
                 //TODO: Is this necessary?
-                setContentView(R.layout.layout_dashboard);
+                //setContentView(R.layout.layout_dashboard);
 
                 LinearLayout contenedor = (LinearLayout) findViewById(R.id.list_news);
                 LayoutInflater inflater = LayoutInflater.from(this);
@@ -258,7 +256,7 @@ public class DashBoardActivity extends ToolbarActivity{
                     ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
                     Picasso.with(this)
                             .load("https://"+ EndpointWrapper.getBaseNewsURL()+news.get(i).getImage())
-                            .resize(200,200)
+                            .resize(100,100)
                             .centerInside()
                             .into(newsImage);
 

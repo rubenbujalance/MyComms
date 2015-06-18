@@ -52,7 +52,7 @@ public class SearchController extends BaseController
         this.mRealm = realm;
         this.mContext = activity;
         realmContactTransactions = new RealmContactTransactions(realm, profileId);
-        internalContactSearch = new InternalContactSearch(activity);
+        internalContactSearch = new InternalContactSearch(activity, profileId);
         this.mProfileId = profileId;
     }
 
@@ -87,7 +87,7 @@ public class SearchController extends BaseController
                 if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES))
                 {
                     morePages = true;
-                    offsetPaging = offsetPaging + 1;
+                    offsetPaging = offsetPaging + 25;
                     search = Constants.CONTACTS_ALL;
                 }
 
@@ -300,5 +300,11 @@ public class SearchController extends BaseController
     public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
         Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
         return realmContactTransactions.getContactsByKeyWord(keyWord);
+    }
+
+    public void storeContactsIntoRealm(ArrayList<Contact> contacts)
+    {
+        Log.d(Constants.TAG, "SearchController.storeContactsIntoRealm: ");
+        realmContactTransactions.insertContactList(contacts);
     }
 }

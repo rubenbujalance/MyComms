@@ -173,5 +173,10 @@ public class BaseConnection extends DefaultConnection {
     public Context getContext() {
         return context;
     }
+
+    public void addMultipartData()
+    {
+
+    }
     
 }

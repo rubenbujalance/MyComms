@@ -191,9 +191,9 @@ public class DashBoardActivity extends ToolbarActivity{
 
                     String action = recentList.get(i).getAction();
 
-                    if (action.equals("call")) {
+                    if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
                         typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                    } else if (action.equals("email")) {
+                    } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
                         typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
                     } else {
                         typerecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));

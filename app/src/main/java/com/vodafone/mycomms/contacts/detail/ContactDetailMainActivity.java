@@ -6,9 +6,13 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -380,7 +384,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
+        final File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
@@ -400,6 +404,50 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             ivAvatar.setImageResource(R.color.grey_middle);
             textAvatar.setText(initials);
         }
+
+        ivAvatar.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                LayoutInflater layoutInflater
+                        = (LayoutInflater) getBaseContext()
+                        .getSystemService(LAYOUT_INFLATER_SERVICE);
+                final View popupView = layoutInflater.inflate(R.layout.layout_contact_detail_zoom, null);
+                final PopupWindow popupWindow = new PopupWindow(
+                        popupView,
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT);
+                ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
+                TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
+
+                if (contact.getAvatar()!=null &&
+                        contact.getAvatar().length()>0 &&
+                        contact.getAvatar().compareTo("")!=0 &&
+                        avatarFile.exists()) {
+
+                    textAvatar.setText(null);
+
+                    Picasso.with(getBaseContext())
+                            .load(avatarFile)
+                            .into(fullAvatar);
+
+                } else{
+                    String initials = contact.getFirstName().substring(0,1) +
+                            contact.getLastName().substring(0,1);
+
+                    fullAvatar.setImageResource(R.color.grey_middle);
+                    textAvatar.setText(initials);
+                }
+
+                popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
+                popupView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View arg0) {
+                        popupWindow.dismiss();
+                    }
+                });
+            }
+        });
 
     }
 

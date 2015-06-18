@@ -38,6 +38,7 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshChatListEvent;
+import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
@@ -200,6 +201,8 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
                 if (cs != null && cs.length() > 0) checkXMPPConnection();
                 else setSendEnabled(false);
+
+                XMPPTransactions.initializeMsgServerSession(getApplicationContext());
             }
 
             @Override
@@ -223,7 +226,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             @Override
             public void onClick(View v)
             {
-                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+                //dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
 
@@ -532,4 +535,12 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     }
 
 
+    @Subscribe
+    public void onXMPPConnecting(XMPPConnectingEvent event){
+        boolean isConnecting = event.isConnecting();
+
+        if(!isConnecting)
+            checkXMPPConnection();
+        else setSendEnabled(false);
+    }
 }

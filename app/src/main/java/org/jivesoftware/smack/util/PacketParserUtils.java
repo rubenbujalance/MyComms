@@ -16,6 +16,11 @@
  */
 package org.jivesoftware.smack.util;
 
+import android.util.Log;
+
+import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.compress.packet.Compress;
 import org.jivesoftware.smack.packet.DefaultExtensionElement;
@@ -366,7 +371,20 @@ public class PacketParserUtils {
                                             boolean fullNamespaces) throws XmlPullParserException,
             IOException {
         assert (parser.getEventType() == XmlPullParser.START_TAG);
+        notifyMessageReceived(parser);
         return parseContentDepth(parser, parser.getDepth(), fullNamespaces);
+    }
+
+    public static void notifyMessageReceived(XmlPullParser parser)
+    {
+        try {
+
+            XMPPTransactions.saveAndNotifyMessageReceived(parser);
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "PacketParserUtils.notifyMessageReceived: ",e);
+            return;
+        }
     }
 
     /**

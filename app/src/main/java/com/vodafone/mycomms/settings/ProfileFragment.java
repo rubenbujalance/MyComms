@@ -98,6 +98,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private FilePushToServerController filePushToServerController;
 
     private UserProfile userProfile;
+    private String profileId = "";
     private File multiPartFile;
     private boolean isFirstLoadNeed = true;
 
@@ -458,6 +459,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             if(isFirstLoadNeed)
             {
                 this.userProfile = userProfile;
+                this.profileId = userProfile.getId();
                 Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
                 EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
                 profileName.setText(userProfile.getFirstName());
@@ -674,8 +676,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             try
             {
                 filePushToServerController =  new FilePushToServerController(getActivity());
-                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
-                        photoBitmap, getActivity(), Constants.MULTIPART_AVATAR);
+                multiPartFile = filePushToServerController.prepareFileToSend
+                        (
+                                multiPartFile,
+                                photoBitmap,
+                                getActivity(),
+                                Constants.MULTIPART_AVATAR,
+                                profileId
+                        );
                 filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_AVATAR,
                         Constants.MULTIPART_AVATAR, multiPartFile);
 

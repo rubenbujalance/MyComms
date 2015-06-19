@@ -511,8 +511,13 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             try
             {
                 filePushToServerController =  new FilePushToServerController(ChatMainActivity.this);
-                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
-                        photoBitmap, ChatMainActivity.this, Constants.MULTIPART_FILE);
+                multiPartFile = filePushToServerController.prepareFileToSend
+                        (
+                                multiPartFile,
+                                photoBitmap,
+                                ChatMainActivity.this,
+                                Constants.MULTIPART_FILE, _profile_id
+                        );
                 filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_FILE,
                         Constants.MULTIPART_FILE, multiPartFile);
 

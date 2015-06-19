@@ -21,8 +21,6 @@ import com.vodafone.mycomms.util.UserSecurity;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by str_oan on 12/06/2015.
@@ -147,20 +145,20 @@ public class FilePushToServerController extends BaseController
     }
 
     public File prepareFileToSend(File inputFile, Bitmap fileBitmap, Context context, String
-            multipartName)
+            multipartName, String profileId)
     {
         try
         {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-            String currentDateandTime = sdf.format(new Date());
-
-            inputFile = new File(context.getCacheDir(), multipartName+"_"+currentDateandTime);
+            inputFile = new File(context.getCacheDir(), multipartName);
             inputFile.createNewFile();
+
+            File avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                    "avatar_"+profileId+".jpg");
 
             //Convert bitmap to byte array
             Bitmap bitmap = fileBitmap;
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, bos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
             byte[] bitmapdata = bos.toByteArray();
 
             //write the bytes in file
@@ -168,6 +166,11 @@ public class FilePushToServerController extends BaseController
             fos.write(bitmapdata);
             fos.flush();
             fos.close();
+
+            FileOutputStream fos2 = new FileOutputStream(avatarFile);
+            fos2.write(bitmapdata);
+            fos2.flush();
+            fos2.close();
 
             return inputFile;
         }

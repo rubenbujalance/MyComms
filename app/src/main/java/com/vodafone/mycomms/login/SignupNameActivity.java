@@ -408,7 +408,7 @@ public class SignupNameActivity extends Activity {
                 filePushToServerController =  new FilePushToServerController
                         (SignupNameActivity.this);
                 multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
-                        photoBitmap, SignupNameActivity.this, Constants.MULTIPART_AVATAR);
+                        photoBitmap, SignupNameActivity.this, Constants.MULTIPART_AVATAR, null);
                 filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_AVATAR,
                         Constants.MULTIPART_AVATAR, multiPartFile);
 

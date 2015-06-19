@@ -45,7 +45,7 @@ public class InternalContactSearch
         for(String id : ids)
         {
             contact = new Contact("");
-            contact.setId("local_contact_"+id);
+            contact.setId("local_contact_"+profileId+"_"+id);
             contact.setContactId("local_contact_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
             contact.setProfileId(profileId);

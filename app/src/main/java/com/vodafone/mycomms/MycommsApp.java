@@ -20,10 +20,6 @@ import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
-import java.util.ArrayList;
-
-import model.News;
-
 /**
  * Created by str_rbm on 02/04/2015.
  *

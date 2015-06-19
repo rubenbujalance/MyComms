@@ -45,6 +45,7 @@
     <string name="having_trouble">Having trouble?</string>
     <string name="company">Company</string>
     <string name="position">Position</string>
+    <string name="wrong_profile_update">Error during profile update</string>
 
     <string name="new_version_available">New Version Available</string>
     <string name="must_update_to_last_application_version">Must update to last application version</string>

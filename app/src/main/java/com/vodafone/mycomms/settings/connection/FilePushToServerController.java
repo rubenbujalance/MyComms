@@ -88,12 +88,12 @@ public class FilePushToServerController extends BaseController
     {
         try
         {
-            return "Body: "+response.body().string();
+            return response.body().string();
         }
         catch(Exception e)
         {
             Log.e(Constants.TAG, "FilePushToServerController.convertResponseToString: ERROR "+e.toString());
-            return "Wrong response!";
+            return null;
         }
 
     }
@@ -130,16 +130,16 @@ public class FilePushToServerController extends BaseController
                 .show();
     }
 
-    public String getAvatarURL()
+    public String getAvatarURL(String result)
     {
         try
         {
-            return response.body().string();
+            return result.replace("{","").replace("}","").replace("\"","").replace("avatar:","");
         }
         catch(Exception e)
         {
             Log.e(Constants.TAG, "FilePushToServerController.getAvatarURL: ERROR "+e.toString());
-            return "Wrong BODY!";
+            return null;
         }
 
     }

@@ -44,8 +44,12 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            for (int i = 0; i < size; i++) {
-                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
+            for (int i = 0; i < size; i++)
+            {
+                if(!contactArrayList.get(i).getContactId().equals(mProfileId))
+                {
+                    mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
+                }
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -58,8 +62,13 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            for (int i = 0; i < size; i++) {
-                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
+            for (int i = 0; i < size; i++)
+            {
+                if(!contactArrayList.get(i).getContactId().equals(mProfileId))
+                {
+                    mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
+                }
+
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
@@ -71,8 +80,12 @@ public class RealmContactTransactions {
         int size = contactArrayList.size();
         try {
             mRealm.beginTransaction();
-            for (int i = 0; i < size; i++) {
-                mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
+            for (int i = 0; i < size; i++)
+            {
+                if(!contactArrayList.get(i).getContactId().equals(mProfileId))
+                {
+                    mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
+                }
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){

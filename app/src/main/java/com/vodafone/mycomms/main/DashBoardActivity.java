@@ -114,8 +114,6 @@ public class DashBoardActivity extends ToolbarActivity{
                 finish();
             }
         });
-
-        loadRecents();
     }
 
     private void loadRecents(){
@@ -131,13 +129,13 @@ public class DashBoardActivity extends ToolbarActivity{
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, profileId);
             recentList = realmContactTransactions.getAllRecentContacts();
 
-            LinearLayout recentscontenedor = (LinearLayout) findViewById(R.id.list_recents);
+            LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
             LayoutInflater inflater = LayoutInflater.from(this);
 
             for (int i = 0; i < recentList.size(); i++) {
-                View childrecents = inflater.inflate(R.layout.layout_recents_dashboard, recentscontenedor, false);
+                View childrecents = inflater.inflate(R.layout.layout_recents_dashboard, recentsContainer, false);
 
-                recentscontenedor.addView(childrecents);
+                recentsContainer.addView(childrecents);
                 childrecents.setPadding(10,20,10,20);
 
                 ImageView recentAvatar = (ImageView) childrecents.findViewById(R.id.recent_avatar);
@@ -147,6 +145,7 @@ public class DashBoardActivity extends ToolbarActivity{
                 if (avatarFile.exists()) {
                     Picasso.with(this)
                             .load(avatarFile)
+                            .fit().centerCrop()
                             .into(recentAvatar);
                 } else {
                     String initials = "";
@@ -180,9 +179,9 @@ public class DashBoardActivity extends ToolbarActivity{
                 long count =_chatTx.getChatPendingMessagesCount(recentList.get(i).getContactId());
 
                 if(count > 0) {
-                    TextView unreaded_messages = (TextView) childrecents.findViewById(R.id.unreaded_messages);
-                    unreaded_messages.setVisibility(View.VISIBLE);
-                    unreaded_messages.setText(String.valueOf(count));
+                    TextView unread_messages = (TextView) childrecents.findViewById(R.id.unreaded_messages);
+                    unread_messages.setVisibility(View.VISIBLE);
+                    unread_messages.setText(String.valueOf(count));
                 } else {
                     ImageView typerecent = (ImageView) childrecents.findViewById(R.id.type_recent);
                     typerecent.setVisibility(View.VISIBLE);
@@ -241,16 +240,14 @@ public class DashBoardActivity extends ToolbarActivity{
         if(news != null)
         {
             try {
-                //TODO: Is this necessary?
-                //setContentView(R.layout.layout_dashboard);
 
-                LinearLayout contenedor = (LinearLayout) findViewById(R.id.list_news);
+                LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
                 LayoutInflater inflater = LayoutInflater.from(this);
 
                 for (int i = 0; i < news.size(); i++) {
-                    View child = inflater.inflate(R.layout.layout_news_dashboard, contenedor, false);
+                    View child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
 
-                    contenedor.addView(child);
+                    container.addView(child);
                     child.setPadding(10, 20, 10, 20);
 
                     ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);

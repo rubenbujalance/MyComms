@@ -116,12 +116,12 @@ public class ToolbarActivity extends ActionBarActivity {
 
         LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
         LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
-        LinearLayout layoutRecents = (LinearLayout) findViewById(R.id.footer_recents_layout);
+        LinearLayout layoutInbox = (LinearLayout) findViewById(R.id.footer_inbox_layout);
 
         layoutContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerProfile");
+                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerContacts");
                 // set an exit transition
                 Intent in = new Intent(context, ContactListMainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -134,17 +134,17 @@ public class ToolbarActivity extends ActionBarActivity {
         layoutDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerProfile");
+                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerDasboard");
                 Intent in = new Intent(context, DashBoardActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 startActivity(in);
             }
         });
 
-        layoutRecents.setOnClickListener(new View.OnClickListener() {
+        layoutInbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerRecents");
+                Log.i(Constants.TAG, "ToolbarActivity.onClick: footerInbox");
                 Intent in = new Intent(context, ChatListActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
@@ -160,7 +160,6 @@ public class ToolbarActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(context, ContactDetailMainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 in.putExtra(Constants.CONTACT_CONTACT_ID, contact.getContactId());
                 startActivity(in);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
@@ -213,7 +212,7 @@ public class ToolbarActivity extends ActionBarActivity {
     public void activateFooterSelected(int selected){
         LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
         LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
-        LinearLayout layoutRecents = (LinearLayout) findViewById(R.id.footer_recents_layout);
+        LinearLayout layoutRecents = (LinearLayout) findViewById(R.id.footer_inbox_layout);
 
         ImageView footerContacts = (ImageView) findViewById(R.id.footer_contacts);
         ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);

@@ -109,7 +109,7 @@
                     <TextView
                         android:layout_width="100dp"
                         android:layout_height="20dp"
-                        android:text="@string/DummyCountry"
+                        android:text="@string/dummyCountry"
                         android:id="@+id/contact_country"
                         android:textColor="#cccccc"
                         android:textSize="12dp"

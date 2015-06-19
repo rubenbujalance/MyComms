@@ -41,6 +41,14 @@ public class RecentContactController extends BaseController {
         realmContactTransactions = new RealmContactTransactions(mRealm, mProfileId);
     }
 
+    public RecentContactController(Context appContext, Realm realm, String profileId) {
+        super(appContext);
+        this.mRealm = realm;
+        this.mContext = appContext;
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(mRealm, mProfileId);
+    }
+
     public void insertRecent(String contactId, String action){
         Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
         JSONObject json = null;

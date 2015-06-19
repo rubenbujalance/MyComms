@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/avatar_popup"
+                android:orientation="vertical"
+                android:background="@color/black_overlay"
+                android:alpha="10"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <com.vodafone.mycomms.custom.CircleImageView
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:id="@+id/avatar_large"
+        tools:src="@drawable/profile_picture"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+
+    <TextView
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:id="@+id/avatarText"
+        android:src="@color/grey_middle"
+        android:adjustViewBounds="false"
+        android:textColor="@color/grey_dark"
+        tools:text="JB"
+        android:textSize="180sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginTop="30dp" />
+
+</RelativeLayout>

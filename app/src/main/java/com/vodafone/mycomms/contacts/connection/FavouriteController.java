@@ -51,7 +51,7 @@ public class FavouriteController  extends BaseController {
         if(mFavouriteConnection != null){
             mFavouriteConnection.cancel();
         }
-        if (realmContactTransactions.favouriteContactIsInRealm(contactId)){
+        if (realmContactTransactions.deleteFavouriteContact(contactId)){
             //Delete favourite
             method = HttpConnection.DELETE;
             apiCall = Constants.CONTACT_API_DEL_FAVOURITE;
@@ -75,6 +75,11 @@ public class FavouriteController  extends BaseController {
             mFavouriteConnection.setPayLoad(json.toString());
             mFavouriteConnection.request();
         }
+    }
+
+    public boolean contactIsFavourite(String contactId)
+    {
+        return realmContactTransactions.favouriteContactIsInRealm(contactId);
     }
 
     @Override

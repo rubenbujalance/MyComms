@@ -124,6 +124,7 @@
     <!--Toolbar titles-->
     <string name="toolbar_title_messages">Messages</string>
     <string name="toolbar_title_contact_list">My Contacts</string>
+    <string name="toolbar_title_contacts">Contacts</string>
     <string name="profile_edit_mode_done">Done</string>
     <string name="profile_edit_mode_edit">Edit</string>
 
@@ -131,7 +132,7 @@
     <string name="chat_me_text">"Me: "</string>
     <string name="DummyTime">Thursday 18:40 a.m</string>
     <string name="Availability">AVAILABILITY</string>
-    <string name="DummyCountry">United States</string>
+    <string name="dummyCountry">United States</string>
     <string name="badge">badge</string>
     <string name="dummyUser">Captain Planet</string>
     <string name="Contacts">Contacts</string>
@@ -204,6 +205,7 @@
     <string name="settings_label_vacation_time_not_set">Not Set</string>
     <string name="about_version">"version "</string>
     <string name="about_build">"build "</string>
+    <string name="Mycomms">MyComms</string>
 
     <!--Progress dialog-->
 

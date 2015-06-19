@@ -109,10 +109,10 @@
                         android:id="@+id/scroll"
                         android:background="#2affffff">
 
-                        <FrameLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:id="@+id/list_news"></FrameLayout>
+                            android:id="@+id/list_news"></LinearLayout>
                     </HorizontalScrollView>
 
                 </LinearLayout>
@@ -124,7 +124,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/Slider2"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="20dp"
                 android:background="#2affffff"
                 android:weightSum="1">
 
@@ -135,10 +135,11 @@
                     android:id="@+id/titleRecents"
                     android:textColor="@color/white"
                     android:padding="15dp"
-                    android:textSize="16dp" />
+                    android:textSize="16dp"
+                    android:paddingBottom="5dp" />
 
                 <Space
-                    android:layout_width="154dp"
+                    android:layout_width="150dp"
                     android:layout_height="fill_parent"
                     android:layout_weight="1.12" />
 
@@ -157,19 +158,29 @@
                         android:textSize="16dp"
                         android:paddingLeft="15dp"
                         android:paddingTop="15dp"
-                        android:paddingBottom="15dp" />
+                        android:paddingBottom="5dp" />
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:id="@+id/imageView13"
-                        android:src="@mipmap/icon_right_grey"
-                        android:paddingTop="15dp"
-                        android:paddingRight="10dp"
-                        android:paddingBottom="15dp" />
+                        android:src="@mipmap/icon_right_white"
+                        android:padding="15dp" />
                 </LinearLayout>
 
             </LinearLayout>
+            <HorizontalScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/scroll_recents"
+                android:background="#2affffff">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/list_recents"
+                    android:orientation="horizontal"></LinearLayout>
+            </HorizontalScrollView>
 
         </LinearLayout>
     </FrameLayout>

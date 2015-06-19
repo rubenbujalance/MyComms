@@ -44,6 +44,7 @@ public class InternalContactSearch
         Contact contact;
         for(String id : ids)
         {
+            //TODO ALEX - Filter by profile id
             contact = new Contact("");
             contact.setId("local_contact_"+profileId+"_"+id);
             contact.setContactId("local_contact_" + id);

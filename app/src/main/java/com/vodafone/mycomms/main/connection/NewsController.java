@@ -18,20 +18,23 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import model.News;
 
 public class NewsController extends BaseController {
     private Context mContext;
     private NewsConnection newsConnection;
     private INewsConnectionCallback newsConnectionCallback;
+    private ArrayList<News> newsList;
 
     private String apiCall;
 
     private int offsetPaging = 0;
 
-    public NewsController(Activity activity) {
-        super(activity);
-        this.mContext = activity;
+    public NewsController(Context context) {
+        super(context);
+        this.mContext = context;
+        newsList = new ArrayList<>();
     }
 
     public void getNewsList(String api) {
@@ -59,13 +62,13 @@ public class NewsController extends BaseController {
                 JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.NEWS_PAGINATION);
 
                 if (jsonPagination.getBoolean(Constants.NEWS_PAGINATION_MORE_PAGES)) {
+                    int pageSize = jsonPagination.getInt(Constants.NEWS_PAGINATION_PAGESIZE);
                     morePages = true;
-                    offsetPaging = offsetPaging + 1;
+                    offsetPaging = offsetPaging + pageSize;
                 } else {
                     offsetPaging = 0;
                 }
 
-                ArrayList<News> newsList = new ArrayList<>();
                 newsList = loadNews(jsonResponse);
                 if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof INewsConnectionCallback) {
                     ((INewsConnectionCallback) this.getConnectionCallback()).onNewsResponse(newsList, morePages, offsetPaging);
@@ -78,33 +81,24 @@ public class NewsController extends BaseController {
     }
 
     private ArrayList<News> loadNews(JSONObject jsonObject) {
-        ArrayList<News> newsList = new ArrayList<>();
 
         try {
             Log.i(Constants.TAG, "NewsController.loadNews: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.NEWS_DATA);
             News news;
 
-            getActivity().setContentView(R.layout.layout_dashboard);
-
-            FrameLayout contenedor = (FrameLayout) getActivity().findViewById(R.id.list_news);
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
                 news = mapNews(jsonObject);
                 newsList.add(news);
 
-                View child = inflater.inflate(R.layout.layout_news_dashboard, contenedor, false);
-
-                contenedor.addView(child);
                //Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
 
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactController.insertContactListInRealm: " + e.toString());
+            Log.e(Constants.TAG, "NewsController.showNews: " + e.toString());
             return null;
         }
         return newsList;

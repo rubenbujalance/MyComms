@@ -6,9 +6,13 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -256,16 +260,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
-        /*btChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent in = new Intent(ContactDetailMainActivity.this, ChatMainActivity.class);
-                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
-                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
-                startActivity(in);
-            }
-        });*/
-
         btChatBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -276,22 +270,34 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
+        //Initialization of favourite icon
+        FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
+
+        if (favouriteController.contactIsFavourite(contactId)) {
+            Drawable imageStar = getResources().getDrawable(imageStarOn);
+            btFavourite.setImageDrawable(imageStar);
+            btFavourite.setTag("icon_favorite_colour");
+        } else {
+            Drawable imageStar = getResources().getDrawable(imageStarOff);
+            btFavourite.setImageDrawable(imageStar);
+            btFavourite.setTag("icon_favorite_grey");
+        }
+
         btFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
-                favouriteController.manageFavourite(contactId);
-
                 if (btFavourite.getTag().equals("icon_favorite_colour")) {
-                    Drawable imageStar = getResources().getDrawable(imageStarOn);
+                    Drawable imageStar = getResources().getDrawable(imageStarOff);
                     btFavourite.setImageDrawable(imageStar);
                     btFavourite.setTag("icon_favorite_grey");
                 } else if (btFavourite.getTag().equals("icon_favorite_grey")) {
-                    Drawable imageStar = getResources().getDrawable(imageStarOff);
+                    Drawable imageStar = getResources().getDrawable(imageStarOn);
                     btFavourite.setImageDrawable(imageStar);
                     btFavourite.setTag("icon_favorite_colour");
                 }
 
+                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
+                favouriteController.manageFavourite(contactId);
             }
         });
 
@@ -383,18 +389,22 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         }
         try {
             //Local time
-            TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+            if(contact.getTimezone()!=null) {
+                TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
 
-            SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
-            sourceFormat.setTimeZone(currentCal.getTimeZone());
-            Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY)+":"+currentCal.get(Calendar.MINUTE));
+                SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
+                sourceFormat.setTimeZone(currentCal.getTimeZone());
+                Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE));
 
-            SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
-            destFormat.setTimeZone(tz);
+                SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
+                destFormat.setTimeZone(tz);
 
-            String result = destFormat.format(parsed);
+                String result = destFormat.format(parsed);
 
-            tvLocalTime.setText(result);
+                tvLocalTime.setText(result);
+            } else {
+                tvLocalTime.setText("");
+            }
 
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
@@ -480,7 +490,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
+        final File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
@@ -509,6 +519,50 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             ivAvatar.setImageResource(R.color.grey_middle);
             textAvatar.setText(initials);
         }
+
+        ivAvatar.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                LayoutInflater layoutInflater
+                        = (LayoutInflater) getBaseContext()
+                        .getSystemService(LAYOUT_INFLATER_SERVICE);
+                final View popupView = layoutInflater.inflate(R.layout.layout_contact_detail_zoom, null);
+                final PopupWindow popupWindow = new PopupWindow(
+                        popupView,
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT);
+                ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
+                TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
+
+                if (contact.getAvatar()!=null &&
+                        contact.getAvatar().length()>0 &&
+                        contact.getAvatar().compareTo("")!=0 &&
+                        avatarFile.exists()) {
+
+                    textAvatar.setText(null);
+
+                    Picasso.with(getBaseContext())
+                            .load(avatarFile)
+                            .into(fullAvatar);
+
+                } else{
+                    String initials = contact.getFirstName().substring(0,1) +
+                            contact.getLastName().substring(0,1);
+
+                    fullAvatar.setImageResource(R.color.grey_middle);
+                    textAvatar.setText(initials);
+                }
+
+                popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
+                popupView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View arg0) {
+                        popupWindow.dismiss();
+                    }
+                });
+            }
+        });
 
     }
 

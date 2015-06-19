@@ -29,7 +29,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         setContentView(R.layout.layout_main_activity);
         noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
         activateContactListToolbar();
-        setToolbarTitle("Contacts");
+        setToolbarTitle(getResources().getString(R.string.toolbar_title_contacts));
         activateFooter();
 
         setFooterListeners(this);

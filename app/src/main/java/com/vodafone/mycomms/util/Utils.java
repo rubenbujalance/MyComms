@@ -194,6 +194,27 @@ public final class Utils extends Activity {
         return difference;
     }
 
+    public static String getShortStringTimeDifference(long millis){
+        long timeDiffMilis = millis;
+        long minutes = timeDiffMilis / 60000;
+        long hours = minutes / 60;
+        long days = hours / 24;
+        long weeks = days / 7;
+        long months = weeks / 4;
+        long years = months / 12;
+
+        String difference = "";
+        if(years >= 1) difference = years + "y ";
+        else if(months >= 1) difference = months + "m ";
+        else if(weeks >= 1) difference = weeks + "w ";
+        else if(days >= 1) difference = days + "d ";
+        else if(hours >=1) difference = hours + "h ";
+        else if(minutes >=1) difference = minutes + "m";
+
+        difference += " ago";
+
+        return difference;
+    }
     /*
     * Returns the unique device ID: IMEI for GSM and the MEID or ESN for CDMA phones.
     */

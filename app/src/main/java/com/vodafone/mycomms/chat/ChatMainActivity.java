@@ -37,7 +37,7 @@ import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.events.RefreshChatListEvent;
+import com.vodafone.mycomms.events.MessageSentEvent;
 import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -265,14 +265,15 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         mRecentContactController.insertRecent(_chat.getContact_id(), action);
         mRecentContactController.setConnectionCallback(this);
 
-        //Refresh previous list view if necessary
+        //Notify app to refresh any view if necessary
         if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
-            BusProvider.getInstance().post(new RefreshChatListEvent());
+            BusProvider.getInstance().post(new MessageSentEvent());
         } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
             //Recent List is refreshed onConnectionComplete
         }
 
         _chatList.add(chatMsg);
+//        if(_chatList.size()>50) _chatList.remove(0);
         refreshAdapter();
         etChatTextBox.setText("");
     }
@@ -374,6 +375,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             _chatList.add(chatMsg);
             mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
             mRecentContactController.setConnectionCallback(this);
+//            if(_chatList.size()>50) _chatList.remove(0);
             refreshAdapter();
         }
     }
@@ -540,8 +542,16 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     }
 
 
+//    @Subscribe
+//     public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
+//        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
+//
+//        if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)
+//            refreshAdapter();
+//    }
+
     @Subscribe
-    public void onXMPPConnecting(XMPPConnectingEvent event){
+    public void onEventXMPPConnecting(XMPPConnectingEvent event){
         boolean isConnecting = event.isConnecting();
 
         if(!isConnecting)

@@ -371,15 +371,15 @@ public class PacketParserUtils {
                                             boolean fullNamespaces) throws XmlPullParserException,
             IOException {
         assert (parser.getEventType() == XmlPullParser.START_TAG);
-        notifyMessageReceived(parser);
+        saveAndNotifyStanzaReceived(parser);
         return parseContentDepth(parser, parser.getDepth(), fullNamespaces);
     }
 
-    public static void notifyMessageReceived(XmlPullParser parser)
+    public static void saveAndNotifyStanzaReceived(XmlPullParser parser)
     {
         try {
 
-            XMPPTransactions.saveAndNotifyMessageReceived(parser);
+            XMPPTransactions.saveAndNotifyStanzaReceived(parser);
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "PacketParserUtils.notifyMessageReceived: ",e);

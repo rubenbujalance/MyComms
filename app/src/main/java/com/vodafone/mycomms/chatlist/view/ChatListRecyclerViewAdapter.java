@@ -75,6 +75,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
             Picasso.with(mContext)
                     .load(avatarFile)
+                    .fit().centerCrop()
                     .into(chatListHolder.imageAvatar);
 
         } else{

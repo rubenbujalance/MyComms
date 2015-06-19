@@ -242,12 +242,6 @@ public final class XMPPTransactions {
             String to = parser.getAttributeValue("", "to");
             String id = parser.getAttributeValue("", "id");
 
-            if (from == null || id == null || to==null) return false;
-
-            to = to.substring(0, to.indexOf("@"));
-            if(to.compareTo(_profile_id)!=0 ||
-                    parser.getName().compareTo("message") != 0) return false;
-
             int event = parser.next();
             if (event != XmlPullParser.START_TAG) return false;
 
@@ -257,10 +251,19 @@ public final class XMPPTransactions {
             realm = Realm.getInstance(_appContext);
             RealmChatTransactions chatTx = new RealmChatTransactions(realm, _appContext);
 
+            //Check if chat message has already been received
+            if(chatTx.existsChatMessageById(id))
+            {
+                realm.close();
+                return false;
+            }
+
             ChatMessage newChatMessage = chatTx.newChatMessageInstance(from,
                     Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                     Constants.CHAT_MESSAGE_TYPE_TEXT,
                     text, "", id);
+
+            if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
             Chat chat = chatTx.getChatById(from);

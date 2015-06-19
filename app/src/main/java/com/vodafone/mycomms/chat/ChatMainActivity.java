@@ -349,6 +349,8 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         if(etChatTextBox.getText().toString()!=null &&
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
         else setSendEnabled(false);
+
+        chatTransactions.setContactAllChatMessagesReceivedAsRead(_contact.getContactId());
     }
 
     @Override

@@ -19,7 +19,9 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
@@ -31,6 +33,9 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -126,7 +131,7 @@ public class DashBoardActivity extends ToolbarActivity{
         try {
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+            final String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
 
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
@@ -137,12 +142,12 @@ public class DashBoardActivity extends ToolbarActivity{
             LayoutInflater inflater = LayoutInflater.from(this);
 
             for (int i = 0; i < recentList.size(); i++) {
-                View childrecents = inflater.inflate(R.layout.layout_recents_dashboard, recentsContainer, false);
+                View childRecents = inflater.inflate(R.layout.layout_recents_dashboard, recentsContainer, false);
 
-                recentsContainer.addView(childrecents);
-                childrecents.setPadding(10,20,10,20);
+                recentsContainer.addView(childRecents);
+                childRecents.setPadding(10, 20, 10, 20);
 
-                ImageView recentAvatar = (ImageView) childrecents.findViewById(R.id.recent_avatar);
+                ImageView recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
                 File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
                         "avatar_"+recentList.get(i).getContactId()+".jpg");
 
@@ -163,31 +168,31 @@ public class DashBoardActivity extends ToolbarActivity{
                         }
 
                     }
-                    TextView avatarText = (TextView) childrecents.findViewById(R.id.avatarText);
+                    TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(initials);
                 }
 
-                TextView firstName = (TextView) childrecents.findViewById(R.id.recent_firstname);
+                TextView firstName = (TextView) childRecents.findViewById(R.id.recent_firstname);
                 firstName.setText(recentList.get(i).getFirstName());
 
-                TextView lastName = (TextView) childrecents.findViewById(R.id.recent_lastname);
+                TextView lastName = (TextView) childRecents.findViewById(R.id.recent_lastname);
                 lastName.setText(recentList.get(i).getLastName());
 
                 // Badges
                 _realm = Realm.getInstance(this);
                 _chatTx = new RealmChatTransactions(_realm, this);
 
-                ChatListHolder chatHolder = new ChatListHolder(childrecents);
+                ChatListHolder chatHolder = new ChatListHolder(childRecents);
 
                 long count =_chatTx.getChatPendingMessagesCount(recentList.get(i).getContactId());
 
                 if(count > 0) {
-                    TextView unread_messages = (TextView) childrecents.findViewById(R.id.unreaded_messages);
+                    TextView unread_messages = (TextView) childRecents.findViewById(R.id.unreaded_messages);
                     unread_messages.setVisibility(View.VISIBLE);
                     unread_messages.setText(String.valueOf(count));
                 } else {
-                    ImageView typeRecent = (ImageView) childrecents.findViewById(R.id.type_recent);
+                    ImageView typeRecent = (ImageView) childRecents.findViewById(R.id.type_recent);
                     typeRecent.setVisibility(View.VISIBLE);
 
                     String action = recentList.get(i).getAction();
@@ -209,6 +214,77 @@ public class DashBoardActivity extends ToolbarActivity{
                             typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
                     }
                 }
+                LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
+                //DO THINGS
+                final ArrayList<RecentContact> finalRecentList = recentList;
+                final int position = i;
+                btRecents.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        try {
+                            String action = finalRecentList.get(position).getAction();
+                            if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
+                                String strPhones = finalRecentList.get(position).getPhones();
+                                if (strPhones != null)
+                                {
+                                    String phone = strPhones;
+                                    if(!finalRecentList.get(position).getPlatform().equals(Constants
+                                            .PLATFORM_LOCAL))
+                                    {
+                                        JSONArray jPhones = new JSONArray(strPhones);
+                                        phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                                    }
+
+                                    Utils.launchCall(phone, DashBoardActivity.this);
+                                }
+                            }
+                            else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
+                            {
+                                // This is LOCAL contact, then in this case the action will be Send SMS
+                                // message
+                                if(null != finalRecentList.get(position).getPlatform() && finalRecentList.get
+                                        (position).getPlatform().equals(Constants.PLATFORM_LOCAL))
+                                {
+                                    String phone = finalRecentList.get(position).getPhones();
+                                    if(null != phone)
+                                    {
+                                        Utils.launchSms(phone, DashBoardActivity.this);
+                                    }
+                                }
+                                else
+                                {
+                                    Intent in = new Intent(DashBoardActivity.this, ChatMainActivity.class);
+                                    in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, finalRecentList.get(position).getContactId());
+                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                    startActivity(in);
+                                }
+
+                            }
+                            else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
+                                String strEmails = finalRecentList.get(position).getEmails();
+                                if (strEmails != null)
+                                {
+                                    String email = strEmails;
+                                    if(!finalRecentList.get(position).getPlatform().equals(Constants
+                                            .PLATFORM_LOCAL))
+                                    {
+                                        JSONArray jPhones = new JSONArray(strEmails);
+                                        email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                                    }
+
+                                    Utils.launchEmail(email, DashBoardActivity.this);
+                                }
+                            }
+                            //ADD RECENT
+                            Realm realm = Realm.getInstance(getBaseContext());
+                            RecentContactController recentController = new RecentContactController(DashBoardActivity.this,realm,profileId);
+                            recentController.insertRecent(finalRecentList.get(position).getContactId(), action);
+                            //setListAdapterTabs();
+                        } catch (Exception ex) {
+                            Log.e(Constants.TAG, "DashBoardActivity.onItemClick: ", ex);
+                        }
+                    }
+                });
+
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: " + e);
@@ -313,8 +389,15 @@ public class DashBoardActivity extends ToolbarActivity{
     protected void onPause() {
         super.onPause();
         Log.i(Constants.TAG, "DashBoardActivity.onPause: ");
-        finish();
-        overridePendingTransition(0, 0);
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        if (sp.getBoolean(Constants.IS_TOOLBAR_CLICKED, true)){
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, false);
+            editor.apply();
+            finish();
+            overridePendingTransition(0, 0);
+        }
     }
 
     @Override

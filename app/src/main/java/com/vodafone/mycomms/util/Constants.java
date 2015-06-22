@@ -22,6 +22,7 @@ public class Constants {
     public static final String PLATFORMS_SHARED_PREF = "mycomms_profile_platforms";
     public static final String DEVICE_ID_SHARED_PREF = "device_Id" ;
     public static final String TIMEZONE_SHARED_PREF = "timezone" ;
+    public static final String IS_TOOLBAR_CLICKED = "toolbar_clicked";
 
     //Profile API & BD
     public static final String PROFILE_PRIVATE_TIMEZONE = "privateTimeZone";

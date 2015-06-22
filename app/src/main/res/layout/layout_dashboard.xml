@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:weightSum="1"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="10dp"
                 android:id="@+id/Line1">
 
                 <TextView
@@ -66,7 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/Line2"
-                android:layout_marginTop="15dp">
+                android:layout_marginTop="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -87,7 +87,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/Slider1"
-                android:layout_marginTop="25dp">
+                android:layout_marginTop="15dp">
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -124,7 +124,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/Slider2"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:background="#2affffff"
                 android:weightSum="1">
 
@@ -171,7 +171,7 @@
             </LinearLayout>
             <HorizontalScrollView
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:id="@+id/scroll_recents"
                 android:background="#2affffff">
 
@@ -200,9 +200,9 @@
     </LinearLayout>
     <!-- Footer -->
     <RelativeLayout android:id="@+id/footer"
-        android:layout_width="fill_parent" android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:layout_height="wrap_content">
+                    android:layout_width="fill_parent" android:orientation="horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:layout_height="wrap_content">
         <LinearLayout
             android:layout_height="?attr/actionBarSize"
             android:layout_width="match_parent"

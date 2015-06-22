@@ -221,62 +221,65 @@ public class DashBoardActivity extends ToolbarActivity{
 
         RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(mRealm);
         newsArrayList = realmNewsTransactions.getAllNews();
-        //TODO: REFORMAR UN COP FUNCIONI
 
         if(newsArrayList != null){
-            try {
-                LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
-                LayoutInflater inflater = LayoutInflater.from(this);
-
-                for (int i = 0; i < newsArrayList.size(); i++) {
-                    View child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
-
-                    container.addView(child);
-                    child.setPadding(10, 20, 10, 20);
-
-                    ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
-                    Picasso.with(this)
-                            .load("https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage())
-                                    //.resize(300,300)
-                                    //.centerInside()
-                            .fit().centerInside()
-                            .into(newsImage);
-
-                    final TextView title = (TextView) child.findViewById(R.id.notice_title);
-                    title.setText(newsArrayList.get(i).getTitle());
-
-                    TextView date = (TextView) child.findViewById(R.id.notice_date);
-                    Long current = Calendar.getInstance().getTimeInMillis();
-                    date.setText(Utils.getShortStringTimeDifference(current - newsArrayList.get(i).getPublished_at()));
-
-                    final String detailImage = newsArrayList.get(i).getImage();
-                    final String detailTitle = newsArrayList.get(i).getTitle();
-                    final String detailAvatar = newsArrayList.get(i).getAuthor_avatar();
-                    final String detailAuthor = newsArrayList.get(i).getAuthor_name();
-                    final String detailPublished = Utils.getShortStringTimeDifference(current - newsArrayList.get(i).getPublished_at());
-                    final String detailHtml = newsArrayList.get(i).getHtml();
-
-                    LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
-                    btnews.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            Intent in = new Intent(DashBoardActivity.this, NewsDetailActivity.class);
-                            in.putExtra(Constants.NEWS_IMAGE, detailImage);
-                            in.putExtra(Constants.NEWS_TITLE, detailTitle);
-                            in.putExtra(Constants.NEWS_AUTHOR_AVATAR, detailAvatar);
-                            in.putExtra(Constants.NEWS_AUTHOR_NAME, detailAuthor);
-                            in.putExtra(Constants.NEWS_PUBLISHED_AT, detailPublished);
-                            in.putExtra(Constants.NEWS_HTML, detailHtml);
-                            in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivity(in);
-                            finish();
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "Load news error: " + e);
-            }
+            drawNews(newsArrayList);
         }
+    }
 
+    private void drawNews(ArrayList<News> newsArrayList) {
+        Log.i(Constants.TAG, "DashBoardActivity.drawNews: ");
+        try{
+            LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
+            LayoutInflater inflater = LayoutInflater.from(this);
+
+            for (int i = 0; i < newsArrayList.size(); i++) {
+                View child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
+
+                container.addView(child);
+                child.setPadding(10, 20, 10, 20);
+
+                ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
+                Picasso.with(this)
+                        .load("https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage())
+                                //.resize(300,300)
+                                //.centerInside()
+                        .fit().centerInside()
+                        .into(newsImage);
+
+                final TextView title = (TextView) child.findViewById(R.id.notice_title);
+                title.setText(newsArrayList.get(i).getTitle());
+
+                TextView date = (TextView) child.findViewById(R.id.notice_date);
+                Long current = Calendar.getInstance().getTimeInMillis();
+                date.setText(Utils.getShortStringTimeDifference(current - newsArrayList.get(i).getPublished_at()));
+
+                final String detailImage = newsArrayList.get(i).getImage();
+                final String detailTitle = newsArrayList.get(i).getTitle();
+                final String detailAvatar = newsArrayList.get(i).getAuthor_avatar();
+                final String detailAuthor = newsArrayList.get(i).getAuthor_name();
+                final String detailPublished = Utils.getShortStringTimeDifference(current - newsArrayList.get(i).getPublished_at());
+                final String detailHtml = newsArrayList.get(i).getHtml();
+
+                LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
+                btnews.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        Intent in = new Intent(DashBoardActivity.this, NewsDetailActivity.class);
+                        in.putExtra(Constants.NEWS_IMAGE, detailImage);
+                        in.putExtra(Constants.NEWS_TITLE, detailTitle);
+                        in.putExtra(Constants.NEWS_AUTHOR_AVATAR, detailAvatar);
+                        in.putExtra(Constants.NEWS_AUTHOR_NAME, detailAuthor);
+                        in.putExtra(Constants.NEWS_PUBLISHED_AT, detailPublished);
+                        in.putExtra(Constants.NEWS_HTML, detailHtml);
+                        in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                        startActivity(in);
+                        finish();
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "DashBoardActivity.drawNews: " + e);
+        }
     }
 
     //Prevent of going from main screen back to login
@@ -298,11 +301,20 @@ public class DashBoardActivity extends ToolbarActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        BusProvider.getInstance().unregister(this);
+        Log.e(Constants.TAG, "DashBoardActivity.onDestroy: ");
 
         // Disconnect from the XMPP server
-        XMPPTransactions.disconnectMsgServerSession();
+        //XMPPTransactions.disconnectMsgServerSession();
+        BusProvider.getInstance().unregister(this);
         mRealm.close();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(Constants.TAG, "DashBoardActivity.onPause: ");
+        finish();
+        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -313,63 +325,11 @@ public class DashBoardActivity extends ToolbarActivity{
 
     @Subscribe
     public void onEventNewsReceived(RefreshNewsEvent event){
+        Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
-        if(news != null)
-        {
-            try {
-
-                LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
-                LayoutInflater inflater = LayoutInflater.from(this);
-
-                for (int i = 0; i < news.size(); i++) {
-                    View child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
-
-                    container.addView(child);
-                    child.setPadding(10, 20, 10, 20);
-
-                    ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
-                    Picasso.with(this)
-                            .load("https://" + EndpointWrapper.getBaseNewsURL() + news.get(i).getImage())
-                            //.resize(300,300)
-                            //.centerInside()
-                            .fit().centerInside()
-                            .into(newsImage);
-
-                    final TextView title = (TextView) child.findViewById(R.id.notice_title);
-                    title.setText(news.get(i).getTitle());
-
-                    TextView date = (TextView) child.findViewById(R.id.notice_date);
-                    Long current = Calendar.getInstance().getTimeInMillis();
-                    date.setText(Utils.getShortStringTimeDifference(current - news.get(i).getPublished_at()));
-
-                    final String detailImage = news.get(i).getImage();
-                    final String detailTitle = news.get(i).getTitle();
-                    final String detailAvatar = news.get(i).getAuthor_avatar();
-                    final String detailAuthor = news.get(i).getAuthor_name();
-                    final String detailPublished = Utils.getShortStringTimeDifference(current - news.get(i).getPublished_at());
-                    final String detailHtml = news.get(i).getHtml();
-
-                    LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
-                    btnews.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            Intent in = new Intent(DashBoardActivity.this, NewsDetailActivity.class);
-                            in.putExtra(Constants.NEWS_IMAGE, detailImage);
-                            in.putExtra(Constants.NEWS_TITLE, detailTitle);
-                            in.putExtra(Constants.NEWS_AUTHOR_AVATAR, detailAvatar);
-                            in.putExtra(Constants.NEWS_AUTHOR_NAME, detailAuthor);
-                            in.putExtra(Constants.NEWS_PUBLISHED_AT, detailPublished);
-                            in.putExtra(Constants.NEWS_HTML, detailHtml);
-                            in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivity(in);
-                            finish();
-                        }
-                    });
-
-                }
-                initALL();
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "Load news error: " + e);
-            }
+        if(news != null) {
+            drawNews(news);
+            initALL();
         }
     }
 }

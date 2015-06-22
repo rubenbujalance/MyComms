@@ -39,7 +39,6 @@ public class RealmNewsTransactions {
         if (result1!=null){
             result1.sort(Constants.NEWS_PUBLISHED_AT, RealmResults.SORT_ORDER_DESCENDING);
             for (News newsListItem : result1) {
-                if (newsArrayList.size()<2)
                 newsArrayList.add(newsListItem);
             }
         }

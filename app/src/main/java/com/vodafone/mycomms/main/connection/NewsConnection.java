@@ -13,6 +13,6 @@ public class NewsConnection extends BaseConnection {
 
     public NewsConnection(Context context, ConnectionInterfaces.ConnectionListener listener, String apiCall) {
         super(apiCall, context, listener, method, true);
-        Log.i(Constants.TAG, "NewsConnection.NewsConnection" + apiCall);
+        Log.i(Constants.TAG, "NewsConnection.NewsConnection " + apiCall);
     }
 }

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/dashboard_layout"
     android:background="@drawable/istanbul_bg_blur"
-    android:backgroundTint="#c8484b57"
+    android:backgroundTint="@color/toolbar_selected_item"
     android:backgroundTintMode="src_over">
 
     <FrameLayout
@@ -105,7 +105,7 @@
 
                     <HorizontalScrollView
                         android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
+                        android:layout_height="wrap_content"
                         android:id="@+id/scroll"
                         android:background="#2affffff">
 
@@ -171,7 +171,7 @@
             </LinearLayout>
             <HorizontalScrollView
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/scroll_recents"
                 android:background="#2affffff">
 

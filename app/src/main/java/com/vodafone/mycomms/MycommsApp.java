@@ -3,6 +3,7 @@ package com.vodafone.mycomms;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -14,15 +15,14 @@ import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.main.connection.DownloadNewsAsyncTask;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
+import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
-import java.util.ArrayList;
-
-import model.News;
+import java.io.File;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -36,6 +36,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private ProfileController profileController;
     private NewsController newsController;
     private Context mContext;
+    private FilePushToServerController filePushToServerController;
+    private SharedPreferences sp;
+    private String profile_id;
 
     @Override
     public void onCreate() {
@@ -65,7 +68,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private String validateAccessToken(){
         Log.i(Constants.TAG, "MycommsApp.validateAccessToken: ");
         String accessToken = UserSecurity.getAccessToken(this);
-        SharedPreferences sp = getSharedPreferences(
+        sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
@@ -110,6 +113,15 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         new DownloadContactsAsyncTask().execute(mContext);
 
         XMPPTransactions.initializeMsgServerSession(this);
+
+        if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
+        {
+            this.profile_id = userProfile.getId();
+            new sendAvatar().execute();
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false) ;
+            editor.apply();
+        }
     }
 
     @Override
@@ -143,9 +155,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     @Subscribe
-    public void initProfileAndContacts(InitProfileAndContacts event){
+    public void initProfileAndContacts(InitProfileAndContacts event)
+    {
         Log.i(Constants.TAG, "MyCommsApp.InitProfileAndContacts: ");
         getProfileIdAndAccessToken();
+
+
     }
 
     @Subscribe
@@ -157,5 +172,51 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void getNews() {
         Log.i(Constants.TAG, "MycommsApp.getNews: ");
         new DownloadNewsAsyncTask().execute(this);
+    }
+
+    public class sendAvatar extends AsyncTask<Void, Void, String>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            try
+            {
+                String profId = "new_profile";
+                File file =  new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                        "avatar_"+profId+".jpg");
+                FilePushToServerController filePushToServerController =
+                        new FilePushToServerController(mContext);
+
+                filePushToServerController.sendImageRequest
+                        (
+                                Constants.CONTACT_API_POST_AVATAR,
+                                Constants.MULTIPART_AVATAR,
+                                file,
+                                Constants.MEDIA_TYPE_JPG
+                        );
+
+                String response = filePushToServerController.executeRequest();
+                file.renameTo(new File(mContext.getFilesDir(),Constants.CONTACT_AVATAR_DIR +
+                        "avatar_"+profile_id+".jpg"));
+                return response;
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "FilePushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            super.onPostExecute(result);
+            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
+        }
     }
 }

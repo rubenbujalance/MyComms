@@ -226,7 +226,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             @Override
             public void onClick(View v)
             {
-                //dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
 
@@ -515,10 +515,19 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             try
             {
                 filePushToServerController =  new FilePushToServerController(ChatMainActivity.this);
-                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
-                        photoBitmap, ChatMainActivity.this, Constants.MULTIPART_FILE);
-                filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_FILE,
-                        Constants.MULTIPART_FILE, multiPartFile);
+                multiPartFile = filePushToServerController.prepareFileToSend
+                        (
+                                photoBitmap,
+                                Constants.MULTIPART_FILE,
+                                _profile_id
+                        );
+                filePushToServerController.sendImageRequest
+                        (
+                                Constants.CONTACT_API_POST_FILE,
+                                Constants.MULTIPART_FILE,
+                                multiPartFile,
+                                Constants.MEDIA_TYPE_JPG
+                        );
 
                 String response = filePushToServerController.executeRequest();
                 return response;
@@ -534,7 +543,8 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if(pdia.isShowing()) pdia.dismiss();
-            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
+            Log.d(Constants.TAG, "ChatMainActivity.sendFile: Response content: " +
+                    filePushToServerController.getAvatarURL(result));
         }
     }
 

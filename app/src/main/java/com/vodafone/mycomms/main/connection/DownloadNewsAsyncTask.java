@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.util.Constants;
 

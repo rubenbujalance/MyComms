@@ -1,14 +1,9 @@
 package com.vodafone.mycomms.main.connection;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.FrameLayout;
 
 import com.framework.library.model.ConnectionResponse;
-import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.util.Constants;
 
@@ -18,7 +13,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.News;
 
 public class NewsController extends BaseController {

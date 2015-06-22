@@ -3,6 +3,7 @@ package com.vodafone.mycomms.main;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,6 +26,7 @@ import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
@@ -45,6 +47,7 @@ public class DashBoardActivity extends ToolbarActivity{
     private LinearLayout noConnectionLayout;
     private Context mContext;
     private Realm _realm;
+    private Realm mRealm;
     private RealmChatTransactions _chatTx;
 
     @Override
@@ -59,7 +62,9 @@ public class DashBoardActivity extends ToolbarActivity{
         BusProvider.getInstance().post(new InitNews());
         BusProvider.getInstance().post(new InitProfileAndContacts());
 
+        mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
+        loadNews();
     }
 
     private void initALL(){
@@ -125,8 +130,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
-            Realm realm = Realm.getInstance(this);
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, profileId);
+            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, profileId);
             recentList = realmContactTransactions.getAllRecentContacts();
 
             LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
@@ -183,24 +187,96 @@ public class DashBoardActivity extends ToolbarActivity{
                     unread_messages.setVisibility(View.VISIBLE);
                     unread_messages.setText(String.valueOf(count));
                 } else {
-                    ImageView typerecent = (ImageView) childrecents.findViewById(R.id.type_recent);
-                    typerecent.setVisibility(View.VISIBLE);
+                    ImageView typeRecent = (ImageView) childrecents.findViewById(R.id.type_recent);
+                    typeRecent.setVisibility(View.VISIBLE);
 
                     String action = recentList.get(i).getAction();
-
+                    int sdk = Build.VERSION.SDK_INT;
                     if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
-                        typerecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                        else
+                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
                     } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
-                        typerecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                        else
+                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
                     } else {
-                        typerecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                        else
+                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
                     }
                 }
             }
-            //initALL();
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: " + e);
         }
+    }
+
+
+    private void loadNews() {
+        ArrayList<News> newsArrayList = new ArrayList<>();
+
+        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(mRealm);
+        newsArrayList = realmNewsTransactions.getAllNews();
+        //TODO: REFORMAR UN COP FUNCIONI
+
+        if(newsArrayList != null){
+            try {
+                LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
+                LayoutInflater inflater = LayoutInflater.from(this);
+
+                for (int i = 0; i < newsArrayList.size(); i++) {
+                    View child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
+
+                    container.addView(child);
+                    child.setPadding(10, 20, 10, 20);
+
+                    ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
+                    Picasso.with(this)
+                            .load("https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage())
+                                    //.resize(300,300)
+                                    //.centerInside()
+                            .fit().centerInside()
+                            .into(newsImage);
+
+                    final TextView title = (TextView) child.findViewById(R.id.notice_title);
+                    title.setText(newsArrayList.get(i).getTitle());
+
+                    TextView date = (TextView) child.findViewById(R.id.notice_date);
+                    Long current = Calendar.getInstance().getTimeInMillis();
+                    date.setText(Utils.getShortStringTimeDifference(current - newsArrayList.get(i).getPublished_at()));
+
+                    final String detailImage = newsArrayList.get(i).getImage();
+                    final String detailTitle = newsArrayList.get(i).getTitle();
+                    final String detailAvatar = newsArrayList.get(i).getAuthor_avatar();
+                    final String detailAuthor = newsArrayList.get(i).getAuthor_name();
+                    final String detailPublished = Utils.getShortStringTimeDifference(current - newsArrayList.get(i).getPublished_at());
+                    final String detailHtml = newsArrayList.get(i).getHtml();
+
+                    LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
+                    btnews.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            Intent in = new Intent(DashBoardActivity.this, NewsDetailActivity.class);
+                            in.putExtra(Constants.NEWS_IMAGE, detailImage);
+                            in.putExtra(Constants.NEWS_TITLE, detailTitle);
+                            in.putExtra(Constants.NEWS_AUTHOR_AVATAR, detailAvatar);
+                            in.putExtra(Constants.NEWS_AUTHOR_NAME, detailAuthor);
+                            in.putExtra(Constants.NEWS_PUBLISHED_AT, detailPublished);
+                            in.putExtra(Constants.NEWS_HTML, detailHtml);
+                            in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                            startActivity(in);
+                            finish();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "Load news error: " + e);
+            }
+        }
+
     }
 
     //Prevent of going from main screen back to login
@@ -226,6 +302,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
         // Disconnect from the XMPP server
         XMPPTransactions.disconnectMsgServerSession();
+        mRealm.close();
     }
 
     @Override
@@ -252,9 +329,10 @@ public class DashBoardActivity extends ToolbarActivity{
 
                     ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
                     Picasso.with(this)
-                            .load("https://"+ EndpointWrapper.getBaseNewsURL()+news.get(i).getImage())
-                            .resize(300,300)
-                            .centerInside()
+                            .load("https://" + EndpointWrapper.getBaseNewsURL() + news.get(i).getImage())
+                            //.resize(300,300)
+                            //.centerInside()
+                            .fit().centerInside()
                             .into(newsImage);
 
                     final TextView title = (TextView) child.findViewById(R.id.notice_title);

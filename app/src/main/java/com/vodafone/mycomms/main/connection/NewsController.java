@@ -1,15 +1,11 @@
 package com.vodafone.mycomms.main.connection;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.FrameLayout;
 
 import com.framework.library.model.ConnectionResponse;
-import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;
@@ -91,10 +87,12 @@ public class NewsController extends BaseController {
                 jsonObject = jsonArray.getJSONObject(i);
                 news = mapNews(jsonObject);
                 newsList.add(news);
-
                //Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
-
             }
+            Realm realm = Realm.getInstance(getContext());
+            RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(realm);
+            realmNewsTransactions.insertNewsList(newsList);
+            realm.close();
 
         } catch (JSONException e) {
             e.printStackTrace();

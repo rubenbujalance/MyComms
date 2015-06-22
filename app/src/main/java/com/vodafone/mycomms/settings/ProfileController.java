@@ -62,7 +62,6 @@ public class ProfileController extends BaseController {
         realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
-
     /**
      * Get Profile, uses DB and Network also. (First loads from DB by a callback then starts network connection.
      */

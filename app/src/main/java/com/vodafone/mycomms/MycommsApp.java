@@ -12,7 +12,6 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.main.connection.DownloadNewsAsyncTask;
-import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
@@ -36,7 +35,6 @@ import model.UserProfile;
 public class MycommsApp extends Application implements IProfileConnectionCallback {
 
     private ProfileController profileController;
-    private NewsController newsController;
     private Context mContext;
 
     @Override

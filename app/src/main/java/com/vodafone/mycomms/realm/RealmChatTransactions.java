@@ -128,6 +128,30 @@ public class RealmChatTransactions {
         }
     }
 
+    public void setContactAllChatMessagesReceivedAsRead (String contactId){
+        //Sets all received messages of a contact as read
+        if(contactId==null) return;
+
+        try {
+            mRealm.beginTransaction();
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contactId);
+
+            RealmResults<ChatMessage> results = query.findAll();
+
+            for (int i = 0; i<results.size(); i++)
+                results.get(i).setRead(Constants.CHAT_MESSAGE_READ);
+
+            mRealm.commitTransaction();
+
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);
+            mRealm.cancelTransaction();
+        }
+    }
+
     public boolean setChatMessageSentStatus (String id, String status){
         //Sets a received message as read
         if(id==null || status==null) return false;
@@ -146,7 +170,7 @@ public class RealmChatTransactions {
             mRealm.commitTransaction();
         } catch (Exception e){
             e.printStackTrace();
-            Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageAsRead: ", e);
+            Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageSentStatus: ", e);
             mRealm.cancelTransaction();
             changed = false;
         }
@@ -245,6 +269,23 @@ public class RealmChatTransactions {
         }
 
         return chatMessage;
+    }
+
+    public boolean existsChatMessageById(String id){
+        boolean exists = false;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, id);
+            long count = query.count();
+            if(count>0) exists = true;
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ", e);
+            return false;
+        }
+
+        return exists;
     }
 
     public ChatMessage getLastChatMessage(String contact_id){

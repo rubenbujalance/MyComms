@@ -121,6 +121,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
             Picasso.with(mContext)
                     .load(avatarFile)
+                    .fit().centerCrop()
                     .into(chatHolder.chatAvatarImage);
 
         } else{

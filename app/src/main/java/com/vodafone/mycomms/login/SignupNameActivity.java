@@ -2,10 +2,10 @@ package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,12 +13,10 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,12 +33,6 @@ import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.Constants;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 
 public class SignupNameActivity extends Activity {
@@ -53,9 +45,7 @@ public class SignupNameActivity extends Activity {
     ClearableEditText mLastName;
     Bitmap photoBitmap = null;
     String photoPath = null;
-
-    private FilePushToServerController filePushToServerController;
-    private File multiPartFile;
+    private SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +109,12 @@ public class SignupNameActivity extends Activity {
         mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
         mFirstName.requestFocus();
+
+        sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false) ;
+        editor.apply();
     }
 
     @Override
@@ -202,10 +198,6 @@ public class SignupNameActivity extends Activity {
             mPhoto.setImageBitmap(photoBitmap);
             mPhoto.setBorderWidth(2);
             mPhoto.setBorderColor(Color.WHITE);
-
-            //Reset avatar from user profile
-            UserProfile.setAvatar(null);
-            new sendFile().execute();
         }
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK)
         {
@@ -215,11 +207,16 @@ public class SignupNameActivity extends Activity {
             mPhoto.setImageBitmap(photoBitmap);
             mPhoto.setBorderWidth(2);
             mPhoto.setBorderColor(Color.WHITE);
-
-            //Reset avatar from user profile
-            UserProfile.setAvatar(null);
-            new sendFile().execute();
         }
+
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, true) ;
+        editor.apply();
+        editor.apply();
+
+        FilePushToServerController filePushToServerController = new FilePushToServerController
+                (SignupNameActivity.this);
+        filePushToServerController.prepareFileToSend(photoBitmap,Constants.MULTIPART_AVATAR, null);
     }
 
     public Uri setImageUri()
@@ -282,66 +279,6 @@ public class SignupNameActivity extends Activity {
         mPhoto.setBorderColor(Color.WHITE);
     }
 
-    private String saveImageFromUrl(String strUrl)
-    {
-        //Reads and saves image from URL, and return de filepath
-        String filepath = null;
-
-        try
-        {
-            URL url = new URL(strUrl);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(true);
-            urlConnection.connect();
-
-            String filename="downloadedFile.png";
-//            File cacheDirRoot = getExternalCacheDir().getAbsoluteFile();
-//            File file = new File(cacheDirRoot,filename);
-//            if(!file.createNewFile())
-//                return null;
-            File file = new File(getCacheDir(), filename);
-
-            FileOutputStream fileOutput = new FileOutputStream(file);
-            InputStream inputStream = urlConnection.getInputStream();
-            int totalSize = urlConnection.getContentLength();
-            int downloadedSize = 0;
-            byte[] buffer = new byte[1024];
-            int bufferLength;
-
-            while ( (bufferLength = inputStream.read(buffer)) > 0 )
-            {
-                fileOutput.write(buffer, 0, bufferLength);
-                downloadedSize += bufferLength;
-                Log.i("Progress:","downloadedSize:"+downloadedSize+"totalSize:"+ totalSize);
-            }
-
-            fileOutput.flush();
-            fileOutput.close();
-
-            if(downloadedSize == totalSize) filepath = file.getPath();
-        }
-        catch (MalformedURLException e)
-        {
-            Log.e(Constants.TAG, "SignupNameActivity.loadAvatarFromUrl: ", e);
-            return null;
-        }
-        catch (IOException e)
-        {
-            Log.e(Constants.TAG, "SignupNameActivity.loadAvatarFromUrl: ", e);
-            return null;
-        }
-        catch (Exception e)
-        {
-            Log.e(Constants.TAG, "SignupNameActivity.loadAvatarFromUrl: ", e);
-            return null;
-        }
-
-        Log.i("filepath:", " " + filepath) ;
-
-        return filepath;
-    }
-
     private boolean checkData()
     {
         boolean ok = true;
@@ -388,49 +325,5 @@ public class SignupNameActivity extends Activity {
         UserProfile.setPhotoPath(photoPath);
     }
 
-    private class sendFile extends AsyncTask<Void, Void, String> {
-        private ProgressDialog pdia;
 
-
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pdia = new ProgressDialog(getApplicationContext());
-            pdia.setMessage(getApplicationContext().getString(R.string.progress_dialog_uploading_file));
-            pdia.show();
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            try
-            {
-                filePushToServerController =  new FilePushToServerController
-                        (SignupNameActivity.this);
-                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
-                        photoBitmap, SignupNameActivity.this, Constants.MULTIPART_AVATAR, null);
-                filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_AVATAR,
-                        Constants.MULTIPART_AVATAR, multiPartFile);
-
-                String response = filePushToServerController.executeRequest();
-                return response;
-            }
-            catch (Exception e)
-            {
-                Log.e(Constants.TAG, "FilePushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            super.onPostExecute(result);
-            if(pdia.isShowing())pdia.dismiss();
-            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
-
-            mPhoto.setImageBitmap(photoBitmap);
-
-        }
-    }
 }

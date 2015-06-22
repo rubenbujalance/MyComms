@@ -319,14 +319,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         realm.close();
     }
 
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        reloadAdapter();
-    }
-
     /**
      * Initiate each component what belong to Search View
      * @author str_oan

@@ -76,6 +76,11 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
     public void onFragmentInteraction(Uri uri) {
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.finish();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

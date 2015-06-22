@@ -1,9 +1,6 @@
 package com.vodafone.mycomms.settings.connection;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -20,7 +17,11 @@ import com.vodafone.mycomms.util.UserSecurity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by str_oan on 12/06/2015.
@@ -28,31 +29,31 @@ import java.io.FileOutputStream;
 public class FilePushToServerController extends BaseController
 {
 
-    private final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
     private Context mContext;
-    private String authorization = "Authorization";
-    private String version_token = "x-mycomms-version";
-    private String ACCESS_TOKEN = "Bearer ";
+    private final String authorization = "Authorization";
+    private final String version_token = "x-mycomms-version";
+    private final String ACCESS_TOKEN = "Bearer ";
 
     private OkHttpClient client;
     private RequestBody requestBody;
     private Request request;
     private Response response;
 
-    public FilePushToServerController(Activity activity)
+    public FilePushToServerController(Context context)
     {
-        super(activity);
-        this.mContext = activity;
+        super(context);
+        this.mContext = context;
     }
 
-    public void sendImageRequest(String URL, String multipartFileName, File fileToSend)
+    public void sendImageRequest(String URL, String multipartFileName, File fileToSend, MediaType
+            mediaType)
     {
         client = new OkHttpClient();
 
         requestBody = new MultipartBuilder()
                 .type(MultipartBuilder.FORM)
                 .addFormDataPart(multipartFileName, fileToSend.getName(),
-                        RequestBody.create(MEDIA_TYPE_PNG, fileToSend))
+                        RequestBody.create(mediaType, fileToSend))
                 .build();
 
         request = new Request.Builder()
@@ -62,11 +63,6 @@ public class FilePushToServerController extends BaseController
                 .url(URL)
                 .post(requestBody)
                 .build();
-    }
-
-    public void sendSimpleFileRequest()
-    {
-
     }
 
     public String executeRequest()
@@ -115,21 +111,6 @@ public class FilePushToServerController extends BaseController
         }
     }
 
-
-    public void showResponse(String response)
-    {
-        new AlertDialog.Builder(mContext)
-                .setTitle("Response")
-                .setMessage(response)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
-
     public String getAvatarURL(String result)
     {
         try
@@ -144,22 +125,30 @@ public class FilePushToServerController extends BaseController
 
     }
 
-    public File prepareFileToSend(File inputFile, Bitmap fileBitmap, Context context, String
+    public File prepareFileToSend(Bitmap fileBitmap, String
             multipartName, String profileId)
     {
         try
         {
-            inputFile = new File(context.getCacheDir(), multipartName);
+            File inputFile;
+            String profId = "new_profile";
+            if(null != profileId) profId = profileId;
+
+            if(null != multipartName && multipartName.equals(Constants.MULTIPART_AVATAR))
+                inputFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                        "avatar_"+profId+".jpg");
+            else
+                inputFile = new File(mContext.getFilesDir(), Constants.CONTACT_CHAT_FILES +
+                        "file_"+profId+".jpg");
+
             inputFile.createNewFile();
 
-            File avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                    "avatar_"+profileId+".jpg");
-
             //Convert bitmap to byte array
-            Bitmap bitmap = fileBitmap;
+
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
+            fileBitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
             byte[] bitmapdata = bos.toByteArray();
+
 
             //write the bytes in file
             FileOutputStream fos = new FileOutputStream(inputFile);
@@ -167,19 +156,28 @@ public class FilePushToServerController extends BaseController
             fos.flush();
             fos.close();
 
-            FileOutputStream fos2 = new FileOutputStream(avatarFile);
-            fos2.write(bitmapdata);
-            fos2.flush();
-            fos2.close();
-
             return inputFile;
         }
         catch(Exception e)
         {
             Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: ERROR "+e.toString());
-            return inputFile;
+            return null;
         }
 
+    }
+
+    public void copy(File src, File dst) throws IOException {
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        in.close();
+        out.close();
     }
 
     public Response getResponse()
@@ -199,23 +197,6 @@ public class FilePushToServerController extends BaseController
     public void setRequest(Request request) {
         this.request = request;
     }
-
-    public OkHttpClient getClient() {
-        return client;
-    }
-
-    public void setClient(OkHttpClient client) {
-        this.client = client;
-    }
-
-    public RequestBody getRequestBody() {
-        return requestBody;
-    }
-
-    public void setRequestBody(RequestBody requestBody) {
-        this.requestBody = requestBody;
-    }
-
 }
 
 

@@ -20,9 +20,11 @@ import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TimeZone;
 
-import model.News;
+import io.realm.Realm;
+import model.UserProfile;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -43,7 +45,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
         BusProvider.getInstance().register(this);
         mContext = getApplicationContext();
-        //getProfileIdAndAccessToken();
     }
 
     @Override
@@ -102,11 +103,41 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     @Override
-    public void onProfileReceived(model.UserProfile userProfile) {
+    public void onProfileReceived(UserProfile userProfile) {
         Log.i(Constants.TAG, "MycommsApp.onProfileReceived: ");
-        profileController.setUserProfile(userProfile.getId(),
-                userProfile.getFirstName() + " " + userProfile.getLastName(),
-                userProfile.getPlatforms());
+        String timeZone = TimeZone.getDefault().getID();
+        String test = userProfile.getTimezone();
+        if (timeZone.equals(userProfile.getTimezone())) {
+            profileController.setUserProfile(userProfile.getId(),
+                    userProfile.getFirstName() + " " + userProfile.getLastName(),
+                    userProfile.getPlatforms(),
+                    userProfile.getTimezone());
+        } else{
+            profileController.setUserProfile(userProfile.getId(),
+                    userProfile.getFirstName() + " " + userProfile.getLastName(),
+                    userProfile.getPlatforms(),
+                    timeZone);
+
+            //profileController.updateUserProfileInDB(firstName, lastName, company, position, officeLocation);
+            UserProfile newProfile = new UserProfile();
+            newProfile = userProfile;
+            Realm realm = Realm.getInstance(this);
+            realm.beginTransaction();
+            newProfile.setTimezone(timeZone);
+            realm.copyToRealmOrUpdate(newProfile);
+            realm.commitTransaction();
+            //newProfile.setTimezone(timeZone);
+            realm.close();
+            HashMap<String, String> body = new HashMap<String, String>();
+            if(userProfile.getTimezone() != null && !userProfile.getTimezone().equals("")) body.put("timeZone",userProfile.getTimezone());
+
+            boolean isValid  = Utils.validateStringHashMap(body);
+            if(!isValid) {
+                profileController.showToast("Info not valid");
+            } else {
+                profileController.updateTimeZone(body);
+            }
+        }
         new DownloadContactsAsyncTask().execute(mContext);
 
         XMPPTransactions.initializeMsgServerSession(this);

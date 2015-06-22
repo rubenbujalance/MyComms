@@ -21,6 +21,7 @@ public class Constants {
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
     public static final String PLATFORMS_SHARED_PREF = "mycomms_profile_platforms";
     public static final String DEVICE_ID_SHARED_PREF = "device_Id" ;
+    public static final String TIMEZONE_SHARED_PREF = "timezone" ;
 
     //Profile API & BD
     public static final String PROFILE_PRIVATE_TIMEZONE = "privateTimeZone";

@@ -15,6 +15,7 @@ import com.vodafone.mycomms.settings.connection.PasswordConnection;
 import com.vodafone.mycomms.settings.connection.ProfileConnection;
 import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.settings.connection.UpdateSettingsConnection;
+import com.vodafone.mycomms.settings.connection.UpdateTimeZoneConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 
@@ -139,7 +140,7 @@ public class ProfileController extends BaseController {
 
     }
 
-    public void setUserProfile(String profileId, String profileFullName, String platforms){
+    public void setUserProfile(String profileId, String profileFullName, String platforms, String timeZone){
         Log.i(Constants.TAG, "ProfileController.setProfileId: ");
         SharedPreferences sp = getContext().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -148,6 +149,7 @@ public class ProfileController extends BaseController {
         editor.putString(Constants.PROFILE_FULLNAME_SHARED_PREF, profileFullName);
         editor.putString(Constants.ACCESS_TOKEN_SHARED_PREF, UserSecurity.getAccessToken(getContext()));
         editor.putString(Constants.PLATFORMS_SHARED_PREF, platforms);
+        editor.putString(Constants.TIMEZONE_SHARED_PREF, timeZone);
         editor.apply();
     }
 
@@ -287,7 +289,6 @@ public class ProfileController extends BaseController {
         return buf.toString();
     }
 
-
     public void updateContactData(HashMap profileHashMap) {
         JSONObject json = new JSONObject(profileHashMap);
         Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
@@ -313,6 +314,14 @@ public class ProfileController extends BaseController {
 
     }
 
+    public void updateTimeZone(HashMap timeZoneHashMap) {
+        JSONObject json = new JSONObject(timeZoneHashMap);
+        Log.d(Constants.TAG, "ProfileController.updateTimeZone: " + json.toString());
+        UpdateTimeZoneConnection updateTimeZoneConnection = new UpdateTimeZoneConnection(getContext(),this);
+        updateTimeZoneConnection.setPayLoad(json.toString());
+        updateTimeZoneConnection.request();
+    }
+
 
     public HashMap getProfileHashMap(UserProfile userProfile)
     {
@@ -322,6 +331,7 @@ public class ProfileController extends BaseController {
         if(userProfile.getCompany()  != null) body.put("company",userProfile.getCompany() );
         if(userProfile.getPosition() != null) body.put("position",userProfile.getPosition());
         if(userProfile.getOfficeLocation() != null) body.put("officeLocation",userProfile.getOfficeLocation());
+        if(userProfile.getTimezone() != null && !userProfile.getTimezone().equals("")) body.put("timeZone",userProfile.getTimezone());
         return body;
     }
 }

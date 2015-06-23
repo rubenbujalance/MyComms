@@ -139,6 +139,7 @@ public class RealmChatTransactions {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contactId)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ);
 
             RealmResults<ChatMessage> results = query.findAll();
@@ -315,6 +316,7 @@ public class RealmChatTransactions {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contactId)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
                     .notEqualTo(Constants.CHAT_MESSAGE_FIELD_STATUS, Constants.CHAT_MESSAGE_STATUS_READ);
 
             RealmResults<ChatMessage> results = query.findAll();
@@ -524,6 +526,24 @@ public class RealmChatTransactions {
                     .count();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getChatMessagesCount: ",e);
+        }
+
+        return count;
+    }
+
+    public long getAllChatPendingMessagesCount(){
+        if(_profile_id==null) return 0;
+
+        long count = 0;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
+                    .count();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmChatTransactions.getAllChatPendingMessagesCount: ",e);
         }
 
         return count;

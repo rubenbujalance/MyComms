@@ -57,6 +57,7 @@ public class ChatListActivity extends ToolbarActivity{
     protected void onResume() {
         super.onResume();
         //Update Pending Messages on Toolbar
+        checkUnreadChatMessages();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 

@@ -139,6 +139,7 @@ public class DashBoardActivity extends ToolbarActivity{
             recentList = realmContactTransactions.getAllRecentContacts();
 
             LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
+            recentsContainer.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
 
             for (int i = 0; i < recentList.size(); i++) {
@@ -186,8 +187,8 @@ public class DashBoardActivity extends ToolbarActivity{
                 ChatListHolder chatHolder = new ChatListHolder(childRecents);
 
                 long count =_chatTx.getChatPendingMessagesCount(recentList.get(i).getContactId());
-
-                if(count > 0) {
+                String action = recentList.get(i).getAction();
+                if(count > 0 && action.equals(Constants.CONTACTS_ACTION_SMS)) {
                     TextView unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
                     unread_messages.setVisibility(View.VISIBLE);
                     unread_messages.setText(String.valueOf(count));
@@ -195,7 +196,6 @@ public class DashBoardActivity extends ToolbarActivity{
                     ImageView typeRecent = (ImageView) childRecents.findViewById(R.id.type_recent);
                     typeRecent.setVisibility(View.VISIBLE);
 
-                    String action = recentList.get(i).getAction();
                     int sdk = Build.VERSION.SDK_INT;
                     if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
                         if (sdk < Build.VERSION_CODES.JELLY_BEAN)
@@ -215,7 +215,6 @@ public class DashBoardActivity extends ToolbarActivity{
                     }
                 }
                 LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
-                //DO THINGS
                 final ArrayList<RecentContact> finalRecentList = recentList;
                 final int position = i;
                 btRecents.setOnClickListener(new View.OnClickListener() {
@@ -402,6 +401,8 @@ public class DashBoardActivity extends ToolbarActivity{
     protected void onResume() {
         super.onResume();
         //Update Pending Messages on Toolbar
+        loadRecents();
+        checkUnreadChatMessages();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 
@@ -418,5 +419,6 @@ public class DashBoardActivity extends ToolbarActivity{
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
         checkUnreadChatMessages();
+        loadRecents();
     }
 }

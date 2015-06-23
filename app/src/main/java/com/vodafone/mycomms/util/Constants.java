@@ -1,5 +1,7 @@
 package com.vodafone.mycomms.util;
 
+import com.squareup.okhttp.MediaType;
+
 import java.text.SimpleDateFormat;
 
 public class Constants {
@@ -124,6 +126,7 @@ public class Constants {
     public static final String AVATAR_URL = "urlAvatar";
     public static final String AVATAR_PATH = "pathAvatar";
     public static final String CONTACT_AVATAR_DIR = "/avatars/files/";
+    public static final String CONTACT_CHAT_FILES = "/chat/files/";
 
     //Chat BD Fields
     public static final String CHAT_MESSAGE_FIELD_ID = "id";
@@ -187,4 +190,8 @@ public class Constants {
     public static String toolbar = "toolbar";
 
     public static boolean isSearchBarFocusRequested = false;
+
+    public static final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpg");
+    public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");
+    public static final String FIRST_TIME_AVATAR_DELIVERY = "first_time_avatar_delivery";
 }

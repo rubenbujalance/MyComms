@@ -3,8 +3,10 @@ package com.vodafone.mycomms.settings;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,7 +30,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.custom.CircleImageView;
@@ -41,10 +42,6 @@ import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -98,8 +95,13 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private FilePushToServerController filePushToServerController;
 
     private UserProfile userProfile;
+    private String profileId;
     private File multiPartFile;
     private boolean isFirstLoadNeed = true;
+
+    private String avatarNewURL = null;
+
+    private SharedPreferences sp;
 
 
     // TODO: Rename and change types of parameters
@@ -129,17 +131,15 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
            @Override
            public void onClick(View v) {
                Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
-               profileEditMode(isEditing);
-               if (isEditing && !isUpdating) {
 
+               if(isUpdating && !isEditing) return;
+
+               profileEditMode(!isEditing);
+
+               if(isEditing)
                    isUpdating = updateContactData();
-                   if (!isUpdating) {
-                       return;
-                   }
-               } else if (!isEditing && !isUpdating) {
-                   isEditing = true;
-                   profileEditMode(isEditing);
-               }
+
+               isEditing = !isEditing;
            }
        });
 
@@ -156,14 +156,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
        profilePicture.setOnClickListener(new View.OnClickListener() {
            @Override
-           public void onClick(View v)
-           {
-               if(isEditing)
-               {
+           public void onClick(View v) {
+               if (isEditing) {
                    dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
                }
            }
        });
+
+
 
        return v;
    }
@@ -197,6 +197,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         String lastName = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
 
         ((SettingsMainActivity)getActivity()).setMainActivityTitle(firstName + " " + lastName);
+
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(Constants.PROFILE_FULLNAME_SHARED_PREF, firstName + " " + lastName);
+        editor.apply();
+
 //      EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
 //      EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
 
@@ -205,10 +210,12 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         String officeLocation = ((EditText) getActivity().findViewById(R.id.office_location)).getText().toString();
 
 
-        if(!profileController.isUserProfileChanged(firstName, lastName, company, position, officeLocation)){
+        if(null != avatarNewURL)  profileController.updateUserAvatarInDB(avatarNewURL);
+
+        if(!profileController.isUserProfileChanged(firstName, lastName, company, position,
+                officeLocation))
+        {
             Log.d(Constants.TAG, "ProfileFragment.updateContactData: profile details not changed");
-            isEditing = false;
-            profileEditMode(isEditing);
             return false;
         }
 
@@ -219,9 +226,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         newProfile.setPosition(position);
         newProfile.setOfficeLocation(officeLocation);
 
+
         Log.d(Constants.TAG, "ProfileFragment.updateContactData:" + profileController.printUserProfile(newProfile));
 
-        profileController.updateUserProfileInDB(firstName, lastName, company, position, officeLocation);
+        profileController.updateUserProfileInDB(firstName, lastName, company, position,
+                officeLocation);
 
         HashMap newProfileHashMap = profileController.getProfileHashMap(newProfile);
 
@@ -283,10 +292,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
         {
             photoBitmap = decodeFile(photoPath);
-            profilePicture.setImageBitmap(photoBitmap);
-            profilePicture.setBorderWidth(2);
-            profilePicture.setBorderColor(Color.WHITE);
-
             new sendFile().execute();
         }
 
@@ -295,10 +300,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             Uri selectedImage = data.getData();
             photoPath = getRealPathFromURI(selectedImage);
             photoBitmap = decodeFile(photoPath);
-            profilePicture.setImageBitmap(photoBitmap);
-            profilePicture.setBorderWidth(2);
-            profilePicture.setBorderColor(Color.WHITE);
-
             new sendFile().execute();
         }
     }
@@ -327,73 +328,32 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
     }
 
-    private void loadProfileImage() {
+    private void loadProfileImage()
+    {
         File avatarFile = null;
-        String profileId = this.userProfile.getId();
 
         if (profileId!=null && !profileId.equals(""))
+        {
             avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
                     "avatar_"+profileId+".jpg");
+        }
 
-        if (avatarFile!= null && avatarFile.exists()) {
-            Picasso.with(getActivity())
-                    .load(avatarFile)
-                    .into(profilePicture);
-        } else{
+        if (avatarFile!= null && avatarFile.exists())
+        {
+            this.profilePicture.setImageBitmap
+                    (
+                            BitmapFactory.decodeFile(avatarFile.getAbsolutePath())
+                    );
+        }
+
+        else
+        {
             String initials = this.userProfile.getFirstName().substring(0,1) +
                     this.userProfile.getLastName().substring(0,1);
             profilePicture.setImageResource(R.color.grey_middle);
             textAvatar.setText(initials);
         }
     }
-
-    private void saveImage()
-    {
-        File avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                "avatar_"+userProfile.getId()+".jpg");
-        if (avatarFile.exists())
-        {
-            avatarFile.delete();
-        }
-
-
-        File avatarFile2 = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                "avatar_"+userProfile.getId()+".jpg");
-        try
-        {
-            avatarFile2.createNewFile();
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "ProfileFragment -> saveImage() ERROR: "+e.toString());
-        }
-
-        copy(multiPartFile,avatarFile2);
-    }
-
-    private void copy(File src, File dst)
-    {
-        try
-        {
-            InputStream in = new FileInputStream(src);
-            OutputStream out = new FileOutputStream(dst);
-
-            // Transfer bytes from in to out
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "ProfileFragment -> copy() ERROR: "+e.toString());
-        }
-
-    }
-
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -421,16 +381,20 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         profileController = new ProfileController(this);
         profileController.setConnectionCallback(this);
+
+        this.sp = getActivity().getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
     }
-    
+
     @Override
     public void onResume(){
         super.onResume();
         Log.d(Constants.TAG, "ProfileFragment.onResume: ");
 //        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
 //        editProfile.setVisibility(View.VISIBLE);
-
         profileController.getProfile();
+
+        loadProfileImage();
     }
 
     @Override
@@ -458,6 +422,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             if(isFirstLoadNeed)
             {
                 this.userProfile = userProfile;
+                this.profileId = userProfile.getId();
                 Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
                 EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
                 profileName.setText(userProfile.getFirstName());
@@ -481,14 +446,15 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                 profileOfficeLocation.setText(userProfile.getOfficeLocation());
 //            EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
 //            profileInfo.setText("????????");
-                loadProfileImage();
+
+
 
                 isFirstLoadNeed = false;
             }
         }
     }
 
-    public void onPause(){
+     public void onPause(){
         super.onPause();
         profileController.setConnectionCallback(null);
         Log.d(Constants.TAG, "ProfileFragment.onPause: ");
@@ -504,6 +470,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     @Override
     public void onProfileConnectionError() {
         Log.d(Constants.TAG, "ProfileFragment.onProfileConnectionError: ");
+        isUpdating = false;
     }
 
 
@@ -511,17 +478,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     @Override
     public void onUpdateProfileConnectionError() {
         Log.d(Constants.TAG, "ProfileFragment.onProfileConnectionUpdateError: ");
-        profileController.showToast("Profile is not updated");
+        profileController.showToast(getString(R.string.wrong_profile_update));
         isUpdating = false;
     }
 
     @Override
     public void onUpdateProfileConnectionCompleted() {
         Log.d(Constants.TAG, "ProfileFragment.onUpdateProfileConnectionCompleted: ");
-        if(isEditing) {
-            isEditing = !isEditing;
-            profileEditMode(isEditing);
-        }
+
         isUpdating = false;
     }
 
@@ -540,8 +504,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     @Override
     public void onConnectionNotAvailable() {
         Log.w(Constants.TAG, "ProfileFragment.onConnectionNotAvailable: ");
-        Toast.makeText(getActivity().getApplicationContext(), "Connection not available", Toast.LENGTH_LONG);
+        Toast.makeText(getActivity().getApplicationContext(), "Connection not available", Toast
+                .LENGTH_LONG).show();
         profileController.showToast("Connection not available");
+        isUpdating = false;
     }
 
     /**
@@ -674,10 +640,19 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             try
             {
                 filePushToServerController =  new FilePushToServerController(getActivity());
-                multiPartFile = filePushToServerController.prepareFileToSend(multiPartFile,
-                        photoBitmap, getActivity(), Constants.MULTIPART_AVATAR);
-                filePushToServerController.sendImageRequest(Constants.CONTACT_API_POST_AVATAR,
-                        Constants.MULTIPART_AVATAR, multiPartFile);
+                multiPartFile = filePushToServerController.prepareFileToSend
+                        (
+                                photoBitmap,
+                                Constants.MULTIPART_AVATAR,
+                                profileId
+                        );
+                filePushToServerController.sendImageRequest
+                        (
+                                Constants.CONTACT_API_POST_AVATAR,
+                                Constants.MULTIPART_AVATAR,
+                                multiPartFile,
+                                Constants.MEDIA_TYPE_JPG
+                        );
 
                 return  filePushToServerController.executeRequest();
             }
@@ -694,11 +669,29 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             if(pdia.isShowing()) pdia.dismiss();
             Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
 
-            //saveImage();
+            if(null != result)
+            {
+                loadNewAvatarURL(result);
+                profilePicture.setImageBitmap(BitmapFactory.decodeFile(multiPartFile
+                        .getAbsolutePath()));
+                profilePicture.setBorderWidth(2);
+                profilePicture.setBorderColor(Color.WHITE);
+            }
         }
     }
 
-
+    private void loadNewAvatarURL(String result)
+    {
+        String URL = filePushToServerController.getAvatarURL(result);
+        if(null != URL)
+        {
+            avatarNewURL = URL;
+        }
+        else
+        {
+            avatarNewURL = null;
+        }
+    }
 
     @Subscribe
     public void enableEditProfile(EnableEditProfileEvent event) {
@@ -709,5 +702,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             editProfile.setVisibility(View.GONE);
         }
     }
+
+
 
 }

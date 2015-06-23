@@ -98,15 +98,18 @@ public class ProfileController extends BaseController {
         profileConnection.request();
     }
 
-    public boolean isUserProfileChanged(String firstName, String lastName, String company, String position, String officeLocation) {
+    public boolean isUserProfileChanged(String firstName, String lastName, String company, String
+            position, String officeLocation)
+    {
         if(userProfile.getFirstName().equals(firstName) && userProfile.getLastName().equals(lastName)
                 && userProfile.getCompany().equals(company) && userProfile.getPosition().equals(position)
-                && userProfile.getOfficeLocation().equals(officeLocation) ) {
+                && userProfile.getOfficeLocation().equals(officeLocation)) {
             return false;
         }
         return true;
     }
-    public void updateUserProfileInDB(String firstName, String lastName, String company, String position, String officeLocation){
+    public void updateUserProfileInDB(String firstName, String lastName, String company, String
+            position, String officeLocation){
         Log.d(Constants.TAG, "ProfileController.updateUserProfileInDB: ");
         if(userProfile != null){
             userProfile.setFirstName(firstName);
@@ -114,6 +117,16 @@ public class ProfileController extends BaseController {
             userProfile.setCompany(company);
             userProfile.setPosition(position);
             userProfile.setOfficeLocation(officeLocation);
+            realmContactTransactions.insertUserProfile(userProfile);
+        }
+    }
+
+    public void updateUserAvatarInDB(String avatarNewURL)
+    {
+        Log.d(Constants.TAG, "ProfileController.updateUserAvatarInDB: ");
+        if(userProfile != null)
+        {
+            userProfile.setAvatar(avatarNewURL);
             realmContactTransactions.insertUserProfile(userProfile);
         }
     }

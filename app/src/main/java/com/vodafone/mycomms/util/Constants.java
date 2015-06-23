@@ -23,6 +23,8 @@ public class Constants {
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
     public static final String PLATFORMS_SHARED_PREF = "mycomms_profile_platforms";
     public static final String DEVICE_ID_SHARED_PREF = "device_Id" ;
+    public static final String TIMEZONE_SHARED_PREF = "timezone" ;
+    public static final String IS_TOOLBAR_CLICKED = "toolbar_clicked";
 
     //Profile API & BD
     public static final String PROFILE_PRIVATE_TIMEZONE = "privateTimeZone";
@@ -147,7 +149,7 @@ public class Constants {
 
     //Chat constants
     public static final int CHAT_MESSAGE_TYPE_TEXT = 0;
-    public static final int CHAT_MESSAGE_TYPE_PICTURE = 1;
+    public static final int CHAT_MESSAGE_TYPE_IMAGE = 1;
     public static final String CHAT_MESSAGE_DIRECTION_SENT = "0";
     public static final String CHAT_MESSAGE_DIRECTION_RECEIVED = "1";
     public static final String CHAT_MESSAGE_STATUS_NOT_SENT = "not_sent";
@@ -165,8 +167,18 @@ public class Constants {
     public static final int XMPP_PARAM_PORT = 5222;
     public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
     public static final String XMPP_MESSAGE_MEDIATYPE_TEXT = "text";
-    public static final String XMPP_MESSAGE_TYPE_CHAT = "chat";
-    public static final String XMPP_IQ_TYPE_CHAT = "chat";
+    public static final String XMPP_MESSAGE_MEDIATYPE_IMAGE = "image";
+    public static final String XMPP_STANZA_TYPE_CHAT = "chat";
+    public static final String XMPP_ELEMENT_IQ = "iq";
+    public static final String XMPP_ELEMENT_MESSAGE = "message";
+    public static final String XMPP_ELEMENT_BODY = "body";
+    public static final String XMPP_ATTR_TYPE = "type";
+    public static final String XMPP_ATTR_MEDIATYPE = "mediaType";
+    public static final String XMPP_ATTR_FROM = "from";
+    public static final String XMPP_ATTR_TO = "to";
+    public static final String XMPP_ATTR_ID = "id";
+    public static final String XMPP_ATTR_STATUS = "status";
+    public static final String XMPP_ATTR_FILEURL = "fileUrl";
 
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";

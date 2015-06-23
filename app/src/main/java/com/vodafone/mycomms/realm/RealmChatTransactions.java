@@ -50,7 +50,8 @@ public class RealmChatTransactions {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,"0");
+                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
+                Constants.CHAT_MESSAGE_STATUS_NOT_SENT);
 
         return chatMessage;
     }
@@ -61,7 +62,8 @@ public class RealmChatTransactions {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,"0", id);
+                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
+                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
 
         return chatMessage;
     }
@@ -136,7 +138,9 @@ public class RealmChatTransactions {
             mRealm.beginTransaction();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contactId);
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contactId)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ);
 
             RealmResults<ChatMessage> results = query.findAll();
 
@@ -184,36 +188,30 @@ public class RealmChatTransactions {
     {
         if(_profile_id==null || contact_id==null) return null;
 
-        ArrayList<ChatMessage> chatMessageArrayList = null;
+        ArrayList<ChatMessage> chatMessageArray = null;
 
         try {
-            chatMessageArrayList = new ArrayList<>();
+            chatMessageArray = new ArrayList<>();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id);
 
-//            RealmResults<ChatMessage> result1 = query.findAllSorted("timestamp");
-            RealmResults<ChatMessage> result1 = query.findAll();
+            RealmResults<ChatMessage> result1 = query.findAllSorted("timestamp");
 
             if (result1 != null) {
+                int initialPoint = 0;
+                if(result1.size()>50)
+                    initialPoint = result1.size()-50;
 
-                for(ChatMessage chatMessage : result1)
-                {
-                    chatMessageArrayList.add(chatMessage);
+                for (int i=initialPoint; i<result1.size(); i++) {
+                    chatMessageArray.add(result1.get(i));
                 }
-//                int count = 0;
-//
-//                for (int i=result1.size()-1; i>=0; i--) {
-//                    if(count>=50) break;
-//                    chatMessageArrayList.add(result1.get(i));
-//                    count++;
-//                }
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getAllChatMessages: ", e);
         }
 
-        return chatMessageArrayList;
+        return chatMessageArray;
     }
 
     public ArrayList<ChatMessage> getFilteredChatMessages(String contact_id, String field, String filter)
@@ -306,6 +304,36 @@ public class RealmChatTransactions {
         }
 
         return message;
+    }
+
+    public ArrayList<ChatMessage> getNotReadReceivedContactChatMessages (String contactId){
+        //Sets all received messages of a contact as read
+        if(contactId==null) return null;
+
+        ArrayList<ChatMessage> messages = null;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contactId)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
+                    .notEqualTo(Constants.CHAT_MESSAGE_FIELD_STATUS, Constants.CHAT_MESSAGE_STATUS_READ);
+
+            RealmResults<ChatMessage> results = query.findAll();
+
+            for (int i = 0; i<results.size(); i++)
+            {
+                if(messages==null) messages = new ArrayList<>();
+                messages.add(results.get(i));
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);
+            return null;
+        }
+
+        return messages;
     }
 
     //DELETES
@@ -498,6 +526,24 @@ public class RealmChatTransactions {
                     .count();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getChatMessagesCount: ",e);
+        }
+
+        return count;
+    }
+
+    public long getAllChatPendingMessagesCount(){
+        if(_profile_id==null) return 0;
+
+        long count = 0;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
+                    .count();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmChatTransactions.getAllChatPendingMessagesCount: ",e);
         }
 
         return count;

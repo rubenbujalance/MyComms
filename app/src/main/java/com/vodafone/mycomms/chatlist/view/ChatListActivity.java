@@ -49,6 +49,6 @@ public class ChatListActivity extends ToolbarActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 }

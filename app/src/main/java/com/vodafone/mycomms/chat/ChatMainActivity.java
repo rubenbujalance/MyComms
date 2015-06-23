@@ -334,7 +334,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
     protected void onResume() {
         super.onResume();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
@@ -343,12 +342,18 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
         else setSendEnabled(false);
 
-        ArrayList<ChatMessage> messages =
-                chatTransactions.getNotReadReceivedContactChatMessages(_contact.getContactId());
+        if(XMPPTransactions.getXmppConnection()!=null &&
+                XMPPTransactions.getXmppConnection().isConnected()) {
+            Realm realm = Realm.getInstance(this);
+            RealmChatTransactions chatTransactions = new RealmChatTransactions(realm, this);
 
-        if(messages!=null && messages.size()>0) {
-            XMPPTransactions.sendReadIQReceivedMessagesList(messages);
-            chatTransactions.setContactAllChatMessagesReceivedAsRead(_contact.getContactId());
+            ArrayList<ChatMessage> messages =
+                    chatTransactions.getNotReadReceivedContactChatMessages(_contact.getContactId());
+
+            if (messages != null && messages.size() > 0) {
+                XMPPTransactions.sendReadIQReceivedMessagesList(messages);
+                chatTransactions.setContactAllChatMessagesReceivedAsRead(_contact.getContactId());
+            }
         }
     }
 

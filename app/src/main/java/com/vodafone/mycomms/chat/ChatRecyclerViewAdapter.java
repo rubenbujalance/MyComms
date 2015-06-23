@@ -11,6 +11,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -163,13 +164,17 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         if(chatMsg.getRead().compareTo("0")==0 &&
                 chatMsg.getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
         {
-//            if(XMPPTransactions.notifyIQMessageStatus(chatMsg, Constants.CHAT_MESSAGE_STATUS_READ))
+            if(XMPPTransactions.getXmppConnection()!=null &&
+                    XMPPTransactions.getXmppConnection().isConnected()) {
+                XMPPTransactions.notifyIQMessageStatus(chatMsg.getId(), chatMsg.getContact_id(),
+                        Constants.CHAT_MESSAGE_STATUS_READ);
                 _chatTx.setChatMessageReceivedAsRead(chatMsg);
+            }
         }
     }
 
     @Override
-    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
 
         if(_realm!=null)

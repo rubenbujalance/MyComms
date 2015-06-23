@@ -82,10 +82,16 @@ public class RealmChatTransactions {
             //Update associated Chat with new last message
             Chat chat = getChatById(newChatMessage.getContact_id());
             chat.setLastMessage_id(newChatMessage.getId());
+
+            String lastText;
+            if(newChatMessage.getType()==Constants.CHAT_MESSAGE_TYPE_TEXT)
+                lastText = newChatMessage.getText();
+            else lastText = mContext.getString(R.string.image);
+
             if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
-                chat.setLastMessage(mContext.getResources().getString(R.string.chat_me_text) + newChatMessage.getText());
-            else
-                chat.setLastMessage(newChatMessage.getText());
+                chat.setLastMessage(mContext.getResources().getString(R.string.chat_me_text) + lastText);
+            else chat.setLastMessage(lastText);
+
             chat.setLastMessageTime(newChatMessage.getTimestamp());
             mRealm.commitTransaction();
 
@@ -165,6 +171,8 @@ public class RealmChatTransactions {
             mRealm.beginTransaction();
             //Update associated Chat with new last message
             ChatMessage chatMessage = getChatMessageById(id);
+            if(chatMessage==null) return false;
+
             if(XMPPTransactions.getXMPPStatusOrder(chatMessage.getStatus()) <
                     XMPPTransactions.getXMPPStatusOrder(status)) {
                 chatMessage.setStatus(status);

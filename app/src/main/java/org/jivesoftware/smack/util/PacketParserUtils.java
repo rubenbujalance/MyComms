@@ -378,9 +378,7 @@ public class PacketParserUtils {
     public static void saveAndNotifyStanzaReceived(XmlPullParser parser)
     {
         try {
-
             XMPPTransactions.saveAndNotifyStanzaReceived(parser);
-
         } catch (Exception e) {
             Log.e(Constants.TAG, "PacketParserUtils.notifyMessageReceived: ",e);
             return;

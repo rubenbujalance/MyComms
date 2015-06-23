@@ -25,7 +25,7 @@ public class ChatMessage extends RealmObject{
     private String resourceUri;
     @Index
     private String read; //0-No; 1-Yes. It's string in case we need an index
-    private String status; //0-Not Sent; 1-Sent; 2-Delivered; 3-Read. It's string in case we need an index
+    private String status; //not_sent; sent; delivered; read
 
     public ChatMessage() {}
 

@@ -74,7 +74,7 @@ public class FilePushToServerController extends BaseController
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, "FilePushToServerController.executeRequest: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.executeRequest: ERROR ",e);
             return null;
         }
 
@@ -88,7 +88,7 @@ public class FilePushToServerController extends BaseController
         }
         catch(Exception e)
         {
-            Log.e(Constants.TAG, "FilePushToServerController.convertResponseToString: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.convertResponseToString: ERROR ",e);
             return null;
         }
 
@@ -106,7 +106,7 @@ public class FilePushToServerController extends BaseController
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, "FilePushToServerController.getVersionName: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.getVersionName: ERROR ",e);
             return "";
         }
     }
@@ -119,7 +119,7 @@ public class FilePushToServerController extends BaseController
         }
         catch(Exception e)
         {
-            Log.e(Constants.TAG, "FilePushToServerController.getAvatarURL: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.getAvatarURL: ERROR ",e);
             return null;
         }
 
@@ -134,13 +134,18 @@ public class FilePushToServerController extends BaseController
             String profId = "new_profile";
             if(null != profileId) profId = profileId;
 
-            if(null != multipartName && multipartName.equals(Constants.MULTIPART_AVATAR))
-                inputFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                        "avatar_"+profId+".jpg");
-            else
-                inputFile = new File(mContext.getFilesDir(), Constants.CONTACT_CHAT_FILES +
-                        "file_"+profId+".jpg");
+            File dir;
 
+            if(null != multipartName && multipartName.equals(Constants.MULTIPART_AVATAR)) {
+                dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+                inputFile = new File(dir, "avatar_" + profId + ".jpg");
+            }
+            else {
+                dir = new File(mContext.getFilesDir() + Constants.CONTACT_CHAT_FILES);
+                inputFile = new File(dir, "file_" + profId + ".jpg");
+            }
+
+            dir.mkdirs();
             inputFile.createNewFile();
 
             //Convert bitmap to byte array
@@ -160,7 +165,7 @@ public class FilePushToServerController extends BaseController
         }
         catch(Exception e)
         {
-            Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: ERROR "+e.toString());
+            Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: ERROR ",e);
             return null;
         }
 

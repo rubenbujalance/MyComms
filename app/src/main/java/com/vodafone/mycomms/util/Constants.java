@@ -10,9 +10,15 @@ public class Constants {
     //Shared preferences
     public static final String MYCOMMS_SHARED_PREFS = "mycomms";
 
+    //Parameter constants
+    public static final int HTTP_READ_AVATAR_TIMEOUT = 10000;
+    public static final int HTTP_READ_FILE_TIMEOUT = 60000;
+
     //Chat Constants
     public static final int LEFT_CHAT = 0;
     public static final int RIGHT_CHAT = 1;
+    public static final int LEFT_IMAGE_CHAT = 2;
+    public static final int RIGHT_IMAGE_CHAT = 3;
 
     //Profile Constants
     public static final int MY_SETTINGS = 0;

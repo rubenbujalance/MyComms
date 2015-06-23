@@ -197,10 +197,8 @@ public class SearchController extends BaseController
                 String dir = Constants.CONTACT_AVATAR_DIR;
 
                 File file = new File(mContext.getFilesDir() + dir);
-                if (file.exists()) {
-                    file.delete();
-                }
                 file.mkdirs();
+
                 if (downloadFile(String.valueOf(url), dir, avatarFileName)) {
                     String avatarFile = mContext.getFilesDir() + dir + avatarFileName;
                     Log.i(Constants.TAG, "DownloadAvatars.doInBackground: avatarFile: " + avatarFile);
@@ -219,13 +217,13 @@ public class SearchController extends BaseController
             URL url = new URL(path);
 
             URLConnection ucon = url.openConnection();
-            ucon.setReadTimeout(5000);
+            ucon.setReadTimeout(Constants.HTTP_READ_AVATAR_TIMEOUT);
             ucon.setConnectTimeout(10000);
 
             InputStream is = ucon.getInputStream();
             BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
 
-            File file = new File(mContext.getFilesDir() + dir + avatarFileName);
+            File file = new File(mContext.getFilesDir() + dir, avatarFileName);
 
             if (file.exists()) {
                 file.delete();

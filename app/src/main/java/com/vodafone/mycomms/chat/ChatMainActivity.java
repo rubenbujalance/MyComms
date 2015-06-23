@@ -47,6 +47,8 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -230,16 +232,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
                 dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
-
-//        ImageView clearText = (ImageView) findViewById(R.id.send_image);
-//        clearText.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.i(LOG_TAG,"sendText()");
-//                chatTransactions.deleteAllChatMessages(_chat.getContact_id());
-//                refreshAdapter();
-//            }
-//        });
     }
 
     private void sendText()
@@ -258,7 +250,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
         //Send through XMPP
         if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
-                chatMsg.getId(), Constants.XMPP_MESSAGE_MEDIATYPE_TEXT, msg))
+                chatMsg.getId(), msg))
             return;
 
         //Insert in recents
@@ -274,9 +266,48 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         }
 
         _chatList.add(chatMsg);
-//        if(_chatList.size()>50) _chatList.remove(0);
+        if(_chatList.size()>50) _chatList.remove(0);
+
         refreshAdapter();
         etChatTextBox.setText("");
+    }
+
+    private void imageSent(String imageUrl)
+    {
+        //Save to DB
+        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
+                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl);
+
+        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+
+        chatTransactions.insertChat(_chat);
+        chatTransactions.insertChatMessage(chatMsg);
+
+        //Send through XMPP
+        if (!XMPPTransactions.sendImage(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
+                chatMsg.getId(), imageUrl))
+            return;
+
+        //Download to file
+        new DownloadFile().execute(imageUrl, chatMsg.getId());
+
+        //Insert in recents
+        String action = Constants.CONTACTS_ACTION_SMS;
+        mRecentContactController.insertRecent(_chat.getContact_id(), action);
+        mRecentContactController.setConnectionCallback(this);
+
+        //Notify app to refresh any view if necessary
+        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
+            BusProvider.getInstance().post(new MessageSentEvent());
+        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
+            //Recent List is refreshed onConnectionComplete
+        }
+
+        _chatList.add(chatMsg);
+        if(_chatList.size()>50) _chatList.remove(0);
+
+        refreshAdapter();
     }
 
     private void loadMessagesArray()
@@ -504,8 +535,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private class sendFile extends AsyncTask<Void, Void, String> {
         private ProgressDialog pdia;
 
-
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -549,6 +578,15 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             if(pdia.isShowing()) pdia.dismiss();
             Log.d(Constants.TAG, "ChatMainActivity.sendFile: Response content: " +
                     filePushToServerController.getAvatarURL(result));
+
+            if(result!=null && result.length()>0) {
+                try {
+                    JSONObject jsonImage = new JSONObject(result);
+                    imageSent(jsonImage.getString("file"));
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "sendFile.onPostExecute: ",e);
+                }
+            }
         }
     }
 
@@ -567,5 +605,17 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         if(!isConnecting)
             checkXMPPConnection();
         else setSendEnabled(false);
+    }
+
+    private class DownloadFile extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(String[] params) {
+            return XMPPTransactions.downloadToChatFile(params[0],params[1]);
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            refreshAdapter();
+        }
     }
 }

@@ -51,4 +51,9 @@ public class ChatListActivity extends ToolbarActivity{
         super.onResume();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 }

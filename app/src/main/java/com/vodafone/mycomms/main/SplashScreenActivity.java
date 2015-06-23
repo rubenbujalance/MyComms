@@ -74,6 +74,11 @@ public class SplashScreenActivity extends Activity {
                         Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                         startActivity(in);
                         finish();
+                    } else{
+                        //TODO: App is entering here when there's no connection. Fix it and enable an alternative way to get in
+                        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
+                        startActivity(in);
+                        finish();
                     }
                 } else {
                     Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);

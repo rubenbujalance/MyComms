@@ -164,9 +164,12 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         if(chatMsg.getRead().compareTo("0")==0 &&
                 chatMsg.getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
         {
-            _chatTx.setChatMessageReceivedAsRead(chatMsg);
-            XMPPTransactions.notifyIQMessageStatus(chatMsg, Constants.CHAT_MESSAGE_STATUS_READ);
-
+            if(XMPPTransactions.getXmppConnection()!=null &&
+                    XMPPTransactions.getXmppConnection().isConnected()) {
+                XMPPTransactions.notifyIQMessageStatus(chatMsg.getId(), chatMsg.getContact_id(),
+                        Constants.CHAT_MESSAGE_STATUS_READ);
+                _chatTx.setChatMessageReceivedAsRead(chatMsg);
+            }
         }
     }
 

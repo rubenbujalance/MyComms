@@ -62,7 +62,8 @@ public final class XMPPTransactions {
     {
         if(markContactsLoaded) _contactsLoaded = true;
 
-        if(_isConnecting || !_contactsLoaded) return;
+//        if(_isConnecting || !_contactsLoaded) return;
+        if(_isConnecting) return;
 
         //Check if haven't received confirmation of last message sent
         //Force reconnection if necessary
@@ -326,7 +327,8 @@ public final class XMPPTransactions {
             chatEvent.setMessage(newChatMessage);
             BusProvider.getInstance().post(chatEvent);
 
-            notifyIQMessageStatus(newChatMessage, Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+            notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
+                    Constants.CHAT_MESSAGE_STATUS_DELIVERED);
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
@@ -381,7 +383,8 @@ public final class XMPPTransactions {
             chatEvent.setMessage(newChatMessage);
             BusProvider.getInstance().post(chatEvent);
 
-            notifyIQMessageStatus(newChatMessage, Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+            notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
+                    Constants.CHAT_MESSAGE_STATUS_DELIVERED);
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
@@ -399,7 +402,8 @@ public final class XMPPTransactions {
         BusProvider.getInstance().post(event);
     }
 
-    public static boolean notifyIQMessageStatus(final ChatMessage chatMsg, final String status)
+    public static boolean notifyIQMessageStatus(final String msgId, final String msgContactId,
+                                                final String status)
     {
         //Sends the IQ stanza to notify
         try {
@@ -407,7 +411,7 @@ public final class XMPPTransactions {
                 @Override
                 public CharSequence toXML() {
                     String message = buildIQStanza(Constants.XMPP_STANZA_TYPE_CHAT,
-                            chatMsg.getId(), chatMsg.getContact_id(), status);
+                            msgId, msgContactId, status);
 
                     return message;
                 }
@@ -434,7 +438,8 @@ public final class XMPPTransactions {
     public static void sendReadIQReceivedMessagesList(ArrayList<ChatMessage> messages)
     {
         for(int i=0; i<messages.size(); i++)
-            notifyIQMessageStatus(messages.get(i), Constants.CHAT_MESSAGE_STATUS_READ);
+            notifyIQMessageStatus(messages.get(i).getId(), messages.get(i).getContact_id(),
+                    Constants.CHAT_MESSAGE_STATUS_READ);
     }
 
     /*

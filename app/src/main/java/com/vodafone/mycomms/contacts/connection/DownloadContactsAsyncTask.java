@@ -8,7 +8,6 @@ import android.util.Log;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.util.ArrayList;
 
@@ -55,7 +54,6 @@ public class DownloadContactsAsyncTask extends AsyncTask<Context, Void, Void> im
                 apiCall = Constants.CONTACT_API_GET_CONTACTS;
                 mContactController.getContactList(apiCall + "&o=" + offsetPaging);
             } else {
-                XMPPTransactions.initializeMsgServerSession(mContext, true);
                 apiCall = Constants.CONTACT_API_GET_RECENTS;
                 mContactController.getRecentList(apiCall);
             }

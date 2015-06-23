@@ -45,6 +45,14 @@ public class FilePushToServerController extends BaseController
         this.mContext = context;
     }
 
+    /**
+     * Prepare request for send image via multipart file with OKHTTP
+     * @author str_oan
+     * @param URL (String) -> request URL
+     * @param multipartFileName (String) -> multipart file name for the request
+     * @param fileToSend (File) -> image file which will be sent
+     * @param mediaType (MediaType) -> media type of the file (e.x. image/jpg)
+     */
     public void sendImageRequest(String URL, String multipartFileName, File fileToSend, MediaType
             mediaType)
     {
@@ -65,6 +73,11 @@ public class FilePushToServerController extends BaseController
                 .build();
     }
 
+    /**
+     * Execute the request
+     * @author str_oan
+     * @return (String) -> response after request execution
+     */
     public String executeRequest()
     {
         try
@@ -80,6 +93,11 @@ public class FilePushToServerController extends BaseController
 
     }
 
+    /**
+     * Converts response to readable string
+     * @author str_oan
+     * @return (String) -> response as a string
+     */
     public String responseToString()
     {
         try
@@ -94,6 +112,11 @@ public class FilePushToServerController extends BaseController
 
     }
 
+    /**
+     * Gets version name of the APP
+     * @author str_oan
+     * @return (String) -> version name as a string
+     */
     private String getVersionName()
     {
         try
@@ -111,6 +134,12 @@ public class FilePushToServerController extends BaseController
         }
     }
 
+    /**
+     * Returns stored avatar URL from given result
+     * @author str_oan
+     * @param result (String) -> result in JSON string format (name:value)
+     * @return (String) -> URL as a string
+     */
     public String getAvatarURL(String result)
     {
         try
@@ -125,6 +154,15 @@ public class FilePushToServerController extends BaseController
 
     }
 
+    /**
+     * Prepare file to send taking values from bitmap. In this case file is image
+     * @author str_oan
+     * @param fileBitmap (Bitmap) -> image in bitmap format
+     * @param multipartName (String) -> file name used for multipart request
+     * @param profileId (String) -> profile Id of user
+     * @return (File) -> file stored in correct directory depending of type (avatar/simple image
+     * file)
+     */
     public File prepareFileToSend(Bitmap fileBitmap, String
             multipartName, String profileId)
     {
@@ -166,6 +204,13 @@ public class FilePushToServerController extends BaseController
 
     }
 
+    /**
+     * Copy of file from src to destination
+     * @author str_oan
+     * @param src (File) -> source file
+     * @param dst (File) -> destination file
+     * @throws IOException -> if is not possible to read file
+     */
     public void copy(File src, File dst) throws IOException {
         InputStream in = new FileInputStream(src);
         OutputStream out = new FileOutputStream(dst);

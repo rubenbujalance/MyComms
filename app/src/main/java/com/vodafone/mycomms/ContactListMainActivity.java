@@ -120,7 +120,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     protected void onResume() {
         super.onResume();
         //Update Pending Messages on Toolbar
-        checkUnreadChatMessages();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 

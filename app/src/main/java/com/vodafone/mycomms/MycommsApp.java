@@ -13,6 +13,7 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.main.connection.DownloadNewsAsyncTask;
+import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
@@ -20,9 +21,9 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.TimeZone;
-import java.io.File;
 
 import io.realm.Realm;
 import model.UserProfile;

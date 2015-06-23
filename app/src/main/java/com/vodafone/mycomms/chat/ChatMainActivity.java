@@ -38,6 +38,7 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageSentEvent;
+import com.vodafone.mycomms.events.MessageSentStatusChanged;
 import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -69,7 +70,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private ArrayList<ChatMessage> _chatList = new ArrayList<>();
     private Chat _chat;
     private Contact _contact;
-    private Contact _profile;
+    private model.UserProfile _profile;
     private String _profile_id;
 
     private String photoPath = null;
@@ -108,7 +109,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         chatTransactions = new RealmChatTransactions(mRealm, this);
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         contactTransactions = new RealmContactTransactions(mRealm,_profile_id);
-        _profile = contactTransactions.getContactById(_profile_id);
+        _profile = contactTransactions.getUserProfile(_profile_id);
 
         if(_profile_id == null)
         {
@@ -202,7 +203,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
                 if (cs != null && cs.length() > 0) checkXMPPConnection();
                 else setSendEnabled(false);
 
-                XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+                XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
             }
 
             @Override
@@ -224,8 +225,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
         sendFileImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 //dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
@@ -256,7 +256,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         chatTransactions.insertChatMessage(chatMsg);
 
         //Send through XMPP
-        if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_MESSAGE_TYPE_CHAT,
+        if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
                 chatMsg.getId(), Constants.XMPP_MESSAGE_MEDIATYPE_TEXT, msg))
             return;
 
@@ -288,14 +288,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     {
         mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList, _profile, _contact);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
-    }
-
-    private void markAllAsRead()
-    {
-        for(int i=0; i<_chatList.size(); i++)
-            _chatList.get(i).setRead("1");
-
-        chatTransactions.insertChatMessageList(_chatList);
     }
 
     private void checkXMPPConnection()
@@ -344,13 +336,19 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     @Override
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
 
         if(etChatTextBox.getText().toString()!=null &&
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
         else setSendEnabled(false);
 
-        chatTransactions.setContactAllChatMessagesReceivedAsRead(_contact.getContactId());
+        ArrayList<ChatMessage> messages =
+                chatTransactions.getNotReadReceivedContactChatMessages(_contact.getContactId());
+
+        if(messages!=null && messages.size()>0) {
+            XMPPTransactions.sendReadIQReceivedMessagesList(messages);
+            chatTransactions.setContactAllChatMessagesReceivedAsRead(_contact.getContactId());
+        }
     }
 
     @Override
@@ -377,8 +375,8 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             _chatList.add(chatMsg);
             mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
             mRecentContactController.setConnectionCallback(this);
-//            if(_chatList.size()>50) _chatList.remove(0);
-            refreshAdapter();
+            if(_chatList.size()>50) _chatList.remove(0);
+                refreshAdapter();
         }
     }
 
@@ -538,14 +536,13 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         }
     }
 
+    @Subscribe
+     public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
+        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
 
-//    @Subscribe
-//     public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
-//        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
-//
-//        if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)
-//            refreshAdapter();
-//    }
+        if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)
+            loadMessagesArray();
+    }
 
     @Subscribe
     public void onEventXMPPConnecting(XMPPConnectingEvent event){

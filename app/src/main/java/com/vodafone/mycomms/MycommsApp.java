@@ -18,11 +18,6 @@ import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
-import com.vodafone.mycomms.xmpp.XMPPTransactions;
-
-import java.util.ArrayList;
-
-import model.News;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -108,8 +103,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 userProfile.getFirstName() + " " + userProfile.getLastName(),
                 userProfile.getPlatforms());
         new DownloadContactsAsyncTask().execute(mContext);
-
-        XMPPTransactions.initializeMsgServerSession(this);
     }
 
     @Override

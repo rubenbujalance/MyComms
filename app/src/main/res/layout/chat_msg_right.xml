@@ -47,7 +47,7 @@
         <TextView
             android:id="@+id/sent_text"
             style="@style/ChatSent"
-            android:visibility="gone"
+            android:visibility="visible"
             android:text="Delivered"
             android:paddingTop="0dp"
             android:layout_marginRight="5dp"

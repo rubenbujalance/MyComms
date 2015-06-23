@@ -1,6 +1,5 @@
 package com.vodafone.mycomms;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 
 import org.json.JSONObject;
@@ -198,66 +197,5 @@ public final class UserProfile implements Serializable{
         if(_avatar != null) body.put("avatar", _avatar);
 
         return body;
-    }
-
-    public boolean saveUserProfile(Context context)
-    {
-        /*
-        Gson gson = new Gson();
-        String json = gson.toJson(this);
-
-        FileOutputStream outputStream;
-
-        try {
-            outputStream = context.openFileOutput(UserProfile.fileName, Context.MODE_PRIVATE);
-            outputStream.write(json.getBytes());
-            outputStream.flush();
-            outputStream.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-        */
-        return false;
-    }
-
-    public static UserProfile readUserProfile(Context context)
-    {
-        /*
-        Gson gson = new Gson();
-
-        FileInputStream fis;
-        String json;
-        UserProfile userProfile = null;
-
-        try {
-            fis = context.openFileInput(UserProfile.fileName);
-            InputStreamReader inputStreamReader = new InputStreamReader(fis);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuilder sb = new StringBuilder();
-            String line;
-
-            while ((line = bufferedReader.readLine()) != null) {
-                sb.append(line);
-            }
-
-            bufferedReader.close();
-            inputStreamReader.close();
-
-            json = sb.toString();
-
-            userProfile = gson.fromJson(json, UserProfile.class);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return userProfile;
-        */
-        return null;
     }
 }

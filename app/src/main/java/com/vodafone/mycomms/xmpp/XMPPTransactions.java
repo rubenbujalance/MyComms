@@ -27,6 +27,9 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.xmlpull.v1.XmlPullParser;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+
 import io.realm.Realm;
 import model.Chat;
 import model.ChatMessage;
@@ -42,41 +45,73 @@ public final class XMPPTransactions {
     private static Context _appContext;
     private static ConnectionListener _connectionListener;
     private static String _device_id;
-    private static Realm _realm;
+
+    //Last ChatMessage sent, to control unexpected server disconnection
+    private static String _lastChatMessageSentId;
+    private static long _lastChatMessageSentTimestamp;
+
+    //This flag indicates if contacts have been loaded completely from API
+    //For prevent from crashes in a new installation
+    private static boolean _contactsLoaded = false;
 
     /*
      * Methods
      */
 
-    public static void initializeMsgServerSession(Context appContext)
+    public static void initializeMsgServerSession(Context appContext, boolean markContactsLoaded)
     {
-        if(_isConnecting) return;
+        if(markContactsLoaded) _contactsLoaded = true;
 
-        if(_xmppConnection == null) {
+        if(_isConnecting || !_contactsLoaded) return;
 
-            //Save context
+        //Check if haven't received confirmation of last message sent
+        //Force reconnection if necessary
+        boolean force = false;
+        if(_lastChatMessageSentId != null &&
+                Calendar.getInstance().getTimeInMillis() > _lastChatMessageSentTimestamp+10000 &&
+                !_isConnecting)
+        {
+            //Disconnect and force manual reconnection
+            try {
+                if(_xmppConnection != null) _xmppConnection.disconnect();
+                _xmppConnection = null;
+                _lastChatMessageSentId = null;
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "XMPPTransactions.forceReconnection: ", e);
+            }
+
+            force = true;
+        }
+
+        //Start connection
+        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() ||
+                !_xmppConnection.isConnected() || force) {
+
+            //Save context and reset connection
+            _xmppConnection = null;
             _appContext = appContext;
-            _realm = Realm.getInstance(_appContext);
 
-            //Get profile_id
-            SharedPreferences sp = appContext.getSharedPreferences(
-                    Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-            _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+            //Check profile id exists
+            if(_profile_id==null) {
+                //Get profile_id
+                SharedPreferences sp = appContext.getSharedPreferences(
+                        Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+                _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+            }
 
             if (_profile_id == null) {
-                Log.e(Constants.TAG, "ContactListMainActivity.initializeMsgServerSession: No profile_id found");
+                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: No profile_id found");
                 return;
             }
+
+            _isConnecting = true;
+            notifyXMPPConnecting(true);
 
             //Device ID
             _device_id = Utils.getDeviceId(_appContext.getContentResolver(),
                     (TelephonyManager) _appContext.getSystemService(Service.TELEPHONY_SERVICE));
-        }
 
-        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() || !_xmppConnection.isConnected()) {
-            _isConnecting = true;
             Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: ");
-            notifyXMPPConnecting(true);
 
             //Configuration for the connection
             XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = XMPPTCPConnectionConfiguration.builder();
@@ -88,7 +123,7 @@ public final class XMPPTransactions {
             xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
 //        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
             xmppConfigBuilder.setDebuggerEnabled(true);
-            xmppConfigBuilder.setSendPresence(false);
+            xmppConfigBuilder.setSendPresence(true);
             xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             xmppConfigBuilder.setCompressionEnabled(false);
 
@@ -100,7 +135,6 @@ public final class XMPPTransactions {
     {
         try {
             _xmppConnection.disconnect();
-            if(_realm != null)_realm.close();
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: ", e);
@@ -124,6 +158,8 @@ public final class XMPPTransactions {
             };
 
             _xmppConnection.sendStanza(st);
+            _lastChatMessageSentId = id;
+            _lastChatMessageSentTimestamp = Calendar.getInstance().getTimeInMillis();
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
@@ -135,11 +171,11 @@ public final class XMPPTransactions {
 
     private static String buildIQStanza(String type, String id, String contactId, final String status)
     {
-        String iq = "<iq type=\""+type+"\" " +
-                "to=\""+contactId+"@my-comms.com\" " +
-                "from=\""+_profile_id+"@my-comms.com/"+_device_id+"\" " +
-                "id=\""+id+"\" " +
-                "status=\""+status+"\"></iq>";
+        String iq = "<"+Constants.XMPP_ELEMENT_IQ+" "+Constants.XMPP_ATTR_TYPE+"=\""+type+"\" " +
+                Constants.XMPP_ATTR_TO+"=\""+contactId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
+                Constants.XMPP_ATTR_FROM+"=\""+_profile_id+"@"+Constants.XMPP_PARAM_DOMAIN+"/"+_device_id+"\" " +
+                Constants.XMPP_ATTR_ID+"=\""+id+"\" " +
+                Constants.XMPP_ATTR_STATUS+"=\""+status+"\"></"+Constants.XMPP_ELEMENT_IQ+">";
 
         return iq;
     }
@@ -147,11 +183,13 @@ public final class XMPPTransactions {
     private static String buildMessageStanza(String type, String id, String contactId,
                                              String mediaType, String text)
     {
-        String message = "<message type=\""+type+"\" id=\""+id+"\" " +
-                    "to=\""+contactId+"@my-comms.com\" " +
-                    "from=\""+_profile_id+"@my-comms.com/"+_device_id+"\" " +
-                    "mediaType=\""+mediaType+"\" >" +
-                    "<body>"+text+"</body></message>";
+        String message = "<"+Constants.XMPP_ELEMENT_MESSAGE+" "+Constants.XMPP_ATTR_TYPE+"=\""+type+"\" " +
+                    Constants.XMPP_ATTR_ID+"=\""+id+"\" " +
+                    Constants.XMPP_ATTR_TO+"=\""+contactId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
+                    Constants.XMPP_ATTR_FROM+"=\""+_profile_id+"@"+Constants.XMPP_PARAM_DOMAIN+"/"+_device_id+"\" " +
+                    Constants.XMPP_ATTR_MEDIATYPE+"=\""+mediaType+"\" >" +
+                    "<"+Constants.XMPP_ELEMENT_BODY+">"+text+"</"+Constants.XMPP_ELEMENT_BODY+">" +
+                    "</"+Constants.XMPP_ELEMENT_MESSAGE+">";
 
         return message;
     }
@@ -170,26 +208,39 @@ public final class XMPPTransactions {
     public static boolean saveAndNotifyStanzaReceived(XmlPullParser parser)
     {
         try {
-            String from = parser.getAttributeValue("", "from");
-            String to = parser.getAttributeValue("", "to");
-            String id = parser.getAttributeValue("", "id");
+            String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
+            String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
+            String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
+            String type = parser.getAttributeValue("", Constants.XMPP_ATTR_TYPE);
 
-            if (from == null || id == null || to==null) return false;
+            if (from == null || id == null ||
+                    to==null || type==null) return false;
 
             to = to.substring(0, to.indexOf("@"));
-            if(to.compareTo(_profile_id)!=0) return false;
+            if(to.compareTo(_profile_id)!=0 || type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0)
+                return false;
 
-            if (parser.getName().compareTo("message") == 0)
-                return saveAndNotifyMessageReceived(parser);
-//            else if (parser.getName().compareTo("iq") == 0)
-//                return saveAndNotifyIQReceived(parser);
-            else return false;
+            if (parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0)
+            {
+                String mediaType = parser.getAttributeValue("", Constants.XMPP_ATTR_MEDIATYPE);
+                if(mediaType==null) return false;
+
+                if(mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_TEXT)==0)
+                    return saveAndNotifyMessageReceived(parser);
+                else if(mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
+                    return saveAndNotifyImageReceived(parser);
+                else return false;
+            }
+            else if (parser.getName().compareTo(Constants.XMPP_ELEMENT_IQ) == 0)
+            {
+                return saveAndNotifyIQReceived(parser);
+            }
+            else {return false;}
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyStanzaReceived: ",e);
+            return false;
         }
-
-        return true;
     }
 
     private static boolean saveAndNotifyIQReceived(XmlPullParser parser)
@@ -198,15 +249,8 @@ public final class XMPPTransactions {
 
         try {
             //Check the stanza
-            String from = parser.getAttributeValue("", "from");
-            String to = parser.getAttributeValue("", "to");
-            String id = parser.getAttributeValue("", "id");
-            String status = parser.getAttributeValue("", "status");
-
-            to = to.substring(0, to.indexOf("@"));
-            from = from.substring(0, from.indexOf("@"));
-
-            String text = parser.nextText();
+            String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
+            String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
 
             //Instantiate Realm
             realm = Realm.getInstance(_appContext);
@@ -222,6 +266,10 @@ public final class XMPPTransactions {
                 statusEvent.setId(id);
                 statusEvent.setStatus(status);
                 BusProvider.getInstance().post(statusEvent);
+
+                //Mark last message as sent (for connection control)
+                if(_lastChatMessageSentId!=null && id.compareTo(_lastChatMessageSentId)==0)
+                    _lastChatMessageSentId = null;
             }
 
         } catch (Exception e) {
@@ -238,9 +286,8 @@ public final class XMPPTransactions {
         Realm realm = null;
 
         try {
-            String from = parser.getAttributeValue("", "from");
-            String to = parser.getAttributeValue("", "to");
-            String id = parser.getAttributeValue("", "id");
+            String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
+            String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
 
             int event = parser.next();
             if (event != XmlPullParser.START_TAG) return false;
@@ -279,6 +326,63 @@ public final class XMPPTransactions {
             chatEvent.setMessage(newChatMessage);
             BusProvider.getInstance().post(chatEvent);
 
+            notifyIQMessageStatus(newChatMessage, Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
+            if(realm!=null) realm.close();
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean saveAndNotifyImageReceived(XmlPullParser parser)
+    {
+        Realm realm = null;
+
+        try {
+            String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
+            String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
+            String url = parser.getAttributeValue("", Constants.XMPP_ATTR_FILEURL);
+
+            if(url==null) return false;
+
+            from = from.substring(0, from.indexOf("@"));
+
+            realm = Realm.getInstance(_appContext);
+            RealmChatTransactions chatTx = new RealmChatTransactions(realm, _appContext);
+
+            //Check if chat message has already been received
+            if(chatTx.existsChatMessageById(id))
+            {
+                realm.close();
+                return false;
+            }
+
+            ChatMessage newChatMessage = chatTx.newChatMessageInstance(from,
+                    Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
+                    Constants.CHAT_MESSAGE_TYPE_IMAGE,
+                    "", url, id);
+
+            if(newChatMessage == null) return false;
+
+            //Load chat and create if it didn't exist
+            Chat chat = chatTx.getChatById(from);
+            if(chat==null) chat = chatTx.newChatInstance(from);
+            chat = chatTx.updatedChatInstance(chat, newChatMessage);
+
+            chatTx.insertChat(chat);
+            chatTx.insertChatMessage(newChatMessage);
+
+            realm.close();
+
+            ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
+            chatEvent.setMessage(newChatMessage);
+            BusProvider.getInstance().post(chatEvent);
+
+            notifyIQMessageStatus(newChatMessage, Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
             if(realm!=null) realm.close();
@@ -302,7 +406,7 @@ public final class XMPPTransactions {
             Stanza st = new Stanza() {
                 @Override
                 public CharSequence toXML() {
-                    String message = buildIQStanza(Constants.XMPP_IQ_TYPE_CHAT,
+                    String message = buildIQStanza(Constants.XMPP_STANZA_TYPE_CHAT,
                             chatMsg.getId(), chatMsg.getContact_id(), status);
 
                     return message;
@@ -325,6 +429,12 @@ public final class XMPPTransactions {
         else if(xmppStatus.compareTo(Constants.CHAT_MESSAGE_STATUS_SENT)==0) return 1;
         else if(xmppStatus.compareTo(Constants.CHAT_MESSAGE_STATUS_DELIVERED)==0) return 2;
         else return 3; //Read
+    }
+
+    public static void sendReadIQReceivedMessagesList(ArrayList<ChatMessage> messages)
+    {
+        for(int i=0; i<messages.size(); i++)
+            notifyIQMessageStatus(messages.get(i), Constants.CHAT_MESSAGE_STATUS_READ);
     }
 
     /*
@@ -357,13 +467,12 @@ public final class XMPPTransactions {
             //CONNECTION SUCCESSFUL
             //**********************
 
-//            //Add IQ Provider
-//            ProviderManager.addIQProvider("iq", "jabber:client", new MyIQProvider());
-
             //Reconnection manager
             ReconnectionManager reconnectionMgr = ReconnectionManager.getInstanceFor(_xmppConnection);
             reconnectionMgr.enableAutomaticReconnection();
             reconnectionMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY);
+
+            //Send the stanza
 
             return _xmppConnection;
         }
@@ -403,7 +512,6 @@ public final class XMPPTransactions {
                 Log.w(Constants.TAG, "XMPPTransactions.connectionClosed");
 
                 _xmppConnection = null;
-                if(_realm != null)_realm.close();
             }
 
             @Override
@@ -411,25 +519,28 @@ public final class XMPPTransactions {
                 Log.w(Constants.TAG, "XMPPTransactions.connectionClosedOnError");
 
                 _xmppConnection = null;
-                if(_realm != null)_realm.close();
             }
 
             @Override
             public void reconnectionSuccessful() {
+                _isConnecting = false;
+                notifyXMPPConnecting(false);
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectionSuccessful");
             }
 
             @Override
             public void reconnectingIn(int seconds) {
+                _isConnecting = true;
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectingIn: " + seconds + " seg.");
             }
 
             @Override
             public void reconnectionFailed(Exception e) {
+                _isConnecting = false;
+                notifyXMPPConnecting(false);
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectionFailed: Trying manually");
 
                 _xmppConnection = null;
-                if(_realm != null)_realm.close();
             }
         };
 

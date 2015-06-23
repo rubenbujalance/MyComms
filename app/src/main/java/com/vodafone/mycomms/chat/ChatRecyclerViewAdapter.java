@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import model.ChatMessage;
 import model.Contact;
+import model.UserProfile;
 
 
 public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
@@ -26,11 +27,11 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     private ArrayList<ChatMessage> chatList = new ArrayList<>();
     private Context mContext;
     private Contact _contact;
-    private Contact _profile;
+    private UserProfile _profile;
     private Realm _realm;
     private RealmChatTransactions _chatTx;
 
-    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem, Contact profile, Contact contact) {
+    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem, UserProfile profile, Contact contact) {
         mContext = context;
         _realm = Realm.getInstance(mContext);
         _chatTx = new RealmChatTransactions(_realm, mContext);
@@ -76,14 +77,15 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         chatHolder.chatTextView.setText(chatList.get(i).getText());
 
         //Set text status
-        if(chatList.get(i).getStatus().compareTo("0")==0)
+        if(chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT)==0)
             chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
-        else if(chatList.get(i).getStatus().compareTo("1")==0)
+        else if(chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_SENT)==0)
             chatHolder.chatSentText.setText(mContext.getString(R.string.status_sent));
-        else if(chatList.get(i).getStatus().compareTo("2")==0)
+        else if(chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_DELIVERED)==0)
             chatHolder.chatSentText.setText(mContext.getString(R.string.status_delivered));
-        else if(chatList.get(i).getStatus().compareTo("3")==0)
+        else if(chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_READ)==0)
             chatHolder.chatSentText.setText(mContext.getString(R.string.status_read));
+        else chatHolder.chatSentText.setText("");
 
         //Set message time
         long currentTimestamp = chatList.get(i).getTimestamp();
@@ -104,17 +106,31 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         }
 
         //Set message avatar
-        Contact contact;
+        String avatar;
+        String contactId;
+        String firstName;
+        String lastName;
 
         if(chatHolder.getItemViewType() == Constants.LEFT_CHAT)
-            contact = _contact;
-        else contact = _profile;
+        {
+            avatar = _contact.getAvatar();
+            contactId = _contact.getContactId();
+            firstName = _contact.getFirstName();
+            lastName = _contact.getLastName();
+        }
+        else
+        {
+            avatar = _profile.getAvatar();
+            contactId = _profile.getId();
+            firstName = _profile.getFirstName();
+            lastName = _profile.getLastName();
+        }
 
-        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
+        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contactId+".jpg");
 
-        if (contact.getAvatar()!=null &&
-                contact.getAvatar().length()>0 &&
-                contact.getAvatar().compareTo("")!=0 &&
+        if (avatar!=null &&
+                avatar.length()>0 &&
+                avatar.compareTo("")!=0 &&
                 avatarFile.exists()) {
 
             chatHolder.chatAvatarText.setText(null);
@@ -126,13 +142,13 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
         } else{
             String initials = "";
-            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            if(null != firstName && firstName.length() > 0)
             {
-                initials = contact.getFirstName().substring(0,1);
+                initials = firstName.substring(0, 1);
 
-                if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                if(null != lastName && lastName.length() > 0)
                 {
-                    initials = initials + contact.getLastName().substring(0,1);
+                    initials = initials + lastName.substring(0,1);
                 }
 
             }

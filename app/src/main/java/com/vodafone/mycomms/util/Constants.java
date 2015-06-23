@@ -1,5 +1,7 @@
 package com.vodafone.mycomms.util;
 
+import com.squareup.okhttp.MediaType;
+
 import java.text.SimpleDateFormat;
 
 public class Constants {
@@ -126,6 +128,7 @@ public class Constants {
     public static final String AVATAR_URL = "urlAvatar";
     public static final String AVATAR_PATH = "pathAvatar";
     public static final String CONTACT_AVATAR_DIR = "/avatars/files/";
+    public static final String CONTACT_CHAT_FILES = "/chat/files/";
 
     //Chat BD Fields
     public static final String CHAT_MESSAGE_FIELD_ID = "id";
@@ -146,7 +149,7 @@ public class Constants {
 
     //Chat constants
     public static final int CHAT_MESSAGE_TYPE_TEXT = 0;
-    public static final int CHAT_MESSAGE_TYPE_PICTURE = 1;
+    public static final int CHAT_MESSAGE_TYPE_IMAGE = 1;
     public static final String CHAT_MESSAGE_DIRECTION_SENT = "0";
     public static final String CHAT_MESSAGE_DIRECTION_RECEIVED = "1";
     public static final String CHAT_MESSAGE_STATUS_NOT_SENT = "not_sent";
@@ -164,8 +167,18 @@ public class Constants {
     public static final int XMPP_PARAM_PORT = 5222;
     public static final String XMPP_PARAM_DOMAIN = "my-comms.com";
     public static final String XMPP_MESSAGE_MEDIATYPE_TEXT = "text";
-    public static final String XMPP_MESSAGE_TYPE_CHAT = "chat";
-    public static final String XMPP_IQ_TYPE_CHAT = "chat";
+    public static final String XMPP_MESSAGE_MEDIATYPE_IMAGE = "image";
+    public static final String XMPP_STANZA_TYPE_CHAT = "chat";
+    public static final String XMPP_ELEMENT_IQ = "iq";
+    public static final String XMPP_ELEMENT_MESSAGE = "message";
+    public static final String XMPP_ELEMENT_BODY = "body";
+    public static final String XMPP_ATTR_TYPE = "type";
+    public static final String XMPP_ATTR_MEDIATYPE = "mediaType";
+    public static final String XMPP_ATTR_FROM = "from";
+    public static final String XMPP_ATTR_TO = "to";
+    public static final String XMPP_ATTR_ID = "id";
+    public static final String XMPP_ATTR_STATUS = "status";
+    public static final String XMPP_ATTR_FILEURL = "fileUrl";
 
 
     public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
@@ -179,4 +192,8 @@ public class Constants {
     public static String toolbar = "toolbar";
 
     public static boolean isSearchBarFocusRequested = false;
+
+    public static final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpg");
+    public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");
+    public static final String FIRST_TIME_AVATAR_DELIVERY = "first_time_avatar_delivery";
 }

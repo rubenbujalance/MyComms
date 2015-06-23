@@ -14,7 +14,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.News;
 
 public class NewsController extends BaseController {

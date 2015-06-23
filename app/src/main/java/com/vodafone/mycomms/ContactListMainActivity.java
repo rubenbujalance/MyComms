@@ -115,6 +115,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     @Override
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 }

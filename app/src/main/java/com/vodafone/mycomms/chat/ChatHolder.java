@@ -13,10 +13,18 @@ public class ChatHolder extends RecyclerView.ViewHolder {
     protected TextView chatSentText;
     protected ImageView chatAvatarImage;
     protected TextView chatAvatarText;
+    protected ImageView chatImage;
 
     public ChatHolder(View view) {
         super(view);
-        this.chatTextView = (TextView) view.findViewById(R.id.chat_text);
+
+        try {
+            this.chatTextView = (TextView) view.findViewById(R.id.chat_text);
+        } catch (Exception e){}
+        try {
+            this.chatImage = (ImageView) view.findViewById(R.id.chat_image);
+        } catch (Exception e){}
+        
         this.chatSentTime = (TextView) view.findViewById(R.id.sent_time);
         this.chatSentText = (TextView) view.findViewById(R.id.sent_text);
         this.chatAvatarImage = (ImageView) view.findViewById(R.id.companyLogo);

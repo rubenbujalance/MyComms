@@ -71,4 +71,9 @@ public class ChatListActivity extends ToolbarActivity{
     public void onEventChatsReceived(ChatsReceivedEvent event){
         checkUnreadChatMessages();
     }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 }

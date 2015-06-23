@@ -59,7 +59,8 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
        mRecyclerView.addOnItemTouchListener(new ChatListRecyclerItemClickListener(getActivity(),
                mRecyclerView, new ChatListRecyclerItemClickListener.OnItemClickListener() {
            @Override
-           public void onItemClick(View view, int position) {
+           public void onItemClick(View view, int position)
+           {
                Intent in = new Intent(getActivity(), ChatMainActivity.class);
                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, mChatRecyclerViewAdapter.getChat(position).getContact_id());
                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CHAT_LIST);

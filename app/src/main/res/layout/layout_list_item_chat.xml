@@ -2,7 +2,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?android:attr/activatedBackgroundIndicator"
+    android:id="@+id/chat_list_item_container"
+
+    >
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,7 +28,9 @@
                  android:layout_width="match_parent"
                  android:layout_toRightOf="@id/layout_list_item_image"
                  android:layout_height="70dp"
-            android:layout_marginLeft="5dp" />
+            android:layout_marginLeft="5dp"
+                 android:layout_toLeftOf="@+id/layout_chatlist_item_status"
+                 android:layout_toStartOf="@+id/layout_chatlist_item_status"/>
         <include android:id="@+id/layout_chatlist_item_status"
              layout="@layout/layout_chatlist_item_status"
              android:layout_width="70dp"

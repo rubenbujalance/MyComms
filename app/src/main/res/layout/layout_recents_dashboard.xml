@@ -10,7 +10,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="106dp"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:id="@+id/recent_content"
         android:layout_gravity="right" android:gravity="center">
 

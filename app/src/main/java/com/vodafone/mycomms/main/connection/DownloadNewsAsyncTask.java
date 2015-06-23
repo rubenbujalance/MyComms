@@ -37,7 +37,6 @@ public class DownloadNewsAsyncTask extends AsyncTask<Context, Void, Void> implem
     @Override
     public void onNewsResponse(ArrayList<News> newsList, boolean morePages, int offsetPaging) {
         Log.i(Constants.TAG, "DownloadNewsAsyncTask.onNewsResponse: " + apiCall);
-
         apiCall = Constants.NEWS_API_GET;
 
         if (morePages){
@@ -47,8 +46,6 @@ public class DownloadNewsAsyncTask extends AsyncTask<Context, Void, Void> implem
             event.setNews(newsList);
             BusProvider.getInstance().post(event);
         }
-
-        //Log.i(Constants.TAG, "ShowNewsList: " + newsList.toString());
     }
 
     @Override

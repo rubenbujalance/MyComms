@@ -58,11 +58,20 @@ public class NewsDetailActivity  extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 //Start Contacts activity
-                Intent in = new Intent(NewsDetailActivity.this, DashBoardActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(in);
-                finish();
+                backAction();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        backAction();
+    }
+
+    private void backAction() {
+        Intent in = new Intent(NewsDetailActivity.this, DashBoardActivity.class);
+        in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(in);
+        finish();
     }
 }

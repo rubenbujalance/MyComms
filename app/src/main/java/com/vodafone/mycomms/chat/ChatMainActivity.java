@@ -334,7 +334,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
     protected void onResume() {
         super.onResume();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);

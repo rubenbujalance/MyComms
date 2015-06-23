@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import model.News;
 
 public class NewsController extends BaseController {
@@ -85,10 +87,12 @@ public class NewsController extends BaseController {
                 jsonObject = jsonArray.getJSONObject(i);
                 news = mapNews(jsonObject);
                 newsList.add(news);
-
                //Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
-
             }
+            Realm realm = Realm.getInstance(getContext());
+            RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(realm);
+            realmNewsTransactions.insertNewsList(newsList);
+            realm.close();
 
         } catch (JSONException e) {
             e.printStackTrace();

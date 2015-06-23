@@ -172,8 +172,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         else if(icon.compareTo("moon")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_moon);
         else viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
 
-        //viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getLastSeen()));
-
         //Local time
         String presenceDetail = "";
 

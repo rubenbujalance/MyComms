@@ -61,7 +61,7 @@
                 android:focusable="true" />
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/footer_recents_layout"
+            android:id="@+id/footer_inbox_layout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"

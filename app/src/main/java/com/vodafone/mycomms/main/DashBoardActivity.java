@@ -48,9 +48,7 @@ import model.News;
 import model.RecentContact;
 
 public class DashBoardActivity extends ToolbarActivity{
-    private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     private LinearLayout noConnectionLayout;
-    private Context mContext;
     private Realm _realm;
     private Realm mRealm;
     private RealmChatTransactions _chatTx;
@@ -188,7 +186,7 @@ public class DashBoardActivity extends ToolbarActivity{
                 long count =_chatTx.getChatPendingMessagesCount(recentList.get(i).getContactId());
 
                 if(count > 0) {
-                    TextView unread_messages = (TextView) childRecents.findViewById(R.id.unreaded_messages);
+                    TextView unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
                     unread_messages.setVisibility(View.VISIBLE);
                     unread_messages.setText(String.valueOf(count));
                 } else {

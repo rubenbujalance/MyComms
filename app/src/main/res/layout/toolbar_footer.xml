@@ -2,7 +2,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mycomms="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="?actionBarSize"
+    android:layout_height="?actionBarSize" xmlns:tools="http://schemas.android.com/tools"
     mycomms:contentInsetEnd="0dp"
     mycomms:contentInsetStart="0dp"
     android:gravity="top"
@@ -75,20 +75,44 @@
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal">
 
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:id="@+id/footer_recents"
-                    android:background="@drawable/chat"
-                    android:focusable="false"
-                    android:backgroundTint="#ff808080" />
-
+                <RelativeLayout android:layout_width="36dp"
+                                android:layout_height="30dp">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:id="@+id/footer_recents"
+                        android:background="@drawable/chat"
+                        android:focusable="false"
+                        android:backgroundTint="#ff808080" android:layout_alignParentBottom="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"/>
+                        <com.vodafone.mycomms.custom.CircleImageView
+                            android:id="@+id/unread_bubble"
+                            android:layout_width="17dp"
+                            android:layout_height="17dp"
+                            android:src="@mipmap/blue"
+                            android:layout_alignParentTop="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"/>
+                    <TextView
+                        android:id="@+id/unread_messages"
+                        android:layout_width="17dp"
+                        android:layout_height="17dp"
+                        tools:text="10"
+                        android:textColor="@color/white"
+                        android:gravity="center"
+                        android:textSize="9sp"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"/>
+                </RelativeLayout>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/Chat"
                     android:id="@+id/textView10"
-                    android:textColor="@color/grey_middle" />
+                    android:textColor="@color/grey_middle"
+                    android:layout_gravity="center_horizontal"/>
 
             </LinearLayout>
         </LinearLayout>

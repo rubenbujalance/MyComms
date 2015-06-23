@@ -4,7 +4,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
+import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -20,7 +23,11 @@ public class ChatListActivity extends ToolbarActivity{
     public void onCreate(Bundle savedInstanceState) {
         Log.i(Constants.TAG, "ChatMainActivity.onCreate: ");
         super.onCreate(savedInstanceState);
+        BusProvider.getInstance().register(this);
+
         setContentView(R.layout.layout_main_activity);
+
+        enableToolbarIsClicked(false);
         activateChatListToolbar();
         activateFooter();
 
@@ -49,7 +56,20 @@ public class ChatListActivity extends ToolbarActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        //Update Pending Messages on Toolbar
+        checkUnreadChatMessages();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+    }
+
+    @Subscribe
+    public void onEventChatsReceived(ChatsReceivedEvent event){
+        checkUnreadChatMessages();
     }
 
     @Override

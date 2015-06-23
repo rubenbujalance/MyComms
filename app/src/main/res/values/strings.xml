@@ -171,7 +171,7 @@
     <string name="Phone">Phone</string>
     <string name="latestNews">Latest News</string>
     <string name="Logout">Logout</string>
-    <string name="Chat">Chat</string>
+    <string name="Chat">"Chat   "</string>
     <string name="Surname">Surname</string>
     <string name="office">office</string>
     <string name="about_my_comms">About MyComms</string>
@@ -212,5 +212,6 @@
     <!--Progress dialog-->
 
     <string name="progress_dialog_uploading_file">Uploading file. Please wait...</string>
+    <string name="unread_messages_more_than_99">99+</string>
 
 </resources>

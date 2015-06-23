@@ -6,9 +6,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.ISessionConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
@@ -28,6 +30,8 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         BusProvider.getInstance().register(this);
         setContentView(R.layout.layout_main_activity);
         noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
+
+        enableToolbarIsClicked(false);
         activateContactListToolbar();
         setToolbarTitle(getResources().getString(R.string.toolbar_title_contacts));
         activateFooter();
@@ -115,6 +119,13 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     @Override
     protected void onResume() {
         super.onResume();
+        //Update Pending Messages on Toolbar
+        checkUnreadChatMessages();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+    }
+
+    @Subscribe
+    public void onEventChatsReceived(ChatsReceivedEvent event){
+        checkUnreadChatMessages();
     }
 }

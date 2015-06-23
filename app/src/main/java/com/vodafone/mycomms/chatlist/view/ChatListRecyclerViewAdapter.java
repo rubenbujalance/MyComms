@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,6 +28,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     private Realm _realm;
     private RealmChatTransactions _chatTx;
 
+
+
     public ChatListRecyclerViewAdapter(Context context, ArrayList<Chat> Chat) {
         mContext = context;
         _realm = Realm.getInstance(mContext);
@@ -40,6 +43,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     }
 
     @Override
+    public void onViewRecycled(ChatListHolder holder) {
+        super.onViewRecycled(holder);
+    }
+
+    @Override
     public ChatListHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_list_item_chat, null);
         ChatListHolder chatHolder = new ChatListHolder(view);
@@ -47,7 +55,29 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     }
 
     @Override
-    public void onBindViewHolder(ChatListHolder chatListHolder, int i) {
+    public void onBindViewHolder(final ChatListHolder chatListHolder, final int i)
+    {
+        chatListHolder.layContainer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if(event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    v.setBackground(mContext.getResources().getDrawable(R.color.grey_light));
+                    return true;
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP
+                        ||
+                        event.getAction() == MotionEvent.ACTION_CANCEL)
+                {
+                    v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
+                    return true;
+                }
+                else return false;
+
+            }
+        });
+
         chatListHolder.textViewName.setText(mChat.get(i).getContactName() + " " + mChat.get(i).getContactSurname());
         chatListHolder.textViewMessage.setText(mChat.get(i).getLastMessage());
         String timeDifference = Utils.getStringChatTimeDifference(mChat.get(i).getLastMessageTime());
@@ -85,6 +115,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
             chatListHolder.imageAvatar.setImageResource(R.color.grey_middle);
             chatListHolder.textAvatar.setText(initials);
         }
+
+
     }
     public Chat getChat(int position) {
         return (null != mChat ? mChat.get(position) : null);

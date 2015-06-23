@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:id="@+id/unreaded_messages"
+                android:id="@+id/unread_messages"
                 android:textColor="#ffffffff"
                 android:padding="5dp"
                 android:layout_gravity="right|top"

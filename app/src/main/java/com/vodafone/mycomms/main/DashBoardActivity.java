@@ -23,6 +23,7 @@ import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
@@ -48,9 +49,7 @@ import model.News;
 import model.RecentContact;
 
 public class DashBoardActivity extends ToolbarActivity{
-    private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     private LinearLayout noConnectionLayout;
-    private Context mContext;
     private Realm _realm;
     private Realm mRealm;
     private RealmChatTransactions _chatTx;
@@ -62,6 +61,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
         BusProvider.getInstance().register(this);
 
+        enableToolbarIsClicked(false);
         setContentView(R.layout.layout_dashboard);
         initALL();
         BusProvider.getInstance().post(new InitNews());
@@ -139,6 +139,7 @@ public class DashBoardActivity extends ToolbarActivity{
             recentList = realmContactTransactions.getAllRecentContacts();
 
             LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
+            recentsContainer.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
 
             for (int i = 0; i < recentList.size(); i++) {
@@ -186,16 +187,15 @@ public class DashBoardActivity extends ToolbarActivity{
                 ChatListHolder chatHolder = new ChatListHolder(childRecents);
 
                 long count =_chatTx.getChatPendingMessagesCount(recentList.get(i).getContactId());
-
-                if(count > 0) {
-                    TextView unread_messages = (TextView) childRecents.findViewById(R.id.unreaded_messages);
+                String action = recentList.get(i).getAction();
+                if(count > 0 && action.equals(Constants.CONTACTS_ACTION_SMS)) {
+                    TextView unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
                     unread_messages.setVisibility(View.VISIBLE);
                     unread_messages.setText(String.valueOf(count));
                 } else {
                     ImageView typeRecent = (ImageView) childRecents.findViewById(R.id.type_recent);
                     typeRecent.setVisibility(View.VISIBLE);
 
-                    String action = recentList.get(i).getAction();
                     int sdk = Build.VERSION.SDK_INT;
                     if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
                         if (sdk < Build.VERSION_CODES.JELLY_BEAN)
@@ -215,7 +215,6 @@ public class DashBoardActivity extends ToolbarActivity{
                     }
                 }
                 LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
-                //DO THINGS
                 final ArrayList<RecentContact> finalRecentList = recentList;
                 final int position = i;
                 btRecents.setOnClickListener(new View.OnClickListener() {
@@ -392,9 +391,7 @@ public class DashBoardActivity extends ToolbarActivity{
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         if (sp.getBoolean(Constants.IS_TOOLBAR_CLICKED, true)){
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, false);
-            editor.apply();
+            enableToolbarIsClicked(true);
             finish();
             overridePendingTransition(0, 0);
         }
@@ -403,6 +400,9 @@ public class DashBoardActivity extends ToolbarActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        //Update Pending Messages on Toolbar
+        loadRecents();
+        checkUnreadChatMessages();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 
@@ -414,5 +414,11 @@ public class DashBoardActivity extends ToolbarActivity{
             drawNews(news);
             initALL();
         }
+    }
+
+    @Subscribe
+    public void onEventChatsReceived(ChatsReceivedEvent event){
+        checkUnreadChatMessages();
+        loadRecents();
     }
 }

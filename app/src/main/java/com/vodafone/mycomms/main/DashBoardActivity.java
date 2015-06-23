@@ -23,6 +23,7 @@ import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
@@ -60,6 +61,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
         BusProvider.getInstance().register(this);
 
+        enableToolbarIsClicked(false);
         setContentView(R.layout.layout_dashboard);
         initALL();
         BusProvider.getInstance().post(new InitNews());
@@ -390,9 +392,7 @@ public class DashBoardActivity extends ToolbarActivity{
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         if (sp.getBoolean(Constants.IS_TOOLBAR_CLICKED, true)){
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, false);
-            editor.apply();
+            enableToolbarIsClicked(true);
             finish();
             overridePendingTransition(0, 0);
         }
@@ -401,6 +401,8 @@ public class DashBoardActivity extends ToolbarActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        //Update Pending Messages on Toolbar
+        checkUnreadChatMessages();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 
@@ -412,5 +414,10 @@ public class DashBoardActivity extends ToolbarActivity{
             drawNews(news);
             initALL();
         }
+    }
+
+    @Subscribe
+    public void onEventChatsReceived(ChatsReceivedEvent event){
+        checkUnreadChatMessages();
     }
 }

@@ -71,31 +71,33 @@ public class ToolbarActivity extends ActionBarActivity {
             if(mFooter != null) {
                 setSupportActionBar(mFooter);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
-                checkChatMessages();
+                checkUnreadChatMessages();
             }
         }
         return mFooter;
     }
 
-    private void checkChatMessages() {
-        ImageView unreadBubble = (ImageView) mFooter.findViewById(R.id.unread_bubble);
-        TextView unreadMessagesText = (TextView) mFooter.findViewById(R.id.unread_messages);
-        Realm realm = Realm.getInstance(this);
-        RealmChatTransactions realmChatTransactions = new RealmChatTransactions(realm, this);
-        long unreadMessages = realmChatTransactions.getAllChatPendingMessagesCount();
-        if(unreadMessages > 0) {
-            unreadBubble.setVisibility(View.VISIBLE);
-            unreadMessagesText.setVisibility(View.VISIBLE);
-            if (unreadMessages > 99) {
-                unreadMessagesText.setTextSize(Constants.CHAT_UNREAD_MORE_THAN_99_SIZE);
-                unreadMessagesText.setText(R.string.unread_messages_more_than_99);
-            } else{
-                unreadMessagesText.setTextSize(Constants.CHAT_UNREAD_REGULAR_SIZE);
-                unreadMessagesText.setText(String.valueOf(unreadMessages));
+    public void checkUnreadChatMessages() {
+        if (mFooter!=null) {
+            ImageView unreadBubble = (ImageView) mFooter.findViewById(R.id.unread_bubble);
+            TextView unreadMessagesText = (TextView) mFooter.findViewById(R.id.unread_messages);
+            Realm realm = Realm.getInstance(this);
+            RealmChatTransactions realmChatTransactions = new RealmChatTransactions(realm, this);
+            long unreadMessages = realmChatTransactions.getAllChatPendingMessagesCount();
+            if (unreadMessages > 0) {
+                unreadBubble.setVisibility(View.VISIBLE);
+                unreadMessagesText.setVisibility(View.VISIBLE);
+                if (unreadMessages > 99) {
+                    unreadMessagesText.setTextSize(Constants.CHAT_UNREAD_MORE_THAN_99_SIZE);
+                    unreadMessagesText.setText(R.string.unread_messages_more_than_99);
+                } else {
+                    unreadMessagesText.setTextSize(Constants.CHAT_UNREAD_REGULAR_SIZE);
+                    unreadMessagesText.setText(String.valueOf(unreadMessages));
+                }
+            } else {
+                unreadBubble.setVisibility(View.GONE);
+                unreadMessagesText.setVisibility(View.GONE);
             }
-        } else {
-            unreadBubble.setVisibility(View.GONE);
-            unreadMessagesText.setVisibility(View.GONE);
         }
     }
 
@@ -305,4 +307,13 @@ public class ToolbarActivity extends ActionBarActivity {
                 break;
         }
     }
+
+    public void enableToolbarIsClicked(boolean enabled){
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, enabled);
+        editor.apply();
+    }
+
 }

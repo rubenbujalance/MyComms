@@ -235,10 +235,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 String dir = Constants.CONTACT_AVATAR_DIR;
 
                 File file = new File(mContext.getFilesDir() + dir);
-                if (file.exists()) {
-                    file.delete();
-                }
                 file.mkdirs();
+
                 if (downloadFile(String.valueOf(url),dir,avatarFileName)){
                     String avatarFile = mContext.getFilesDir() + dir + avatarFileName;
                     Log.i(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.doInBackground: avatarFile: " + avatarFile);
@@ -248,7 +246,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 Log.e(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.doInBackground: " + e.toString());
             }
             return null;
-
         }
 
         public boolean downloadFile(final String path, String dir, String avatarFileName) {
@@ -256,13 +253,13 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 URL url = new URL(path);
 
                 URLConnection ucon = url.openConnection();
-                ucon.setReadTimeout(5000);
+                ucon.setReadTimeout(Constants.HTTP_READ_AVATAR_TIMEOUT);
                 ucon.setConnectTimeout(10000);
 
                 InputStream is = ucon.getInputStream();
                 BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
 
-                File file = new File(mContext.getFilesDir() + dir + avatarFileName);
+                File file = new File(mContext.getFilesDir() + dir, avatarFileName);
 
                 if (file.exists()) {
                     file.delete();

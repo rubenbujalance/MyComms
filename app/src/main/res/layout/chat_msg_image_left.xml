@@ -21,26 +21,25 @@
             android:paddingBottom="3dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp">
-            <TextView
-                android:id="@+id/chat_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/chat_image"
+                android:layout_width="250dp"
+                android:layout_height="150dp"
                 style="@style/ChatText"
-                tools:text="You say goodbye
-                and I say hello.
-                Hello Hello!"
                 android:gravity="left"
                 android:background="@drawable/chat_bubble_grey_tail"
-                android:layout_toRightOf="@+id/layout_list_item_image"/>
-
+                android:layout_toRightOf="@+id/layout_list_item_image"
+                android:src="@drawable/splash_istambul"
+                android:scaleType="centerCrop" />
             <include android:id="@+id/layout_list_item_image"
                 layout="@layout/layout_list_item_image_little"
                 android:layout_width="35dp"
                 android:layout_height = "35dp"
                 android:layout_gravity="bottom"
-                android:layout_alignBottom="@+id/chat_text"
+                android:layout_alignBottom="@+id/chat_image"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"/>
+                android:layout_alignParentStart="true"
+                android:layout_marginRight="5dp"/>
         </RelativeLayout>
         <TextView
             android:id="@+id/sent_text"

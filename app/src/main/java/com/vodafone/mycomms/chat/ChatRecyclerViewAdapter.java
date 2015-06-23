@@ -50,8 +50,21 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     @Override
     public int getItemViewType(int position) {
         if(chatList.get(position).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_SENT)==0)
-            return Constants.RIGHT_CHAT;
-        else return Constants.LEFT_CHAT;
+        {
+            if(chatList.get(position).getType()==Constants.CHAT_MESSAGE_TYPE_TEXT)
+                return Constants.RIGHT_CHAT;
+            else if(chatList.get(position).getType()==Constants.CHAT_MESSAGE_TYPE_IMAGE)
+                return Constants.RIGHT_IMAGE_CHAT;
+        }
+        else
+        {
+            if(chatList.get(position).getType()==Constants.CHAT_MESSAGE_TYPE_TEXT)
+                return Constants.LEFT_CHAT;
+            else if(chatList.get(position).getType()==Constants.CHAT_MESSAGE_TYPE_IMAGE)
+                return Constants.LEFT_IMAGE_CHAT;
+        }
+
+        return Constants.RIGHT_CHAT;
     }
 
     @Override
@@ -64,8 +77,14 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         int layout;
         if (viewType == Constants.LEFT_CHAT)
             layout = R.layout.chat_msg_left;
-        else
+        else if (viewType == Constants.RIGHT_CHAT)
             layout = R.layout.chat_msg_right;
+        else if (viewType == Constants.RIGHT_IMAGE_CHAT)
+            layout = R.layout.chat_msg_image_right;
+        else if (viewType == Constants.LEFT_IMAGE_CHAT)
+            layout = R.layout.chat_msg_image_left;
+        else layout = R.layout.chat_msg_right;
+
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(layout, null);
         ChatHolder chatHolder = new ChatHolder(view);
         return chatHolder;
@@ -75,19 +94,35 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     public void onBindViewHolder(ChatHolder chatHolder, int i)
     {
 
-        //Set text message
-        chatHolder.chatTextView.setText(chatList.get(i).getText());
+        if(chatList.get(i).getType()==Constants.CHAT_MESSAGE_TYPE_IMAGE)
+        {
+            String dirStr = mContext.getFilesDir() + Constants.CONTACT_CHAT_FILES;
+            String fileStr = "file_" + chatList.get(i).getId() + ".jpg";
 
-        //Set text status
-        if(chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT)==0)
-            chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
-        else if(chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_SENT)==0)
-            chatHolder.chatSentText.setText(mContext.getString(R.string.status_sent));
-        else if(chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_DELIVERED)==0)
-            chatHolder.chatSentText.setText(mContext.getString(R.string.status_delivered));
-        else if(chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_READ)==0)
-            chatHolder.chatSentText.setText(mContext.getString(R.string.status_read));
-        else chatHolder.chatSentText.setText("");
+            File image = new File(dirStr, fileStr);
+
+            Picasso.with(mContext)
+                    .load(image)
+                    .fit().centerCrop()
+                    .into(chatHolder.chatImage);
+        }
+        else
+        {
+            chatHolder.chatTextView.setText(chatList.get(i).getText());
+        }
+
+        if(chatList.get(i).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_SENT)==0) {
+            //Set text status
+            if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT) == 0)
+                chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
+            else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_SENT) == 0)
+                chatHolder.chatSentText.setText(mContext.getString(R.string.status_sent));
+            else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_DELIVERED) == 0)
+                chatHolder.chatSentText.setText(mContext.getString(R.string.status_delivered));
+            else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_READ) == 0)
+                chatHolder.chatSentText.setText(mContext.getString(R.string.status_read));
+            else chatHolder.chatSentText.setText("");
+        }
 
         //Set message time
         long currentTimestamp = chatList.get(i).getTimestamp();
@@ -113,7 +148,8 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         String firstName;
         String lastName;
 
-        if(chatHolder.getItemViewType() == Constants.LEFT_CHAT)
+        if(chatHolder.getItemViewType() == Constants.LEFT_CHAT ||
+                chatHolder.getItemViewType() == Constants.LEFT_IMAGE_CHAT)
         {
             avatar = _contact.getAvatar();
             contactId = _contact.getContactId();
@@ -160,16 +196,15 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         }
 
         //Set message as read
-        ChatMessage chatMsg = chatList.get(i);
-
-        if(chatMsg.getRead().compareTo("0")==0 &&
-                chatMsg.getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
+        if(chatList.get(i).getRead().compareTo("0")==0 &&
+            chatList.get(i).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
         {
             if(XMPPTransactions.getXmppConnection()!=null &&
                     XMPPTransactions.getXmppConnection().isConnected()) {
-                XMPPTransactions.notifyIQMessageStatus(chatMsg.getId(), chatMsg.getContact_id(),
+                XMPPTransactions.notifyIQMessageStatus(chatList.get(i).getId(),
+                        chatList.get(i).getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_READ);
-                _chatTx.setChatMessageReceivedAsRead(chatMsg);
+                _chatTx.setChatMessageReceivedAsRead(chatList.get(i));
             }
         }
     }

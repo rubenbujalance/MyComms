@@ -27,6 +27,12 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.xmlpull.v1.XmlPullParser;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -47,7 +53,7 @@ public final class XMPPTransactions {
     private static String _device_id;
 
     //Last ChatMessage sent, to control unexpected server disconnection
-    private static String _lastChatMessageSentId;
+    private static String _lastChatMessageSent;
     private static long _lastChatMessageSentTimestamp;
 
     //This flag indicates if contacts have been loaded completely from API
@@ -68,15 +74,14 @@ public final class XMPPTransactions {
         //Check if haven't received confirmation of last message sent
         //Force reconnection if necessary
         boolean force = false;
-        if(_lastChatMessageSentId != null &&
-                Calendar.getInstance().getTimeInMillis() > _lastChatMessageSentTimestamp+10000 &&
+        if(_lastChatMessageSent != null &&
+                Calendar.getInstance().getTimeInMillis() > _lastChatMessageSentTimestamp+5000 &&
                 !_isConnecting)
         {
             //Disconnect and force manual reconnection
             try {
                 if(_xmppConnection != null) _xmppConnection.disconnect();
                 _xmppConnection = null;
-                _lastChatMessageSentId = null;
             } catch (Exception e) {
                 Log.e(Constants.TAG, "XMPPTransactions.forceReconnection: ", e);
             }
@@ -146,25 +151,70 @@ public final class XMPPTransactions {
         return true;
     }
 
-    public static boolean sendText(final String contact_id, final String type, final String id,
-                                   final String mediaType, final String text)
+    public static boolean sendText(String contact_id, String type, String id, String text)
     {
+        final String stanzaStr = buildMessageStanza(type, id, contact_id, text);
+
         try {
             Stanza st = new Stanza() {
                 @Override
                 public CharSequence toXML() {
-                    String message = buildMessageStanza(type, id, contact_id, mediaType, text);
-                    return message;
+                    return stanzaStr;
                 }
             };
 
             _xmppConnection.sendStanza(st);
-            _lastChatMessageSentId = id;
+            _lastChatMessageSent = stanzaStr;
             _lastChatMessageSentTimestamp = Calendar.getInstance().getTimeInMillis();
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
             return false;
+        }
+
+        return true;
+    }
+
+    public static boolean sendImage(String contact_id, String type, String id, String fileUrl)
+    {
+        final String stanzaStr = buildImageStanza(type, id, contact_id, fileUrl);
+
+        try {
+            Stanza st = new Stanza() {
+                @Override
+                public CharSequence toXML() {
+                    return stanzaStr;
+                }
+            };
+
+            _xmppConnection.sendStanza(st);
+            _lastChatMessageSent = stanzaStr;
+            _lastChatMessageSentTimestamp = Calendar.getInstance().getTimeInMillis();
+        }
+        catch (SmackException.NotConnectedException e) {
+            Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean sendStanzaStr(final String stanzaStr)
+    {
+        try {
+            Stanza st = new Stanza() {
+                @Override
+                public CharSequence toXML() {
+                    return stanzaStr;
+                }
+            };
+
+            _xmppConnection.sendStanza(st);
+            _lastChatMessageSent = stanzaStr;
+            _lastChatMessageSentTimestamp = Calendar.getInstance().getTimeInMillis();
+        }
+        catch (SmackException.NotConnectedException e) {
+            Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
         }
 
         return true;
@@ -181,16 +231,27 @@ public final class XMPPTransactions {
         return iq;
     }
 
-    private static String buildMessageStanza(String type, String id, String contactId,
-                                             String mediaType, String text)
+    private static String buildMessageStanza(String type, String id, String contactId, String text)
     {
         String message = "<"+Constants.XMPP_ELEMENT_MESSAGE+" "+Constants.XMPP_ATTR_TYPE+"=\""+type+"\" " +
                     Constants.XMPP_ATTR_ID+"=\""+id+"\" " +
                     Constants.XMPP_ATTR_TO+"=\""+contactId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
                     Constants.XMPP_ATTR_FROM+"=\""+_profile_id+"@"+Constants.XMPP_PARAM_DOMAIN+"/"+_device_id+"\" " +
-                    Constants.XMPP_ATTR_MEDIATYPE+"=\""+mediaType+"\" >" +
+                    Constants.XMPP_ATTR_MEDIATYPE+"=\""+Constants.XMPP_MESSAGE_MEDIATYPE_TEXT+"\" >" +
                     "<"+Constants.XMPP_ELEMENT_BODY+">"+text+"</"+Constants.XMPP_ELEMENT_BODY+">" +
                     "</"+Constants.XMPP_ELEMENT_MESSAGE+">";
+
+        return message;
+    }
+
+    private static String buildImageStanza(String type, String id, String contactId, String fileUrl)
+    {
+        String message = "<"+Constants.XMPP_ELEMENT_MESSAGE+" "+Constants.XMPP_ATTR_TYPE+"=\""+type+"\" " +
+                Constants.XMPP_ATTR_ID+"=\""+id+"\" " +
+                Constants.XMPP_ATTR_TO+"=\""+contactId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
+                Constants.XMPP_ATTR_FROM+"=\""+_profile_id+"@"+Constants.XMPP_PARAM_DOMAIN+"/"+_device_id+"\" " +
+                Constants.XMPP_ATTR_MEDIATYPE+"=\""+Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE+"\" " +
+                Constants.XMPP_ATTR_FILEURL+"=\""+fileUrl+"\"/>";
 
         return message;
     }
@@ -211,13 +272,13 @@ public final class XMPPTransactions {
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
+            to = to.substring(0, to.indexOf("@"));
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String type = parser.getAttributeValue("", Constants.XMPP_ATTR_TYPE);
 
             if (from == null || id == null ||
                     to==null || type==null) return false;
 
-            to = to.substring(0, to.indexOf("@"));
             if(to.compareTo(_profile_id)!=0 || type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0)
                 return false;
 
@@ -269,8 +330,8 @@ public final class XMPPTransactions {
                 BusProvider.getInstance().post(statusEvent);
 
                 //Mark last message as sent (for connection control)
-                if(_lastChatMessageSentId!=null && id.compareTo(_lastChatMessageSentId)==0)
-                    _lastChatMessageSentId = null;
+                if(_lastChatMessageSent!=null && id.compareTo(_lastChatMessageSent)==0)
+                    _lastChatMessageSent = null;
             }
 
         } catch (Exception e) {
@@ -379,16 +440,61 @@ public final class XMPPTransactions {
 
             realm.close();
 
+            //Send IQ
+            notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
+                    Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+
+            //Download to file
+            if(!downloadToChatFile(url, id))
+                return false;
+
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
             BusProvider.getInstance().post(chatEvent);
 
-            notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
-                    Constants.CHAT_MESSAGE_STATUS_DELIVERED);
-
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
             if(realm!=null) realm.close();
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean downloadToChatFile(String urlStr, String chatMessageId) {
+        try {
+            String dirStr = _appContext.getFilesDir() + Constants.CONTACT_CHAT_FILES;
+            String fileStr = "file_" + chatMessageId + ".jpg";
+
+            URL url = new URL(urlStr);
+
+            URLConnection ucon = url.openConnection();
+            ucon.setReadTimeout(Constants.HTTP_READ_FILE_TIMEOUT);
+            ucon.setConnectTimeout(10000);
+
+            InputStream is = ucon.getInputStream();
+            BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
+
+            File dir = new File(dirStr);
+            dir.mkdirs();
+
+            File file = new File(dirStr, fileStr);
+            if(file.exists()) file.delete();
+            file.createNewFile();
+
+            FileOutputStream outStream = new FileOutputStream(file);
+            byte[] buff = new byte[5 * 1024];
+
+            int len;
+            while ((len = inStream.read(buff)) != -1) {
+                outStream.write(buff, 0, len);
+            }
+            outStream.flush();
+            outStream.close();
+            inStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "XMPPTransactions.downloadToChatFile: ",e);
             return false;
         }
 
@@ -477,7 +583,11 @@ public final class XMPPTransactions {
             reconnectionMgr.enableAutomaticReconnection();
             reconnectionMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY);
 
-            //Send the stanza
+            //Check if there is a stanza not sent
+            if(_lastChatMessageSent!=null) {
+                sendStanzaStr(_lastChatMessageSent);
+                _lastChatMessageSent = null;
+            }
 
             return _xmppConnection;
         }
@@ -528,6 +638,12 @@ public final class XMPPTransactions {
 
             @Override
             public void reconnectionSuccessful() {
+                //Check if there is a stanza not sent
+                if(_lastChatMessageSent!=null) {
+                    sendStanzaStr(_lastChatMessageSent);
+                    _lastChatMessageSent = null;
+                }
+
                 _isConnecting = false;
                 notifyXMPPConnecting(false);
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectionSuccessful");
@@ -551,60 +667,6 @@ public final class XMPPTransactions {
 
         return _connectionListener;
     }
-
-//    //IQ extended class
-//    static class MyIQ extends IQ
-//    {
-//        public static final String IQ_STATUS_SENT = "sent";
-//        public static final String IQ_STATUS_DELIVERED = "delivered";
-//        public static final String IQ_STATUS_READ = "read";
-//
-//        private int pendingMessages = 0;
-//        private String status;
-//
-//        public MyIQ(IQ iq) {super(iq);}
-//        protected MyIQ(String childElementName) {
-//            super(childElementName);
-//        }
-//
-//        public MyIQ(String id, String from, String to, String status) {
-//            super("iq");
-//            setStanzaId(id);
-//            setFrom(from);
-//            setTo(to);
-//            setStatus(status);
-//        }
-//
-//        @Override
-//        protected IQChildElementXmlStringBuilder getIQChildElementBuilder(IQChildElementXmlStringBuilder xml) {
-//            return null;
-//        }
-//
-//        public int getPendingMessages() {return pendingMessages;}
-//        public void setPendingMessages(int pendingMessages) {this.pendingMessages = pendingMessages;}
-//
-//        public String getStatus() {return status;}
-//        public void setStatus(String status) {this.status = status;}
-//    }
-//
-//    //Provider for IQ Packets
-//    static class MyIQProvider extends IQProvider<MyIQ> {
-//        @Override
-//        public MyIQ parse(XmlPullParser parser, int initialDepth) throws XmlPullParserException, IOException, SmackException {
-//            Log.e(Constants.TAG, "MyIQProvider.parse: "+parser.getText());
-//
-//            MyIQ iq = new MyIQ(parser.getName());
-//            iq.setType(IQ.Type.fromString(parser.getAttributeValue("", "type")));
-//            iq.setFrom(parser.getAttributeValue("", "from"));
-//            iq.setTo(parser.getAttributeValue("", "to"));
-//
-//            try {
-//                iq.setPendingMessages(Integer.valueOf(parser.getAttributeValue("", "pending")));
-//            } catch (Exception e) {}
-//
-//            return iq;
-//        }
-//    }
 
     /*
      * Getters and Setters

@@ -128,6 +128,13 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             @Override
             public void onRefresh() {
                 refreshContent();
+                //Spinner is always finished after 10 seconds
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finishSpinner();
+                    }
+                }, 10000);
             }
         });
 
@@ -181,6 +188,13 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         } else if (mIndex==Constants.CONTACTS_RECENT) {
             contactListController.getContactList(Constants.CONTACT_API_GET_RECENTS);
             contactListController.setConnectionCallback(this);
+        }
+    }
+
+    private void finishSpinner(){
+        Log.i(Constants.TAG, "ContactListFragment.finishSpinner: ");
+        if (mSwipeRefreshLayout!=null){
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 

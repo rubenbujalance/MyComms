@@ -79,7 +79,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
             mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
         }
 
-        if(isProgressDialogNeeded())showProgressDialog();
+
     }
 
     @Override
@@ -200,8 +200,6 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     public void setListAdapterEvent(SetContactListAdapterEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.setListAdapterEvent: ");
         setListsAdapter();
-
-        if(!isProgressDialogNeeded())hideProgressDialog();
     }
 
     @Subscribe
@@ -211,30 +209,4 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mContactController.getFavouritesList(apiCall);
         setListsAdapter();
     }
-
-    private void showProgressDialog()
-    {
-        //TODO here we should show Swipe Refresh Layout when no data is downloaded yet
-    }
-
-    private void hideProgressDialog()
-    {
-        //TODO hide Swipe Layout
-    }
-
-    private boolean isProgressDialogNeeded()
-    {
-        if(mViewPager.getCurrentItem() == Constants.CONTACTS_ALL && mContactController
-                .getAllContacts().size() <= 0)
-            return true;
-        else if(mViewPager.getCurrentItem() == Constants.CONTACTS_RECENT && mContactController
-                .getAllRecentContacts().size() <= 0)
-            return true;
-        else if(mViewPager.getCurrentItem() == Constants.CONTACTS_FAVOURITE && mContactController
-                .getAllFavouriteContacts().size() <= 0)
-            return true;
-        else
-            return false;
-    }
-
 }

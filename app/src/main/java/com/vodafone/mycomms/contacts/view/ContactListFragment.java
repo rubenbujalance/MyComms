@@ -13,6 +13,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
@@ -130,6 +132,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                 refreshContent();
             }
         });
+
+        if(isProgressDialogNeeded())showProgressDialog();
 
         return v;
     }
@@ -702,8 +706,34 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         setSearchBarEvents();
     }
 
-    public boolean isContactListEmpty()
+    @Subscribe
+    public void setListAdapterEvent(SetContactListAdapterEvent event){
+        Log.i(Constants.TAG, "ContactListPagerFragment.setListAdapterEvent: ");
+        if(!isProgressDialogNeeded())hideProgressDialog();
+    }
+
+
+    private void showProgressDialog()
     {
-        return contactList.isEmpty();
+        mSwipeRefreshLayout.setProgressViewOffset(false, 0,
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
+        mSwipeRefreshLayout.setRefreshing(true);
+    }
+
+    private void hideProgressDialog()
+    {
+        if(mSwipeRefreshLayout.isRefreshing())mSwipeRefreshLayout.setRefreshing(false);
+    }
+
+    private boolean isProgressDialogNeeded()
+    {
+        if(mIndex == Constants.CONTACTS_ALL && contactList.size() <= 0)
+            return true;
+        else if(mIndex == Constants.CONTACTS_RECENT && recentContactList.size() <= 0)
+            return true;
+        else if(mIndex == Constants.CONTACTS_FAVOURITE && favouriteContactList.size() <= 0)
+            return true;
+        else
+            return false;
     }
 }

@@ -348,10 +348,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         else
         {
-            String initials = this.userProfile.getFirstName().substring(0,1) +
-                    this.userProfile.getLastName().substring(0,1);
-            profilePicture.setImageResource(R.color.grey_middle);
-            textAvatar.setText(initials);
+            if (userProfile.getFirstName()!=null) {
+                String initials = this.userProfile.getFirstName().substring(0, 1) +
+                        this.userProfile.getLastName().substring(0, 1);
+                profilePicture.setImageResource(R.color.grey_middle);
+                textAvatar.setText(initials);
+            } else{
+                Log.e(Constants.TAG, "ProfileFragment.loadProfileImage: Error Getting UserProfile");
+            }
         }
     }
 

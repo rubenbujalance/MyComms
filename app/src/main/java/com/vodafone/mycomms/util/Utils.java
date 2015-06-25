@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +32,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import io.realm.Realm;
 
 /**
  * Created by str_rbm on 16/04/2015.
@@ -338,5 +342,26 @@ public final class Utils extends Activity {
             }
         }
         return true;
+    }
+
+    public static boolean isAnyContactSaved(Context context)
+    {
+        String profileId = null;
+
+        SharedPreferences sp = context.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        if(sp!=null && sp.contains(Constants.PROFILE_ID_SHARED_PREF))
+            profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+        if(profileId==null) return false;
+
+        Realm realm = Realm.getInstance(context);
+        RealmContactTransactions contactTx = new RealmContactTransactions(realm, profileId);
+
+        boolean exists = contactTx.isAnyContactSaved();
+        realm.close();
+
+        return exists;
     }
 }

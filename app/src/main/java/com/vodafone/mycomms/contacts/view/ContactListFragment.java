@@ -643,4 +643,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         initiateComponentsForSearchView(v);
         setSearchBarEvents();
     }
+
+    public boolean isContactListEmpty()
+    {
+        return contactList.isEmpty();
+    }
 }

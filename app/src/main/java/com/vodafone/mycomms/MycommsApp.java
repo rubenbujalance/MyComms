@@ -85,7 +85,10 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         }
         else {
             String profile = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-            new DownloadContactsAsyncTask().execute(this);
+
+            DownloadContactsAsyncTask task = new DownloadContactsAsyncTask(mContext);
+            task.execute();
+
             return profile;
         }
     }
@@ -145,7 +148,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 profileController.updateTimeZone(body);
             }
         }
-        new DownloadContactsAsyncTask().execute(mContext);
+
+        DownloadContactsAsyncTask task = new DownloadContactsAsyncTask(mContext);
+        task.execute();
 
         XMPPTransactions.initializeMsgServerSession(mContext, false);
 
@@ -252,4 +257,5 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
         }
     }
+
 }

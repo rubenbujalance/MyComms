@@ -57,6 +57,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         //mContactController.getContactList(apiCall);
         //mContactController.setConnectionCallback(this);
         BusProvider.getInstance().register(this);
+
+
         //((ContactListMainActivity)getActivity()).activateContactListToolbar();
     }
 
@@ -77,6 +79,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         } else {
             mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
         }
+
+        if(isProgressDialogNeeded())showProgressDialog();
     }
 
     @Override
@@ -178,7 +182,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mContactController.getFavouritesList(apiCall);
     }
 
-    private void setListsAdapter() {
+    private void setListsAdapter()
+    {
         if (contactListFragment!=null)
         {
             contactListFragment.hideSearchBarContent();
@@ -204,6 +209,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     public void setListAdapterEvent(SetContactListAdapterEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.setListAdapterEvent: ");
         setListsAdapter();
+
+        if(!isProgressDialogNeeded())hideProgressDialog();
     }
 
     @Subscribe
@@ -214,5 +221,29 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         setListsAdapter();
     }
 
+    private void showProgressDialog()
+    {
+        //TODO here we should show Swipe Refresh Layout when no data is downloaded yet
+    }
+
+    private void hideProgressDialog()
+    {
+        //TODO hide Swipe Layout
+    }
+
+    private boolean isProgressDialogNeeded()
+    {
+        if(mViewPager.getCurrentItem() == Constants.CONTACTS_ALL && mContactController
+                .getAllContacts().size() <= 0)
+            return true;
+        else if(mViewPager.getCurrentItem() == Constants.CONTACTS_RECENT && mContactController
+                .getAllRecentContacts().size() <= 0)
+            return true;
+        else if(mViewPager.getCurrentItem() == Constants.CONTACTS_FAVOURITE && mContactController
+                .getAllFavouriteContacts().size() <= 0)
+            return true;
+        else
+            return false;
+    }
 
 }

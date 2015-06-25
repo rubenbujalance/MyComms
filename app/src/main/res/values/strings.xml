@@ -212,6 +212,8 @@
     <!--Progress dialog-->
 
     <string name="progress_dialog_uploading_file">Uploading file. Please wait...</string>
+    <string name="progress_dialog_downloading_contacts">Downloading contacts. Please wait..
+        .</string>
     <string name="unread_messages_more_than_99">99+</string>
 
 </resources>

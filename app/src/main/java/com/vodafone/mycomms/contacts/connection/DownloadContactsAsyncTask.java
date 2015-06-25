@@ -14,16 +14,33 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import model.Contact;
 
-public class DownloadContactsAsyncTask extends AsyncTask<Context, Void, Void> implements IContactsConnectionCallback {
+public class DownloadContactsAsyncTask extends AsyncTask<Void, Void, Void> implements
+        IContactsConnectionCallback {
     private String mProfileId;
     private Realm realm;
     private ContactController mContactController;
     private String apiCall;
     private  Context mContext;
 
+    public DownloadContactsAsyncTask(Context context)
+    {
+        this.mContext = context;
+    }
+
+    public String getResponse()
+    {
+        return "OK";
+    }
+
     @Override
-    protected Void doInBackground(Context... params) {
-        mContext = params[0];
+    protected void onPreExecute()
+    {
+        super.onPreExecute();
+    }
+
+    @Override
+    protected Void doInBackground(Void... params)
+    {
         return null;
     }
 

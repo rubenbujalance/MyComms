@@ -141,6 +141,9 @@ public class ContactController extends BaseController {
                         if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsConnectionCallback) {
                             ((IContactsConnectionCallback) this.getConnectionCallback()).onContactsResponse(realmContactList, morePages, offsetPaging);
                         }
+                        else{
+                            BusProvider.getInstance().post(new SetContactListAdapterEvent());
+                        }
                         // realmContactTransactions.getContactById("mc_55361a9cc729d4430b9722f3");
 
                     } catch (Exception e) {

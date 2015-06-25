@@ -409,6 +409,7 @@ public class ContactController extends BaseController {
         favoriteContact.setAvailability(contact.getAvailability());
         favoriteContact.setPresence(contact.getPresence());
         favoriteContact.setCountry(contact.getCountry());
+        favoriteContact.setTimezone(contact.getTimezone());
         return favoriteContact;
     }
 

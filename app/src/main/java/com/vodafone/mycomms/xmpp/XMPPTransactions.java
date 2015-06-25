@@ -17,7 +17,6 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
-import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SmackException;
@@ -47,10 +46,12 @@ public final class XMPPTransactions {
     private static XMPPTCPConnection _xmppConnection = null;
     private static String accessToken;
     private static String _profile_id;
-    private static boolean _isConnecting = false;
     private static Context _appContext;
     private static ConnectionListener _connectionListener;
     private static String _device_id;
+
+    //Control to no retry consecutive connections
+    private static boolean _isConnecting = false;
 
     //Last ChatMessage sent, to control unexpected server disconnection
     private static String _lastChatMessageSent;
@@ -66,9 +67,15 @@ public final class XMPPTransactions {
 
     public static void initializeMsgServerSession(Context appContext, boolean markContactsLoaded)
     {
-        if(markContactsLoaded) _contactsLoaded = true;
+        if(!_contactsLoaded)
+            if(Utils.isAnyContactSaved(appContext)) _contactsLoaded = true;
 
-//        if(_isConnecting || !_contactsLoaded) return;
+        if(_isConnecting &&
+                Calendar.getInstance().getTimeInMillis() > _lastChatMessageSentTimestamp+10000)
+            _isConnecting = false;
+
+        if(_isConnecting || !_contactsLoaded) return;
+
         if(_isConnecting) return;
 
         //Check if haven't received confirmation of last message sent
@@ -127,10 +134,10 @@ public final class XMPPTransactions {
             xmppConfigBuilder.setServiceName(Constants.XMPP_PARAM_DOMAIN);
             xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
             xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
-//        xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
+            xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
             xmppConfigBuilder.setDebuggerEnabled(true);
             xmppConfigBuilder.setSendPresence(true);
-            xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+//            xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             xmppConfigBuilder.setCompressionEnabled(false);
 
             new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
@@ -272,12 +279,14 @@ public final class XMPPTransactions {
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
-            to = to.substring(0, to.indexOf("@"));
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String type = parser.getAttributeValue("", Constants.XMPP_ATTR_TYPE);
 
             if (from == null || id == null ||
                     to==null || type==null) return false;
+
+            if(to.indexOf("@")<0) return false;
+            to = to.substring(0, to.indexOf("@"));
 
             if(to.compareTo(_profile_id)!=0 || type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0)
                 return false;

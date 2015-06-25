@@ -186,7 +186,7 @@ public class ContactController extends BaseController {
 
 
 
-    private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
+    public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
         ArrayList<Contact> realmContactList = new ArrayList<>();
 
         try {

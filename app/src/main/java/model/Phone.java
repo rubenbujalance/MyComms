@@ -1,8 +1,5 @@
 package model;
 
-/**
- * Created by Lestat on 13/05/2015.
- */
 public class Phone {
     private String phone;
     private String country;

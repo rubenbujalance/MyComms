@@ -183,13 +183,7 @@ public class ContactController extends BaseController {
         }
     }
 
-<<<<<<< HEAD
-
-
     public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
-=======
-    private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
->>>>>>> 415ad601de4b5e136123fdec50692e2bbe0a8fdf
         ArrayList<Contact> realmContactList = new ArrayList<>();
 
         try {

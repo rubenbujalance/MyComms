@@ -12,6 +12,7 @@ import com.vodafone.mycomms.contacts.connection.DownloadContactsAsyncTask;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.main.connection.DownloadNewsAsyncTask;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
@@ -251,5 +252,10 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             super.onPostExecute(result);
             Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
         }
+    }
+
+    @Subscribe
+    public void contactsLoadedEvent(SetContactListAdapterEvent event){
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), true);
     }
 }

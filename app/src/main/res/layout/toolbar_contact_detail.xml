@@ -23,49 +23,54 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_vertical">
             <ImageView
                 android:id="@+id/btcall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginRight="10dp"
-                android:background="@drawable/ic_enrroll_phone"
                 android:layout_centerVertical="true"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"/>
+                android:layout_alignParentStart="true"
+                android:src="@drawable/ic_enrroll_phone" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
             android:gravity="center_horizontal"
-            android:paddingTop="5dp"
-            android:weightSum="1">
+            android:weightSum="1"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/transparent">
             <ImageView
                 android:id="@+id/btchat"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="@drawable/imessage"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:contentDescription="@string/ButtonChat"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp"
+                android:src="@drawable/imessage"
+                android:layout_gravity="center"
+                android:padding="7dp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:background="@android:color/transparent"
             android:gravity="center_horizontal"
-            android:id="@+id/maillayout">
+            android:id="@+id/maillayout"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical">
             <ImageView
                 android:id="@+id/btemail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/ic_enrroll_mail_white"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:contentDescription="@string/emailbutton" />
+                android:contentDescription="@string/emailbutton"
+                android:src="@drawable/ic_enrroll_mail_white"
+                android:layout_gravity="center"
+                android:layout_marginRight="10dp" />
         </LinearLayout>
     </LinearLayout>
 </android.support.v7.widget.Toolbar>

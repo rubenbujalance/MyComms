@@ -59,9 +59,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         }
 
         activateFooterSelected(Constants.TOOLBAR_CONTACTS);
-
-        //Check if is first login and upload avatar
-        checkAndUploadAvatar();
     }
 
     //Prevent of going from main screen back to login
@@ -81,17 +78,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     }
 
     @Override
-    public void onFragmentInteraction(String id) {
-
-    }
-
-    private void checkAndUploadAvatar()
-    {
-        //Check sharedPreferences
-        // TODO RBM - Check sharedPreferences
-
-        // TODO RBM - Upload avatar
-    }
+    public void onFragmentInteraction(String id) {}
 
     public void setConnectionLayoutVisibility(boolean connection){
         if (connection){

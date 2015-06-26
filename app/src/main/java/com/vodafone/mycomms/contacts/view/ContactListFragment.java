@@ -81,12 +81,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private String profileId;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private int mIndex;
     private String mParam2;
 
@@ -101,7 +98,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
 
-    // TODO: Rename and change types of parameters
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
         Bundle args = new Bundle();
@@ -309,7 +305,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }
 

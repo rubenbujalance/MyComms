@@ -213,8 +213,6 @@ public class ProfileController extends BaseController {
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback ) {
             if (ex.getUrl() != null && ex.getUrl().contains(ProfileConnection.URL)) {
                 if (ex.getContent() != null && ex.getContent().contains("\"err\":\"incorrectData\"")) {
-                    //TODO It does not seem correct that the MyComms  Public API has two calls to "/api/me"  URLs and the only difference is that one is PUT and the other is GET
-                    //TODO Currently the Connectivity API is not prepared to retrieve the Method type (GET, PUT, DELETE) of the connection from the error, so no clean way of doing this.
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionError();
                 } else {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileConnectionError();
@@ -230,7 +228,7 @@ public class ProfileController extends BaseController {
                     Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
                 }
 
-                //TODO: Commented due to "BaseController.onConnectionError: {"err":"auth_proxy_error","des":"invalid body request"}
+                //Commented due to "BaseController.onConnectionError: {"err":"auth_proxy_error","des":"invalid body request"}
                 //((IProfileConnectionCallback) this.getConnectionCallback()).onPasswordChangeError(error);
             }
         }

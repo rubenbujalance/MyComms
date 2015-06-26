@@ -191,6 +191,18 @@ public class RealmContactTransactions {
         }
     }
 
+    public boolean isAnyContactSaved()
+    {
+        RealmQuery<Contact> query = mRealm.where(Contact.class)
+                .equalTo(Constants.CONTACT_PLATFORM,Constants.PLATFORM_MY_COMMS)
+                .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
+
+        Contact result = query.findFirst();
+
+        if (result==null) return false;
+        else return true;
+    }
+
     public UserProfile getUserProfile(String contactId){
         try {
             RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);

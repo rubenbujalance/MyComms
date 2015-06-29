@@ -11,7 +11,6 @@ import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.ISessionConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -21,7 +20,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     private LinearLayout noConnectionLayout;
-    private ProfileController profileController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,17 +36,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
 
         setFooterListeners(this);
         setContactsListeners(this);
-
-        //profileController = new ProfileController(this);
-
-        //Save profile_id if accessToken has changed
-        //String profile_id = validateAccessToken();
-
-        //String deviceId = setDeviceId();
-
-        //Initialize messaging server session (needs the profile_id saved)
-        //if(profile_id != null) //If null, do initialization in callback method
-            //XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
@@ -98,9 +85,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-
-        // Disconnect from the XMPP server
-        XMPPTransactions.disconnectMsgServerSession();
     }
 
     @Override
@@ -108,7 +92,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         super.onResume();
         //Update Pending Messages on Toolbar
         checkUnreadChatMessages();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 
     @Subscribe

@@ -10,8 +10,6 @@ public class Chat extends RealmObject{
 
     private String profile_id;
     private String contact_id;
-    private String contactName;
-    private String contactSurname;
     private String lastMessage_id;
     private String lastMessage;
     private long lastMessageTime;
@@ -36,11 +34,9 @@ public class Chat extends RealmObject{
 
     public Chat() {}
 
-    public Chat(String profile_id, String contact_id, String contactName, String contactSurname, String lastMessage_id, String lastMessage, long lastMessageTime) {
+    public Chat(String profile_id, String contact_id, String lastMessage_id, String lastMessage, long lastMessageTime) {
         this.profile_id = profile_id;
         this.contact_id = contact_id;
-        this.contactName = contactName;
-        this.contactSurname = contactSurname;
         this.lastMessage_id = lastMessage_id;
         this.lastMessage = lastMessage;
         this.lastMessageTime = lastMessageTime;
@@ -77,22 +73,6 @@ public class Chat extends RealmObject{
 
     public void setLastMessage_id(String lastMessage_id) {
         this.lastMessage_id = lastMessage_id;
-    }
-
-    public String getContactName() {
-        return contactName;
-    }
-
-    public void setContactName(String contactName) {
-        this.contactName = contactName;
-    }
-
-    public String getContactSurname() {
-        return contactSurname;
-    }
-
-    public void setContactSurname(String contactSurname) {
-        this.contactSurname = contactSurname;
     }
 
     public long getLastMessageTime() {

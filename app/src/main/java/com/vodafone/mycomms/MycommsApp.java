@@ -7,12 +7,16 @@ import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.NetworkEvents;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.contacts.connection.DownloadContactsAsyncTask;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
-import com.vodafone.mycomms.events.InitProfileAndContacts;
-import com.vodafone.mycomms.events.SetContactListAdapterEvent;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.main.connection.DownloadNewsAsyncTask;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
@@ -44,7 +48,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private FilePushToServerController filePushToServerController;
     private SharedPreferences sp;
-    private String profile_id;
+
+    //Network listener
+    private NetworkEvents networkEvents;
 
     @Override
     public void onCreate() {
@@ -52,13 +58,32 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
         BusProvider.getInstance().register(this);
         mContext = getApplicationContext();
-        //getProfileIdAndAccessToken();
+
+        //Network listener
+        networkEvents = new NetworkEvents(this, BusProvider.getInstance());
+        networkEvents.register();
+
+        //Shared Preferences
+        sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
     }
 
     @Override
     public void onTerminate() {
         super.onTerminate();
         BusProvider.getInstance().unregister(this);
+
+        //Network listener
+        networkEvents.unregister();
+    }
+
+    @Subscribe
+    public void onConnectivityChanged(ConnectivityChanged event) {
+        if(event.getConnectivityStatus()==ConnectivityStatus.MOBILE_CONNECTED ||
+                event.getConnectivityStatus()==ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
+        {
+            XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+        }
     }
 
     public void getProfileIdAndAccessToken() {
@@ -67,15 +92,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //Save profile_id if accessToken has changed
         String profile_id = validateAccessToken();
-
         String deviceId = setDeviceId();
     }
 
     private String validateAccessToken(){
         Log.i(Constants.TAG, "MycommsApp.validateAccessToken: ");
         String accessToken = UserSecurity.getAccessToken(this);
-        sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
         if (prefAccessToken==null || prefAccessToken.equals("") || !prefAccessToken.equals(accessToken)){
@@ -88,6 +110,18 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             String profile = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
             new DownloadContactsAsyncTask().execute(this);
             return profile;
+        }
+    }
+
+    public boolean isProfileAvailable()
+    {
+        try {
+            if(sp.contains(Constants.PROFILE_ID_SHARED_PREF)) return true;
+            else return false;
+
+        } catch(Exception e) {
+            Log.e(Constants.TAG, "SplashScreenActivity.isProfileAvailable: ",e);
+            return false;
         }
     }
 
@@ -115,6 +149,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Log.i(Constants.TAG, "MycommsApp.onProfileReceived: ");
         String timeZone = TimeZone.getDefault().getID();
         String test = userProfile.getTimezone();
+
         if (timeZone.equals(userProfile.getTimezone())) {
             profileController.setUserProfile(userProfile.getId(),
                     userProfile.getFirstName() + " " + userProfile.getLastName(),
@@ -126,7 +161,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                     userProfile.getPlatforms(),
                     timeZone);
 
-            //profileController.updateUserProfileInDB(firstName, lastName, company, position, officeLocation);
             UserProfile newProfile = new UserProfile();
             newProfile = userProfile;
             Realm realm = Realm.getInstance(this);
@@ -134,8 +168,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             newProfile.setTimezone(timeZone);
             realm.copyToRealmOrUpdate(newProfile);
             realm.commitTransaction();
-            //newProfile.setTimezone(timeZone);
             realm.close();
+
             HashMap<String, String> body = new HashMap<String, String>();
             if(userProfile.getTimezone() != null && !userProfile.getTimezone().equals("")) body.put("timeZone",userProfile.getTimezone());
 
@@ -146,23 +180,19 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 profileController.updateTimeZone(body);
             }
         }
-        new DownloadContactsAsyncTask().execute(mContext);
 
-        XMPPTransactions.initializeMsgServerSession(mContext, false);
-
-        if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
-        {
-            this.profile_id = userProfile.getId();
-            new sendAvatar().execute();
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false) ;
-            editor.apply();
-        }
+        // Profile loaded
+        // Notify application to initialize everything
+        BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
     }
 
     @Override
     public void onProfileConnectionError() {
         Log.e(Constants.TAG, "MycommsApp.onProfileConnectionError: ");
+
+        // Connection error
+        // Notify application
+        BusProvider.getInstance().post(new ApplicationAndProfileReadError());
     }
 
     @Override
@@ -191,16 +221,26 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     @Subscribe
-    public void initProfileAndContacts(InitProfileAndContacts event)
-    {
-        Log.i(Constants.TAG, "MyCommsApp.InitProfileAndContacts: ");
-        getProfileIdAndAccessToken();
-    }
-
-    @Subscribe
     public void initNews(InitNews event){
         Log.i(Constants.TAG, "MyCommsApp.InitNews: ");
         getNews();
+    }
+
+    @Subscribe
+    public void onApplicationAndProfileInitialized(ApplicationAndProfileInitialized event)
+    {
+        if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
+        {
+            String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+            if(profile_id!=null)
+                new sendAvatar().execute(profile_id);
+        }
+    }
+
+    @Subscribe
+    public void onRecentContactsReceivedEvent (RecentContactsReceivedEvent event)
+    {
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 
     public void getNews() {
@@ -208,7 +248,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         new DownloadNewsAsyncTask().execute(this);
     }
 
-    public class sendAvatar extends AsyncTask<Void, Void, String>
+    public class sendAvatar extends AsyncTask<String, Void, String>
     {
 
         @Override
@@ -217,12 +257,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         }
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected String doInBackground(String... params) {
             try
             {
-                String profId = "new_profile";
+                String profile_id = params[0];
                 File file =  new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                        "avatar_"+profId+".jpg");
+                        "avatar_new_profile.jpg");
                 FilePushToServerController filePushToServerController =
                         new FilePushToServerController(mContext);
 
@@ -235,8 +275,14 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                         );
 
                 String response = filePushToServerController.executeRequest();
-                file.renameTo(new File(mContext.getFilesDir(),Constants.CONTACT_AVATAR_DIR +
-                        "avatar_"+profile_id+".jpg"));
+
+                file.renameTo(new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                        "avatar_" + profile_id + ".jpg"));
+
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false);
+                editor.commit();
+
                 return response;
             }
             catch (Exception e)
@@ -252,10 +298,5 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             super.onPostExecute(result);
             Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
         }
-    }
-
-    @Subscribe
-    public void contactsLoadedEvent(SetContactListAdapterEvent event){
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), true);
     }
 }

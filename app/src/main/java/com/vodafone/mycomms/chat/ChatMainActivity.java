@@ -204,8 +204,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
                 if (cs != null && cs.length() > 0) checkXMPPConnection();
                 else setSendEnabled(false);
-
-                XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
             }
 
             @Override
@@ -367,7 +365,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if(etChatTextBox.getText().toString()!=null &&
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();

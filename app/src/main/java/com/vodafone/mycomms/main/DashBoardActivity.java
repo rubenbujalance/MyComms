@@ -24,10 +24,7 @@ import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-<<<<<<< HEAD
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
-=======
->>>>>>> 511e2fff3edbeb11b690a74002c714502e40a8cd
 import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -66,7 +63,6 @@ public class DashBoardActivity extends ToolbarActivity{
         enableToolbarIsClicked(false);
         setContentView(R.layout.layout_dashboard);
         initALL();
-<<<<<<< HEAD
         //BusProvider.getInstance().post(new InitNews());
         //BusProvider.getInstance().post(new InitProfileAndContacts());
 
@@ -76,14 +72,12 @@ public class DashBoardActivity extends ToolbarActivity{
 
         //RecentContactController recentContactController = new RecentContactController(this, mRealm, profileId);
         //recentContactController.getRecentList();
-=======
 //        BusProvider.getInstance().post(new InitNews());
 //        BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
 //        loadRecents();
 //        loadNews();
->>>>>>> 511e2fff3edbeb11b690a74002c714502e40a8cd
     }
 
     private void initALL(){

@@ -20,12 +20,7 @@ import model.News;
 public class NewsController extends BaseController {
     private Context mContext;
     private NewsConnection newsConnection;
-    private INewsConnectionCallback newsConnectionCallback;
     private ArrayList<News> newsList;
-
-    private String apiCall;
-
-    private int offsetPaging = 0;
 
     public NewsController(Context context) {
         super(context);
@@ -38,15 +33,13 @@ public class NewsController extends BaseController {
         if (newsConnection != null) {
             newsConnection.cancel();
         }
-        apiCall = api;
-        newsConnection = new NewsConnection(getContext(), this, apiCall);
+        newsConnection = new NewsConnection(getContext(), this, api);
         newsConnection.request();
     }
 
     @Override
     public void onConnectionComplete(ConnectionResponse response) {
         super.onConnectionComplete(response);
-        boolean morePages = false;
         String result = response.getData().toString();
 
         Log.i(Constants.TAG, "NewsController.onConnectionComplete" + result);
@@ -55,19 +48,9 @@ public class NewsController extends BaseController {
         if (result != null && result.trim().length()>0) {
             try {
                 jsonResponse = new JSONObject(result);
-                JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.NEWS_PAGINATION);
-
-                if (jsonPagination.getBoolean(Constants.NEWS_PAGINATION_MORE_PAGES)) {
-                    int pageSize = jsonPagination.getInt(Constants.NEWS_PAGINATION_PAGESIZE);
-                    morePages = true;
-                    offsetPaging = offsetPaging + pageSize;
-                } else {
-                    offsetPaging = 0;
-                }
-
                 newsList = loadNews(jsonResponse);
                 if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof INewsConnectionCallback) {
-                    ((INewsConnectionCallback) this.getConnectionCallback()).onNewsResponse(newsList, morePages, offsetPaging);
+                    ((INewsConnectionCallback) this.getConnectionCallback()).onNewsResponse(newsList);
                 }
 
             } catch (JSONException e) {
@@ -87,7 +70,6 @@ public class NewsController extends BaseController {
                 jsonObject = jsonArray.getJSONObject(i);
                 news = mapNews(jsonObject);
                 newsList.add(news);
-               //Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
             }
             Realm realm = Realm.getInstance(getContext());
             RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(realm);

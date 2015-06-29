@@ -12,6 +12,7 @@ import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.contacts.connection.DownloadContactsAsyncTask;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
@@ -229,12 +230,16 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onApplicationAndProfileInitialized(ApplicationAndProfileInitialized event)
     {
+        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
         {
-            String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
             if(profile_id!=null)
                 new sendAvatar().execute(profile_id);
         }
+        Realm realm = Realm.getInstance(this);
+        RecentContactController recentContactController = new RecentContactController(this, realm, profile_id);
+        recentContactController.getRecentList();
     }
 
     @Subscribe

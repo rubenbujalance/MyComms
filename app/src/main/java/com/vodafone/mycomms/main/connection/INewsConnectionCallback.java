@@ -7,5 +7,5 @@ import java.util.ArrayList;
 import model.News;
 
 public interface INewsConnectionCallback extends IConnectionCallback {
-    void onNewsResponse(ArrayList<News> newsList, boolean morePages, int offsetPaging);
+    void onNewsResponse(ArrayList<News> newsList);
 }

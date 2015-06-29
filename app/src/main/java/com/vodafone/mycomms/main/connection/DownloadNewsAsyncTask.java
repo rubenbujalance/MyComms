@@ -35,17 +35,13 @@ public class DownloadNewsAsyncTask extends AsyncTask<Context, Void, Void> implem
     }
 
     @Override
-    public void onNewsResponse(ArrayList<News> newsList, boolean morePages, int offsetPaging) {
+    public void onNewsResponse(ArrayList<News> newsList) {
         Log.i(Constants.TAG, "DownloadNewsAsyncTask.onNewsResponse: " + apiCall);
-        apiCall = Constants.NEWS_API_GET;
 
-        if (morePages){
-            mNewsController.getNewsList(apiCall + "&o=" + offsetPaging);
-        } else {
-            RefreshNewsEvent event = new RefreshNewsEvent();
-            event.setNews(newsList);
-            BusProvider.getInstance().post(event);
-        }
+        RefreshNewsEvent event = new RefreshNewsEvent();
+        event.setNews(newsList);
+        BusProvider.getInstance().post(event);
+
     }
 
     @Override

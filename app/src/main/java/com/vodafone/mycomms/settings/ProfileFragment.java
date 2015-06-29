@@ -221,7 +221,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         newProfile.setPosition(position);
         newProfile.setOfficeLocation(officeLocation);
 
-
         Log.d(Constants.TAG, "ProfileFragment.updateContactData:" + profileController.printUserProfile(newProfile));
 
         profileController.updateUserProfileInDB(firstName, lastName, company, position,
@@ -374,7 +373,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             Log.i(Constants.TAG, "ProfileFragment.onCreate: " + mIndex);
         }
 
-        profileController = new ProfileController(this);
+        profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);
 
         this.sp = getActivity().getSharedPreferences(

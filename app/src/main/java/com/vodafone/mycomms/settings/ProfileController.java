@@ -1,9 +1,7 @@
 package com.vodafone.mycomms.settings;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
@@ -31,27 +29,10 @@ public class ProfileController extends BaseController {
 
     private RealmContactTransactions realmContactTransactions;
     private ProfileConnection profileConnection;
-    private Realm realm;;
+    private Realm realm;
     private UserProfile userProfile;
     private String profileId;
 
-    public ProfileController(Fragment fragment) {
-        super(fragment);
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
-        realm = Realm.getInstance(fragment.getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
-    }
-
-    public ProfileController(Activity activity) {
-        super(activity);
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
-        realm = Realm.getInstance(activity);
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
-    }
 
     public ProfileController(Context context) {
         super(context);
@@ -66,30 +47,23 @@ public class ProfileController extends BaseController {
      * Get Profile, uses DB and Network also. (First loads from DB by a callback then starts network connection.
      */
     public void getProfile(){
-        Log.d(Constants.TAG, "ProfileController.getProfile: ");
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileId = null;
 
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-            String profileId = null;
+        if (sharedPreferences != null) {
+            profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        }
 
-            if (sharedPreferences != null) {
-                profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        if (profileId != null && profileId.length() > 0) {
+            UserProfile userProfileFromDB = null;
+            if (realmContactTransactions != null) {
+                userProfileFromDB = realmContactTransactions.getUserProfile(profileId);
             }
 
-            if (profileId != null && profileId.length() > 0) {
-                Log.d(Constants.TAG, "ProfileController.getProfile: retrieving profile with profileID:" + profileId);
-                UserProfile userProfileFromDB = null;
-                if (realmContactTransactions != null) {
-                    userProfileFromDB = realmContactTransactions.getUserProfile(profileId);
-                } else {
-                    Log.e(Constants.TAG, "ProfileController.getProfile: realmContactTransactions is null");
-                }
-
-                if (this.getConnectionCallback() != null && userProfileFromDB != null) {
-                    Log.d(Constants.TAG, "ProfileController.getProfile: profile received from DB: " + printUserProfile(userProfileFromDB));
-                    ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
-                }
+            if (this.getConnectionCallback() != null && userProfileFromDB != null) {
+                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
             }
-
+        }
 
         if(profileConnection != null){
             profileConnection.cancel();
@@ -108,6 +82,7 @@ public class ProfileController extends BaseController {
         }
         return true;
     }
+
     public void updateUserProfileInDB(String firstName, String lastName, String company, String
             position, String officeLocation){
         Log.d(Constants.TAG, "ProfileController.updateUserProfileInDB: ");

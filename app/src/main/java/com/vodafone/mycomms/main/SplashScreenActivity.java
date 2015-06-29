@@ -14,9 +14,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -49,6 +55,7 @@ public class SplashScreenActivity extends Activity {
         setContentView(R.layout.splash_screen);
         mContext = this;
 
+        BusProvider.getInstance().register(this);
     }
 
     @Override
@@ -69,24 +76,51 @@ public class SplashScreenActivity extends Activity {
         else {
             //Normal behaviour
             if (!APIWrapper.isConnected(this)) {
+                //No connection, cannot check version nor profile
                 if (UserSecurity.isUserLogged(this)) {
                     if (!UserSecurity.hasExpired(this)) {
-                        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
-                        startActivity(in);
-                        finish();
-                    } else{
-                        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
-                        startActivity(in);
-                        finish();
+                        if(((MycommsApp)getApplication()).isProfileAvailable()) {
+                            goToApp(true);
+                        }
                     }
-                } else {
-                    Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
-                    startActivity(in);
-                    finish();
                 }
+
+                //No Internet connection, and user not logged in or accessToken expired
+                Toast.makeText(this,
+                        getString(R.string.no_internet_connection_log_in_needed),
+                        Toast.LENGTH_SHORT).show();
+                goToLogin();
+
             } else {
                 new CheckVersionApi().execute(new HashMap<String, Object>(), null);
             }
+        }
+    }
+
+    private void loadUserProfile()
+    {
+        ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
+    }
+
+    //Called when user profile has been loaded
+    @Subscribe
+    public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
+        goToApp(false);
+    }
+
+    //Called when user profile has failed
+    @Subscribe
+    public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
+
+        if(((MycommsApp)getApplication()).isProfileAvailable()) {
+            goToApp(false);
+        }
+        else {
+            Toast.makeText(this,
+                    getString(R.string.no_internet_connection_log_in_needed),
+                    Toast.LENGTH_SHORT).show();
+
+            goToLogin();
         }
     }
 
@@ -94,9 +128,9 @@ public class SplashScreenActivity extends Activity {
     {
         try {
             if(result != null) {
-        /*
-         * New version detected! Show an alert and start the update...
-         */
+                /*
+                 * New version detected! Show an alert and start the update...
+                 */
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.new_version_available));
                 builder.setMessage(getString(R.string.must_update_to_last_application_version));
@@ -116,25 +150,40 @@ public class SplashScreenActivity extends Activity {
                 builder.show();
 
             } else {
-                //If version is correct, check login
+                //Version is correct, check login
                 if (UserSecurity.isUserLogged(this)) {
                     if (UserSecurity.hasExpired(this)) {
                         renewToken();
                     } else {
-                        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
-                        startActivity(in);
-                        finish();
+                        loadUserProfile();
                     }
                 } else {
-                    Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
-                    startActivity(in);
-                    finish();
+                    //User not logged in
+                    goToLogin();
                 }
             }
         } catch (Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: \n" + ex.toString());
             finish();
         }
+    }
+
+    private void goToLogin()
+    {
+        Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
+        startActivity(in);
+        finish();
+    }
+
+    private void goToApp(boolean notify)
+    {
+        //Notify app that profile is available and we are entering
+        if(notify) BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
+
+        //Go to app
+        Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
+        startActivity(in);
+        finish();
     }
 
     private class CheckVersionApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
@@ -197,17 +246,13 @@ public class SplashScreenActivity extends Activity {
 
                 UserSecurity.setTokens(accessToken, null, expiresIn, this);
 
-                //Go to app
-                Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
-                startActivity(in);
-                finish();
+                //Load profile and go to app
+                loadUserProfile();
             }
             else
             {
                 //Renew failed, go to login
-                Intent in = new Intent(SplashScreenActivity.this, LoginSignupActivity.class);
-                startActivity(in);
-                finish();
+                goToLogin();
             }
         } catch(Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackRenewToken: \n" + ex.toString());

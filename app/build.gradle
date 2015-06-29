@@ -163,6 +163,9 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.3.2@aar') {
         transitive = true
     }
+
+    //Network listener
+    compile 'com.github.pwittchen:networkevents:1.0.5'
 }
 
 apply plugin: 'jacoco'

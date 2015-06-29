@@ -94,7 +94,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             mParam1 = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        profileController = new ProfileController(this);
+        profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);
     }
 

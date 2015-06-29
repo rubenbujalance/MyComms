@@ -24,8 +24,6 @@ import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.events.InitNews;
-import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -64,12 +62,12 @@ public class DashBoardActivity extends ToolbarActivity{
         enableToolbarIsClicked(false);
         setContentView(R.layout.layout_dashboard);
         initALL();
-        BusProvider.getInstance().post(new InitNews());
-        BusProvider.getInstance().post(new InitProfileAndContacts());
+//        BusProvider.getInstance().post(new InitNews());
+//        BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
-        loadRecents();
-        loadNews();
+//        loadRecents();
+//        loadNews();
     }
 
     private void initALL(){
@@ -401,9 +399,9 @@ public class DashBoardActivity extends ToolbarActivity{
     protected void onResume() {
         super.onResume();
         //Update Pending Messages on Toolbar
-        loadRecents();
+//        loadRecents();
         checkUnreadChatMessages();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 
     @Subscribe

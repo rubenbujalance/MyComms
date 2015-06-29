@@ -24,8 +24,7 @@ import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.events.InitNews;
-import com.vodafone.mycomms.events.InitProfileAndContacts;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -64,12 +63,15 @@ public class DashBoardActivity extends ToolbarActivity{
         enableToolbarIsClicked(false);
         setContentView(R.layout.layout_dashboard);
         initALL();
-        BusProvider.getInstance().post(new InitNews());
-        BusProvider.getInstance().post(new InitProfileAndContacts());
+        //BusProvider.getInstance().post(new InitNews());
+        //BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
         loadNews();
+
+        //RecentContactController recentContactController = new RecentContactController(this, mRealm, profileId);
+        //recentContactController.getRecentList();
     }
 
     private void initALL(){
@@ -132,7 +134,6 @@ public class DashBoardActivity extends ToolbarActivity{
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
             final String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, profileId);
@@ -419,6 +420,11 @@ public class DashBoardActivity extends ToolbarActivity{
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
         checkUnreadChatMessages();
+        loadRecents();
+    }
+
+    @Subscribe
+    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
         loadRecents();
     }
 }

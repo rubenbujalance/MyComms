@@ -44,6 +44,27 @@ public class UserProfile extends RealmObject{
     private long longField8;
     private long longField9;
 
+    public UserProfile(String id, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country, String settings, String platforms) {
+        this.id = id;
+        this.platform = platform;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.avatar = avatar;
+        this.phones = phones;
+        this.emails = emails;
+        this.position = position;
+        this.company = company;
+        this.timezone = timezone;
+        this.lastSeen = lastSeen;
+        this.officeLocation = officeLocation;
+        this.availability = availability;
+        this.presence = presence;
+        this.country = country;
+        this.settings = settings;
+        this.platforms = platforms;
+
+    }
+
     public String getId() {
         return id;
     }
@@ -167,29 +188,6 @@ public class UserProfile extends RealmObject{
     public UserProfile(){
 
     }
-
-    public UserProfile(String id, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, int lastSeen, String officeLocation, String availability, String presence, String country, String settings, String platforms) {
-        this.id = id;
-        this.platform = platform;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.avatar = avatar;
-        this.phones = phones;
-        this.emails = emails;
-        this.position = position;
-        this.company = company;
-        this.timezone = timezone;
-        this.lastSeen = lastSeen;
-        this.officeLocation = officeLocation;
-        this.availability = availability;
-        this.presence = presence;
-        this.country = country;
-        this.settings = settings;
-        this.platforms = platforms;
-
-    }
-
-
 
     public String getSettings() {
         return settings;

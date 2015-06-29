@@ -198,7 +198,7 @@ public class ContactController extends BaseController {
             }
             realmContactTransactions.insertContactList(realmContactList);
 
-            new DownloadAvatars().execute(realmContactList);
+            //new DownloadAvatars().execute(realmContactList);
 
         } catch (JSONException e) {
             e.printStackTrace();

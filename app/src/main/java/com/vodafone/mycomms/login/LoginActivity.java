@@ -276,7 +276,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         else {
             Toast.makeText(this,
                     getString(R.string.no_internet_connection_log_in_needed),
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
         }
     }
 

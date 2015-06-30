@@ -90,7 +90,7 @@ public class SplashScreenActivity extends Activity {
                 //No Internet connection, and user not logged in or accessToken expired
                 Toast.makeText(this,
                         getString(R.string.no_internet_connection_log_in_needed),
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_LONG).show();
                 goToLogin();
 
             } else {
@@ -117,7 +117,7 @@ public class SplashScreenActivity extends Activity {
         else {
             Toast.makeText(this,
                     getString(R.string.no_internet_connection_log_in_needed),
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
 
             goToLogin();
         }

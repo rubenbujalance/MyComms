@@ -27,6 +27,7 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
+import com.vodafone.mycomms.events.RecentAvatarsReceivedEvent;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -446,5 +447,10 @@ public class DashBoardActivity extends ToolbarActivity{
 
         loadRecents();
         ((MycommsApp)getApplication()).getNews();
+    }
+
+    @Subscribe
+    public void onRecentAvatarsReceived(RecentAvatarsReceivedEvent event){
+        loadRecents();
     }
 }

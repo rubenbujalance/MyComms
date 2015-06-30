@@ -12,10 +12,12 @@ import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.contacts.connection.DownloadContactsAsyncTask;
+import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
@@ -235,17 +237,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Override
     public void onNewsResponse(ArrayList<News> newsList) {
         Log.e(Constants.TAG, "MyCommsApp.onNewsResponse: ");
-        new DownloadImagesAsyncTask(getBaseContext(), newsList, 0).execute();
+        DownloadImagesAsyncTask downloadImagesAsyncTask = new DownloadImagesAsyncTask(getBaseContext(), newsList, 0);
+        downloadImagesAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
         BusProvider.getInstance().post(event);
 
-    }
-
-    @Subscribe
-    public void initNews(InitNews event){
-        Log.e(Constants.TAG, "MyCommsApp.InitNews: ");
-        getNews();
     }
 
     @Subscribe
@@ -272,6 +269,15 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Realm realm = Realm.getInstance(this);
         RecentContactController recentContactController = new RecentContactController(this, realm, profile_id);
         recentContactController.getRecentList();
+    }
+
+    @Subscribe
+    public void onEventNewsImagesReceived(NewsImagesReceivedEvent event){
+        Log.i(Constants.TAG, "MycommsApp.onEventNewsImagesReceived: ");
+        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        Realm realm = Realm.getInstance(this);
+        FavouriteController favouriteController = new FavouriteController(mContext, realm, profile_id);
+        favouriteController.getFavouritesList(Constants.CONTACT_API_GET_FAVOURITES);
     }
 
     public void getNews() {

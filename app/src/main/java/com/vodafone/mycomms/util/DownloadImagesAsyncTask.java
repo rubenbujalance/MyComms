@@ -11,8 +11,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.NewsReceivedEvent;
-import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
+import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
+import com.vodafone.mycomms.events.RecentAvatarsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 
 import java.io.BufferedInputStream;
@@ -132,11 +132,14 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
             Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ",e);
             return null;
         }
+        Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: FINISHED AT " + ((Calendar.getInstance().getTimeInMillis()-init)/1000));
+        return null;
     }
 
     @Override
     protected void onPostExecute(Void nothing) {
         super.onPostExecute(nothing);
+        Log.i(Constants.TAG, "DownloadImagesAsyncTask.onPostExecute: imageType" + imageType);
         if (imageType == Constants.IMAGE_TYPE_AVATAR) {
             //UNmark this contact list as downloading...
             Iterator<Contact> itContact = mContactArrayList.iterator();
@@ -147,11 +150,9 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
                 downloadingAvatars.remove(c.getContactId());
             }
             //-----------------------------------------
-            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+            BusProvider.getInstance().post(new RecentAvatarsReceivedEvent());
         } else if (imageType == Constants.IMAGE_TYPE_NEWS) {
-            NewsReceivedEvent event = new NewsReceivedEvent();
-            event.setNews(mNewsArrayList);
-            BusProvider.getInstance().post(event);
+            BusProvider.getInstance().post(new NewsImagesReceivedEvent());
         }
         if (realm!=null)
             realm.close();
@@ -164,7 +165,6 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
             file.mkdirs();
 
             Log.i(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: downloading image " + fileName + "...");
-            //if (!downloadFile(String.valueOf(url), dir, avatarFileName)) {
             if (!okHttpDownloadFile(String.valueOf(url), dir, fileName)) {
                 File badAvatar = new File(mContext.getFilesDir() + dir, fileName);
                 badAvatar.delete();

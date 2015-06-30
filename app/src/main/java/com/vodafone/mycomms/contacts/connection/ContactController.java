@@ -243,7 +243,6 @@ public class ContactController extends BaseController {
             if (contactList.size()!=0) {
                 realmContactTransactions.deleteAllFavouriteContacts();
                 realmContactTransactions.insertFavouriteContactList(contactList);
-                //BusProvider.getInstance().post(new SetContactListAdapterEvent());
             }
         } catch (JSONException e) {
             e.printStackTrace();

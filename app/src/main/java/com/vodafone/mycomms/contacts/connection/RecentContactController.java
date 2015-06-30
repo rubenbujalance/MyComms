@@ -33,7 +33,7 @@ public class RecentContactController extends BaseController {
     }
 
     public void getRecentList() {
-        Log.i(Constants.TAG, "RecentContactController.getRecentList: ");
+        Log.e(Constants.TAG, "RecentContactController.getRecentList: ");
         if(mRecentContactConnection != null){
             mRecentContactConnection.cancel();
         }
@@ -64,6 +64,8 @@ public class RecentContactController extends BaseController {
 
     @Override
     public void onConnectionComplete(ConnectionResponse response) {
+        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ");
+
         super.onConnectionComplete(response);
         if (method==HttpConnection.POST) {
             Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: POST");

@@ -25,6 +25,7 @@ import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
@@ -58,7 +59,7 @@ public class DashBoardActivity extends ToolbarActivity{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(Constants.TAG, "DashBoardActivity.onCreate: ");
+        Log.e(Constants.TAG, "DashBoardActivity.onCreate: ");
 
         BusProvider.getInstance().register(this);
 
@@ -72,6 +73,8 @@ public class DashBoardActivity extends ToolbarActivity{
         mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
         loadNews();
+
+        BusProvider.getInstance().post(new DashboardCreatedEvent());
     }
 
     private void initALL(){
@@ -129,7 +132,8 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     private void loadRecents(){
-        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: ");
+        Log.e(Constants.TAG, "DashBoardActivity.loadRecents: ");
+
         try {
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -293,6 +297,8 @@ public class DashBoardActivity extends ToolbarActivity{
 
 
     private void loadNews() {
+        Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
+
         ArrayList<News> newsArrayList = new ArrayList<>();
 
         RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(mRealm);
@@ -304,7 +310,8 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     private void drawNews(ArrayList<News> newsArrayList) {
-        Log.i(Constants.TAG, "DashBoardActivity.drawNews: ");
+        Log.e(Constants.TAG, "DashBoardActivity.drawNews: ");
+
         try{
             LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
             container.removeAllViews();
@@ -386,7 +393,7 @@ public class DashBoardActivity extends ToolbarActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e(Constants.TAG, "DashBoardActivity.onDestroy: ");
+        Log.i(Constants.TAG, "DashBoardActivity.onDestroy: ");
 
         // Disconnect from the XMPP server
         //XMPPTransactions.disconnectMsgServerSession();
@@ -413,12 +420,12 @@ public class DashBoardActivity extends ToolbarActivity{
         //Update Pending Messages on Toolbar
 //        loadRecents();
         checkUnreadChatMessages();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 
     @Subscribe
-    public void onEventNewsReceived(NewsReceivedEvent event){
-        Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
+    public void onEventNewsReceived(NewsReceivedEvent event)
+    {
+        Log.e(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
         if(news != null) {
             drawNews(news);
@@ -427,13 +434,16 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     @Subscribe
-    public void onEventChatsReceived(ChatsReceivedEvent event){
+    public void onEventChatsReceived(ChatsReceivedEvent event)
+    {
         checkUnreadChatMessages();
         loadRecents();
     }
 
     @Subscribe
     public void onRecentContactsReceived(RecentContactsReceivedEvent event){
+        Log.e(Constants.TAG, "DashBoardActivity.onRecentContactsReceived: ");
+
         loadRecents();
         ((MycommsApp)getApplication()).getNews();
     }

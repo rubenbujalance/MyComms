@@ -72,7 +72,8 @@ public class ContactSearchController extends BaseController {
                 jsonObject = jsonArray.getJSONObject(i);
                 if (jsonObject.getString(Constants.CONTACT_ID)!=null
                         && !jsonObject.getString(Constants.CONTACT_ID).equals("")){
-                    ids = ids + "," + jsonObject.getString(Constants.CONTACT_ID);
+                    if(i>0) ids += ",";
+                    ids += jsonObject.getString(Constants.CONTACT_ID);
                 }
             }
         } catch (JSONException e){

@@ -16,9 +16,9 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
-import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
@@ -99,7 +99,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     public void getProfileIdAndAccessToken() {
-        Log.i(Constants.TAG, "MycommsApp.getProfileIdAndAccessToken: ");
+        Log.e(Constants.TAG, "MycommsApp.getProfileIdAndAccessToken: ");
         profileController = new ProfileController(mContext);
 
         //Save profile_id if accessToken has changed
@@ -158,7 +158,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Override
     public void onProfileReceived(UserProfile userProfile) {
-        Log.i(Constants.TAG, "MycommsApp.onProfileReceived: ");
+        Log.e(Constants.TAG, "MycommsApp.onProfileReceived: ");
         String timeZone = TimeZone.getDefault().getID();
         String test = userProfile.getTimezone();
 
@@ -234,7 +234,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Override
     public void onNewsResponse(ArrayList<News> newsList) {
-        Log.i(Constants.TAG, "MyCommsApp.onNewsResponse: ");
+        Log.e(Constants.TAG, "MyCommsApp.onNewsResponse: ");
         new DownloadImagesAsyncTask(getBaseContext(), newsList, 0).execute();
         NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
@@ -244,16 +244,16 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Subscribe
     public void initNews(InitNews event){
-        Log.i(Constants.TAG, "MyCommsApp.InitNews: ");
+        Log.e(Constants.TAG, "MyCommsApp.InitNews: ");
         getNews();
     }
 
     @Subscribe
     public void onApplicationAndProfileInitialized(ApplicationAndProfileInitialized event)
     {
+        Log.e(Constants.TAG, "MycommsApp.onApplicationAndProfileInitialized: ");
+
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        //TODO RBM - Only for testing before merge with Albert
-        new DownloadContactsAsyncTask().execute(mContext);
 
         if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
         {
@@ -261,19 +261,21 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             if(profile_id!=null)
                 new sendAvatar().execute(profile_id);
         }
+    }
+
+    @Subscribe
+    public void onDashboardCreatedEvent(DashboardCreatedEvent event)
+    {
+        Log.e(Constants.TAG, "MycommsApp.onDashboardCreatedEvent: ");
+
+        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         Realm realm = Realm.getInstance(this);
         RecentContactController recentContactController = new RecentContactController(this, realm, profile_id);
         recentContactController.getRecentList();
     }
 
-    @Subscribe
-    public void onRecentContactsReceivedEvent (RecentContactsReceivedEvent event)
-    {
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
-    }
-
     public void getNews() {
-        Log.i(Constants.TAG, "MycommsApp.getNews: ");
+        Log.e(Constants.TAG, "MycommsApp.getNews: ");
 //        new DownloadNewsAsyncTask().execute(getApplicationContext());
         NewsController mNewsController = new NewsController(mContext);
         String apiCall = Constants.NEWS_API_GET;

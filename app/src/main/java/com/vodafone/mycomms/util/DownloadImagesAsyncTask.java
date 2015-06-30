@@ -56,23 +56,23 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
     @Override
     protected Void doInBackground(Void... params) {
         try {
-            Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of avatars");
-
-            //Mark this contact list as downloading...
-            if (imageType == Constants.IMAGE_TYPE_AVATAR) {
-                Iterator<Contact> itContact = mContactArrayList.iterator();
-                Contact c;
-
-                while (itContact.hasNext()) {
-                    c = itContact.next();
-                    downloadingAvatars.put(c.getContactId(), null);
-                }
-            }
-            //-----------------------------------------
+//            //Mark this contact list as downloading...
+//            if (imageType == Constants.IMAGE_TYPE_AVATAR) {
+//                Iterator<Contact> itContact = mContactArrayList.iterator();
+//                Contact c;
+//
+//                while (itContact.hasNext()) {
+//                    c = itContact.next();
+//                    downloadingAvatars.put(c.getContactId(), null);
+//                }
+//            }
+//            //-----------------------------------------
 
             long init = Calendar.getInstance().getTimeInMillis();
             Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: INIT 0");
             if (imageType == Constants.IMAGE_TYPE_AVATAR) {
+                Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of avatars");
+
                 realm = Realm.getInstance(mContext);
                 RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(realm);
                 for (int i = 0; i < mContactArrayList.size(); i++) {
@@ -105,6 +105,8 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
                     }
                 }
             }else if (imageType == Constants.IMAGE_TYPE_NEWS){
+                Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of images");
+
                 for (int i = 0; i < mNewsArrayList.size(); i++) {
                     try {
                         News news = mNewsArrayList.get(i);

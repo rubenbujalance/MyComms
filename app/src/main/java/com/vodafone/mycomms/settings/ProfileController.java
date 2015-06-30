@@ -144,7 +144,7 @@ public class ProfileController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-        Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl() + response.getUrl());
+        Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
 
         boolean isUserProfileReceived = false;
         if(response.getUrl() != null && !response.getUrl().contains(UpdateSettingsConnection.URL)) {

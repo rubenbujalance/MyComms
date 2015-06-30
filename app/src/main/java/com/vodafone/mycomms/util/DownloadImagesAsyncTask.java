@@ -132,8 +132,6 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
             Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ",e);
             return null;
         }
-        Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: FINISHED AT " + ((Calendar.getInstance().getTimeInMillis()-init)/1000));
-        return null;
     }
 
     @Override

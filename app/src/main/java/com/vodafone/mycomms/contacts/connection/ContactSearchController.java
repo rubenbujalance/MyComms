@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
+import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
@@ -38,7 +39,7 @@ public class ContactSearchController extends BaseController {
     }
 
     public void getContactById(JSONObject jsonObject) {
-        Log.i(Constants.TAG, "ContactSearchController.getRecentList: ");
+        Log.e(Constants.TAG, "ContactSearchController.getRecentList: ");
         if(mContactSearchConnection != null){
             mContactSearchConnection.cancel();
         }
@@ -86,7 +87,7 @@ public class ContactSearchController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response) {
         super.onConnectionComplete(response);
-        Log.i(Constants.TAG, "ContactSearchController.onConnectionComplete: ");
+        Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ");
         String result = response.getData().toString();
         if (result != null && result.trim().length()>0) {
             try {
@@ -103,5 +104,11 @@ public class ContactSearchController extends BaseController {
                 Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
             }
         }
+    }
+
+    @Override
+    public void onConnectionError(ConnectionException e) {
+        super.onConnectionError(e);
+        Log.e(Constants.TAG, "ContactSearchController.onConnectionError: ");
     }
 }

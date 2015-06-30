@@ -18,13 +18,13 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -65,7 +65,7 @@ public class DashBoardActivity extends ToolbarActivity{
         setContentView(R.layout.layout_dashboard);
 
         initALL();
-        BusProvider.getInstance().post(new InitNews());
+        //BusProvider.getInstance().post(new InitNews());
         //BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
@@ -425,5 +425,7 @@ public class DashBoardActivity extends ToolbarActivity{
     @Subscribe
     public void onRecentContactsReceived(RecentContactsReceivedEvent event){
         loadRecents();
+        MycommsApp mycommsApp = new MycommsApp();
+        mycommsApp.getNews();
     }
 }

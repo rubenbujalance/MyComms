@@ -18,6 +18,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
@@ -25,6 +26,7 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.InitProfileAndContacts;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -62,9 +64,10 @@ public class DashBoardActivity extends ToolbarActivity{
 
         enableToolbarIsClicked(false);
         setContentView(R.layout.layout_dashboard);
+
         initALL();
 //        BusProvider.getInstance().post(new InitNews());
-        BusProvider.getInstance().post(new InitProfileAndContacts());
+//        BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
 //        loadRecents();
@@ -419,5 +422,13 @@ public class DashBoardActivity extends ToolbarActivity{
     public void onEventChatsReceived(ChatsReceivedEvent event){
         checkUnreadChatMessages();
         loadRecents();
+    }
+
+    @Subscribe
+    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
+        loadRecents();
+        //MycommsApp mycommsApp = new MycommsApp();
+        //mycommsApp.getNews();
+        ((MycommsApp)getApplication()).getNews();
     }
 }

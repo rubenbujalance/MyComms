@@ -183,7 +183,7 @@ public class ContactController extends BaseController {
         }
     }
 
-    private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
+    public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
         ArrayList<Contact> realmContactList = new ArrayList<>();
 
         try {
@@ -198,7 +198,7 @@ public class ContactController extends BaseController {
             }
             realmContactTransactions.insertContactList(realmContactList);
 
-            new DownloadAvatars().execute(realmContactList);
+            //new DownloadAvatars().execute(realmContactList);
 
         } catch (JSONException e) {
             e.printStackTrace();

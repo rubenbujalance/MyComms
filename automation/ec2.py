@@ -630,7 +630,6 @@ class Ec2Inventory(object):
                 instance_vars["ec2_security_group_names"] = ','.join([str(i) for i in group_names])
             else:
                 pass
-                # TODO Product codes if someone finds them useful
                 #print key
                 #print type(value)
                 #print value

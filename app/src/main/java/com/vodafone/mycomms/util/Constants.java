@@ -122,6 +122,7 @@ public class Constants {
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_CONTACTS_BASIC_CALL = "/api/me/contact?p=";
+    public static final String CONTACT_API_GET_CONTACTS_IDS = "/api/me/contact?ids=";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_RECENTS = "/api/me/recents";

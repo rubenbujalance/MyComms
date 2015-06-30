@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -28,10 +29,14 @@ import android.widget.TextView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
+import com.vodafone.mycomms.contacts.connection.ContactListController;
+import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.connection.SearchController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -57,8 +62,9 @@ import model.RecentContact;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends ListFragment implements ISearchConnectionCallback{
+public class ContactListFragment extends ListFragment implements ISearchConnectionCallback, IContactsRefreshConnectionCallback {
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;;
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private Realm realm;
@@ -112,8 +118,21 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
         listView = (ListView) v.findViewById(android.R.id.list);
         emptyText = (TextView) v.findViewById(android.R.id.empty);
-
         loadSearchBarComponentsAndEvents(v);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.contacts_swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshContent();
+                //Spinner is always finished after 10 seconds
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finishSpinner();
+                    }
+                }, 10000);
+            }
+        });
 
         return v;
     }
@@ -129,6 +148,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        BusProvider.getInstance().register(this);
 
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
@@ -150,7 +171,27 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         mSearchController = new SearchController(getActivity(), realm, profileId);
 
         setListAdapterTabs();
-        
+    }
+
+    private void refreshContent(){
+        ContactListController contactListController = new ContactListController(getActivity(),realm,profileId);
+        if (mIndex==Constants.CONTACTS_ALL) {
+            contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
+            contactListController.setConnectionCallback(this);
+        } else if (mIndex==Constants.CONTACTS_FAVOURITE) {
+            contactListController.getContactList(Constants.CONTACT_API_GET_FAVOURITES);
+            contactListController.setConnectionCallback(this);
+        } else if (mIndex==Constants.CONTACTS_RECENT) {
+            contactListController.getContactList(Constants.CONTACT_API_GET_RECENTS);
+            contactListController.setConnectionCallback(this);
+        }
+    }
+
+    private void finishSpinner(){
+        Log.i(Constants.TAG, "ContactListFragment.finishSpinner: ");
+        if (mSwipeRefreshLayout!=null){
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
@@ -261,7 +302,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                         }
                     }
                     //ADD RECENT
-                    RecentContactController recentController = new RecentContactController(this,realm,profileId);
+                    RecentContactController recentController = new RecentContactController(getActivity(),realm,profileId);
                     recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                     setListAdapterTabs();
                 } catch (Exception ex) {
@@ -294,6 +335,36 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         Log.d(Constants.TAG, "ContactListFragment.onConnectionNotAvailable: ");
     }
 
+    @Override
+    public void onContactsRefreshResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging) {
+
+        if (morePages){
+            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: ");
+            apiCall = Constants.CONTACT_API_GET_CONTACTS;
+            ContactListController contactListController = new ContactListController(getActivity(),realm, profileId);
+            contactListController.getContactList(apiCall + "&o=" + offsetPaging);
+            contactListController.setConnectionCallback(this);
+        } else {
+            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: FINISH");
+            mSwipeRefreshLayout.setRefreshing(false);
+            BusProvider.getInstance().post(new SetContactListAdapterEvent());
+        }
+    }
+
+    @Override
+    public void onFavouritesRefreshResponse() {
+        Log.i(Constants.TAG, "ContactListFragment.onFavouritesRefreshResponse: ");
+        mSwipeRefreshLayout.setRefreshing(false);
+        BusProvider.getInstance().post(new SetContactListAdapterEvent());
+    }
+
+    @Override
+    public void onRecentsRefreshResponse() {
+        Log.i(Constants.TAG, "ContactListFragment.onRecentsRefreshResponse: ");
+        mSwipeRefreshLayout.setRefreshing(false);
+        BusProvider.getInstance().post(new SetContactListAdapterEvent());
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -312,6 +383,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     public void onDestroyView() {
         super.onDestroyView();
         realm.close();
+        BusProvider.getInstance().unregister(this);
     }
 
     /**

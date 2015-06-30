@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import io.realm.Realm;
 import model.Contact;
@@ -35,6 +37,9 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
     private ArrayList<News> mNewsArrayList;
     private Realm realm;
     private int imageType;
+
+    //HashMap to control currently downloading avatars
+    private static HashMap<String, String> downloadingAvatars = new HashMap<>();
 
     public DownloadImagesAsyncTask(Context context, ArrayList<Contact> contactArrayList){
         this.mContext = context;
@@ -50,67 +55,96 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of avatars");
-        long init = Calendar.getInstance().getTimeInMillis();
-        Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: INIT 0");
-        if (imageType == Constants.IMAGE_TYPE_AVATAR) {
-            realm = Realm.getInstance(mContext);
-            RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(realm);
-            for (int i = 0; i < mContactArrayList.size(); i++) {
-                try {
-                    Contact contact = mContactArrayList.get(i);
+        try {
+            Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of avatars");
 
-                    if (contact.getAvatar() != null && contact.getAvatar().length() != 0) {
-                        String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
-                        ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
+            //Mark this contact list as downloading...
+            if (imageType == Constants.IMAGE_TYPE_AVATAR) {
+                Iterator<Contact> itContact = mContactArrayList.iterator();
+                Contact c;
 
-                        if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-//                            if (downloadContactAvatar(contact)) {
-                            URL url = new URL(contact.getAvatar());
-                            if (downloadImage(url, avatarFileName, Constants.CONTACT_AVATAR_DIR)) {
-                                if (avatar == null) {
-                                    avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), avatarFileName);
-                                } else {
-                                    realm.beginTransaction();
-                                    avatar.setUrl(contact.getAvatar());
-                                    realm.commitTransaction();
+                while (itContact.hasNext()) {
+                    c = itContact.next();
+                    downloadingAvatars.put(c.getContactId(), null);
+                }
+            }
+            //-----------------------------------------
+
+            long init = Calendar.getInstance().getTimeInMillis();
+            Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: INIT 0");
+            if (imageType == Constants.IMAGE_TYPE_AVATAR) {
+                realm = Realm.getInstance(mContext);
+                RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(realm);
+                for (int i = 0; i < mContactArrayList.size(); i++) {
+                    try {
+                        Contact contact = mContactArrayList.get(i);
+                        //Check if avatar is currently being downloaded
+                        if (!downloadingAvatars.containsKey(contact.getContactId())) {
+                            if (contact.getAvatar() != null && contact.getAvatar().length() != 0) {
+                                String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
+                                ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
+
+                                if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
+                                    //                            if (downloadContactAvatar(contact)) {
+                                    URL url = new URL(contact.getAvatar());
+                                    if (downloadImage(url, avatarFileName, Constants.CONTACT_AVATAR_DIR)) {
+                                        if (avatar == null) {
+                                            avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), avatarFileName);
+                                        } else {
+                                            realm.beginTransaction();
+                                            avatar.setUrl(contact.getAvatar());
+                                            realm.commitTransaction();
+                                        }
+                                        realmAvatarTransactions.insertAvatar(avatar);
+                                    }
                                 }
-                                realmAvatarTransactions.insertAvatar(avatar);
                             }
                         }
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ", e);
                     }
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ", e);
                 }
-            }
-        }else if (imageType == Constants.IMAGE_TYPE_NEWS){
-            for (int i = 0; i < mNewsArrayList.size(); i++) {
-                try {
-                    News news = mNewsArrayList.get(i);
+            }else if (imageType == Constants.IMAGE_TYPE_NEWS){
+                for (int i = 0; i < mNewsArrayList.size(); i++) {
+                    try {
+                        News news = mNewsArrayList.get(i);
 
-                    if (news.getImage() != null && news.getImage().length() != 0) {
-                        String newsFileName = "news_"+ mNewsArrayList.get(i).getUuid()+".jpg";
+                        if (news.getImage() != null && news.getImage().length() != 0) {
+                            String newsFileName = "news_"+ mNewsArrayList.get(i).getUuid()+".jpg";
 
-                        String dir = Constants.CONTACT_NEWS_DIR;
-                        File file = new File(mContext.getFilesDir() + dir+newsFileName);
-                        if (!file.exists()) {
-                            URL url = new URL("https://" + EndpointWrapper.getBaseNewsURL() + mNewsArrayList.get(i).getImage());
-                            downloadImage(url, newsFileName, dir);
+                            String dir = Constants.CONTACT_NEWS_DIR;
+                            File file = new File(mContext.getFilesDir() + dir+newsFileName);
+                            if (!file.exists()) {
+                                URL url = new URL("https://" + EndpointWrapper.getBaseNewsURL() + mNewsArrayList.get(i).getImage());
+                                downloadImage(url, newsFileName, dir);
+                            }
                         }
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ", e);
                     }
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ", e);
                 }
             }
+            Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: FINISHED AT " + ((Calendar.getInstance().getTimeInMillis()-init)/1000));
+            return null;
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ",e);
+            return null;
         }
-        Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: FINISHED AT " + ((Calendar.getInstance().getTimeInMillis()-init)/1000));
-        return null;
     }
 
     @Override
     protected void onPostExecute(Void nothing) {
         super.onPostExecute(nothing);
         if (imageType == Constants.IMAGE_TYPE_AVATAR) {
+            //UNmark this contact list as downloading...
+            Iterator<Contact> itContact = mContactArrayList.iterator();
+            Contact c;
+
+            while (itContact.hasNext()) {
+                c = itContact.next();
+                downloadingAvatars.remove(c.getContactId());
+            }
+            //-----------------------------------------
             BusProvider.getInstance().post(new RecentContactsReceivedEvent());
         } else if (imageType == Constants.IMAGE_TYPE_NEWS) {
             NewsReceivedEvent event = new NewsReceivedEvent();

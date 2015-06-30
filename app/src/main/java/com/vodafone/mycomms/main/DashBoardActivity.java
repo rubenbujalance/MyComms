@@ -70,8 +70,8 @@ public class DashBoardActivity extends ToolbarActivity{
         //BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
-//        loadRecents();
-//        loadNews();
+        loadRecents();
+        loadNews();
     }
 
     private void initALL(){

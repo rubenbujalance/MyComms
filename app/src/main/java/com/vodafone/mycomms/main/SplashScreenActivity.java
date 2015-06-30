@@ -46,6 +46,7 @@ public class SplashScreenActivity extends Activity {
 
     ProgressDialog mProgress;
     Context mContext;
+    private boolean isForeground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class SplashScreenActivity extends Activity {
         setContentView(R.layout.splash_screen);
         mContext = this;
 
+        //Register Otto Bus
         BusProvider.getInstance().register(this);
     }
 
@@ -97,20 +99,17 @@ public class SplashScreenActivity extends Activity {
         }
     }
 
-    private void loadUserProfile()
-    {
-        ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
-    }
-
     //Called when user profile has been loaded
     @Subscribe
     public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
+        if(!isForeground) return;
         goToApp(false);
     }
 
     //Called when user profile has failed
     @Subscribe
     public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
+        if(!isForeground) return;
 
         if(((MycommsApp)getApplication()).isProfileAvailable()) {
             goToApp(false);
@@ -155,7 +154,7 @@ public class SplashScreenActivity extends Activity {
                     if (UserSecurity.hasExpired(this)) {
                         renewToken();
                     } else {
-                        loadUserProfile();
+                        ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
                     }
                 } else {
                     //User not logged in
@@ -247,7 +246,7 @@ public class SplashScreenActivity extends Activity {
                 UserSecurity.setTokens(accessToken, null, expiresIn, this);
 
                 //Load profile and go to app
-                loadUserProfile();
+                ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
             }
             else
             {
@@ -328,5 +327,17 @@ public class SplashScreenActivity extends Activity {
         protected void onPostExecute(HashMap<String,Object> result) {
             callBackRenewToken(result);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        isForeground = true;
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        isForeground = false;
+        super.onPause();
     }
 }

@@ -114,7 +114,7 @@ public class SignupNameActivity extends Activity {
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false) ;
-        editor.apply();
+        editor.commit();
     }
 
     @Override
@@ -211,8 +211,7 @@ public class SignupNameActivity extends Activity {
 
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, true) ;
-        editor.apply();
-        editor.apply();
+        editor.commit();
 
         FilePushToServerController filePushToServerController = new FilePushToServerController
                 (SignupNameActivity.this);

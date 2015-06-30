@@ -57,6 +57,13 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onCreate() {
         super.onCreate();
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
+
+//        //Check Realm migration
+//        try {
+//            Realm.migrateRealmAtPath(getFilesDir().toString()+"/default.realm", new RealmDBMigration());
+//        } catch (Exception e){}
+
+        //Initializations
         BusProvider.getInstance().register(this);
         mContext = getApplicationContext();
 
@@ -136,7 +143,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(Constants.DEVICE_ID_SHARED_PREF, deviceId);
-        editor.apply();
+        editor.commit();
 
         //SessionController sessionController = new SessionController(mContext);
         //sessionController.setDeviceId(deviceId);

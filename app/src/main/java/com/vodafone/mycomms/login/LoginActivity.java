@@ -26,6 +26,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.util.APIWrapper;
@@ -44,11 +45,17 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
     LoginController loginController;
 
+    private boolean isForeground;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Register Otto Bus
+        BusProvider.getInstance().register(this);
+
+        //Initializations
         btLogin = (Button) findViewById(R.id.btLogin);
         btLoginSalesforce = (Button) findViewById(R.id.btLoginSalesforce);
         tvForgotPass = (TextView) findViewById(R.id.tvForgotPass);
@@ -216,8 +223,6 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
         //Load profile
         ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
-//        TestConnection testConnection = new TestConnection(this.getApplicationContext(), this.loginController);
-//        testConnection.request();
     }
 
     @Override
@@ -256,12 +261,14 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
     //Called when user profile has been loaded
     @Subscribe
     public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
-        goToApp();
+        if(!isForeground) return;
+            goToApp();
     }
 
     //Called when user profile has failed
     @Subscribe
     public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
+        if(!isForeground) return;
 
         if(((MycommsApp)getApplication()).isProfileAvailable()) {
             goToApp();
@@ -279,5 +286,17 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         Intent in = new Intent(LoginActivity.this, DashBoardActivity.class);
         startActivity(in);
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        isForeground = true;
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        isForeground = false;
+        super.onPause();
     }
 }

@@ -10,10 +10,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -28,12 +34,17 @@ public class OAuthActivity extends Activity {
     WebView wvOAuth;
     String oauthPrefix;
 
+    private boolean isForeground;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_oauth_web);
 
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);
+
+        //Register Otto Bus
+        BusProvider.getInstance().register(this);
 
         //Read OAuth prefix
         oauthPrefix = getIntent().getStringExtra("oauth");
@@ -116,13 +127,8 @@ public class OAuthActivity extends Activity {
 
                 UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
 
-                //Start Main activity
-                Intent in = new Intent(OAuthActivity.this, DashBoardActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-                startActivity(in);
-                finish();
+                //Load profile
+                ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
             }
             else if (status.compareTo("203") == 0) {
                 //We have got user information, continue SignUp process
@@ -154,6 +160,36 @@ public class OAuthActivity extends Activity {
         }
     }
 
+    //Called when user profile has been loaded
+    @Subscribe
+    public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
+        if(!isForeground) return;
+        goToApp();
+    }
+
+    //Called when user profile has failed
+    @Subscribe
+    public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
+        if(!isForeground) return;
+
+        if(((MycommsApp)getApplication()).isProfileAvailable()) {
+            goToApp();
+        }
+        else {
+            Toast.makeText(this,
+                    getString(R.string.no_internet_connection_log_in_needed),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void goToApp()
+    {
+        //Go to app
+        Intent in = new Intent(OAuthActivity.this, DashBoardActivity.class);
+        startActivity(in);
+        finish();
+    }
+
     private class CallOAuthCallback extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
         @Override
         protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
@@ -163,5 +199,17 @@ public class OAuthActivity extends Activity {
         protected void onPostExecute(HashMap<String,Object> result) {
             callbackOAuthCallback(result);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        isForeground = true;
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        isForeground = false;
+        super.onPause();
     }
 }

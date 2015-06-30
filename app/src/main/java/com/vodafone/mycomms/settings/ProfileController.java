@@ -65,6 +65,7 @@ public class ProfileController extends BaseController {
             }
         }
 
+
         if(profileConnection != null){
             profileConnection.cancel();
         }

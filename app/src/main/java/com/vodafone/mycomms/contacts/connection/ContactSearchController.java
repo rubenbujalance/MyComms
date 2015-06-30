@@ -94,18 +94,10 @@ public class ContactSearchController extends BaseController {
                 ContactController contactController = new ContactController(mContext, mRealm, mProfileId);
                 ArrayList<Contact> contactArrayList = contactController.insertContactListInRealm(jsonResponse);
 
-                JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
-                if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
-                    int pageSize = jsonPagination.getInt(Constants.CONTACT_PAGINATION_PAGESIZE);
-                    offsetPaging = offsetPaging + pageSize;
-                    getContactByIdPagination();
-                } else {
-                    offsetPaging = 0;
-                    contactController.insertRecentContactInRealm(mJSONRecents);
-                    //Show Recents on Dashboard
-                    BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-                    new DownloadImagesAsyncTask(mContext, contactArrayList).execute();
-                }
+                contactController.insertRecentContactInRealm(mJSONRecents);
+                //Show Recents on Dashboard
+                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+                new DownloadImagesAsyncTask(mContext, contactArrayList).execute();
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
             }

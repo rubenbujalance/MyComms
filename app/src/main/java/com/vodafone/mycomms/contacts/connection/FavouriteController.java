@@ -1,8 +1,6 @@
 package com.vodafone.mycomms.contacts.connection;
 
-import android.app.Activity;
 import android.content.Context;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
@@ -10,6 +8,7 @@ import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshFavouritesEvent;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
@@ -26,26 +25,29 @@ public class FavouriteController  extends BaseController {
     private FavouriteConnection mFavouriteConnection;
     private String apiCall;
     private String mProfileId;
+    private int method;
 
-    public FavouriteController(Activity activity, Realm realm, String profileId) {
-        super(activity);
+    public FavouriteController(Context context, Realm realm, String profileId) {
+        super(context);
         this.mRealm = realm;
-        this.mContext = activity;
+        this.mContext = context;
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
     }
 
-    public FavouriteController(Fragment fragment, Realm realm, String profileId) {
-        super(fragment);
-        this.mRealm = realm;
-        this.mContext = fragment.getActivity();
-        this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+    public void getFavouritesList(String api){
+        Log.i(Constants.TAG, "FavouriteController.getFavouritesList: ");
+        if(mFavouriteConnection != null){
+            mFavouriteConnection.cancel();
+        }
+        apiCall = api;
+        method = HttpConnection.GET;
+        mFavouriteConnection = new FavouriteConnection(getContext(), this, apiCall,method );
+        mFavouriteConnection.request();
     }
 
     public void manageFavourite(String contactId){
         Log.i(Constants.TAG, "FavouriteController.manageFavourite: ");
-        int method;
         JSONObject json = null;
         HashMap body = new HashMap<>();
         if(mFavouriteConnection != null){
@@ -85,8 +87,23 @@ public class FavouriteController  extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-        Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: ");
+        Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: method " + method);
         String result = response.getData().toString();
-        BusProvider.getInstance().post(new RefreshFavouritesEvent());
+        if (method == HttpConnection.POST || method == HttpConnection.POST) {
+            BusProvider.getInstance().post(new RefreshFavouritesEvent());
+        } else if (method == HttpConnection.GET){
+            try {
+                if (result != null && !result.equals("")) {
+                    JSONObject jsonResponse = new JSONObject(result);
+                    ContactController contactController = new ContactController(mContext, mRealm, mProfileId);
+                    contactController.insertFavouriteContactInRealm(jsonResponse);
+                } else {
+                    realmContactTransactions.deleteAllFavouriteContacts();
+                }
+                BusProvider.getInstance().post(new SetContactListAdapterEvent());
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "ContactController.onConnectionComplete: favourites", e);
+            }
+        }
     }
 }

@@ -11,8 +11,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.NewsReceivedEvent;
-import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
+import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
+import com.vodafone.mycomms.events.RecentAvatarsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 
 import java.io.BufferedInputStream;
@@ -50,7 +50,7 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of avatars");
+        Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of images " + imageType);
         long init = Calendar.getInstance().getTimeInMillis();
         Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: INIT 0");
         if (imageType == Constants.IMAGE_TYPE_AVATAR) {
@@ -110,12 +110,11 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
     @Override
     protected void onPostExecute(Void nothing) {
         super.onPostExecute(nothing);
+        Log.i(Constants.TAG, "DownloadImagesAsyncTask.onPostExecute: imageType" + imageType);
         if (imageType == Constants.IMAGE_TYPE_AVATAR) {
-            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+            BusProvider.getInstance().post(new RecentAvatarsReceivedEvent());
         } else if (imageType == Constants.IMAGE_TYPE_NEWS) {
-            NewsReceivedEvent event = new NewsReceivedEvent();
-            event.setNews(mNewsArrayList);
-            BusProvider.getInstance().post(event);
+            BusProvider.getInstance().post(new NewsImagesReceivedEvent());
         }
         if (realm!=null)
             realm.close();
@@ -128,7 +127,6 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
             file.mkdirs();
 
             Log.i(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: downloading image " + fileName + "...");
-            //if (!downloadFile(String.valueOf(url), dir, avatarFileName)) {
             if (!okHttpDownloadFile(String.valueOf(url), dir, fileName)) {
                 File badAvatar = new File(mContext.getFilesDir() + dir, fileName);
                 badAvatar.delete();

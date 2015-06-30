@@ -12,11 +12,12 @@ import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.contacts.connection.DownloadContactsAsyncTask;
+import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.InitNews;
+import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
@@ -244,12 +245,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     @Subscribe
-    public void initNews(InitNews event){
-        Log.i(Constants.TAG, "MyCommsApp.InitNews: ");
-        getNews();
-    }
-
-    @Subscribe
     public void onApplicationAndProfileInitialized(ApplicationAndProfileInitialized event)
     {
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
@@ -268,6 +263,15 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onRecentContactsReceivedEvent (RecentContactsReceivedEvent event)
     {
         XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+    }
+
+    @Subscribe
+    public void onEventNewsImagesReceived(NewsImagesReceivedEvent event){
+        Log.i(Constants.TAG, "MycommsApp.onEventNewsImagesReceived: ");
+        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        Realm realm = Realm.getInstance(this);
+        FavouriteController favouriteController = new FavouriteController(mContext, realm, profile_id);
+        favouriteController.getFavouritesList(Constants.CONTACT_API_GET_FAVOURITES);
     }
 
     public void getNews() {

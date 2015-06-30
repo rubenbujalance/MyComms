@@ -236,6 +236,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onApplicationAndProfileInitialized(ApplicationAndProfileInitialized event)
     {
+        //TODO RBM - Only for testing before merge with Albert
+        new DownloadContactsAsyncTask().execute(mContext);
+
         if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
         {
             String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);

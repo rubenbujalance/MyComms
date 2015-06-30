@@ -425,7 +425,8 @@ public class DashBoardActivity extends ToolbarActivity{
     @Subscribe
     public void onRecentContactsReceived(RecentContactsReceivedEvent event){
         loadRecents();
-        MycommsApp mycommsApp = new MycommsApp();
-        mycommsApp.getNews();
+        //MycommsApp mycommsApp = new MycommsApp();
+        //mycommsApp.getNews();
+        ((MycommsApp)getApplication()).getNews();
     }
 }

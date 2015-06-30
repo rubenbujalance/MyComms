@@ -24,7 +24,7 @@ public class NewsController extends BaseController {
 
     public NewsController(Context context) {
         super(context);
-        this.mContext = context;
+        this.mContext = getContext();
         newsList = new ArrayList<>();
     }
 

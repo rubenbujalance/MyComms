@@ -18,7 +18,8 @@ import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
-import com.vodafone.mycomms.main.connection.DownloadNewsAsyncTask;
+import com.vodafone.mycomms.events.RefreshNewsEvent;
+import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
@@ -29,10 +30,12 @@ import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TimeZone;
 
 import io.realm.Realm;
+import model.News;
 import model.UserProfile;
 
 /**
@@ -42,7 +45,7 @@ import model.UserProfile;
  * It handles global data and backend services
  */
 
-public class MycommsApp extends Application implements IProfileConnectionCallback {
+public class MycommsApp extends Application implements IProfileConnectionCallback, INewsConnectionCallback {
 
     private ProfileController profileController;
     private NewsController newsController;
@@ -228,6 +231,15 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Log.e(Constants.TAG, "MycommsApp.onConnectionNotAvailable: ");
     }
 
+    @Override
+    public void onNewsResponse(ArrayList<News> newsList) {
+        Log.i(Constants.TAG, "MyCommsApp.onNewsResponse: ");
+        RefreshNewsEvent event = new RefreshNewsEvent();
+        event.setNews(newsList);
+        BusProvider.getInstance().post(event);
+
+    }
+
     @Subscribe
     public void initNews(InitNews event){
         Log.i(Constants.TAG, "MyCommsApp.InitNews: ");
@@ -257,7 +269,11 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     public void getNews() {
         Log.i(Constants.TAG, "MycommsApp.getNews: ");
-        new DownloadNewsAsyncTask().execute(this);
+//        new DownloadNewsAsyncTask().execute(getApplicationContext());
+        NewsController mNewsController = new NewsController(mContext);
+        String apiCall = Constants.NEWS_API_GET;
+        mNewsController.getNewsList(apiCall);
+        mNewsController.setConnectionCallback(this);
     }
 
     public class sendAvatar extends AsyncTask<String, Void, String>

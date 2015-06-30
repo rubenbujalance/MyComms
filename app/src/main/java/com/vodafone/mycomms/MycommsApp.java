@@ -235,7 +235,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Override
     public void onNewsResponse(ArrayList<News> newsList) {
         Log.i(Constants.TAG, "MyCommsApp.onNewsResponse: ");
-        new DownloadImagesAsyncTask(getBaseContext(), newsList, 0).execute();
+        DownloadImagesAsyncTask downloadImagesAsyncTask = new DownloadImagesAsyncTask(getBaseContext(), newsList, 0);
+        downloadImagesAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
         BusProvider.getInstance().post(event);
@@ -271,7 +272,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     public void getNews() {
         Log.i(Constants.TAG, "MycommsApp.getNews: ");
-//        new DownloadNewsAsyncTask().execute(getApplicationContext());
         NewsController mNewsController = new NewsController(mContext);
         String apiCall = Constants.NEWS_API_GET;
         mNewsController.getNewsList(apiCall);

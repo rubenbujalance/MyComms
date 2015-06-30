@@ -25,8 +25,8 @@ import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
-import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
@@ -306,6 +306,7 @@ public class DashBoardActivity extends ToolbarActivity{
         Log.i(Constants.TAG, "DashBoardActivity.drawNews: ");
         try{
             LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
+            container.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
 
             for (int i = 0; i < newsArrayList.size(); i++) {
@@ -315,12 +316,20 @@ public class DashBoardActivity extends ToolbarActivity{
                 child.setPadding(10, 20, 10, 20);
 
                 ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
-                Picasso.with(this)
-                        .load("https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage())
-                                //.resize(300,300)
-                                //.centerInside()
-                        .fit().centerInside()
-                        .into(newsImage);
+                File newsFile = new File(getFilesDir(), Constants.CONTACT_NEWS_DIR +
+                        "news_"+newsArrayList.get(i).getUuid()+".jpg");
+
+                if (newsFile.exists()) {
+                    Picasso.with(this)
+                            .load(newsFile)
+                            .fit().centerInside()
+                            .into(newsImage);
+                } else{
+                    Picasso.with(this)
+                            .load("https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage())
+                            .fit().centerInside()
+                            .into(newsImage);
+                }
 
                 final TextView title = (TextView) child.findViewById(R.id.notice_title);
                 title.setText(newsArrayList.get(i).getTitle());
@@ -407,7 +416,7 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     @Subscribe
-    public void onEventNewsReceived(RefreshNewsEvent event){
+    public void onEventNewsReceived(NewsReceivedEvent event){
         Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
         if(news != null) {
@@ -425,8 +434,6 @@ public class DashBoardActivity extends ToolbarActivity{
     @Subscribe
     public void onRecentContactsReceived(RecentContactsReceivedEvent event){
         loadRecents();
-        //MycommsApp mycommsApp = new MycommsApp();
-        //mycommsApp.getNews();
         ((MycommsApp)getApplication()).getNews();
     }
 }

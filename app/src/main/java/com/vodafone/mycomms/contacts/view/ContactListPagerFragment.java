@@ -17,6 +17,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshFavouritesEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
@@ -189,6 +190,12 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
             contactRecentListFragment.setListAdapterTabs();
         if (contactFavouritesListFragment!=null)
             contactFavouritesListFragment.setListAdapterTabs();
+    }
+
+    @Subscribe
+    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
+        Log.i(Constants.TAG, "ContactListPagerFragment.onRecentContactsReceived: ");
+        setListsAdapter();
     }
 
     @Subscribe

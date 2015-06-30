@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.RefreshNewsEvent;
+import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class DownloadNewsAsyncTask extends AsyncTask<Context, Void, Void> implem
     public void onNewsResponse(ArrayList<News> newsList) {
         Log.i(Constants.TAG, "DownloadNewsAsyncTask.onNewsResponse: " + apiCall);
 
-        RefreshNewsEvent event = new RefreshNewsEvent();
+        NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
         BusProvider.getInstance().post(event);
 

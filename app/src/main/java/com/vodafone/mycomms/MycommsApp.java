@@ -17,14 +17,15 @@ import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.InitNews;
+import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
-import com.vodafone.mycomms.events.RefreshNewsEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.DownloadImagesAsyncTask;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -234,7 +235,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Override
     public void onNewsResponse(ArrayList<News> newsList) {
         Log.i(Constants.TAG, "MyCommsApp.onNewsResponse: ");
-        RefreshNewsEvent event = new RefreshNewsEvent();
+        new DownloadImagesAsyncTask(getBaseContext(), newsList, 0).execute();
+        NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
         BusProvider.getInstance().post(event);
 

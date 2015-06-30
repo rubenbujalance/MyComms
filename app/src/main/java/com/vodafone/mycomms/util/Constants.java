@@ -136,6 +136,7 @@ public class Constants {
     public static final String AVATAR_URL = "urlAvatar";
     public static final String AVATAR_PATH = "pathAvatar";
     public static final String CONTACT_AVATAR_DIR = "/avatars/files/";
+    public static final String CONTACT_NEWS_DIR = "/news/files/";
     public static final String CONTACT_CHAT_FILES = "/chat/files/";
 
     //Chat BD Fields
@@ -204,4 +205,7 @@ public class Constants {
     public static final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpg");
     public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");
     public static final String FIRST_TIME_AVATAR_DELIVERY = "first_time_avatar_delivery";
+
+    public static final int IMAGE_TYPE_AVATAR = 0;
+    public static final int IMAGE_TYPE_NEWS = 1;
 }

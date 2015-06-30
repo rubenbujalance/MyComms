@@ -9,7 +9,9 @@ import android.util.Log;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 
@@ -25,47 +27,80 @@ import java.util.Calendar;
 import io.realm.Realm;
 import model.Contact;
 import model.ContactAvatar;
+import model.News;
 
 public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
     private Context mContext;
     private ArrayList<Contact> mContactArrayList;
+    private ArrayList<News> mNewsArrayList;
     private Realm realm;
+    private int imageType;
 
     public DownloadImagesAsyncTask(Context context, ArrayList<Contact> contactArrayList){
         this.mContext = context;
         this.mContactArrayList = contactArrayList;
+        imageType = Constants.IMAGE_TYPE_AVATAR;
+    }
+
+    public DownloadImagesAsyncTask(Context context, ArrayList<News> newsArrayList, int foo){
+        this.mContext = context;
+        this.mNewsArrayList = newsArrayList;
+        imageType = Constants.IMAGE_TYPE_NEWS;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
         Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of avatars");
-        realm = Realm.getInstance(mContext);
-        RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(realm);
         long init = Calendar.getInstance().getTimeInMillis();
-        Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: INIT 0" );
-        for(int i=0; i<mContactArrayList.size(); i++) {
-            try {
-                Contact contact = mContactArrayList.get(i);
+        Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: INIT 0");
+        if (imageType == Constants.IMAGE_TYPE_AVATAR) {
+            realm = Realm.getInstance(mContext);
+            RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(realm);
+            for (int i = 0; i < mContactArrayList.size(); i++) {
+                try {
+                    Contact contact = mContactArrayList.get(i);
 
-                if (contact.getAvatar() != null && contact.getAvatar().length() != 0) {
-                    String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
-                    ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
+                    if (contact.getAvatar() != null && contact.getAvatar().length() != 0) {
+                        String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
+                        ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
 
-                    if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                        if(downloadContactAvatar(contact)) {
-                            if (avatar == null) {
-                                avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), avatarFileName);
-                            } else {
-                                realm.beginTransaction();
-                                avatar.setUrl(contact.getAvatar());
-                                realm.commitTransaction();
+                        if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
+//                            if (downloadContactAvatar(contact)) {
+                            URL url = new URL(contact.getAvatar());
+                            if (downloadImage(url, avatarFileName, Constants.CONTACT_AVATAR_DIR)) {
+                                if (avatar == null) {
+                                    avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), avatarFileName);
+                                } else {
+                                    realm.beginTransaction();
+                                    avatar.setUrl(contact.getAvatar());
+                                    realm.commitTransaction();
+                                }
+                                realmAvatarTransactions.insertAvatar(avatar);
                             }
-                            realmAvatarTransactions.insertAvatar(avatar);
                         }
                     }
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ", e);
                 }
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ", e);
+            }
+        }else if (imageType == Constants.IMAGE_TYPE_NEWS){
+            for (int i = 0; i < mNewsArrayList.size(); i++) {
+                try {
+                    News news = mNewsArrayList.get(i);
+
+                    if (news.getImage() != null && news.getImage().length() != 0) {
+                        String newsFileName = "news_"+ mNewsArrayList.get(i).getUuid()+".jpg";
+
+                        String dir = Constants.CONTACT_NEWS_DIR;
+                        File file = new File(mContext.getFilesDir() + dir+newsFileName);
+                        if (!file.exists()) {
+                            URL url = new URL("https://" + EndpointWrapper.getBaseNewsURL() + mNewsArrayList.get(i).getImage());
+                            downloadImage(url, newsFileName, dir);
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: ", e);
+                }
             }
         }
         Log.i(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: FINISHED AT " + ((Calendar.getInstance().getTimeInMillis()-init)/1000));
@@ -75,24 +110,27 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
     @Override
     protected void onPostExecute(Void nothing) {
         super.onPostExecute(nothing);
-        BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-        realm.close();
+        if (imageType == Constants.IMAGE_TYPE_AVATAR) {
+            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+        } else if (imageType == Constants.IMAGE_TYPE_NEWS) {
+            NewsReceivedEvent event = new NewsReceivedEvent();
+            event.setNews(mNewsArrayList);
+            BusProvider.getInstance().post(event);
+        }
+        if (realm!=null)
+            realm.close();
     }
 
-    private boolean downloadContactAvatar(Contact contact)
+    private boolean downloadImage(URL url, String fileName, String dir)
     {
         try {
-            URL url = new URL(contact.getAvatar());
-            String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
-            String dir = Constants.CONTACT_AVATAR_DIR;
-
             File file = new File(mContext.getFilesDir() + dir);
             file.mkdirs();
 
-            Log.i(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: downloading avatar " + avatarFileName + "...");
+            Log.i(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: downloading image " + fileName + "...");
             //if (!downloadFile(String.valueOf(url), dir, avatarFileName)) {
-            if (!okHttpDownloadFile(String.valueOf(url), dir, avatarFileName)) {
-                File badAvatar = new File(mContext.getFilesDir() + dir, avatarFileName);
+            if (!okHttpDownloadFile(String.valueOf(url), dir, fileName)) {
+                File badAvatar = new File(mContext.getFilesDir() + dir, fileName);
                 badAvatar.delete();
                 return false;
             }
@@ -104,14 +142,14 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
         return true;
     }
 
-    public boolean okHttpDownloadFile(final String path, String dir, String avatarFileName){
+    public boolean okHttpDownloadFile(final String path, String dir, String fileName){
         OkHttpClient client = new OkHttpClient();
         try {
             Request request = new Request.Builder().url(path).build();
             Response response = client.newCall(request).execute();
             InputStream in = response.body().byteStream();
             BufferedInputStream inStream = new BufferedInputStream(in, 1024 * 5);
-            File file = new File(mContext.getFilesDir() + dir, avatarFileName);
+            File file = new File(mContext.getFilesDir() + dir, fileName);
             if (file.exists()) {
                 file.delete();
             }

@@ -6,6 +6,8 @@ import android.util.Log;
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONException;
@@ -68,6 +70,7 @@ public class RecentContactController extends BaseController {
             String apiCall = Constants.CONTACT_API_GET_RECENTS;
             ContactController contactController = new ContactController(getActivity(), mRealm, mProfileId);
             contactController.getRecentList(apiCall);
+            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
         } else{
             Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: GET");
             String result = response.getData().toString();

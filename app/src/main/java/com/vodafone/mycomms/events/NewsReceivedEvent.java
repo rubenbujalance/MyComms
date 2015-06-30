@@ -7,7 +7,7 @@ import model.News;
 /**
  * Created by str_rbm on 04/06/2015.
  */
-public class RefreshNewsEvent {
+public class NewsReceivedEvent {
     private ArrayList<News> newslist;
 
     public ArrayList<News> getNews() {

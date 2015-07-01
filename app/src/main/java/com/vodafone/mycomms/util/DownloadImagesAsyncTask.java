@@ -79,23 +79,26 @@ public class DownloadImagesAsyncTask extends AsyncTask<Void, String, Void> {
                     try {
                         Contact contact = mContactArrayList.get(i);
                         //Check if avatar is currently being downloaded
-                        if (!downloadingAvatars.containsKey(contact.getContactId())) {
-                            if (contact.getAvatar() != null && contact.getAvatar().length() != 0) {
-                                String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
-                                ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
+                        //TODO: De momento solo descargaremos los avatares de MC porque los SF dan error
+                        if (contact.getPlatform().equalsIgnoreCase("mc")) {
+                            if (!downloadingAvatars.containsKey(contact.getContactId())) {
+                                if (contact.getAvatar() != null && contact.getAvatar().length() != 0) {
+                                    String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
+                                    ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
 
-                                if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                                    //                            if (downloadContactAvatar(contact)) {
-                                    URL url = new URL(contact.getAvatar());
-                                    if (downloadImage(url, avatarFileName, Constants.CONTACT_AVATAR_DIR)) {
-                                        if (avatar == null) {
-                                            avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), avatarFileName);
-                                        } else {
-                                            realm.beginTransaction();
-                                            avatar.setUrl(contact.getAvatar());
-                                            realm.commitTransaction();
+                                    if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
+                                        //                            if (downloadContactAvatar(contact)) {
+                                        URL url = new URL(contact.getAvatar());
+                                        if (downloadImage(url, avatarFileName, Constants.CONTACT_AVATAR_DIR)) {
+                                            if (avatar == null) {
+                                                avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), avatarFileName);
+                                            } else {
+                                                realm.beginTransaction();
+                                                avatar.setUrl(contact.getAvatar());
+                                                realm.commitTransaction();
+                                            }
+                                            realmAvatarTransactions.insertAvatar(avatar);
                                         }
-                                        realmAvatarTransactions.insertAvatar(avatar);
                                     }
                                 }
                             }

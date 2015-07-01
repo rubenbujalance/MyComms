@@ -3,6 +3,8 @@ package com.vodafone.mycomms.main;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
@@ -28,7 +31,6 @@ import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentAvatarsReceivedEvent;
-import com.vodafone.mycomms.events.InitProfileAndContacts;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -36,12 +38,12 @@ import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
-import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -147,44 +149,109 @@ public class DashBoardActivity extends ToolbarActivity{
             LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
             recentsContainer.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
+            RecentContact recentContact;
 
             for (int i = 0; i < recentList.size(); i++) {
+                recentContact = recentList.get(i);
+
                 View childRecents = inflater.inflate(R.layout.layout_recents_dashboard, recentsContainer, false);
 
                 recentsContainer.addView(childRecents);
                 childRecents.setPadding(10, 20, 10, 20);
 
-                ImageView recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
-                File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                        "avatar_"+recentList.get(i).getContactId()+".jpg");
+                final ImageView recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
+                final File avatarFile = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR,
+                        "avatar_"+recentContact.getContactId()+".jpg");
 
-                if (avatarFile.exists()) {
+                //Avatar image
+                if (avatarFile.exists()) { //From file if already exists
                     Picasso.with(this)
                             .load(avatarFile)
                             .fit().centerCrop()
                             .into(recentAvatar);
                 } else {
+                    //Set name initials image during the download
                     String initials = "";
-                    if(null != recentList.get(i).getFirstName() && recentList.get(i).getFirstName().length() > 0)
-                    {
-                        initials = recentList.get(i).getFirstName().substring(0,1);
+                    if (null != recentContact.getFirstName() && recentContact.getFirstName().length() > 0) {
+                        initials = recentContact.getFirstName().substring(0, 1);
 
-                        if(null != recentList.get(i).getLastName() && recentList.get(i).getLastName().length() > 0)
-                        {
-                            initials = initials + recentList.get(i).getLastName().substring(0,1);
+                        if (null != recentContact.getLastName() && recentContact.getLastName().length() > 0) {
+                            initials = initials + recentContact.getLastName().substring(0, 1);
                         }
 
                     }
+
                     TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(initials);
+
+                    //Download avatar
+                    if (recentContact.getAvatar() != null &&
+                            recentContact.getAvatar().length() > 0) {
+                        File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+
+                        if(!avatarsDir.exists()) avatarsDir.mkdirs();
+
+                        final Target target = new Target() {
+                            @Override
+                            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            //Descarga del archivo local
+                                            Log.e(Constants.TAG, "DashBoardActivity.run(INICIO DownloadAvatar by Picasso: "
+                                                    + avatarFile.toString());
+
+                                            avatarFile.createNewFile();
+                                            FileOutputStream ostream = new FileOutputStream(avatarFile);
+                                            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
+                                            ostream.close();
+                                            Log.e(Constants.TAG, "DashBoardActivity.run(FIN DownloadAvatar by Picasso: "
+                                                    + avatarFile.toString());
+
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //Carga del bitmap
+                                                    Picasso.with(DashBoardActivity.this)
+                                                            .load(avatarFile)
+                                                            .fit().centerCrop()
+                                                            .into(recentAvatar);
+                                                }
+                                            });
+
+                                        } catch (Exception e) {
+                                            Log.e(Constants.TAG, "DashBoardActivity.run: ", e);
+                                            if(avatarFile.exists()) avatarFile.delete();
+                                        }
+                                    }
+                                }).start();
+                            }
+
+                            @Override
+                            public void onBitmapFailed(Drawable errorDrawable) {
+                                if(avatarFile.exists()) avatarFile.delete();
+                            }
+
+                            @Override
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                            }
+                        };
+
+                        Picasso.with(this)
+                            .load(recentContact.getAvatar())
+                            .into(target);
+                    }
                 }
 
+                // Names
                 TextView firstName = (TextView) childRecents.findViewById(R.id.recent_firstname);
-                firstName.setText(recentList.get(i).getFirstName());
+                firstName.setText(recentContact.getFirstName());
 
                 TextView lastName = (TextView) childRecents.findViewById(R.id.recent_lastname);
-                lastName.setText(recentList.get(i).getLastName());
+                lastName.setText(recentContact.getLastName());
 
                 // Badges
                 _realm = Realm.getInstance(this);
@@ -192,8 +259,8 @@ public class DashBoardActivity extends ToolbarActivity{
 
                 ChatListHolder chatHolder = new ChatListHolder(childRecents);
 
-                long count =_chatTx.getChatPendingMessagesCount(recentList.get(i).getContactId());
-                String action = recentList.get(i).getAction();
+                long count =_chatTx.getChatPendingMessagesCount(recentContact.getContactId());
+                String action = recentContact.getAction();
                 if(count > 0 && action.equals(Constants.CONTACTS_ACTION_SMS)) {
                     TextView unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
                     unread_messages.setVisibility(View.VISIBLE);
@@ -424,8 +491,7 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     @Subscribe
-    public void onEventNewsReceived(NewsReceivedEvent event)
-    {
+    public void onEventNewsReceived(NewsReceivedEvent event) {
         Log.e(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
         if(news != null) {
@@ -435,8 +501,7 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     @Subscribe
-    public void onEventChatsReceived(ChatsReceivedEvent event)
-    {
+    public void onEventChatsReceived(ChatsReceivedEvent event) {
         checkUnreadChatMessages();
         loadRecents();
     }

@@ -17,9 +17,8 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
-import com.vodafone.mycomms.events.InitNews;
+import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
@@ -242,7 +241,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
         BusProvider.getInstance().post(event);
-
     }
 
     @Subscribe

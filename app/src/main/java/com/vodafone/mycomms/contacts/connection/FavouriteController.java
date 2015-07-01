@@ -6,8 +6,10 @@ import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
+import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
@@ -16,7 +18,7 @@ import com.vodafone.mycomms.events.RefreshFavouritesEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
@@ -32,6 +34,7 @@ public class FavouriteController  extends BaseController {
     private String apiCall;
     private String mProfileId;
     private int method;
+    private HashMap body;
 
     public FavouriteController(Context context, Realm realm, String profileId) {
         super(context);
@@ -53,7 +56,7 @@ public class FavouriteController  extends BaseController {
     public void manageFavourite(String contactId){
         Log.i(Constants.TAG, "FavouriteController.manageFavourite: ");
         JSONObject json = null;
-        HashMap body = new HashMap<>();
+        body = new HashMap<>();
         if(mFavouriteConnection != null){
             mFavouriteConnection.cancel();
         }
@@ -65,7 +68,6 @@ public class FavouriteController  extends BaseController {
             json = new JSONObject();
             apiCall = apiCall + contactId;
             String test = "{}";
-            //TODO: Investigate how to send a Payload on OKHTTP
             mFavouriteConnection = new FavouriteConnection(getContext(), this, apiCall, method);
             mFavouriteConnection.setPayLoad(test);
             mFavouriteConnection.request();
@@ -82,6 +84,9 @@ public class FavouriteController  extends BaseController {
             mFavouriteConnection.setPayLoad(json.toString());
             mFavouriteConnection.request();
         }
+        //TODO: Pending Test
+//        new FavouritesAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+//                (String)apiCall, json);
     }
 
     public boolean contactIsFavourite(String contactId)
@@ -92,7 +97,7 @@ public class FavouriteController  extends BaseController {
     public void favouriteListCallback(String json){
         Log.i(Constants.TAG, "FavouriteController.favouriteListCallback " + method);
         if (method == HttpConnection.POST || method == HttpConnection.DELETE) {
-            BusProvider.getInstance().post(new RefreshFavouritesEvent());
+            BusProvider.getInstance().post(new SetContactListAdapterEvent());
         } else if (method == HttpConnection.GET){
             try {
                 if (json != null && !json.equals("")) {
@@ -118,7 +123,7 @@ public class FavouriteController  extends BaseController {
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: method " + method);
         String result = response.getData().toString();
-        if (method == HttpConnection.POST || method == HttpConnection.POST) {
+        if (method == HttpConnection.POST || method == HttpConnection.DELETE) {
             BusProvider.getInstance().post(new RefreshFavouritesEvent());
         } else if (method == HttpConnection.GET){
             try {
@@ -144,23 +149,46 @@ public class FavouriteController  extends BaseController {
         @Override
         protected String doInBackground(String... params) {
             Log.e(Constants.TAG, "FavouritesAsyncTask.doInBackground: START");
-
+            //String jsonBody = params[1];
+            String jsonBody;
             Response response = null;
             String json = null;
 
             try {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url("https://" + EndpointWrapper.getBaseURL() +
-                                params[0])
-                        .addHeader("x-mycomms-version", "android/0.1.129")
-                        .addHeader("Content-Type", "application/json; charset=utf-8")
-                        .addHeader("Authorization", "Bearer " +
-                                UserSecurity.getAccessToken(mContext))
-                        .build();
 
+                OkHttpClient client = new OkHttpClient();
+                Request request = null;
+                if (method == HttpConnection.GET) {
+                    request = new Request.Builder()
+                            .url("https://" + EndpointWrapper.getBaseURL() +
+                                    params[0])
+                            .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                    Utils.getHttpHeaderVersion(mContext))
+                            .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                    Utils.getHttpHeaderContentType())
+                            .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                    Utils.getHttpHeaderAuth(mContext))
+                            .build();
+                } if (method == HttpConnection.POST || method == HttpConnection.POST) {
+                    jsonBody = params[1];
+                    MediaType JSON
+                            = MediaType.parse("application/json; charset=utf-8");
+                    RequestBody body = RequestBody.create(JSON, jsonBody);
+                    request = new Request.Builder()
+                            .url("https://" + EndpointWrapper.getBaseURL() +
+                                    params[0])
+                            .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                    Utils.getHttpHeaderVersion(mContext))
+                            .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                    Utils.getHttpHeaderContentType())
+                            .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                    Utils.getHttpHeaderAuth(mContext))
+                            .post(body)
+                            .build();
+                }
                 response = client.newCall(request).execute();
                 json = response.body().string();
+
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "FavouritesAsyncTask.doInBackground: ",e);

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -364,4 +366,31 @@ public final class Utils extends Activity {
 
         return exists;
     }
+
+    public static String getHttpHeaderVersion(Context context) {
+        String versionHeader = "android/";
+
+        PackageInfo pinfo = null;
+        try {
+            pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.wtf(Constants.TAG, "Utils.getHttpHeaderVersion: Couldn't get application version:", e);
+            return null;
+        }
+
+        int versionCode = pinfo.versionCode;
+        String versionName = pinfo.versionName;
+        versionHeader += versionName + "." + versionCode;
+
+        return versionHeader;
+    }
+
+    public static String getHttpHeaderAuth(Context context) {
+        return "Bearer "+UserSecurity.getAccessToken(context);
+    }
+
+    public static String getHttpHeaderContentType() {
+        return "application/json; charset=utf-8";
+    }
+
 }

@@ -14,6 +14,11 @@ public class Constants {
     public static final int HTTP_READ_AVATAR_TIMEOUT = 10000;
     public static final int HTTP_READ_FILE_TIMEOUT = 60000;
 
+    //API Constants
+    public static final String API_HTTP_HEADER_VERSION = "x-mycomms-version";
+    public static final String API_HTTP_HEADER_CONTENTTYPE = "Content-Type";
+    public static final String API_HTTP_HEADER_AUTHORIZATION = "Authorization";
+
     //Chat Constants
     public static final int LEFT_CHAT = 0;
     public static final int RIGHT_CHAT = 1;

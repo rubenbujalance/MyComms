@@ -1,12 +1,18 @@
 package com.vodafone.mycomms.main.connection;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.framework.library.model.ConnectionResponse;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -102,5 +108,48 @@ public class NewsController extends BaseController {
             Log.e(Constants.TAG, "NewsAPIController.mapNews: " + e.toString());
         }
         return news;
+    }
+
+    public void newsListCallback(String json) {
+
+    }
+
+    public class NewsListAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            Log.e(Constants.TAG, "NewsAsyncTask.doInBackground: START");
+
+            Response response = null;
+            String json = null;
+
+            try {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("https://" + EndpointWrapper.getBaseURL() +
+                                params[0])
+                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                Utils.getHttpHeaderVersion(mContext))
+                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                Utils.getHttpHeaderContentType())
+                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                Utils.getHttpHeaderAuth(mContext))
+                        .build();
+
+                response = client.newCall(request).execute();
+                json = response.body().string();
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "NewsAsyncTask.doInBackground: ",e);
+            }
+
+            Log.e(Constants.TAG, "NewsAsyncTask.doInBackground: END");
+
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(String json) {
+            newsListCallback(json);
+        }
     }
 }

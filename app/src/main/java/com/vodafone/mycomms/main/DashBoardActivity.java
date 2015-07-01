@@ -3,6 +3,9 @@ package com.vodafone.mycomms.main;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,24 +19,27 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.events.InitNews;
-import com.vodafone.mycomms.events.InitProfileAndContacts;
-import com.vodafone.mycomms.events.RefreshNewsEvent;
+import com.vodafone.mycomms.events.DashboardCreatedEvent;
+import com.vodafone.mycomms.events.NewsReceivedEvent;
+import com.vodafone.mycomms.events.RecentAvatarsReceivedEvent;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
-import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,6 +49,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.realm.Realm;
 import model.News;
@@ -53,23 +61,27 @@ public class DashBoardActivity extends ToolbarActivity{
     private Realm _realm;
     private Realm mRealm;
     private RealmChatTransactions _chatTx;
+    private ArrayList<News> newsArrayList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(Constants.TAG, "DashBoardActivity.onCreate: ");
+        Log.e(Constants.TAG, "DashBoardActivity.onCreate: ");
 
         BusProvider.getInstance().register(this);
 
         enableToolbarIsClicked(false);
         setContentView(R.layout.layout_dashboard);
+
         initALL();
-        BusProvider.getInstance().post(new InitNews());
-        BusProvider.getInstance().post(new InitProfileAndContacts());
+        //BusProvider.getInstance().post(new InitNews());
+        //BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
         loadNews();
+
+        BusProvider.getInstance().post(new DashboardCreatedEvent());
     }
 
     private void initALL(){
@@ -127,12 +139,12 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     private void loadRecents(){
-        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: ");
+        Log.e(Constants.TAG, "DashBoardActivity.loadRecents: ");
+
         try {
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
             final String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, profileId);
@@ -141,44 +153,84 @@ public class DashBoardActivity extends ToolbarActivity{
             LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
             recentsContainer.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
+            RecentContact recentContact;
 
             for (int i = 0; i < recentList.size(); i++) {
+                recentContact = recentList.get(i);
+
                 View childRecents = inflater.inflate(R.layout.layout_recents_dashboard, recentsContainer, false);
 
                 recentsContainer.addView(childRecents);
                 childRecents.setPadding(10, 20, 10, 20);
 
-                ImageView recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
-                File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                        "avatar_"+recentList.get(i).getContactId()+".jpg");
+                final ImageView recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
+                final File avatarFile = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR,
+                        "avatar_"+recentContact.getContactId()+".jpg");
 
-                if (avatarFile.exists()) {
+                //Avatar image
+                if (avatarFile.exists()) { //From file if already exists
                     Picasso.with(this)
                             .load(avatarFile)
                             .fit().centerCrop()
                             .into(recentAvatar);
                 } else {
+                    //Set name initials image during the download
                     String initials = "";
-                    if(null != recentList.get(i).getFirstName() && recentList.get(i).getFirstName().length() > 0)
-                    {
-                        initials = recentList.get(i).getFirstName().substring(0,1);
+                    if (null != recentContact.getFirstName() && recentContact.getFirstName().length() > 0) {
+                        initials = recentContact.getFirstName().substring(0, 1);
 
-                        if(null != recentList.get(i).getLastName() && recentList.get(i).getLastName().length() > 0)
-                        {
-                            initials = initials + recentList.get(i).getLastName().substring(0,1);
+                        if (null != recentContact.getLastName() && recentContact.getLastName().length() > 0) {
+                            initials = initials + recentContact.getLastName().substring(0, 1);
                         }
 
                     }
-                    TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
+
+                    final TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(initials);
+
+                    //Download avatar
+                    if (recentContact.getAvatar() != null &&
+                            recentContact.getAvatar().length() > 0) {
+                        File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+
+                        if(!avatarsDir.exists()) avatarsDir.mkdirs();
+
+                        final Target target = new Target() {
+                            @Override
+                            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                                SaveAndShowImageAsyncTask task =
+                                        new SaveAndShowImageAsyncTask(
+                                                recentAvatar, avatarFile, bitmap, avatarText);
+
+                                task.executeOnExecutor(Executors.newCachedThreadPool());
+                            }
+
+                            @Override
+                            public void onBitmapFailed(Drawable errorDrawable) {
+                                if(avatarFile.exists()) avatarFile.delete();
+                            }
+
+                            @Override
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                            }
+                        };
+
+                        recentAvatar.setTag(target);
+
+                        Picasso.with(this)
+                            .load(recentContact.getAvatar())
+                            .into(target);
+                    }
                 }
 
+                // Names
                 TextView firstName = (TextView) childRecents.findViewById(R.id.recent_firstname);
-                firstName.setText(recentList.get(i).getFirstName());
+                firstName.setText(recentContact.getFirstName());
 
                 TextView lastName = (TextView) childRecents.findViewById(R.id.recent_lastname);
-                lastName.setText(recentList.get(i).getLastName());
+                lastName.setText(recentContact.getLastName());
 
                 // Badges
                 _realm = Realm.getInstance(this);
@@ -186,8 +238,8 @@ public class DashBoardActivity extends ToolbarActivity{
 
                 ChatListHolder chatHolder = new ChatListHolder(childRecents);
 
-                long count =_chatTx.getChatPendingMessagesCount(recentList.get(i).getContactId());
-                String action = recentList.get(i).getAction();
+                long count =_chatTx.getChatPendingMessagesCount(recentContact.getContactId());
+                String action = recentContact.getAction();
                 if(count > 0 && action.equals(Constants.CONTACTS_ACTION_SMS)) {
                     TextView unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
                     unread_messages.setVisibility(View.VISIBLE);
@@ -286,13 +338,15 @@ public class DashBoardActivity extends ToolbarActivity{
 
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "Load recents error: " + e);
+            Log.e(Constants.TAG, "Load recents error: ",e);
         }
     }
 
 
     private void loadNews() {
-        ArrayList<News> newsArrayList = new ArrayList<>();
+        Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
+
+        newsArrayList = new ArrayList<>();
 
         RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(mRealm);
         newsArrayList = realmNewsTransactions.getAllNews();
@@ -303,9 +357,11 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     private void drawNews(ArrayList<News> newsArrayList) {
-        Log.i(Constants.TAG, "DashBoardActivity.drawNews: ");
+        Log.e(Constants.TAG, "DashBoardActivity.drawNews: ");
+
         try{
             LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
+            container.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
 
             for (int i = 0; i < newsArrayList.size(); i++) {
@@ -314,13 +370,51 @@ public class DashBoardActivity extends ToolbarActivity{
                 container.addView(child);
                 child.setPadding(10, 20, 10, 20);
 
-                ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
-                Picasso.with(this)
-                        .load("https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage())
-                                //.resize(300,300)
-                                //.centerInside()
-                        .fit().centerInside()
-                        .into(newsImage);
+                final ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
+                final File newsFile = new File(getFilesDir(), Constants.CONTACT_NEWS_DIR +
+                        "news_"+newsArrayList.get(i).getUuid()+".jpg");
+
+                if (newsFile.exists()) {
+                    Picasso.with(this)
+                            .load(newsFile)
+                            .fit().centerInside()
+                            .into(newsImage);
+                } else{
+                    //Download image
+                    if (newsArrayList.get(i).getImage() != null &&
+                            newsArrayList.get(i).getImage().length() > 0) {
+                        final String imageUrl = "https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage();
+                        File imagesDir = new File(getFilesDir() + Constants.CONTACT_NEWS_DIR);
+                        if(!imagesDir.exists()) imagesDir.mkdirs();
+
+                        final Target target = new Target() {
+                            @Override
+                            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                                SaveAndShowImageAsyncTask task =
+                                        new SaveAndShowImageAsyncTask(
+                                                newsImage, newsFile, bitmap);
+
+                                task.executeOnExecutor(Executors.newCachedThreadPool());
+                            }
+
+                            @Override
+                            public void onBitmapFailed(Drawable errorDrawable) {
+                                if(newsFile.exists()) newsFile.delete();
+                            }
+
+                            @Override
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                            }
+                        };
+
+                        newsImage.setTag(target);
+
+                        Picasso.with(this)
+                                .load(imageUrl)
+                                .into(target);
+                    }
+                }
 
                 final TextView title = (TextView) child.findViewById(R.id.notice_title);
                 title.setText(newsArrayList.get(i).getTitle());
@@ -376,7 +470,7 @@ public class DashBoardActivity extends ToolbarActivity{
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e(Constants.TAG, "DashBoardActivity.onDestroy: ");
+        Log.i(Constants.TAG, "DashBoardActivity.onDestroy: ");
 
         // Disconnect from the XMPP server
         //XMPPTransactions.disconnectMsgServerSession();
@@ -401,24 +495,40 @@ public class DashBoardActivity extends ToolbarActivity{
     protected void onResume() {
         super.onResume();
         //Update Pending Messages on Toolbar
-        loadRecents();
+//        loadRecents();
         checkUnreadChatMessages();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 
     @Subscribe
-    public void onEventNewsReceived(RefreshNewsEvent event){
-        Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
+    public void onEventNewsReceived(NewsReceivedEvent event) {
+        Log.e(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
         if(news != null) {
-            drawNews(news);
+            if (newsArrayList==null ||newsArrayList.size()==0) {
+                Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: FIRST LOAD");
+                drawNews(news);
+            }
             initALL();
         }
     }
 
     @Subscribe
-    public void onEventChatsReceived(ChatsReceivedEvent event){
+    public void onEventChatsReceived(ChatsReceivedEvent event) {
         checkUnreadChatMessages();
         loadRecents();
     }
+
+    @Subscribe
+    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
+        Log.e(Constants.TAG, "DashBoardActivity.onRecentContactsReceived: ");
+
+        loadRecents();
+        ((MycommsApp)getApplication()).getNews();
+    }
+
+    @Subscribe
+    public void onRecentAvatarsReceived(RecentAvatarsReceivedEvent event){
+        loadRecents();
+    }
+
 }

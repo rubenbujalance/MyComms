@@ -14,6 +14,11 @@ public class Constants {
     public static final int HTTP_READ_AVATAR_TIMEOUT = 10000;
     public static final int HTTP_READ_FILE_TIMEOUT = 60000;
 
+    //API Constants
+    public static final String API_HTTP_HEADER_VERSION = "x-mycomms-version";
+    public static final String API_HTTP_HEADER_CONTENTTYPE = "Content-Type";
+    public static final String API_HTTP_HEADER_AUTHORIZATION = "Authorization";
+
     //Chat Constants
     public static final int LEFT_CHAT = 0;
     public static final int RIGHT_CHAT = 1;
@@ -26,7 +31,6 @@ public class Constants {
     public static final int MY_SETTINGS = 0;
     public static final int MY_PROFILE = 1;
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
-    public static final String PROFILE_PLATFORMS_SHARED_PREF = "mycomms_profile_platforms";
     public static final String PROFILE_FULLNAME_SHARED_PREF = "mycomms_profile_fullname";
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
     public static final String PLATFORMS_SHARED_PREF = "mycomms_profile_platforms";
@@ -123,6 +127,7 @@ public class Constants {
     //Contacts API Calls
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_CONTACTS_BASIC_CALL = "/api/me/contact?p=";
+    public static final String CONTACT_API_GET_CONTACTS_IDS = "/api/me/contact?ids=";
     public static final String CONTACT_API_GET_FAVOURITES = "/api/me/favourites";
     public static final String CONTACT_API_GET_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_RECENTS = "/api/me/recents";
@@ -136,6 +141,7 @@ public class Constants {
     public static final String AVATAR_URL = "urlAvatar";
     public static final String AVATAR_PATH = "pathAvatar";
     public static final String CONTACT_AVATAR_DIR = "/avatars/files/";
+    public static final String CONTACT_NEWS_DIR = "/news/files/";
     public static final String CONTACT_CHAT_FILES = "/chat/files/";
 
     //Chat BD Fields
@@ -204,4 +210,7 @@ public class Constants {
     public static final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpg");
     public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");
     public static final String FIRST_TIME_AVATAR_DELIVERY = "first_time_avatar_delivery";
+
+    public static final int IMAGE_TYPE_AVATAR = 0;
+    public static final int IMAGE_TYPE_NEWS = 1;
 }

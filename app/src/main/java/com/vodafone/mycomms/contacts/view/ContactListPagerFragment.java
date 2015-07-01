@@ -14,10 +14,10 @@ import android.view.ViewGroup;
 
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.connection.ContactController;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.RefreshContactListEvent;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.events.RefreshFavouritesEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
@@ -32,7 +32,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private boolean mBusRegistered = false;
-    private ContactController mContactController;
+    private ContactsController mContactsController;
     private Realm realm;
     private String apiCall;
     private ContactListFragment contactListFragment;
@@ -52,10 +52,10 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(this,realm, mProfileId);
+        mContactsController = new ContactsController(this,realm, mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        //mContactController.getContactList(apiCall);
-        //mContactController.setConnectionCallback(this);
+        //mContactsController.getContactList(apiCall);
+        //mContactsController.setConnectionCallback(this);
         BusProvider.getInstance().register(this);
         //((ContactListMainActivity)getActivity()).activateContactListToolbar();
     }
@@ -157,16 +157,16 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
 
             if (morePages){
                 apiCall = Constants.CONTACT_API_GET_CONTACTS;
-                mContactController.getContactList(apiCall + "&o=" + offsetPaging);
+                mContactsController.getContactList(apiCall + "&o=" + offsetPaging);
             } else {
                 apiCall = Constants.CONTACT_API_GET_RECENTS;
-                mContactController.getRecentList(apiCall);
+                mContactsController.getRecentList(apiCall);
             }
         }else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
 
             setListsAdapter();
             apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-            mContactController.getFavouritesList(apiCall);
+            mContactsController.getFavouritesList(apiCall);
         }
     }
 
@@ -175,7 +175,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         Log.i(Constants.TAG, "onRecentContactsResponse: " + apiCall);
         setListsAdapter();
         apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-        mContactController.getFavouritesList(apiCall);
+        mContactsController.getFavouritesList(apiCall);
     }
 
     private void setListsAdapter() {
@@ -193,11 +193,9 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     }
 
     @Subscribe
-    public void refreshContactListEvent(RefreshContactListEvent event) {
-        Log.i(Constants.TAG, "ContactListPagerFragment.refreshContactListEvent");
-        apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        mContactController.getContactList(apiCall);
-        mContactController.setConnectionCallback(this);
+    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
+        Log.i(Constants.TAG, "ContactListPagerFragment.onRecentContactsReceived: ");
+        setListsAdapter();
     }
 
     @Subscribe
@@ -210,7 +208,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     public void refreshFavouritesEvent(RefreshFavouritesEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.refreshFavouritesEvent: ");
         apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-        mContactController.getFavouritesList(apiCall);
+        mContactsController.getFavouritesList(apiCall);
         setListsAdapter();
     }
 

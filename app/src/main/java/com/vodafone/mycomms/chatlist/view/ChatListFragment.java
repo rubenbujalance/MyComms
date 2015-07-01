@@ -46,15 +46,12 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        View v = inflater.inflate(R.layout.layout_fragment_chat_list, container, false);
        mSwipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_chat_list, container, false);
-       mSwipeRefreshLayout.setOnRefreshListener(this);
+
        mRecyclerView = (RecyclerView) mSwipeRefreshLayout.findViewById(R.id.recycler_view);
        final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
        mRecyclerView.setLayoutManager(layoutManager);
 
-       ArrayList<Chat> chatList = new ArrayList<>();
-       chatList = mChatTransactions.getAllChats();
-       mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), chatList);
-       mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+       refreshAdapter();
 
        mRecyclerView.addOnItemTouchListener(new ChatListRecyclerItemClickListener(getActivity(),
                mRecyclerView, new ChatListRecyclerItemClickListener.OnItemClickListener() {
@@ -104,13 +101,11 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
         @Override
         public void run() {
             mSwipeRefreshLayout.setRefreshing(false);
-            Log.wtf(Constants.TAG, "ChatListFragment.run: TEEEEESTINGGGG");
         }
     };
 
-    public void refreshAdapter(){
-        ArrayList<Chat> chatList = new ArrayList<>();
-        chatList = mChatTransactions.getAllChats();
+    public void refreshAdapter() {
+        ArrayList<Chat> chatList = mChatTransactions.getAllChatsFromExistingContacts();
         mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), chatList);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }

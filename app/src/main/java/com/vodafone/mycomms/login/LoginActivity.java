@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.login;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -15,14 +14,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.util.APIWrapper;
@@ -41,11 +45,17 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
     LoginController loginController;
 
+    private boolean isForeground;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Register Otto Bus
+        BusProvider.getInstance().register(this);
+
+        //Initializations
         btLogin = (Button) findViewById(R.id.btLogin);
         btLoginSalesforce = (Button) findViewById(R.id.btLoginSalesforce);
         tvForgotPass = (TextView) findViewById(R.id.tvForgotPass);
@@ -207,51 +217,12 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         }
     }
 
-//    private void callBackPassCheck(HashMap<String, Object> result)
-//    {
-//        String status = (String)result.get("status");
-//
-//        try {
-//            if (status.compareTo("200") != 0) {
-//               onLoginError(getString(R.string.oops_wrong_password));
-//            }
-//            else
-//            {
-//                //Get tokens and expiration data from http response
-//                JSONObject jsonResponse = (JSONObject)result.get("json");
-//                String accessToken = jsonResponse.getString("accessToken");
-//                String refreshToken = jsonResponse.getString("refreshToken");
-//                long expiresIn = jsonResponse.getLong("expiresIn");
-//
-//                UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
-//
-//                startMainActivity();
-//            }
-//        } catch(Exception ex) {
-//            Log.e(Constants.TAG, "LoginActivity.callBackPassCheck:" , ex);
-//            return;
-//        }
-//    }
-
-    private void startMainActivity(){
-        //Force hide keyboard
-        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mgr.hideSoftInputFromWindow(etEmail.getWindowToken(), 0);
-
-
-        //Start Main activity
-        Intent in = new Intent(LoginActivity.this, DashBoardActivity.class);
-
-        in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(in);
-        finish();
-    }
     @Override
     public void onLoginSuccess() {
         Log.d(Constants.TAG, "LoginActivity.onLoginSuccess: ");
-        startMainActivity();
-//        TestConnection testConnection = new TestConnection(this.getApplicationContext(), this.loginController);
-//        testConnection.request();
+
+        //Load profile
+        ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
     }
 
     @Override
@@ -287,14 +258,46 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
         onLoginError(getString(R.string.connection_error));
     }
 
-//    private class CheckPasswordApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
-//        @Override
-//        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
-//            return APIWrapper.httpPostAPI("/auth/login", params[0], params[1], LoginActivity.this);
-//        }
-//        @Override
-//        protected void onPostExecute(HashMap<String,Object> result) {
-//            callBackPassCheck(result);
-//        }
-//    }
+    //Called when user profile has been loaded
+    @Subscribe
+    public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
+        if(!isForeground) return;
+            goToApp();
+    }
+
+    //Called when user profile has failed
+    @Subscribe
+    public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
+        Log.e(Constants.TAG, "LoginActivity.onApplicationAndProfileReadErrorEvent: ");
+        if(!isForeground) return;
+
+        if(((MycommsApp)getApplication()).isProfileAvailable()) {
+            goToApp();
+        }
+        else {
+            Toast.makeText(this,
+                    getString(R.string.no_internet_connection_log_in_needed),
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void goToApp()
+    {
+        //Go to app
+        Intent in = new Intent(LoginActivity.this, DashBoardActivity.class);
+        startActivity(in);
+        finish();
+    }
+
+    @Override
+    protected void onResume() {
+        isForeground = true;
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        isForeground = false;
+        super.onPause();
+    }
 }

@@ -57,24 +57,17 @@ public final class XMPPTransactions {
     private static String _lastChatMessageSent;
     private static long _lastChatMessageSentTimestamp;
 
-    //This flag indicates if contacts have been loaded completely from API
-    //For prevent from crashes in a new installation
-    private static boolean _contactsLoaded = false;
-
     /*
      * Methods
      */
 
-    public static void initializeMsgServerSession(Context appContext, boolean markContactsLoaded)
+    public static void initializeMsgServerSession(Context appContext)
     {
-        if(!_contactsLoaded)
-            if(Utils.isAnyContactSaved(appContext)) _contactsLoaded = true;
-
         if(_isConnecting &&
                 Calendar.getInstance().getTimeInMillis() > _lastChatMessageSentTimestamp+10000)
             _isConnecting = false;
 
-        if(_isConnecting || !_contactsLoaded) return;
+        if(_isConnecting) return;
 
         if(_isConnecting) return;
 
@@ -140,7 +133,10 @@ public final class XMPPTransactions {
 //            xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             xmppConfigBuilder.setCompressionEnabled(false);
 
-            new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
+            //TODO: Testing executeOnExecutor
+            //new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
+            XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
+            xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, xmppConfigBuilder);
         }
     }
 

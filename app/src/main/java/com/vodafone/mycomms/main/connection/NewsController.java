@@ -1,12 +1,18 @@
 package com.vodafone.mycomms.main.connection;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.framework.library.model.ConnectionResponse;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,33 +26,28 @@ import model.News;
 public class NewsController extends BaseController {
     private Context mContext;
     private NewsConnection newsConnection;
-    private INewsConnectionCallback newsConnectionCallback;
     private ArrayList<News> newsList;
-
-    private String apiCall;
-
-    private int offsetPaging = 0;
 
     public NewsController(Context context) {
         super(context);
-        this.mContext = context;
+        this.mContext = getContext();
         newsList = new ArrayList<>();
     }
 
     public void getNewsList(String api) {
         Log.i(Constants.TAG, "NewsController.getNewsList: ");
-        if (newsConnection != null) {
-            newsConnection.cancel();
-        }
-        apiCall = api;
-        newsConnection = new NewsConnection(getContext(), this, apiCall);
-        newsConnection.request();
+//        if (newsConnection != null) {
+//            newsConnection.cancel();
+//        }
+//        newsConnection = new NewsConnection(getContext(), this, api);
+//        newsConnection.request();
+        new NewsListAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                (String)Constants.NEWS_API_GET);
     }
 
     @Override
     public void onConnectionComplete(ConnectionResponse response) {
         super.onConnectionComplete(response);
-        boolean morePages = false;
         String result = response.getData().toString();
 
         Log.i(Constants.TAG, "NewsController.onConnectionComplete" + result);
@@ -55,19 +56,9 @@ public class NewsController extends BaseController {
         if (result != null && result.trim().length()>0) {
             try {
                 jsonResponse = new JSONObject(result);
-                JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.NEWS_PAGINATION);
-
-                if (jsonPagination.getBoolean(Constants.NEWS_PAGINATION_MORE_PAGES)) {
-                    int pageSize = jsonPagination.getInt(Constants.NEWS_PAGINATION_PAGESIZE);
-                    morePages = true;
-                    offsetPaging = offsetPaging + pageSize;
-                } else {
-                    offsetPaging = 0;
-                }
-
                 newsList = loadNews(jsonResponse);
                 if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof INewsConnectionCallback) {
-                    ((INewsConnectionCallback) this.getConnectionCallback()).onNewsResponse(newsList, morePages, offsetPaging);
+                    ((INewsConnectionCallback) this.getConnectionCallback()).onNewsResponse(newsList);
                 }
 
             } catch (JSONException e) {
@@ -87,7 +78,6 @@ public class NewsController extends BaseController {
                 jsonObject = jsonArray.getJSONObject(i);
                 news = mapNews(jsonObject);
                 newsList.add(news);
-               //Log.e(Constants.TAG, "Title: " + news.getTitle() + " Image: " + news.getImage() + " Date: " + news.getPublished_at());
             }
             Realm realm = Realm.getInstance(getContext());
             RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(realm);
@@ -120,5 +110,62 @@ public class NewsController extends BaseController {
             Log.e(Constants.TAG, "NewsAPIController.mapNews: " + e.toString());
         }
         return news;
+    }
+
+    public void newsListCallback(String json) {
+        Log.i(Constants.TAG, "NewsController.newsListCallback" + json);
+        JSONObject jsonResponse;
+
+        if (json != null && json.trim().length()>0) {
+            try {
+                jsonResponse = new JSONObject(json);
+                newsList = loadNews(jsonResponse);
+                if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof INewsConnectionCallback) {
+                    ((INewsConnectionCallback) this.getConnectionCallback()).onNewsResponse(newsList);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public class NewsListAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            Log.e(Constants.TAG, "NewsAsyncTask.doInBackground: START");
+
+            Response response = null;
+            String json = null;
+
+            try {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("https://" + EndpointWrapper.getBaseNewsURL() +
+                                params[0])
+                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                Utils.getHttpHeaderVersion(mContext))
+                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                Utils.getHttpHeaderContentType())
+                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                Utils.getHttpHeaderAuth(mContext))
+                        .build();
+
+                response = client.newCall(request).execute();
+                json = response.body().string();
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "NewsAsyncTask.doInBackground: ",e);
+            }
+
+            Log.e(Constants.TAG, "NewsAsyncTask.doInBackground: END");
+
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(String json) {
+            newsListCallback(json);
+        }
     }
 }

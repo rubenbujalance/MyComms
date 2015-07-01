@@ -268,6 +268,7 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
     //Called when user profile has failed
     @Subscribe
     public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
+        Log.e(Constants.TAG, "LoginActivity.onApplicationAndProfileReadErrorEvent: ");
         if(!isForeground) return;
 
         if(((MycommsApp)getApplication()).isProfileAvailable()) {

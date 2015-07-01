@@ -109,6 +109,7 @@ public class SplashScreenActivity extends Activity {
     //Called when user profile has failed
     @Subscribe
     public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
+        Log.e(Constants.TAG, "SplashScreenActivity.onApplicationAndProfileReadErrorEvent: ");
         if(!isForeground) return;
 
         if(((MycommsApp)getApplication()).isProfileAvailable()) {

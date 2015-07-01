@@ -269,12 +269,17 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     @Subscribe
-    public void onEventNewsImagesReceived(NewsImagesReceivedEvent event){
-        Log.i(Constants.TAG, "MycommsApp.onEventNewsImagesReceived: ");
+    public void onEventNewsReceived(NewsReceivedEvent event) {
+        Log.e(Constants.TAG, "MyCommsApp.onEventNewsReceived: ");
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         Realm realm = Realm.getInstance(this);
         FavouriteController favouriteController = new FavouriteController(mContext, realm, profile_id);
         favouriteController.getFavouritesList(Constants.CONTACT_API_GET_FAVOURITES);
+    }
+
+    @Subscribe
+    public void onEventNewsImagesReceived(NewsImagesReceivedEvent event){
+        Log.i(Constants.TAG, "MycommsApp.onEventNewsImagesReceived: ");
     }
 
     public void getNews() {

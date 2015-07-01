@@ -79,8 +79,8 @@ public class RecentContactController extends BaseController {
         if (method==HttpConnection.POST) {
             Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: POST");
             String apiCall = Constants.CONTACT_API_GET_RECENTS;
-            ContactController contactController = new ContactController(getActivity(), mRealm, mProfileId);
-            contactController.getRecentList(apiCall);
+            ContactsController contactsController = new ContactsController(getActivity(), mRealm, mProfileId);
+            contactsController.getRecentList(apiCall);
             BusProvider.getInstance().post(new RecentContactsReceivedEvent());
         } else{
             Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: GET");
@@ -104,8 +104,8 @@ public class RecentContactController extends BaseController {
             if (method == HttpConnection.POST) {
                 Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: POST");
                 String apiCall = Constants.CONTACT_API_GET_RECENTS;
-                ContactController contactController = new ContactController(getActivity(), mRealm, mProfileId);
-                contactController.getRecentList(apiCall);
+                ContactsController contactsController = new ContactsController(getActivity(), mRealm, mProfileId);
+                contactsController.getRecentList(apiCall);
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             } else {
                 Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: GET");

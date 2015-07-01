@@ -135,7 +135,7 @@ public class SearchController extends BaseController
         ArrayList<Contact> realmContactList = new ArrayList<>();
 
         try {
-            Log.i(Constants.TAG, "ContactController.insertContactListInRealm: ");
+            Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
             Contact contact;
             boolean doRefreshAdapter;
@@ -183,7 +183,7 @@ public class SearchController extends BaseController
                 realmAvatarTransactions.insertAvatar(avatar);
             }
         } catch (Exception ex) {
-            Log.e(Constants.TAG, "ContactController.updateContactAvatar: ", ex);
+            Log.e(Constants.TAG, "ContactsController.updateContactAvatar: ", ex);
         }
     }
 

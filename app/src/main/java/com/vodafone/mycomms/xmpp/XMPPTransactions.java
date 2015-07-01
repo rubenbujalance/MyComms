@@ -133,7 +133,10 @@ public final class XMPPTransactions {
 //            xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             xmppConfigBuilder.setCompressionEnabled(false);
 
-            new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
+            //TODO: Testing executeOnExecutor
+            //new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
+            XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
+            xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, xmppConfigBuilder);
         }
     }
 

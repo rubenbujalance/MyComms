@@ -50,15 +50,15 @@ public class ContactListController extends BaseController {
         if (result != null && result.trim().length()>0) {
             try {
                 jsonResponse = new JSONObject(result);
-                ContactController contactController = new ContactController(mContext, mRealm, mProfileId);
+                ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
                 if (api.equals(Constants.CONTACT_API_GET_FAVOURITES)){
-                    contactController.insertFavouriteContactInRealm(jsonResponse);
+                    contactsController.insertFavouriteContactInRealm(jsonResponse);
 
                     if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsRefreshConnectionCallback) {
                         ((IContactsRefreshConnectionCallback) this.getConnectionCallback()).onFavouritesRefreshResponse();
                     }
                 } else if (api.equals(Constants.CONTACT_API_GET_RECENTS)){
-                    contactController.insertFavouriteContactInRealm(jsonResponse);
+                    contactsController.insertFavouriteContactInRealm(jsonResponse);
 
                     if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsRefreshConnectionCallback) {
                         ((IContactsRefreshConnectionCallback) this.getConnectionCallback()).onRecentsRefreshResponse();
@@ -73,8 +73,8 @@ public class ContactListController extends BaseController {
                         offsetPaging = 0;
                     }
                     ArrayList<Contact> realmContactList = new ArrayList<>();
-                    contactController = new ContactController(mContext, mRealm, mProfileId);
-                    realmContactList = contactController.insertContactListInRealm(jsonResponse);
+                    contactsController = new ContactsController(mContext, mRealm, mProfileId);
+                    realmContactList = contactsController.insertContactListInRealm(jsonResponse);
 
                     if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsRefreshConnectionCallback) {
                         ((IContactsRefreshConnectionCallback) this.getConnectionCallback()).onContactsRefreshResponse(realmContactList, morePages, offsetPaging);

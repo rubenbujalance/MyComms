@@ -28,8 +28,8 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
-import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
@@ -68,7 +68,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private Realm realm;
-    private ContactController mContactController;
+    private ContactsController mContactsController;
     private SearchController mSearchController;
     private ArrayList<Contact> contactList;
     private ArrayList<FavouriteContact> favouriteContactList;
@@ -167,7 +167,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
         realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(getActivity(),realm, profileId);
+        mContactsController = new ContactsController(getActivity(),realm, profileId);
         mSearchController = new SearchController(getActivity(), realm, profileId);
 
         setListAdapterTabs();
@@ -512,7 +512,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
-            favouriteContactList = mContactController.getAllFavouriteContacts();
+            favouriteContactList = mContactsController.getAllFavouriteContacts();
             if (favouriteContactList!=null) {
                 setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
                         favouriteContactList));
@@ -520,7 +520,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }else if(mIndex == Constants.CONTACTS_RECENT){
             if (emptyText!=null)
                 emptyText.setText("");
-            recentContactList = mContactController.getAllRecentContacts();
+            recentContactList = mContactsController.getAllRecentContacts();
             if (recentContactList!=null) {
                 RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList);
                 if (listView != null) {
@@ -603,7 +603,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         ArrayList<Contact> contactArrayList;
         if(null == keyWord)
         {
-            contactArrayList = mContactController.getAllContacts();
+            contactArrayList = mContactsController.getAllContacts();
         }
         else
         {

@@ -59,6 +59,7 @@ public class DashBoardActivity extends ToolbarActivity{
     private Realm _realm;
     private Realm mRealm;
     private RealmChatTransactions _chatTx;
+    private ArrayList<News> newsArrayList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -179,6 +180,7 @@ public class DashBoardActivity extends ToolbarActivity{
                         if (null != recentContact.getLastName() && recentContact.getLastName().length() > 0) {
                             initials = initials + recentContact.getLastName().substring(0, 1);
                         }
+
                     }
 
                     final TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
@@ -342,7 +344,7 @@ public class DashBoardActivity extends ToolbarActivity{
     private void loadNews() {
         Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
 
-        ArrayList<News> newsArrayList = new ArrayList<>();
+        newsArrayList = new ArrayList<>();
 
         RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(mRealm);
         newsArrayList = realmNewsTransactions.getAllNews();
@@ -470,7 +472,10 @@ public class DashBoardActivity extends ToolbarActivity{
         Log.e(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
         if(news != null) {
-            drawNews(news);
+            if (newsArrayList==null ||newsArrayList.size()==0) {
+                Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: FIRST LOAD");
+                drawNews(news);
+            }
             initALL();
         }
     }

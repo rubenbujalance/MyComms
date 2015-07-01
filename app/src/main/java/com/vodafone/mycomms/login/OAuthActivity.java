@@ -166,7 +166,7 @@ public class OAuthActivity extends Activity {
     @Subscribe
     public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
         if(!isForeground) return;
-        Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of avatars");
+        Log.e(Constants.TAG, "OAuthActivity.onApplicationAndProfileInitializedEvent: ");
 
         goToApp();
     }
@@ -175,7 +175,7 @@ public class OAuthActivity extends Activity {
     @Subscribe
     public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
         if(!isForeground) return;
-        Log.e(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: Downloading a pool of avatars");
+        Log.e(Constants.TAG, "OAuthActivity.onApplicationAndProfileReadErrorEvent: ");
 
         if(((MycommsApp)getApplication()).isProfileAvailable()) {
             goToApp();

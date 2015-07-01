@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -178,10 +179,9 @@ public class DashBoardActivity extends ToolbarActivity{
                         if (null != recentContact.getLastName() && recentContact.getLastName().length() > 0) {
                             initials = initials + recentContact.getLastName().substring(0, 1);
                         }
-
                     }
 
-                    TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
+                    final TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(initials);
 
@@ -195,38 +195,11 @@ public class DashBoardActivity extends ToolbarActivity{
                         final Target target = new Target() {
                             @Override
                             public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            //Descarga del archivo local
-                                            Log.e(Constants.TAG, "DashBoardActivity.run(INICIO DownloadAvatar by Picasso: "
-                                                    + avatarFile.toString());
+                                OkHttpSaveBitmapToDiskAsyncTask task =
+                                        new OkHttpSaveBitmapToDiskAsyncTask(
+                                                recentAvatar, avatarText, avatarFile, bitmap);
 
-                                            avatarFile.createNewFile();
-                                            FileOutputStream ostream = new FileOutputStream(avatarFile);
-                                            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
-                                            ostream.close();
-                                            Log.e(Constants.TAG, "DashBoardActivity.run(FIN DownloadAvatar by Picasso: "
-                                                    + avatarFile.toString());
-
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    //Carga del bitmap
-                                                    Picasso.with(DashBoardActivity.this)
-                                                            .load(avatarFile)
-                                                            .fit().centerCrop()
-                                                            .into(recentAvatar);
-                                                }
-                                            });
-
-                                        } catch (Exception e) {
-                                            Log.e(Constants.TAG, "DashBoardActivity.run: ", e);
-                                            if(avatarFile.exists()) avatarFile.delete();
-                                        }
-                                    }
-                                }).start();
+                                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             }
 
                             @Override
@@ -359,7 +332,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "Load recents error: " + e);
+            Log.e(Constants.TAG, "Load recents error: ",e);
         }
     }
 
@@ -517,5 +490,62 @@ public class DashBoardActivity extends ToolbarActivity{
     @Subscribe
     public void onRecentAvatarsReceived(RecentAvatarsReceivedEvent event){
         loadRecents();
+    }
+
+    public class OkHttpSaveBitmapToDiskAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        ImageView avatarImage;
+        TextView avatarText;
+        File avatarFile;
+        Bitmap bitmap;
+
+        public OkHttpSaveBitmapToDiskAsyncTask(ImageView avatarImage, TextView avatarText,
+                                               File avatarFile, Bitmap bitmap)
+        {
+            this.avatarImage = avatarImage;
+            this.avatarText = avatarText;
+            this.avatarFile = avatarFile;
+            this.bitmap = bitmap;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: START "+avatarFile);
+
+            try {
+                //Descarga del archivo local
+                Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (INICIO DownloadAvatar by Picasso: "
+                        + avatarFile.toString());
+
+                avatarFile.createNewFile();
+                FileOutputStream ostream = new FileOutputStream(avatarFile);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
+                ostream.close();
+
+                Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (FIN DownloadAvatar by Picasso: "
+                        + avatarFile.toString());
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "DashBoardActivity.run(Picasso avatar Target): ", e);
+                if(avatarFile.exists()) avatarFile.delete();
+            }
+
+            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: END "+avatarFile);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.onPostExecute: "+avatarFile);
+
+            //Carga del bitmap
+            avatarText.setVisibility(View.INVISIBLE);
+
+            Picasso.with(DashBoardActivity.this)
+                    .load(avatarFile)
+                    .fit().centerCrop()
+                    .into(avatarImage);
+        }
     }
 }

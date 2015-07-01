@@ -252,7 +252,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
         {
-
             if(profile_id!=null)
                 new sendAvatar().execute(profile_id);
         }

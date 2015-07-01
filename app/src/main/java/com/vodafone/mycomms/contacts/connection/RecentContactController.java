@@ -1,14 +1,20 @@
 package com.vodafone.mycomms.contacts.connection;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UserSecurity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,13 +40,16 @@ public class RecentContactController extends BaseController {
 
     public void getRecentList() {
         Log.e(Constants.TAG, "RecentContactController.getRecentList: ");
-        if(mRecentContactConnection != null){
-            mRecentContactConnection.cancel();
-        }
+//        if(mRecentContactConnection != null){
+//            mRecentContactConnection.cancel();
+//        }
         method = HttpConnection.GET;
-        String apiCall = Constants.CONTACT_API_GET_RECENTS;
-        mRecentContactConnection = new RecentContactConnection(mContext, this, method, apiCall);
-        mRecentContactConnection.request();
+//        String apiCall = Constants.CONTACT_API_GET_RECENTS;
+//        mRecentContactConnection = new RecentContactConnection(mContext, this, method, apiCall);
+//        mRecentContactConnection.request();
+
+        new RecentContactsAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                (String)Constants.CONTACT_API_GET_RECENTS);
     }
 
     public void insertRecent(String contactId, String action){
@@ -85,6 +94,71 @@ public class RecentContactController extends BaseController {
                     Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
                 }
             }
+        }
+    }
+
+    public void recentsListCallback(String json) {
+        Log.e(Constants.TAG, "RecentContactController.recentsListCallback: ");
+
+        try {
+            if (method == HttpConnection.POST) {
+                Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: POST");
+                String apiCall = Constants.CONTACT_API_GET_RECENTS;
+                ContactController contactController = new ContactController(getActivity(), mRealm, mProfileId);
+                contactController.getRecentList(apiCall);
+                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+            } else {
+                Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: GET");
+//                String result = response.body().string();
+                if (json != null && json.trim().length() > 0) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(json);
+                        ContactSearchController contactSearchController = new ContactSearchController(mContext, mRealm, mProfileId);
+                        contactSearchController.getContactById(jsonResponse);
+                    } catch (JSONException e) {
+                        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
+        }
+    }
+
+    public class RecentContactsAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: START");
+
+            Response response = null;
+            String json = null;
+
+            try {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                    .url("https://" + EndpointWrapper.getBaseURL() +
+                            params[0])
+                    .addHeader("x-mycomms-version", "android/0.1.129")
+                    .addHeader("Content-Type", "application/json; charset=utf-8")
+                    .addHeader("Authorization", "Bearer " +
+                            UserSecurity.getAccessToken(mContext))
+                    .build();
+
+                response = client.newCall(request).execute();
+                json = response.body().string();
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: ",e);
+            }
+
+            Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: END");
+
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(String json) {
+            recentsListCallback(json);
         }
     }
 }

@@ -36,11 +36,13 @@ public class NewsController extends BaseController {
 
     public void getNewsList(String api) {
         Log.i(Constants.TAG, "NewsController.getNewsList: ");
-        if (newsConnection != null) {
-            newsConnection.cancel();
-        }
-        newsConnection = new NewsConnection(getContext(), this, api);
-        newsConnection.request();
+//        if (newsConnection != null) {
+//            newsConnection.cancel();
+//        }
+//        newsConnection = new NewsConnection(getContext(), this, api);
+//        newsConnection.request();
+        new NewsListAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                (String)Constants.NEWS_API_GET);
     }
 
     @Override
@@ -111,7 +113,21 @@ public class NewsController extends BaseController {
     }
 
     public void newsListCallback(String json) {
+        Log.i(Constants.TAG, "NewsController.newsListCallback" + json);
+        JSONObject jsonResponse;
 
+        if (json != null && json.trim().length()>0) {
+            try {
+                jsonResponse = new JSONObject(json);
+                newsList = loadNews(jsonResponse);
+                if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof INewsConnectionCallback) {
+                    ((INewsConnectionCallback) this.getConnectionCallback()).onNewsResponse(newsList);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public class NewsListAsyncTask extends AsyncTask<String, Void, String> {
@@ -125,7 +141,7 @@ public class NewsController extends BaseController {
             try {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("https://" + EndpointWrapper.getBaseURL() +
+                        .url("https://" + EndpointWrapper.getBaseNewsURL() +
                                 params[0])
                         .addHeader(Constants.API_HTTP_HEADER_VERSION,
                                 Utils.getHttpHeaderVersion(mContext))

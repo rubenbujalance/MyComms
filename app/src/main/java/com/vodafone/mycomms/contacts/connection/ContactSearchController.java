@@ -120,10 +120,10 @@ public class ContactSearchController extends BaseController {
             try {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(json);
-                ContactController contactController = new ContactController(mContext, mRealm, mProfileId);
-                ArrayList<Contact> contactArrayList = contactController.insertContactListInRealm(jsonResponse);
+                ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
+                ArrayList<Contact> contactArrayList = contactsController.insertContactListInRealm(jsonResponse);
 
-                contactController.insertRecentContactInRealm(mJSONRecents);
+                contactsController.insertRecentContactInRealm(mJSONRecents);
                 //Show Recents on Dashboard
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
                 //TODO RBM - For testing!! Restore before commit

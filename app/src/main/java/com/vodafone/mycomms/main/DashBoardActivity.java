@@ -183,7 +183,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
                     }
 
-                    TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
+                    final TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(initials);
 

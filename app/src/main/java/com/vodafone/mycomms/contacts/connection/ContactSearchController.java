@@ -10,7 +10,6 @@ import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.DownloadImagesAsyncTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,7 +63,7 @@ public class ContactSearchController extends BaseController {
     }
 
     private String getContactIdList() {
-        Log.i(Constants.TAG, "ContactSearchController.getContactIdList: ");
+        Log.e(Constants.TAG, "ContactSearchController.getContactIdList: ");
         String ids = "";
         try {
             JSONArray jsonArray = mJSONRecents.getJSONArray(Constants.CONTACT_RECENTS);
@@ -99,7 +98,8 @@ public class ContactSearchController extends BaseController {
                 contactController.insertRecentContactInRealm(mJSONRecents);
                 //Show Recents on Dashboard
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-                new DownloadImagesAsyncTask(mContext, contactArrayList).execute();
+                //TODO RBM - For testing!! Restore before commit
+//                new DownloadImagesAsyncTask(mContext, contactArrayList).execute();
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
             }

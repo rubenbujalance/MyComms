@@ -33,7 +33,6 @@ public class ProfileController extends BaseController {
     private UserProfile userProfile;
     private String profileId;
 
-
     public ProfileController(Context context) {
         super(context);
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -47,6 +46,8 @@ public class ProfileController extends BaseController {
      * Get Profile, uses DB and Network also. (First loads from DB by a callback then starts network connection.
      */
     public void getProfile(){
+        Log.e(Constants.TAG, "ProfileController.getProfile: ");
+
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String profileId = null;
 
@@ -64,7 +65,6 @@ public class ProfileController extends BaseController {
                 ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
             }
         }
-
 
         if(profileConnection != null){
             profileConnection.cancel();
@@ -144,7 +144,7 @@ public class ProfileController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-        Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
+        Log.e(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
 
         boolean isUserProfileReceived = false;
         if(response.getUrl() != null && !response.getUrl().contains(UpdateSettingsConnection.URL)) {
@@ -277,7 +277,7 @@ public class ProfileController extends BaseController {
 
     public void updateContactData(HashMap profileHashMap) {
         JSONObject json = new JSONObject(profileHashMap);
-        Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+        Log.e(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
         UpdateProfileConnection updateProfileConnection = new UpdateProfileConnection(getContext(),this);
         updateProfileConnection.setPayLoad(json.toString());
         updateProfileConnection.request();
@@ -285,7 +285,7 @@ public class ProfileController extends BaseController {
 
     public void updateSettingsData(HashMap settingsHashMap) {
         JSONObject json = new JSONObject(settingsHashMap);
-        Log.d(Constants.TAG, "ProfileController.updateSettingsData: " + json.toString());
+        Log.e(Constants.TAG, "ProfileController.updateSettingsData: " + json.toString());
         UpdateSettingsConnection updateSettingsConnection = new UpdateSettingsConnection(getContext(),this);
         updateSettingsConnection.setPayLoad(json.toString());
         updateSettingsConnection.request();
@@ -293,7 +293,7 @@ public class ProfileController extends BaseController {
 
     public void updatePassword(HashMap passwordHashMap){
             JSONObject json = new JSONObject(passwordHashMap);
-            Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+            Log.e(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
             PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
             passwordConnection.setPayLoad(json.toString());
             passwordConnection.request();
@@ -302,7 +302,7 @@ public class ProfileController extends BaseController {
 
     public void updateTimeZone(HashMap timeZoneHashMap) {
         JSONObject json = new JSONObject(timeZoneHashMap);
-        Log.d(Constants.TAG, "ProfileController.updateTimeZone: " + json.toString());
+        Log.e(Constants.TAG, "ProfileController.updateTimeZone: " + json.toString());
         UpdateTimeZoneConnection updateTimeZoneConnection = new UpdateTimeZoneConnection(getContext(),this);
         updateTimeZoneConnection.setPayLoad(json.toString());
         updateTimeZoneConnection.request();

@@ -6,8 +6,8 @@ import android.util.Log;
 
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.ContactDetailConnection;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -55,7 +55,7 @@ public class ContactDetailController extends BaseController {
             jsonResponse = new JSONObject(result);
             String data = jsonResponse.getString(Constants.CONTACT_DATA);
             jsonResponse = new JSONObject(data.substring(1, data.length()-1 )); //Removing squared bracelets.
-            contact = ContactController.mapContact(jsonResponse, profileId);
+            contact = ContactsController.mapContact(jsonResponse, profileId);
 
             if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactDetailConnectionCallback){
                 ((IContactDetailConnectionCallback)this.getConnectionCallback()).onContactDetailReceived(contact);
@@ -63,7 +63,7 @@ public class ContactDetailController extends BaseController {
             realmContactTransactions.updateContact(contact);
 
         } catch (Exception e){
-            Log.e(Constants.TAG, "ContactController.onConnectionComplete: " + e.toString());
+            Log.e(Constants.TAG, "ContactsController.onConnectionComplete: " + e.toString());
         }
 
     }

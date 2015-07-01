@@ -58,6 +58,7 @@ public class DashBoardActivity extends ToolbarActivity{
     private Realm _realm;
     private Realm mRealm;
     private RealmChatTransactions _chatTx;
+    private ArrayList<News> newsArrayList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -170,21 +171,27 @@ public class DashBoardActivity extends ToolbarActivity{
                             .fit().centerCrop()
                             .into(recentAvatar);
                 } else {
-                    //Set name initials image during the download
-                    String initials = "";
-                    if (null != recentContact.getFirstName() && recentContact.getFirstName().length() > 0) {
-                        initials = recentContact.getFirstName().substring(0, 1);
+                    if (!recentContact.getAvatar().equals("") && recentContact.getAvatar()!=null){
+                        Picasso.with(this)
+                                .load(recentContact.getAvatar())
+                                .fit().centerCrop()
+                                .into(recentAvatar);
+                    }else {
+                        //Set name initials image during the download
+                        String initials = "";
+                        if (null != recentContact.getFirstName() && recentContact.getFirstName().length() > 0) {
+                            initials = recentContact.getFirstName().substring(0, 1);
 
-                        if (null != recentContact.getLastName() && recentContact.getLastName().length() > 0) {
-                            initials = initials + recentContact.getLastName().substring(0, 1);
+                            if (null != recentContact.getLastName() && recentContact.getLastName().length() > 0) {
+                                initials = initials + recentContact.getLastName().substring(0, 1);
+                            }
+
                         }
 
+                        TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
+                        recentAvatar.setImageResource(R.color.grey_middle);
+                        avatarText.setText(initials);
                     }
-
-                    TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
-                    recentAvatar.setImageResource(R.color.grey_middle);
-                    avatarText.setText(initials);
-
                     //Download avatar
                     if (recentContact.getAvatar() != null &&
                             recentContact.getAvatar().length() > 0) {
@@ -367,7 +374,7 @@ public class DashBoardActivity extends ToolbarActivity{
     private void loadNews() {
         Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
 
-        ArrayList<News> newsArrayList = new ArrayList<>();
+        newsArrayList = new ArrayList<>();
 
         RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(mRealm);
         newsArrayList = realmNewsTransactions.getAllNews();
@@ -495,7 +502,10 @@ public class DashBoardActivity extends ToolbarActivity{
         Log.e(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
         if(news != null) {
-            drawNews(news);
+            if (newsArrayList==null ||newsArrayList.size()==0) {
+                Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: FIRST LOAD");
+                drawNews(news);
+            }
             initALL();
         }
     }

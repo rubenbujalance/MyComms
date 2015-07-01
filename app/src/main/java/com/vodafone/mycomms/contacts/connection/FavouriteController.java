@@ -95,14 +95,18 @@ public class FavouriteController  extends BaseController {
             try {
                 if (result != null && !result.equals("")) {
                     JSONObject jsonResponse = new JSONObject(result);
-                    ContactController contactController = new ContactController(mContext, mRealm, mProfileId);
-                    contactController.insertFavouriteContactInRealm(jsonResponse);
+                    ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
+                    contactsController.insertFavouriteContactInRealm(jsonResponse);
                 } else {
                     realmContactTransactions.deleteAllFavouriteContacts();
                 }
                 BusProvider.getInstance().post(new SetContactListAdapterEvent());
+
+                Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: Calling ContactController");
+                ContactController contactController = new ContactController(mContext,mRealm,mProfileId);
+                contactController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
             } catch (Exception e) {
-                Log.e(Constants.TAG, "ContactController.onConnectionComplete: favourites", e);
+                Log.e(Constants.TAG, "ContactsController.onConnectionComplete: favourites", e);
             }
         }
     }

@@ -97,7 +97,7 @@ public class FavouriteController  extends BaseController {
     public void favouriteListCallback(String json){
         Log.i(Constants.TAG, "FavouriteController.favouriteListCallback " + method);
         if (method == HttpConnection.POST || method == HttpConnection.DELETE) {
-            BusProvider.getInstance().post(new RefreshFavouritesEvent());
+            BusProvider.getInstance().post(new SetContactListAdapterEvent());
         } else if (method == HttpConnection.GET){
             try {
                 if (json != null && !json.equals("")) {
@@ -123,7 +123,7 @@ public class FavouriteController  extends BaseController {
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: method " + method);
         String result = response.getData().toString();
-        if (method == HttpConnection.POST || method == HttpConnection.POST) {
+        if (method == HttpConnection.POST || method == HttpConnection.DELETE) {
             BusProvider.getInstance().post(new RefreshFavouritesEvent());
         } else if (method == HttpConnection.GET){
             try {

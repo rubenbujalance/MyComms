@@ -37,6 +37,7 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -44,11 +45,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.realm.Realm;
 import model.News;
@@ -197,11 +199,11 @@ public class DashBoardActivity extends ToolbarActivity{
                         final Target target = new Target() {
                             @Override
                             public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                                OkHttpSaveBitmapToDiskAsyncTask task =
-                                        new OkHttpSaveBitmapToDiskAsyncTask(
-                                                recentAvatar, avatarText, avatarFile, bitmap);
+                                SaveAndShowImageAsyncTask task =
+                                        new SaveAndShowImageAsyncTask(
+                                                recentAvatar, avatarFile, bitmap, avatarText);
 
-                                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                task.executeOnExecutor(Executors.newCachedThreadPool());
                             }
 
                             @Override
@@ -368,8 +370,8 @@ public class DashBoardActivity extends ToolbarActivity{
                 container.addView(child);
                 child.setPadding(10, 20, 10, 20);
 
-                ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
-                File newsFile = new File(getFilesDir(), Constants.CONTACT_NEWS_DIR +
+                final ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
+                final File newsFile = new File(getFilesDir(), Constants.CONTACT_NEWS_DIR +
                         "news_"+newsArrayList.get(i).getUuid()+".jpg");
 
                 if (newsFile.exists()) {
@@ -378,10 +380,40 @@ public class DashBoardActivity extends ToolbarActivity{
                             .fit().centerInside()
                             .into(newsImage);
                 } else{
-                    Picasso.with(this)
-                            .load("https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage())
-                            .fit().centerInside()
-                            .into(newsImage);
+                    //Download image
+                    if (newsArrayList.get(i).getImage() != null &&
+                            newsArrayList.get(i).getImage().length() > 0) {
+                        final String imageUrl = "https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage();
+                        File imagesDir = new File(getFilesDir() + Constants.CONTACT_NEWS_DIR);
+                        if(!imagesDir.exists()) imagesDir.mkdirs();
+
+                        final Target target = new Target() {
+                            @Override
+                            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                                SaveAndShowImageAsyncTask task =
+                                        new SaveAndShowImageAsyncTask(
+                                                newsImage, newsFile, bitmap);
+
+                                task.executeOnExecutor(Executors.newCachedThreadPool());
+                            }
+
+                            @Override
+                            public void onBitmapFailed(Drawable errorDrawable) {
+                                if(newsFile.exists()) newsFile.delete();
+                            }
+
+                            @Override
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                            }
+                        };
+
+                        newsImage.setTag(target);
+
+                        Picasso.with(this)
+                                .load(imageUrl)
+                                .into(target);
+                    }
                 }
 
                 final TextView title = (TextView) child.findViewById(R.id.notice_title);
@@ -499,59 +531,4 @@ public class DashBoardActivity extends ToolbarActivity{
         loadRecents();
     }
 
-    public class OkHttpSaveBitmapToDiskAsyncTask extends AsyncTask<Void, Void, Void> {
-
-        ImageView avatarImage;
-        TextView avatarText;
-        File avatarFile;
-        Bitmap bitmap;
-
-        public OkHttpSaveBitmapToDiskAsyncTask(ImageView avatarImage, TextView avatarText,
-                                               File avatarFile, Bitmap bitmap) {
-            this.avatarImage = avatarImage;
-            this.avatarText = avatarText;
-            this.avatarFile = avatarFile;
-            this.bitmap = bitmap;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: START "+avatarFile);
-
-            try {
-                //Descarga del archivo local
-                Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (INICIO DownloadAvatar by Picasso: "
-                        + avatarFile.toString());
-
-                avatarFile.createNewFile();
-                FileOutputStream ostream = new FileOutputStream(avatarFile);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
-                ostream.close();
-
-                Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (FIN DownloadAvatar by Picasso: "
-                        + avatarFile.toString());
-
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "DashBoardActivity.run(Picasso avatar Target): ", e);
-                if(avatarFile.exists()) avatarFile.delete();
-            }
-
-            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: END "+avatarFile);
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.onPostExecute: "+avatarFile);
-
-            //Carga del bitmap
-            avatarText.setVisibility(View.INVISIBLE);
-
-            Picasso.with(DashBoardActivity.this)
-                    .load(avatarFile)
-                    .fit().centerCrop()
-                    .into(avatarImage);
-        }
-    }
 }

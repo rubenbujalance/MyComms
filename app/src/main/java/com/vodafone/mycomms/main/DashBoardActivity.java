@@ -213,6 +213,8 @@ public class DashBoardActivity extends ToolbarActivity{
                             }
                         };
 
+                        recentAvatar.setTag(target);
+
                         Picasso.with(this)
                             .load(recentContact.getAvatar())
                             .into(target);
@@ -500,8 +502,7 @@ public class DashBoardActivity extends ToolbarActivity{
         Bitmap bitmap;
 
         public OkHttpSaveBitmapToDiskAsyncTask(ImageView avatarImage, TextView avatarText,
-                                               File avatarFile, Bitmap bitmap)
-        {
+                                               File avatarFile, Bitmap bitmap) {
             this.avatarImage = avatarImage;
             this.avatarText = avatarText;
             this.avatarFile = avatarFile;

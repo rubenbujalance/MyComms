@@ -15,6 +15,7 @@ import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,14 +74,16 @@ public class ContactSearchController extends BaseController {
         Log.e(Constants.TAG, "ContactSearchController.getContactIdList: ");
         String ids = "";
         try {
-            JSONArray jsonArray = mJSONRecents.getJSONArray(Constants.CONTACT_RECENTS);
-            JSONObject jsonObject;
-            for (int i = 0; i < jsonArray.length(); i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                if (jsonObject.getString(Constants.CONTACT_ID)!=null
-                        && !jsonObject.getString(Constants.CONTACT_ID).equals("")){
-                    if(i>0) ids += ",";
-                    ids += jsonObject.getString(Constants.CONTACT_ID);
+            if(mJSONRecents!=null && mJSONRecents.length()>0) {
+                JSONArray jsonArray = mJSONRecents.getJSONArray(Constants.CONTACT_RECENTS);
+                JSONObject jsonObject;
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    jsonObject = jsonArray.getJSONObject(i);
+                    if (jsonObject.getString(Constants.CONTACT_ID) != null
+                            && !jsonObject.getString(Constants.CONTACT_ID).equals("")) {
+                        if (i > 0) ids += ",";
+                        ids += jsonObject.getString(Constants.CONTACT_ID);
+                    }
                 }
             }
         } catch (JSONException e){
@@ -105,7 +108,6 @@ public class ContactSearchController extends BaseController {
                 contactController.insertRecentContactInRealm(mJSONRecents);
                 //Show Recents on Dashboard
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-                //TODO RBM - For testing!! Restore before commit
 //                new DownloadImagesAsyncTask(mContext, contactArrayList).execute();
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
@@ -126,8 +128,6 @@ public class ContactSearchController extends BaseController {
                 contactController.insertRecentContactInRealm(mJSONRecents);
                 //Show Recents on Dashboard
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-                //TODO RBM - For testing!! Restore before commit
-//                new DownloadImagesAsyncTask(mContext, contactArrayList).execute();
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
             }
@@ -152,12 +152,12 @@ public class ContactSearchController extends BaseController {
                 Request request = new Request.Builder()
                         .url("https://" + EndpointWrapper.getBaseURL() +
                                 params[0])
-                        .addHeader("x-mycomms-version", "android/0.1.129")
-                        .addHeader("Content-Type", "application/json; charset=utf-8")
-                        .addHeader("Authorization", "Bearer c7n_CO-qva-s9vgLfbljwQKLqf9hQVhMFNv" +
-                                "WgP-ula0O-SG0DYdXPgI6zt1cgdZuANAgso_cjErpKdLY7YMaTisRp3RVdXsj" +
-                                "M_L_YVEp1qUuzAoOSutLIfo5LN5ijbJdCPmhDZydQQxD0NHdHmilwUdikrVBR" +
-                                "XAi2GTESdveOkI")
+                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                Utils.getHttpHeaderVersion(mContext))
+                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                Utils.getHttpHeaderContentType())
+                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                Utils.getHttpHeaderAuth(mContext))
                         .build();
 
                 Response response = client.newCall(request).execute();

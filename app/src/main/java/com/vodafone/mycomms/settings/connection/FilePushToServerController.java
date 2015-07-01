@@ -13,7 +13,7 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -65,9 +65,12 @@ public class FilePushToServerController extends BaseController
                 .build();
 
         request = new Request.Builder()
-                .addHeader(authorization, ACCESS_TOKEN+UserSecurity.getAccessToken
-                        (mContext))
-                .addHeader(version_token, getVersionName())
+                .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                        Utils.getHttpHeaderVersion(mContext))
+                .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                        Utils.getHttpHeaderContentType())
+                .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                        Utils.getHttpHeaderAuth(mContext))
                 .url(URL)
                 .post(requestBody)
                 .build();

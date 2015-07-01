@@ -14,7 +14,7 @@ import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -136,13 +136,15 @@ public class RecentContactController extends BaseController {
             try {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                    .url("https://" + EndpointWrapper.getBaseURL() +
+                        .url("https://" + EndpointWrapper.getBaseURL() +
                             params[0])
-                    .addHeader("x-mycomms-version", "android/0.1.129")
-                    .addHeader("Content-Type", "application/json; charset=utf-8")
-                    .addHeader("Authorization", "Bearer " +
-                            UserSecurity.getAccessToken(mContext))
-                    .build();
+                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                Utils.getHttpHeaderVersion(mContext))
+                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                Utils.getHttpHeaderContentType())
+                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                Utils.getHttpHeaderAuth(mContext))
+                        .build();
 
                 response = client.newCall(request).execute();
                 json = response.body().string();

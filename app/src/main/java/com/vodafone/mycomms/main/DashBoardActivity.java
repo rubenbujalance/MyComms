@@ -219,6 +219,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
                         recentAvatar.setTag(target);
 
+                        //Add this download to queue, to avoid duplicated downloads
                         ConnectionsQueue.putConnection(avatarFile.toString());
                         Picasso.with(this)
                             .load(recentContact.getAvatar())
@@ -423,8 +424,8 @@ public class DashBoardActivity extends ToolbarActivity{
     protected void onResume() {
         super.onResume();
         //Update Pending Messages on Toolbar
-//        loadRecents();
         checkUnreadChatMessages();
+        loadRecents();
     }
 
     @Subscribe
@@ -447,11 +448,9 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     @Subscribe
-    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
+    public void onRecentContactsReceived(RecentContactsReceivedEvent event) {
         Log.e(Constants.TAG, "DashBoardActivity.onRecentContactsReceived: ");
-
         loadRecents();
-        ((MycommsApp)getApplication()).getNews();
     }
 
     public class DrawSingleNewsAsyncTask extends AsyncTask<Void,Void,Void>

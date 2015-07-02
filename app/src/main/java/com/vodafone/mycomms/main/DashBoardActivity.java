@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -49,7 +48,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.realm.Realm;
@@ -74,8 +72,6 @@ public class DashBoardActivity extends ToolbarActivity{
         setContentView(R.layout.layout_dashboard);
 
         initALL();
-        //BusProvider.getInstance().post(new InitNews());
-        //BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
@@ -191,7 +187,9 @@ public class DashBoardActivity extends ToolbarActivity{
 
                     //Download avatar
                     if (recentContact.getAvatar() != null &&
-                            recentContact.getAvatar().length() > 0) {
+                            recentContact.getAvatar().length() > 0
+                                && recentContact.getPlatform().equalsIgnoreCase("mc")) {
+                        //TODO: Filtering only MC avatars. Pending SF avatar download
                         File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
 
                         if(!avatarsDir.exists()) avatarsDir.mkdirs();
@@ -409,7 +407,6 @@ public class DashBoardActivity extends ToolbarActivity{
                         };
 
                         newsImage.setTag(target);
-
                         Picasso.with(this)
                                 .load(imageUrl)
                                 .into(target);

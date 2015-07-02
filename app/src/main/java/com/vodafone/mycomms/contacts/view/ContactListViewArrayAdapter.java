@@ -16,13 +16,13 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -90,7 +90,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 avatarFile.exists()) {
 
             viewHolder.textAvatar.setText(null);
-
             Picasso.with(mContext)
                     .load(avatarFile) // thumbnail url goes here
                     .fit().centerCrop()
@@ -115,7 +114,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
             //Download avatar
             if (contact.getAvatar() != null &&
-                    contact.getAvatar().length() > 0) {
+                    contact.getAvatar().length() > 0
+                        && contact.getPlatform().equalsIgnoreCase("mc")) {
                 File avatarsDir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
 
                 if(!avatarsDir.exists()) avatarsDir.mkdirs();
@@ -123,10 +123,9 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 final Target target = new Target() {
                     @Override
                     public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                        OkHttpSaveBitmapToDiskAsyncTask task =
-                                new OkHttpSaveBitmapToDiskAsyncTask(
-                                        viewHolder.imageAvatar, viewHolder.textAvatar, avatarFile, bitmap);
-
+                        SaveAndShowImageAsyncTask task =
+                                new SaveAndShowImageAsyncTask(
+                                        viewHolder.imageAvatar, avatarFile, bitmap, viewHolder.textAvatar);
                         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     }
 
@@ -234,67 +233,67 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         TextView textAvatar;
     }
 
-public class OkHttpSaveBitmapToDiskAsyncTask extends AsyncTask<Void, Void, Void> {
-
-    ImageView avatarImage;
-    TextView avatarText;
-    File avatarFile;
-    Bitmap bitmap;
-
-    public OkHttpSaveBitmapToDiskAsyncTask(ImageView avatarImage, TextView avatarText,
-                                           File avatarFile, Bitmap bitmap) {
-        this.avatarImage = avatarImage;
-        this.avatarText = avatarText;
-        this.avatarFile = avatarFile;
-        this.bitmap = bitmap;
-    }
-
-    @Override
-    protected Void doInBackground(Void... params) {
-        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: START "+avatarFile);
-
-        try {
-            //Descarga del archivo local
-            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (INICIO DownloadAvatar by Picasso: "
-                    + avatarFile.toString());
-
-            avatarFile.createNewFile();
-            FileOutputStream ostream = new FileOutputStream(avatarFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
-            ostream.close();
-
-            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (FIN DownloadAvatar by Picasso: "
-                    + avatarFile.toString());
-
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "DashBoardActivity.run(Picasso avatar Target): ", e);
-            if(avatarFile.exists())
-            {
-                avatarFile.delete();
-                bitmap = null;
-            }
-        }
-
-        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: END "+avatarFile);
-
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.onPostExecute: "+avatarFile);
-
-        if(bitmap!=null) {
-            //Carga del bitmap
-            avatarText.setVisibility(View.INVISIBLE);
-
-            Picasso.with(mContext)
-                    .load(avatarFile)
-                    .fit().centerCrop()
-                    .into(avatarImage);
-        }
-    }
-}
+//public class OkHttpSaveBitmapToDiskAsyncTask extends AsyncTask<Void, Void, Void> {
+//
+//    ImageView avatarImage;
+//    TextView avatarText;
+//    File avatarFile;
+//    Bitmap bitmap;
+//
+//    public OkHttpSaveBitmapToDiskAsyncTask(ImageView avatarImage, TextView avatarText,
+//                                           File avatarFile, Bitmap bitmap) {
+//        this.avatarImage = avatarImage;
+//        this.avatarText = avatarText;
+//        this.avatarFile = avatarFile;
+//        this.bitmap = bitmap;
+//    }
+//
+//    @Override
+//    protected Void doInBackground(Void... params) {
+//        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: START "+avatarFile);
+//
+//        try {
+//            //Descarga del archivo local
+//            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (INICIO DownloadAvatar by Picasso: "
+//                    + avatarFile.toString());
+//
+//            avatarFile.createNewFile();
+//            FileOutputStream ostream = new FileOutputStream(avatarFile);
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
+//            ostream.close();
+//
+//            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (FIN DownloadAvatar by Picasso: "
+//                    + avatarFile.toString());
+//
+//        } catch (Exception e) {
+//            Log.e(Constants.TAG, "DashBoardActivity.run(Picasso avatar Target): ", e);
+//            if(avatarFile.exists())
+//            {
+//                avatarFile.delete();
+//                bitmap = null;
+//            }
+//        }
+//
+//        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: END "+avatarFile);
+//
+//        return null;
+//    }
+//
+//    @Override
+//    protected void onPostExecute(Void aVoid) {
+//        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.onPostExecute: "+avatarFile);
+//
+//        if(bitmap!=null) {
+//            //Carga del bitmap
+//            avatarText.setVisibility(View.INVISIBLE);
+//
+//            Picasso.with(mContext)
+//                    .load(avatarFile)
+//                    .fit().centerCrop()
+//                    .into(avatarImage);
+//        }
+//    }
+//}
 
 //    class DownloadAvatars extends AsyncTask<String, String, String> {
 //

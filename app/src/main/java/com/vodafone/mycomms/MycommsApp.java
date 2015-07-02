@@ -53,6 +53,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private FilePushToServerController filePushToServerController;
     private SharedPreferences sp;
+    private boolean appIsInitialized = false;
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -159,8 +160,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Override
     public void onProfileReceived(UserProfile userProfile) {
         Log.e(Constants.TAG, "MycommsApp.onProfileReceived: ");
+
         String timeZone = TimeZone.getDefault().getID();
-        String test = userProfile.getTimezone();
 
         if (timeZone.equals(userProfile.getTimezone())) {
             profileController.setUserProfile(userProfile.getId(),
@@ -173,7 +174,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                     userProfile.getPlatforms(),
                     timeZone);
 
-            UserProfile newProfile = new UserProfile();
+            UserProfile newProfile;
             newProfile = userProfile;
             Realm realm = Realm.getInstance(this);
             realm.beginTransaction();
@@ -195,7 +196,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         // Profile loaded
         // Notify application to initialize everything
-        BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
+        if(!appIsInitialized)
+            BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
     }
 
     @Override
@@ -248,8 +250,10 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     {
         Log.e(Constants.TAG, "MycommsApp.onApplicationAndProfileInitialized: ");
 
-        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        appIsInitialized = true;
 
+        //Check if sign up avatar is pending to upload
+        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
         {
             if(profile_id!=null)

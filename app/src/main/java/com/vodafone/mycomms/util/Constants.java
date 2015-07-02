@@ -125,6 +125,7 @@ public class Constants {
     public static final String NEWS_PUBLISHED_AT = "published_at";
 
     //Contacts API Calls
+    public static final String CONTACT_API_GET_PROFILE = "/api/me";
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_CONTACTS_BASIC_CALL = "/api/me/contact?p=";
     public static final String CONTACT_API_GET_CONTACTS_IDS = "/api/me/contact?ids=";
@@ -133,8 +134,8 @@ public class Constants {
     public static final String CONTACT_API_POST_RECENTS = "/api/me/recents";
     public static final String CONTACT_API_POST_FAVOURITE = "/api/me/favourites";
     public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
-    public static final String CONTACT_API_POST_AVATAR = "https://int.my-comms.com/api/me/avatar";
-    public static final String CONTACT_API_POST_FILE = "https://int.my-comms.com/api/uploadFile";
+    public static final String CONTACT_API_POST_AVATAR = "/api/me/avatar";
+    public static final String CONTACT_API_POST_FILE = "/api/uploadFile";
 
     //Contact Avatar BD Fields
     public static final String AVATAR_CONTACT_ID = "contactId";

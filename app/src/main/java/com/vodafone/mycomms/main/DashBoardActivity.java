@@ -203,7 +203,7 @@ public class DashBoardActivity extends ToolbarActivity{
                                         new SaveAndShowImageAsyncTask(
                                                 recentAvatar, avatarFile, bitmap, avatarText);
 
-                                task.executeOnExecutor(Executors.newCachedThreadPool());
+                                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             }
 
                             @Override
@@ -394,7 +394,7 @@ public class DashBoardActivity extends ToolbarActivity{
                                         new SaveAndShowImageAsyncTask(
                                                 newsImage, newsFile, bitmap);
 
-                                task.executeOnExecutor(Executors.newCachedThreadPool());
+                                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                             }
 
                             @Override

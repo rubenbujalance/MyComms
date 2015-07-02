@@ -22,7 +22,6 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
@@ -49,7 +48,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import io.realm.Realm;
 import model.News;

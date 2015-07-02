@@ -49,7 +49,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import io.realm.Realm;
 import model.News;
@@ -62,8 +61,6 @@ public class DashBoardActivity extends ToolbarActivity{
     private RealmChatTransactions _chatTx;
     private ArrayList<News> newsArrayList;
 
-    private HashMap<String,String> openedDownloadConnections = new HashMap<>();
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +72,6 @@ public class DashBoardActivity extends ToolbarActivity{
         setContentView(R.layout.layout_dashboard);
 
         initALL();
-        //BusProvider.getInstance().post(new InitNews());
-        //BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
@@ -347,6 +342,7 @@ public class DashBoardActivity extends ToolbarActivity{
             Log.e(Constants.TAG, "Load recents error: ",e);
         }
     }
+
 
     private void loadNews() {
         Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");

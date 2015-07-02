@@ -123,6 +123,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 final Target target = new Target() {
                     @Override
                     public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                        viewHolder.imageAvatar.setImageBitmap(bitmap);
+
                         SaveAndShowImageAsyncTask task =
                                 new SaveAndShowImageAsyncTask(
                                         viewHolder.imageAvatar, avatarFile, bitmap, viewHolder.textAvatar);

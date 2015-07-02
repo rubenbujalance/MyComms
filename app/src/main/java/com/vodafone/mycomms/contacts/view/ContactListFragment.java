@@ -64,7 +64,7 @@ import model.RecentContact;
  */
 public class ContactListFragment extends ListFragment implements ISearchConnectionCallback, IContactsRefreshConnectionCallback {
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private Realm realm;

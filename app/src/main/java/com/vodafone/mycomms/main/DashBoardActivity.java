@@ -414,16 +414,17 @@ public class DashBoardActivity extends ToolbarActivity{
         Log.i(Constants.TAG, "DashBoardActivity.onPause: ");
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        if (sp.getBoolean(Constants.IS_TOOLBAR_CLICKED, true)){
-            enableToolbarIsClicked(true);
-            finish();
-            overridePendingTransition(0, 0);
-        }
+//        if (sp.getBoolean(Constants.IS_TOOLBAR_CLICKED, true)){
+//            enableToolbarIsClicked(false);
+//            finish();
+//            overridePendingTransition(0, 0);
+//        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        overridePendingTransition(0,0);
         //Update Pending Messages on Toolbar
         checkUnreadChatMessages();
         loadRecents();

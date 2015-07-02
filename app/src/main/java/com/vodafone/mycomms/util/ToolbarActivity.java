@@ -158,10 +158,9 @@ public class ToolbarActivity extends ActionBarActivity {
                 editor.apply();
                 // set an exit transition
                 Intent in = new Intent(context, ContactListMainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
-                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
 
@@ -172,7 +171,7 @@ public class ToolbarActivity extends ActionBarActivity {
                 editor.apply();
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerDasboard");
                 Intent in = new Intent(context, DashBoardActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
             }
         });
@@ -184,10 +183,9 @@ public class ToolbarActivity extends ActionBarActivity {
                 editor.apply();
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerInbox");
                 Intent in = new Intent(context, ChatListActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
-                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
     }

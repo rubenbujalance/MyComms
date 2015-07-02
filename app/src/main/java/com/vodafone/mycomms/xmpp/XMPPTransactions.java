@@ -129,11 +129,10 @@ public final class XMPPTransactions {
             xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
             xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
             xmppConfigBuilder.setDebuggerEnabled(true);
-            xmppConfigBuilder.setSendPresence(true);
+            xmppConfigBuilder.setSendPresence(false);
 //            xmppConfigBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
             xmppConfigBuilder.setCompressionEnabled(false);
 
-            //TODO: Testing executeOnExecutor
             //new XMPPOpenConnectionTask().execute(xmppConfigBuilder);
             XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
             xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, xmppConfigBuilder);

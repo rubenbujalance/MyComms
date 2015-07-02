@@ -26,12 +26,12 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
+import com.vodafone.mycomms.connection.ConnectionsQueue;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
-import com.vodafone.mycomms.events.RecentAvatarsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -49,8 +49,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.HashMap;
 
 import io.realm.Realm;
 import model.News;
@@ -62,6 +61,8 @@ public class DashBoardActivity extends ToolbarActivity{
     private Realm mRealm;
     private RealmChatTransactions _chatTx;
     private ArrayList<News> newsArrayList;
+
+    private HashMap<String,String> openedDownloadConnections = new HashMap<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -191,7 +192,8 @@ public class DashBoardActivity extends ToolbarActivity{
 
                     //Download avatar
                     if (recentContact.getAvatar() != null &&
-                            recentContact.getAvatar().length() > 0) {
+                            recentContact.getAvatar().length() > 0 &&
+                            !ConnectionsQueue.isConnectionAlive(avatarFile.toString())) {
                         File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
 
                         if(!avatarsDir.exists()) avatarsDir.mkdirs();
@@ -199,16 +201,19 @@ public class DashBoardActivity extends ToolbarActivity{
                         final Target target = new Target() {
                             @Override
                             public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                                recentAvatar.setImageBitmap(bitmap);
+
                                 SaveAndShowImageAsyncTask task =
                                         new SaveAndShowImageAsyncTask(
                                                 recentAvatar, avatarFile, bitmap, avatarText);
 
-                                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                                task.execute();
                             }
 
                             @Override
                             public void onBitmapFailed(Drawable errorDrawable) {
                                 if(avatarFile.exists()) avatarFile.delete();
+                                ConnectionsQueue.removeConnection(avatarFile.toString());
                             }
 
                             @Override
@@ -219,6 +224,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
                         recentAvatar.setTag(target);
 
+                        ConnectionsQueue.putConnection(avatarFile.toString());
                         Picasso.with(this)
                             .load(recentContact.getAvatar())
                             .into(target);
@@ -342,7 +348,6 @@ public class DashBoardActivity extends ToolbarActivity{
         }
     }
 
-
     private void loadNews() {
         Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
 
@@ -363,88 +368,15 @@ public class DashBoardActivity extends ToolbarActivity{
             LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
             container.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
+            News news;
 
             for (int i = 0; i < newsArrayList.size(); i++) {
-                View child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
+                news = newsArrayList.get(i);
 
-                container.addView(child);
-                child.setPadding(10, 20, 10, 20);
-
-                final ImageView newsImage = (ImageView) child.findViewById(R.id.notice_image);
-                final File newsFile = new File(getFilesDir(), Constants.CONTACT_NEWS_DIR +
-                        "news_"+newsArrayList.get(i).getUuid()+".jpg");
-
-                if (newsFile.exists()) {
-                    Picasso.with(this)
-                            .load(newsFile)
-                            .fit().centerInside()
-                            .into(newsImage);
-                } else{
-                    //Download image
-                    if (newsArrayList.get(i).getImage() != null &&
-                            newsArrayList.get(i).getImage().length() > 0) {
-                        final String imageUrl = "https://" + EndpointWrapper.getBaseNewsURL() + newsArrayList.get(i).getImage();
-                        File imagesDir = new File(getFilesDir() + Constants.CONTACT_NEWS_DIR);
-                        if(!imagesDir.exists()) imagesDir.mkdirs();
-
-                        final Target target = new Target() {
-                            @Override
-                            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                                SaveAndShowImageAsyncTask task =
-                                        new SaveAndShowImageAsyncTask(
-                                                newsImage, newsFile, bitmap);
-
-                                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                            }
-
-                            @Override
-                            public void onBitmapFailed(Drawable errorDrawable) {
-                                if(newsFile.exists()) newsFile.delete();
-                            }
-
-                            @Override
-                            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                            }
-                        };
-
-                        newsImage.setTag(target);
-
-                        Picasso.with(this)
-                                .load(imageUrl)
-                                .into(target);
-                    }
-                }
-
-                final TextView title = (TextView) child.findViewById(R.id.notice_title);
-                title.setText(newsArrayList.get(i).getTitle());
-
-                TextView date = (TextView) child.findViewById(R.id.notice_date);
-                Long current = Calendar.getInstance().getTimeInMillis();
-                date.setText(Utils.getShortStringTimeDifference(current - newsArrayList.get(i).getPublished_at()));
-
-                final String detailImage = newsArrayList.get(i).getImage();
-                final String detailTitle = newsArrayList.get(i).getTitle();
-                final String detailAvatar = newsArrayList.get(i).getAuthor_avatar();
-                final String detailAuthor = newsArrayList.get(i).getAuthor_name();
-                final String detailPublished = Utils.getShortStringTimeDifference(current - newsArrayList.get(i).getPublished_at());
-                final String detailHtml = newsArrayList.get(i).getHtml();
-
-                LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
-                btnews.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        Intent in = new Intent(DashBoardActivity.this, NewsDetailActivity.class);
-                        in.putExtra(Constants.NEWS_IMAGE, detailImage);
-                        in.putExtra(Constants.NEWS_TITLE, detailTitle);
-                        in.putExtra(Constants.NEWS_AUTHOR_AVATAR, detailAvatar);
-                        in.putExtra(Constants.NEWS_AUTHOR_NAME, detailAuthor);
-                        in.putExtra(Constants.NEWS_PUBLISHED_AT, detailPublished);
-                        in.putExtra(Constants.NEWS_HTML, detailHtml);
-                        in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        startActivity(in);
-                        finish();
-                    }
-                });
+                new DrawSingleNewsAsyncTask(inflater,container,
+                        news.getUuid(),news.getImage(),news.getTitle(),news.getAuthor_avatar(),
+                        news.getAuthor_name(),news.getHtml(),news.getPublished_at())
+                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "DashBoardActivity.drawNews: " + e);
@@ -526,9 +458,138 @@ public class DashBoardActivity extends ToolbarActivity{
         ((MycommsApp)getApplication()).getNews();
     }
 
-    @Subscribe
-    public void onRecentAvatarsReceived(RecentAvatarsReceivedEvent event){
-        loadRecents();
+    public class DrawSingleNewsAsyncTask extends AsyncTask<Void,Void,Void>
+    {
+        LayoutInflater inflater;
+        LinearLayout container;
+        View child;
+        Target target;
+        String imageUrl;
+
+        String titleStr;
+        String dateStr;
+
+        String uuid,image,title,author_avatar,author_name,html;
+        long published_at;
+
+        boolean loadFromDisk;
+        File newsFile;
+        ImageView newsImage;
+
+        public DrawSingleNewsAsyncTask(LayoutInflater inflater, LinearLayout container,
+                                       String uuid,String image,String title,String author_avatar,
+                                       String author_name,String html,long published_at) {
+            this.inflater = inflater;
+            this.container = container;
+            this.uuid = uuid;
+            this.image = image;
+            this.title = title;
+            this.author_avatar = author_avatar;
+            this.author_name = author_name;
+            this.published_at = published_at;
+            this.html = html;
+            loadFromDisk = false;
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
+            container.addView(child);
+            child.setPadding(10, 20, 10, 20);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            newsImage = (ImageView) child.findViewById(R.id.notice_image);
+            newsFile = new File(getFilesDir(), Constants.CONTACT_NEWS_DIR +
+                    "news_"+uuid+".jpg");
+
+            if (newsFile.exists()) {
+                loadFromDisk = true;
+            } else{
+                //Download image
+                if (image != null &&
+                        image.length() > 0) {
+                    imageUrl = "https://" + EndpointWrapper.getBaseNewsURL() + image;
+                    File imagesDir = new File(getFilesDir() + Constants.CONTACT_NEWS_DIR);
+                    if(!imagesDir.exists()) imagesDir.mkdirs();
+
+                    target = new Target() {
+                        @Override
+                        public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                            newsImage.setImageBitmap(bitmap);
+
+                            SaveAndShowImageAsyncTask task =
+                                    new SaveAndShowImageAsyncTask(
+                                            newsImage, newsFile, bitmap);
+
+                            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+                            if(newsFile.exists()) newsFile.delete();
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                        }
+                    };
+
+                    newsImage.setTag(target);
+                }
+            }
+
+            Long current = Calendar.getInstance().getTimeInMillis();
+            final String detailImage = image;
+            final String detailTitle = title;
+            final String detailAvatar = author_avatar;
+            final String detailAuthor = author_name;
+            final String detailPublished = Utils.getShortStringTimeDifference(current - published_at);
+            final String detailHtml = html;
+
+            LinearLayout btnews = (LinearLayout) child.findViewById(R.id.notice_content);
+            btnews.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    Intent in = new Intent(DashBoardActivity.this, NewsDetailActivity.class);
+                    in.putExtra(Constants.NEWS_IMAGE, detailImage);
+                    in.putExtra(Constants.NEWS_TITLE, detailTitle);
+                    in.putExtra(Constants.NEWS_AUTHOR_AVATAR, detailAvatar);
+                    in.putExtra(Constants.NEWS_AUTHOR_NAME, detailAuthor);
+                    in.putExtra(Constants.NEWS_PUBLISHED_AT, detailPublished);
+                    in.putExtra(Constants.NEWS_HTML, detailHtml);
+                    in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(in);
+                    finish();
+                }
+            });
+
+            titleStr = title;
+            dateStr = detailPublished;
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            final TextView title = (TextView) child.findViewById(R.id.notice_title);
+            title.setText(titleStr);
+            TextView date = (TextView) child.findViewById(R.id.notice_date);
+            date.setText(dateStr);
+
+            if(loadFromDisk)
+                Picasso.with(DashBoardActivity.this)
+                        .load(newsFile)
+                        .fit().centerInside()
+                        .into(newsImage);
+            else
+                Picasso.with(DashBoardActivity.this)
+                        .load(imageUrl)
+                        .into(target);
+        }
     }
 
 }

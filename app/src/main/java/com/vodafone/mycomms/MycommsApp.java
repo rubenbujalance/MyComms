@@ -11,7 +11,6 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
-import com.vodafone.mycomms.contacts.connection.DownloadContactsAsyncTask;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
@@ -121,7 +120,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         }
         else {
             String profile = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-            new DownloadContactsAsyncTask().execute(this);
+            //new DownloadContactsAsyncTask().execute(this);
             return profile;
         }
     }

@@ -55,7 +55,7 @@ public class ContactController extends BaseController {
                     if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
                         int pageSize = jsonPagination.getInt(Constants.CONTACT_PAGINATION_PAGESIZE);
                         offsetPaging = offsetPaging + pageSize;
-                        getContactList(apiCall + "&o=" + offsetPaging);
+                        getContactList(Constants.CONTACT_API_GET_CONTACTS + "&o=" + offsetPaging);
                     } else {
                         offsetPaging = 0;
                     }

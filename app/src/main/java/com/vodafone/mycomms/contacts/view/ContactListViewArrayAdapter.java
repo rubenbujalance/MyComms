@@ -268,7 +268,11 @@ public class OkHttpSaveBitmapToDiskAsyncTask extends AsyncTask<Void, Void, Void>
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "DashBoardActivity.run(Picasso avatar Target): ", e);
-            if(avatarFile.exists()) avatarFile.delete();
+            if(avatarFile.exists())
+            {
+                avatarFile.delete();
+                bitmap = null;
+            }
         }
 
         Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: END "+avatarFile);
@@ -280,13 +284,15 @@ public class OkHttpSaveBitmapToDiskAsyncTask extends AsyncTask<Void, Void, Void>
     protected void onPostExecute(Void aVoid) {
         Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.onPostExecute: "+avatarFile);
 
-        //Carga del bitmap
-        avatarText.setVisibility(View.INVISIBLE);
+        if(bitmap!=null) {
+            //Carga del bitmap
+            avatarText.setVisibility(View.INVISIBLE);
 
-        Picasso.with(mContext)
-                .load(avatarFile)
-                .fit().centerCrop()
-                .into(avatarImage);
+            Picasso.with(mContext)
+                    .load(avatarFile)
+                    .fit().centerCrop()
+                    .into(avatarImage);
+        }
     }
 }
 

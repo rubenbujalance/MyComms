@@ -3,7 +3,6 @@ package com.vodafone.mycomms.contacts.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.connection.ConnectionsQueue;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.Utils;
@@ -128,12 +128,14 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                         SaveAndShowImageAsyncTask task =
                                 new SaveAndShowImageAsyncTask(
                                         viewHolder.imageAvatar, avatarFile, bitmap, viewHolder.textAvatar);
-                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        task.execute();
                     }
 
                     @Override
                     public void onBitmapFailed(Drawable errorDrawable) {
                         if(avatarFile.exists()) avatarFile.delete();
+                        ConnectionsQueue.removeConnection(avatarFile.toString());
                     }
 
                     @Override
@@ -144,6 +146,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
                 viewHolder.imageAvatar.setTag(target);
 
+                //Add this download to queue, to avoid duplicated downloads
+                ConnectionsQueue.putConnection(avatarFile.toString());
                 Picasso.with(mContext)
                         .load(contact.getAvatar())
                         .into(target);

@@ -62,8 +62,6 @@ public class DashBoardActivity extends ToolbarActivity{
     private RealmChatTransactions _chatTx;
     private ArrayList<News> newsArrayList;
 
-    private HashMap<String,String> openedDownloadConnections = new HashMap<>();
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +73,6 @@ public class DashBoardActivity extends ToolbarActivity{
         setContentView(R.layout.layout_dashboard);
 
         initALL();
-        //BusProvider.getInstance().post(new InitNews());
-        //BusProvider.getInstance().post(new InitProfileAndContacts());
 
         mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
@@ -224,6 +220,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
                         recentAvatar.setTag(target);
 
+                        //Add this download to queue, to avoid duplicated downloads
                         ConnectionsQueue.putConnection(avatarFile.toString());
                         Picasso.with(this)
                             .load(recentContact.getAvatar())
@@ -348,6 +345,7 @@ public class DashBoardActivity extends ToolbarActivity{
         }
     }
 
+
     private void loadNews() {
         Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
 
@@ -427,8 +425,8 @@ public class DashBoardActivity extends ToolbarActivity{
     protected void onResume() {
         super.onResume();
         //Update Pending Messages on Toolbar
-//        loadRecents();
         checkUnreadChatMessages();
+        loadRecents();
     }
 
     @Subscribe
@@ -451,11 +449,9 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
     @Subscribe
-    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
+    public void onRecentContactsReceived(RecentContactsReceivedEvent event) {
         Log.e(Constants.TAG, "DashBoardActivity.onRecentContactsReceived: ");
-
         loadRecents();
-        ((MycommsApp)getApplication()).getNews();
     }
 
     public class DrawSingleNewsAsyncTask extends AsyncTask<Void,Void,Void>

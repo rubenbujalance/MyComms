@@ -27,7 +27,7 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.res.builder.RobolectricPackageManager;
-import org.robolectric.shadows.FakeHttp;
+import org.robolectric.shadows.httpclient.FakeHttp;
 import org.robolectric.shadows.ShadowAlertDialog;
 
 import static com.vodafone.mycomms.constants.Constants.ACCESS_TOKEN;

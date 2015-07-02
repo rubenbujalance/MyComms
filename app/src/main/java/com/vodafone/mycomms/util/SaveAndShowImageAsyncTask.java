@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -68,14 +67,6 @@ public class SaveAndShowImageAsyncTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         Log.e(Constants.TAG, "SaveAndShowImageAsyncTask.onPostExecute: " + file);
-
-        //Load bitmap to ImageView
-        if(textView!=null) textView.setVisibility(View.INVISIBLE);
         ConnectionsQueue.removeConnection(file.toString());
-
-//        Picasso.with(context)
-//                .load(file)
-//                .fit().centerCrop()
-//                .into(image);
     }
 }

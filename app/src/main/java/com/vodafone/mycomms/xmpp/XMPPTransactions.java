@@ -283,15 +283,17 @@ public final class XMPPTransactions {
             if(to.indexOf("@")<0) return false;
             to = to.substring(0, to.indexOf("@"));
 
-            if(to.compareTo(_profile_id)!=0 || type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0)
+            if((parser.getName().compareTo(Constants.XMPP_ELEMENT_IQ) == 0
+                    && to.compareTo(_profile_id)!=0)
+                    || type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0)
                 return false;
 
             if (parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0)
             {
                 String mediaType = parser.getAttributeValue("", Constants.XMPP_ATTR_MEDIATYPE);
-                if(mediaType==null) return false;
 
-                if(mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_TEXT)==0)
+                if(mediaType == null ||
+                        mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_TEXT)==0)
                     return saveAndNotifyMessageReceived(parser);
                 else if(mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
                     return saveAndNotifyImageReceived(parser);
@@ -353,13 +355,15 @@ public final class XMPPTransactions {
 
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
+            String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
 
             int event = parser.next();
             if (event != XmlPullParser.START_TAG) return false;
 
             String text = parser.nextText();
-            from = from.substring(0, from.indexOf("@"));
+            if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
+            if(to.contains("@")) to = to.substring(0, to.indexOf("@"));
 
             realm = Realm.getInstance(_appContext);
             RealmChatTransactions chatTx = new RealmChatTransactions(realm, _appContext);
@@ -371,16 +375,31 @@ public final class XMPPTransactions {
                 return false;
             }
 
-            ChatMessage newChatMessage = chatTx.newChatMessageInstance(from,
-                    Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
-                    Constants.CHAT_MESSAGE_TYPE_TEXT,
-                    text, "", id);
+            ChatMessage newChatMessage = null;
+            String contactId = null;
+
+            if(to.compareTo(_profile_id)==0) {
+                newChatMessage = chatTx.newChatMessageInstance(from,
+                        Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
+                        Constants.CHAT_MESSAGE_TYPE_TEXT,
+                        text, "", id);
+
+                contactId = from;
+            }
+            else if(from.compareTo(_profile_id)==0){
+                newChatMessage = chatTx.newChatMessageInstance(to,
+                        Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                        Constants.CHAT_MESSAGE_TYPE_TEXT,
+                        text, "", id);
+
+                contactId = to;
+            }
 
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            Chat chat = chatTx.getChatById(from);
-            if(chat==null) chat = chatTx.newChatInstance(from);
+            Chat chat = chatTx.getChatById(contactId);
+            if(chat==null) chat = chatTx.newChatInstance(contactId);
             chat = chatTx.updatedChatInstance(chat, newChatMessage);
 
             chatTx.insertChat(chat);
@@ -392,8 +411,10 @@ public final class XMPPTransactions {
             chatEvent.setMessage(newChatMessage);
             BusProvider.getInstance().post(chatEvent);
 
-            notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
-                    Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+            if(to.compareTo(_profile_id)==0) {
+                notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
+                        Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+            }
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
@@ -410,12 +431,11 @@ public final class XMPPTransactions {
 
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
+            String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String url = parser.getAttributeValue("", Constants.XMPP_ATTR_FILEURL);
 
             if(url==null) return false;
-
-            from = from.substring(0, from.indexOf("@"));
 
             realm = Realm.getInstance(_appContext);
             RealmChatTransactions chatTx = new RealmChatTransactions(realm, _appContext);
@@ -427,16 +447,35 @@ public final class XMPPTransactions {
                 return false;
             }
 
-            ChatMessage newChatMessage = chatTx.newChatMessageInstance(from,
-                    Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
-                    Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                    "", url, id);
+            if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
+            if(to.contains("@")) to = from.substring(0, to.indexOf("@"));
+
+            ChatMessage newChatMessage = null;
+            String contactId = null;
+
+            if(to.compareTo(_profile_id)==0) {
+                newChatMessage = chatTx.newChatMessageInstance(from,
+                        Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
+                        Constants.CHAT_MESSAGE_TYPE_IMAGE,
+                        "", url, id);
+
+                contactId = from;
+            }
+            else if(from.compareTo(_profile_id)==0) {
+                newChatMessage = chatTx.newChatMessageInstance(to,
+                        Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                        Constants.CHAT_MESSAGE_TYPE_IMAGE,
+                        "", url, id);
+
+                contactId = to;
+            }
 
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            Chat chat = chatTx.getChatById(from);
-            if(chat==null) chat = chatTx.newChatInstance(from);
+            Chat chat = chatTx.getChatById(contactId);
+
+            if(chat==null) chat = chatTx.newChatInstance(contactId);
             chat = chatTx.updatedChatInstance(chat, newChatMessage);
 
             chatTx.insertChat(chat);
@@ -445,8 +484,10 @@ public final class XMPPTransactions {
             realm.close();
 
             //Send IQ
-            notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
-                    Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+            if(to.compareTo(_profile_id)==0) {
+                notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
+                        Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+            }
 
             //Download to file
             if(!downloadToChatFile(url, id))

@@ -197,6 +197,7 @@ public class DashBoardActivity extends ToolbarActivity{
                             @Override
                             public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
                                 recentAvatar.setImageBitmap(bitmap);
+                                avatarText.setVisibility(View.INVISIBLE);
 
                                 SaveAndShowImageAsyncTask task =
                                         new SaveAndShowImageAsyncTask(
@@ -220,7 +221,7 @@ public class DashBoardActivity extends ToolbarActivity{
                         recentAvatar.setTag(target);
 
                         //Add this download to queue, to avoid duplicated downloads
-                        ConnectionsQueue.putConnection(avatarFile.toString());
+                        ConnectionsQueue.putConnection(avatarFile.toString(), target);
                         Picasso.with(this)
                             .load(recentContact.getAvatar())
                             .into(target);

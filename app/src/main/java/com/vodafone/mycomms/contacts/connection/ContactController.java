@@ -51,6 +51,7 @@ public class ContactController extends BaseController {
                     ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
                     contactsController.insertContactListInRealm(jsonResponse);
 
+                    //Update Contact List View on every pagination
                     BusProvider.getInstance().post(new SetContactListAdapterEvent());
 
                     JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);

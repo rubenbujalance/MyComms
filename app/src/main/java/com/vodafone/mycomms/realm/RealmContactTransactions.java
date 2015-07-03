@@ -139,17 +139,20 @@ public class RealmContactTransactions {
 
     public ArrayList<Contact> getContactsByKeyWord(String keyWord)
     {
+        String test = keyWord;
         ArrayList<Contact> contactArrayList = new ArrayList<>();
         RealmResults<Contact> result = mRealm.where(Contact.class)
                                             .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId)
                                             .beginGroup()
-                                                .contains(Constants.CONTACT_FNAME, keyWord, false)
-                                                .or()
-                                                .contains(Constants.CONTACT_LNAME, keyWord, false)
-                                                .or()
-                                                .contains(Constants.CONTACT_COMPANY, keyWord, false)
+                                                .contains(Constants.CONTACT_SORT_HELPER, keyWord, false)
                                                 .or()
                                                 .contains(Constants.CONTACT_EMAILS, keyWord, false)
+//                                                .or()
+//                                                .contains(Constants.CONTACT_FNAME, keyWord, false)
+//                                                .or()
+//                                                .contains(Constants.CONTACT_LNAME, keyWord, false)
+//                                                .or()
+//                                                .contains(Constants.CONTACT_COMPANY, keyWord, false)
                                             .endGroup()
                                             .findAll();
 

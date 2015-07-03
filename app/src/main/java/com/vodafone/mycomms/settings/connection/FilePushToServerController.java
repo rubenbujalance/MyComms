@@ -11,6 +11,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -71,7 +72,7 @@ public class FilePushToServerController extends BaseController
                         Utils.getHttpHeaderContentType())
                 .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
                         Utils.getHttpHeaderAuth(mContext))
-                .url(URL)
+                .url("https://" + EndpointWrapper.getBaseURL() + URL)
                 .post(requestBody)
                 .build();
     }

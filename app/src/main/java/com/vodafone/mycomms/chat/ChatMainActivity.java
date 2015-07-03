@@ -94,7 +94,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_main);
         activateToolbar();
-        setToolbarBackground(R.drawable.toolbar_header);
+//        setToolbarBackground(R.drawable.toolbar_header);
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
@@ -410,8 +410,11 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         if(chatMsg!=null)
         {
             _chatList.add(chatMsg);
-            mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-            mRecentContactController.setConnectionCallback(this);
+            if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
+                mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
+                mRecentContactController.setConnectionCallback(this);
+            }
+
             if(_chatList.size()>50) _chatList.remove(0);
                 refreshAdapter();
         }

@@ -283,6 +283,10 @@ public class SearchController extends BaseController
                 contact.setPresence(jsonObject.getString(Constants.CONTACT_PRESENCE));
             if (!jsonObject.isNull(Constants.CONTACT_COUNTRY))
                 contact.setCountry(jsonObject.getString(Constants.CONTACT_COUNTRY));
+            contact.setSearchHelper((contact.getFirstName() + " " + contact.getLastName() + " "
+                    + contact.getCompany() + " " + contact.getEmails()).trim());
+            contact.setSortHelper((contact.getFirstName() + " " + contact.getLastName() + " "
+                    + contact.getCompany()).trim());
         }catch (JSONException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());

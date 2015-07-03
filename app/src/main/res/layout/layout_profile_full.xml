@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/profile_layout"
-    android:background="@drawable/istanbul_bg_blur"
-    android:backgroundTint="#c8484b57"
-    android:backgroundTintMode="src_over">
+    android:background="@drawable/istanbul_bg_blur">
+    <!--android:backgroundTint="#c8484b57"-->
+    <!--android:backgroundTintMode="src_over"-->
 
     <ScrollView
         android:layout_width="fill_parent"

@@ -2,10 +2,15 @@ package com.vodafone.mycomms.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
@@ -16,6 +21,7 @@ import com.vodafone.mycomms.settings.connection.UpdateSettingsConnection;
 import com.vodafone.mycomms.settings.connection.UpdateTimeZoneConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,11 +72,14 @@ public class ProfileController extends BaseController {
             }
         }
 
-        if(profileConnection != null){
-            profileConnection.cancel();
-        }
-        profileConnection = new ProfileConnection(getContext(), this);
-        profileConnection.request();
+//        if(profileConnection != null){
+//            profileConnection.cancel();
+//        }
+//        profileConnection = new ProfileConnection(getContext(), this);
+//        profileConnection.request();
+
+        new GetProfileAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                (String) Constants.CONTACT_API_GET_PROFILE);
     }
 
     public boolean isUserProfileChanged(String firstName, String lastName, String company, String
@@ -147,7 +156,7 @@ public class ProfileController extends BaseController {
         Log.e(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
 
         boolean isUserProfileReceived = false;
-        if(response.getUrl() != null && !response.getUrl().contains(UpdateSettingsConnection.URL)) {
+        if(response.getUrl() != null && !response.getUrl().endsWith(UpdateSettingsConnection.URL)) {
             String result = response.getData().toString();
 
             try {
@@ -170,7 +179,7 @@ public class ProfileController extends BaseController {
         }
 
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
-            if (response.getUrl() != null && response.getUrl().contains(ProfileConnection.URL)) {
+            if (response.getUrl() != null && response.getUrl().endsWith(ProfileConnection.URL)) {
                 if (isUserProfileReceived) {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
                 } else {
@@ -308,7 +317,6 @@ public class ProfileController extends BaseController {
         updateTimeZoneConnection.request();
     }
 
-
     public HashMap getProfileHashMap(UserProfile userProfile)
     {
         HashMap<String, String> body = new HashMap<String, String>();
@@ -319,5 +327,71 @@ public class ProfileController extends BaseController {
         if(userProfile.getOfficeLocation() != null) body.put("officeLocation",userProfile.getOfficeLocation());
         if(userProfile.getTimezone() != null && !userProfile.getTimezone().equals("")) body.put("timeZone",userProfile.getTimezone());
         return body;
+    }
+
+    public void getProfileCallback(String json) {
+        Log.e(Constants.TAG, "ProfileController.getProfileCallback: " + json);
+
+        boolean isUserProfileReceived = false;
+
+        try {
+
+            if (json != null && json.length() > 0) {
+                JSONObject jsonResponse = new JSONObject(json);
+
+                userProfile = mapUserProfile(jsonResponse);
+                realmContactTransactions.insertUserProfile(userProfile);
+                if(userProfile != null) {
+                    isUserProfileReceived = true;
+                }
+            }
+        } catch (Exception e) {
+            Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile" + e.getMessage());
+        }
+
+        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
+            if (isUserProfileReceived) {
+                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
+            }
+        }
+    }
+
+    public class GetProfileAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: START");
+
+            Response response;
+            String json = null;
+
+            try {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("https://" + EndpointWrapper.getBaseURL() +
+                                params[0])
+                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                Utils.getHttpHeaderVersion(getContext()))
+                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                Utils.getHttpHeaderContentType())
+                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                Utils.getHttpHeaderAuth(getContext()))
+                        .build();
+
+                response = client.newCall(request).execute();
+                json = response.body().string();
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: ",e);
+            }
+
+            Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: END");
+
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(String json) {
+            getProfileCallback(json);
+        }
     }
 }

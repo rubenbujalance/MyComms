@@ -9,6 +9,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -49,7 +51,8 @@ public class ContactController extends BaseController {
                     ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
                     contactsController.insertContactListInRealm(jsonResponse);
 
-                    //TODO: Update Contacts on Fragment
+                    //Update Contact List View on every pagination
+                    BusProvider.getInstance().post(new SetContactListAdapterEvent());
 
                     JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
                     if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {

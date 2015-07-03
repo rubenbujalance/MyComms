@@ -19,6 +19,7 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
@@ -52,6 +53,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private FilePushToServerController filePushToServerController;
     private SharedPreferences sp;
+    private boolean appIsInitialized = false;
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -90,10 +92,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Subscribe
     public void onConnectivityChanged(ConnectivityChanged event) {
+        Log.e(Constants.TAG, "MycommsApp.onConnectivityChanged: "
+                + event.getConnectivityStatus().toString());
         if(event.getConnectivityStatus()==ConnectivityStatus.MOBILE_CONNECTED ||
                 event.getConnectivityStatus()==ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
         {
-            XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+//            XMPPTransactions.initializeMsgServerSession(getApplicationContext());
         }
     }
 
@@ -158,8 +162,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Override
     public void onProfileReceived(UserProfile userProfile) {
         Log.e(Constants.TAG, "MycommsApp.onProfileReceived: ");
+
         String timeZone = TimeZone.getDefault().getID();
-        String test = userProfile.getTimezone();
 
         if (timeZone.equals(userProfile.getTimezone())) {
             profileController.setUserProfile(userProfile.getId(),
@@ -172,7 +176,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                     userProfile.getPlatforms(),
                     timeZone);
 
-            UserProfile newProfile = new UserProfile();
+            UserProfile newProfile;
             newProfile = userProfile;
             Realm realm = Realm.getInstance(this);
             realm.beginTransaction();
@@ -194,7 +198,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         // Profile loaded
         // Notify application to initialize everything
-        BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
+        if(!appIsInitialized)
+            BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
     }
 
     @Override
@@ -247,8 +252,10 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     {
         Log.e(Constants.TAG, "MycommsApp.onApplicationAndProfileInitialized: ");
 
-        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        appIsInitialized = true;
 
+        //Check if sign up avatar is pending to upload
+        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
         {
             if(profile_id!=null)
@@ -265,6 +272,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Realm realm = Realm.getInstance(this);
         RecentContactController recentContactController = new RecentContactController(this, realm, profile_id);
         recentContactController.getRecentList();
+
+        XMPPTransactions.initializeMsgServerSession(this);
     }
 
     @Subscribe
@@ -279,6 +288,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onEventNewsImagesReceived(NewsImagesReceivedEvent event){
         Log.i(Constants.TAG, "MycommsApp.onEventNewsImagesReceived: ");
+    }
+
+    @Subscribe
+    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
+        Log.e(Constants.TAG, "MycommsApp.onRecentContactsReceived: ");
+        getNews();
     }
 
     public void getNews() {

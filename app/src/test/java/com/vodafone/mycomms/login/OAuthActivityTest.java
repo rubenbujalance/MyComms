@@ -17,7 +17,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.FakeHttp;
+import org.robolectric.shadows.httpclient.FakeHttp;
 import org.robolectric.shadows.ShadowWebView;
 
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;

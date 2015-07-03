@@ -124,6 +124,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                     @Override
                     public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
                         viewHolder.imageAvatar.setImageBitmap(bitmap);
+                        viewHolder.textAvatar.setVisibility(View.INVISIBLE);
 
                         SaveAndShowImageAsyncTask task =
                                 new SaveAndShowImageAsyncTask(
@@ -147,7 +148,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 viewHolder.imageAvatar.setTag(target);
 
                 //Add this download to queue, to avoid duplicated downloads
-                ConnectionsQueue.putConnection(avatarFile.toString());
+                ConnectionsQueue.putConnection(avatarFile.toString(), target);
                 Picasso.with(mContext)
                         .load(contact.getAvatar())
                         .into(target);

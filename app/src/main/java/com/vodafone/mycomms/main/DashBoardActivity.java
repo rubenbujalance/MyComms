@@ -196,6 +196,7 @@ public class DashBoardActivity extends ToolbarActivity{
                             @Override
                             public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
                                 recentAvatar.setImageBitmap(bitmap);
+                                avatarText.setVisibility(View.INVISIBLE);
 
                                 SaveAndShowImageAsyncTask task =
                                         new SaveAndShowImageAsyncTask(
@@ -219,7 +220,7 @@ public class DashBoardActivity extends ToolbarActivity{
                         recentAvatar.setTag(target);
 
                         //Add this download to queue, to avoid duplicated downloads
-                        ConnectionsQueue.putConnection(avatarFile.toString());
+                        ConnectionsQueue.putConnection(avatarFile.toString(), target);
                         Picasso.with(this)
                             .load(recentContact.getAvatar())
                             .into(target);
@@ -412,16 +413,17 @@ public class DashBoardActivity extends ToolbarActivity{
         Log.i(Constants.TAG, "DashBoardActivity.onPause: ");
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        if (sp.getBoolean(Constants.IS_TOOLBAR_CLICKED, true)){
-            enableToolbarIsClicked(true);
-            finish();
-            overridePendingTransition(0, 0);
-        }
+//        if (sp.getBoolean(Constants.IS_TOOLBAR_CLICKED, true)){
+//            enableToolbarIsClicked(false);
+//            finish();
+//            overridePendingTransition(0, 0);
+//        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        overridePendingTransition(0,0);
         //Update Pending Messages on Toolbar
         checkUnreadChatMessages();
         loadRecents();

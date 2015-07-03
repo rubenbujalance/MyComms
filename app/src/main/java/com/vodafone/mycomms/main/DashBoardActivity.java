@@ -22,10 +22,9 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
-import com.vodafone.mycomms.chatlist.view.ChatListHolder;
+import com.vodafone.mycomms.connection.AsyncTaskQueue;
 import com.vodafone.mycomms.connection.ConnectionsQueue;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
@@ -60,6 +59,8 @@ public class DashBoardActivity extends ToolbarActivity{
     private Realm mRealm;
     private RealmChatTransactions _chatTx;
     private ArrayList<News> newsArrayList;
+    private AsyncTaskQueue recentsTasksQueue = new AsyncTaskQueue();
+    private boolean recentsLoading = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,9 +116,9 @@ public class DashBoardActivity extends ToolbarActivity{
                 //Start Contacts activity
                 Constants.isSearchBarFocusRequested = true;
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
-                finish();
+//                finish();
             }
         });
 
@@ -127,222 +128,52 @@ public class DashBoardActivity extends ToolbarActivity{
                 //Start Favourites activity
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
                 in.putExtra(Constants.toolbar, false);
-                in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
-                finish();
+//                finish();
             }
         });
     }
 
     private void loadRecents(){
         Log.e(Constants.TAG, "DashBoardActivity.loadRecents: ");
+        if(recentsLoading) return;
+
+        recentsLoading = true;
 
         try {
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-            final String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, profileId);
-            recentList = realmContactTransactions.getAllRecentContacts();
 
             LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
             recentsContainer.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
             RecentContact recentContact;
 
+            recentList = realmContactTransactions.getAllRecentContacts();
+
             for (int i = 0; i < recentList.size(); i++) {
                 recentContact = recentList.get(i);
+                DrawSingleRecentAsyncTask task = new DrawSingleRecentAsyncTask(recentContact.getContactId(),
+                        recentContact.getFirstName(),recentContact.getLastName(),
+                        recentContact.getAvatar(),recentContact.getAction(),
+                        recentContact.getPhones(),recentContact.getEmails(),
+                        recentContact.getPlatform(),recentContact.getUniqueId(),profileId,
+                        recentsContainer,inflater);
 
-                View childRecents = inflater.inflate(R.layout.layout_recents_dashboard, recentsContainer, false);
-
-                recentsContainer.addView(childRecents);
-                childRecents.setPadding(10, 20, 10, 20);
-
-                final ImageView recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
-                final File avatarFile = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR,
-                        "avatar_"+recentContact.getContactId()+".jpg");
-
-                //Avatar image
-                if (avatarFile.exists()) { //From file if already exists
-                    Picasso.with(this)
-                            .load(avatarFile)
-                            .fit().centerCrop()
-                            .into(recentAvatar);
-                } else {
-                    //Set name initials image during the download
-                    String initials = "";
-                    if (null != recentContact.getFirstName() && recentContact.getFirstName().length() > 0) {
-                        initials = recentContact.getFirstName().substring(0, 1);
-
-                        if (null != recentContact.getLastName() && recentContact.getLastName().length() > 0) {
-                            initials = initials + recentContact.getLastName().substring(0, 1);
-                        }
-
-                    }
-
-                    final TextView avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
-                    recentAvatar.setImageResource(R.color.grey_middle);
-                    avatarText.setText(initials);
-
-                    //Download avatar
-                    if (recentContact.getAvatar() != null &&
-                            recentContact.getAvatar().length() > 0 &&
-                            !ConnectionsQueue.isConnectionAlive(avatarFile.toString())) {
-                        File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
-
-                        if(!avatarsDir.exists()) avatarsDir.mkdirs();
-
-                        final Target target = new Target() {
-                            @Override
-                            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                                recentAvatar.setImageBitmap(bitmap);
-                                avatarText.setVisibility(View.INVISIBLE);
-
-                                SaveAndShowImageAsyncTask task =
-                                        new SaveAndShowImageAsyncTask(
-                                                recentAvatar, avatarFile, bitmap, avatarText);
-
-                                task.execute();
-                            }
-
-                            @Override
-                            public void onBitmapFailed(Drawable errorDrawable) {
-                                if(avatarFile.exists()) avatarFile.delete();
-                                ConnectionsQueue.removeConnection(avatarFile.toString());
-                            }
-
-                            @Override
-                            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                            }
-                        };
-
-                        recentAvatar.setTag(target);
-
-                        //Add this download to queue, to avoid duplicated downloads
-                        ConnectionsQueue.putConnection(avatarFile.toString(), target);
-                        Picasso.with(this)
-                            .load(recentContact.getAvatar())
-                            .into(target);
-                    }
-                }
-
-                // Names
-                TextView firstName = (TextView) childRecents.findViewById(R.id.recent_firstname);
-                firstName.setText(recentContact.getFirstName());
-
-                TextView lastName = (TextView) childRecents.findViewById(R.id.recent_lastname);
-                lastName.setText(recentContact.getLastName());
-
-                // Badges
-                _realm = Realm.getInstance(this);
-                _chatTx = new RealmChatTransactions(_realm, this);
-
-                ChatListHolder chatHolder = new ChatListHolder(childRecents);
-
-                long count =_chatTx.getChatPendingMessagesCount(recentContact.getContactId());
-                String action = recentContact.getAction();
-                if(count > 0 && action.equals(Constants.CONTACTS_ACTION_SMS)) {
-                    TextView unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
-                    unread_messages.setVisibility(View.VISIBLE);
-                    unread_messages.setText(String.valueOf(count));
-                } else {
-                    ImageView typeRecent = (ImageView) childRecents.findViewById(R.id.type_recent);
-                    typeRecent.setVisibility(View.VISIBLE);
-
-                    int sdk = Build.VERSION.SDK_INT;
-                    if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                    } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                    } else {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
-                    }
-                }
-                LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
-                final ArrayList<RecentContact> finalRecentList = recentList;
-                final int position = i;
-                btRecents.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        try {
-                            String action = finalRecentList.get(position).getAction();
-                            if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
-                                String strPhones = finalRecentList.get(position).getPhones();
-                                if (strPhones != null)
-                                {
-                                    String phone = strPhones;
-                                    if(!finalRecentList.get(position).getPlatform().equals(Constants
-                                            .PLATFORM_LOCAL))
-                                    {
-                                        JSONArray jPhones = new JSONArray(strPhones);
-                                        phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
-                                    }
-
-                                    Utils.launchCall(phone, DashBoardActivity.this);
-                                }
-                            }
-                            else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
-                            {
-                                // This is LOCAL contact, then in this case the action will be Send SMS
-                                // message
-                                if(null != finalRecentList.get(position).getPlatform() && finalRecentList.get
-                                        (position).getPlatform().equals(Constants.PLATFORM_LOCAL))
-                                {
-                                    String phone = finalRecentList.get(position).getPhones();
-                                    if(null != phone)
-                                    {
-                                        Utils.launchSms(phone, DashBoardActivity.this);
-                                    }
-                                }
-                                else
-                                {
-                                    Intent in = new Intent(DashBoardActivity.this, ChatMainActivity.class);
-                                    in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, finalRecentList.get(position).getContactId());
-                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
-                                    startActivity(in);
-                                }
-
-                            }
-                            else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
-                                String strEmails = finalRecentList.get(position).getEmails();
-                                if (strEmails != null)
-                                {
-                                    String email = strEmails;
-                                    if(!finalRecentList.get(position).getPlatform().equals(Constants
-                                            .PLATFORM_LOCAL))
-                                    {
-                                        JSONArray jPhones = new JSONArray(strEmails);
-                                        email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
-                                    }
-
-                                    Utils.launchEmail(email, DashBoardActivity.this);
-                                }
-                            }
-                            //ADD RECENT
-                            Realm realm = Realm.getInstance(getBaseContext());
-                            RecentContactController recentController = new RecentContactController(DashBoardActivity.this,realm,profileId);
-                            recentController.insertRecent(finalRecentList.get(position).getContactId(), action);
-                            //setListAdapterTabs();
-                        } catch (Exception ex) {
-                            Log.e(Constants.TAG, "DashBoardActivity.onItemClick: ", ex);
-                        }
-                    }
-                });
-
+                recentsTasksQueue.putConnection(recentContact.getUniqueId(),task);
+                task.execute();
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: ",e);
         }
+
+        recentsLoading = false;
     }
 
 
@@ -424,9 +255,11 @@ public class DashBoardActivity extends ToolbarActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        setForegroundActivity(1);
         overridePendingTransition(0,0);
         //Update Pending Messages on Toolbar
-        checkUnreadChatMessages();
+        //RBM - It is done every time a message is received
+//        checkUnreadChatMessages();
         loadRecents();
     }
 
@@ -435,7 +268,7 @@ public class DashBoardActivity extends ToolbarActivity{
         Log.e(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
         if(news != null) {
-            if (newsArrayList==null ||newsArrayList.size()==0) {
+            if (newsArrayList==null || newsArrayList.size()==0) {
                 Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: FIRST LOAD");
                 drawNews(news);
             }
@@ -560,7 +393,6 @@ public class DashBoardActivity extends ToolbarActivity{
                     in.putExtra(Constants.NEWS_HTML, detailHtml);
                     in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(in);
-                    finish();
                 }
             });
 
@@ -572,20 +404,280 @@ public class DashBoardActivity extends ToolbarActivity{
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            final TextView title = (TextView) child.findViewById(R.id.notice_title);
-            title.setText(titleStr);
-            TextView date = (TextView) child.findViewById(R.id.notice_date);
-            date.setText(dateStr);
+            try {
+                final TextView title = (TextView) child.findViewById(R.id.notice_title);
+                title.setText(titleStr);
+                TextView date = (TextView) child.findViewById(R.id.notice_date);
+                date.setText(dateStr);
 
-            if(loadFromDisk)
-                Picasso.with(DashBoardActivity.this)
-                        .load(newsFile)
-                        .fit().centerInside()
-                        .into(newsImage);
-            else
-                Picasso.with(DashBoardActivity.this)
-                        .load(imageUrl)
-                        .into(target);
+                if (loadFromDisk)
+                    Picasso.with(DashBoardActivity.this)
+                            .load(newsFile)
+                            .fit().centerInside()
+                            .into(newsImage);
+                else
+                    Picasso.with(DashBoardActivity.this)
+                            .load(imageUrl)
+                            .into(target);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "DrawSingleNewsAsyncTask.onPostExecute: ",e);
+            }
+        }
+    }
+
+    public class DrawSingleRecentAsyncTask extends AsyncTask<Void,Void,Void>
+    {
+
+        String contactId,firstName,lastName,avatar,action,phones,emails,platform,recentId;
+        LinearLayout recentsContainer;
+        LayoutInflater inflater;
+        ImageView recentAvatar;
+        String profileId;
+        View childRecents;
+
+        //Avatar
+        boolean loadAvatarFromDisk = false;
+        File avatarFile = null;
+        String nameInitials = null;
+        TextView avatarText = null;
+        Target avatarTarget;
+
+        //Name
+        String firstNameStr,lastNameStr;
+        TextView firstNameView,lastNameView;
+
+        // Action icon and badges
+        TextView unread_messages;
+        long pendingMsgsCount;
+        ImageView typeRecent;
+
+        public DrawSingleRecentAsyncTask(String contactId, String firstName, String lastName,
+                                         String avatar, String action, String phones,
+                                         String emails, String platform, String recentId,
+                                         String profileId, LinearLayout recentsContainer,
+                                         LayoutInflater inflater)
+        {
+
+            this.recentsContainer = recentsContainer;
+            this.inflater = inflater;
+
+            this.contactId = contactId;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.avatar = avatar;
+            this.action = action;
+            this.phones = phones;
+            this.emails = emails;
+            this.platform = platform;
+            this.profileId = profileId;
+            this.recentId = recentId;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            childRecents = inflater.inflate(R.layout.layout_recents_dashboard, recentsContainer, false);
+
+            recentsContainer.addView(childRecents);
+            childRecents.setPadding(10, 20, 10, 20);
+            recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
+
+            //Avatar
+            avatarText = (TextView) childRecents.findViewById(R.id.avatarText);
+
+            // Names
+            firstNameView = (TextView) childRecents.findViewById(R.id.recent_firstname);
+            lastNameView = (TextView) childRecents.findViewById(R.id.recent_lastname);
+
+            //Action icon and badges
+            unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
+            typeRecent = (ImageView) childRecents.findViewById(R.id.type_recent);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            avatarFile = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR,
+                    "avatar_"+contactId+".jpg");
+
+            //Avatar image
+            if (avatarFile.exists()) { //From file if already exists
+                loadAvatarFromDisk = true;
+            } else {
+                //Set name initials image during the download
+                if (null != firstName && firstName.length() > 0) {
+                    nameInitials = firstName.substring(0, 1);
+
+                    if (null != lastName && lastName.length() > 0) {
+                        nameInitials = nameInitials + lastName.substring(0, 1);
+                    }
+
+                }
+
+                //Download avatar
+                if (avatar != null &&
+                        avatar.length() > 0 &&
+                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())) {
+                    File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+
+                    if(!avatarsDir.exists()) avatarsDir.mkdirs();
+
+                    avatarTarget = new Target() {
+                        @Override
+                        public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                            recentAvatar.setImageBitmap(bitmap);
+                            avatarText.setVisibility(View.INVISIBLE);
+
+                            SaveAndShowImageAsyncTask task =
+                                    new SaveAndShowImageAsyncTask(
+                                            recentAvatar, avatarFile, bitmap, avatarText);
+
+                            task.execute();
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+                            if(avatarFile.exists()) avatarFile.delete();
+                            ConnectionsQueue.removeConnection(avatarFile.toString());
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                        }
+                    };
+                    recentAvatar.setTag(avatarTarget);
+                }
+            }
+
+            // Badges
+            _realm = Realm.getInstance(DashBoardActivity.this);
+            _chatTx = new RealmChatTransactions(_realm, DashBoardActivity.this);
+            pendingMsgsCount =_chatTx.getChatPendingMessagesCount(contactId);
+
+            LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
+
+            btRecents.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    try {
+                        if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
+                            String strPhones = phones;
+                            if (strPhones != null)
+                            {
+                                String phone = strPhones;
+                                if(!platform.equals(Constants
+                                        .PLATFORM_LOCAL))
+                                {
+                                    JSONArray jPhones = new JSONArray(strPhones);
+                                    phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                                }
+
+                                Utils.launchCall(phone, DashBoardActivity.this);
+                            }
+                        }
+                        else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
+                        {
+                            // This is LOCAL contact, then in this case the action will be Send SMS
+                            // message
+                            if(null != platform && platform.compareTo(Constants.PLATFORM_LOCAL)==0)
+                            {
+                                String phone = phones;
+                                if(null != phone)
+                                {
+                                    Utils.launchSms(phone, DashBoardActivity.this);
+                                }
+                            }
+                            else
+                            {
+                                Intent in = new Intent(DashBoardActivity.this, ChatMainActivity.class);
+                                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
+                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                startActivity(in);
+                            }
+
+                        }
+                        else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
+                            String strEmails = emails;
+                            if (strEmails != null)
+                            {
+                                String email = strEmails;
+                                if(platform.compareTo(Constants.PLATFORM_LOCAL)!=0)
+                                {
+                                    JSONArray jPhones = new JSONArray(strEmails);
+                                    email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                                }
+
+                                Utils.launchEmail(email, DashBoardActivity.this);
+                            }
+                        }
+                        //ADD RECENT
+                        Realm realm = Realm.getInstance(getBaseContext());
+                        RecentContactController recentController = new RecentContactController(DashBoardActivity.this,realm,profileId);
+                        recentController.insertRecent(contactId, action);
+                        //setListAdapterTabs();
+                    } catch (Exception ex) {
+                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ",ex);
+                    }
+                }
+            });
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            try {
+                //Avatar
+                if (loadAvatarFromDisk) {
+                    Picasso.with(DashBoardActivity.this)
+                            .load(avatarFile)
+                            .fit().centerCrop()
+                            .into(recentAvatar);
+                } else if(avatarTarget!=null) {
+                    recentAvatar.setImageResource(R.color.grey_middle);
+                    avatarText.setText(nameInitials);
+
+                    //Add this download to queue, to avoid duplicated downloads
+                    ConnectionsQueue.putConnection(avatarFile.toString(), avatarTarget);
+                    Picasso.with(DashBoardActivity.this)
+                            .load(avatar)
+                            .into(avatarTarget);
+                }
+
+                // Recent action icon and bagdes
+                if (pendingMsgsCount > 0 && action.equals(Constants.CONTACTS_ACTION_SMS)) {
+                    unread_messages.setVisibility(View.VISIBLE);
+                    unread_messages.setText(String.valueOf(pendingMsgsCount));
+                } else {
+                    typeRecent.setVisibility(View.VISIBLE);
+
+                    int sdk = Build.VERSION.SDK_INT;
+                    if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
+                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                        else
+                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                    } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
+                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                        else
+                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                    } else {
+                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                        else
+                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                    }
+                }
+
+                // Names
+                firstNameView.setText(firstName);
+                lastNameView.setText(lastName);
+
+                //Since it's finished, remove this task from queue
+                recentsTasksQueue.removeConnection(recentId);
+
+            }  catch (Exception e) {
+                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
+            }
         }
     }
 

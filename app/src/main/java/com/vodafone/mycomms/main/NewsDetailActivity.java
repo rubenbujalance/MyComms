@@ -69,9 +69,9 @@ public class NewsDetailActivity  extends ToolbarActivity {
     }
 
     private void backAction() {
-        Intent in = new Intent(NewsDetailActivity.this, DashBoardActivity.class);
-        in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        startActivity(in);
+//        Intent in = new Intent(NewsDetailActivity.this, DashBoardActivity.class);
+//        in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//        startActivity(in);
         finish();
     }
 }

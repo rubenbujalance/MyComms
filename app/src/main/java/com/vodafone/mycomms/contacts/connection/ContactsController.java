@@ -360,25 +360,26 @@ public class ContactsController extends BaseController {
     }
 
     public FavouriteContact mapContactToFavourite(Contact contact){
-        FavouriteContact favoriteContact = new FavouriteContact();
-        favoriteContact.setId(contact.getId());
-        favoriteContact.setProfileId(contact.getProfileId());
-        favoriteContact.setContactId(contact.getContactId());
-        favoriteContact.setPlatform(contact.getPlatform());
-        favoriteContact.setFirstName(contact.getFirstName());
-        favoriteContact.setLastName(contact.getLastName());
-        favoriteContact.setAvatar(contact.getAvatar());
-        favoriteContact.setCompany(contact.getCompany());
-        favoriteContact.setPosition(contact.getPosition());
-        favoriteContact.setLastSeen(contact.getLastSeen());
-        favoriteContact.setOfficeLocation(contact.getOfficeLocation());
-        favoriteContact.setPhones(contact.getPhones());
-        favoriteContact.setOfficeLocation(contact.getOfficeLocation());
-        favoriteContact.setEmails(contact.getEmails());
-        favoriteContact.setAvailability(contact.getAvailability());
-        favoriteContact.setPresence(contact.getPresence());
-        favoriteContact.setCountry(contact.getCountry());
-        return favoriteContact;
+        FavouriteContact favouriteContact = new FavouriteContact();
+        favouriteContact.setId(contact.getId());
+        favouriteContact.setProfileId(contact.getProfileId());
+        favouriteContact.setContactId(contact.getContactId());
+        favouriteContact.setPlatform(contact.getPlatform());
+        favouriteContact.setFirstName(contact.getFirstName());
+        favouriteContact.setLastName(contact.getLastName());
+        favouriteContact.setAvatar(contact.getAvatar());
+        favouriteContact.setCompany(contact.getCompany());
+        favouriteContact.setPosition(contact.getPosition());
+        favouriteContact.setLastSeen(contact.getLastSeen());
+        favouriteContact.setOfficeLocation(contact.getOfficeLocation());
+        favouriteContact.setPhones(contact.getPhones());
+        favouriteContact.setOfficeLocation(contact.getOfficeLocation());
+        favouriteContact.setEmails(contact.getEmails());
+        favouriteContact.setAvailability(contact.getAvailability());
+        favouriteContact.setPresence(contact.getPresence());
+        favouriteContact.setCountry(contact.getCountry());
+        favouriteContact.setTimezone(contact.getTimezone());
+        return favouriteContact;
     }
 
     public RecentContact mapRecentContact(JSONObject jsonObject){

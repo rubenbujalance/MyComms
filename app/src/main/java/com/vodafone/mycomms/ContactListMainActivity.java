@@ -94,7 +94,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         overridePendingTransition(0,0);
         //Update Pending Messages on Toolbar
         //RBM - It is done every time a message is received
-//        checkUnreadChatMessages();
+        checkUnreadChatMessages();
         XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 

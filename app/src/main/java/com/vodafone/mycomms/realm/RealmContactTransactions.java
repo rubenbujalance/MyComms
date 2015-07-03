@@ -139,25 +139,23 @@ public class RealmContactTransactions {
 
     public ArrayList<Contact> getContactsByKeyWord(String keyWord)
     {
-        String test = keyWord;
+        if(keyWord==null || keyWord.length()<=0) return null;
+
         ArrayList<Contact> contactArrayList = new ArrayList<>();
-        RealmResults<Contact> result = mRealm.where(Contact.class)
-                                            .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId)
-                                            .beginGroup()
-                                                .contains(Constants.CONTACT_SORT_HELPER, keyWord, false)
-                                                .or()
-                                                .contains(Constants.CONTACT_EMAILS, keyWord, false)
-//                                                .or()
-//                                                .contains(Constants.CONTACT_FNAME, keyWord, false)
-//                                                .or()
-//                                                .contains(Constants.CONTACT_LNAME, keyWord, false)
-//                                                .or()
-//                                                .contains(Constants.CONTACT_COMPANY, keyWord, false)
-                                            .endGroup()
-                                            .findAll();
+        String[] keywordSplit = keyWord.split(" ");
+
+        RealmQuery<Contact> query = mRealm.where(Contact.class)
+                .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
+
+        for(int i=0; i<keywordSplit.length; i++)
+        {
+            query = query.contains(Constants.CONTACT_SEARCH_HELPER, keywordSplit[i], false);
+        }
+
+        RealmResults<Contact> result = query.findAll();
 
         if (result!=null){
-            result.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
+            result.sort(Constants.CONTACT_SORT_HELPER, RealmResults.SORT_ORDER_ASCENDING);
             for (Contact contactListItem : result)
             {
                 contactArrayList.add(contactListItem);

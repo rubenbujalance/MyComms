@@ -259,7 +259,7 @@ public class DashBoardActivity extends ToolbarActivity{
         overridePendingTransition(0,0);
         //Update Pending Messages on Toolbar
         //RBM - It is done every time a message is received
-//        checkUnreadChatMessages();
+        checkUnreadChatMessages();
         loadRecents();
     }
 
@@ -551,7 +551,7 @@ public class DashBoardActivity extends ToolbarActivity{
             // Badges
             _realm = Realm.getInstance(DashBoardActivity.this);
             _chatTx = new RealmChatTransactions(_realm, DashBoardActivity.this);
-            pendingMsgsCount =_chatTx.getChatPendingMessagesCount(contactId);
+            pendingMsgsCount = _chatTx.getChatPendingMessagesCount(contactId);
 
             LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
@@ -643,7 +643,7 @@ public class DashBoardActivity extends ToolbarActivity{
                 }
 
                 // Recent action icon and bagdes
-                if (pendingMsgsCount > 0 && action.equals(Constants.CONTACTS_ACTION_SMS)) {
+                if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
                     unread_messages.setVisibility(View.VISIBLE);
                     unread_messages.setText(String.valueOf(pendingMsgsCount));
                 } else {

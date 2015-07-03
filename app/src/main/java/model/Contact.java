@@ -28,6 +28,7 @@ public class Contact extends RealmObject{
     private String availability;
     private String presence;
     private String country;
+    private String searchHelper;
     private String sortHelper;
 
     private String stringField1;
@@ -239,12 +240,12 @@ public class Contact extends RealmObject{
         this.pathAvatar = pathAvatar;
     }
 
-    public String getSortHelper() {
-        return sortHelper;
+    public String getSearchHelper() {
+        return searchHelper;
     }
 
-    public void setSortHelper(String sortHelper) {
-        this.sortHelper = sortHelper;
+    public void setSearchHelper(String searchHelper) {
+        this.searchHelper = searchHelper;
     }
 
     public String getStringField1() {
@@ -389,5 +390,13 @@ public class Contact extends RealmObject{
 
     public void setLongField9(long longField9) {
         this.longField9 = longField9;
+    }
+
+    public String getSortHelper() {
+        return sortHelper;
+    }
+
+    public void setSortHelper(String sortHelper) {
+        this.sortHelper = sortHelper;
     }
 }

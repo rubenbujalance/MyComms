@@ -28,6 +28,7 @@ import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -271,6 +272,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Realm realm = Realm.getInstance(this);
         RecentContactController recentContactController = new RecentContactController(this, realm, profile_id);
         recentContactController.getRecentList();
+
+        XMPPTransactions.initializeMsgServerSession(this);
     }
 
     @Subscribe

@@ -548,20 +548,22 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     {
         adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
         if (contactList!=null) {
-            if (listView!=null)
+            if (listView != null)
                 state = listView.onSaveInstanceState();
-            if (adapter != null)
-            {
+            if (adapter != null) {
                 setListAdapter(adapter);
-                if (state!=null)
+                if (state != null)
                     listView.onRestoreInstanceState(state);
-            }
-            else
-            {
+            } else {
                 adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
                 setListAdapter(adapter);
-                if (state!= null)
+                if (state != null)
                     listView.onRestoreInstanceState(state);
+            }
+            if (contactList.size()!=0) {
+                Log.i(Constants.TAG, "ContactListFragment.reloadAdapter: No results from Search");
+                if (emptyText!=null)
+                    emptyText.setText(getResources().getString(R.string.no_search_records));
             }
         }
     }

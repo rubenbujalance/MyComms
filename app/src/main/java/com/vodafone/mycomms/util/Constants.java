@@ -90,6 +90,7 @@ public class Constants {
     public static final String CONTACT_PAGINATION_OFFSET = "offset";
     public static final String CONTACT_PAGINATION_PAGESIZE = "pageSize";
     public static final String CONTACT_LOCAL_CONTENT= "local_contact";
+    public static final String CONTACT_SORT_HELPER= "sortHelper";
 
     public static final String CONTACT_IS_FAVORITE = "contactIsFavorite";
 

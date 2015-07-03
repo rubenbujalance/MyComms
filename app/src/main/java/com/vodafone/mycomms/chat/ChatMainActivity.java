@@ -94,7 +94,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_main);
         activateToolbar();
-        setToolbarBackground(R.drawable.toolbar_header);
+//        setToolbarBackground(R.drawable.toolbar_header);
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);

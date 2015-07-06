@@ -107,7 +107,7 @@ public class Constants {
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";
 
-    //Contacts API Calls
+    //API Calls
     public static final String NEWS = "news";
     public static final String NEWS_DATA = "data";
     public static final String NEWS_API_GET = "/api/news";
@@ -126,7 +126,6 @@ public class Constants {
     public static final String NEWS_UPDATED_AT = "updated_at";
     public static final String NEWS_PUBLISHED_AT = "published_at";
 
-    //Contacts API Calls
     public static final String CONTACT_API_GET_PROFILE = "/api/me";
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_CONTACTS_BASIC_CALL = "/api/me/contact?p=";
@@ -138,6 +137,8 @@ public class Constants {
     public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
     public static final String CONTACT_API_POST_AVATAR = "/api/me/avatar";
     public static final String CONTACT_API_POST_FILE = "/api/uploadFile";
+
+    public static final String PROFILE_API_LOGOUT = "/auth/logout";
 
     //Contact Avatar BD Fields
     public static final String AVATAR_CONTACT_ID = "contactId";

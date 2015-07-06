@@ -140,6 +140,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                         Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(in);
                 getActivity().finish();
+
+                //Logout on server
+                profileController.logoutToAPI();
             }
         });
 
@@ -401,8 +404,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: setting holidayDate to:" + holidayDateToSet);
         vacationTimeEnds.setText(holidayDateToSet);
     }
-
-
 
     void updateProfileInDb(){
         this.profileController.updateUserProfileSettingsInDB(false, this.privateTimeZone, this.isOnHoliday, this.holidayEndDate, this.doNotDisturb);

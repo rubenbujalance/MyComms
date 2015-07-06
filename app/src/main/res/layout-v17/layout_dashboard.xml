@@ -29,12 +29,14 @@
                 android:layout_marginTop="10dp"
                 android:id="@+id/Line1">
 
-                <DigitalClock
+                <TextClock
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:format24Hour="HH:mm"
+                    android:text="@string/dummyHour"
                     android:id="@+id/timeDashboard"
                     android:textColor="#ffffffff"
-                    android:textSize="38sp"
+                    android:textSize="38dp"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
                     android:paddingLeft="15dp"
@@ -68,10 +70,10 @@
                 android:id="@+id/Line2"
                 android:layout_marginTop="10dp">
 
-                <TextView
+                <TextClock
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/dummyday"
+                    android:format24Hour="EEEE, d MMMM"
                     android:id="@+id/dateDashboard"
                     android:textColor="@color/white"
                     android:textSize="22dp"

@@ -8,10 +8,14 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatgroup.ComposedChat;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -21,31 +25,42 @@ import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import model.Chat;
 import model.Contact;
+import model.GroupChat;
+import model.UserProfile;
 
 public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHolder>{
 
-    private ArrayList<Chat> mChat = new ArrayList<>();
+    private ArrayList<ComposedChat> composedChat = new ArrayList<>();
     private Context mContext;
     private Realm _realm;
     private RealmChatTransactions _chatTx;
-    private String _profileId;
+    private RealmContactTransactions mContactTransactions;
+    private String profileId;
 
-
-    public ChatListRecyclerViewAdapter(Context context, ArrayList<Chat> Chat) {
+    public ChatListRecyclerViewAdapter
+            (
+                    Context context
+                    , ArrayList<ComposedChat> composedChats
+            )
+    {
         mContext = context;
         _realm = Realm.getInstance(mContext);
         _chatTx = new RealmChatTransactions(_realm, mContext);
-        mChat = Chat;
-
-        SharedPreferences sp = mContext.getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+       this.composedChat = composedChats;
+        SharedPreferences sp = mContext.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        mContactTransactions = new RealmContactTransactions
+                (
+                        _realm
+                        , profileId
+                );
     }
 
     @Override
     public int getItemCount() {
-        return mChat.size();
+        return composedChat.size();
     }
 
     @Override
@@ -55,7 +70,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
     @Override
     public ChatListHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_list_item_chat, null);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.layout_list_item_group_chat, null);
         ChatListHolder chatHolder = new ChatListHolder(view);
         return chatHolder;
     }
@@ -65,37 +80,50 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     {
         chatListHolder.layContainer.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                if(event.getAction() == MotionEvent.ACTION_DOWN)
-                {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     v.setBackground(mContext.getResources().getDrawable(R.color.grey_light));
                     return true;
-                }
-                else if(event.getAction() == MotionEvent.ACTION_UP
+                } else if (event.getAction() == MotionEvent.ACTION_UP
                         ||
-                        event.getAction() == MotionEvent.ACTION_CANCEL)
-                {
+                        event.getAction() == MotionEvent.ACTION_CANCEL) {
                     v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
                     return true;
-                }
-                else return false;
-
+                } else return false;
             }
         });
 
-        //Get Contact
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(_realm, _profileId);
-        Contact contact = realmContactTransactions.getContactById(mChat.get(i).getContact_id());
+        if(null != composedChat.get(i).getChat())
+            loadChat(chatListHolder, i);
+        else if(null != composedChat.get(i).getGroupChat())
+            loadGroupChat(chatListHolder, i);
+    }
 
-        if(contact != null)
-            chatListHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName());
+    private void loadChat(final ChatListHolder chatListHolder, final int i)
+    {
+        chatListHolder.lay_top_right_image_hide.setVisibility(View.GONE);
+        chatListHolder.lay_bottom_both_image_hide.setVisibility(View.GONE);
+        chatListHolder.lay_top_left_image.setLayoutParams
+                (
+                        new LinearLayout.LayoutParams
+                                (
+                                        LinearLayout.LayoutParams.MATCH_PARENT
+                                        , LinearLayout.LayoutParams.MATCH_PARENT
+                                )
+                );
 
-        chatListHolder.textViewMessage.setText(mChat.get(i).getLastMessage());
-        String timeDifference = Utils.getStringChatTimeDifference(mChat.get(i).getLastMessageTime());
+
+        chatListHolder.textViewName.setText
+                (
+                        getChatMemberName(composedChat.get(i).getChat().getContact_id())
+                );
+
+        chatListHolder.textViewMessage.setText(composedChat.get(i).getChat().getLastMessage());
+        String timeDifference = Utils.getStringChatTimeDifference(composedChat.get(i)
+                .getChat().getLastMessageTime());
         chatListHolder.textViewTime.setText(timeDifference);
 
-        long count = _chatTx.getChatPendingMessagesCount(getChat(i).getContact_id());
+        long count = _chatTx.getChatPendingMessagesCount(getComposedChat(i).getChat().getContact_id());
 
         if(count > 0) {
             BadgeView badge = new BadgeView(mContext, chatListHolder.badgeUnread);
@@ -106,35 +134,185 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         }
 
         //Image avatar
-        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+mChat.get(i).getContact_id()+".jpg");
+        File avatarFile = new File
+                (
+                        mContext.getFilesDir()
+                        , Constants.CONTACT_AVATAR_DIR + "avatar_"+composedChat.get(i)
+                        .getChat().getContact_id()+".jpg"
+                );
 
-        if (mChat.get(i).getContact_id()!=null &&
-                mChat.get(i).getContact_id().length()>0 &&
-                mChat.get(i).getContact_id().compareTo("")!=0 &&
+        if (composedChat.get(i).getChat().getContact_id()!=null &&
+                composedChat.get(i).getChat().getContact_id().length()>0 &&
+                composedChat.get(i).getChat().getContact_id().compareTo("")!=0 &&
                 avatarFile.exists()) {
 
-            chatListHolder.textAvatar.setText(null);
+            chatListHolder.top_left_avatar_text.setText(null);
 
             Picasso.with(mContext)
                     .load(avatarFile)
                     .fit().centerCrop()
-                    .into(chatListHolder.imageAvatar);
+                    .into(chatListHolder.top_left_avatar);
+
+        } else{
+            String initials = getChatMemberInitials(composedChat.get(i).getChat().getContact_id());
+
+            chatListHolder.top_left_avatar.setImageResource(R.color.grey_middle);
+            chatListHolder.top_left_avatar_text.setText(initials);
+        }
+    }
+
+    private String getChatMemberName(String contactId)
+    {
+        Contact contact = mContactTransactions.getContactById(contactId);
+        String name = contact.getFirstName() + " " + contact.getLastName();
+        return  name;
+    }
+
+    private String getChatMemberInitials(String contactId)
+    {
+        Contact contact = mContactTransactions.getContactById(contactId);
+        String name = contact.getFirstName().substring(0,1) + " " + contact.getLastName().substring(0,1);
+        return  name;
+    }
+
+
+    private void loadGroupChat(final ChatListHolder chatListHolder, final int i)
+    {
+
+        ArrayList<ImageView> images = new ArrayList<>();
+        images.add(chatListHolder.top_left_avatar);
+        images.add(chatListHolder.bottom_left_avatar);
+        images.add(chatListHolder.bottom_right_avatar);
+
+        ArrayList<TextView> texts = new ArrayList<>();
+        texts.add(chatListHolder.top_left_avatar_text);
+        texts.add(chatListHolder.bottom_left_avatar_text);
+        texts.add(chatListHolder.bottom_right_avatar_text);
+
+
+
+        GroupChat groupChat = composedChat.get(i).getGroupChat();
+        String members = groupChat.getMembers();
+        String[] membersArray = members.split("@");
+
+        if(membersArray.length > 3)
+        {
+            chatListHolder.lay_top_right_image_hide.setVisibility(View.VISIBLE);
+            images.add(chatListHolder.top_right_avatar);
+            texts.add(chatListHolder.top_right_avatar_text);
+        }
+
+        String contactName = null;
+        int count = 0;
+        for(String id : membersArray)
+        {
+            if(id.equals(profileId))
+            {
+                UserProfile userProfile = mContactTransactions.getUserProfile(id);
+                if(null == contactName)
+                    contactName = userProfile.getFirstName();
+                else
+                    contactName = contactName + ", " + userProfile.getFirstName();
+
+                Contact contact = new Contact();
+                contact.setContactId(id);
+                contact.setFirstName(userProfile.getFirstName());
+                contact.setLastName(userProfile.getLastName());
+                contact.setAvatar(userProfile.getAvatar());
+                if(count < 4)
+                {
+                    loadComposedAvatar
+                            (
+                                    count
+                                    , id
+                                    , contact
+                                    , images
+                                    , texts
+                            );
+                    count++;
+                }
+            }
+            else
+            {
+                Contact contact = mContactTransactions.getContactById(id);
+                if(null == contactName)
+                    contactName = contact.getFirstName();
+                else
+                    contactName = contactName + ", " + contact.getFirstName();
+                if(count < 4)
+                {
+                    loadComposedAvatar
+                            (
+                                    count
+                                    , id
+                                    , contact
+                                    , images
+                                    , texts
+                            );
+                    count++;
+                }
+            }
+
+        }
+        chatListHolder.textViewName.setText(contactName);
+        chatListHolder.textViewMessage.setText(groupChat.getLastMessage());
+        String timeDifference = Utils.getStringChatTimeDifference(groupChat.getLastMessageTime());
+        chatListHolder.textViewTime.setText(timeDifference);
+
+        //TODO how to find unread messages in group chat case???
+        //long count = _chatTx.getChatPendingMessagesCount(getChat(i).getContact_id());
+
+        /*if(count > 0) {
+            BadgeView badge = new BadgeView(mContext, chatListHolder.badgeUnread);
+            badge.setText(String.valueOf(count));
+            badge.setBadgePosition(BadgeView.POSITION_CENTER);
+            badge.setBadgeBackgroundColor(Color.parseColor("#0071FF"));
+            badge.show();
+        }*/
+
+    }
+
+    private void loadComposedAvatar
+            (
+                    int count
+                    , String id
+                    , Contact contact
+                    , ArrayList<ImageView> images
+                    , ArrayList<TextView> texts
+            )
+    {
+        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                "avatar_"+id+".jpg");
+
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0 &&
+                contact.getAvatar().compareTo("")!=0 &&
+                avatarFile.exists())
+        {
+
+            Picasso.with(mContext)
+                    .load(avatarFile)
+                    .fit().centerCrop()
+                    .into(images.get(count));
 
         } else{
             String initials = "";
+            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            {
+                initials = contact.getFirstName().substring(0,1);
 
-            if(contact != null)
-                initials = contact.getFirstName().substring(0, 1)
-                        + contact.getLastName().substring(0,1);
-
-            chatListHolder.imageAvatar.setImageResource(R.color.grey_middle);
-            chatListHolder.textAvatar.setText(initials);
+                if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                {
+                    initials = initials + contact.getLastName().substring(0,1);
+                }
+            }
+            images.get(count).setImageResource(R.color.grey_middle);
+            texts.get(count).setText(initials);
         }
-
-
     }
-    public Chat getChat(int position) {
-        return (null != mChat ? mChat.get(position) : null);
+
+    public ComposedChat getComposedChat(int position) {
+        return (null != composedChat ? composedChat.get(position) : null);
     }
 
     @Override

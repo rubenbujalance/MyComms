@@ -416,7 +416,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             }
 
             if(_chatList.size()>50) _chatList.remove(0);
-                refreshAdapter();
+            refreshAdapter();
         }
     }
 
@@ -597,7 +597,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     }
 
     @Subscribe
-     public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
+    public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
         ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
 
         if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)

@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.contacts.connection;
+package com.vodafone.mycomms.search;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,7 @@ import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.connection.IConnectionCallback;
+import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -302,6 +303,11 @@ public class SearchController extends BaseController
     public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
         Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
         return realmContactTransactions.getContactsByKeyWord(keyWord);
+    }
+
+    public ArrayList<Contact> getContactsByKeyWordWithoutLocals(String keyWord) {
+        Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
+        return realmContactTransactions.getContactsByKeyWordWithoutLocals(keyWord);
     }
 
     public void storeContactsIntoRealm(ArrayList<Contact> contacts)

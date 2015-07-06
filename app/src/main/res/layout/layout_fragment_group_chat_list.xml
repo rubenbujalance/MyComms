@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:clickable="false"
+    >
+
+    <LinearLayout
+        android:id="@+id/lay_search_bar_container"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp">
+
+        <include android:id="@+id/app_bar" layout="@layout/layout_search_bar"
+                 android:layout_width="fill_parent"
+                 android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:clickable="false">
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/contacts_swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ListView android:id="@android:id/list"
+                      android:layout_width="match_parent"
+                      android:layout_height = "wrap_content"
+                      android:layout_alignParentRight="true"
+                      android:layout_alignParentTop="true"/>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+        <TextView
+            android:id="@android:id/empty"
+            android:text="@string/no_favourite_records"
+            style="@style/NoRecordsTextView"/>
+
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:orientation="vertical"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:background="@color/black_overlay"
+            >
+
+        </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/group_chat_header"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:layout_weight="5">
+
+            <TextView
+                android:id="@+id/txt_participants"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="@string/group_chat_participants"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="left|center"
+                android:lines="1"
+                android:textSize="16sp"
+                android:textColor="@color/contact_soft_blue_text"/>
+
+            <TextView
+                android:id="@+id/txt_write"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:text="@string/group_chat_write"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="right|center"
+                android:lines="1"
+                android:textSize="16sp"
+                android:clickable="true"
+                android:textColor="@color/contact_strong_blue_text"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            >
+
+            <HorizontalScrollView
+                android:id="@+id/scroll_hor"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:id="@+id/list_group_chat_contacts"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/grey_chat_name"
+                        android:id="@+id/empty_text_view"
+                        android:text="@string/no_group_chat_records"
+
+                        />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

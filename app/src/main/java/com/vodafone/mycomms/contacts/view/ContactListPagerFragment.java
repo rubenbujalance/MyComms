@@ -57,6 +57,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         //mContactsController.getContactList(apiCall);
         //mContactsController.setConnectionCallback(this);
         BusProvider.getInstance().register(this);
+
+
         //((ContactListMainActivity)getActivity()).activateContactListToolbar();
     }
 
@@ -77,6 +79,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         } else {
             mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
         }
+
+
     }
 
     @Override
@@ -178,11 +182,12 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mContactsController.getFavouritesList(apiCall);
     }
 
-    private void setListsAdapter() {
+    private void setListsAdapter()
+    {
         if (contactListFragment!=null)
         {
-            contactListFragment.hideSearchBarContent();
-            contactListFragment.hideKeyboard();
+            contactListFragment.getSearchBarController().hideSearchBarContent();
+            contactListFragment.getSearchBarController().hideKeyboard();
             contactListFragment.setListAdapterTabs();
         }
 
@@ -211,6 +216,4 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         mContactsController.getFavouritesList(apiCall);
         setListsAdapter();
     }
-
-
 }

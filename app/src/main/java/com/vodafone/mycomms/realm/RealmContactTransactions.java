@@ -164,6 +164,33 @@ public class RealmContactTransactions {
         return contactArrayList;
     }
 
+    public ArrayList<Contact> getContactsByKeyWordWithoutLocals(String keyWord)
+    {
+        ArrayList<Contact> contactArrayList = new ArrayList<>();
+        RealmResults<Contact> result = mRealm.where(Contact.class)
+                .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId)
+                .not().equalTo(Constants.CONTACT_PLATFORM, Constants.PLATFORM_LOCAL)
+                .beginGroup()
+                    .contains(Constants.CONTACT_FNAME, keyWord, false)
+                    .or()
+                    .contains(Constants.CONTACT_LNAME, keyWord, false)
+                    .or()
+                    .contains(Constants.CONTACT_COMPANY, keyWord, false)
+                    .or()
+                    .contains(Constants.CONTACT_EMAILS, keyWord, false)
+                .endGroup()
+                .findAll();
+
+        if (result!=null){
+            result.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
+            for (Contact contactListItem : result)
+            {
+                contactArrayList.add(contactListItem);
+            }
+        }
+        return contactArrayList;
+    }
+
     public ArrayList<Contact> getFilteredContacts(String field, String filter){
         ArrayList<Contact> contactArrayList = new ArrayList<>();
         RealmQuery<Contact> query = mRealm.where(Contact.class);

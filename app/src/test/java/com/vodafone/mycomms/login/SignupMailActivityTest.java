@@ -24,8 +24,8 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.httpclient.FakeHttp;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.httpclient.FakeHttp;
 
 import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
 import static com.vodafone.mycomms.constants.Constants.INVALID_VERSION_RESPONSE;

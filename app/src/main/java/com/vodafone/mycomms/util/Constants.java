@@ -179,6 +179,7 @@ public class Constants {
     public static final String CHAT_VIEW_CHAT_LIST = "Chat_List";
     public static final String CHAT_VIEW_CONTACT_DETAIL = "Contact_Detail";
     public static final String CHAT_VIEW_CONTACT_LIST = "Contact_List";
+    public static final String GROUP_CHAT_VIEW_CHAT_LIST = "Group_Chat_List";
 
     //XMPP Constants
     public static final int XMPP_PARAM_PORT = 5222;
@@ -197,9 +198,6 @@ public class Constants {
     public static final String XMPP_ATTR_STATUS = "status";
     public static final String XMPP_ATTR_FILEURL = "fileUrl";
 
-
-    public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
-
     //Kind of files to send as multipart;
     public static final String IMAGE_FILE_TO_SEND = "image_file";
     public static final String SIMPLE_FILE_TO_SEND = "simple_file";
@@ -214,6 +212,25 @@ public class Constants {
     public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");
     public static final String FIRST_TIME_AVATAR_DELIVERY = "first_time_avatar_delivery";
 
-    public static final int IMAGE_TYPE_AVATAR = 0;
-    public static final int IMAGE_TYPE_NEWS = 1;
+    public static final String GROUP_CHAT_PREVIOUS_ACTIVITY = "previous_activity";
+    public static final String GROUP_CHAT_GROUP_CHAT_LIST_ACTIVITY = "GroupChatListActivity";
+    public static final String CHAT_LIST_ACTIVITY = "ChatListActivity";
+    public static final String GROUP_CHAT_MEMBERS = "group_chat_members";
+    public static final String GROUP_CHAT_NAME = "group_chat_name";
+    public static final String GROUP_CHAT_ABOUT = "group_chat_about";
+    public static final String GROUP_CHAT_AVATAR = "group_chat_avatar";
+    public static final String GROUP_CHAT_ID = "group_chat_id";
+
+    public static final String GROUP_CHAT_API = "/api/me/group";
+    public static final String GROUP_CHAT_API_SET_MEMBERS = "/api/group";
+    public static final String GROUP_CHAT_PREFIX_ID = "mg";
+
+    public static final String GROUP_CHAT_REALM_ID = "id";
+    public static final String GROUP_CHAT_REALM_PROFILE_ID = "profileId";
+    public static final String GROUP_CHAT_REALM_CREATOR_ID = "creatorId";
+    public static final String GROUP_CHAT_REALM_NAME = "name";
+    public static final String GROUP_CHAT_REALM_AVATAR = "avatar";
+    public static final String GROUP_CHAT_REALM_ABOUT = "about";
+    public static final String GROUP_CHAT_REALM_MEMBERS = "members";
+    public static final String GROUP_CHAT_REALM_TIMESTAMP_CREATED = "timeStampCreated";
 }

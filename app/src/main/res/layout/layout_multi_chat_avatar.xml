@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="50dp"
+             android:layout_height="50dp">
+
+
+    <LinearLayout
+        android:id="@+id/lay_main_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:id="@+id/lay_top_left_image"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:gravity="center"
+                >
+
+                    <com.vodafone.mycomms.custom.CircleImageView
+                        android:id="@+id/top_left_avatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/cartoon_round_contact_image_example" />
+
+                    <TextView
+                        android:id="@+id/top_left_avatar_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="12sp"
+                        android:textColor="@color/grey_dark"
+                        android:layout_gravity="center"
+                        android:gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lay_top_right_image_hide"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:visibility="gone"
+                >
+
+                    <com.vodafone.mycomms.custom.CircleImageView
+                        android:id="@+id/top_right_avatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/cartoon_round_contact_image_example" />
+
+                    <TextView
+                        android:id="@+id/top_right_avatar_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textSize="12sp"
+                        android:textColor="@color/grey_dark"
+                        android:layout_gravity="center"
+                        android:gravity="center"/>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lay_bottom_both_image_hide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:baselineAligned="false"
+        >
+
+
+        <LinearLayout
+                     android:layout_width="25dp"
+                     android:layout_height="25dp"
+                     android:orientation="horizontal"
+            >
+
+            <com.vodafone.mycomms.custom.CircleImageView
+                android:id="@+id/bottom_left_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/cartoon_round_contact_image_example" />
+
+            <TextView
+                android:id="@+id/bottom_left_avatar_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="12sp"
+                android:textColor="@color/grey_dark"
+                android:layout_gravity="center"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+                     android:layout_width="25dp"
+                     android:layout_height="25dp"
+                     android:orientation="horizontal"
+            >
+
+            <com.vodafone.mycomms.custom.CircleImageView
+                android:id="@+id/bottom_right_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/cartoon_round_contact_image_example" />
+
+            <TextView
+                android:id="@+id/bottom_right_avatar_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="12sp"
+                android:textColor="@color/grey_dark"
+                android:layout_gravity="center"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

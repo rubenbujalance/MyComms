@@ -6,7 +6,6 @@ import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
-import org.robolectric.shadows.httpclient.FakeHttp;
 
 /**
  * Created by str_evc on 21/05/2015.

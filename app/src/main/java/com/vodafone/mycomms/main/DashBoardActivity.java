@@ -530,7 +530,7 @@ public class DashBoardActivity extends ToolbarActivity{
                                     new SaveAndShowImageAsyncTask(
                                             recentAvatar, avatarFile, bitmap, avatarText);
 
-                            task.execute();
+                            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                         }
 
                         @Override
@@ -631,6 +631,7 @@ public class DashBoardActivity extends ToolbarActivity{
                             .load(avatarFile)
                             .fit().centerCrop()
                             .into(recentAvatar);
+                    loadAvatarFromDisk = false;
                 } else if(avatarTarget!=null) {
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(nameInitials);

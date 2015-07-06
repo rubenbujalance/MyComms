@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 
@@ -26,8 +25,8 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.httpclient.FakeHttp;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.httpclient.FakeHttp;
 
 import static com.vodafone.mycomms.constants.Constants.INVALID_VERSION_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
@@ -61,22 +60,22 @@ public class LoginActivityTest {
         ivBack = (ImageView) activity.findViewById(R.id.ivBack);
     }
 
-    @Test
-    public void testLoginOk() throws Exception {
-        HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
-        FakeHttp.addPendingHttpResponse(httpResponse);
-        etEmail.setText(VALID_EMAIL);
-        etPassword.setText(PASSWORD);
-        btLogin.performClick();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Robolectric.flushForegroundThreadScheduler();
-        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
-        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
-    }
+//    @Test
+//    public void testLoginOk() throws Exception {
+//        HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
+//        FakeHttp.addPendingHttpResponse(httpResponse);
+//        etEmail.setText(VALID_EMAIL);
+//        etPassword.setText(PASSWORD);
+//        btLogin.performClick();
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        Robolectric.flushForegroundThreadScheduler();
+//        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
+//        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+//    }
 
     @Test
     public void testLoginError() throws Exception {

@@ -23,7 +23,7 @@ public class AsyncTaskQueue {
         synchronized (AsyncTaskQueue.class) {
             try {
                 if(asyncTaskQueue.containsKey(key)) {
-                    asyncTaskQueue.get(key).cancel(true);
+                    asyncTaskQueue.get(key).cancel(false);
                     Log.i(Constants.TAG, "AsyncTaskQueue.putConnection: Task canceled "+key);
                 }
 

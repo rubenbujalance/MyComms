@@ -185,8 +185,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     {
         if (contactListFragment!=null)
         {
-            contactListFragment.hideSearchBarContent();
-            contactListFragment.hideKeyboard();
+            contactListFragment.getSearchBarController().hideSearchBarContent();
+            contactListFragment.getSearchBarController().hideKeyboard();
             contactListFragment.setListAdapterTabs();
         }
 

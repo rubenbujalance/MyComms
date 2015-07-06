@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.contacts.connection;
+package com.vodafone.mycomms.search;
 
 import android.content.Context;
 import android.util.Log;

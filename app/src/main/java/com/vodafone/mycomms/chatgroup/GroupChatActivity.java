@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.chat;
+package com.vodafone.mycomms.chatgroup;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,20 +28,21 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chat.ChatRecyclerViewAdapter;
 import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.events.MessageSentEvent;
-import com.vodafone.mycomms.events.MessageSentStatusChanged;
 import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -50,28 +51,30 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
 import io.realm.Realm;
-import model.Chat;
 import model.ChatMessage;
 import model.Contact;
+import model.GroupChat;
 
-public class ChatMainActivity extends ToolbarActivity implements IRecentContactConnectionCallback {
+/**
+ * Created by str_oan on 29/06/2015.
+ */
+public class GroupChatActivity extends ToolbarActivity implements
+        IRecentContactConnectionCallback, Serializable {
 
-    private String LOG_TAG = ChatMainActivity.class.getSimpleName();
+    private String LOG_TAG = GroupChatActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private ChatRecyclerViewAdapter mChatRecyclerViewAdapter;
     private EditText etChatTextBox;
     private TextView tvSendChat;
-    private ImageView ivAvatarImage;
     private ImageView sendFileImage;
-    private TextView tvAvatarText;
+    private ImageView imgModifyGroupChat;
 
     private ArrayList<ChatMessage> _chatList = new ArrayList<>();
-    private Chat _chat;
-    private Contact _contact;
     private model.UserProfile _profile;
     private String _profile_id;
 
@@ -82,24 +85,39 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private File multiPartFile;
     private FilePushToServerController filePushToServerController;
 
-    private String previousView;
-
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
     private RealmContactTransactions contactTransactions;
     private RecentContactController mRecentContactController;
 
+    private ArrayList<String> contactIds;
+    private ArrayList<Contact> contactList;
+    private String composedContactId = null;
+    private GroupChatController mGroupChatController;
+    private RealmGroupChatTransactions mGroupChatTransactions;
+    private String groupChatAbout = null;
+    private String groupChatAvatar = null;
+    private String groupChatName = null;
+    private GroupChat groupChat;
+    private SharedPreferences sp;
+
+
+    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
+    private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
+    private LinearLayout lay_to_hide;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat_main);
+        setContentView(R.layout.activity_group_chat_main);
         activateToolbar();
         setToolbarBackground(R.drawable.toolbar_header);
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
-        SharedPreferences sp = getSharedPreferences(
+        sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         if(sp==null)
@@ -108,10 +126,20 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             finish();
         }
         mRealm = Realm.getInstance(this);
-        chatTransactions = new RealmChatTransactions(mRealm, this);
+
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
         contactTransactions = new RealmContactTransactions(mRealm,_profile_id);
-        _profile = contactTransactions.getUserProfile(_profile_id);
+        chatTransactions = new RealmChatTransactions(mRealm, this);
+
+
+        mGroupChatTransactions = new RealmGroupChatTransactions
+                (
+                        mRealm
+                        , this
+                        , _profile_id
+                );
+
 
         if(_profile_id == null)
         {
@@ -119,183 +147,208 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             finish();
         }
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecentContactController = new RecentContactController(this,mRealm,_profile_id);
+        _profile = contactTransactions.getUserProfile(_profile_id);
+        this.mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        this.mRecentContactController = new RecentContactController(this,mRealm,_profile_id);
+        this.mGroupChatController = new GroupChatController(GroupChatActivity.this);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
-        refreshAdapter();
-
-        etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
-        tvSendChat = (TextView) findViewById(R.id.chat_send);
-        ivAvatarImage = (ImageView) findViewById(R.id.companyLogo);
-        sendFileImage = (ImageView) findViewById(R.id.send_image);
-        tvAvatarText = (TextView) findViewById(R.id.avatarText);
 
         //Load chat from db
-        Intent in = getIntent();
-        String contact_id = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
-        previousView = in.getStringExtra(Constants.CHAT_PREVIOUS_VIEW);
+        loadExtras();
+        loadContactsFromIds();
+        loadTheRestOfTheComponents();
 
-        if(contact_id==null || contact_id.length()==0) finish(); //Prevent from errors
-
-        //Contact and profile
-        _contact = contactTransactions.getContactById(contact_id);
-
-        //Chat listeners
-        setChatListeners(this, _contact);
-
-        //Load chat
-        _chat = chatTransactions.getChatById(contact_id);
-
-        //If there was no chat, create a new one, but not saved in db yet
-        //If chat exists, load all messages
-        if(_chat==null) _chat = chatTransactions.newChatInstance(contact_id);
-        else loadMessagesArray();
-
-        //This prevents the view focusing on the edit text and opening the keyboard
-        getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-
-        ImageView backButton = (ImageView) findViewById(R.id.back_button);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        //Set avatar
-        File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+_contact.getContactId()+".jpg");
-
-        if (_contact.getAvatar()!=null &&
-                _contact.getAvatar().length()>0 &&
-                _contact.getAvatar().compareTo("")!=0 &&
-                avatarFile.exists()) {
-
-            tvAvatarText.setText(null);
-
-            Picasso.with(this)
-                    .load(avatarFile)
-                    .into(ivAvatarImage);
-
-        } else{
-            String initials = "";
-            if(null != _contact.getFirstName() && _contact.getFirstName().length() > 0)
-            {
-                initials = _contact.getFirstName().substring(0,1);
-
-                if(null != _contact.getLastName() && _contact.getLastName().length() > 0)
-                {
-                    initials = initials + _contact.getLastName().substring(0,1);
-                }
-
-            }
-
-            ivAvatarImage.setImageResource(R.color.grey_middle);
-            tvAvatarText.setText(initials);
-        }
-
-        //Sent chat in grey by default
-        setSendEnabled(false);
-
-        etChatTextBox.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                if (cs != null && cs.length() > 0) checkXMPPConnection();
-                else setSendEnabled(false);
-
-                XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable arg0) {
-            }
-        });
-
-        tvSendChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());
-                sendText();
-            }
-        });
-
-        sendFileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
-            }
-        });
     }
 
-    private void sendText()
+
+    public void setGroupChatAvatar()
+    {
+        if(null == this.groupChatAvatar)
+        {
+            ArrayList<ImageView> images = new ArrayList<>();
+            images.add(top_left_avatar);
+            images.add(bottom_left_avatar);
+            images.add(bottom_right_avatar);
+
+            ArrayList<TextView> texts = new ArrayList<>();
+            texts.add(top_left_avatar_text);
+            texts.add(bottom_left_avatar_text);
+            texts.add(bottom_right_avatar_text);
+
+            if(null != contactIds && contactIds.size() > 3)
+            {
+                lay_to_hide.setVisibility(View.VISIBLE);
+                images.add(top_right_avatar);
+                texts.add(top_right_avatar_text);
+            }
+
+            int i = 0;
+            for(Contact contact : contactList)
+            {
+                if(i>3) break;
+
+                File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                        "avatar_"+contact.getContactId()+".jpg");
+
+                if (contact.getAvatar()!=null &&
+                        contact.getAvatar().length()>0 &&
+                        contact.getAvatar().compareTo("")!=0 &&
+                        avatarFile.exists())
+                {
+
+                    Picasso.with(this)
+                            .load(avatarFile)
+                            .fit().centerCrop()
+                            .into(images.get(i));
+
+                } else{
+                    String initials = "";
+                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+                    {
+                        initials = contact.getFirstName().substring(0,1);
+
+                        if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                        {
+                            initials = initials + contact.getLastName().substring(0,1);
+                        }
+                    }
+                    images.get(i).setImageResource(R.color.grey_middle);
+                    texts.get(i).setText(initials);
+                }
+                i++;
+            }
+        }
+    }
+
+    private void startGroupChatListActivity()
+    {
+        Intent in = new Intent(GroupChatActivity.this, GroupChatListActivity.class);
+        in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, LOG_TAG);
+        in.putExtra(Constants.GROUP_CHAT_ID, groupChat.getId());
+        startActivity(in);
+    }
+
+    private void loadExtras()
+    {
+        Intent in = getIntent();
+        this.groupChatName = in.getStringExtra(Constants.GROUP_CHAT_NAME);
+        if(null != this.groupChatName && this.groupChatName.length() == 0)
+            this.groupChatName = null;
+
+        this.groupChatAbout = in.getStringExtra(Constants.GROUP_CHAT_ABOUT);
+        if(null != this.groupChatAbout && this.groupChatAbout.length() == 0)
+            this.groupChatAbout = null;
+
+        this.groupChatAvatar = in.getStringExtra(Constants.GROUP_CHAT_AVATAR);
+        if(null != this.groupChatAvatar && this.groupChatAvatar.length() == 0)
+            this.groupChatAvatar = null;
+
+        this.groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants.GROUP_CHAT_ID));
+        this.composedContactId = in.getStringExtra(Constants.GROUP_CHAT_MEMBERS);
+        loadContactIds();
+
+    }
+
+    private void loadContactIds()
+    {
+        String[] ids = composedContactId.split("@");
+        contactIds = new ArrayList<>();
+        for(String id : ids)
+        {
+            contactIds.add(id);
+        }
+    }
+
+    private void loadContactsFromIds()
+    {
+        contactList = new ArrayList<>();
+        Contact contact = new Contact();
+        contact.setAvatar(_profile.getAvatar());
+        contact.setFirstName(_profile.getFirstName());
+        contact.setLastName(_profile.getLastName());
+        contact.setContactId(_profile.getId());
+        contactList.add(contact);
+        //Contact and profile
+        for(String id : contactIds)
+        {
+            if(!id.equals(_profile_id))
+            {
+                contact = contactTransactions.getContactById(id);
+                contactList.add(contact);
+            }
+        }
+    }
+
+    /*private void sendText()
     {
         String msg = etChatTextBox.getText().toString();
+        ChatMessage chatMsg = chatTransactions.newChatMessageInstance
+                (
+                        composedContactId
+                        , Constants.CHAT_MESSAGE_DIRECTION_SENT
+                        , Constants.CHAT_MESSAGE_TYPE_TEXT
+                        , msg
+                        , ""
+                        , composedContactId
+                );
 
-        //Save to DB
-        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
-                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
+        groupChat = chatTransactions.updatedGroupChatInstance(chatMsg, composedContactId);
 
-        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+        chatTransactions.insertChat(groupChat);
+        chatTransactions.insertGroupChatMessage(chatMsg, composedContactId);
+        for(String id : contactIds)
+        {
+            //Send through XMPP
+            if (!XMPPTransactions.sendText(id, Constants.XMPP_STANZA_TYPE_CHAT,
+                    chatMsg.getId(), msg))
+                return;
 
-        chatTransactions.insertChat(_chat);
-        chatTransactions.insertChatMessage(chatMsg);
-
-        //Send through XMPP
-        if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
-                chatMsg.getId(), msg))
-            return;
-
-        //Insert in recents
-        String action = Constants.CONTACTS_ACTION_SMS;
-        mRecentContactController.insertRecent(_chat.getContact_id(), action);
-        mRecentContactController.setConnectionCallback(this);
-
-        //Notify app to refresh any view if necessary
-        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
-            BusProvider.getInstance().post(new MessageSentEvent());
-        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
-            //Recent List is refreshed onConnectionComplete
+            //Insert in recents
+            String action = Constants.CONTACTS_ACTION_SMS;
+            mRecentContactController.insertRecent(id, action);
+            mRecentContactController.setConnectionCallback(this);
         }
 
         _chatList.add(chatMsg);
         if(_chatList.size()>50) _chatList.remove(0);
-
         refreshAdapter();
         etChatTextBox.setText("");
-    }
+    }*/
 
-    private void imageSent(String imageUrl)
+    /*private void imageSent(String imageUrl)
     {
-        //Save to DB
-        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
-                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl);
+        ChatMessage chatMsg = chatTransactions.newChatMessageInstance
+                (
+                        composedContactId
+                        , Constants.CHAT_MESSAGE_DIRECTION_SENT
+                        , Constants.CHAT_MESSAGE_TYPE_IMAGE
+                        , ""
+                        , imageUrl
+                        , composedContactId
+                );
 
-        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+            groupChat = chatTransactions.updatedGroupChatInstance(chatMsg, composedContactId);
 
-        chatTransactions.insertChat(_chat);
-        chatTransactions.insertChatMessage(chatMsg);
+            chatTransactions.insertChat(groupChat);
+            chatTransactions.insertChatMessage(chatMsg);
 
-        //Send through XMPP
-        if (!XMPPTransactions.sendImage(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
-                chatMsg.getId(), imageUrl))
-            return;
+        for(String id : contactIds)
+        {
+            //Send through XMPP
+            if (!XMPPTransactions.sendImage(id, Constants.XMPP_STANZA_TYPE_CHAT,
+                    chatMsg.getId(), imageUrl))
+                return;
 
-        //Download to file
-        new DownloadFile().execute(imageUrl, chatMsg.getId());
+            //Download to file
+            new DownloadFile().execute(imageUrl, chatMsg.getId());
 
-        //Insert in recents
-        String action = Constants.CONTACTS_ACTION_SMS;
-        mRecentContactController.insertRecent(_chat.getContact_id(), action);
-        mRecentContactController.setConnectionCallback(this);
+            //Insert in recents
+            String action = Constants.CONTACTS_ACTION_SMS;
+            mRecentContactController.insertRecent(id, action);
+            mRecentContactController.setConnectionCallback(this);
+        }
 
         //Notify app to refresh any view if necessary
         if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
@@ -306,19 +359,19 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
         _chatList.add(chatMsg);
         if(_chatList.size()>50) _chatList.remove(0);
-
         refreshAdapter();
-    }
+    }*/
 
     private void loadMessagesArray()
     {
-        _chatList = chatTransactions.getAllChatMessages(_chat.getContact_id());
+        _chatList = chatTransactions.getAllChatMessages(composedContactId);
         refreshAdapter();
     }
 
     private void refreshAdapter()
     {
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList, _profile, _contact);
+        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
+                _profile, contactList.get(0));
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
@@ -363,29 +416,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    protected void onResume() {
-        super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
-
-        if(etChatTextBox.getText().toString()!=null &&
-                etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
-        else setSendEnabled(false);
-
-        if(XMPPTransactions.getXmppConnection()!=null &&
-                XMPPTransactions.getXmppConnection().isConnected()) {
-            Realm realm = Realm.getInstance(this);
-            RealmChatTransactions chatTransactions = new RealmChatTransactions(realm, this);
-
-            ArrayList<ChatMessage> messages =
-                    chatTransactions.getNotReadReceivedContactChatMessages(_contact.getContactId());
-
-            if (messages != null && messages.size() > 0) {
-                XMPPTransactions.sendReadIQReceivedMessagesList(messages);
-                chatTransactions.setContactAllChatMessagesReceivedAsRead(_contact.getContactId());
-            }
-        }
     }
 
     @Override
@@ -442,11 +472,11 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
         //Build the alert dialog to let the user choose the origin of the picture
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ChatMainActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(GroupChatActivity.this);
         builder.setTitle(title);
 
         if(subtitle != null) {
-            LayoutInflater inflater = ChatMainActivity.this.getLayoutInflater();
+            LayoutInflater inflater = GroupChatActivity.this.getLayoutInflater();
             View view = inflater.inflate(R.layout.cv_title_subtitle, null);
             ((TextView) view.findViewById(R.id.tvTitle)).setText(title);
             ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
@@ -519,7 +549,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     private String getRealPathFromURI(Uri contentURI)
     {
         String result;
-        Cursor cursor = ChatMainActivity.this.getContentResolver().query(contentURI, null, null, null,
+        Cursor cursor = GroupChatActivity.this.getContentResolver().query(contentURI, null, null, null,
                 null);
         if (cursor == null) {
             result = contentURI.getPath();
@@ -538,8 +568,8 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pdia = new ProgressDialog(ChatMainActivity.this);
-            pdia.setMessage(ChatMainActivity.this.getString(R.string.progress_dialog_uploading_file));
+            pdia = new ProgressDialog(GroupChatActivity.this);
+            pdia.setMessage(GroupChatActivity.this.getString(R.string.progress_dialog_uploading_file));
             pdia.show();
         }
 
@@ -547,7 +577,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         protected String doInBackground(Void... params) {
             try
             {
-                filePushToServerController =  new FilePushToServerController(ChatMainActivity.this);
+                filePushToServerController =  new FilePushToServerController(GroupChatActivity.this);
                 multiPartFile = filePushToServerController.prepareFileToSend
                         (
                                 photoBitmap,
@@ -582,20 +612,12 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             if(result!=null && result.length()>0) {
                 try {
                     JSONObject jsonImage = new JSONObject(result);
-                    imageSent(jsonImage.getString("file"));
+                    //imageSent(jsonImage.getString("file"));
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "sendFile.onPostExecute: ",e);
                 }
             }
         }
-    }
-
-    @Subscribe
-    public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
-        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
-
-        if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)
-            loadMessagesArray();
     }
 
     @Subscribe
@@ -617,5 +639,94 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         protected void onPostExecute(Boolean aBoolean) {
             refreshAdapter();
         }
+    }
+
+    private void loadTheRestOfTheComponents()
+    {
+        imgModifyGroupChat = (ImageView) findViewById(R.id.img_modify_group_chat);
+        if(groupChat.getCreatorId().equals(_profile_id))
+            imgModifyGroupChat.setVisibility(View.VISIBLE);
+        else
+            imgModifyGroupChat.setVisibility(View.GONE);
+
+
+        etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
+        tvSendChat = (TextView) findViewById(R.id.chat_send);
+        top_left_avatar = (ImageView) findViewById(R.id.top_left_avatar);
+        top_right_avatar = (ImageView) findViewById(R.id.top_right_avatar);
+        bottom_left_avatar = (ImageView) findViewById(R.id.bottom_left_avatar);
+        bottom_right_avatar = (ImageView) findViewById(R.id.bottom_right_avatar);
+        top_left_avatar_text = (TextView) findViewById(R.id.top_left_avatar_text);
+        top_right_avatar_text = (TextView) findViewById(R.id.top_right_avatar_text);
+        bottom_left_avatar_text = (TextView) findViewById(R.id.bottom_left_avatar_text);
+        bottom_right_avatar_text = (TextView) findViewById(R.id.bottom_right_avatar_text);
+        lay_to_hide = (LinearLayout) findViewById(R.id.lay_top_right_image_hide);
+        lay_to_hide.setVisibility(View.GONE);
+
+        sendFileImage = (ImageView) findViewById(R.id.send_image);
+
+        if(contactIds==null || contactIds.size()==0) finish(); //Prevent from errors
+
+
+        //This prevents the view focusing on the edit text and opening the keyboard
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        ImageView backButton = (ImageView) findViewById(R.id.back_button);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        //Set avatar
+
+        setGroupChatAvatar();
+
+        //Sent chat in grey by default
+        setSendEnabled(false);
+
+        etChatTextBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                if (cs != null && cs.length() > 0) checkXMPPConnection();
+                else setSendEnabled(false);
+
+                XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+            }
+        });
+
+        tvSendChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());
+                //sendText();
+            }
+        });
+
+        sendFileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+            }
+        });
+
+        imgModifyGroupChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                startGroupChatListActivity();
+            }
+        });
     }
 }

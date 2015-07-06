@@ -8,22 +8,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,22 +25,20 @@ import com.vodafone.mycomms.contacts.connection.ContactListController;
 import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
-import com.vodafone.mycomms.contacts.connection.SearchController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
+import com.vodafone.mycomms.search.SearchBarController;
+import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
-import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
@@ -66,12 +54,11 @@ import model.RecentContact;
  */
 public class ContactListFragment extends ListFragment implements ISearchConnectionCallback, IContactsRefreshConnectionCallback {
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;;
-    private SlidingTabLayout mSlidingTabLayout;
-    private ViewPager mViewPager;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private Realm realm;
     private ContactController mContactController;
     private SearchController mSearchController;
+    private SearchBarController mSearchBarController;
     private ArrayList<Contact> contactList;
     private ArrayList<FavouriteContact> favouriteContactList;
     private ArrayList<RecentContact> recentContactList;
@@ -81,10 +68,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private ListView listView;
     private Parcelable state;
     private TextView emptyText;
-    private EditText searchView;
-    private Button cancelButton;
-    private LinearLayout layCancel;
-    private LinearLayout laySearchBar;
     private String apiCall;
 
     private String profileId;
@@ -100,14 +83,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private OnFragmentInteractionListener mListener;
 
-
-    private ArrayList<Contact> internalContacts = new ArrayList<>();
-    private ArrayList<Contact> realmContacts = new ArrayList<>();
-
     private SharedPreferences sp;
-
-    private final int drLeft = android.R.drawable.ic_menu_search;
-    private final int drRight = R.drawable.ic_action_remove;
 
     // TODO: Rename and change types of parameters
     public static ContactListFragment newInstance(int index, String param2) {
@@ -124,7 +100,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
         listView = (ListView) v.findViewById(android.R.id.list);
         emptyText = (TextView) v.findViewById(android.R.id.empty);
-        loadSearchBarComponentsAndEvents(v);
+
+        loadSearchBarEventsAndControllers(v);
+
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.contacts_swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -136,6 +114,24 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         if(isProgressDialogNeeded())showProgressDialog();
 
         return v;
+    }
+
+    private void loadSearchBarEventsAndControllers(View v)
+    {
+        mSearchBarController = new SearchBarController
+                (
+                        getActivity()
+                        , mContactController
+                        , contactList
+                        , mSearchController
+                        , adapter
+                        , mIndex
+                        , listView
+                        , false
+                );
+
+        mSearchBarController.initiateComponentsForSearchView(v);
+        mSearchBarController.setSearchBarEvents();
     }
 
     /**
@@ -381,128 +377,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         BusProvider.getInstance().unregister(this);
     }
 
-    /**
-     * Initiate each component what belong to Search View
-     * @author str_oan
-     */
-    private void initiateComponentsForSearchView(View v)
-    {
-        searchView = (EditText) v.findViewById(R.id.et_search);
-        cancelButton = (Button) v.findViewById(R.id.btn_cancel);
-        layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
-
-        laySearchBar = (LinearLayout) v.findViewById(R.id.lay_search_bar_container);
-
-        if(mIndex != Constants.CONTACTS_ALL)
-        {
-            laySearchBar.setVisibility(View.GONE);
-            hideSearchBarContent();
-        }
-
-        layCancel.setVisibility(View.GONE);
-
-        if(mIndex == Constants.CONTACTS_ALL && Constants.isSearchBarFocusRequested)
-        {
-            showKeyboard();
-            //Constants.isSearchBarFocusRequested = false;
-        }
-    }
-
-    /**
-     * Sets events to search bar. Makes response on touch, onKey and on text change.
-     * @author str_oan
-     */
-    private void setSearchBarEvents()
-    {
-
-        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-
-
-        searchView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                final int DRAWABLE_LEFT = 0;
-                final int DRAWABLE_TOP = 1;
-                final int DRAWABLE_RIGHT = 2;
-                final int DRAWABLE_BOTTOM = 3;
-
-                searchView.requestFocus();
-                showKeyboard();
-                cancelButton.setVisibility(View.VISIBLE);
-
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    // Will hide X button for delete searched text
-                    if (null != searchView.getCompoundDrawables()[DRAWABLE_RIGHT] && event.getRawX() >= (searchView.getRight() - searchView.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        Log.d("onTouch() -> ", "You have pressed right drawable!");
-                        searchView.setText("");
-                        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-                        return true;
-                    } else {
-                        Log.d("onTouch() -> ", "You have pressed other part of ET!");
-                        return true;
-                    }
-                } else {
-                    return true;
-                }
-            }
-        });
-
-        searchView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.i(this.getClass().getSimpleName() + " -> onTextChanged", "Input is: " + searchView.getText().toString());
-                if (searchView.getText().length() == 1) {
-                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, drRight, 0);
-                    layCancel.setVisibility(View.VISIBLE);
-                } else if (searchView.getText().length() == 0) {
-                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-                }
-
-                contactList = searchAllContacts(searchView.getText().toString());
-                reloadAdapter();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        searchView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    hideKeyboard();
-                }
-                return false;
-            }
-        });
-
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSearchBarContent();
-                hideKeyboard();
-
-            }
-        });
-
-    }
-
-    public void hideSearchBarContent()
-    {
-        layCancel.setVisibility(View.GONE);
-        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-        searchView.setText("");
-    }
-
     public void setListAdapterTabs()
     {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
@@ -561,30 +435,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }
     }
 
-    /**
-     * Searches all contacts by given key word. Calls the rest of functions for perform each type
-     * of search action
-     * @param keyWord (String) -> key word for make search
-     * @return (ArrayList Contact) -> list of found contacts
-     */
-    private ArrayList<Contact> searchAllContacts(String keyWord)
-    {
-        if(keyWord.length() == 0)
-        {
-            return loadAllContactsFromDB();
-        }
-        else if(keyWord.length() > 0 && keyWord.length() < 3)
-        {
-            return loadAllContactsFromDB(keyWord);
-        }
-        else if(keyWord.length() >= 3)
-        {
-            loadAllContactsFromServer(keyWord);
-            loadLocalContacts(keyWord);
-            return loadAllContactsFromDB(keyWord);
-        }
-        return null;
-    }
 
     /**
      * Gets all contacts from Realm DB by given key word
@@ -613,103 +463,18 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         return loadAllContactsFromDB(null);
     }
 
-    /**
-     * Loads all contacts from server by given key word storing them into Realm
-     * @author str_oan
-     * @param keyWord -> key word for make search
-     */
-    private void loadAllContactsFromServer(String keyWord)
-    {
-        buildRequestForSearchContacts(keyWord);
-        mSearchController.getContactList(apiCall);
-        mSearchController.setConnectionCallback(this);
-    }
-
-    /**
-     * Builds request string for search the contacts
-     * @author str_oan
-     * @param keyWord (String) -> key word for make search;
-     */
-    private void buildRequestForSearchContacts(String keyWord)
-    {
-        String basicCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
-        String content = sp.getString(Constants.PLATFORMS_SHARED_PREF, "mc");
-        content = content.replace("[","").replace("]","").replace("\"","");
-        apiCall = basicCall+content+"&t="+keyWord;
-    }
-
-    /**
-     * Gets all contacts from Local Device DB by given key word
-     * @author str_oan
-     * @param keyWord (String) -> key word for make search
-     * @return (ArrayList<Contact>) -> local contacts if any, otherwise returns empty list
-     */
-    private ArrayList<Contact> loadLocalContacts(String keyWord)
-    {
-        ArrayList<Contact> contactArrayList = mSearchController.getLocalContactsByKeyWord(keyWord);
-        mSearchController.storeContactsIntoRealm(contactArrayList);
-        return contactArrayList;
-    }
-
-    /**
-     * Force to show keyboard in current View
-     * @author str_oan
-     */
-    public void showKeyboard()
-    {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
-
-    }
-
-    /**
-     * Force to hide keyboard in current activity
-     * @author str_oan
-     */
-    public void hideKeyboard()
-    {
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
-          ().INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-    }
-
-    /**
-     * Sorts list of contacts by First Name + Last Name alphabetically
-     * @param contactList (List<Contact>) -> list which will be sorted
-     */
-    private void sortContacts(List<Contact> contactList)
-    {
-        Collections.sort(contactList, new Comparator<Contact>() {
-            @Override
-            public int compare(Contact lhs, Contact rhs) {
-                String name1 = lhs.getFirstName() + lhs.getLastName();
-                String name2 = rhs.getFirstName() + rhs.getLastName();
-                return name1.compareTo(name2);
-            }
-        });
-    }
-
-    private void loadSearchBarComponentsAndEvents(View v)
-    {
-        if(mIndex == Constants.CONTACTS_ALL && Constants.isSearchBarFocusRequested)
-        {
-            showKeyboard();
-            Constants.isSearchBarFocusRequested = false;
-        }
-        else if(mIndex == Constants.CONTACTS_ALL && !Constants.isSearchBarFocusRequested)
-        {
-            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
-                    .SOFT_INPUT_STATE_HIDDEN);
-
-        }
-        initiateComponentsForSearchView(v);
-        setSearchBarEvents();
-    }
 
     @Subscribe
     public void setListAdapterEvent(SetContactListAdapterEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.setListAdapterEvent: ");
         if(!isProgressDialogNeeded())hideProgressDialog();
+    }
+
+    @Subscribe
+    public void reloadAdapterEvent(ReloadAdapterEvent event){
+        Log.i(Constants.TAG, "ContactListPagerFragment.reloadAdapterEvent: ");
+        this.contactList = mSearchBarController.getContactList();
+        reloadAdapter();
     }
 
 
@@ -735,5 +500,10 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             return true;
         else
             return false;
+    }
+
+    public SearchBarController getSearchBarController()
+    {
+        return this.mSearchBarController;
     }
 }

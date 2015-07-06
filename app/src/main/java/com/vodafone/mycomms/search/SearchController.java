@@ -136,7 +136,7 @@ public class SearchController extends BaseController
         ArrayList<Contact> realmContactList = new ArrayList<>();
 
         try {
-            Log.i(Constants.TAG, "ContactController.insertContactListInRealm: ");
+            Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
             Contact contact;
             boolean doRefreshAdapter;
@@ -184,7 +184,7 @@ public class SearchController extends BaseController
                 realmAvatarTransactions.insertAvatar(avatar);
             }
         } catch (Exception ex) {
-            Log.e(Constants.TAG, "ContactController.updateContactAvatar: ", ex);
+            Log.e(Constants.TAG, "ContactsController.updateContactAvatar: ", ex);
         }
     }
 
@@ -284,6 +284,10 @@ public class SearchController extends BaseController
                 contact.setPresence(jsonObject.getString(Constants.CONTACT_PRESENCE));
             if (!jsonObject.isNull(Constants.CONTACT_COUNTRY))
                 contact.setCountry(jsonObject.getString(Constants.CONTACT_COUNTRY));
+            contact.setSearchHelper((contact.getFirstName() + " " + contact.getLastName() + " "
+                    + contact.getCompany() + " " + contact.getEmails()).trim());
+            contact.setSortHelper((contact.getFirstName() + " " + contact.getLastName() + " "
+                    + contact.getCompany()).trim());
         }catch (JSONException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());

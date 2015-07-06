@@ -18,9 +18,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -241,7 +241,7 @@ public class SignupPincodeActivity extends Activity {
             }
             else if (status.compareTo("201") == 0) {
                 //User created from OAuth, not necessary to check mail
-                //We have accessToken to access app
+                //We have accessToken to go to app
 
                 //Delete the oauth from userProfile
                 UserProfile.setOauth(null);
@@ -260,11 +260,12 @@ public class SignupPincodeActivity extends Activity {
 
                 UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
 
-                //Start main activity and clear history
-                Intent in = new Intent(getApplicationContext(), ContactListMainActivity.class);
+                //Go to splashcreen which will check everything before entering app
+                Intent in = new Intent(getApplicationContext(), SplashScreenActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                         Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(in);
+                finish();
             }
             else
             {

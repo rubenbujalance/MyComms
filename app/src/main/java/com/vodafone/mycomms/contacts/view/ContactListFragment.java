@@ -22,6 +22,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
@@ -56,7 +57,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Realm realm;
-    private ContactController mContactController;
+    private ContactsController mContactsController;
     private SearchController mSearchController;
     private SearchBarController mSearchBarController;
     private ArrayList<Contact> contactList;
@@ -72,12 +73,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private String profileId;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private int mIndex;
     private String mParam2;
 
@@ -85,7 +83,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private SharedPreferences sp;
 
-    // TODO: Rename and change types of parameters
+    private final int drLeft = android.R.drawable.ic_menu_search;
+    private final int drRight = R.drawable.ic_action_remove;
+
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
         Bundle args = new Bundle();
@@ -108,6 +108,13 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             @Override
             public void onRefresh() {
                 refreshContent();
+                //Spinner is always finished after 10 seconds
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        finishSpinner();
+                    }
+                }, 10000);
             }
         });
 
@@ -121,7 +128,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         mSearchBarController = new SearchBarController
                 (
                         getActivity()
-                        , mContactController
+                        , mContactsController
                         , contactList
                         , mSearchController
                         , adapter
@@ -164,7 +171,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
         realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(getActivity(),realm, profileId);
+        mContactsController = new ContactsController(getActivity(),realm, profileId);
         mSearchController = new SearchController(getActivity(), realm, profileId);
 
         setListAdapterTabs();
@@ -181,6 +188,13 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         } else if (mIndex==Constants.CONTACTS_RECENT) {
             contactListController.getContactList(Constants.CONTACT_API_GET_RECENTS);
             contactListController.setConnectionCallback(this);
+        }
+    }
+
+    private void finishSpinner(){
+        Log.i(Constants.TAG, "ContactListFragment.finishSpinner: ");
+        if (mSwipeRefreshLayout!=null){
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -292,7 +306,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                         }
                     }
                     //ADD RECENT
-                    RecentContactController recentController = new RecentContactController(this,realm,profileId);
+                    RecentContactController recentController = new RecentContactController(getActivity(),realm,profileId);
                     recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                     setListAdapterTabs();
                 } catch (Exception ex) {
@@ -366,7 +380,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }
 
@@ -381,7 +394,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
-            favouriteContactList = mContactController.getAllFavouriteContacts();
+            favouriteContactList = mContactsController.getAllFavouriteContacts();
             if (favouriteContactList!=null) {
                 setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
                         favouriteContactList));
@@ -389,7 +402,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }else if(mIndex == Constants.CONTACTS_RECENT){
             if (emptyText!=null)
                 emptyText.setText("");
-            recentContactList = mContactController.getAllRecentContacts();
+            recentContactList = mContactsController.getAllRecentContacts();
             if (recentContactList!=null) {
                 RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList);
                 if (listView != null) {
@@ -417,20 +430,22 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     {
         adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
         if (contactList!=null) {
-            if (listView!=null)
+            if (listView != null)
                 state = listView.onSaveInstanceState();
-            if (adapter != null)
-            {
+            if (adapter != null) {
                 setListAdapter(adapter);
-                if (state!=null)
+                if (state != null)
                     listView.onRestoreInstanceState(state);
-            }
-            else
-            {
+            } else {
                 adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
                 setListAdapter(adapter);
-                if (state!= null)
+                if (state != null)
                     listView.onRestoreInstanceState(state);
+            }
+            if (contactList.size()!=0) {
+                Log.i(Constants.TAG, "ContactListFragment.reloadAdapter: No results from Search");
+                if (emptyText!=null)
+                    emptyText.setText(getResources().getString(R.string.no_search_records));
             }
         }
     }
@@ -448,7 +463,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         ArrayList<Contact> contactArrayList;
         if(null == keyWord)
         {
-            contactArrayList = mContactController.getAllContacts();
+            contactArrayList = mContactsController.getAllContacts();
         }
         else
         {

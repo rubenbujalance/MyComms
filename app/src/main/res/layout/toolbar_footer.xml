@@ -83,7 +83,8 @@
                         android:id="@+id/footer_recents"
                         android:background="@drawable/chat"
                         android:focusable="false"
-                        android:backgroundTint="#ff808080" android:layout_alignParentBottom="true"
+                        android:backgroundTint="#ff808080"
+                        android:layout_alignParentBottom="true"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"/>
                         <com.vodafone.mycomms.custom.CircleImageView

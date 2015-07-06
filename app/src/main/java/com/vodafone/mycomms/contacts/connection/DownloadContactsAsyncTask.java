@@ -18,7 +18,7 @@ public class DownloadContactsAsyncTask extends AsyncTask<Void, Void, Void> imple
         IContactsConnectionCallback {
     private String mProfileId;
     private Realm realm;
-    private ContactController mContactController;
+    private ContactsController mContactsController;
     private String apiCall;
     private  Context mContext;
 
@@ -52,10 +52,10 @@ public class DownloadContactsAsyncTask extends AsyncTask<Void, Void, Void> imple
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realm = Realm.getInstance(mContext);
-        mContactController = new ContactController(mContext,realm, mProfileId);
+        mContactsController = new ContactsController(mContext,realm, mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
-        mContactController.getContactList(apiCall);
-        mContactController.setConnectionCallback(this);
+        mContactsController.getContactList(apiCall);
+        mContactsController.setConnectionCallback(this);
     }
 
     @Override
@@ -69,14 +69,14 @@ public class DownloadContactsAsyncTask extends AsyncTask<Void, Void, Void> imple
         }else if(apiCall.equals(Constants.CONTACT_API_GET_CONTACTS)){
             if (morePages){
                 apiCall = Constants.CONTACT_API_GET_CONTACTS;
-                mContactController.getContactList(apiCall + "&o=" + offsetPaging);
+                mContactsController.getContactList(apiCall + "&o=" + offsetPaging);
             } else {
                 apiCall = Constants.CONTACT_API_GET_RECENTS;
-                mContactController.getRecentList(apiCall);
+                mContactsController.getRecentList(apiCall);
             }
         }else if (apiCall.equals(Constants.CONTACT_API_GET_RECENTS)){
             apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-            mContactController.getFavouritesList(apiCall);
+            mContactsController.getFavouritesList(apiCall);
         }
     }
 
@@ -84,7 +84,7 @@ public class DownloadContactsAsyncTask extends AsyncTask<Void, Void, Void> imple
     public void onRecentContactsResponse() {
         Log.i(Constants.TAG, "DownloadContactsAsyncTask.onRecentContactsResponse: " + apiCall);
         apiCall = Constants.CONTACT_API_GET_FAVOURITES;
-        mContactController.getFavouritesList(apiCall);
+        mContactsController.getFavouritesList(apiCall);
     }
 
     @Override

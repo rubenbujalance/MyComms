@@ -1,7 +1,8 @@
 package com.vodafone.mycomms.contacts.view;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,21 +11,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.connection.ConnectionsQueue;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -86,40 +84,16 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         final File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
                 "avatar_"+contact.getContactId()+".jpg");
 
-
-        //TODO RBM - Review download avatars
-        if (!avatarFile.exists() && contact.getAvatar()!=null && contact.getAvatar().length()>0)
-        {
-            String filename = "avatar_" + contact.getContactId() + ".jpg";
-            Log.i(Constants.TAG, "ContactListViewArrayAdapter.getView: AVATAR " + filename +
-                    " does not exists");
-            new DownloadAvatars().execute(contact.getAvatar(), filename);
-        }
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
                 contact.getAvatar().compareTo("")!=0 &&
                 avatarFile.exists()) {
 
             viewHolder.textAvatar.setText(null);
-
             Picasso.with(mContext)
                     .load(avatarFile) // thumbnail url goes here
-                    .placeholder(R.drawable.ic_circle_contact_photo)
                     .fit().centerCrop()
-                    .into(viewHolder.imageAvatar, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Picasso.with(mContext)
-                                    .load(avatarFile) // image url goes here
-                                    .fit().centerCrop()
-                                    .placeholder(viewHolder.imageAvatar.getDrawable())
-                                    .into(viewHolder.imageAvatar);
-                        }
-
-                        @Override
-                        public void onError() {
-                        }
-                    });
+                    .into(viewHolder.imageAvatar);
         }
         else
         {
@@ -137,6 +111,48 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
             viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
             viewHolder.textAvatar.setText(initials);
+
+            //Download avatar
+            if (contact.getAvatar() != null &&
+                    contact.getAvatar().length() > 0
+                        && contact.getPlatform().equalsIgnoreCase("mc")) {
+                File avatarsDir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+
+                if(!avatarsDir.exists()) avatarsDir.mkdirs();
+
+                final Target target = new Target() {
+                    @Override
+                    public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                        viewHolder.imageAvatar.setImageBitmap(bitmap);
+                        viewHolder.textAvatar.setVisibility(View.INVISIBLE);
+
+                        SaveAndShowImageAsyncTask task =
+                                new SaveAndShowImageAsyncTask(
+                                        viewHolder.imageAvatar, avatarFile, bitmap, viewHolder.textAvatar);
+//                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        task.execute();
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        if(avatarFile.exists()) avatarFile.delete();
+                        ConnectionsQueue.removeConnection(avatarFile.toString());
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                };
+
+                viewHolder.imageAvatar.setTag(target);
+
+                //Add this download to queue, to avoid duplicated downloads
+                ConnectionsQueue.putConnection(avatarFile.toString(), target);
+                Picasso.with(mContext)
+                        .load(contact.getAvatar())
+                        .into(target);
+            }
         }
 
         viewHolder.textViewCompany.setText(contact.getCompany());
@@ -224,66 +240,128 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         TextView textAvatar;
     }
 
-    class DownloadAvatars extends AsyncTask<String, String, String> {
+//public class OkHttpSaveBitmapToDiskAsyncTask extends AsyncTask<Void, Void, Void> {
+//
+//    ImageView avatarImage;
+//    TextView avatarText;
+//    File avatarFile;
+//    Bitmap bitmap;
+//
+//    public OkHttpSaveBitmapToDiskAsyncTask(ImageView avatarImage, TextView avatarText,
+//                                           File avatarFile, Bitmap bitmap) {
+//        this.avatarImage = avatarImage;
+//        this.avatarText = avatarText;
+//        this.avatarFile = avatarFile;
+//        this.bitmap = bitmap;
+//    }
+//
+//    @Override
+//    protected Void doInBackground(Void... params) {
+//        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: START "+avatarFile);
+//
+//        try {
+//            //Descarga del archivo local
+//            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (INICIO DownloadAvatar by Picasso: "
+//                    + avatarFile.toString());
+//
+//            avatarFile.createNewFile();
+//            FileOutputStream ostream = new FileOutputStream(avatarFile);
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, ostream);
+//            ostream.close();
+//
+//            Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground (FIN DownloadAvatar by Picasso: "
+//                    + avatarFile.toString());
+//
+//        } catch (Exception e) {
+//            Log.e(Constants.TAG, "DashBoardActivity.run(Picasso avatar Target): ", e);
+//            if(avatarFile.exists())
+//            {
+//                avatarFile.delete();
+//                bitmap = null;
+//            }
+//        }
+//
+//        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.doInBackground: END "+avatarFile);
+//
+//        return null;
+//    }
+//
+//    @Override
+//    protected void onPostExecute(Void aVoid) {
+//        Log.e(Constants.TAG, "OkHttpSaveBitmapToDiskAsyncTask.onPostExecute: "+avatarFile);
+//
+//        if(bitmap!=null) {
+//            //Carga del bitmap
+//            avatarText.setVisibility(View.INVISIBLE);
+//
+//            Picasso.with(mContext)
+//                    .load(avatarFile)
+//                    .fit().centerCrop()
+//                    .into(avatarImage);
+//        }
+//    }
+//}
 
-        @Override
-        protected String doInBackground(String... aurl) {
-            try {
-                Log.i(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.doInBackground: ");
-                URL url = new URL(aurl[0]);
-                String avatarFileName = aurl[1];
-                String dir = Constants.CONTACT_AVATAR_DIR;
-
-                File file = new File(mContext.getFilesDir() + dir);
-                file.mkdirs();
-
-                if (downloadFile(String.valueOf(url),dir,avatarFileName)){
-                    String avatarFile = mContext.getFilesDir() + dir + avatarFileName;
-                    Log.i(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.doInBackground: avatarFile: " + avatarFile);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.doInBackground: " + e.toString());
-            }
-            return null;
-        }
-
-        public boolean downloadFile(final String path, String dir, String avatarFileName) {
-            try {
-                URL url = new URL(path);
-
-                URLConnection ucon = url.openConnection();
-                ucon.setReadTimeout(Constants.HTTP_READ_AVATAR_TIMEOUT);
-                ucon.setConnectTimeout(10000);
-
-                InputStream is = ucon.getInputStream();
-                BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
-
-                File file = new File(mContext.getFilesDir() + dir, avatarFileName);
-
-                if (file.exists()) {
-                    file.delete();
-                }
-                file.createNewFile();
-
-                FileOutputStream outStream = new FileOutputStream(file);
-                byte[] buff = new byte[5 * 1024];
-
-                int len;
-                while ((len = inStream.read(buff)) != -1) {
-                    outStream.write(buff, 0, len);
-                }
-                outStream.flush();
-                outStream.close();
-                inStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.downloadFile: " + e.toString());
-                return false;
-            }
-
-            return true;
-        }
-    }
+//    class DownloadAvatars extends AsyncTask<String, String, String> {
+//
+//        @Override
+//        protected String doInBackground(String... aurl) {
+//            try {
+//                Log.i(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.doInBackground: ");
+//                URL url = new URL(aurl[0]);
+//                String avatarFileName = aurl[1];
+//                String dir = Constants.CONTACT_AVATAR_DIR;
+//
+//                File file = new File(mContext.getFilesDir() + dir);
+//                file.mkdirs();
+//
+//                if (downloadFile(String.valueOf(url),dir,avatarFileName)){
+//                    String avatarFile = mContext.getFilesDir() + dir + avatarFileName;
+//                    Log.i(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.doInBackground: avatarFile: " + avatarFile);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                Log.e(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.doInBackground: " + e.toString());
+//            }
+//            return null;
+//        }
+//
+//        public boolean downloadFile(final String path, String dir, String avatarFileName) {
+//            try {
+//                URL url = new URL(path);
+//
+//                URLConnection ucon = url.openConnection();
+//                ucon.setReadTimeout(Constants.HTTP_READ_AVATAR_TIMEOUT);
+//                ucon.setConnectTimeout(10000);
+//
+//                InputStream is = ucon.getInputStream();
+//                BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
+//
+//                File file = new File(mContext.getFilesDir() + dir, avatarFileName);
+//
+//                if (file.exists()) {
+//                    file.delete();
+//                }
+//                file.createNewFile();
+//
+//                FileOutputStream outStream = new FileOutputStream(file);
+//                byte[] buff = new byte[5 * 1024];
+//
+//                int len;
+//                while ((len = inStream.read(buff)) != -1) {
+//                    outStream.write(buff, 0, len);
+//                }
+//                outStream.flush();
+//                outStream.close();
+//                inStream.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                Log.e(Constants.TAG, "ContactArrayAdapter.DownloadAvatars.downloadFile: " + e.toString());
+//                return false;
+//            }
+//
+//            return true;
+//        }
+//    }
 
 }

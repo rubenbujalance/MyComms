@@ -1,13 +1,16 @@
 package com.vodafone.mycomms.settings;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.app.Fragment;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
@@ -18,6 +21,7 @@ import com.vodafone.mycomms.settings.connection.UpdateSettingsConnection;
 import com.vodafone.mycomms.settings.connection.UpdateTimeZoneConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,27 +35,9 @@ public class ProfileController extends BaseController {
 
     private RealmContactTransactions realmContactTransactions;
     private ProfileConnection profileConnection;
-    private Realm realm;;
+    private Realm realm;
     private UserProfile userProfile;
     private String profileId;
-
-    public ProfileController(Fragment fragment) {
-        super(fragment);
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
-        realm = Realm.getInstance(fragment.getActivity());
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
-    }
-
-    public ProfileController(Activity activity) {
-        super(activity);
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
-        realm = Realm.getInstance(activity);
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
-    }
 
     public ProfileController(Context context) {
         super(context);
@@ -66,36 +52,34 @@ public class ProfileController extends BaseController {
      * Get Profile, uses DB and Network also. (First loads from DB by a callback then starts network connection.
      */
     public void getProfile(){
-        Log.d(Constants.TAG, "ProfileController.getProfile: ");
+        Log.e(Constants.TAG, "ProfileController.getProfile: ");
 
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-            String profileId = null;
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileId = null;
 
-            if (sharedPreferences != null) {
-                profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-            }
-
-            if (profileId != null && profileId.length() > 0) {
-                Log.d(Constants.TAG, "ProfileController.getProfile: retrieving profile with profileID:" + profileId);
-                UserProfile userProfileFromDB = null;
-                if (realmContactTransactions != null) {
-                    userProfileFromDB = realmContactTransactions.getUserProfile(profileId);
-                } else {
-                    Log.e(Constants.TAG, "ProfileController.getProfile: realmContactTransactions is null");
-                }
-
-                if (this.getConnectionCallback() != null && userProfileFromDB != null) {
-                    Log.d(Constants.TAG, "ProfileController.getProfile: profile received from DB: " + printUserProfile(userProfileFromDB));
-                    ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
-                }
-            }
-
-
-        if(profileConnection != null){
-            profileConnection.cancel();
+        if (sharedPreferences != null) {
+            profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         }
-        profileConnection = new ProfileConnection(getContext(), this);
-        profileConnection.request();
+
+        if (profileId != null && profileId.length() > 0) {
+            UserProfile userProfileFromDB = null;
+            if (realmContactTransactions != null) {
+                userProfileFromDB = realmContactTransactions.getUserProfile(profileId);
+            }
+
+            if (this.getConnectionCallback() != null && userProfileFromDB != null) {
+                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
+            }
+        }
+
+//        if(profileConnection != null){
+//            profileConnection.cancel();
+//        }
+//        profileConnection = new ProfileConnection(getContext(), this);
+//        profileConnection.request();
+
+        new GetProfileAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                (String) Constants.CONTACT_API_GET_PROFILE);
     }
 
     public boolean isUserProfileChanged(String firstName, String lastName, String company, String
@@ -108,6 +92,7 @@ public class ProfileController extends BaseController {
         }
         return true;
     }
+
     public void updateUserProfileInDB(String firstName, String lastName, String company, String
             position, String officeLocation){
         Log.d(Constants.TAG, "ProfileController.updateUserProfileInDB: ");
@@ -168,10 +153,10 @@ public class ProfileController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-        Log.d(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl() + response.getUrl());
+        Log.e(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
 
         boolean isUserProfileReceived = false;
-        if(response.getUrl() != null && !response.getUrl().contains(UpdateSettingsConnection.URL)) {
+        if(response.getUrl() != null && !response.getUrl().endsWith(UpdateSettingsConnection.URL)) {
             String result = response.getData().toString();
 
             try {
@@ -194,7 +179,7 @@ public class ProfileController extends BaseController {
         }
 
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
-            if (response.getUrl() != null && response.getUrl().contains(ProfileConnection.URL)) {
+            if (response.getUrl() != null && response.getUrl().endsWith(ProfileConnection.URL)) {
                 if (isUserProfileReceived) {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
                 } else {
@@ -213,8 +198,6 @@ public class ProfileController extends BaseController {
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback ) {
             if (ex.getUrl() != null && ex.getUrl().contains(ProfileConnection.URL)) {
                 if (ex.getContent() != null && ex.getContent().contains("\"err\":\"incorrectData\"")) {
-                    //TODO It does not seem correct that the MyComms  Public API has two calls to "/api/me"  URLs and the only difference is that one is PUT and the other is GET
-                    //TODO Currently the Connectivity API is not prepared to retrieve the Method type (GET, PUT, DELETE) of the connection from the error, so no clean way of doing this.
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionError();
                 } else {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileConnectionError();
@@ -230,7 +213,7 @@ public class ProfileController extends BaseController {
                     Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
                 }
 
-                //TODO: Commented due to "BaseController.onConnectionError: {"err":"auth_proxy_error","des":"invalid body request"}
+                //Commented due to "BaseController.onConnectionError: {"err":"auth_proxy_error","des":"invalid body request"}
                 //((IProfileConnectionCallback) this.getConnectionCallback()).onPasswordChangeError(error);
             }
         }
@@ -303,7 +286,7 @@ public class ProfileController extends BaseController {
 
     public void updateContactData(HashMap profileHashMap) {
         JSONObject json = new JSONObject(profileHashMap);
-        Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+        Log.e(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
         UpdateProfileConnection updateProfileConnection = new UpdateProfileConnection(getContext(),this);
         updateProfileConnection.setPayLoad(json.toString());
         updateProfileConnection.request();
@@ -311,7 +294,7 @@ public class ProfileController extends BaseController {
 
     public void updateSettingsData(HashMap settingsHashMap) {
         JSONObject json = new JSONObject(settingsHashMap);
-        Log.d(Constants.TAG, "ProfileController.updateSettingsData: " + json.toString());
+        Log.e(Constants.TAG, "ProfileController.updateSettingsData: " + json.toString());
         UpdateSettingsConnection updateSettingsConnection = new UpdateSettingsConnection(getContext(),this);
         updateSettingsConnection.setPayLoad(json.toString());
         updateSettingsConnection.request();
@@ -319,7 +302,7 @@ public class ProfileController extends BaseController {
 
     public void updatePassword(HashMap passwordHashMap){
             JSONObject json = new JSONObject(passwordHashMap);
-            Log.d(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+            Log.e(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
             PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
             passwordConnection.setPayLoad(json.toString());
             passwordConnection.request();
@@ -328,12 +311,11 @@ public class ProfileController extends BaseController {
 
     public void updateTimeZone(HashMap timeZoneHashMap) {
         JSONObject json = new JSONObject(timeZoneHashMap);
-        Log.d(Constants.TAG, "ProfileController.updateTimeZone: " + json.toString());
+        Log.e(Constants.TAG, "ProfileController.updateTimeZone: " + json.toString());
         UpdateTimeZoneConnection updateTimeZoneConnection = new UpdateTimeZoneConnection(getContext(),this);
         updateTimeZoneConnection.setPayLoad(json.toString());
         updateTimeZoneConnection.request();
     }
-
 
     public HashMap getProfileHashMap(UserProfile userProfile)
     {
@@ -345,5 +327,71 @@ public class ProfileController extends BaseController {
         if(userProfile.getOfficeLocation() != null) body.put("officeLocation",userProfile.getOfficeLocation());
         if(userProfile.getTimezone() != null && !userProfile.getTimezone().equals("")) body.put("timeZone",userProfile.getTimezone());
         return body;
+    }
+
+    public void getProfileCallback(String json) {
+        Log.e(Constants.TAG, "ProfileController.getProfileCallback: " + json);
+
+        boolean isUserProfileReceived = false;
+
+        try {
+
+            if (json != null && json.length() > 0) {
+                JSONObject jsonResponse = new JSONObject(json);
+
+                userProfile = mapUserProfile(jsonResponse);
+                realmContactTransactions.insertUserProfile(userProfile);
+                if(userProfile != null) {
+                    isUserProfileReceived = true;
+                }
+            }
+        } catch (Exception e) {
+            Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile" + e.getMessage());
+        }
+
+        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
+            if (isUserProfileReceived) {
+                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
+            }
+        }
+    }
+
+    public class GetProfileAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: START");
+
+            Response response;
+            String json = null;
+
+            try {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("https://" + EndpointWrapper.getBaseURL() +
+                                params[0])
+                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                Utils.getHttpHeaderVersion(getContext()))
+                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                Utils.getHttpHeaderContentType())
+                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                Utils.getHttpHeaderAuth(getContext()))
+                        .build();
+
+                response = client.newCall(request).execute();
+                json = response.body().string();
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: ",e);
+            }
+
+            Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: END");
+
+            return json;
+        }
+
+        @Override
+        protected void onPostExecute(String json) {
+            getProfileCallback(json);
+        }
     }
 }

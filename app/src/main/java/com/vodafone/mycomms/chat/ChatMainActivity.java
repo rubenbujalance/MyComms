@@ -94,7 +94,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_main);
         activateToolbar();
-        setToolbarBackground(R.drawable.toolbar_header);
+//        setToolbarBackground(R.drawable.toolbar_header);
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
@@ -204,8 +204,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
                 if (cs != null && cs.length() > 0) checkXMPPConnection();
                 else setSendEnabled(false);
-
-                XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
             }
 
             @Override
@@ -290,8 +288,10 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             return;
 
         //Download to file
-        new DownloadFile().execute(imageUrl, chatMsg.getId());
-
+        //TODO: Testing executeOnExecutor
+        //new DownloadFile().execute(imageUrl, chatMsg.getId());
+        DownloadFile downloadFile = new DownloadFile();
+        downloadFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl, chatMsg.getId());
         //Insert in recents
         String action = Constants.CONTACTS_ACTION_SMS;
         mRecentContactController.insertRecent(_chat.getContact_id(), action);
@@ -367,7 +367,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
 
         if(etChatTextBox.getText().toString()!=null &&
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
@@ -410,8 +410,11 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         if(chatMsg!=null)
         {
             _chatList.add(chatMsg);
-            mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-            mRecentContactController.setConnectionCallback(this);
+            if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
+                mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
+                mRecentContactController.setConnectionCallback(this);
+            }
+
             if(_chatList.size()>50) _chatList.remove(0);
             refreshAdapter();
         }
@@ -433,7 +436,10 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             photoPath = getRealPathFromURI(selectedImage);
             photoBitmap = decodeFile(photoPath);
 
-            new sendFile().execute();
+            //TODO: Testing executeOnExecutor
+//            new sendFile().execute();
+            sendFile sendFile = new sendFile();
+            sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 

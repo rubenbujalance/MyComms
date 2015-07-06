@@ -32,6 +32,12 @@ public class ToolbarActivity extends ActionBarActivity {
 
     private Toolbar mToolbar;
     private Toolbar mFooter;
+    private int foregroundActivity; //0-Contacts,1-Dashboard,2-Inbox
+
+    public void setForegroundActivity(int activity)
+    {
+        foregroundActivity = activity;
+    }
 
     protected Toolbar activateToolbar() {
         if(mToolbar == null) {
@@ -204,6 +210,7 @@ public class ToolbarActivity extends ActionBarActivity {
         layoutContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(foregroundActivity==0) return;
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerContacts");
                 editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, true);
                 editor.apply();
@@ -220,28 +227,27 @@ public class ToolbarActivity extends ActionBarActivity {
         layoutDashboard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(foregroundActivity==1) return;
                 editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, true);
                 editor.apply();
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerDasboard");
                 Intent in = new Intent(context, DashBoardActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
-                overridePendingTransition(0,0);
             }
         });
 
         layoutInbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(foregroundActivity==2) return;
                 editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, true);
                 editor.apply();
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerInbox");
                 Intent in = new Intent(context, ChatListActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
-                overridePendingTransition(0, 0);
-                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
     }

@@ -11,7 +11,6 @@ import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.ISessionConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -21,7 +20,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     private LinearLayout noConnectionLayout;
-    private ProfileController profileController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,17 +37,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         setFooterListeners(this);
         setContactsListeners(this);
 
-        //profileController = new ProfileController(this);
-
-        //Save profile_id if accessToken has changed
-        //String profile_id = validateAccessToken();
-
-        //String deviceId = setDeviceId();
-
-        //Initialize messaging server session (needs the profile_id saved)
-        //if(profile_id != null) //If null, do initialization in callback method
-            //XMPPTransactions.initializeMsgServerSession(getApplicationContext());
-
         if (savedInstanceState == null) {
             FragmentTransaction transaction;
             transaction = getSupportFragmentManager().beginTransaction();
@@ -59,9 +46,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         }
 
         activateFooterSelected(Constants.TOOLBAR_CONTACTS);
-
-        //Check if is first login and upload avatar
-        checkAndUploadAvatar();
     }
 
     //Prevent of going from main screen back to login
@@ -81,17 +65,7 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     }
 
     @Override
-    public void onFragmentInteraction(String id) {
-
-    }
-
-    private void checkAndUploadAvatar()
-    {
-        //Check sharedPreferences
-        // TODO RBM - Check sharedPreferences
-
-        // TODO RBM - Upload avatar
-    }
+    public void onFragmentInteraction(String id) {}
 
     public void setConnectionLayoutVisibility(boolean connection){
         if (connection){
@@ -111,17 +85,17 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-
-        // Disconnect from the XMPP server
-        XMPPTransactions.disconnectMsgServerSession();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        setForegroundActivity(0);
+        overridePendingTransition(0,0);
         //Update Pending Messages on Toolbar
+        //RBM - It is done every time a message is received
         checkUnreadChatMessages();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
     }
 
     @Subscribe

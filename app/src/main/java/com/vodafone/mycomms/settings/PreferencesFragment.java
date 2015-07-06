@@ -38,12 +38,9 @@ import model.UserProfile;
  * create an instance of this fragment.
  */
 public class PreferencesFragment extends Fragment implements IProfileConnectionCallback{
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private int mParam1;
     private String mParam2;
 
@@ -67,7 +64,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
      * @param param2 Parameter 2.
      * @return A new instance of fragment PreferencesFragment.
      */
-    // TODO: Rename and change types and number of parameters
+
     public static PreferencesFragment newInstance(String param1, String param2) {
         PreferencesFragment fragment = new PreferencesFragment();
         Bundle args = new Bundle();
@@ -81,7 +78,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types of parameters
     public static PreferencesFragment newInstance(int index, String param2) {
         PreferencesFragment fragment = new PreferencesFragment();
         Bundle args = new Bundle();
@@ -98,7 +94,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             mParam1 = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        profileController = new ProfileController(this);
+        profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);
     }
 
@@ -354,7 +350,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 

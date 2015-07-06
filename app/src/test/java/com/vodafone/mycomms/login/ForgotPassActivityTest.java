@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.FakeHttp;
+import org.robolectric.shadows.httpclient.FakeHttp;
 
 import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
 import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;

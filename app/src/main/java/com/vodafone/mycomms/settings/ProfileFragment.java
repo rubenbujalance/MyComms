@@ -59,8 +59,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -71,7 +69,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private static int TAKE_OR_PICK = 0;
     private static int RESULT_OK = 1;
 
-    // TODO: Rename and change types of parameters
     private int mIndex;
     private String mParam2;
 
@@ -103,8 +100,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private SharedPreferences sp;
 
-
-    // TODO: Rename and change types of parameters
     public static ProfileFragment newInstance(int index, String param2) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -225,7 +220,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         newProfile.setCompany(company);
         newProfile.setPosition(position);
         newProfile.setOfficeLocation(officeLocation);
-
 
         Log.d(Constants.TAG, "ProfileFragment.updateContactData:" + profileController.printUserProfile(newProfile));
 
@@ -383,7 +377,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             Log.i(Constants.TAG, "ProfileFragment.onCreate: " + mIndex);
         }
 
-        profileController = new ProfileController(this);
+        profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);
 
         this.sp = getActivity().getSharedPreferences(
@@ -525,7 +519,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(String id);
     }
 

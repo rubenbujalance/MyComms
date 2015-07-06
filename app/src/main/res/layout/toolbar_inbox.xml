@@ -7,9 +7,8 @@
     mycomms:contentInsetStart="0dp"
     mycomms:theme="@style/ActionBarThemeOverlay"
     android:gravity="top"
-    android:visibility="visible"
-    mycomms:titleTextAppearance="@style/ActionBar.TitleText"
-    android:background="@color/toolbar_selected_item">
+    android:background="@color/toolbar_selected_item"
+    mycomms:titleTextAppearance="@style/ActionBar.TitleText">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -28,8 +27,8 @@
             android:background="@drawable/btn_navbar_settings"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:backgroundTint="#ffffffff" />
+            android:layout_alignParentStart="true"/>
+            <!--android:backgroundTint="#ffffffff" -->
         <ImageView
             android:id="@+id/chat_add"
             android:layout_width="30dp"
@@ -38,7 +37,9 @@
             android:layout_alignTop="@+id/contacts_profile"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:backgroundTint="#ffffffff" />
+            android:visibility="gone"/>
+            <!--android:backgroundTint="#ffffffff" -->
+
         <TextView
             android:id="@+id/toolbar_title"
             android:layout_width="180dp"

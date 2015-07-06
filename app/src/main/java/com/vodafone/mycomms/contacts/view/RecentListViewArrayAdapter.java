@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
@@ -83,22 +82,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
 
             Picasso.with(mContext)
                     .load(avatarFile) // thumbnail url goes here
-                    .placeholder(R.drawable.ic_circle_contact_photo)
                     .fit().centerCrop()
-                    .into(viewHolder.imageAvatar, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Picasso.with(mContext)
-                                    .load(finalAvatarFile) // image url goes here
-                                    .fit().centerCrop()
-                                    .placeholder(viewHolder.imageAvatar.getDrawable())
-                                    .into(viewHolder.imageAvatar);
-                        }
-
-                        @Override
-                        public void onError() {
-                        }
-                    });
+                    .into(viewHolder.imageAvatar);
 
         } else{
             String initials = "";

@@ -115,8 +115,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
         chatListHolder.textViewName.setText
                 (
-                        composedChat.get(i).getChat().getContactName() + " "
-                        + composedChat.get(i).getChat().getContactSurname());
+                        getChatMemberName(composedChat.get(i).getChat().getContact_id())
+                );
 
         chatListHolder.textViewMessage.setText(composedChat.get(i).getChat().getLastMessage());
         String timeDifference = Utils.getStringChatTimeDifference(composedChat.get(i)
@@ -154,13 +154,27 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                     .into(chatListHolder.top_left_avatar);
 
         } else{
-            String initials = composedChat.get(i).getChat().getContactName().substring(0,1)
-                    + composedChat.get(i).getChat().getContactSurname().substring(0,1);
+            String initials = getChatMemberInitials(composedChat.get(i).getChat().getContact_id());
 
             chatListHolder.top_left_avatar.setImageResource(R.color.grey_middle);
             chatListHolder.top_left_avatar_text.setText(initials);
         }
     }
+
+    private String getChatMemberName(String contactId)
+    {
+        Contact contact = mContactTransactions.getContactById(contactId);
+        String name = contact.getFirstName() + " " + contact.getLastName();
+        return  name;
+    }
+
+    private String getChatMemberInitials(String contactId)
+    {
+        Contact contact = mContactTransactions.getContactById(contactId);
+        String name = contact.getFirstName().substring(0,1) + " " + contact.getLastName().substring(0,1);
+        return  name;
+    }
+
 
     private void loadGroupChat(final ChatListHolder chatListHolder, final int i)
     {

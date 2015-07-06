@@ -693,7 +693,6 @@ public class GroupChatActivity extends ToolbarActivity implements
                 if (cs != null && cs.length() > 0) checkXMPPConnection();
                 else setSendEnabled(false);
 
-                XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
             }
 
             @Override

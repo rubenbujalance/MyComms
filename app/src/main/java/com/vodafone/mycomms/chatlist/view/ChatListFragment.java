@@ -6,13 +6,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
@@ -32,9 +32,9 @@ import io.realm.Realm;
 import model.Chat;
 import model.GroupChat;
 
-public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
+public class ChatListFragment extends Fragment{
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private LinearLayout mSwipeRefreshLayout;
     protected Handler handler = new Handler();
 
     private RecyclerView mRecyclerView;
@@ -52,8 +52,8 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_fragment_chat_list, container, false);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.layout_fragment_chat_list, container, false);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout = (LinearLayout) inflater.inflate(R.layout.layout_fragment_chat_list, container,
+                false);
         mRecyclerView = (RecyclerView) mSwipeRefreshLayout.findViewById(R.id.recycler_view);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
@@ -104,7 +104,7 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
         ArrayList<Chat> chatList = new ArrayList<>();
         ArrayList<GroupChat> groupChats = new ArrayList<>();
         ArrayList<ComposedChat> composedChats = new ArrayList<>();
-        chatList = mChatTransactions.getAllChats();
+        chatList = mChatTransactions.getAllChatsFromExistingContacts();
         groupChats = mGroupChatTransactions.getAllGroupChats();
         for(Chat c : chatList)
         {
@@ -141,25 +141,12 @@ public class ChatListFragment extends Fragment implements SwipeRefreshLayout.OnR
     }
 
     @Override
-    public void onRefresh() {
-        handler.postDelayed(testIsGood, 5000);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         if (mRealm!=null)
             mRealm.close();
         BusProvider.getInstance().unregister(this);
     }
-
-    public Runnable testIsGood = new Runnable() {
-        @Override
-        public void run() {
-            mSwipeRefreshLayout.setRefreshing(false);
-            Log.wtf(Constants.TAG, "ChatListFragment.run: TEEEEESTINGGGG");
-        }
-    };
 
     public void refreshAdapter()
     {

@@ -25,7 +25,6 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
-import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
 import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
@@ -53,7 +52,6 @@ public class GroupChatListFragment extends ListFragment implements
 
     private Realm mRealm;
     private ListView listView;
-    private ContactController mContactController;
     private SearchController mSearchController;
     private SharedPreferences sp;
     private ArrayList<Contact> contactList;
@@ -120,7 +118,6 @@ public class GroupChatListFragment extends ListFragment implements
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
         realm = Realm.getInstance(getActivity());
-        mContactController = new ContactController(getActivity(),realm, profileId);
         mSearchController = new SearchController(getActivity(), realm, profileId);
         mGroupChatTransactions = new RealmGroupChatTransactions(realm,getActivity(),profileId);
         mContactTransactions = new RealmContactTransactions(realm,profileId);
@@ -296,7 +293,7 @@ public class GroupChatListFragment extends ListFragment implements
     {
         if(null == keyWord)
         {
-            contactList = mContactController.getAllContacts();
+            contactList = mContactTransactions.getAllContacts();
         }
         else
         {
@@ -348,7 +345,7 @@ public class GroupChatListFragment extends ListFragment implements
         mSearchBarController = new SearchBarController
                 (
                         getActivity()
-                        , mContactController
+                        , mContactTransactions
                         , contactList
                         , mSearchController
                         , adapter

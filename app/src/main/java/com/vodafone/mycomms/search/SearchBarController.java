@@ -16,11 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -39,7 +39,6 @@ public class SearchBarController implements ISearchConnectionCallback
     private Activity mActivity;
     private Button cancelButton;
     private LinearLayout layCancel;
-    private ContactController mContactController;
     private SearchController mSearchController;
     private ArrayList<Contact> contactList;
     private String apiCall;
@@ -49,6 +48,7 @@ public class SearchBarController implements ISearchConnectionCallback
     private int mIndex;
     private ListView mListView;
     private boolean isGroupChatSearch;
+    private RealmContactTransactions mContactTransactions;
 
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
@@ -57,7 +57,7 @@ public class SearchBarController implements ISearchConnectionCallback
     public SearchBarController
             (
                     Activity activity
-                    , ContactController contactController
+                    , RealmContactTransactions contactTransactions
                     , ArrayList<Contact> contactList
                     , SearchController searchController
                     , ContactListViewArrayAdapter adapter
@@ -67,7 +67,7 @@ public class SearchBarController implements ISearchConnectionCallback
             )
     {
         this.mActivity = activity;
-        this.mContactController = contactController;
+        this.mContactTransactions = contactTransactions;
         this.contactList = contactList;
         this.mSearchController = searchController;
         this.mAdapter = adapter;
@@ -253,7 +253,7 @@ public class SearchBarController implements ISearchConnectionCallback
     {
         if(null == keyWord)
         {
-            contactList = mContactController.getAllContacts();
+            contactList = mContactTransactions.getAllContacts();
         }
         else
         {

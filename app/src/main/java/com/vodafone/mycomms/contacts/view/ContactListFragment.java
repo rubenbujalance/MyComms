@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -40,7 +40,6 @@ import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
-import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -65,24 +64,19 @@ import model.RecentContact;
 public class ContactListFragment extends ListFragment implements ISearchConnectionCallback, IContactsRefreshConnectionCallback {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private SlidingTabLayout mSlidingTabLayout;
-    private ViewPager mViewPager;
     private Realm realm;
     private ContactsController mContactsController;
     private SearchController mSearchController;
     private ArrayList<Contact> contactList;
     private ArrayList<FavouriteContact> favouriteContactList;
     private ArrayList<RecentContact> recentContactList;
-    protected Handler handler = new Handler();
 
-    private ContactListViewArrayAdapter adapter;
     private ListView listView;
     private Parcelable state;
     private TextView emptyText;
     private EditText searchView;
     private Button cancelButton;
     private LinearLayout layCancel;
-    private LinearLayout laySearchBar;
     private String apiCall;
 
     private String profileId;
@@ -91,13 +85,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private static final String ARG_PARAM2 = "param2";
 
     private int mIndex;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-
-    private ArrayList<Contact> internalContacts = new ArrayList<>();
-    private ArrayList<Contact> realmContacts = new ArrayList<>();
 
     private SharedPreferences sp;
 
@@ -133,7 +122,24 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                 }, 10000);
             }
         });
-
+        if (mIndex == Constants.CONTACTS_ALL) {
+            //This shows the keyboard and focus on searchView when called from the Dashboard search
+            //The Manifest defines that the keybord won't show every time you enter the view (windowSoftInputMode="adjustPan")
+            //So it needs a delayed handler in order to show the keyboard after the activity is created (half a second seems to be enough)
+            if (Constants.isDashboardOrigin) {
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        searchView.requestFocus();
+                        showKeyboard();
+                    }
+                }, 500);
+                Constants.isDashboardOrigin = false;
+            }
+        }
+        else{
+            hideKeyboard();
+        }
         return v;
     }
 
@@ -153,7 +159,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+//            String param2 = getArguments().getString(ARG_PARAM2);
         }
 
         sp = getActivity().getSharedPreferences(
@@ -396,7 +402,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         cancelButton = (Button) v.findViewById(R.id.btn_cancel);
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
 
-        laySearchBar = (LinearLayout) v.findViewById(R.id.lay_search_bar_container);
+        LinearLayout laySearchBar = (LinearLayout) v.findViewById(R.id.lay_search_bar_container);
 
         if(mIndex != Constants.CONTACTS_ALL)
         {
@@ -546,7 +552,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     private void reloadAdapter()
     {
-        adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
         if (contactList!=null) {
             if (listView != null)
                 state = listView.onSaveInstanceState();
@@ -664,9 +670,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     public void showKeyboard()
     {
+        Log.i(Constants.TAG, "ContactListFragment.showKeyboard: ");
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
-
     }
 
     /**
@@ -675,6 +681,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     public void hideKeyboard()
     {
+        Log.i(Constants.TAG, "ContactListFragment.hideKeyboard: ");
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
           ().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);

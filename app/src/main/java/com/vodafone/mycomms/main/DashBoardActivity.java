@@ -118,8 +118,9 @@ public class DashBoardActivity extends ToolbarActivity{
             public void onClick(View v) {
                 //Start Contacts activity
                 Constants.isSearchBarFocusRequested = true;
+                Constants.isDashboardOrigin = true;
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                //in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
 //                finish();
             }

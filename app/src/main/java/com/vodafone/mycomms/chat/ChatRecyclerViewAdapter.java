@@ -132,7 +132,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         long thirtyMinutesDiff = 30 * 60 * 1000;
 
         if(currentTimestamp - previousTimestamp > thirtyMinutesDiff ||
-            previousTimestamp == 0)
+                previousTimestamp == 0)
         {
             chatHolder.chatSentTime.setVisibility(View.VISIBLE);
             chatHolder.chatSentTime.setText(Utils.getStringChatTimeDifference(currentTimestamp));
@@ -197,7 +197,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
         //Set message as read
         if(chatList.get(i).getRead().compareTo("0")==0 &&
-            chatList.get(i).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
+                chatList.get(i).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
         {
             if(XMPPTransactions.getXmppConnection()!=null &&
                     XMPPTransactions.getXmppConnection().isConnected()) {
@@ -210,7 +210,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     }
 
     @Override
-     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
 
         if(_realm!=null)

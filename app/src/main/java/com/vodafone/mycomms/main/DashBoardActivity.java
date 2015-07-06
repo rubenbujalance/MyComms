@@ -81,6 +81,7 @@ public class DashBoardActivity extends ToolbarActivity{
         BusProvider.getInstance().post(new DashboardCreatedEvent());
     }
 
+
     private void initALL(){
         int sdk = Build.VERSION.SDK_INT;
         if (sdk < Build.VERSION_CODES.JELLY_BEAN_MR1) {

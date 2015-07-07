@@ -56,7 +56,6 @@ public class ContactsController extends BaseController {
         this.mContext = context;
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
-        internalContactSearch = new InternalContactSearch(mContext, profileId);
     }
 
     public void getContactList(String api){

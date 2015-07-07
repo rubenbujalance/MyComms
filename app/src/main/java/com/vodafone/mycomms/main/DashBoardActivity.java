@@ -96,8 +96,6 @@ public class DashBoardActivity extends ToolbarActivity{
 
         BusProvider.getInstance().post(new DashboardCreatedEvent());
 
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         if(sp==null)
         {
             Log.e(Constants.TAG, "DashBoardActivity.onCreate: error loading Shared Preferences");

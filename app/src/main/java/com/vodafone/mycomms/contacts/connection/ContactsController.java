@@ -15,7 +15,6 @@ import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.InternalContactSearch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,7 +45,6 @@ public class ContactsController extends BaseController {
     private Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
-    private InternalContactSearch internalContactSearch;
     private String apiCall;
     private String mProfileId;
     private int search = Constants.CONTACTS_ALL;
@@ -58,7 +56,6 @@ public class ContactsController extends BaseController {
         this.mContext = context;
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
-        internalContactSearch = new InternalContactSearch(mContext, profileId);
     }
 
     public void getContactList(String api){

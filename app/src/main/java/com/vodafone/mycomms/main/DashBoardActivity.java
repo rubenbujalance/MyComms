@@ -27,6 +27,7 @@ import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.connection.AsyncTaskQueue;
 import com.vodafone.mycomms.connection.ConnectionsQueue;
+import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
@@ -37,6 +38,7 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
+import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -85,10 +87,15 @@ public class DashBoardActivity extends ToolbarActivity{
         loadRecents();
         loadNews();
 
-        BusProvider.getInstance().post(new DashboardCreatedEvent());
-
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        Log.i(Constants.TAG, "DashBoardActivity.onCreate: DownloadLocalContacts");
+        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, profileId, mRealm);
+        downloadLocalContacts.execute();
+
+        BusProvider.getInstance().post(new DashboardCreatedEvent());
+
         if(sp==null)
         {
             Log.e(Constants.TAG, "DashBoardActivity.onCreate: error loading Shared Preferences");
@@ -96,26 +103,29 @@ public class DashBoardActivity extends ToolbarActivity{
         }
     }
 
+
     private void initALL(){
+        int sdk = Build.VERSION.SDK_INT;
+        if (sdk < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                public void run() {
+                    // Set Time line
+                    //                DateFormat tf = new SimpleDateFormat("HH:mm");
+                    //                String time = tf.format(Calendar.getInstance().getTime());
 
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            public void run() {
-                // Set Time line
-                DateFormat tf = new SimpleDateFormat("HH:mm");
-                String time = tf.format(Calendar.getInstance().getTime());
+                    //                TextView timeText = (TextView) findViewById(R.id.timeDashboard);
+                    //                timeText.setText(time);
 
-                TextView timeText = (TextView) findViewById(R.id.timeDashboard);
-                timeText.setText(time);
+                    // Set Date line
+                                    DateFormat df = new SimpleDateFormat("EEEE, d MMMM");
+                                    String date = df.format(Calendar.getInstance().getTime());
 
-                // Set Date line
-                DateFormat df = new SimpleDateFormat("EEEE, d MMMM");
-                String date = df.format(Calendar.getInstance().getTime());
-
-                TextView dateText = (TextView) findViewById(R.id.dateDashboard);
-                dateText.setText(date);
-            }
-        });
+                                    TextView dateText = (TextView) findViewById(R.id.dateDashboard);
+                                    dateText.setText(date);
+                }
+            });
+        }
 
         noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
         activateFooter();
@@ -130,8 +140,9 @@ public class DashBoardActivity extends ToolbarActivity{
             public void onClick(View v) {
                 //Start Contacts activity
                 Constants.isSearchBarFocusRequested = true;
+                Constants.isDashboardOrigin = true;
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                //in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
 //                finish();
             }
@@ -916,10 +927,11 @@ public class DashBoardActivity extends ToolbarActivity{
                 //Download avatar
                 if (avatar != null &&
                         avatar.length() > 0 &&
-                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())) {
+                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
+                        && platform.equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)) {
                     File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
 
-                    if(!avatarsDir.exists()) avatarsDir.mkdirs();
+                    if (!avatarsDir.exists()) avatarsDir.mkdirs();
 
                     avatarTarget = new Target() {
                         @Override
@@ -936,7 +948,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
                         @Override
                         public void onBitmapFailed(Drawable errorDrawable) {
-                            if(avatarFile.exists()) avatarFile.delete();
+                            if (avatarFile.exists()) avatarFile.delete();
                             ConnectionsQueue.removeConnection(avatarFile.toString());
                         }
 
@@ -946,6 +958,12 @@ public class DashBoardActivity extends ToolbarActivity{
                         }
                     };
                     recentAvatar.setTag(avatarTarget);
+                } else if (avatar != null &&
+                        avatar.length() > 0 &&
+                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
+                        && platform.equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
+                    AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), recentAvatar, avatarText, contactId);
+                    avatarSFController.getSFAvatar(avatar);
                 }
             }
 
@@ -1042,6 +1060,21 @@ public class DashBoardActivity extends ToolbarActivity{
                     Picasso.with(DashBoardActivity.this)
                             .load(avatar)
                             .into(avatarTarget);
+                }
+
+                //Local avatar
+                if (avatar != null &&
+                        avatar.length() > 0 &&
+                        platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                    Picasso.with(DashBoardActivity.this)
+                            .load(avatar)
+                            .fit().centerCrop()
+                            .into(recentAvatar);
+                } else if  (platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL) &&
+                        avatar == null ||
+                        avatar.length() < 0) {
+                    recentAvatar.setImageResource(R.color.grey_middle);
+                    avatarText.setText(nameInitials);
                 }
 
                 // Recent action icon and bagdes

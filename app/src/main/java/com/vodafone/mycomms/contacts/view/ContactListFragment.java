@@ -6,14 +6,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -34,6 +40,7 @@ import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -55,6 +62,8 @@ import model.RecentContact;
 public class ContactListFragment extends ListFragment implements ISearchConnectionCallback, IContactsRefreshConnectionCallback {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private SlidingTabLayout mSlidingTabLayout;
+    private ViewPager mViewPager;
     private Realm realm;
     private SearchController mSearchController;
     private SearchBarController mSearchBarController;
@@ -64,9 +73,13 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     protected Handler handler = new Handler();
     private RealmContactTransactions mContactTransactions;
     private ContactListViewArrayAdapter adapter;
+
     private ListView listView;
     private Parcelable state;
     private TextView emptyText;
+    private EditText searchView;
+    private Button cancelButton;
+    private LinearLayout layCancel;
     private String apiCall;
 
     private String profileId;
@@ -79,8 +92,14 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private OnFragmentInteractionListener mListener;
 
+
+    private ArrayList<Contact> internalContacts = new ArrayList<>();
+    private ArrayList<Contact> realmContacts = new ArrayList<>();
+
     private SharedPreferences sp;
 
+    private final int drLeft = android.R.drawable.ic_menu_search;
+    private final int drRight = R.drawable.ic_action_remove;
 
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
@@ -96,6 +115,10 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
         listView = (ListView) v.findViewById(android.R.id.list);
         emptyText = (TextView) v.findViewById(android.R.id.empty);
+        searchView = (EditText) v.findViewById(R.id.et_search);
+        cancelButton = (Button) v.findViewById(R.id.btn_cancel);
+        layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
+
 
         loadSearchBarEventsAndControllers(v);
 
@@ -113,6 +136,24 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                 }, 10000);
             }
         });
+        if (mIndex == Constants.CONTACTS_ALL) {
+            //This shows the keyboard and focus on searchView when called from the Dashboard search
+            //The Manifest defines that the keybord won't show every time you enter the view (windowSoftInputMode="adjustPan")
+            //So it needs a delayed handler in order to show the keyboard after the activity is created (half a second seems to be enough)
+            if (Constants.isDashboardOrigin) {
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        searchView.requestFocus();
+                        showKeyboard();
+                    }
+                }, 500);
+                Constants.isDashboardOrigin = false;
+            }
+        }
+        else{
+            hideKeyboard();
+        }
 
 
 
@@ -388,6 +429,40 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         BusProvider.getInstance().unregister(this);
     }
 
+    /**
+     * Initiate each component what belong to Search View
+     * @author str_oan
+     */
+    private void initiateComponentsForSearchView(View v)
+    {
+        searchView = (EditText) v.findViewById(R.id.et_search);
+        cancelButton = (Button) v.findViewById(R.id.btn_cancel);
+        layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
+
+        LinearLayout laySearchBar = (LinearLayout) v.findViewById(R.id.lay_search_bar_container);
+
+        if(mIndex != Constants.CONTACTS_ALL)
+        {
+            laySearchBar.setVisibility(View.GONE);
+            hideSearchBarContent();
+        }
+
+        layCancel.setVisibility(View.GONE);
+
+        if(mIndex == Constants.CONTACTS_ALL && Constants.isSearchBarFocusRequested)
+        {
+            showKeyboard();
+            //Constants.isSearchBarFocusRequested = false;
+        }
+    }
+
+    public void hideSearchBarContent()
+    {
+        layCancel.setVisibility(View.GONE);
+        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
+        searchView.setText("");
+    }
+
     public void setListAdapterTabs()
     {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
@@ -426,7 +501,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     private void reloadAdapter()
     {
-        adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
         if (contactList!=null) {
             if (listView != null)
                 state = listView.onSaveInstanceState();
@@ -490,17 +565,42 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         reloadAdapter();
     }
 
-
-    private void showProgressDialog()
-    {
+    private void showProgressDialog() {
         mSwipeRefreshLayout.setProgressViewOffset(false, 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         mSwipeRefreshLayout.setRefreshing(true);
     }
 
+    /**
+     * Force to show keyboard in current View
+     * @author str_oan
+     */
+    public void showKeyboard()
+    {
+        Log.i(Constants.TAG, "ContactListFragment.showKeyboard: ");
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    /**
+     * Force to hide keyboard in current activity
+     * @author str_oan
+     */
+    public void hideKeyboard()
+    {
+        Log.i(Constants.TAG, "ContactListFragment.hideKeyboard: ");
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
+                ().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+    }
+
     private void hideProgressDialog()
     {
         if(mSwipeRefreshLayout.isRefreshing())mSwipeRefreshLayout.setRefreshing(false);
+        Log.i(Constants.TAG, "ContactListFragment.hideKeyboard: ");
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
+          ().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
     }
 
     private boolean isProgressDialogNeeded()

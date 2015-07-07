@@ -152,6 +152,7 @@ public class Constants {
     public static final String CHAT_MESSAGE_FIELD_ID = "id";
     public static final String CHAT_MESSAGE_FIELD_PROFILE_ID = "profile_id";
     public static final String CHAT_MESSAGE_FIELD_CONTACT_ID = "contact_id";
+    public static final String CHAT_MESSAGE_FIELD_GROUP_ID = "group_id";
     public static final String CHAT_MESSAGE_FIELD_TIMESTAMP = "timestamp";
     public static final String CHAT_MESSAGE_FIELD_DIRECTION = "direction";
     public static final String CHAT_MESSAGE_FIELD_TYPE = "type";
@@ -188,6 +189,7 @@ public class Constants {
     public static final String XMPP_MESSAGE_MEDIATYPE_TEXT = "text";
     public static final String XMPP_MESSAGE_MEDIATYPE_IMAGE = "image";
     public static final String XMPP_STANZA_TYPE_CHAT = "chat";
+    public static final String XMPP_STANZA_TYPE_GROUPCHAT = "groupchat";
     public static final String XMPP_ELEMENT_IQ = "iq";
     public static final String XMPP_ELEMENT_MESSAGE = "message";
     public static final String XMPP_ELEMENT_BODY = "body";
@@ -214,13 +216,14 @@ public class Constants {
     public static final String FIRST_TIME_AVATAR_DELIVERY = "first_time_avatar_delivery";
 
     public static final String GROUP_CHAT_PREVIOUS_ACTIVITY = "previous_activity";
-    public static final String GROUP_CHAT_GROUP_CHAT_LIST_ACTIVITY = "GroupChatListActivity";
+    public static final String GROUP_CHAT_LIST_ACTIVITY = "GroupChatListActivity";
     public static final String CHAT_LIST_ACTIVITY = "ChatListActivity";
     public static final String GROUP_CHAT_MEMBERS = "group_chat_members";
     public static final String GROUP_CHAT_NAME = "group_chat_name";
     public static final String GROUP_CHAT_ABOUT = "group_chat_about";
     public static final String GROUP_CHAT_AVATAR = "group_chat_avatar";
     public static final String GROUP_CHAT_ID = "group_chat_id";
+    public static final String IS_GROUP_CHAT = "is_group_chat";
 
     public static final String GROUP_CHAT_API = "/api/me/group";
     public static final String GROUP_CHAT_API_SET_MEMBERS = "/api/group";

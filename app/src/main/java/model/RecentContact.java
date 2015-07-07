@@ -48,11 +48,19 @@ public class RecentContact extends RealmObject {
     private long longField8;
     private long longField9;
 
+    private boolean isGroupChatObject;
+
     public RecentContact(){
 
     }
 
-    public RecentContact(String uniqueId, String profileId, String contactId, int lastInteraction, String platform, String firstName, String lastName, String avatar, String phones, String emails, String position, String company, String timezone, long lastSeen, String officeLocation, String availability, String presence, String country, String action, int timestamp) {
+    public RecentContact(String uniqueId, String profileId, String contactId, int
+            lastInteraction, String platform, String firstName, String lastName, String avatar,
+                         String phones, String emails, String position, String company, String
+                                 timezone, long lastSeen, String officeLocation, String
+                                 availability, String presence, String country, String action,
+                         int timestamp)
+    {
         this.uniqueId = uniqueId;
         this.profileId = profileId;
         this.contactId = contactId;
@@ -73,6 +81,7 @@ public class RecentContact extends RealmObject {
         this.country = country;
         this.action = action;
         this.timestamp = timestamp;
+        this.isGroupChatObject = false;
     }
 
     public String getUniqueId() {
@@ -385,5 +394,13 @@ public class RecentContact extends RealmObject {
 
     public void setLongField9(long longField9) {
         this.longField9 = longField9;
+    }
+
+    public boolean isGroupChatObject() {
+        return isGroupChatObject;
+    }
+
+    public void setIsGroupChatObject(boolean isGroupChatObject) {
+        this.isGroupChatObject = isGroupChatObject;
     }
 }

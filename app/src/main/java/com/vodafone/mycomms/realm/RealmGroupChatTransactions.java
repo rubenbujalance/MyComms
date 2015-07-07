@@ -34,6 +34,7 @@ public class RealmGroupChatTransactions {
                     String id
                     , String profile_id
                     , ArrayList<String> membersIds
+                    , ArrayList<String> ownersIds
                     , String name
                     , String about
                     , String avatar
@@ -50,6 +51,7 @@ public class RealmGroupChatTransactions {
                         , avatar
                         , about
                         , generateComposedMembersId(membersIds)
+                        , generateComposedMembersId(ownersIds)
                         , timestamp
                 );
 

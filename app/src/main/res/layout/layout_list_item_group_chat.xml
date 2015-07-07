@@ -5,7 +5,6 @@
              android:layout_height="match_parent"
              android:background="?android:attr/activatedBackgroundIndicator"
              android:id="@+id/chat_list_item_container"
-
     >
 
     <RelativeLayout

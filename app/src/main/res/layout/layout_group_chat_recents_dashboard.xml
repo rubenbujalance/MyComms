@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/recents"
+              android:orientation="horizontal"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:background="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="106dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/recent_content"
+        android:layout_gravity="center"
+        android:gravity="center">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <include
+                android:id="@+id/app_bar"
+                layout="@layout/layout_multi_chat_avatar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignLeft="@+id/recent_firstname"
+                android:layout_alignStart="@+id/recent_firstname"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:id="@+id/unread_messages"
+                android:textColor="#ffffffff"
+                android:padding="5dp"
+                android:layout_gravity="right|top"
+                android:layout_marginRight="6dp"
+                android:layout_marginEnd="6dp"
+                android:background="@mipmap/blue"
+                android:autoText="false"
+                android:visibility="gone"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_alignTop="@+id/app_bar"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/type_recent"
+                android:layout_alignTop="@+id/app_bar"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:visibility="gone"
+                android:background="@mipmap/icon_notification_chat_grey"
+                android:longClickable="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Andrew"
+                android:id="@+id/recent_firstname"
+                android:textColor="#ffffffff"
+                android:layout_below="@+id/app_bar"
+                android:layout_centerHorizontal="true"
+                android:shadowColor="#000000"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="15" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout >

@@ -1,9 +1,7 @@
 package com.vodafone.mycomms.contacts.connection;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
@@ -54,29 +52,13 @@ public class ContactsController extends BaseController {
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
 
-    public ContactsController(Activity activity, Realm realm, String profileId) {
-        super(activity);
-        this.mRealm = realm;
-        this.mContext = activity;
-        this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
-        internalContactSearch = new InternalContactSearch(activity, profileId);
-    }
-
-    public ContactsController(Fragment fragment, Realm realm, String profileId) {
-        super(fragment);
-        this.mRealm = realm;
-        this.mContext = fragment.getActivity();
-        this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
-    }
-
     public ContactsController(Context context, Realm realm, String profileId) {
         super(context);
         this.mRealm = realm;
         this.mContext = context;
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        internalContactSearch = new InternalContactSearch(mContext, profileId);
     }
 
     public void getContactList(String api){
@@ -105,7 +87,7 @@ public class ContactsController extends BaseController {
             contactConnection.cancel();
         }
         apiCall = api;
-        contactConnection = new ContactConnection(getContext(), this, apiCall);
+        contactConnection = new ContactConnection(mContext, this, apiCall);
         contactConnection.request();
     }
 
@@ -478,6 +460,7 @@ public class ContactsController extends BaseController {
     @Override
     public void onConnectionError(ConnectionException e) {
         super.onConnectionError(e);
+        Log.e(Constants.TAG, "ContactsController.onConnectionError",e.getException());
         BusProvider.getInstance().post(new SetNoConnectionLayoutVisibility());
     }
 

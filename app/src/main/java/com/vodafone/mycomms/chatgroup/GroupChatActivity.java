@@ -130,6 +130,10 @@ public class GroupChatActivity extends ToolbarActivity implements
         loadContactsFromIds();
         loadTheRestOfTheComponents();
 
+        String action = Constants.CONTACTS_ACTION_SMS;
+        String id = groupChat.getId();
+        mRecentContactController.insertRecentOKHttp(id, action);
+
     }
 
     public void setGroupChatAvatar()

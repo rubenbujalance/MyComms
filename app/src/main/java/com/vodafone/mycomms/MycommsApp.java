@@ -74,7 +74,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //Network listener
         networkEvents = new NetworkEvents(this, BusProvider.getInstance());
-        networkEvents.register();
+
+        try {
+            networkEvents.register();
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "MycommsApp.onCreate: ",ex);
+        }
 
         //Shared Preferences
         sp = getSharedPreferences(

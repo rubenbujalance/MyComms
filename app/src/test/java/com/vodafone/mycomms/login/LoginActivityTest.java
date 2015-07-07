@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 
@@ -61,22 +60,22 @@ public class LoginActivityTest {
         ivBack = (ImageView) activity.findViewById(R.id.ivBack);
     }
 
-    @Test
-    public void testLoginOk() throws Exception {
-        HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
-        FakeHttp.addPendingHttpResponse(httpResponse);
-        etEmail.setText(VALID_EMAIL);
-        etPassword.setText(PASSWORD);
-        btLogin.performClick();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Robolectric.flushForegroundThreadScheduler();
-        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
-        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
-    }
+//    @Test
+//    public void testLoginOk() throws Exception {
+//        HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
+//        FakeHttp.addPendingHttpResponse(httpResponse);
+//        etEmail.setText(VALID_EMAIL);
+//        etPassword.setText(PASSWORD);
+//        btLogin.performClick();
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        Robolectric.flushForegroundThreadScheduler();
+//        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
+//        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+//    }
 
     @Test
     public void testLoginError() throws Exception {

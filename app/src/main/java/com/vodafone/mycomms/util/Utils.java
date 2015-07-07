@@ -375,7 +375,7 @@ public final class Utils extends Activity {
             pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
         } catch (PackageManager.NameNotFoundException e) {
             Log.wtf(Constants.TAG, "Utils.getHttpHeaderVersion: Couldn't get application version:", e);
-            return null;
+            return versionHeader+"0.1.0";
         }
 
         int versionCode = pinfo.versionCode;

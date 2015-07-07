@@ -7,8 +7,10 @@ import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
+import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
@@ -23,6 +25,7 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -329,6 +332,24 @@ public class ProfileController extends BaseController {
         return body;
     }
 
+    public void logoutToAPI()
+    {
+        try {
+            UserProfile userProfile = realmContactTransactions.getUserProfile(profileId);
+            String jsonEmails = userProfile.getEmails();
+            if (jsonEmails == null || jsonEmails.length() == 0) return;
+
+            JSONArray jsonArray = new JSONArray(jsonEmails);
+            String email = ((JSONObject)jsonArray.get(0)).getString("email");
+
+            new LogoutProfileAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                    Constants.PROFILE_API_LOGOUT, email);
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "ProfileController.logoutToAPI: ",e);
+        }
+    }
+
     public void getProfileCallback(String json) {
         Log.e(Constants.TAG, "ProfileController.getProfileCallback: " + json);
 
@@ -393,5 +414,48 @@ public class ProfileController extends BaseController {
         protected void onPostExecute(String json) {
             getProfileCallback(json);
         }
+    }
+
+    public class LogoutProfileAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            Log.e(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: START");
+
+            Response response;
+            String jsonResp = null;
+
+            try {
+                String json = "{\"userId\":\""+params[1]+"\"}";
+                OkHttpClient client = new OkHttpClient();
+                RequestBody body = RequestBody.create(
+                        MediaType.parse(Utils.getHttpHeaderContentType()), json);
+                Request request = new Request.Builder()
+                        .url("https://" + EndpointWrapper.getBaseURL() +
+                                params[0])
+                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                Utils.getHttpHeaderVersion(getContext()))
+                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                Utils.getHttpHeaderContentType())
+                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                Utils.getHttpHeaderAuth(getContext()))
+                        .post(body)
+                        .build();
+
+                response = client.newCall(request).execute();
+                jsonResp = response.body().string();
+
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: ",e);
+            }
+
+            Log.e(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: END");
+
+            return jsonResp;
+        }
+
+//        @Override
+//        protected void onPostExecute(String json) {
+//            getProfileCallback(json);
+//        }
     }
 }

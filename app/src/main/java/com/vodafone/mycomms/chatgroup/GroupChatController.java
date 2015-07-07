@@ -40,6 +40,7 @@ public class GroupChatController
     private String chatAvatar;
     private String chatAbout;
     private String chatCreator;
+    private ArrayList<String> chatOwners;
     private ArrayList<String> chatMembers;
     private String LOG_TAG = GroupChatController.class.getSimpleName();
     private String jsonRequest;
@@ -72,7 +73,7 @@ public class GroupChatController
                 jsonRequest = jsonRequest + "\"members\":[";
                 for(String member : this.chatMembers)
                 {
-                    if(member.equals(this.chatCreator))
+                    if(this.chatOwners.contains(member))
                         jsonRequest = jsonRequest + "{\"id\":\""+member+"\",\"owner\": true},";
                     else
                         jsonRequest = jsonRequest + "{\"id\":\""+member+"\"},";
@@ -107,7 +108,10 @@ public class GroupChatController
                 jsonRequest = jsonRequest + "\"members\":[";
                 for(String member : this.chatMembers)
                 {
-                    jsonRequest = jsonRequest + "{\"id\":\""+member+"\"},";
+                    if(this.chatOwners.contains(member))
+                        jsonRequest = jsonRequest + "{\"id\":\""+member+"\",\"owner\": true},";
+                    else
+                        jsonRequest = jsonRequest + "{\"id\":\""+member+"\"},";
                 }
                 jsonRequest = jsonRequest.substring(0,jsonRequest.length()-1);
                 jsonRequest = jsonRequest + "]}";
@@ -148,12 +152,12 @@ public class GroupChatController
         {
             client = new OkHttpClient();
             requestBody = RequestBody.create(JSON, this.jsonRequest);
-            URL_UPDATE_GROUP_CHAT = URL_UPDATE_GROUP_CHAT + "/" + groupChatId + "/";
+            URL_UPDATE_GROUP_CHAT = URL_UPDATE_GROUP_CHAT + "/" + groupChatId + "/members";
             request = new Request.Builder()
                     .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
                     .addHeader(version_token, getVersionName())
                     .url(URL_UPDATE_GROUP_CHAT)
-                    .post(this.requestBody)
+                    .put(this.requestBody)
                     .build();
         }
         catch (Exception e)
@@ -223,6 +227,14 @@ public class GroupChatController
 
     public void setChatMembers(ArrayList<String> chatMembers) {
         this.chatMembers = chatMembers;
+    }
+
+    public ArrayList<String> getChatOwners() {
+        return chatOwners;
+    }
+
+    public void setChatOwners(ArrayList<String> chatOwners) {
+        this.chatOwners = chatOwners;
     }
 
     public String responseToString()

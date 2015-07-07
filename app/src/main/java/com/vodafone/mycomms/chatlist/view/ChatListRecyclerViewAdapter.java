@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -112,7 +113,6 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                                 )
                 );
 
-
         chatListHolder.textViewName.setText
                 (
                         getChatMemberName(composedChat.get(i).getChat().getContact_id())
@@ -156,7 +156,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         } else{
             String initials = getChatMemberInitials(composedChat.get(i).getChat().getContact_id());
 
+
             chatListHolder.top_left_avatar.setImageResource(R.color.grey_middle);
+            chatListHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
             chatListHolder.top_left_avatar_text.setText(initials);
         }
     }
@@ -171,7 +173,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     private String getChatMemberInitials(String contactId)
     {
         Contact contact = mContactTransactions.getContactById(contactId);
-        String name = contact.getFirstName().substring(0,1) + " " + contact.getLastName().substring(0,1);
+        String name = contact.getFirstName().substring(0,1) + contact.getLastName().substring(0,1);
         return  name;
     }
 
@@ -198,6 +200,14 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         if(membersArray.length > 3)
         {
             chatListHolder.lay_top_right_image_hide.setVisibility(View.VISIBLE);
+            chatListHolder.lay_top_right_image_hide.setLayoutParams
+                (
+                        new LinearLayout.LayoutParams
+                                (
+                                        LinearLayout.LayoutParams.MATCH_PARENT
+                                        , LinearLayout.LayoutParams.MATCH_PARENT
+                                )
+                );
             images.add(chatListHolder.top_right_avatar);
             texts.add(chatListHolder.top_right_avatar_text);
         }

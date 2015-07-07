@@ -1,27 +1,14 @@
 package com.vodafone.mycomms.chatgroup;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,29 +18,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatRecyclerViewAdapter;
 import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
-import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
-import com.vodafone.mycomms.xmpp.XMPPTransactions;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 
 import io.realm.Realm;
 import model.ChatMessage;
@@ -64,7 +44,8 @@ import model.GroupChat;
  * Created by str_oan on 29/06/2015.
  */
 public class GroupChatActivity extends ToolbarActivity implements
-        IRecentContactConnectionCallback, Serializable {
+        IRecentContactConnectionCallback, Serializable
+{
 
     private String LOG_TAG = GroupChatActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
@@ -78,13 +59,6 @@ public class GroupChatActivity extends ToolbarActivity implements
     private model.UserProfile _profile;
     private String _profile_id;
 
-    private String photoPath = null;
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int REQUEST_IMAGE_GALLERY = 2;
-    private Bitmap photoBitmap = null;
-    private File multiPartFile;
-    private FilePushToServerController filePushToServerController;
-
     private Realm mRealm;
     private RealmChatTransactions chatTransactions;
     private RealmContactTransactions contactTransactions;
@@ -93,18 +67,16 @@ public class GroupChatActivity extends ToolbarActivity implements
     private ArrayList<String> contactIds;
     private ArrayList<Contact> contactList;
     private String composedContactId = null;
-    private GroupChatController mGroupChatController;
     private RealmGroupChatTransactions mGroupChatTransactions;
-    private String groupChatAbout = null;
-    private String groupChatAvatar = null;
-    private String groupChatName = null;
     private GroupChat groupChat;
     private SharedPreferences sp;
+    private String previousActivity;
+    private boolean isGroupChatMode;
 
 
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
-    private LinearLayout lay_to_hide;
+    private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -150,7 +122,6 @@ public class GroupChatActivity extends ToolbarActivity implements
         _profile = contactTransactions.getUserProfile(_profile_id);
         this.mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         this.mRecentContactController = new RecentContactController(this,mRealm,_profile_id);
-        this.mGroupChatController = new GroupChatController(GroupChatActivity.this);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -165,59 +136,108 @@ public class GroupChatActivity extends ToolbarActivity implements
 
     public void setGroupChatAvatar()
     {
-        if(null == this.groupChatAvatar)
+        if(this.isGroupChatMode)
         {
-            ArrayList<ImageView> images = new ArrayList<>();
-            images.add(top_left_avatar);
-            images.add(bottom_left_avatar);
-            images.add(bottom_right_avatar);
-
-            ArrayList<TextView> texts = new ArrayList<>();
-            texts.add(top_left_avatar_text);
-            texts.add(bottom_left_avatar_text);
-            texts.add(bottom_right_avatar_text);
-
-            if(null != contactIds && contactIds.size() > 3)
+            if(null == this.groupChat.getAvatar() || this.groupChat.getAvatar().length() == 0)
             {
-                lay_to_hide.setVisibility(View.VISIBLE);
-                images.add(top_right_avatar);
-                texts.add(top_right_avatar_text);
-            }
+                ArrayList<ImageView> images = new ArrayList<>();
+                images.add(top_left_avatar);
+                images.add(bottom_left_avatar);
+                images.add(bottom_right_avatar);
 
-            int i = 0;
-            for(Contact contact : contactList)
-            {
-                if(i>3) break;
+                ArrayList<TextView> texts = new ArrayList<>();
+                texts.add(top_left_avatar_text);
+                texts.add(bottom_left_avatar_text);
+                texts.add(bottom_right_avatar_text);
 
-                File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                        "avatar_"+contact.getContactId()+".jpg");
-
-                if (contact.getAvatar()!=null &&
-                        contact.getAvatar().length()>0 &&
-                        contact.getAvatar().compareTo("")!=0 &&
-                        avatarFile.exists())
+                if (null != contactIds && contactIds.size() > 3)
                 {
-
-                    Picasso.with(this)
-                            .load(avatarFile)
-                            .fit().centerCrop()
-                            .into(images.get(i));
-
-                } else{
-                    String initials = "";
-                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-                    {
-                        initials = contact.getFirstName().substring(0,1);
-
-                        if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                        {
-                            initials = initials + contact.getLastName().substring(0,1);
-                        }
-                    }
-                    images.get(i).setImageResource(R.color.grey_middle);
-                    texts.get(i).setText(initials);
+                    lay_right_top_avatar_to_hide.setVisibility(View.VISIBLE);
+                    images.add(top_right_avatar);
+                    texts.add(top_right_avatar_text);
                 }
-                i++;
+
+                int i = 0;
+                for(Contact contact : contactList)
+                {
+                    if(i>3) break;
+
+                    File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                            "avatar_"+contact.getContactId()+".jpg");
+
+                    if (contact.getAvatar()!=null &&
+                            contact.getAvatar().length()>0 &&
+                            contact.getAvatar().compareTo("")!=0 &&
+                            avatarFile.exists())
+                    {
+
+                        Picasso.with(this)
+                                .load(avatarFile)
+                                .fit().centerCrop()
+                                .into(images.get(i));
+
+                    } else{
+                        String initials = "";
+                        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+                        {
+                            initials = contact.getFirstName().substring(0,1);
+
+                            if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                            {
+                                initials = initials + contact.getLastName().substring(0,1);
+                            }
+                        }
+                        images.get(i).setImageResource(R.color.grey_middle);
+                        texts.get(i).setText(initials);
+                    }
+                    i++;
+                }
+            }
+        }
+        else
+        {
+            lay_right_top_avatar_to_hide.setVisibility(View.GONE);
+            lay_bottom_to_hide.setVisibility(View.GONE);
+            imgModifyGroupChat.setVisibility(View.GONE);
+            lay_top_left_avatar.setLayoutParams
+                (
+                        new LinearLayout.LayoutParams
+                                (
+                                        LinearLayout.LayoutParams.MATCH_PARENT
+                                        , LinearLayout.LayoutParams.MATCH_PARENT
+                                )
+                );
+
+            Contact contact = contactList.get(0);
+            File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                    "avatar_"+contact.getContactId()+".jpg");
+
+            if (contact.getAvatar()!=null &&
+                    contact.getAvatar().length()>0 &&
+                    contact.getAvatar().compareTo("")!=0 &&
+                    avatarFile.exists())
+            {
+
+                Picasso.with(this)
+                        .load(avatarFile)
+                        .fit().centerCrop()
+                        .into(top_left_avatar);
+            }
+            else
+            {
+                String initials = "";
+                if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+                {
+                    initials = contact.getFirstName().substring(0,1);
+
+                    if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                    {
+                        initials = initials + contact.getLastName().substring(0,1);
+                    }
+                }
+                top_left_avatar.setImageResource(R.color.grey_middle);
+                top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+                top_left_avatar_text.setText(initials);
             }
         }
     }
@@ -228,171 +248,59 @@ public class GroupChatActivity extends ToolbarActivity implements
         in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, LOG_TAG);
         in.putExtra(Constants.GROUP_CHAT_ID, groupChat.getId());
         startActivity(in);
+
+        this.finish();
     }
 
     private void loadExtras()
     {
         Intent in = getIntent();
-        this.groupChatName = in.getStringExtra(Constants.GROUP_CHAT_NAME);
-        if(null != this.groupChatName && this.groupChatName.length() == 0)
-            this.groupChatName = null;
 
-        this.groupChatAbout = in.getStringExtra(Constants.GROUP_CHAT_ABOUT);
-        if(null != this.groupChatAbout && this.groupChatAbout.length() == 0)
-            this.groupChatAbout = null;
-
-        this.groupChatAvatar = in.getStringExtra(Constants.GROUP_CHAT_AVATAR);
-        if(null != this.groupChatAvatar && this.groupChatAvatar.length() == 0)
-            this.groupChatAvatar = null;
-
-        this.groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants.GROUP_CHAT_ID));
-        this.composedContactId = in.getStringExtra(Constants.GROUP_CHAT_MEMBERS);
-        loadContactIds();
-
+        this.previousActivity = in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY);
+        this.isGroupChatMode = in.getBooleanExtra(Constants.IS_GROUP_CHAT, false);
+        if(isGroupChatMode)
+        {
+            this.groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants.GROUP_CHAT_ID));
+            loadContactIds();
+        }
+        else
+        {
+            this.contactIds = new ArrayList<>();
+            this.contactIds.add(in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID));
+        }
     }
 
     private void loadContactIds()
     {
-        String[] ids = composedContactId.split("@");
+        String[] ids = groupChat.getMembers().split("@");
         contactIds = new ArrayList<>();
-        for(String id : ids)
-        {
-            contactIds.add(id);
-        }
+        Collections.addAll(contactIds, ids);
     }
 
     private void loadContactsFromIds()
     {
         contactList = new ArrayList<>();
-        Contact contact = new Contact();
-        contact.setAvatar(_profile.getAvatar());
-        contact.setFirstName(_profile.getFirstName());
-        contact.setLastName(_profile.getLastName());
-        contact.setContactId(_profile.getId());
-        contactList.add(contact);
-        //Contact and profile
-        for(String id : contactIds)
+        if(isGroupChatMode)
         {
-            if(!id.equals(_profile_id))
+            Contact contact = new Contact();
+            contact.setAvatar(_profile.getAvatar());
+            contact.setFirstName(_profile.getFirstName());
+            contact.setLastName(_profile.getLastName());
+            contact.setContactId(_profile.getId());
+            contactList.add(contact);
+            for(String id : contactIds)
             {
-                contact = contactTransactions.getContactById(id);
-                contactList.add(contact);
+                if(!id.equals(_profile_id))
+                {
+                    contact = contactTransactions.getContactById(id);
+                    contactList.add(contact);
+                }
             }
         }
-    }
-
-    /*private void sendText()
-    {
-        String msg = etChatTextBox.getText().toString();
-        ChatMessage chatMsg = chatTransactions.newChatMessageInstance
-                (
-                        composedContactId
-                        , Constants.CHAT_MESSAGE_DIRECTION_SENT
-                        , Constants.CHAT_MESSAGE_TYPE_TEXT
-                        , msg
-                        , ""
-                        , composedContactId
-                );
-
-        groupChat = chatTransactions.updatedGroupChatInstance(chatMsg, composedContactId);
-
-        chatTransactions.insertChat(groupChat);
-        chatTransactions.insertGroupChatMessage(chatMsg, composedContactId);
-        for(String id : contactIds)
-        {
-            //Send through XMPP
-            if (!XMPPTransactions.sendText(id, Constants.XMPP_STANZA_TYPE_CHAT,
-                    chatMsg.getId(), msg))
-                return;
-
-            //Insert in recents
-            String action = Constants.CONTACTS_ACTION_SMS;
-            mRecentContactController.insertRecent(id, action);
-            mRecentContactController.setConnectionCallback(this);
-        }
-
-        _chatList.add(chatMsg);
-        if(_chatList.size()>50) _chatList.remove(0);
-        refreshAdapter();
-        etChatTextBox.setText("");
-    }*/
-
-    /*private void imageSent(String imageUrl)
-    {
-        ChatMessage chatMsg = chatTransactions.newChatMessageInstance
-                (
-                        composedContactId
-                        , Constants.CHAT_MESSAGE_DIRECTION_SENT
-                        , Constants.CHAT_MESSAGE_TYPE_IMAGE
-                        , ""
-                        , imageUrl
-                        , composedContactId
-                );
-
-            groupChat = chatTransactions.updatedGroupChatInstance(chatMsg, composedContactId);
-
-            chatTransactions.insertChat(groupChat);
-            chatTransactions.insertChatMessage(chatMsg);
-
-        for(String id : contactIds)
-        {
-            //Send through XMPP
-            if (!XMPPTransactions.sendImage(id, Constants.XMPP_STANZA_TYPE_CHAT,
-                    chatMsg.getId(), imageUrl))
-                return;
-
-            //Download to file
-            new DownloadFile().execute(imageUrl, chatMsg.getId());
-
-            //Insert in recents
-            String action = Constants.CONTACTS_ACTION_SMS;
-            mRecentContactController.insertRecent(id, action);
-            mRecentContactController.setConnectionCallback(this);
-        }
-
-        //Notify app to refresh any view if necessary
-        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
-            BusProvider.getInstance().post(new MessageSentEvent());
-        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
-            //Recent List is refreshed onConnectionComplete
-        }
-
-        _chatList.add(chatMsg);
-        if(_chatList.size()>50) _chatList.remove(0);
-        refreshAdapter();
-    }*/
-
-    private void loadMessagesArray()
-    {
-        _chatList = chatTransactions.getAllChatMessages(composedContactId);
-        refreshAdapter();
-    }
-
-    private void refreshAdapter()
-    {
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
-                _profile, contactList.get(0));
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
-    }
-
-    private void checkXMPPConnection()
-    {
-        if(XMPPTransactions.getXmppConnection()!=null &&
-                XMPPTransactions.getXmppConnection().isConnected())
-            setSendEnabled(true);
         else
-            setSendEnabled(false);
-    }
-
-    private void setSendEnabled(boolean enable)
-    {
-        if(!enable) {
-            tvSendChat.setEnabled(false);
-            tvSendChat.setTextColor(Color.GRAY);
-        }
-        else {
-            tvSendChat.setEnabled(true);
-            tvSendChat.setTextColor(Color.parseColor("#02B1FF"));
+        {
+            Contact contact = contactTransactions.getContactById(contactIds.get(0));
+            contactList.add(contact);
         }
     }
 
@@ -434,221 +342,17 @@ public class GroupChatActivity extends ToolbarActivity implements
         tvSendChat.setTextColor(Color.GRAY);
     }
 
-    @Subscribe
-    public void onEventChatsReceived(ChatsReceivedEvent event){
-        ChatMessage chatMsg = event.getMessage();
-        if(chatMsg!=null)
-        {
-            _chatList.add(chatMsg);
-            mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-            mRecentContactController.setConnectionCallback(this);
-            if(_chatList.size()>50) _chatList.remove(0);
-            refreshAdapter();
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
-        {
-            photoBitmap = decodeFile(photoPath);
-            new sendFile().execute();
-        }
-
-        else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
-        {
-            Uri selectedImage = data.getData();
-            photoPath = getRealPathFromURI(selectedImage);
-            photoBitmap = decodeFile(photoPath);
-
-            new sendFile().execute();
-        }
-    }
-
-    private void dispatchTakePictureIntent(String title, String subtitle)
-    {
-
-        //Build the alert dialog to let the user choose the origin of the picture
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(GroupChatActivity.this);
-        builder.setTitle(title);
-
-        if(subtitle != null) {
-            LayoutInflater inflater = GroupChatActivity.this.getLayoutInflater();
-            View view = inflater.inflate(R.layout.cv_title_subtitle, null);
-            ((TextView) view.findViewById(R.id.tvTitle)).setText(title);
-            ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
-            builder.setCustomTitle(view);
-        }
-        else
-        {
-            builder.setTitle(title);
-        }
-
-        builder.setItems(R.array.add_photo_chooser, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-
-                Intent in;
-
-                if(which == 0)
-                {
-                    in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    in.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
-                    startActivityForResult(in, REQUEST_IMAGE_CAPTURE);
-                }
-                else if(which == 1)
-                {
-                    in = new Intent();
-                    in.setType("image/*");
-                    in.setAction(Intent.ACTION_PICK);
-
-                    startActivityForResult(in, REQUEST_IMAGE_GALLERY);
-                }
-            }
-        });
-
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-
-        builder.create();
-        builder.show();
-    }
-
-    public Uri setImageUri()
-    {
-        // Store image in dcim
-        File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new
-                Date().getTime() + ".png");
-        Uri imgUri = Uri.fromFile(file);
-        photoPath = file.getAbsolutePath();
-        return imgUri;
-    }
-
-    public Bitmap decodeFile(String path)
-    {
-        try
-        {
-            // Decode image size
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(path, o);
-            return BitmapFactory.decodeFile(path);
-        }
-        catch (Throwable e)
-        {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String getRealPathFromURI(Uri contentURI)
-    {
-        String result;
-        Cursor cursor = GroupChatActivity.this.getContentResolver().query(contentURI, null, null, null,
-                null);
-        if (cursor == null) {
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
-    }
-
-    private class sendFile extends AsyncTask<Void, Void, String> {
-        private ProgressDialog pdia;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pdia = new ProgressDialog(GroupChatActivity.this);
-            pdia.setMessage(GroupChatActivity.this.getString(R.string.progress_dialog_uploading_file));
-            pdia.show();
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            try
-            {
-                filePushToServerController =  new FilePushToServerController(GroupChatActivity.this);
-                multiPartFile = filePushToServerController.prepareFileToSend
-                        (
-                                photoBitmap,
-                                Constants.MULTIPART_FILE,
-                                _profile_id
-                        );
-                filePushToServerController.sendImageRequest
-                        (
-                                Constants.CONTACT_API_POST_FILE,
-                                Constants.MULTIPART_FILE,
-                                multiPartFile,
-                                Constants.MEDIA_TYPE_JPG
-                        );
-
-                String response = filePushToServerController.executeRequest();
-                return response;
-            }
-            catch (Exception e)
-            {
-                Log.e(Constants.TAG, "FilePushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if(pdia.isShowing()) pdia.dismiss();
-            Log.d(Constants.TAG, "ChatMainActivity.sendFile: Response content: " +
-                    filePushToServerController.getAvatarURL(result));
-
-            if(result!=null && result.length()>0) {
-                try {
-                    JSONObject jsonImage = new JSONObject(result);
-                    //imageSent(jsonImage.getString("file"));
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "sendFile.onPostExecute: ",e);
-                }
-            }
-        }
-    }
-
-    @Subscribe
-    public void onEventXMPPConnecting(XMPPConnectingEvent event){
-        boolean isConnecting = event.isConnecting();
-
-        if(!isConnecting)
-            checkXMPPConnection();
-        else setSendEnabled(false);
-    }
-
-    private class DownloadFile extends AsyncTask<String, Void, Boolean> {
-        @Override
-        protected Boolean doInBackground(String[] params) {
-            return XMPPTransactions.downloadToChatFile(params[0],params[1]);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            refreshAdapter();
-        }
-    }
-
     private void loadTheRestOfTheComponents()
     {
         imgModifyGroupChat = (ImageView) findViewById(R.id.img_modify_group_chat);
-        if(groupChat.getCreatorId().equals(_profile_id))
-            imgModifyGroupChat.setVisibility(View.VISIBLE);
-        else
-            imgModifyGroupChat.setVisibility(View.GONE);
 
+        if(isGroupChatMode)
+        {
+            if(groupChat.getCreatorId().equals(_profile_id))
+                imgModifyGroupChat.setVisibility(View.VISIBLE);
+            else
+                imgModifyGroupChat.setVisibility(View.GONE);
+        }
 
         etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
         tvSendChat = (TextView) findViewById(R.id.chat_send);
@@ -660,8 +364,11 @@ public class GroupChatActivity extends ToolbarActivity implements
         top_right_avatar_text = (TextView) findViewById(R.id.top_right_avatar_text);
         bottom_left_avatar_text = (TextView) findViewById(R.id.bottom_left_avatar_text);
         bottom_right_avatar_text = (TextView) findViewById(R.id.bottom_right_avatar_text);
-        lay_to_hide = (LinearLayout) findViewById(R.id.lay_top_right_image_hide);
-        lay_to_hide.setVisibility(View.GONE);
+        lay_right_top_avatar_to_hide = (LinearLayout) findViewById(R.id.lay_top_right_image_hide);
+        lay_right_top_avatar_to_hide.setVisibility(View.GONE);
+        lay_bottom_to_hide = (LinearLayout) findViewById(R.id.lay_bottom_both_image_hide);
+        lay_bottom_to_hide.setVisibility(View.VISIBLE);
+        lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
 
         sendFileImage = (ImageView) findViewById(R.id.send_image);
 
@@ -683,42 +390,6 @@ public class GroupChatActivity extends ToolbarActivity implements
         //Set avatar
 
         setGroupChatAvatar();
-
-        //Sent chat in grey by default
-        setSendEnabled(false);
-
-        etChatTextBox.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                if (cs != null && cs.length() > 0) checkXMPPConnection();
-                else setSendEnabled(false);
-
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable arg0) {
-            }
-        });
-
-        tvSendChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());
-                //sendText();
-            }
-        });
-
-        sendFileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
-            }
-        });
 
         imgModifyGroupChat.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -23,8 +23,6 @@ public class GroupChat extends RealmObject
 
     public GroupChat (){}
 
-
-
     public GroupChat(String id, String profileId, String creatorId, String name, String avatar,
                      String
             about, String

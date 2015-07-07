@@ -152,6 +152,7 @@ public class Constants {
     public static final String CHAT_MESSAGE_FIELD_ID = "id";
     public static final String CHAT_MESSAGE_FIELD_PROFILE_ID = "profile_id";
     public static final String CHAT_MESSAGE_FIELD_CONTACT_ID = "contact_id";
+    public static final String CHAT_MESSAGE_FIELD_GROUP_ID = "group_id";
     public static final String CHAT_MESSAGE_FIELD_TIMESTAMP = "timestamp";
     public static final String CHAT_MESSAGE_FIELD_DIRECTION = "direction";
     public static final String CHAT_MESSAGE_FIELD_TYPE = "type";
@@ -188,6 +189,7 @@ public class Constants {
     public static final String XMPP_MESSAGE_MEDIATYPE_TEXT = "text";
     public static final String XMPP_MESSAGE_MEDIATYPE_IMAGE = "image";
     public static final String XMPP_STANZA_TYPE_CHAT = "chat";
+    public static final String XMPP_STANZA_TYPE_GROUPCHAT = "groupchat";
     public static final String XMPP_ELEMENT_IQ = "iq";
     public static final String XMPP_ELEMENT_MESSAGE = "message";
     public static final String XMPP_ELEMENT_BODY = "body";

@@ -101,7 +101,6 @@ public class GroupChatActivity extends ToolbarActivity implements
     private GroupChat groupChat;
     private SharedPreferences sp;
 
-
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
     private LinearLayout lay_to_hide;
@@ -112,7 +111,7 @@ public class GroupChatActivity extends ToolbarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat_main);
         activateToolbar();
-        setToolbarBackground(R.drawable.toolbar_header);
+//        setToolbarBackground(R.drawable.toolbar_header);
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
@@ -161,7 +160,6 @@ public class GroupChatActivity extends ToolbarActivity implements
         loadTheRestOfTheComponents();
 
     }
-
 
     public void setGroupChatAvatar()
     {

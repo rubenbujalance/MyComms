@@ -9,8 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
@@ -81,7 +81,7 @@ public class SignupPincodeActivityTest {
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
-        Intent expectedIntent = new Intent(activity, ContactListMainActivity.class);
+        Intent expectedIntent = new Intent(activity, SplashScreenActivity.class);
         expectedIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));

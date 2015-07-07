@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,10 +13,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatgroup.GroupChatListActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.main.DashBoardActivity;
@@ -50,11 +53,13 @@ public class ToolbarActivity extends ActionBarActivity {
     public Toolbar activateContactListToolbar() {
         mToolbar = (Toolbar) findViewById(R.id.app_bar);
         Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_inbox);
+        Toolbar goneToolbar2 = (Toolbar) findViewById(R.id.app_group_chat);
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
             mToolbar.setVisibility(View.VISIBLE);
             goneToolbar.setVisibility(View.GONE);
+            goneToolbar2.setVisibility(View.GONE);
         }
         return mToolbar;
     }
@@ -62,14 +67,48 @@ public class ToolbarActivity extends ActionBarActivity {
     public Toolbar activateChatListToolbar() {
         mToolbar = (Toolbar) findViewById(R.id.app_inbox);
         Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar goneToolbar2 = (Toolbar) findViewById(R.id.app_group_chat);
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
             getSupportActionBar().setDisplayShowTitleEnabled(false);
             mToolbar.setVisibility(View.VISIBLE);
             goneToolbar.setVisibility(View.GONE);
+            goneToolbar2.setVisibility(View.GONE);
         }
         return mToolbar;
     }
+
+    public Toolbar activateGroupChatListToolbar()
+    {
+        mToolbar = (Toolbar) findViewById(R.id.app_group_chat);
+        Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar goneToolbar2 = (Toolbar) findViewById(R.id.app_inbox);
+        if(mToolbar != null) {
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            mToolbar.setVisibility(View.VISIBLE);
+            goneToolbar.setVisibility(View.GONE);
+            goneToolbar2.setVisibility(View.GONE);
+        }
+        return mToolbar;
+    }
+
+    public Toolbar activateGroupChatToolbar()
+    {
+        mToolbar = (Toolbar) findViewById(R.id.app_group_chat);
+        Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_bar);
+        Toolbar goneToolbar2 = (Toolbar) findViewById(R.id.app_inbox);
+        if(mToolbar != null) {
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            mToolbar.setVisibility(View.VISIBLE);
+            goneToolbar.setVisibility(View.GONE);
+            goneToolbar2.setVisibility(View.GONE);
+        }
+        return mToolbar;
+    }
+
+
 
     protected Toolbar activateFooter() {
         if(mFooter == null) {
@@ -78,6 +117,18 @@ public class ToolbarActivity extends ActionBarActivity {
                 setSupportActionBar(mFooter);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
                 checkUnreadChatMessages();
+            }
+        }
+        return mFooter;
+    }
+
+    protected Toolbar hideFooter() {
+        if(mFooter == null) {
+            mFooter = (Toolbar) findViewById(R.id.app_footer);
+            RelativeLayout footerLay = (RelativeLayout) findViewById(R.id.footer);
+            if(mFooter != null) {
+                mFooter.setVisibility(View.GONE);
+                footerLay.setVisibility(View.GONE);
             }
         }
         return mFooter;
@@ -165,9 +216,11 @@ public class ToolbarActivity extends ActionBarActivity {
                 editor.apply();
                 // set an exit transition
                 Intent in = new Intent(context, ContactListMainActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
+                overridePendingTransition(0, 0);
+                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
             }
         });
 
@@ -199,7 +252,8 @@ public class ToolbarActivity extends ActionBarActivity {
         });
     }
 
-    protected void setChatListeners(final Context context, final Contact contact) {
+    protected void setChatListeners(final Context context, final Contact contact)
+    {
         ImageView imageContact = (ImageView) findViewById(R.id.companyLogo);
         imageContact.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,8 +302,20 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent in = new Intent(context, ChatMainActivity.class);
-                //startActivity(in);
+                Intent in = new Intent(context, GroupChatListActivity.class);
+                in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, GroupChatListActivity.class.getSimpleName());
+                startActivity(in);
+            }
+        });
+    }
+
+    protected void setGroupChatListListeners(final Context context){
+        TextView contactsProfile = (TextView) mToolbar.findViewById(R.id.chat_group_cancel);
+        contactsProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                ((Activity)context).finish();
             }
         });
     }

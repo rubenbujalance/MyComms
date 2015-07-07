@@ -146,7 +146,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         setChatListeners(this, _contact);
 
         //Load chat
-        _chat = chatTransactions.getChatById(contact_id);
+        _chat = chatTransactions.getChatByContactId(contact_id);
 
         //If there was no chat, create a new one, but not saved in db yet
         //If chat exists, load all messages
@@ -236,38 +236,50 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     {
         String msg = etChatTextBox.getText().toString();
 
-        //Save to DB
-        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
-                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //Save to DB
+                ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
+                        _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                        Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
 
-        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+                _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+                final String id = chatMsg.getId();
 
-        chatTransactions.insertChat(_chat);
-        chatTransactions.insertChatMessage(chatMsg);
+                chatTransactions.insertChat(_chat);
+                chatTransactions.insertChatMessage(chatMsg);
 
-        //Send through XMPP
-        if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
-                chatMsg.getId(), msg))
-            return;
+                //Send through XMPP
+                if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
+                        chatMsg.getId(), msg))
+                    return;
 
-        //Insert in recents
-        String action = Constants.CONTACTS_ACTION_SMS;
-        mRecentContactController.insertRecent(_chat.getContact_id(), action);
-        mRecentContactController.setConnectionCallback(this);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Insert in recents
+                        String action = Constants.CONTACTS_ACTION_SMS;
+                        mRecentContactController.insertRecent(_chat.getContact_id(), action);
+                        mRecentContactController.setConnectionCallback(ChatMainActivity.this);
 
-        //Notify app to refresh any view if necessary
-        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
-            BusProvider.getInstance().post(new MessageSentEvent());
-        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
-            //Recent List is refreshed onConnectionComplete
-        }
+                        //Notify app to refresh any view if necessary
+                        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
+                            BusProvider.getInstance().post(new MessageSentEvent());
+                        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
+                            //Recent List is refreshed onConnectionComplete
+                        }
 
-        _chatList.add(chatMsg);
-        if(_chatList.size()>50) _chatList.remove(0);
+                        _chatList.add(chatMsg);
+                        if(_chatList.size()>50) _chatList.remove(0);
 
-        refreshAdapter();
-        etChatTextBox.setText("");
+                        refreshAdapter();
+                        etChatTextBox.setText("");
+                    }
+                });
+            }
+        }).start();
+
     }
 
     private void imageSent(String imageUrl)
@@ -373,19 +385,20 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
         else setSendEnabled(false);
 
-        if(XMPPTransactions.getXmppConnection()!=null &&
-                XMPPTransactions.getXmppConnection().isConnected()) {
-            Realm realm = Realm.getInstance(this);
-            RealmChatTransactions chatTransactions = new RealmChatTransactions(realm, this);
+        final String contactId = _contact.getContactId();
 
-            ArrayList<ChatMessage> messages =
-                    chatTransactions.getNotReadReceivedContactChatMessages(_contact.getContactId());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<ChatMessage> messages =
+                        chatTransactions.getNotReadReceivedContactChatMessages(contactId);
 
-            if (messages != null && messages.size() > 0) {
-                XMPPTransactions.sendReadIQReceivedMessagesList(messages);
-                chatTransactions.setContactAllChatMessagesReceivedAsRead(_contact.getContactId());
+                if (messages != null && messages.size() > 0) {
+                    XMPPTransactions.sendReadIQReceivedMessagesList(messages);
+                    chatTransactions.setContactAllChatMessagesReceivedAsRead(contactId);
+                }
             }
-        }
+        }).start();
     }
 
     @Override
@@ -416,14 +429,13 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             }
 
             if(_chatList.size()>50) _chatList.remove(0);
-                refreshAdapter();
+            refreshAdapter();
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
         {
             photoBitmap = decodeFile(photoPath);
@@ -597,7 +609,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     }
 
     @Subscribe
-     public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
+    public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
         ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
 
         if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)

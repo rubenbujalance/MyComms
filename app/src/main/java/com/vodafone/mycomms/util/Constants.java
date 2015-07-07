@@ -107,7 +107,7 @@ public class Constants {
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";
 
-    //Contacts API Calls
+    //API Calls
     public static final String NEWS = "news";
     public static final String NEWS_DATA = "data";
     public static final String NEWS_API_GET = "/api/news";
@@ -126,7 +126,6 @@ public class Constants {
     public static final String NEWS_UPDATED_AT = "updated_at";
     public static final String NEWS_PUBLISHED_AT = "published_at";
 
-    //Contacts API Calls
     public static final String CONTACT_API_GET_PROFILE = "/api/me";
     public static final String CONTACT_API_GET_CONTACTS = "/api/me/contact?p=mc";
     public static final String CONTACT_API_GET_CONTACTS_BASIC_CALL = "/api/me/contact?p=";
@@ -138,6 +137,8 @@ public class Constants {
     public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
     public static final String CONTACT_API_POST_AVATAR = "/api/me/avatar";
     public static final String CONTACT_API_POST_FILE = "/api/uploadFile";
+
+    public static final String PROFILE_API_LOGOUT = "/auth/logout";
 
     //Contact Avatar BD Fields
     public static final String AVATAR_CONTACT_ID = "contactId";
@@ -151,6 +152,7 @@ public class Constants {
     public static final String CHAT_MESSAGE_FIELD_ID = "id";
     public static final String CHAT_MESSAGE_FIELD_PROFILE_ID = "profile_id";
     public static final String CHAT_MESSAGE_FIELD_CONTACT_ID = "contact_id";
+    public static final String CHAT_MESSAGE_FIELD_GROUP_ID = "group_id";
     public static final String CHAT_MESSAGE_FIELD_TIMESTAMP = "timestamp";
     public static final String CHAT_MESSAGE_FIELD_DIRECTION = "direction";
     public static final String CHAT_MESSAGE_FIELD_TYPE = "type";
@@ -179,6 +181,7 @@ public class Constants {
     public static final String CHAT_VIEW_CHAT_LIST = "Chat_List";
     public static final String CHAT_VIEW_CONTACT_DETAIL = "Contact_Detail";
     public static final String CHAT_VIEW_CONTACT_LIST = "Contact_List";
+    public static final String GROUP_CHAT_VIEW_CHAT_LIST = "Group_Chat_List";
 
     //XMPP Constants
     public static final int XMPP_PARAM_PORT = 5222;
@@ -186,6 +189,7 @@ public class Constants {
     public static final String XMPP_MESSAGE_MEDIATYPE_TEXT = "text";
     public static final String XMPP_MESSAGE_MEDIATYPE_IMAGE = "image";
     public static final String XMPP_STANZA_TYPE_CHAT = "chat";
+    public static final String XMPP_STANZA_TYPE_GROUPCHAT = "groupchat";
     public static final String XMPP_ELEMENT_IQ = "iq";
     public static final String XMPP_ELEMENT_MESSAGE = "message";
     public static final String XMPP_ELEMENT_BODY = "body";
@@ -196,9 +200,6 @@ public class Constants {
     public static final String XMPP_ATTR_ID = "id";
     public static final String XMPP_ATTR_STATUS = "status";
     public static final String XMPP_ATTR_FILEURL = "fileUrl";
-
-
-    public static final String BUNDLE_DASHBOARD_ACTIVITY = "is_dashboard_activity";
 
     //Kind of files to send as multipart;
     public static final String IMAGE_FILE_TO_SEND = "image_file";
@@ -215,6 +216,26 @@ public class Constants {
     public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");
     public static final String FIRST_TIME_AVATAR_DELIVERY = "first_time_avatar_delivery";
 
-    public static final int IMAGE_TYPE_AVATAR = 0;
-    public static final int IMAGE_TYPE_NEWS = 1;
+    public static final String GROUP_CHAT_PREVIOUS_ACTIVITY = "previous_activity";
+    public static final String GROUP_CHAT_LIST_ACTIVITY = "GroupChatListActivity";
+    public static final String CHAT_LIST_ACTIVITY = "ChatListActivity";
+    public static final String GROUP_CHAT_MEMBERS = "group_chat_members";
+    public static final String GROUP_CHAT_NAME = "group_chat_name";
+    public static final String GROUP_CHAT_ABOUT = "group_chat_about";
+    public static final String GROUP_CHAT_AVATAR = "group_chat_avatar";
+    public static final String GROUP_CHAT_ID = "group_chat_id";
+    public static final String IS_GROUP_CHAT = "is_group_chat";
+
+    public static final String GROUP_CHAT_API = "/api/me/group";
+    public static final String GROUP_CHAT_API_SET_MEMBERS = "/api/group";
+    public static final String GROUP_CHAT_PREFIX_ID = "mg";
+
+    public static final String GROUP_CHAT_REALM_ID = "id";
+    public static final String GROUP_CHAT_REALM_PROFILE_ID = "profileId";
+    public static final String GROUP_CHAT_REALM_CREATOR_ID = "creatorId";
+    public static final String GROUP_CHAT_REALM_NAME = "name";
+    public static final String GROUP_CHAT_REALM_AVATAR = "avatar";
+    public static final String GROUP_CHAT_REALM_ABOUT = "about";
+    public static final String GROUP_CHAT_REALM_MEMBERS = "members";
+    public static final String GROUP_CHAT_REALM_TIMESTAMP_CREATED = "timeStampCreated";
 }

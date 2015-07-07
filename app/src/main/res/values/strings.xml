@@ -122,6 +122,7 @@
 
     <string name="no_favourite_records">Store a list of your favourite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favourite contacts.</string>
     <string name="no_recent_records">You have no recent interactions with other users</string>
+    <string name="no_group_chat_records">Select the people you want to chat with</string>
     <string name="no_search_records">No results found</string>
 
     <!--Toolbar titles-->
@@ -130,6 +131,7 @@
     <string name="toolbar_title_contacts">Contacts</string>
     <string name="profile_edit_mode_done">Done</string>
     <string name="profile_edit_mode_edit">Edit</string>
+    <string name="toolbar_group_chat_title_messages">Add to Group</string>
 
     <!-- Chat Strings -->
     <string name="chat_me_text">"Me: "</string>
@@ -214,6 +216,20 @@
     <!--Progress dialog-->
 
     <string name="progress_dialog_uploading_file">Uploading file. Please wait...</string>
+    <string name="progress_dialog_downloading_contacts">Downloading contacts. Please wait..
+        .</string>
     <string name="unread_messages_more_than_99">99+</string>
+    <string name="title_activity_group_chat">GroupChatActivity</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Group chat -->
+
+    <string name="group_chat_participants">Participants</string>
+    <string name="group_chat_write">Write</string>
+    <string name="progress_dialog_creating_group_chat">Creating group chat. Please wait...</string>
+    <string name="progress_dialog_updating_group_chat">Updating group chat. Please wait...</string>
+
 
 </resources>

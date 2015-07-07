@@ -35,6 +35,7 @@ import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
+import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -519,10 +520,11 @@ public class DashBoardActivity extends ToolbarActivity{
                 //Download avatar
                 if (avatar != null &&
                         avatar.length() > 0 &&
-                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())) {
+                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
+                        && platform.equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)) {
                     File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
 
-                    if(!avatarsDir.exists()) avatarsDir.mkdirs();
+                    if (!avatarsDir.exists()) avatarsDir.mkdirs();
 
                     avatarTarget = new Target() {
                         @Override
@@ -539,7 +541,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
                         @Override
                         public void onBitmapFailed(Drawable errorDrawable) {
-                            if(avatarFile.exists()) avatarFile.delete();
+                            if (avatarFile.exists()) avatarFile.delete();
                             ConnectionsQueue.removeConnection(avatarFile.toString());
                         }
 
@@ -549,6 +551,12 @@ public class DashBoardActivity extends ToolbarActivity{
                         }
                     };
                     recentAvatar.setTag(avatarTarget);
+                } else if (avatar != null &&
+                        avatar.length() > 0 &&
+                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
+                        && platform.equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
+                    AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), recentAvatar, avatarText, contactId);
+                    avatarSFController.getSFAvatar(avatar);
                 }
             }
 

@@ -14,8 +14,8 @@ import model.News;
 public class RealmNewsTransactions {
     private Realm mRealm;
 
-    public RealmNewsTransactions(Realm realm) {
-        mRealm = realm;
+    public RealmNewsTransactions() {
+        mRealm = Realm.getDefaultInstance();
     }
 
     public void insertNewsList (ArrayList<News> newsArrayList){
@@ -44,4 +44,6 @@ public class RealmNewsTransactions {
         }
         return newsArrayList;
     }
+
+    public void closeRealm() {if(mRealm!=null) mRealm.close();}
 }

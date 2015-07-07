@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -16,7 +17,6 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 import java.io.File;
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.ChatMessage;
 import model.Contact;
 import model.UserProfile;
@@ -27,18 +27,16 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     private String LOG_TAG = ChatRecyclerViewAdapter.class.getSimpleName();
     private ArrayList<ChatMessage> chatList = new ArrayList<>();
     private Context mContext;
-    private Contact _contact;
     private UserProfile _profile;
-    private Realm _realm;
     private RealmChatTransactions _chatTx;
+    private RealmContactTransactions _contactTx;
 
-    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem, UserProfile profile, Contact contact) {
+    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem, UserProfile profile) {
         mContext = context;
-        _realm = Realm.getInstance(mContext);
-        _chatTx = new RealmChatTransactions(_realm, mContext);
-
-        this._contact = contact;
         this._profile = profile;
+
+        _chatTx = new RealmChatTransactions(mContext);
+        _contactTx = new RealmContactTransactions(_profile.getId());
 
         if (chatListItem!=null){
             for (ChatMessage chatListItems : chatListItem) {
@@ -93,6 +91,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     @Override
     public void onBindViewHolder(ChatHolder chatHolder, int i)
     {
+        Contact contact = _contactTx.getContactById(chatList.get(i).getContact_id());
 
         if(chatList.get(i).getType()==Constants.CHAT_MESSAGE_TYPE_IMAGE)
         {
@@ -151,10 +150,10 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         if(chatHolder.getItemViewType() == Constants.LEFT_CHAT ||
                 chatHolder.getItemViewType() == Constants.LEFT_IMAGE_CHAT)
         {
-            avatar = _contact.getAvatar();
-            contactId = _contact.getContactId();
-            firstName = _contact.getFirstName();
-            lastName = _contact.getLastName();
+            avatar = contact.getAvatar();
+            contactId = contact.getContactId();
+            firstName = contact.getFirstName();
+            lastName = contact.getLastName();
         }
         else
         {
@@ -171,7 +170,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                 avatar.compareTo("")!=0 &&
                 avatarFile.exists()) {
 
-            chatHolder.chatAvatarText.setText(null);
+            chatHolder.chatAvatarText.setVisibility(View.INVISIBLE);
 
             Picasso.with(mContext)
                     .load(avatarFile)
@@ -193,27 +192,23 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
             chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
             chatHolder.chatAvatarText.setText(initials);
+            chatHolder.chatAvatarText.setVisibility(View.VISIBLE);
         }
 
         //Set message as read
         if(chatList.get(i).getRead().compareTo("0")==0 &&
                 chatList.get(i).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
         {
-            if(XMPPTransactions.getXmppConnection()!=null &&
-                    XMPPTransactions.getXmppConnection().isConnected()) {
-                XMPPTransactions.notifyIQMessageStatus(chatList.get(i).getId(),
-                        chatList.get(i).getContact_id(),
-                        Constants.CHAT_MESSAGE_STATUS_READ);
-                _chatTx.setChatMessageReceivedAsRead(chatList.get(i));
-            }
+            XMPPTransactions.notifyIQMessageStatus(chatList.get(i).getId(),
+                    chatList.get(i).getContact_id(),
+                    Constants.CHAT_MESSAGE_STATUS_READ);
+            _chatTx.setChatMessageReceivedAsRead(chatList.get(i));
         }
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-
-        if(_realm!=null)
-            _realm.close();
+        _chatTx.closeRealm();
     }
 }

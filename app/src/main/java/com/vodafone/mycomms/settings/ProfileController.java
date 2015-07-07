@@ -31,14 +31,11 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-import io.realm.Realm;
 import model.UserProfile;
 
 public class ProfileController extends BaseController {
 
     private RealmContactTransactions realmContactTransactions;
-    private ProfileConnection profileConnection;
-    private Realm realm;
     private UserProfile userProfile;
     private String profileId;
 
@@ -47,8 +44,7 @@ public class ProfileController extends BaseController {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        realm = Realm.getInstance(context);
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        realmContactTransactions = new RealmContactTransactions(profileId);
     }
 
     /**
@@ -67,7 +63,7 @@ public class ProfileController extends BaseController {
         if (profileId != null && profileId.length() > 0) {
             UserProfile userProfileFromDB = null;
             if (realmContactTransactions != null) {
-                userProfileFromDB = realmContactTransactions.getUserProfile(profileId);
+                userProfileFromDB = realmContactTransactions.getUserProfile();
             }
 
             if (this.getConnectionCallback() != null && userProfileFromDB != null) {
@@ -151,6 +147,11 @@ public class ProfileController extends BaseController {
         editor.putString(Constants.PLATFORMS_SHARED_PREF, platforms);
         editor.putString(Constants.TIMEZONE_SHARED_PREF, timeZone);
         editor.apply();
+    }
+
+    public void updateProfileTimezone(String timezone)
+    {
+        realmContactTransactions.updateProfileTimezone(timezone);
     }
 
     @Override
@@ -335,7 +336,7 @@ public class ProfileController extends BaseController {
     public void logoutToAPI()
     {
         try {
-            UserProfile userProfile = realmContactTransactions.getUserProfile(profileId);
+            UserProfile userProfile = realmContactTransactions.getUserProfile();
             String jsonEmails = userProfile.getEmails();
             if (jsonEmails == null || jsonEmails.length() == 0) return;
 
@@ -356,7 +357,6 @@ public class ProfileController extends BaseController {
         boolean isUserProfileReceived = false;
 
         try {
-
             if (json != null && json.length() > 0) {
                 JSONObject jsonResponse = new JSONObject(json);
 
@@ -457,5 +457,10 @@ public class ProfileController extends BaseController {
 //        protected void onPostExecute(String json) {
 //            getProfileCallback(json);
 //        }
+    }
+
+    public void closeRealm()
+    {
+        realmContactTransactions.closeRealm();
     }
 }

@@ -3,7 +3,6 @@ package com.vodafone.mycomms.search;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
@@ -28,7 +27,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Contact;
 import model.ContactAvatar;
 
@@ -38,9 +36,9 @@ import model.ContactAvatar;
 public class SearchController extends BaseController
 {
     private SearchConnection searchConnection;
-    private Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private RealmAvatarTransactions realmAvatarTransactions;
     private InternalContactSearch internalContactSearch;
     private String apiCall;
     private int search = Constants.CONTACTS_ALL;
@@ -48,21 +46,13 @@ public class SearchController extends BaseController
     private String mProfileId;
 
 
-    public SearchController(Activity activity, Realm realm, String profileId) {
+    public SearchController(Activity activity, String profileId) {
         super(activity);
-        this.mRealm = realm;
         this.mContext = activity;
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        realmContactTransactions = new RealmContactTransactions(profileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
         internalContactSearch = new InternalContactSearch(activity, profileId);
         this.mProfileId = profileId;
-    }
-
-    public SearchController(Fragment fragment, Realm realm, String profileId) {
-        super(fragment);
-        this.mRealm = realm;
-        this.mContext = fragment.getActivity();
-        this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
     }
 
 
@@ -163,7 +153,6 @@ public class SearchController extends BaseController
             if (contact.getAvatar()==null || contact.getAvatar().length()==0)
                 return;
 
-            RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(mRealm);
             ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
             if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
                 String filename = "avatar_" + contact.getContactId() + ".jpg";
@@ -176,9 +165,8 @@ public class SearchController extends BaseController
                 }
                 else
                 {
-                    mRealm.beginTransaction();
-                    avatar.setUrl(contact.getAvatar());
-                    mRealm.commitTransaction();
+                    realmAvatarTransactions.updateAvatarUrlByContactId(
+                            contact.getContactId(), contact.getAvatar());
                 }
 
                 realmAvatarTransactions.insertAvatar(avatar);
@@ -314,5 +302,11 @@ public class SearchController extends BaseController
     {
         Log.d(Constants.TAG, "SearchController.storeContactsIntoRealm: ");
         realmContactTransactions.insertContactList(contacts);
+    }
+
+    public void closeRealm()
+    {
+        realmContactTransactions.closeRealm();
+        realmAvatarTransactions.closeRealm();
     }
 }

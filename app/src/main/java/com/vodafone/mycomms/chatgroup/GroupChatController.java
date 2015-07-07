@@ -300,7 +300,4 @@ public class GroupChatController
             return "";
         }
     }
-
-
-
 }

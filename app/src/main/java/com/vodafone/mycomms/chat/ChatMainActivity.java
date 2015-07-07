@@ -53,7 +53,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
-import io.realm.Realm;
 import model.Chat;
 import model.ChatMessage;
 import model.Contact;
@@ -84,7 +83,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
     private String previousView;
 
-    private Realm mRealm;
     private RealmChatTransactions chatTransactions;
     private RealmContactTransactions contactTransactions;
     private RecentContactController mRecentContactController;
@@ -107,11 +105,11 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
             Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
             finish();
         }
-        mRealm = Realm.getInstance(this);
-        chatTransactions = new RealmChatTransactions(mRealm, this);
+
+        chatTransactions = new RealmChatTransactions(this);
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        contactTransactions = new RealmContactTransactions(mRealm,_profile_id);
-        _profile = contactTransactions.getUserProfile(_profile_id);
+        contactTransactions = new RealmContactTransactions(_profile_id);
+        _profile = contactTransactions.getUserProfile();
 
         if(_profile_id == null)
         {
@@ -120,7 +118,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecentContactController = new RecentContactController(this,mRealm,_profile_id);
+        mRecentContactController = new RecentContactController(this, _profile_id);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(layoutManager);
@@ -143,7 +141,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         _contact = contactTransactions.getContactById(contact_id);
 
         //Chat listeners
-        setChatListeners(this, _contact);
+//        setChatHeaderListener(this, _contact);
 
         //Load chat
         _chat = chatTransactions.getChatByContactId(contact_id);
@@ -234,13 +232,13 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
     private void sendText()
     {
-        String msg = etChatTextBox.getText().toString();
+        final String msg = etChatTextBox.getText().toString();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 //Save to DB
-                ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
+                final ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
                         _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
 
@@ -330,7 +328,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
     private void refreshAdapter()
     {
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList, _profile, _contact);
+        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList, _profile);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
@@ -404,17 +402,17 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mRealm != null){
-            mRealm.close();
-        }
+        mRecentContactController.closeRealm();
+        chatTransactions.closeRealm();
+        XMPPTransactions.closeRealm();
+        contactTransactions.closeRealm();
     }
 
     @Override
     public void onConnectionNotAvailable() {
         Log.e(Constants.TAG, "ChatMainActivity.onConnectionNotAvailable: ");
 
-        tvSendChat.setEnabled(false);
-        tvSendChat.setTextColor(Color.GRAY);
+        setSendEnabled(false);
     }
 
     @Subscribe

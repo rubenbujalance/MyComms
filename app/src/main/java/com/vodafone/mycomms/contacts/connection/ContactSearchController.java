@@ -23,24 +23,23 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Contact;
 
 public class ContactSearchController extends BaseController {
 
-    private final Realm mRealm;
     private Context mContext;
     private String mProfileId;
     private ContactSearchConnection mContactSearchConnection;
     private JSONObject mJSONRecents;
     private String idList = "";
     private int offsetPaging = 0;
+    private ContactsController contactsController;
 
-    public ContactSearchController(Context appContext, Realm realm, String profileId) {
+    public ContactSearchController(Context appContext, String profileId) {
         super(appContext);
-        this.mRealm = realm;
         this.mContext = appContext;
         this.mProfileId = profileId;
+        contactsController = new ContactsController(mContext, mProfileId);
     }
 
     public void getContactById(JSONObject jsonObject) {
@@ -102,7 +101,6 @@ public class ContactSearchController extends BaseController {
             try {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(result);
-                ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
                 ArrayList<Contact> contactArrayList = contactsController.insertContactListInRealm(jsonResponse);
 
                 contactsController.insertRecentContactInRealm(mJSONRecents);
@@ -122,7 +120,7 @@ public class ContactSearchController extends BaseController {
             try {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(json);
-                ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
+
                 ArrayList<Contact> contactArrayList = contactsController.insertContactListInRealm(jsonResponse);
 
                 contactsController.insertRecentContactInRealm(mJSONRecents);
@@ -177,5 +175,10 @@ public class ContactSearchController extends BaseController {
         protected void onPostExecute(String json) {
             contactsByIdsCallback(json);
         }
+    }
+
+    public void closeRealm()
+    {
+        contactsController.closeRealm();
     }
 }

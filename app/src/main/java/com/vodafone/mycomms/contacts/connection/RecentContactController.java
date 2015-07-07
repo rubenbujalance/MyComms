@@ -22,20 +22,21 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.HashMap;
 
-import io.realm.Realm;
-
 public class RecentContactController extends BaseController {
 
-    private final Realm mRealm;
-    private Context mContext;private String mProfileId;
+    private Context mContext;
+    private String mProfileId;
     private RecentContactConnection mRecentContactConnection;
     int method;
+    private ContactsController contactsController;
+    private ContactSearchController contactSearchController;
 
-    public RecentContactController(Context appContext, Realm realm, String profileId) {
+    public RecentContactController(Context appContext, String profileId) {
         super(appContext);
-        this.mRealm = realm;
         this.mContext = appContext;
         this.mProfileId = profileId;
+        contactsController = new ContactsController(getActivity(), mProfileId);
+        contactSearchController = new ContactSearchController(mContext,mProfileId);
     }
 
     public void getRecentList() {
@@ -79,7 +80,7 @@ public class RecentContactController extends BaseController {
         if (method==HttpConnection.POST) {
             Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: POST");
             String apiCall = Constants.CONTACT_API_GET_RECENTS;
-            ContactsController contactsController = new ContactsController(getActivity(), mRealm, mProfileId);
+
             contactsController.getRecentList(apiCall);
             BusProvider.getInstance().post(new RecentContactsReceivedEvent());
         } else{
@@ -88,7 +89,7 @@ public class RecentContactController extends BaseController {
             if (result != null && result.trim().length()>0) {
                 try {
                     JSONObject jsonResponse = new JSONObject(result);
-                    ContactSearchController contactSearchController = new ContactSearchController(mContext,mRealm, mProfileId);
+
                     contactSearchController.getContactById(jsonResponse);
                 } catch (JSONException e){
                     Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
@@ -104,7 +105,6 @@ public class RecentContactController extends BaseController {
             if (method == HttpConnection.POST) {
                 Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: POST");
                 String apiCall = Constants.CONTACT_API_GET_RECENTS;
-                ContactsController contactsController = new ContactsController(getActivity(), mRealm, mProfileId);
                 contactsController.getRecentList(apiCall);
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             } else {
@@ -113,7 +113,6 @@ public class RecentContactController extends BaseController {
                 if (json != null && json.trim().length() > 0) {
                     try {
                         JSONObject jsonResponse = new JSONObject(json);
-                        ContactSearchController contactSearchController = new ContactSearchController(mContext, mRealm, mProfileId);
                         contactSearchController.getContactById(jsonResponse);
                     } catch (JSONException e) {
                         Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
@@ -162,5 +161,11 @@ public class RecentContactController extends BaseController {
         protected void onPostExecute(String json) {
             recentsListCallback(json);
         }
+    }
+
+    public void closeRealm()
+    {
+        contactSearchController.closeRealm();
+        contactsController.closeRealm();
     }
 }

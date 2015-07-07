@@ -2,7 +2,6 @@ package com.vodafone.mycomms.contacts.connection;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
@@ -23,18 +22,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import io.realm.Realm;
 import model.Contact;
-import model.ContactAvatar;
 import model.FavouriteContact;
 import model.RecentContact;
 
@@ -45,38 +35,38 @@ public class ContactsController extends BaseController {
 
     private ContactConnection contactConnection;
     private IContactsConnectionCallback contactsConnectionCallback;
-    private Realm mRealm;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
+    private RealmAvatarTransactions realmAvatarTransactions;
     private InternalContactSearch internalContactSearch;
     private String apiCall;
     private String mProfileId;
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
 
-    public ContactsController(Activity activity, Realm realm, String profileId) {
+    public ContactsController(Activity activity, String profileId) {
         super(activity);
-        this.mRealm = realm;
         this.mContext = activity;
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
         internalContactSearch = new InternalContactSearch(activity, profileId);
     }
 
-    public ContactsController(Fragment fragment, Realm realm, String profileId) {
+    public ContactsController(Fragment fragment, String profileId) {
         super(fragment);
-        this.mRealm = realm;
         this.mContext = fragment.getActivity();
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
     }
 
-    public ContactsController(Context context, Realm realm, String profileId) {
+    public ContactsController(Context context, String profileId) {
         super(context);
-        this.mRealm = realm;
         this.mContext = context;
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
     }
 
     public void getContactList(String api){
@@ -487,111 +477,8 @@ public class ContactsController extends BaseController {
         return super.getConnectionCallback();
     }
 
-    class DownloadAvatars extends AsyncTask<ArrayList<Contact>, String, Long> {
-
-        @Override
-        protected Long doInBackground(ArrayList<Contact>... params) {
-            Log.e(Constants.TAG, "DownloadAvatars.doInBackground: Downloading a pool of avatars");
-            ArrayList<Contact> contactList = params[0];
-            long initialTime = Calendar.getInstance().getTimeInMillis();
-            Realm realm = Realm.getInstance(mContext);
-            RealmAvatarTransactions realmAvatarTransactions = new RealmAvatarTransactions(realm);
-
-            for(int i=0; i<contactList.size(); i++) {
-                try {
-                    Contact contact = contactList.get(i);
-
-                    if (contact.getAvatar() != null && contact.getAvatar().length() != 0) {
-                        String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
-                        ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
-
-                        if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
-                            if(downloadContactAvatar(contact)) {
-                                if (avatar == null) {
-                                    avatar = new ContactAvatar(contact.getContactId(), contact.getAvatar(), avatarFileName);
-                                } else {
-                                    mRealm.beginTransaction();
-                                    avatar.setUrl(contact.getAvatar());
-                                    mRealm.commitTransaction();
-                                }
-                                realmAvatarTransactions.insertAvatar(avatar);
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e(Constants.TAG, "DownloadAvatars.doInBackground: ", e);
-                }
-            }
-
-            return (Calendar.getInstance().getTimeInMillis() - initialTime);
-        }
-
-        @Override
-        protected void onPostExecute(Long totalTime) {
-            Log.e(Constants.TAG, "DownloadAvatars.onPostExecute: Total time "+totalTime/1000);
-        }
-
-        private boolean downloadContactAvatar(Contact contact)
-        {
-            try {
-                URL url = new URL(contact.getAvatar());
-                String avatarFileName = "avatar_" + contact.getContactId() + ".jpg";
-                String dir = Constants.CONTACT_AVATAR_DIR;
-
-                File file = new File(mContext.getFilesDir() + dir);
-                file.mkdirs();
-
-                Log.i(Constants.TAG, "DownloadAvatars.doInBackground: downloading avatar " + avatarFileName + "...");
-
-                if (!downloadFile(String.valueOf(url), dir, avatarFileName)) {
-                    File badAvatar = new File(mContext.getFilesDir() + dir, avatarFileName);
-                    badAvatar.delete();
-                    return false;
-                }
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "DownloadAvatars.downloadContactAvatar: ",e);
-                return false;
-            }
-
-            return true;
-        }
-
-        public boolean downloadFile(final String path, String dir, String avatarFileName) {
-            try {
-                URL url = new URL(path);
-
-                URLConnection ucon = url.openConnection();
-                ucon.setReadTimeout(Constants.HTTP_READ_AVATAR_TIMEOUT);
-                ucon.setConnectTimeout(10000);
-
-                InputStream is = ucon.getInputStream();
-                BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
-
-                File file = new File(mContext.getFilesDir() + dir, avatarFileName);
-
-                if (file.exists()) {
-                    file.delete();
-                }
-                file.createNewFile();
-
-                FileOutputStream outStream = new FileOutputStream(file);
-                byte[] buff = new byte[5 * 1024];
-
-                int len;
-                while ((len = inStream.read(buff)) != -1) {
-                    outStream.write(buff, 0, len);
-                }
-                outStream.flush();
-                outStream.close();
-                inStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.e(Constants.TAG, "DownloadAvatars.downloadFile: ",e);
-                return false;
-            }
-
-            return true;
-        }
+    public void closeRealm() {
+        realmAvatarTransactions.closeRealm();
+        realmContactTransactions.closeRealm();
     }
 }

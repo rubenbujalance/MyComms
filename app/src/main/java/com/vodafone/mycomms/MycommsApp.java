@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.TimeZone;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import model.News;
 import model.UserProfile;
 
@@ -49,11 +50,14 @@ import model.UserProfile;
 public class MycommsApp extends Application implements IProfileConnectionCallback, INewsConnectionCallback {
 
     private ProfileController profileController;
-    private NewsController newsController;
     private Context mContext;
     private FilePushToServerController filePushToServerController;
     private SharedPreferences sp;
     private boolean appIsInitialized = false;
+    FavouriteController favouriteController;
+    private RecentContactController recentContactController;
+    private NewsController mNewsController;
+    String profile_id;
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -63,10 +67,17 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         super.onCreate();
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
 
-//        //Check Realm migration
-//        try {
-//            Realm.migrateRealmAtPath(getFilesDir().toString()+"/default.realm", new RealmDBMigration());
-//        } catch (Exception e){}
+        //Realm config
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext())
+                .name("mycomms.realm")
+//                .encryptionKey()
+//                .schemaVersion(1)
+//                .migration(new RealmDBMigration())
+                .build();
+
+        Realm.setDefaultConfiguration(realmConfig);
+
+        mNewsController = new NewsController(getApplicationContext());
 
         //Initializations
         BusProvider.getInstance().register(this);
@@ -90,6 +101,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onTerminate() {
         super.onTerminate();
         BusProvider.getInstance().unregister(this);
+
+        favouriteController.closeRealm();
+        recentContactController.closeRealm();
+        profileController.closeRealm();
+        mNewsController.closeRealm();
+        XMPPTransactions.closeRealm();
 
         //Network listener
         networkEvents.unregister();
@@ -181,14 +198,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                     userProfile.getPlatforms(),
                     timeZone);
 
-            UserProfile newProfile;
-            newProfile = userProfile;
-            Realm realm = Realm.getInstance(this);
-            realm.beginTransaction();
-            newProfile.setTimezone(timeZone);
-            realm.copyToRealmOrUpdate(newProfile);
-            realm.commitTransaction();
-            realm.close();
+            profileController.updateProfileTimezone(timeZone);
 
             HashMap<String, String> body = new HashMap<String, String>();
             if(userProfile.getTimezone() != null && !userProfile.getTimezone().equals("")) body.put("timeZone",userProfile.getTimezone());
@@ -260,12 +270,14 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         appIsInitialized = true;
 
         //Check if sign up avatar is pending to upload
-        String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY,false))
         {
             if(profile_id!=null)
                 new sendAvatar().execute(profile_id);
         }
+
+        favouriteController = new FavouriteController(mContext, profile_id);
     }
 
     @Subscribe
@@ -274,8 +286,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Log.e(Constants.TAG, "MycommsApp.onDashboardCreatedEvent: ");
 
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        Realm realm = Realm.getInstance(this);
-        RecentContactController recentContactController = new RecentContactController(this, realm, profile_id);
+        recentContactController = new RecentContactController(this, profile_id);
         recentContactController.getRecentList();
 
         XMPPTransactions.initializeMsgServerSession(this);
@@ -285,8 +296,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onEventNewsReceived(NewsReceivedEvent event) {
         Log.e(Constants.TAG, "MyCommsApp.onEventNewsReceived: ");
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        Realm realm = Realm.getInstance(this);
-        FavouriteController favouriteController = new FavouriteController(mContext, realm, profile_id);
+
         favouriteController.getFavouritesList(Constants.CONTACT_API_GET_FAVOURITES);
     }
 
@@ -304,7 +314,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void getNews() {
         Log.e(Constants.TAG, "MycommsApp.getNews: ");
 //        new DownloadNewsAsyncTask().execute(getApplicationContext());
-        NewsController mNewsController = new NewsController(mContext);
         String apiCall = Constants.NEWS_API_GET;
         mNewsController.getNewsList(apiCall);
         mNewsController.setConnectionCallback(this);

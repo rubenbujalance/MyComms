@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
 import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
@@ -71,6 +72,7 @@ public class GroupChatListFragment extends ListFragment implements
     private RealmGroupChatTransactions mGroupChatTransactions;
     private RealmContactTransactions mContactTransactions;
     private GroupChatController mGroupChatController;
+    private RecentContactController mRecentContactController;
 
     private ArrayList<String> selectedContacts;
     private ArrayList<String> ownersIds;
@@ -122,6 +124,7 @@ public class GroupChatListFragment extends ListFragment implements
         mGroupChatTransactions = new RealmGroupChatTransactions(realm,getActivity(),profileId);
         mContactTransactions = new RealmContactTransactions(realm,profileId);
         mGroupChatController = new GroupChatController(getActivity());
+        mRecentContactController = new RecentContactController(getActivity(),realm,profileId);
 
     }
 
@@ -561,8 +564,12 @@ public class GroupChatListFragment extends ListFragment implements
             {
                 String chatToString = groupChat.getId() + groupChat.getProfileId()
                         + groupChat.getMembers();
-                Log.i(Constants.TAG, LOG_TAG+".CreateGroupChatTask -> Created chat is: " + chatToString);
+                Log.i(Constants.TAG, LOG_TAG + ".CreateGroupChatTask -> Created chat is: " + chatToString);
                 mGroupChatTransactions.insertOrUpdateGroupChat(groupChat);
+
+                String action = Constants.CONTACTS_ACTION_SMS;
+                mRecentContactController.insertRecent(groupChat.getId(), action);
+
                 startActivityInGroupChatMode();
             }
         }

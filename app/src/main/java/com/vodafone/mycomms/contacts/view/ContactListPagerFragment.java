@@ -52,7 +52,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realm = Realm.getInstance(getActivity());
-        mContactsController = new ContactsController(this,realm, mProfileId);
+        mContactsController = new ContactsController(getActivity(),realm, mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
         //mContactsController.getContactList(apiCall);
         //mContactsController.setConnectionCallback(this);

@@ -48,8 +48,6 @@ public class RecentContact extends RealmObject {
     private long longField8;
     private long longField9;
 
-    private boolean isGroupChatObject;
-
     public RecentContact(){
 
     }
@@ -81,7 +79,6 @@ public class RecentContact extends RealmObject {
         this.country = country;
         this.action = action;
         this.timestamp = timestamp;
-        this.isGroupChatObject = false;
     }
 
     public String getUniqueId() {
@@ -396,11 +393,4 @@ public class RecentContact extends RealmObject {
         this.longField9 = longField9;
     }
 
-    public boolean isGroupChatObject() {
-        return isGroupChatObject;
-    }
-
-    public void setIsGroupChatObject(boolean isGroupChatObject) {
-        this.isGroupChatObject = isGroupChatObject;
-    }
 }

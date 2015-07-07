@@ -73,7 +73,6 @@ public class GroupChatActivity extends ToolbarActivity implements
     private String previousActivity;
     private boolean isGroupChatMode;
 
-
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
@@ -84,7 +83,7 @@ public class GroupChatActivity extends ToolbarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat_main);
         activateToolbar();
-        setToolbarBackground(R.drawable.toolbar_header);
+//        setToolbarBackground(R.drawable.toolbar_header);
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
@@ -136,7 +135,6 @@ public class GroupChatActivity extends ToolbarActivity implements
         mRecentContactController.insertRecentOKHttp(id, action);
 
     }
-
 
     public void setGroupChatAvatar()
     {

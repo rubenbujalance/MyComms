@@ -1,7 +1,8 @@
 package model;
 
+import java.util.UUID;
+
 import io.realm.RealmObject;
-import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 
 /**
@@ -10,26 +11,23 @@ import io.realm.annotations.PrimaryKey;
 public class ChatMessage extends RealmObject{
 
     @PrimaryKey
-    private String id; //Concatenation of: <profileid>_<contact_id>_<timestamp>
+    private String id; //UUID
 
-    @Index
     private String profile_id;
-    @Index
     private String contact_id;
+    private String group_id; //In case of group message
 
     private long timestamp;
-
     private String direction; //0-Sent; 1-Received. String just in case we need an index
     private int type; //Text-0, picture-1,..., map, video, file, etc.
     private String text;
     private String resourceUri;
-    @Index
     private String read; //0-No; 1-Yes. It's string in case we need an index
     private String status; //not_sent; sent; delivered; read
 
     public ChatMessage() {}
 
-    public ChatMessage(String profile_id, String contact_id, long timestamp, String direction,
+    public ChatMessage(String profile_id, String contact_id, String group_id, long timestamp, String direction,
                        int type, String text, String resourceUri, String read, String status)
     {
         this.setProfile_id(profile_id);
@@ -41,11 +39,14 @@ public class ChatMessage extends RealmObject{
         this.setResourceUri(resourceUri);
         this.setRead(read);
         this.setStatus(status);
+        this.setGroup_id(group_id);
 
-        this.setId(profile_id + "_" + contact_id + "_" + timestamp);
+        //Generate a random UUID
+        String id = UUID.randomUUID().toString();
+        this.setId(id);
     }
 
-    public ChatMessage(String profile_id, String contact_id, long timestamp, String direction,
+    public ChatMessage(String profile_id, String contact_id, String group_id, long timestamp, String direction,
                        int type, String text, String resourceUri, String read, String status, String id)
     {
         this.setProfile_id(profile_id);
@@ -57,6 +58,7 @@ public class ChatMessage extends RealmObject{
         this.setResourceUri(resourceUri);
         this.setRead(read);
         this.setStatus(status);
+        this.setGroup_id(group_id);
 
         this.setId(id);
     }
@@ -139,5 +141,13 @@ public class ChatMessage extends RealmObject{
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getGroup_id() {
+        return group_id;
+    }
+
+    public void setGroup_id(String group_id) {
+        this.group_id = group_id;
     }
 }

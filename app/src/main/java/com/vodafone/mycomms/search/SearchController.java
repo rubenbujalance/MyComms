@@ -3,7 +3,6 @@ package com.vodafone.mycomms.search;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
@@ -57,12 +56,13 @@ public class SearchController extends BaseController
         this.mProfileId = profileId;
     }
 
-    public SearchController(Fragment fragment, Realm realm, String profileId) {
-        super(fragment);
+    public SearchController(Context context, Realm realm, String profileId) {
+        super(context);
         this.mRealm = realm;
-        this.mContext = fragment.getActivity();
+        this.mContext = context;
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        //        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        realmContactTransactions = new RealmContactTransactions(mContext, profileId);
     }
 
 

@@ -155,9 +155,22 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                         .into(target);
             } else if (contact.getAvatar() != null &&
                     contact.getAvatar().length() > 0
-                    &&contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
+                    && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
                 AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.imageAvatar, viewHolder.textAvatar, contact.getContactId());
                 avatarSFController.getSFAvatar(contact.getAvatar());
+            } else if (contact.getAvatar() != null &&
+                    contact.getAvatar().length() > 0 &&
+                    contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                    viewHolder.textAvatar.setVisibility(View.INVISIBLE);
+                    Picasso.with(mContext)
+                        .load(contact.getAvatar())
+                        .fit().centerCrop()
+                        .into(viewHolder.imageAvatar);
+            } else if  (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL) &&
+                    contact.getAvatar() == null ||
+                    contact.getAvatar().length() < 0) {
+                viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
+                viewHolder.textAvatar.setText(initials);
             }
         }
 

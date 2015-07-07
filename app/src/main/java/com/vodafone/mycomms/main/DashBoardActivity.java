@@ -26,6 +26,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.connection.AsyncTaskQueue;
 import com.vodafone.mycomms.connection.ConnectionsQueue;
+import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
@@ -78,6 +79,13 @@ public class DashBoardActivity extends ToolbarActivity{
         mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
         loadNews();
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        Log.i(Constants.TAG, "DashBoardActivity.onCreate: DownloadLocalContacts");
+        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, profileId, mRealm);
+        downloadLocalContacts.execute();
 
         BusProvider.getInstance().post(new DashboardCreatedEvent());
     }
@@ -653,6 +661,21 @@ public class DashBoardActivity extends ToolbarActivity{
                     Picasso.with(DashBoardActivity.this)
                             .load(avatar)
                             .into(avatarTarget);
+                }
+
+                //Local avatar
+                if (avatar != null &&
+                        avatar.length() > 0 &&
+                        platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                    Picasso.with(DashBoardActivity.this)
+                            .load(avatar)
+                            .fit().centerCrop()
+                            .into(recentAvatar);
+                } else if  (platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL) &&
+                        avatar == null ||
+                        avatar.length() < 0) {
+                    recentAvatar.setImageResource(R.color.grey_middle);
+                    avatarText.setText(nameInitials);
                 }
 
                 // Recent action icon and bagdes

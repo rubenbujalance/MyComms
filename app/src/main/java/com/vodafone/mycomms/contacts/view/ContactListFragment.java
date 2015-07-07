@@ -9,12 +9,17 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,6 +40,7 @@ import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,6 +98,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
 
     private SharedPreferences sp;
 
+    private final int drLeft = android.R.drawable.ic_menu_search;
+    private final int drRight = R.drawable.ic_action_remove;
 
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
@@ -107,6 +115,10 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         View v = inflater.inflate(R.layout.layout_fragment_pager_contact_list, container, false);
         listView = (ListView) v.findViewById(android.R.id.list);
         emptyText = (TextView) v.findViewById(android.R.id.empty);
+        searchView = (EditText) v.findViewById(R.id.et_search);
+        cancelButton = (Button) v.findViewById(R.id.btn_cancel);
+        layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
+
 
         loadSearchBarEventsAndControllers(v);
 
@@ -444,94 +456,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }
     }
 
-    /**
-     * Sets events to search bar. Makes response on touch, onKey and on text change.
-     * @author str_oan
-     */
-    private void setSearchBarEvents()
-    {
-
-        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-
-
-        searchView.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                final int DRAWABLE_LEFT = 0;
-                final int DRAWABLE_TOP = 1;
-                final int DRAWABLE_RIGHT = 2;
-                final int DRAWABLE_BOTTOM = 3;
-
-                searchView.requestFocus();
-                showKeyboard();
-                cancelButton.setVisibility(View.VISIBLE);
-
-                if (event.getAction() == MotionEvent.ACTION_UP) {
-                    // Will hide X button for delete searched text
-                    if (null != searchView.getCompoundDrawables()[DRAWABLE_RIGHT] && event.getRawX() >= (searchView.getRight() - searchView.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        Log.d("onTouch() -> ", "You have pressed right drawable!");
-                        searchView.setText("");
-                        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-                        return true;
-                    } else {
-                        Log.d("onTouch() -> ", "You have pressed other part of ET!");
-                        return true;
-                    }
-                } else {
-                    return true;
-                }
-            }
-        });
-
-        searchView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.i(this.getClass().getSimpleName() + " -> onTextChanged", "Input is: " + searchView.getText().toString());
-                if (searchView.getText().length() == 1) {
-                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, drRight, 0);
-                    layCancel.setVisibility(View.VISIBLE);
-                } else if (searchView.getText().length() == 0) {
-                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-                }
-
-                contactList = searchAllContacts(searchView.getText().toString());
-                reloadAdapter();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        searchView.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    hideKeyboard();
-                }
-                return false;
-            }
-        });
-
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSearchBarContent();
-                hideKeyboard();
-
-            }
-        });
-
-    }
-
     public void hideSearchBarContent()
     {
         layCancel.setVisibility(View.GONE);
@@ -641,12 +565,12 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         reloadAdapter();
     }
 
-
-    private void showProgressDialog()
-    {
+    private void showProgressDialog() {
         mSwipeRefreshLayout.setProgressViewOffset(false, 0,
                 (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
         mSwipeRefreshLayout.setRefreshing(true);
+    }
+
     /**
      * Force to show keyboard in current View
      * @author str_oan
@@ -656,6 +580,18 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         Log.i(Constants.TAG, "ContactListFragment.showKeyboard: ");
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    /**
+     * Force to hide keyboard in current activity
+     * @author str_oan
+     */
+    public void hideKeyboard()
+    {
+        Log.i(Constants.TAG, "ContactListFragment.hideKeyboard: ");
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
+                ().INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
     }
 
     private void hideProgressDialog()

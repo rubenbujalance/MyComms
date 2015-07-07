@@ -250,6 +250,29 @@ public class ContactsController extends BaseController {
         }
     }
 
+    public void insertFavouriteContactInRealm(JSONObject json, boolean isGroupChatObject){
+        JSONArray jsonArray = null;
+        Contact contact;
+        ArrayList<FavouriteContact> contactList = new ArrayList<>();
+        try {
+            Log.i(Constants.TAG, "ContactsController.insertFavouriteContactInRealm: jsonResponse: " + json.toString());
+            jsonArray = json.getJSONArray(Constants.CONTACT_FAVOURITES);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                contact = realmContactTransactions.getContactById(jsonArray.getString(i));
+                if (contact != null) {
+                    contactList.add(mapContactToFavourite(contact));
+                }
+            }
+            if (contactList.size()!=0) {
+                realmContactTransactions.deleteAllFavouriteContacts();
+                realmContactTransactions.insertFavouriteContactList(contactList);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : " + e.toString());
+        }
+    }
+
     public void insertRecentContactInRealm(JSONObject json){
         JSONArray jsonArray = null;
         Contact contact;

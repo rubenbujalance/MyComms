@@ -20,13 +20,39 @@ public class GroupChat extends RealmObject
     private long lastMessageTime;
     private String lastMessage;
     private String lastMessage_id;
+    private String owners;
 
     public GroupChat (){}
 
-    public GroupChat(String id, String profileId, String creatorId, String name, String avatar,
-                     String
-            about, String
-            members, long lastMessageTime)
+
+    public GroupChat(GroupChat groupChat)
+    {
+        this.id = groupChat.getId();
+        this.creatorId = groupChat.getCreatorId();
+        this.profileId = groupChat.getProfileId();
+        this.name = groupChat.getName();
+        this.avatar = groupChat.getAvatar();
+        this.about = groupChat.getAbout();
+        this.members = groupChat.getMembers();
+        this.lastMessageTime = groupChat.getLastMessageTime();
+        this.lastMessage = groupChat.getLastMessage();
+        this.lastMessage_id = groupChat.getLastMessage_id();
+        this.owners = groupChat.getOwners();
+
+    }
+
+    public GroupChat
+            (
+                    String id
+                    , String profileId
+                    , String creatorId
+                    , String name
+                    , String avatar
+                    , String about
+                    , String members
+                    , String owners
+                    , long lastMessageTime
+            )
     {
         this.id = id;
         this.profileId = profileId;
@@ -35,6 +61,7 @@ public class GroupChat extends RealmObject
         this.avatar = avatar;
         this.about = about;
         this.members = members;
+        this.owners = owners;
         this.lastMessageTime = lastMessageTime;
         this.lastMessage = "";
         this.lastMessage_id = null;
@@ -117,5 +144,13 @@ public class GroupChat extends RealmObject
 
     public void setProfileId(String profileId) {
         this.profileId = profileId;
+    }
+
+    public String getOwners() {
+        return owners;
+    }
+
+    public void setOwners(String owners) {
+        this.owners = owners;
     }
 }

@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatgroup.ComposedChat;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.events.BusProvider;
@@ -82,21 +81,20 @@ public class ChatListFragment extends Fragment{
 
     private void startChatActivity(Chat chat)
     {
-        Intent in = new Intent(getActivity(), ChatMainActivity.class);
+        Intent in = new Intent(getActivity(), GroupChatActivity.class);
         in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, chat.getContact_id());
-        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CHAT_LIST);
+        in.putExtra(Constants.IS_GROUP_CHAT, false);
+        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_LIST_ACTIVITY);
         startActivity(in);
     }
 
     private void startGroupChatActivity(GroupChat chat)
     {
-        Intent intent = new Intent(getActivity(), GroupChatActivity.class);
-        intent.putExtra(Constants.GROUP_CHAT_MEMBERS, chat.getMembers());
-        intent.putExtra(Constants.GROUP_CHAT_ID, chat.getId());
-        intent.putExtra(Constants.GROUP_CHAT_NAME, chat.getName());
-        intent.putExtra(Constants.GROUP_CHAT_ABOUT, chat.getAbout());
-        intent.putExtra(Constants.GROUP_CHAT_AVATAR, chat.getAvatar());
-        startActivity(intent);
+        Intent in = new Intent(getActivity(), GroupChatActivity.class);
+        in.putExtra(Constants.GROUP_CHAT_ID, chat.getId());
+        in.putExtra(Constants.IS_GROUP_CHAT, true);
+        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_LIST_ACTIVITY);
+        startActivity(in);
     }
 
     private ArrayList<ComposedChat> getComposedChat()

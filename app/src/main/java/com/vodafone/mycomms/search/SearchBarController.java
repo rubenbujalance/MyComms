@@ -238,7 +238,7 @@ public class SearchBarController implements ISearchConnectionCallback
             loadAllContactsFromServer(keyWord);
             if(!isGroupChatSearch)
             {
-                loadLocalContacts(keyWord);
+                //loadLocalContacts(keyWord);
             }
             loadAllContactsFromDB(keyWord);
         }
@@ -304,6 +304,7 @@ public class SearchBarController implements ISearchConnectionCallback
      * @author str_oan
      * @param keyWord (String) -> key word for make search
      * @return (ArrayList<Contact>) -> local contacts if any, otherwise returns empty list
+     * @deprecated Now all contacts are saved on Realm at the application start
      */
     private ArrayList<Contact> loadLocalContacts(String keyWord)
     {

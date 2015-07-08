@@ -17,9 +17,9 @@
         android:background="@drawable/simpleborder"
         android:paddingLeft="5dp">
         <include android:id="@+id/layout_list_item_image"
-                 layout="@layout/layout_multi_chat_avatar"
-                 android:layout_width="50dp"
-                 android:layout_height = "50dp"
+                 layout="@layout/layout_multi_chat_avatar_60"
+                 android:layout_width="60dp"
+                 android:layout_height = "60dp"
                  android:layout_gravity="center"
                  android:layout_centerVertical="true" />
         <include android:id="@+id/layout_chatlist_item_content"

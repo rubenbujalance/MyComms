@@ -458,7 +458,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             for(int i = 0; i < jsonArray.length() ; i++) {
                 jsonObject = jsonArray.getJSONObject(i);
                 if (!jsonObject.isNull(key)) {
-
                     result = jsonObject.getString(key);
                 }
             }
@@ -472,14 +471,23 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private String getElementFromJsonObjectString(String json, String key){
-        Log.d(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " + json + ", key=" + key);
-        JSONObject jsonObject = null;
-        String result = null;
+        JSONObject jsonObject;
+        String result = "";
         try {
             jsonObject = new JSONObject(json);
-            result = jsonObject.getString(key);
+            if (key.equals(Constants.CONTACT_PHONE)){
+                //TODO: Pending show all telephone numbers of Contact
+                if (!jsonObject.isNull(Constants.CONTACT_PHONE_WORK)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_WORK);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE_HOME)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_HOME);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE_MOBILE)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_MOBILE);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE);
+                }
+            }
 
-            Log.d(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " + result);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " , e);
@@ -494,7 +502,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
                 contact.getAvatar().compareTo("")!=0 &&
-                avatarFile.exists()) {
+                avatarFile.exists() &&
+                !contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
 
             textAvatar.setText(null);
 
@@ -502,6 +511,14 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     .load(avatarFile)
                     .into(ivAvatar);
 
+        } else if (contact.getAvatar() != null &&
+                contact.getAvatar().length() > 0 &&
+                contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+            textAvatar.setVisibility(View.INVISIBLE);
+            Picasso.with(this)
+                    .load(contact.getAvatar())
+                    .fit().centerCrop()
+                    .into(ivAvatar);
         } else{
             String initials = "";
             if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
@@ -534,10 +551,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
                 TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
 
-                if (contact.getAvatar()!=null &&
-                        contact.getAvatar().length()>0 &&
-                        contact.getAvatar().compareTo("")!=0 &&
-                        avatarFile.exists()) {
+                if (contact.getAvatar() != null &&
+                        contact.getAvatar().length() > 0 &&
+                        contact.getAvatar().compareTo("") != 0 &&
+                        avatarFile.exists() &&
+                        !contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
 
                     textAvatar.setText(null);
 
@@ -545,9 +563,16 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                             .load(avatarFile)
                             .into(fullAvatar);
 
-                } else{
-                    String initials = contact.getFirstName().substring(0,1) +
-                            contact.getLastName().substring(0,1);
+                } else if (contact.getAvatar() != null &&
+                        contact.getAvatar().length() > 0 &&
+                        contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                    textAvatar.setVisibility(View.INVISIBLE);
+                    Picasso.with(getBaseContext())
+                            .load(contact.getAvatar())
+                            .into(fullAvatar);
+                } else {
+                    String initials = contact.getFirstName().substring(0, 1) +
+                            contact.getLastName().substring(0, 1);
 
                     fullAvatar.setImageResource(R.color.grey_middle);
                     textAvatar.setText(initials);
@@ -592,7 +617,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         }
         else
         {
-            tvPhoneNumber.setText(contact.getPhones());
+            tvPhoneNumber.setText(getElementFromJsonObjectString(contact.getPhones(), Constants.CONTACT_PHONE));
             tvEmail.setText(contact.getEmails());
         }
 

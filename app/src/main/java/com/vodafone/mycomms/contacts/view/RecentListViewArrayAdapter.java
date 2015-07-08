@@ -74,7 +74,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
                 contact.getAvatar().compareTo("")!=0 &&
-                avatarFile.exists()) {
+                avatarFile.exists() &&
+                !contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
 
             viewHolder.textAvatar.setText(null);
 
@@ -85,6 +86,14 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact> {
                     .fit().centerCrop()
                     .into(viewHolder.imageAvatar);
 
+        } else if (contact.getAvatar() != null &&
+                contact.getAvatar().length() > 0 &&
+                contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+            viewHolder.textAvatar.setVisibility(View.INVISIBLE);
+            Picasso.with(mContext)
+                    .load(contact.getAvatar())
+                    .fit().centerCrop()
+                    .into(viewHolder.imageAvatar);
         } else{
             String initials = "";
             if(null != contact.getFirstName() && contact.getFirstName().length() > 0)

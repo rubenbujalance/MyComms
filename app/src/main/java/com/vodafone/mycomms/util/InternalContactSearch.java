@@ -2,12 +2,16 @@ package com.vodafone.mycomms.util;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import model.Contact;
 
@@ -42,11 +46,14 @@ public class InternalContactSearch
         ArrayList<String> ids = getContactsIds(keyWord);
         ArrayList<Contact> contacts = new ArrayList<>();
         Contact contact;
+        SharedPreferences sp = context.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String deviceId = sp.getString(Constants.DEVICE_ID_SHARED_PREF,"");
         for(String id : ids)
         {
             contact = new Contact("");
-            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + id);
-            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + id);
+            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
+            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
             contact.setProfileId(profileId);
             contact = setContactsCompanyDataByContactsIds(id, contact);
@@ -80,11 +87,14 @@ public class InternalContactSearch
         ArrayList<String> ids = getAllContactsIds();
         ArrayList<Contact> contacts = new ArrayList<>();
         Contact contact;
+        SharedPreferences sp = context.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String deviceId = sp.getString(Constants.DEVICE_ID_SHARED_PREF,"");
         for(String id : ids)
         {
             contact = new Contact("");
-            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_"+profileId+"_"+id);
-            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + id);
+            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
+            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
             contact.setProfileId(profileId);
             contact = setContactsCompanyDataByContactsIds(id, contact);
@@ -240,13 +250,35 @@ public class InternalContactSearch
             {
                 do
                 {
-                    String phone = "";
-                    if (cursor.getString(cursor.getColumnIndex(ContactsContract
-                            .CommonDataKinds.Phone.NORMALIZED_NUMBER)) != null) {
-                        phone = cursor.getString(cursor.getColumnIndex(ContactsContract
-                                .CommonDataKinds.Phone.NORMALIZED_NUMBER)).replace(" ", "");
+                    ContentResolver cr = this.context.getContentResolver();
+                    Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id, null, null);
+                    HashMap body = new HashMap<>();
+                    while (phones.moveToNext()) {
+                        //TODO: Get all numbers and save them into a JSON (and show them correctly on detail)
+                        String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).trim();
+                        int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                        body.put(Constants.CONTACT_PHONE, number);
+                        switch (type) {
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+                                body.put(Constants.CONTACT_PHONE_HOME, number);
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                                body.put(Constants.CONTACT_PHONE_MOBILE, number);
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                                body.put(Constants.CONTACT_PHONE_WORK, number);
+                                break;
+                            default:
+                                body.put(Constants.CONTACT_PHONE, number);
+                                break;
+                        }
                     }
-                    contact.setPhones(phone);
+                    phones.close();
+                    if (body!=null && !body.isEmpty()) {
+                        JSONObject json = new JSONObject(body);
+                        contact.setPhones(json.toString());
+                    }
                 }
                 while(cursor.moveToNext());
             }
@@ -424,7 +456,6 @@ public class InternalContactSearch
                     + " AND "+ContactsContract.Data.IN_VISIBLE_GROUP+" = '1'"
                     ;
 
-//            return cr.query(uri, projection, selection, null, ContactsContract.Data.CONTACT_ID+" ASC");
             return cr.query(uri, projection, null, null, ContactsContract.Data.CONTACT_ID+" ASC");
         }
         catch (Exception ex)
@@ -539,21 +570,17 @@ public class InternalContactSearch
                         , ContactsContract.CommonDataKinds.Organization.DEPARTMENT
                         , ContactsContract.CommonDataKinds.Organization.JOB_DESCRIPTION
                         , ContactsContract.CommonDataKinds.Organization.TITLE
+                        , ContactsContract.CommonDataKinds.Organization.DATA
                 };
 
-        String selection = ContactsContract.Data.CONTACT_ID +" =? "
-                + " AND "+ContactsContract.Data.MIMETYPE+" = ?";
-        String[] selectionArgs = new String[]
-                {
-                        id
-                        , ContactsContract.CommonDataKinds.Organization.COMPANY
-                };
+        String selection = ContactsContract.Data.CONTACT_ID + " = ? AND " +
+                ContactsContract.Data.MIMETYPE + " = ?";
+        String[] selectionArgs = new String[]{
+                id,
+                ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE};
 
         return cr.query(uri,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        ContactsContract.Data.CONTACT_ID + " ASC");
+                projection, selection, selectionArgs, ContactsContract.Data.CONTACT_ID + " ASC");
 
     }
 
@@ -650,7 +677,7 @@ public class InternalContactSearch
         return cr.query
                 (
                         uri
-                        , projection
+                        , null
                         , selection
                         , selectionArgs
                         , ContactsContract.Data.CONTACT_ID + " " + "ASC"

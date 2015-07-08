@@ -33,7 +33,6 @@ import android.widget.TextView;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
@@ -57,7 +56,7 @@ import model.Chat;
 import model.ChatMessage;
 import model.Contact;
 
-public class ChatMainActivity extends ToolbarActivity implements IRecentContactConnectionCallback {
+public class ChatMainActivity extends ToolbarActivity {
 
     private String LOG_TAG = ChatMainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
@@ -259,7 +258,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
                         //Insert in recents
                         String action = Constants.CONTACTS_ACTION_SMS;
                         mRecentContactController.insertRecent(_chat.getContact_id(), action);
-                        mRecentContactController.setConnectionCallback(ChatMainActivity.this);
 
                         //Notify app to refresh any view if necessary
                         if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
@@ -305,7 +303,6 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         //Insert in recents
         String action = Constants.CONTACTS_ACTION_SMS;
         mRecentContactController.insertRecent(_chat.getContact_id(), action);
-        mRecentContactController.setConnectionCallback(this);
 
         //Notify app to refresh any view if necessary
         if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
@@ -408,22 +405,14 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
         contactTransactions.closeRealm();
     }
 
-    @Override
-    public void onConnectionNotAvailable() {
-        Log.e(Constants.TAG, "ChatMainActivity.onConnectionNotAvailable: ");
-
-        setSendEnabled(false);
-    }
-
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
         ChatMessage chatMsg = event.getMessage();
         if(chatMsg!=null)
         {
             _chatList.add(chatMsg);
-            if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
+            if(chatMsg.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)) {
                 mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-                mRecentContactController.setConnectionCallback(this);
             }
 
             if(_chatList.size()>50) _chatList.remove(0);
@@ -578,8 +567,7 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
                                 Constants.MEDIA_TYPE_JPG
                         );
 
-                String response = filePushToServerController.executeRequest();
-                return response;
+                return filePushToServerController.executeRequest();
             }
             catch (Exception e)
             {

@@ -54,7 +54,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 
-import io.realm.Realm;
 import model.Contact;
 import model.News;
 import model.RecentContact;
@@ -69,9 +68,9 @@ public class DashBoardActivity extends ToolbarActivity{
     private RealmContactTransactions realmContactTransactions;
     private String _profileId;
     private RealmNewsTransactions realmNewsTransactions;
-    private RecentContactController recentController;
     private RealmGroupChatTransactions realmGroupTransactions;
     private RecentContactController recentContactController;
+
 
 
     @Override
@@ -90,7 +89,6 @@ public class DashBoardActivity extends ToolbarActivity{
         _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realmContactTransactions = new RealmContactTransactions(_profileId);
         realmNewsTransactions = new RealmNewsTransactions();
-        recentController = new RecentContactController(this, _profileId);
         realmGroupTransactions = new RealmGroupChatTransactions(this, _profileId);
         recentContactController = new RecentContactController(this, _profileId);
 
@@ -100,6 +98,7 @@ public class DashBoardActivity extends ToolbarActivity{
         setContentView(R.layout.layout_dashboard);
 
         initALL();
+
 
         loadRecents();
         loadNews();
@@ -284,7 +283,7 @@ public class DashBoardActivity extends ToolbarActivity{
         BusProvider.getInstance().unregister(this);
         realmContactTransactions.closeRealm();
         realmNewsTransactions.closeRealm();
-        recentController.closeRealm();
+        recentContactController.closeRealm();
         _chatTx.closeRealm();
     }
 
@@ -477,7 +476,7 @@ public class DashBoardActivity extends ToolbarActivity{
     public class DrawSingleGroupChatRecentAsyncTask extends AsyncTask<Void,Void,Void>
     {
 
-        String contactId,firstName,lastName,action,phones,emails,platform,recentId;
+        String contactId,action,recentId;
         LinearLayout recentsContainer;
         LayoutInflater inflater;
 
@@ -488,13 +487,11 @@ public class DashBoardActivity extends ToolbarActivity{
         View childRecents;
 
         //Avatar
-        boolean loadAvatarFromDisk = false;
         File avatarFile = null;
         String nameInitials = null;
         Target avatarTarget;
 
         //Name
-        String firstNameStr,lastNameStr;
         TextView firstNameView;
 
         // Action icon and badges
@@ -505,8 +502,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
         ArrayList<String> contactIds = new ArrayList<>();
         ArrayList<Contact> contacts = new ArrayList<>();
-        String groupChatid;
-        UserProfile _profile;
+        String groupChatId;
         ArrayList<ImageView> images = new ArrayList<>();
 
         HashMap<ImageView,Target> mapAvatarTarget = new HashMap<>();
@@ -526,18 +522,15 @@ public class DashBoardActivity extends ToolbarActivity{
 
             this.recentsContainer = recentsContainer;
             this.inflater = inflater;
-
-
             this.action = action;
             this.recentId = recentId;
-            String[] ids = contactId.split("@");
-            Collections.addAll(contactIds,ids);
-            this.groupChatid = groupChatId;
-            this.contactId = realmGroupTransactions.getGroupChatById(this.groupChatid).getMembers();
-            this._profile = realmContactTransactions.getUserProfile();
-            loadContactsFromIds(contactIds);
-            mapAvatarToContactId();
+            this.groupChatId = groupChatId;
+            RealmGroupChatTransactions realmGroupChatTransactions = new
+                    RealmGroupChatTransactions(DashBoardActivity.this, _profileId);
+            this.contactId = realmGroupChatTransactions.getGroupChatById(groupChatId).getMembers();
 
+            String[] ids = contactId.split("@");
+            Collections.addAll(contactIds, ids);
         }
 
         private void loadContactsFromIds
@@ -545,15 +538,18 @@ public class DashBoardActivity extends ToolbarActivity{
                         ArrayList<String> ids
                 )
         {
+            RealmContactTransactions realmContactTransactions = new RealmContactTransactions
+                    (DashBoardActivity.this,_profileId);
+            UserProfile userProfile = realmContactTransactions.getUserProfile();
             Contact contact = new Contact();
-            contact.setAvatar(_profile.getAvatar());
-            contact.setFirstName(_profile.getFirstName());
-            contact.setLastName(_profile.getLastName());
-            contact.setContactId(_profile.getId());
+            contact.setAvatar(userProfile.getAvatar());
+            contact.setFirstName(userProfile.getFirstName());
+            contact.setLastName(userProfile.getLastName());
+            contact.setContactId(userProfile.getId());
             contacts.add(contact);
             for(String id : ids)
             {
-                if(!id.equals(_profile.getId()))
+                if(!id.equals(userProfile.getId()))
                 {
                     contact = realmContactTransactions.getContactById(id);
                     contacts.add(contact);
@@ -587,7 +583,7 @@ public class DashBoardActivity extends ToolbarActivity{
             bottom_left_avatar_text = (TextView) childRecents.findViewById(R.id.bottom_left_avatar_text);
             bottom_right_avatar_text = (TextView) childRecents.findViewById(R.id.bottom_right_avatar_text);
 
-            firstNameView = (TextView) findViewById(R.id.recent_firstname);
+            firstNameView = (TextView) childRecents.findViewById(R.id.group_chat_recent_first_name);
 
             lay_top_right_image = (LinearLayout) childRecents.findViewById(R.id
                     .lay_top_right_image_hide);
@@ -619,6 +615,9 @@ public class DashBoardActivity extends ToolbarActivity{
         @Override
         protected Void doInBackground(Void... params)
         {
+            loadContactsFromIds(contactIds);
+            mapAvatarToContactId();
+
             int i = 0;
             for(final ImageView image : images)
             {
@@ -630,10 +629,12 @@ public class DashBoardActivity extends ToolbarActivity{
                 avatarTarget = null;
 
                 //Avatar image
-                if (avatarFile.exists()) { //From file if already exists
-                    loadAvatarFromDisk = true;
+                if (avatarFile.exists())
+                {   //From file if already exists
                     mapAvatarFile.put(image,avatarFile);
-                } else {
+                }
+                else
+                {
                     mapAvatarFile.put(image,null);
                     //Set name initials image during the download
                     if (null != contact.getFirstName() && contact.getFirstName().length() > 0) {
@@ -693,56 +694,18 @@ public class DashBoardActivity extends ToolbarActivity{
                 btRecents.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         try {
-                            if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
-                                String strPhones = phones;
-                                if (strPhones != null) {
-                                    String phone = strPhones;
-                                    if (!platform.equals(Constants
-                                            .PLATFORM_LOCAL)) {
-                                        JSONArray jPhones = new JSONArray(strPhones);
-                                        phone = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
-                                    }
-
-                                    Utils.launchCall(phone, DashBoardActivity.this);
-                                }
-                            } else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
-                                // This is LOCAL contact, then in this case the action will be Send SMS
-                                // message
-                                if (null != platform && platform.compareTo(Constants.PLATFORM_LOCAL) == 0) {
-                                    String phone = phones;
-                                    if (null != phone) {
-                                        Utils.launchSms(phone, DashBoardActivity.this);
-                                    }
-                                }
-                                else if(null != platform && platform.compareTo(Constants.PLATFORM_LOCAL) != 0)
-                                {
-                                    Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
-                                    in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
-                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
-                                    in.putExtra(Constants.IS_GROUP_CHAT, false);
-                                    startActivity(in);
-                                }
-                                else if(null == platform)
-                                {
-                                    Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
-                                    in.putExtra(Constants.GROUP_CHAT_ID, groupChatid);
-                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
-                                    in.putExtra(Constants.IS_GROUP_CHAT, true);
-                                    startActivity(in);
-                                }
-
-                            } else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
-                                String strEmails = emails;
-                                if (strEmails != null) {
-                                    String email = strEmails;
-                                    if (platform.compareTo(Constants.PLATFORM_LOCAL) != 0) {
-                                        JSONArray jPhones = new JSONArray(strEmails);
-                                        email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
-                                    }
-
-                                    Utils.launchEmail(email, DashBoardActivity.this);
-                                }
+                            if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
+                            {
+                                Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
+                                in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
+                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                in.putExtra(Constants.IS_GROUP_CHAT, true);
+                                startActivity(in);
                             }
+
+                            RecentContactController recentContactController = new
+                                    RecentContactController(DashBoardActivity.this,_profileId);
+                            recentContactController.insertRecentOKHttp(groupChatId, Constants.CONTACTS_ACTION_SMS);
 
                         } catch (Exception ex) {
                             Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ", ex);
@@ -751,14 +714,14 @@ public class DashBoardActivity extends ToolbarActivity{
                 });
 
             }
-            //ADD RECENT
-            recentContactController.insertRecent(contactId, action);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid)
         {
+            contacts = new ArrayList<>();
+            loadContactsFromIds(contactIds);
             int i = 0;
             for(ImageView image : images)
             {
@@ -768,17 +731,21 @@ public class DashBoardActivity extends ToolbarActivity{
                     i++;
                     String avatar = mapAvatarContactId.get(contact.getContactId());
                     //Avatar
-                    if (loadAvatarFromDisk)
+                    if (null != mapAvatarFile.get(image))
                     {
                         Picasso.with(DashBoardActivity.this)
                                 .load(mapAvatarFile.get(image))
                                 .fit().centerCrop()
                                 .into(image);
-                        loadAvatarFromDisk = false;
                     }
                     else if(null != mapAvatarTarget.get(image))
                     {
                         image.setImageResource(R.color.grey_middle);
+                        nameInitials = contact.getFirstName().substring(0, 1);
+
+                        if (null != contact.getLastName() && contact.getLastName().length() > 0) {
+                            nameInitials = nameInitials + contact.getLastName().substring(0, 1);
+                        }
                         mapAvatarImageAndText.get(image).setText(nameInitials);
 
                         //Add this download to queue, to avoid duplicated downloads
@@ -813,17 +780,15 @@ public class DashBoardActivity extends ToolbarActivity{
                                 typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
                         }
                     }
-
-                    // Names
-                    firstNameView.setText("Group("+contacts.size()+")");
-
-                    //Since it's finished, remove this task from queue
-                    recentsTasksQueue.removeConnection(recentId);
-
                 }  catch (Exception e) {
                     Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
                 }
             }
+
+            // Names
+            firstNameView.setText("Group("+contacts.size()+")");
+            //Since it's finished, remove this task from queue
+            recentsTasksQueue.removeConnection(recentId);
         }
     }
 
@@ -995,7 +960,8 @@ public class DashBoardActivity extends ToolbarActivity{
                             {
                                 Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
                                 in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
-                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                in.putExtra(Constants.IS_GROUP_CHAT, false);
                                 startActivity(in);
                             }
 
@@ -1015,7 +981,7 @@ public class DashBoardActivity extends ToolbarActivity{
                             }
                         }
                         //ADD RECENT
-                        recentController.insertRecent(contactId, action);
+                        recentContactController.insertRecent(contactId, action);
                         //setListAdapterTabs();
                     } catch (Exception ex) {
                         Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ",ex);

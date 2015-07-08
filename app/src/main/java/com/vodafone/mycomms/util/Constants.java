@@ -93,6 +93,10 @@ public class Constants {
     public static final String CONTACT_SORT_HELPER= "sortHelper";
     public static final String CONTACT_SEARCH_HELPER= "searchHelper";
 
+    public static final String CONTACT_PHONE_WORK = "phone_work";
+    public static final String CONTACT_PHONE_HOME = "phone_home";
+    public static final String CONTACT_PHONE_MOBILE = "phone_mobile";
+
     public static final String CONTACT_IS_FAVORITE = "contactIsFavorite";
 
     public static final String MULTIPART_AVATAR = "avatar";

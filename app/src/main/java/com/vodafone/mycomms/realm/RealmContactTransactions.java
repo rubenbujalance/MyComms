@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.realm;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.vodafone.mycomms.util.Constants;
@@ -21,11 +20,6 @@ public class RealmContactTransactions {
 
     public RealmContactTransactions(String profileId) {
         mRealm = Realm.getDefaultInstance();
-        mProfileId = profileId;
-    }
-
-    public RealmContactTransactions(Context context, String profileId){
-        mRealm = Realm.getInstance(context);
         mProfileId = profileId;
     }
 

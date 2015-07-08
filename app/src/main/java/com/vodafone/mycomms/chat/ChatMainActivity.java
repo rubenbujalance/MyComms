@@ -248,7 +248,7 @@ public class ChatMainActivity extends ToolbarActivity {
                 chatTransactions.insertChatMessage(chatMsg);
 
                 //Send through XMPP
-                if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
+                if(!XMPPTransactions.sendText(false, _contact.getContactId(),
                         chatMsg.getId(), msg))
                     return;
 

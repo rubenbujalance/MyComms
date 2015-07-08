@@ -3,6 +3,7 @@ package com.vodafone.mycomms.realm;
 import android.content.Context;
 import android.util.Log;
 
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -54,30 +55,41 @@ public class RealmGroupChatTransactions {
                         , generateComposedMembersId(membersIds)
                         , generateComposedMembersId(ownersIds)
                         , timestamp
+                        , ""
+                        , ""
                 );
 
     }
 
-    public ChatMessage newGroupChatMessageInstance(String contact_id, String group_id,
+    public GroupChat updatedGroupChatInstance(GroupChat chat, ChatMessage chatMsg) {
+        GroupChat updatedChat = new GroupChat(chat.getId(), chat.getProfileId(),
+                chat.getCreatorId(), chat.getName(), chat.getAvatar(), chat.getAbout(),
+                chat.getMembers(), chat.getOwners(), chatMsg.getTimestamp(),
+                chatMsg.getText(), chatMsg.getId());
+
+        return updatedChat;
+    }
+
+    public ChatMessage newGroupChatMessageInstance(String group_id,
                                                    String direction, int type, String text,
                                                    String resourceUri)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
-        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
+        ChatMessage chatMessage = new ChatMessage(_profile_id,"",group_id,timestamp,
                 direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
                 Constants.CHAT_MESSAGE_STATUS_NOT_SENT);
 
         return chatMessage;
     }
 
-    public ChatMessage newGroupChatMessageInstance(String contact_id, String group_id,
+    public ChatMessage newGroupChatMessageInstance(String group_id,
                                                    String direction, int type, String text,
                                                    String resourceUri, String id)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
-        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
+        ChatMessage chatMessage = new ChatMessage(_profile_id,"",group_id,timestamp,
                 direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
                 Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
 
@@ -93,9 +105,44 @@ public class RealmGroupChatTransactions {
 
             mRealm.commitTransaction();
         } catch (Exception e){
-            Log.e(Constants.TAG, LOG_TAG+".insertGroupChat: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: ",e);
             mRealm.cancelTransaction();
         }
+    }
+
+    public boolean insertGroupChatMessage (String groupId, ChatMessage newChatMessage){
+        if(newChatMessage==null) return false;
+
+        try {
+            //Insert new chat message
+            mRealm.beginTransaction();
+            newChatMessage.setProfile_id(_profile_id);
+            mRealm.copyToRealmOrUpdate(newChatMessage);
+
+            //Update associated Chat with new last message
+            GroupChat chat = getGroupChatById(groupId);
+            chat.setLastMessage_id(newChatMessage.getId());
+
+            String lastText;
+            if(newChatMessage.getType()==Constants.CHAT_MESSAGE_TYPE_TEXT)
+                lastText = newChatMessage.getText();
+            else lastText = mContext.getString(R.string.image);
+
+            if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
+                chat.setLastMessage(mContext.getResources().getString(R.string.chat_me_text) + lastText);
+            else chat.setLastMessage(lastText);
+
+            chat.setLastMessageTime(newChatMessage.getTimestamp());
+            
+            mRealm.commitTransaction();
+
+        } catch (Exception e){
+            Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ", e);
+            mRealm.cancelTransaction();
+            return false;
+        }
+
+        return true;
     }
 
     public GroupChat getGroupChatById(String id)
@@ -108,7 +155,7 @@ public class RealmGroupChatTransactions {
         }
         catch (Exception e )
         {
-            Log.e(Constants.TAG, LOG_TAG + ".getGroupChatById: ", e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatById: ", e);
             return  null;
         }
     }
@@ -128,9 +175,8 @@ public class RealmGroupChatTransactions {
             }
             return groupChats;
         }
-        catch (Exception e )
-        {
-            Log.e(Constants.TAG, LOG_TAG+".getGroupChatById: " , e);
+        catch (Exception e ) {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChats: ",e);
             return  null;
         }
     }
@@ -170,7 +216,7 @@ public class RealmGroupChatTransactions {
                 }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getAllChatMessages: ", e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChatMessages: ",e);
         }
 
         return chatMessageArray;
@@ -196,10 +242,8 @@ public class RealmGroupChatTransactions {
                 if(messages==null) messages = new ArrayList<>();
                 messages.add(results.get(i));
             }
-
         } catch (Exception e){
-            e.printStackTrace();
-            Log.e(Constants.TAG, "RealmChatTransactions.getNotReadReceivedContactChatMessages: ", e);
+Log.e(Constants.TAG, "RealmGroupChatTransactions.getNotReadReceivedGroupChatMessages: ",e);
             return null;
         }
 
@@ -226,10 +270,46 @@ public class RealmGroupChatTransactions {
             mRealm.commitTransaction();
 
         } catch (Exception e){
-            e.printStackTrace();
-            Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead: ",e);
             mRealm.cancelTransaction();
         }
+    }
+
+    public long getGroupChatPendingMessagesCount(String groupId){
+        if(groupId==null || _profile_id==null) return 0;
+
+        long count = 0;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, groupId)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
+                    .count();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatPendingMessagesCount: ", e);
+        }
+
+        return count;
+    }
+
+    public long getAllChatPendingMessagesCount(){
+        if(_profile_id==null) return 0;
+
+        long count = 0;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
+                    .count();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllChatPendingMessagesCount: ", e);
+        }
+
+        return count;
     }
 
     public void closeRealm() {if(mRealm!=null) mRealm.close();}

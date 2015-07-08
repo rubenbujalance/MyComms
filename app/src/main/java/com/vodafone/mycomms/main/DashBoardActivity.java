@@ -22,11 +22,11 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.connection.AsyncTaskQueue;
 import com.vodafone.mycomms.connection.ConnectionsQueue;
-import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
@@ -102,10 +102,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
         loadRecents();
         loadNews();
-
-        Log.i(Constants.TAG, "DashBoardActivity.onCreate: DownloadLocalContacts");
-        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, _profileId);
-        downloadLocalContacts.execute();
+        loadLocalContacts();
 
         BusProvider.getInstance().post(new DashboardCreatedEvent());
 
@@ -233,6 +230,11 @@ public class DashBoardActivity extends ToolbarActivity{
         if(newsArrayList != null){
             drawNews(newsArrayList);
         }
+    }
+
+    private void loadLocalContacts(){
+        Log.e(Constants.TAG, "DashBoardActivity.loadLocalContacts: ");
+        ((MycommsApp)getApplication()).getLocalContacts();
     }
 
     private void drawNews(ArrayList<News> newsArrayList) {

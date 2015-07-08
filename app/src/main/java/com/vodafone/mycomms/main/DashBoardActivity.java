@@ -482,7 +482,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
         ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
         TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
-        LinearLayout lay_top_right_image, layout_bottom_both_images;
+        LinearLayout lay_top_right_image, layout_bottom_both_images, lay_main_container;
 
         View childRecents;
 
@@ -590,6 +590,8 @@ public class DashBoardActivity extends ToolbarActivity{
             layout_bottom_both_images = (LinearLayout) childRecents.findViewById(R.id
                     .lay_bottom_both_image_hide);
             layout_bottom_both_images.setVisibility(View.VISIBLE);
+
+            lay_main_container = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
             if(contactIds.size() == 3)
                 lay_top_right_image.setVisibility(View.GONE);
@@ -720,6 +722,7 @@ public class DashBoardActivity extends ToolbarActivity{
         @Override
         protected void onPostExecute(Void aVoid)
         {
+
             contacts = new ArrayList<>();
             loadContactsFromIds(contactIds);
             int i = 0;
@@ -738,7 +741,7 @@ public class DashBoardActivity extends ToolbarActivity{
                                 .fit().centerCrop()
                                 .into(image);
                     }
-                    else if(null != mapAvatarTarget.get(image))
+                    else
                     {
                         image.setImageResource(R.color.grey_middle);
                         nameInitials = contact.getFirstName().substring(0, 1);
@@ -749,35 +752,12 @@ public class DashBoardActivity extends ToolbarActivity{
                         mapAvatarImageAndText.get(image).setText(nameInitials);
 
                         //Add this download to queue, to avoid duplicated downloads
-                        ConnectionsQueue.putConnection(mapAvatarFile.get(image).toString(), mapAvatarTarget.get(image));
-                        Picasso.with(DashBoardActivity.this)
-                                .load(avatar)
-                                .into(mapAvatarTarget.get(image));
-                    }
-
-                    // Recent action icon and bagdes
-                    if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
-                        unread_messages.setVisibility(View.VISIBLE);
-                        unread_messages.setText(String.valueOf(pendingMsgsCount));
-                    } else {
-                        typeRecent.setVisibility(View.VISIBLE);
-
-                        int sdk = Build.VERSION.SDK_INT;
-                        if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
-                            if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                                typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                            else
-                                typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                        } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
-                            if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                                typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                            else
-                                typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                        } else {
-                            if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                                typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
-                            else
-                                typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                        if(null != mapAvatarFile.get(image))
+                        {
+                            ConnectionsQueue.putConnection(mapAvatarFile.get(image).toString(), mapAvatarTarget.get(image));
+                            Picasso.with(DashBoardActivity.this)
+                                    .load(avatar)
+                                    .into(mapAvatarTarget.get(image));
                         }
                     }
                 }  catch (Exception e) {
@@ -785,10 +765,37 @@ public class DashBoardActivity extends ToolbarActivity{
                 }
             }
 
+            // Recent action icon and bagdes
+            if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
+                unread_messages.setVisibility(View.VISIBLE);
+                unread_messages.setText(String.valueOf(pendingMsgsCount));
+            } else {
+                typeRecent.setVisibility(View.VISIBLE);
+
+                int sdk = Build.VERSION.SDK_INT;
+                if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                } else {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                }
+            }
+
             // Names
             firstNameView.setText("Group("+contacts.size()+")");
             //Since it's finished, remove this task from queue
             recentsTasksQueue.removeConnection(recentId);
+            lay_main_container.setVisibility(View.VISIBLE);
         }
     }
 
@@ -1024,6 +1031,11 @@ public class DashBoardActivity extends ToolbarActivity{
                 } else if  (platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL) &&
                         avatar == null ||
                         avatar.length() < 0) {
+                    recentAvatar.setImageResource(R.color.grey_middle);
+                    avatarText.setText(nameInitials);
+                }
+                else if (!platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL))
+                {
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(nameInitials);
                 }

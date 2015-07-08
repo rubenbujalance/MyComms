@@ -186,6 +186,13 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         String members = groupChat.getMembers();
         String[] membersArray = members.split("@");
 
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30,
+                mContext.getResources().getDisplayMetrics());
+        chatListHolder.lay_top_left_image.setLayoutParams
+                (
+                        new LinearLayout.LayoutParams(width,width)
+                );
+
         if(membersArray.length > 3)
         {
             chatListHolder.lay_top_right_image_hide.setVisibility(View.VISIBLE);

@@ -55,7 +55,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 
-import io.realm.Realm;
 import model.Contact;
 import model.News;
 import model.RecentContact;

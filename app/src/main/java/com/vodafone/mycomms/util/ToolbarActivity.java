@@ -21,12 +21,9 @@ import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatListActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
-import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
-
-import model.Contact;
 
 public class ToolbarActivity extends ActionBarActivity {
 
@@ -264,20 +261,6 @@ public class ToolbarActivity extends ActionBarActivity {
         });
     }
 
-    protected void setChatHeaderListener(final Context context, final Contact contact)
-    {
-        ImageView imageContact = (ImageView) findViewById(R.id.companyLogo);
-        imageContact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent in = new Intent(context, ContactDetailMainActivity.class);
-                in.putExtra(Constants.CONTACT_CONTACT_ID, contact.getContactId());
-                startActivity(in);
-                //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
-            }
-        });
-    }
-
     protected void setContactsListeners(final Context context){
         ImageView contactsProfile = (ImageView) findViewById(R.id.contacts_profile);
         contactsProfile.setOnClickListener(new View.OnClickListener() {
@@ -293,7 +276,7 @@ public class ToolbarActivity extends ActionBarActivity {
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent in = new Intent(context, ChatMainActivity.class);
+                //Intent in = new Intent(context, GroupChatActivity.class);
                 //startActivity(in);
             }
         });

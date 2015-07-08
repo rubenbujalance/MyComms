@@ -20,7 +20,6 @@ import com.vodafone.mycomms.chatgroup.ComposedChat;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
-import com.vodafone.mycomms.events.MessageSentEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -54,7 +53,6 @@ public class ChatListFragment extends Fragment{
         mRecyclerView = (RecyclerView) mSwipeRefreshLayout.findViewById(R.id.recycler_view);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
-
 
         mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), getComposedChat());
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
@@ -149,10 +147,10 @@ public class ChatListFragment extends Fragment{
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
-    @Subscribe
-    public void onEventMessageSent(MessageSentEvent event) {
-        refreshAdapter();
-    }
+//    @Subscribe
+//    public void onEventMessageSent(MessageSentEvent event) {
+//        refreshAdapter();
+//    }
 
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){

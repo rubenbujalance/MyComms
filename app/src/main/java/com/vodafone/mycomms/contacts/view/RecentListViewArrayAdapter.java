@@ -105,10 +105,10 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         String[] ids = groupChat.getMembers().split("@");
 
         RealmContactTransactions contactTransactions =
-                new RealmContactTransactions(mContext, _profile_id);
+                new RealmContactTransactions(_profile_id);
 
         RealmContactTransactions realmContactTransactions = new RealmContactTransactions
-                (mContext,_profile_id);
+                (_profile_id);
 
         UserProfile userProfile = realmContactTransactions.getUserProfile();
         Contact contact = new Contact();

@@ -538,8 +538,8 @@ public class DashBoardActivity extends ToolbarActivity{
                         ArrayList<String> ids
                 )
         {
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions
-                    (DashBoardActivity.this,_profileId);
+            RealmContactTransactions realmContactTransactions =
+                    new RealmContactTransactions(_profileId);
             UserProfile userProfile = realmContactTransactions.getUserProfile();
             Contact contact = new Contact();
             contact.setAvatar(userProfile.getAvatar());

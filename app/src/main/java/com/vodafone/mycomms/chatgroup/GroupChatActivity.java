@@ -426,10 +426,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if(!XMPPTransactions.sendText(isGroupChatMode, groupContactId, chatMsg.getId(), msg))
             return;
 
-        //Insert in recents
-        String action = Constants.CONTACTS_ACTION_SMS;
-        mRecentContactController.insertRecent(_chat.getContact_id(), action);
-        mRecentContactController.setConnectionCallback(GroupChatActivity.this);
+//        //Insert in recents
+//        String action = Constants.CONTACTS_ACTION_SMS;
+//        mRecentContactController.insertRecent(_chat.getContact_id(), action);
+//        mRecentContactController.setConnectionCallback(GroupChatActivity.this);
 
 //        //Notify app to refresh any view if necessary
 //        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {

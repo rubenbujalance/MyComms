@@ -99,7 +99,6 @@ public class DashBoardActivity extends ToolbarActivity{
 
         initALL();
 
-
         loadRecents();
         loadNews();
         loadLocalContacts();

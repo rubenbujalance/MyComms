@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.search;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -44,13 +45,21 @@ public class SearchController extends BaseController
     private int offsetPaging = 0;
     private String mProfileId;
 
+
+    public SearchController(Activity activity, String profileId) {
+        super(activity);
+        this.mContext = activity;
+        realmContactTransactions = new RealmContactTransactions(profileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
+        internalContactSearch = new InternalContactSearch(activity, profileId);
+        this.mProfileId = profileId;
+    }
+
     public SearchController(Context context, String profileId) {
         super(context);
         this.mContext = context;
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(profileId);
-        realmAvatarTransactions = new RealmAvatarTransactions();
-        internalContactSearch = new InternalContactSearch(context, profileId);
+        realmContactTransactions = new RealmContactTransactions(mContext, profileId);
     }
 
     @Override

@@ -23,7 +23,13 @@ public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
         this.mContext = context;
         this.mProfileId = profileId;
         internalContactSearch = new InternalContactSearch(mContext, mProfileId);
-        mSearchController = new SearchController(context, profileId);
+
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mSearchController = new SearchController(mContext, mProfileId);
     }
 
     @Override
@@ -43,6 +49,7 @@ public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         mSearchController.storeContactsIntoRealm(contactArrayList);
+        mSearchController.closeRealm();
     }
 
     public ArrayList<Contact> getAllLocalContacts() {

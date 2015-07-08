@@ -35,6 +35,8 @@ public class RecentContactController extends BaseController {
     private ContactsController contactsController;
     private ContactSearchController contactSearchController;
 
+
+
     private String URL_SET_RECENT = "https://" + EndpointWrapper.getBaseURL() +
             Constants.CONTACT_API_POST_RECENTS;
 
@@ -109,7 +111,6 @@ public class RecentContactController extends BaseController {
         protected void onPostExecute(String response)
         {
             Log.i(Constants.TAG, "RecentContactsAsyncTask.doInBackground: " + response);
-            ContactsController contactsController = new ContactsController(mContext, mProfileId);
             contactsController.insertRecentContactInRealm(null);
         }
     }

@@ -29,7 +29,6 @@ public class RealmContactTransactions {
         mProfileId = profileId;
     }
 
-
     public void insertUserProfile(UserProfile userProfile){
         Log.d(Constants.TAG, "RealmContactTransactions.insertUserProfile: " + userProfile);
         if(userProfile == null){

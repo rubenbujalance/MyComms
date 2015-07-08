@@ -1,6 +1,8 @@
 package com.vodafone.mycomms.contacts.connection;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
@@ -39,6 +41,22 @@ public class ContactsController extends BaseController {
     private String mProfileId;
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
+
+    public ContactsController(Activity activity, String profileId) {
+        super(activity);
+        this.mContext = activity;
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
+    }
+
+    public ContactsController(Fragment fragment, String profileId) {
+        super(fragment);
+        this.mContext = fragment.getActivity();
+        this.mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
+    }
 
     public ContactsController(Context context, String profileId) {
         super(context);
@@ -447,7 +465,7 @@ public class ContactsController extends BaseController {
     @Override
     public void onConnectionError(ConnectionException e) {
         super.onConnectionError(e);
-        Log.e(Constants.TAG, "ContactsController.onConnectionError",e.getException());
+        Log.e(Constants.TAG, "ContactsController.onConnectionError", e.getException());
         BusProvider.getInstance().post(new SetNoConnectionLayoutVisibility());
     }
 

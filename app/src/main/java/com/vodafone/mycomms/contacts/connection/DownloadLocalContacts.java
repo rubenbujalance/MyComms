@@ -38,6 +38,7 @@ public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
         contactArrayList = getAllLocalContacts();
         Log.i(Constants.TAG, "DownloadLocalContacts.doInBackground: Size: " + contactArrayList.size());
         for (Contact contact : contactArrayList){
+            Log.i(Constants.TAG, "DownloadLocalContacts.doInBackground: Contact Id " + contact.getId());
             Log.i(Constants.TAG, "DownloadLocalContacts.doInBackground: Local Contact " + contact.getFirstName() + " " + contact.getLastName());
             Log.i(Constants.TAG, "DownloadLocalContacts.doInBackground: Local Contact PHOTO " + contact.getAvatar());
         }

@@ -53,7 +53,7 @@ public class InternalContactSearch
         {
             contact = new Contact("");
             contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
-            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + id);
+            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
             contact.setProfileId(profileId);
             contact = setContactsCompanyDataByContactsIds(id, contact);
@@ -90,11 +90,12 @@ public class InternalContactSearch
         SharedPreferences sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String deviceId = sp.getString(Constants.DEVICE_ID_SHARED_PREF,"");
+        Log.i(Constants.TAG, "InternalContactSearch.getAllLocalContact: deviceId " + deviceId);
         for(String id : ids)
         {
             contact = new Contact("");
             contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
-            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + id);
+            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
             contact.setProfileId(profileId);
             contact = setContactsCompanyDataByContactsIds(id, contact);
@@ -250,7 +251,6 @@ public class InternalContactSearch
             {
                 do
                 {
-                    String phone = "";
                     ContentResolver cr = this.context.getContentResolver();
                     Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                             ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id, null, null);

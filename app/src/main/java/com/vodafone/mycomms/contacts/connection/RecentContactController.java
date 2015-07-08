@@ -1,19 +1,23 @@
 package com.vodafone.mycomms.contacts.connection;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
+import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
@@ -30,6 +34,11 @@ public class RecentContactController extends BaseController {
     int method;
     private ContactsController contactsController;
     private ContactSearchController contactSearchController;
+
+
+
+    private String URL_SET_RECENT = "https://" + EndpointWrapper.getBaseURL() +
+            Constants.CONTACT_API_POST_RECENTS;
 
     public RecentContactController(Context appContext, String profileId) {
         super(appContext);
@@ -72,9 +81,133 @@ public class RecentContactController extends BaseController {
         mRecentContactConnection.request();
     }
 
+    public void insertRecentOKHttp(String contactId, String action)
+    {
+        String[] params = new String[]{contactId,action};
+        new RecentContactsOKHTTPAsyncTask().execute(params);
+    }
+
+    public class RecentContactsOKHTTPAsyncTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params)
+        {
+            Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: START");
+
+            try
+            {
+                Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
+                Request request = createGroupChatRequestForCreation(params[0], params[1]);
+                return executeRequest(request);
+
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: ",e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String response)
+        {
+            Log.i(Constants.TAG, "RecentContactsAsyncTask.doInBackground: " + response);
+            ContactsController contactsController = new ContactsController(mContext, mRealm,
+                    mProfileId);
+            contactsController.insertRecentContactInRealm(null);
+        }
+    }
+
+    public String createdJSONObjectForSetRecent(String contactId, String action)
+    {
+        long timestamp = Calendar.getInstance().getTimeInMillis();
+        String jsonRequest = "{\"id\":\""
+                    + contactId + "\","
+                    + "\"timestamp\": "+timestamp+","
+                    + "\"action\":\""+action+"\"}";
+
+        return jsonRequest;
+    }
+
+
+    public Request createGroupChatRequestForCreation(String contactId, String action)
+    {
+        try
+        {
+            final String authorization = "Authorization";
+            final String version_token = "x-mycomms-version";
+            final String ACCESS_TOKEN = "Bearer ";
+
+            String jsonRequest = createdJSONObjectForSetRecent(contactId, action);
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+            RequestBody requestBody = RequestBody.create(JSON, jsonRequest);
+            Request request = new Request.Builder()
+                    .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
+                    .addHeader(version_token, getVersionName())
+                    .url(URL_SET_RECENT)
+                    .post(requestBody)
+                    .build();
+            return request;
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "RecentContactController.createGroupChatRequest: ERROR ", e);
+            return null;
+        }
+    }
+
+    public String executeRequest(Request request)
+    {
+        try
+        {
+            OkHttpClient client = new OkHttpClient();
+            Response response = client.newCall(request).execute();
+            return responseToString(response);
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "RecentContactController.executeRequest: ERROR ", e);
+            return null;
+        }
+
+    }
+
+    public String responseToString(Response response)
+    {
+        try
+        {
+            return response.body().string();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RecentContactController.convertResponseToString: " + "ERROR ",e);
+            return null;
+        }
+    }
+
+    private String getVersionName()
+    {
+        try
+        {
+            PackageInfo pinfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
+            int versionCode = pinfo.versionCode;
+            String versionName = pinfo.versionName;
+
+            return "android/"+versionName+"."+versionCode;
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "RecentContactController.getVersionName: ERROR ",e);
+            return "";
+        }
+    }
+
+
+
+
     @Override
     public void onConnectionComplete(ConnectionResponse response) {
-        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ");
+        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: " + response.getData().toString());
 
         super.onConnectionComplete(response);
         if (method==HttpConnection.POST) {

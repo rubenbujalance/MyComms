@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.ConnectionsQueue;
+import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.Utils;
@@ -115,7 +116,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             //Download avatar
             if (contact.getAvatar() != null &&
                     contact.getAvatar().length() > 0
-                        && contact.getPlatform().equalsIgnoreCase("mc")) {
+                        && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)) {
                 File avatarsDir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
 
                 if(!avatarsDir.exists()) avatarsDir.mkdirs();
@@ -152,6 +153,24 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 Picasso.with(mContext)
                         .load(contact.getAvatar())
                         .into(target);
+            } else if (contact.getAvatar() != null &&
+                    contact.getAvatar().length() > 0
+                    && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
+                AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.imageAvatar, viewHolder.textAvatar, contact.getContactId());
+                avatarSFController.getSFAvatar(contact.getAvatar());
+            } else if (contact.getAvatar() != null &&
+                    contact.getAvatar().length() > 0 &&
+                    contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                    viewHolder.textAvatar.setVisibility(View.INVISIBLE);
+                    Picasso.with(mContext)
+                        .load(contact.getAvatar())
+                        .fit().centerCrop()
+                        .into(viewHolder.imageAvatar);
+            } else if  (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL) &&
+                    contact.getAvatar() == null ||
+                    contact.getAvatar().length() < 0) {
+                viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
+                viewHolder.textAvatar.setText(initials);
             }
         }
 

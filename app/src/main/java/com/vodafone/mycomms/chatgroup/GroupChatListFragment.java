@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
 import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
@@ -68,6 +69,7 @@ public class GroupChatListFragment extends ListFragment implements
     private RealmGroupChatTransactions mGroupChatTransactions;
     private RealmContactTransactions mContactTransactions;
     private GroupChatController mGroupChatController;
+    private RecentContactController mRecentContactController;
 
     private ArrayList<String> selectedContacts;
     private ArrayList<String> ownersIds;
@@ -120,6 +122,7 @@ public class GroupChatListFragment extends ListFragment implements
         mContactTransactions = new RealmContactTransactions(profileId);
         mGroupChatController = new GroupChatController(getActivity());
         contactListController = new ContactListController(getActivity(), profileId);
+        mRecentContactController = new RecentContactController(getActivity(),profileId);
     }
 
     @Override
@@ -141,6 +144,7 @@ public class GroupChatListFragment extends ListFragment implements
         mContactTransactions.closeRealm();
         contactListController.closeRealm();
         contactListController.closeRealm();
+        mRecentContactController.closeRealm();
         BusProvider.getInstance().unregister(this);
     }
 
@@ -561,8 +565,12 @@ public class GroupChatListFragment extends ListFragment implements
             {
                 String chatToString = groupChat.getId() + groupChat.getProfileId()
                         + groupChat.getMembers();
-                Log.i(Constants.TAG, LOG_TAG+".CreateGroupChatTask -> Created chat is: " + chatToString);
+                Log.i(Constants.TAG, LOG_TAG + ".CreateGroupChatTask -> Created chat is: " + chatToString);
                 mGroupChatTransactions.insertOrUpdateGroupChat(groupChat);
+
+                String action = Constants.CONTACTS_ACTION_SMS;
+                mRecentContactController.insertRecent(groupChat.getId(), action);
+
                 startActivityInGroupChatMode();
             }
         }
@@ -671,7 +679,8 @@ public class GroupChatListFragment extends ListFragment implements
         return false;
     }
 
-    private boolean updateGroupChat(String groupChatId) {
+    private boolean updateGroupChat(String groupChatId)
+    {
         this.selectedContacts.add(profileId);
         mGroupChatController.setChatMembers(this.selectedContacts);
         mGroupChatController.setChatCreator(this.profileId);

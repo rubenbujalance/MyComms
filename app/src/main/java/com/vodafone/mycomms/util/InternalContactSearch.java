@@ -45,6 +45,44 @@ public class InternalContactSearch
         for(String id : ids)
         {
             contact = new Contact("");
+            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + id);
+            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + id);
+            contact.setPlatform(Constants.PLATFORM_LOCAL);
+            contact.setProfileId(profileId);
+            contact = setContactsCompanyDataByContactsIds(id, contact);
+            contact = setContactsBasicDataByContactsIds(id, contact);
+            contact = setContactsEmailDataByContactsIds(id, contact);
+            contact = setContactsPhoneDataByContactsIds(id, contact);
+            contact.setSearchHelper
+                    (
+                            (contact.getFirstName() + " " +
+                                    contact.getLastName() + " "
+                                    +contact.getCompany() + " "
+                                    +contact.getEmails()).trim()
+                    );
+            contact.setSortHelper
+                    (
+                            (contact.getFirstName() + " " +
+                                    contact.getLastName() + " "
+                                    + contact.getCompany()).trim()
+                    );
+            contacts.add(contact);
+        }
+        return contacts;
+    }
+
+    /**
+     * Get All local contacts
+     * @author str_vdf01
+     * @return (ArrayList Contact ) -> list of found contacts
+     */
+    public ArrayList<Contact> getAllLocalContact() {
+        ArrayList<String> ids = getAllContactsIds();
+        ArrayList<Contact> contacts = new ArrayList<>();
+        Contact contact;
+        for(String id : ids)
+        {
+            contact = new Contact("");
             contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_"+profileId+"_"+id);
             contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
@@ -53,6 +91,19 @@ public class InternalContactSearch
             contact = setContactsBasicDataByContactsIds(id, contact);
             contact = setContactsEmailDataByContactsIds(id, contact);
             contact = setContactsPhoneDataByContactsIds(id, contact);
+            contact.setSearchHelper
+                    (
+                            (contact.getFirstName() + " " +
+                                    contact.getLastName() + " "
+                                    +contact.getCompany() + " "
+                                    +contact.getEmails()).trim()
+                    );
+            contact.setSortHelper
+                    (
+                            (contact.getFirstName() + " " +
+                                    contact.getLastName() + " "
+                                    + contact.getCompany()).trim()
+                    );
             contacts.add(contact);
         }
         return contacts;
@@ -108,7 +159,12 @@ public class InternalContactSearch
                 do
                 {
                     String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                    String[] splitName = name.split(" ");
+                    String[] splitName = new String[10];
+                    if (name!=null)
+                        splitName = name.split(" ");
+                    else
+                        splitName[0] = " ";
+
                     if(splitName.length > 1)
                     {
                         contact.setFirstName(splitName[0]);
@@ -120,8 +176,11 @@ public class InternalContactSearch
                     }
 
                     contact.setLastSeen(Long.parseLong(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LAST_TIME_CONTACTED))));
+
+                    String avatar = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI));
+                    contact.setAvatar(avatar);
                 }
-                while(cursor.moveToNext());
+                while (cursor.moveToNext());
             }
             cursor.close();
             return contact;
@@ -181,8 +240,12 @@ public class InternalContactSearch
             {
                 do
                 {
-                    String phone = cursor.getString(cursor.getColumnIndex(ContactsContract
-                            .CommonDataKinds.Phone.NORMALIZED_NUMBER)).replace(" ", "");
+                    String phone = "";
+                    if (cursor.getString(cursor.getColumnIndex(ContactsContract
+                            .CommonDataKinds.Phone.NORMALIZED_NUMBER)) != null) {
+                        phone = cursor.getString(cursor.getColumnIndex(ContactsContract
+                                .CommonDataKinds.Phone.NORMALIZED_NUMBER)).replace(" ", "");
+                    }
                     contact.setPhones(phone);
                 }
                 while(cursor.moveToNext());
@@ -274,6 +337,39 @@ public class InternalContactSearch
     }
 
     /**
+     * Gets all contact ids from Contact Name
+     * @author str_vdf01
+     * @return (ArrayList String ) -> list of unique contact IDS
+     */
+    private ArrayList<String> getAllContactsIds()
+    {
+        Cursor cursorByName = getAllContactsIdsFromName();
+
+        ArrayList<String> distinctIds = new ArrayList<>();
+
+        if(null != cursorByName && cursorByName.moveToFirst())
+        {
+            do
+            {
+                String id = cursorByName
+                        .getString(cursorByName.getColumnIndex(ContactsContract.Data.CONTACT_ID));
+                if(!distinctIds.contains(id))
+                {
+                    distinctIds.add(id);
+                }
+            }
+            while (cursorByName.moveToNext());
+        }
+        if(null != cursorByName && !cursorByName.isClosed())
+        {
+            cursorByName.close();
+        }
+
+
+        return distinctIds;
+    }
+
+    /**
      * Gets Cursor of contact_ids by given key word considered as CONTACT NAME from
      * ContactsContract.Contacts table
      * @author str_oan
@@ -303,6 +399,38 @@ public class InternalContactSearch
         {
             String message = ex.getMessage();
             Log.e(Constants.TAG, "getContactsIdsByKeyWordFromName() -> ERROR: " + message);
+            return null;
+        }
+    }
+
+    /**
+     * Gets Cursor of all contact_ids from ContactsContract.Contacts table
+     * @author str_vdf01
+     * @return (Cursor) -> ids of contacts if any, otherwise empty Cursor
+     */
+    private Cursor getAllContactsIdsFromName()
+    {
+        ContentResolver cr = this.context.getContentResolver();
+        try
+        {
+            Uri uri = ContactsContract.Data.CONTENT_URI;
+            String[] projection = new String[]
+                    {
+                            ContactsContract.Data.CONTACT_ID
+                    };
+
+            String selection = ContactsContract.Data.DISPLAY_NAME
+                    + " AND "+ContactsContract.Data.HAS_PHONE_NUMBER+" = 1"
+                    + " AND "+ContactsContract.Data.IN_VISIBLE_GROUP+" = '1'"
+                    ;
+
+//            return cr.query(uri, projection, selection, null, ContactsContract.Data.CONTACT_ID+" ASC");
+            return cr.query(uri, projection, null, null, ContactsContract.Data.CONTACT_ID+" ASC");
+        }
+        catch (Exception ex)
+        {
+            String message = ex.getMessage();
+            Log.e(Constants.TAG, "getAllContactsIdsFromName() -> ERROR: " + message);
             return null;
         }
     }
@@ -367,7 +495,7 @@ public class InternalContactSearch
             Uri uri = ContactsContract.Data.CONTENT_URI;
             String[] projection = new String[]
                     {
-                            ContactsContract.Data.CONTACT_ID
+                            ContactsContract.Data.CONTACT_ID,
                     };
 
             String selection = ContactsContract.CommonDataKinds.Organization.COMPANY
@@ -421,8 +549,12 @@ public class InternalContactSearch
                         , ContactsContract.CommonDataKinds.Organization.COMPANY
                 };
 
-        return cr.query(uri, projection, selection, selectionArgs, ContactsContract.Data.CONTACT_ID + " " +
-                "ASC");
+        return cr.query(uri,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        ContactsContract.Data.CONTACT_ID + " ASC");
+
     }
 
     /**
@@ -440,6 +572,7 @@ public class InternalContactSearch
                           ContactsContract.Data.DISPLAY_NAME
                         , ContactsContract.Data.LAST_TIME_CONTACTED
                         , ContactsContract.Data.TIMES_CONTACTED
+                        , ContactsContract.Data.PHOTO_URI
                 };
 
         String selection = ContactsContract.Data.CONTACT_ID +" =? ";

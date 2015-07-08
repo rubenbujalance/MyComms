@@ -204,6 +204,10 @@ public class GroupChatActivity extends ToolbarActivity implements
                 dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
+        String action = Constants.CONTACTS_ACTION_SMS;
+        String id = groupChat.getId();
+        mRecentContactController.insertRecentOKHttp(id, action);
+
     }
 
     public void setHeaderAvatar()

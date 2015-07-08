@@ -55,6 +55,14 @@ public class SearchController extends BaseController
         this.mProfileId = profileId;
     }
 
+    public SearchController(Context context, Realm realm, String profileId) {
+        super(context);
+        this.mRealm = realm;
+        this.mContext = context;
+        this.mProfileId = profileId;
+        //        realmContactTransactions = new RealmContactTransactions(realm, profileId);
+        realmContactTransactions = new RealmContactTransactions(mContext, profileId);
+    }
 
     @Override
     public void onConnectionComplete(ConnectionResponse response)

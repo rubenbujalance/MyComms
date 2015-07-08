@@ -1,7 +1,7 @@
 package com.vodafone.mycomms.contacts.connection;
 
-import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
@@ -16,15 +16,23 @@ import com.vodafone.mycomms.events.SetNoConnectionLayoutVisibility;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.InternalContactSearch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Calendar;
 
+import io.realm.Realm;
 import model.Contact;
+import model.ContactAvatar;
 import model.FavouriteContact;
 import model.RecentContact;
 
@@ -38,7 +46,6 @@ public class ContactsController extends BaseController {
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
     private RealmAvatarTransactions realmAvatarTransactions;
-    private InternalContactSearch internalContactSearch;
     private String apiCall;
     private String mProfileId;
     private int search = Constants.CONTACTS_ALL;
@@ -95,7 +102,7 @@ public class ContactsController extends BaseController {
             contactConnection.cancel();
         }
         apiCall = api;
-        contactConnection = new ContactConnection(getContext(), this, apiCall);
+        contactConnection = new ContactConnection(mContext, this, apiCall);
         contactConnection.request();
     }
 
@@ -468,6 +475,7 @@ public class ContactsController extends BaseController {
     @Override
     public void onConnectionError(ConnectionException e) {
         super.onConnectionError(e);
+        Log.e(Constants.TAG, "ContactsController.onConnectionError",e.getException());
         BusProvider.getInstance().post(new SetNoConnectionLayoutVisibility());
     }
 

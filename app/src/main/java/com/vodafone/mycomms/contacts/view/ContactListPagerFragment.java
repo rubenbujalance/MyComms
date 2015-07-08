@@ -49,7 +49,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         SharedPreferences sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        mContactsController = new ContactsController(this, mProfileId);
+        mContactsController = new ContactsController(getActivity(), mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
         //mContactsController.getContactList(apiCall);
         //mContactsController.setConnectionCallback(this);

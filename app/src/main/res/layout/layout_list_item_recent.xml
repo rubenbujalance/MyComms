@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:weightSum="1"
         android:padding="10dp">
-    <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image"
+    <include android:id="@+id/layout_list_item_image" layout="@layout/layout_multi_chat_avatar_60"
         android:layout_width="60dp"
         android:layout_height = "60dp"
         android:layout_gravity="center" />

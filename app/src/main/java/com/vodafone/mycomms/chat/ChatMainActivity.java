@@ -234,13 +234,13 @@ public class ChatMainActivity extends ToolbarActivity implements IRecentContactC
 
     private void sendText()
     {
-        String msg = etChatTextBox.getText().toString();
+        final String msg = etChatTextBox.getText().toString();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 //Save to DB
-                ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
+                final ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
                         _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
 

@@ -67,6 +67,11 @@ public class DashBoardActivity extends ToolbarActivity{
     private ArrayList<News> newsArrayList;
     private AsyncTaskQueue recentsTasksQueue = new AsyncTaskQueue();
     private boolean recentsLoading = false;
+    private String profileId;
+    private UserProfile userProfile;
+    private RealmContactTransactions mContactTransactions;
+    private RealmGroupChatTransactions mGroupChatTransactions;
+
 
 
     @Override
@@ -79,16 +84,28 @@ public class DashBoardActivity extends ToolbarActivity{
         enableToolbarIsClicked(false);
         setContentView(R.layout.layout_dashboard);
 
-        initALL();
-
-        mRealm = Realm.getInstance(getBaseContext());
-        loadRecents();
-        loadNews();
-
         BusProvider.getInstance().post(new DashboardCreatedEvent());
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        this.profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        this.mRealm = Realm.getInstance(getBaseContext());
+        this.mContactTransactions = new RealmContactTransactions(this.mRealm, this.profileId);
+        this.mGroupChatTransactions = new RealmGroupChatTransactions
+                (
+                        mRealm
+                        ,DashBoardActivity.this
+                        ,this.profileId
+                );
+        this.userProfile = mContactTransactions.getUserProfile(profileId);
+
+        initALL();
+
+
+        loadRecents();
+        loadNews();
+
         if(sp==null)
         {
             Log.e(Constants.TAG, "DashBoardActivity.onCreate: error loading Shared Preferences");
@@ -156,12 +173,8 @@ public class DashBoardActivity extends ToolbarActivity{
 
         recentsLoading = true;
 
-        try {
-
-            SharedPreferences sp = getSharedPreferences(
-                    Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-
+        try
+        {
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, profileId);
@@ -179,11 +192,10 @@ public class DashBoardActivity extends ToolbarActivity{
                 {
                     Log.e(Constants.TAG, "DashBoardActivity.loadRecents: GroupChatRecent " +
                             "detected!");
-                    DrawSingleGroupChatRecentAsyncTask task = new DrawSingleGroupChatRecentAsyncTask
+                   /* DrawSingleGroupChatRecentAsyncTask task = new DrawSingleGroupChatRecentAsyncTask
                             (
                                     recentContact.getAction()
                                     , recentContact.getUniqueId()
-                                    , profileId
                                     , recentsContainer
                                     , inflater
                                     , recentContact.getId()
@@ -191,7 +203,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
                     recentsTasksQueue.putConnection(recentContact.getUniqueId(),task);
                     task.execute();
-                }
+                }*/
                 else
                 {
                     DrawSingleRecentAsyncTask task = new DrawSingleRecentAsyncTask(recentContact.getContactId(),
@@ -465,7 +477,7 @@ public class DashBoardActivity extends ToolbarActivity{
     public class DrawSingleGroupChatRecentAsyncTask extends AsyncTask<Void,Void,Void>
     {
 
-        String contactId,firstName,lastName,action,phones,emails,platform,recentId;
+        String contactId,action,phones,emails,platform,recentId;
         LinearLayout recentsContainer;
         LayoutInflater inflater;
 
@@ -473,7 +485,6 @@ public class DashBoardActivity extends ToolbarActivity{
         TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
         LinearLayout lay_top_right_image, layout_bottom_both_images;
 
-        String profileId;
         View childRecents;
 
         //Avatar
@@ -483,7 +494,6 @@ public class DashBoardActivity extends ToolbarActivity{
         Target avatarTarget;
 
         //Name
-        String firstNameStr,lastNameStr;
         TextView firstNameView;
 
         // Action icon and badges
@@ -494,10 +504,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
         ArrayList<String> contactIds = new ArrayList<>();
         ArrayList<Contact> contacts = new ArrayList<>();
-        String groupChatid;
-        RealmContactTransactions mContactTransactions;
-        RealmGroupChatTransactions mGroupChatTransactions;
-        UserProfile _profile;
+        String groupChatId;
         ArrayList<ImageView> images = new ArrayList<>();
 
         HashMap<ImageView,Target> mapAvatarTarget = new HashMap<>();
@@ -509,7 +516,6 @@ public class DashBoardActivity extends ToolbarActivity{
                 (
                         String action
                         , String recentId
-                        , String profileId
                         , LinearLayout recentsContainer
                         , LayoutInflater inflater
                         , String groupChatId
@@ -518,22 +524,9 @@ public class DashBoardActivity extends ToolbarActivity{
 
             this.recentsContainer = recentsContainer;
             this.inflater = inflater;
-
-
             this.action = action;
-            this.profileId = profileId;
             this.recentId = recentId;
-            String[] ids = contactId.split("@");
-            Collections.addAll(contactIds,ids);
-            this.mContactTransactions = new RealmContactTransactions(_realm,this.profileId);
-            this.mGroupChatTransactions = new RealmGroupChatTransactions(_realm,DashBoardActivity
-                    .this,profileId);
-            this.groupChatid = groupChatId;
-            this.contactId = mGroupChatTransactions.getGroupChatById(this.groupChatid).getMembers();
-            this._profile = this.mContactTransactions.getUserProfile(profileId);
-            loadContactsFromIds(contactIds);
-            mapAvatarToContactId();
-
+            this.groupChatId = groupChatId;
         }
 
         private void loadContactsFromIds
@@ -542,14 +535,14 @@ public class DashBoardActivity extends ToolbarActivity{
                 )
         {
             Contact contact = new Contact();
-            contact.setAvatar(_profile.getAvatar());
-            contact.setFirstName(_profile.getFirstName());
-            contact.setLastName(_profile.getLastName());
-            contact.setContactId(_profile.getId());
+            contact.setAvatar(userProfile.getAvatar());
+            contact.setFirstName(userProfile.getFirstName());
+            contact.setLastName(userProfile.getLastName());
+            contact.setContactId(userProfile.getId());
             contacts.add(contact);
             for(String id : ids)
             {
-                if(!id.equals(_profile.getId()))
+                if(!id.equals(userProfile.getId()))
                 {
                     contact = mContactTransactions.getContactById(id);
                     contacts.add(contact);
@@ -615,6 +608,14 @@ public class DashBoardActivity extends ToolbarActivity{
         @Override
         protected Void doInBackground(Void... params)
         {
+
+            this.contactId = mGroupChatTransactions.getGroupChatById(groupChatId).getMembers();
+            String[] ids = contactId.split("@");
+            Collections.addAll(contactIds, ids);
+
+            loadContactsFromIds(contactIds);
+            mapAvatarToContactId();
+
             int i = 0;
             for(final ImageView image : images)
             {
@@ -721,7 +722,7 @@ public class DashBoardActivity extends ToolbarActivity{
                                 else if(null == platform)
                                 {
                                     Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
-                                    in.putExtra(Constants.GROUP_CHAT_ID, groupChatid);
+                                    in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
                                     in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
                                     in.putExtra(Constants.IS_GROUP_CHAT, true);
                                     startActivity(in);

@@ -240,6 +240,12 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         viewHolder.lay_bottom_both_image_hide.setVisibility(View.VISIBLE);
         viewHolder.imageCompanyLogo.setVisibility(View.GONE);
         viewHolder.textViewCompany.setVisibility(View.GONE);
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30,
+        mContext.getResources().getDisplayMetrics());
+        viewHolder.lay_top_left_image.setLayoutParams
+                (
+                        new LinearLayout.LayoutParams(width, width)
+                );
 
         ArrayList<ImageView> images = new ArrayList<>();
         images.add(viewHolder.top_left_avatar);

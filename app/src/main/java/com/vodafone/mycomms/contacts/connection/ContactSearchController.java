@@ -121,10 +121,9 @@ public class ContactSearchController extends BaseController {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(json);
 
-                ArrayList<Contact> contactArrayList = contactsController.insertContactListInRealm(jsonResponse);
-
+                contactsController.insertContactListInRealm(jsonResponse);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
-                //Show Recents on Dashboard
+                //Show Recent Contacts
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);

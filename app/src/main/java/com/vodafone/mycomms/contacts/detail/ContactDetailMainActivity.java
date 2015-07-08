@@ -471,7 +471,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private String getElementFromJsonObjectString(String json, String key){
-        Log.d(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " + json + ", key=" + key);
         JSONObject jsonObject;
         String result = "";
         try {
@@ -489,7 +488,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 }
             }
 
-            Log.d(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " + result);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " , e);

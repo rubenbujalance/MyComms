@@ -90,7 +90,6 @@ public class InternalContactSearch
         SharedPreferences sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String deviceId = sp.getString(Constants.DEVICE_ID_SHARED_PREF,"");
-        Log.i(Constants.TAG, "InternalContactSearch.getAllLocalContact: deviceId " + deviceId);
         for(String id : ids)
         {
             contact = new Contact("");
@@ -457,7 +456,6 @@ public class InternalContactSearch
                     + " AND "+ContactsContract.Data.IN_VISIBLE_GROUP+" = '1'"
                     ;
 
-//            return cr.query(uri, projection, selection, null, ContactsContract.Data.CONTACT_ID+" ASC");
             return cr.query(uri, projection, null, null, ContactsContract.Data.CONTACT_ID+" ASC");
         }
         catch (Exception ex)

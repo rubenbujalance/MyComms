@@ -55,7 +55,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 
-import io.realm.Realm;
 import model.Contact;
 import model.News;
 import model.RecentContact;
@@ -63,18 +62,33 @@ import model.UserProfile;
 
 public class DashBoardActivity extends ToolbarActivity{
     private LinearLayout noConnectionLayout;
-    private Realm _realm;
-    private Realm mRealm;
     private RealmChatTransactions _chatTx;
     private ArrayList<News> newsArrayList;
     private AsyncTaskQueue recentsTasksQueue = new AsyncTaskQueue();
     private boolean recentsLoading = false;
+    private RealmContactTransactions realmContactTransactions;
+    private String _profileId;
+    private RealmNewsTransactions realmNewsTransactions;
+    private RecentContactController recentController;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e(Constants.TAG, "DashBoardActivity.onCreate: ");
+
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        if(sp==null) {
+            Log.e(Constants.TAG, "DashBoardActivity.onCreate: error loading Shared Preferences");
+            finish();
+        }
+        
+        _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        realmContactTransactions = new RealmContactTransactions(_profileId);
+        realmNewsTransactions = new RealmNewsTransactions();
+        recentController = new RecentContactController(DashBoardActivity.this, _profileId);
 
         BusProvider.getInstance().register(this);
 
@@ -83,24 +97,15 @@ public class DashBoardActivity extends ToolbarActivity{
 
         initALL();
 
-        mRealm = Realm.getInstance(getBaseContext());
         loadRecents();
         loadNews();
 
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         Log.i(Constants.TAG, "DashBoardActivity.onCreate: DownloadLocalContacts");
-        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, profileId, mRealm);
+        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, _profileId, mRealm);
         downloadLocalContacts.execute();
 
         BusProvider.getInstance().post(new DashboardCreatedEvent());
 
-        if(sp==null)
-        {
-            Log.e(Constants.TAG, "DashBoardActivity.onCreate: error loading Shared Preferences");
-            finish();
-        }
     }
 
 
@@ -168,14 +173,7 @@ public class DashBoardActivity extends ToolbarActivity{
         recentsLoading = true;
 
         try {
-
-            SharedPreferences sp = getSharedPreferences(
-                    Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-
             ArrayList<RecentContact> recentList = new ArrayList<>();
-
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, profileId);
 
             LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
             recentsContainer.removeAllViews();
@@ -224,13 +222,10 @@ public class DashBoardActivity extends ToolbarActivity{
     }
 
 
-
     private void loadNews() {
         Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
 
         newsArrayList = new ArrayList<>();
-
-        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(mRealm);
         newsArrayList = realmNewsTransactions.getAllNews();
 
         if(newsArrayList != null){
@@ -284,7 +279,10 @@ public class DashBoardActivity extends ToolbarActivity{
         // Disconnect from the XMPP server
         //XMPPTransactions.disconnectMsgServerSession();
         BusProvider.getInstance().unregister(this);
-        mRealm.close();
+        realmContactTransactions.closeRealm();
+        realmNewsTransactions.closeRealm();
+        recentController.closeRealm();
+        _chatTx.closeRealm();
     }
 
     @Override
@@ -844,7 +842,6 @@ public class DashBoardActivity extends ToolbarActivity{
         LinearLayout recentsContainer;
         LayoutInflater inflater;
         ImageView recentAvatar;
-        String profileId;
         View childRecents;
 
         //Avatar
@@ -866,8 +863,7 @@ public class DashBoardActivity extends ToolbarActivity{
         public DrawSingleRecentAsyncTask(String contactId, String firstName, String lastName,
                                          String avatar, String action, String phones,
                                          String emails, String platform, String recentId,
-                                         String profileId, LinearLayout recentsContainer,
-                                         LayoutInflater inflater)
+                                         LinearLayout recentsContainer, LayoutInflater inflater)
         {
 
             this.recentsContainer = recentsContainer;
@@ -881,7 +877,6 @@ public class DashBoardActivity extends ToolbarActivity{
             this.phones = phones;
             this.emails = emails;
             this.platform = platform;
-            this.profileId = profileId;
             this.recentId = recentId;
         }
 
@@ -948,7 +943,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
                         @Override
                         public void onBitmapFailed(Drawable errorDrawable) {
-                            if (avatarFile.exists()) avatarFile.delete();
+                            if(avatarFile.exists()) avatarFile.delete();
                             ConnectionsQueue.removeConnection(avatarFile.toString());
                         }
 
@@ -968,8 +963,7 @@ public class DashBoardActivity extends ToolbarActivity{
             }
 
             // Badges
-            _realm = Realm.getInstance(DashBoardActivity.this);
-            _chatTx = new RealmChatTransactions(_realm, DashBoardActivity.this);
+            _chatTx = new RealmChatTransactions(DashBoardActivity.this);
             pendingMsgsCount = _chatTx.getChatPendingMessagesCount(contactId);
 
             LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
@@ -1028,8 +1022,6 @@ public class DashBoardActivity extends ToolbarActivity{
                             }
                         }
                         //ADD RECENT
-                        Realm realm = Realm.getInstance(getBaseContext());
-                        RecentContactController recentController = new RecentContactController(DashBoardActivity.this,realm,profileId);
                         recentController.insertRecent(contactId, action);
                         //setListAdapterTabs();
                     } catch (Exception ex) {

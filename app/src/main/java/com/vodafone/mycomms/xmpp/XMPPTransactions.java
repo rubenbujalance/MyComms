@@ -36,7 +36,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import io.realm.Realm;
 import model.Chat;
 import model.ChatMessage;
 
@@ -52,7 +51,6 @@ public final class XMPPTransactions {
     private static String _device_id;
     private static RealmChatTransactions _chatTx;
     private static RealmGroupChatTransactions _groupChatTx;
-    private static Realm _realm;
 
     //Control to no retry consecutive connections
     private static boolean _isConnecting = false;
@@ -276,10 +274,9 @@ public final class XMPPTransactions {
     public static boolean saveAndNotifyStanzaReceived(XmlPullParser parser)
     {
         //Realm initialization
-        if(_realm==null) {
-            _realm = Realm.getInstance(_appContext);
-            _chatTx = new RealmChatTransactions(_realm, _appContext);
-            _groupChatTx = new RealmGroupChatTransactions(_realm, _appContext, _profile_id);
+        if(_chatTx==null) {
+            _chatTx = new RealmChatTransactions(_appContext);
+            _groupChatTx = new RealmGroupChatTransactions(_appContext, _profile_id);
         }
 
         try {
@@ -501,6 +498,8 @@ public final class XMPPTransactions {
 
     private static boolean saveAndNotifyGroupMessageReceived(XmlPullParser parser)
     {
+        if(true) return true;
+
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -566,6 +565,8 @@ public final class XMPPTransactions {
 
     private static boolean saveAndNotifyGroupImageReceived(XmlPullParser parser)
     {
+        if(true) return true;
+
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -839,6 +840,12 @@ public final class XMPPTransactions {
         };
 
         return _connectionListener;
+    }
+
+    public static void closeRealm()
+    {
+        _chatTx.closeRealm();
+        _groupChatTx.closeRealm();
     }
 
     /*

@@ -27,7 +27,6 @@ import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Chat;
 import model.GroupChat;
 
@@ -38,7 +37,6 @@ public class ChatListFragment extends Fragment{
 
     private RecyclerView mRecyclerView;
     private ChatListRecyclerViewAdapter mChatRecyclerViewAdapter;
-    private Realm mRealm;
     private RealmChatTransactions mChatTransactions;
     private RealmGroupChatTransactions mGroupChatTransactions;
 
@@ -122,12 +120,11 @@ public class ChatListFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
-        mRealm = Realm.getInstance(getActivity());
-        mChatTransactions = new RealmChatTransactions(mRealm, getActivity());
+        mChatTransactions = new RealmChatTransactions(getActivity());
         SharedPreferences sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        mGroupChatTransactions = new RealmGroupChatTransactions(mRealm, getActivity(),profileId);
+        mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
         BusProvider.getInstance().register(this);
     }
 
@@ -141,8 +138,8 @@ public class ChatListFragment extends Fragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mRealm!=null)
-            mRealm.close();
+        mChatTransactions.closeRealm();
+        mGroupChatTransactions.closeRealm();
         BusProvider.getInstance().unregister(this);
     }
 

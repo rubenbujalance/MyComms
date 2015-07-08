@@ -40,7 +40,6 @@ import com.vodafone.mycomms.util.Constants;
 import java.io.File;
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Contact;
 import model.GroupChat;
 
@@ -50,12 +49,10 @@ public class GroupChatListFragment extends ListFragment implements
     private SwipeRefreshLayout mSwipeRefreshLayout;
     protected Handler handler = new Handler();
 
-    private Realm mRealm;
     private ListView listView;
     private SearchController mSearchController;
     private SharedPreferences sp;
     private ArrayList<Contact> contactList;
-    private Realm realm;
     private String profileId;
     private ContactListViewArrayAdapter adapter;
     private Parcelable state;
@@ -76,6 +73,7 @@ public class GroupChatListFragment extends ListFragment implements
 
     private ArrayList<String> selectedContacts;
     private ArrayList<String> ownersIds;
+    private ContactListController contactListController;
 
     private final String LOG_TAG = GroupChatListActivity.class.getSimpleName();
 
@@ -107,7 +105,6 @@ public class GroupChatListFragment extends ListFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
-        mRealm = Realm.getInstance(getActivity());
         BusProvider.getInstance().register(this);
 
         sp = getActivity().getSharedPreferences(
@@ -119,13 +116,13 @@ public class GroupChatListFragment extends ListFragment implements
         }else{
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
-        realm = Realm.getInstance(getActivity());
-        mSearchController = new SearchController(getActivity(), realm, profileId);
-        mGroupChatTransactions = new RealmGroupChatTransactions(realm,getActivity(),profileId);
-        mContactTransactions = new RealmContactTransactions(realm,profileId);
-        mGroupChatController = new GroupChatController(getActivity());
-        mRecentContactController = new RecentContactController(getActivity(),realm,profileId);
 
+        mSearchController = new SearchController(getActivity(), profileId);
+        mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
+        mContactTransactions = new RealmContactTransactions(profileId);
+        mGroupChatController = new GroupChatController(getActivity());
+        contactListController = new ContactListController(getActivity(), profileId);
+        mRecentContactController = new RecentContactController(getActivity(),profileId);
     }
 
     @Override
@@ -141,8 +138,13 @@ public class GroupChatListFragment extends ListFragment implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mRealm!=null)
-            mRealm.close();
+        contactListController.closeRealm();
+        mSearchController.closeRealm();
+        mGroupChatTransactions.closeRealm();
+        mContactTransactions.closeRealm();
+        contactListController.closeRealm();
+        contactListController.closeRealm();
+        mRecentContactController.closeRealm();
         BusProvider.getInstance().unregister(this);
     }
 
@@ -328,9 +330,8 @@ public class GroupChatListFragment extends ListFragment implements
 
     private void refreshContent()
     {
-        ContactListController contactListController = new ContactListController(getActivity(),realm,profileId);
-            contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
-            contactListController.setConnectionCallback(this);
+        contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
+        contactListController.setConnectionCallback(this);
     }
 
     private void loadSearchBarEventsAndControllers(View v)
@@ -496,7 +497,7 @@ public class GroupChatListFragment extends ListFragment implements
         if (morePages){
             Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: ");
             apiCall = Constants.CONTACT_API_GET_CONTACTS;
-            ContactListController contactListController = new ContactListController(getActivity(),realm, profileId);
+
             contactListController.getContactList(apiCall + "&o=" + offsetPaging);
             contactListController.setConnectionCallback(this);
         } else {

@@ -16,26 +16,25 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import model.Chat;
 import model.ChatMessage;
-import model.Contact;
 
 public class RealmChatTransactions {
     private Realm mRealm;
     private String _profile_id;
     private Context mContext;
+    private RealmContactTransactions contactTx;
 
-    public RealmChatTransactions(Realm realm, Context context) {
+    public RealmChatTransactions(Context context) {
 
         mContext = context;
-        mRealm = realm;
-        _profile_id = null;
+        mRealm = Realm.getDefaultInstance();
 
+        _profile_id = null;
         SharedPreferences sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
         if(sp==null) return;
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
+        contactTx = new RealmContactTransactions(_profile_id);
     }
 
     /*
@@ -62,32 +61,6 @@ public class RealmChatTransactions {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,"",timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
-                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
-
-        return chatMessage;
-    }
-
-    public ChatMessage newGroupChatMessageInstance(String contact_id, String group_id,
-                                                   String direction, int type, String text,
-                                                   String resourceUri)
-    {
-        long timestamp = Calendar.getInstance().getTimeInMillis();
-
-        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
-                Constants.CHAT_MESSAGE_STATUS_NOT_SENT);
-
-        return chatMessage;
-    }
-
-    public ChatMessage newGroupChatMessageInstance(String contact_id, String group_id,
-                                                   String direction, int type, String text,
-                                                   String resourceUri, String id)
-    {
-        long timestamp = Calendar.getInstance().getTimeInMillis();
-
-        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
                 direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
                 Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
 
@@ -189,32 +162,6 @@ public class RealmChatTransactions {
         }
     }
 
-    public void setGroupChatAllReceivedMessagesAsRead (String groupId){
-        //Sets all received messages of a contact as read
-        if(groupId==null) return;
-
-        try {
-            mRealm.beginTransaction();
-            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, groupId)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ);
-
-            RealmResults<ChatMessage> results = query.findAll();
-
-            for (int i = 0; i<results.size(); i++)
-                results.get(i).setRead(Constants.CHAT_MESSAGE_READ);
-
-            mRealm.commitTransaction();
-
-        } catch (Exception e){
-            e.printStackTrace();
-            Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);
-            mRealm.cancelTransaction();
-        }
-    }
-
     public boolean setChatMessageSentStatus (String id, String status){
         //Sets a received message as read
         if(id==null || status==null) return false;
@@ -256,36 +203,6 @@ public class RealmChatTransactions {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contact_id);
-
-            RealmResults<ChatMessage> result1 = query.findAllSorted("timestamp");
-
-            if (result1 != null) {
-                int initialPoint = 0;
-                if(result1.size()>50)
-                    initialPoint = result1.size()-50;
-
-                for (int i=initialPoint; i<result1.size(); i++) {
-                    chatMessageArray.add(result1.get(i));
-                }
-            }
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getAllChatMessages: ", e);
-        }
-
-        return chatMessageArray;
-    }
-
-    public ArrayList<ChatMessage> getAllGroupChatMessages(String group_id)
-    {
-        if(_profile_id==null || group_id==null) return null;
-
-        ArrayList<ChatMessage> chatMessageArray = null;
-
-        try {
-            chatMessageArray = new ArrayList<>();
-            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, group_id);
 
             RealmResults<ChatMessage> result1 = query.findAllSorted("timestamp");
 
@@ -366,36 +283,6 @@ public class RealmChatTransactions {
         return messages;
     }
 
-    public ArrayList<ChatMessage> getNotReadReceivedGroupChatMessages (String groupId){
-        //Sets all received messages of a contact as read
-        if(groupId==null) return null;
-
-        ArrayList<ChatMessage> messages = null;
-
-        try {
-            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, groupId)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
-                    .notEqualTo(Constants.CHAT_MESSAGE_FIELD_STATUS, Constants.CHAT_MESSAGE_STATUS_READ);
-
-            RealmResults<ChatMessage> results = query.findAll();
-
-            for (int i = 0; i<results.size(); i++)
-            {
-                if(messages==null) messages = new ArrayList<>();
-                messages.add(results.get(i));
-            }
-
-        } catch (Exception e){
-            e.printStackTrace();
-            Log.e(Constants.TAG, "RealmChatTransactions.getNotReadReceivedContactChatMessages: ", e);
-            return null;
-        }
-
-        return messages;
-    }
-
     //DELETES
 
 //    public void deleteChatMessageById(String id) {
@@ -441,10 +328,7 @@ public class RealmChatTransactions {
 
     public Chat newChatInstance(String contact_id)
     {
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mRealm, _profile_id);
-        Contact contact = realmContactTransactions.getContactById(contact_id);
         Chat chat = new Chat(_profile_id, contact_id, "","",0);
-
         return chat;
     }
 
@@ -474,7 +358,6 @@ public class RealmChatTransactions {
     public ArrayList<Chat> getAllChatsFromExistingContacts()
     {
         ArrayList<Chat> chatMessageArrayList = null;
-        RealmContactTransactions contactTx = new RealmContactTransactions(mRealm, _profile_id);
 
         try {
             chatMessageArrayList = new ArrayList<>();
@@ -622,5 +505,10 @@ public class RealmChatTransactions {
 //            mRealm.cancelTransaction();
 //        }
 //    }
+
+    public void closeRealm() {
+        if(mRealm!=null) mRealm.close();
+        contactTx.closeRealm();
+    }
 
 }

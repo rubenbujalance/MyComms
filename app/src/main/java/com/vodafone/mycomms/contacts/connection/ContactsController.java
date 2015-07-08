@@ -1,8 +1,6 @@
 package com.vodafone.mycomms.contacts.connection;
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
@@ -21,18 +19,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Calendar;
 
-import io.realm.Realm;
 import model.Contact;
-import model.ContactAvatar;
 import model.FavouriteContact;
 import model.RecentContact;
 
@@ -50,23 +39,6 @@ public class ContactsController extends BaseController {
     private String mProfileId;
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
-
-    public ContactsController(Activity activity, String profileId) {
-        super(activity);
-        this.mContext = activity;
-        this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(mProfileId);
-        realmAvatarTransactions = new RealmAvatarTransactions();
-        internalContactSearch = new InternalContactSearch(activity, profileId);
-    }
-
-    public ContactsController(Fragment fragment, String profileId) {
-        super(fragment);
-        this.mContext = fragment.getActivity();
-        this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(mProfileId);
-        realmAvatarTransactions = new RealmAvatarTransactions();
-    }
 
     public ContactsController(Context context, String profileId) {
         super(context);

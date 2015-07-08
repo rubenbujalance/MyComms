@@ -25,7 +25,6 @@ import com.vodafone.mycomms.util.Utils;
 import java.io.File;
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Contact;
 import model.GroupChat;
 import model.UserProfile;
@@ -34,29 +33,19 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
     private ArrayList<ComposedChat> composedChat = new ArrayList<>();
     private Context mContext;
-    private Realm _realm;
     private RealmChatTransactions _chatTx;
     private RealmContactTransactions mContactTransactions;
     private String profileId;
 
-    public ChatListRecyclerViewAdapter
-            (
-                    Context context
-                    , ArrayList<ComposedChat> composedChats
-            )
+    public ChatListRecyclerViewAdapter(Context context, ArrayList<ComposedChat> composedChats)
     {
         mContext = context;
-        _realm = Realm.getInstance(mContext);
-        _chatTx = new RealmChatTransactions(_realm, mContext);
+        _chatTx = new RealmChatTransactions(mContext);
        this.composedChat = composedChats;
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        mContactTransactions = new RealmContactTransactions
-                (
-                        _realm
-                        , profileId
-                );
+        mContactTransactions = new RealmContactTransactions(profileId);
     }
 
     @Override
@@ -218,7 +207,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         {
             if(id.equals(profileId))
             {
-                UserProfile userProfile = mContactTransactions.getUserProfile(id);
+                UserProfile userProfile = mContactTransactions.getUserProfile();
                 if(null == contactName)
                     contactName = userProfile.getFirstName();
                 else
@@ -329,7 +318,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
 
-        if(_realm!=null)
-            _realm.close();
+        _chatTx.closeRealm();
+        mContactTransactions.closeRealm();
     }
 }

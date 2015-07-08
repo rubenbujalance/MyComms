@@ -47,7 +47,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Contact;
 import model.FavouriteContact;
 import model.RecentContact;
@@ -64,7 +63,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
-    private Realm realm;
     private SearchController mSearchController;
     private SearchBarController mSearchBarController;
     private ArrayList<Contact> contactList;
@@ -81,6 +79,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private Button cancelButton;
     private LinearLayout layCancel;
     private String apiCall;
+    private ContactListController contactListController;
+    private RecentContactController recentController;
 
     private String profileId;
 
@@ -119,7 +119,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         cancelButton = (Button) v.findViewById(R.id.btn_cancel);
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
 
-
         loadSearchBarEventsAndControllers(v);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.contacts_swipe_refresh_layout);
@@ -154,8 +153,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         else{
             hideKeyboard();
         }
-
-
 
         if(isProgressDialogNeeded())showProgressDialog();
 
@@ -209,15 +206,16 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
-        realm = Realm.getInstance(getActivity());
-        mContactTransactions = new RealmContactTransactions(realm, profileId);
-        mSearchController = new SearchController(getActivity(), realm, profileId);
+        mContactTransactions = new RealmContactTransactions(profileId);
+        mSearchController = new SearchController(getActivity(), profileId);
+        recentController = new RecentContactController(getActivity(), profileId);
+        contactListController = new ContactListController(getActivity(), profileId);
 
         setListAdapterTabs();
     }
 
     private void refreshContent(){
-        ContactListController contactListController = new ContactListController(getActivity(),realm,profileId);
+
         if (mIndex==Constants.CONTACTS_ALL) {
             contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
             contactListController.setConnectionCallback(this);
@@ -252,6 +250,15 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        contactListController.closeRealm();
+        recentController.closeRealm();
+        mContactTransactions.closeRealm();
+        mSearchController.closeRealm();
     }
 
     @Override
@@ -345,7 +352,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                         }
                     }
                     //ADD RECENT
-                    RecentContactController recentController = new RecentContactController(getActivity(),realm,profileId);
                     recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                     setListAdapterTabs();
                 } catch (Exception ex) {
@@ -384,7 +390,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         if (morePages){
             Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: ");
             apiCall = Constants.CONTACT_API_GET_CONTACTS;
-            ContactListController contactListController = new ContactListController(getActivity(),realm, profileId);
+
             contactListController.getContactList(apiCall + "&o=" + offsetPaging);
             contactListController.setConnectionCallback(this);
         } else {
@@ -425,7 +431,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        realm.close();
+        mContactTransactions.closeRealm();
+        contactListController.closeRealm();
         BusProvider.getInstance().unregister(this);
     }
 

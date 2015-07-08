@@ -68,6 +68,7 @@ public class ChatListActivity extends ToolbarActivity{
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
+        XMPPTransactions.closeRealm();
     }
 
     @Subscribe

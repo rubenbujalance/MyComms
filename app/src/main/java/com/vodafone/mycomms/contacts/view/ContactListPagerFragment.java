@@ -25,7 +25,6 @@ import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Contact;
 
 public class ContactListPagerFragment extends Fragment implements ContactListFragment.OnFragmentInteractionListener ,IContactsConnectionCallback {
@@ -33,7 +32,6 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     private ViewPager mViewPager;
     private boolean mBusRegistered = false;
     private ContactsController mContactsController;
-    private Realm realm;
     private String apiCall;
     private ContactListFragment contactListFragment;
     private ContactListFragment contactRecentListFragment;
@@ -51,8 +49,7 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         SharedPreferences sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        realm = Realm.getInstance(getActivity());
-        mContactsController = new ContactsController(getActivity(),realm, mProfileId);
+        mContactsController = new ContactsController(getActivity(), mProfileId);
         apiCall = Constants.CONTACT_API_GET_CONTACTS;
         //mContactsController.getContactList(apiCall);
         //mContactsController.setConnectionCallback(this);
@@ -91,7 +88,8 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     @Override
     public void onDestroy() {
         super.onDestroy();
-        realm.close();
+        mContactsController.closeRealm();
+
         BusProvider.getInstance().unregister(this);
     }
 

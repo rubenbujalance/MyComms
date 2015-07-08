@@ -17,20 +17,18 @@ import com.vodafone.mycomms.util.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import io.realm.Realm;
-
 public class ContactController extends BaseController {
     private Context mContext;
-    private Realm mRealm;
     private String apiCall;
     private String mProfileId;
     private int offsetPaging = 0;
+    private ContactsController contactsController;
 
-    public ContactController(Context context, Realm realm, String profileId) {
+    public ContactController(Context context, String profileId) {
         super(context);
-        this.mRealm = realm;
         this.mContext = context;
         this.mProfileId = profileId;
+        contactsController = new ContactsController(mContext, mProfileId);
     }
 
     public void getContactList(String api){
@@ -48,7 +46,6 @@ public class ContactController extends BaseController {
                 try {
                     JSONObject jsonResponse = new JSONObject(json);
 
-                    ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
                     contactsController.insertContactListInRealm(jsonResponse);
 
                     //Update Contact List View on every pagination
@@ -109,5 +106,10 @@ public class ContactController extends BaseController {
         protected void onPostExecute(String json) {
             contactListCallback(json);
         }
+    }
+
+    public void closeRealm()
+    {
+        contactsController.closeRealm();
     }
 }

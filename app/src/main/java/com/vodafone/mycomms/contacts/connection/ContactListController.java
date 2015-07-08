@@ -5,32 +5,28 @@ import android.util.Log;
 
 import com.framework.library.model.ConnectionResponse;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Contact;
 
 public class ContactListController extends BaseController {
 
-    private Realm mRealm;
     private Context mContext;
     private String mProfileId;
-    private RealmContactTransactions realmContactTransactions;
     private ContactConnection contactConnection;
     private int offsetPaging = 0;
     private String api;
+    private ContactsController contactsController;
 
-    public ContactListController(Context context, Realm realm, String profileId) {
+    public ContactListController(Context context, String profileId) {
         super(context);
-        this.mRealm = realm;
         this.mContext = context;
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
+        contactsController = new ContactsController(mContext, mProfileId);
     }
 
     public void getContactList(String apiCall){
@@ -50,7 +46,7 @@ public class ContactListController extends BaseController {
         if (result != null && result.trim().length()>0) {
             try {
                 jsonResponse = new JSONObject(result);
-                ContactsController contactsController = new ContactsController(mContext, mRealm, mProfileId);
+
                 if (api.equals(Constants.CONTACT_API_GET_FAVOURITES)){
                     contactsController.insertFavouriteContactInRealm(jsonResponse);
 
@@ -72,8 +68,7 @@ public class ContactListController extends BaseController {
                     } else {
                         offsetPaging = 0;
                     }
-                    ArrayList<Contact> realmContactList = new ArrayList<>();
-                    contactsController = new ContactsController(mContext, mRealm, mProfileId);
+                    ArrayList<Contact> realmContactList;
                     realmContactList = contactsController.insertContactListInRealm(jsonResponse);
 
                     if (this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactsRefreshConnectionCallback) {
@@ -85,5 +80,10 @@ public class ContactListController extends BaseController {
                 Log.e(Constants.TAG, "ContactListController.onConnectionComplete: contacts ", e);
             }
         }
+    }
+
+    public void closeRealm()
+    {
+        contactsController.closeRealm();
     }
 }

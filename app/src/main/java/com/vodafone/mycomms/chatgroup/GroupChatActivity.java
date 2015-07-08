@@ -38,7 +38,6 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatRecyclerViewAdapter;
-import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
@@ -68,8 +67,7 @@ import model.GroupChat;
 /**
  * Created by str_oan on 29/06/2015.
  */
-public class GroupChatActivity extends ToolbarActivity implements
-        IRecentContactConnectionCallback, Serializable
+public class GroupChatActivity extends ToolbarActivity implements Serializable
 {
 
     private String LOG_TAG = GroupChatActivity.class.getSimpleName();
@@ -204,9 +202,7 @@ public class GroupChatActivity extends ToolbarActivity implements
                 dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
-        String action = Constants.CONTACTS_ACTION_SMS;
-        String id = _groupChat.getId();
-        mRecentContactController.insertRecentOKHttp(id, action);
+
 
     }
 
@@ -575,7 +571,6 @@ public class GroupChatActivity extends ToolbarActivity implements
             _chatList.add(chatMsg);
             if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
                 mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-                mRecentContactController.setConnectionCallback(this);
             }
 
             if(_chatList.size()>50) _chatList.remove(0);
@@ -590,14 +585,6 @@ public class GroupChatActivity extends ToolbarActivity implements
         chatTransactions.closeRealm();
         mGroupChatTransactions.closeRealm();
         contactTransactions.closeRealm();
-    }
-
-    @Override
-    public void onConnectionNotAvailable() {
-        Log.e(Constants.TAG, "ChatMainActivity.onConnectionNotAvailable: ");
-
-        tvSendChat.setEnabled(false);
-        tvSendChat.setTextColor(Color.GRAY);
     }
 
     private void loadTheRestOfTheComponents()

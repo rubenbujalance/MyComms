@@ -25,7 +25,7 @@
             android:background="@drawable/btn_back_white"
             android:layout_centerVertical="true" />
 
-        <include android:id="@+id/layout_list_item_image" layout="@layout/layout_multi_chat_avatar"
+        <include android:id="@+id/layout_list_item_image" layout="@layout/layout_multi_chat_avatar_50"
                  android:layout_width="50dp"
                  android:layout_height = "50dp"
                  android:layout_centerInParent="true" />

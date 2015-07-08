@@ -5,15 +5,12 @@ import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.framework.library.connection.HttpConnection;
-import com.framework.library.model.ConnectionResponse;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
@@ -24,85 +21,68 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
-import java.util.HashMap;
 
-public class RecentContactController extends BaseController {
+import model.Contact;
+
+public class RecentContactController {
 
     private Context mContext;
     private String mProfileId;
-    private RecentContactConnection mRecentContactConnection;
-    int method;
     private ContactsController contactsController;
     private ContactSearchController contactSearchController;
-
-
 
     private String URL_SET_RECENT = "https://" + EndpointWrapper.getBaseURL() +
             Constants.CONTACT_API_POST_RECENTS;
 
-    public RecentContactController(Context appContext, String profileId) {
-        super(appContext);
-        this.mContext = appContext;
+    public RecentContactController(Context context, String profileId) {
+        this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(getActivity(), mProfileId);
+        contactsController = new ContactsController(mContext, mProfileId);
         contactSearchController = new ContactSearchController(mContext,mProfileId);
     }
 
     public void getRecentList() {
         Log.e(Constants.TAG, "RecentContactController.getRecentList: ");
-//        if(mRecentContactConnection != null){
-//            mRecentContactConnection.cancel();
-//        }
-        method = HttpConnection.GET;
-//        String apiCall = Constants.CONTACT_API_GET_RECENTS;
-//        mRecentContactConnection = new RecentContactConnection(mContext, this, method, apiCall);
-//        mRecentContactConnection.request();
 
-        new RecentContactsAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                (String)Constants.CONTACT_API_GET_RECENTS);
+        new RecentContactsGETAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                (String) Constants.CONTACT_API_GET_RECENTS);
     }
 
     public void insertRecent(String contactId, String action){
         Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
-        if(mRecentContactConnection != null){
-            mRecentContactConnection.cancel();
-        }
-        JSONObject json;
-        HashMap body = new HashMap<>();
-        method = HttpConnection.POST;
-        String apiCall = Constants.CONTACT_API_POST_RECENTS;
-        long timestamp = Calendar.getInstance().getTimeInMillis();
-        body.put(Constants.CONTACT_ID, contactId);
-        body.put(Constants.CONTACT_RECENTS_ACTION, action);
-        body.put(Constants.CONTACT_RECENTS_ACTION_TIME, timestamp);
-        json = new JSONObject(body);
-        mRecentContactConnection = new RecentContactConnection(mContext, this, method, apiCall);
-        mRecentContactConnection.setPayLoad(json.toString());
-        mRecentContactConnection.request();
+        insertRecentPOSTOKHttp(contactId, action);
     }
 
-    public void insertRecentOKHttp(String contactId, String action)
+    public void insertRecentOKHttp(String groupChatId, String action)
     {
-        String[] params = new String[]{contactId,action};
-        new RecentContactsOKHTTPAsyncTask().execute(params);
+        new RecentContactsOKHTTPAsyncTask(groupChatId, action).execute();
     }
 
-    public class RecentContactsOKHTTPAsyncTask extends AsyncTask<String, Void, String> {
+    public class RecentContactsOKHTTPAsyncTask extends AsyncTask<String, Void, String>
+    {
+        private String groupChatId;
+        private String action;
+
+        public RecentContactsOKHTTPAsyncTask(String groupChatId, String action)
+        {
+            this.groupChatId = groupChatId;
+            this.action = action;
+        }
         @Override
         protected String doInBackground(String... params)
         {
-            Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: START");
+            Log.e(Constants.TAG, "RecentContactsOKHTTPAsyncTask.doInBackground: START");
 
             try
             {
                 Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
-                Request request = createGroupChatRequestForCreation(params[0], params[1]);
+                Request request = createGroupChatRequestForCreation(this.groupChatId,this.action);
                 return executeRequest(request);
 
             }
             catch (Exception e)
             {
-                Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: ",e);
+                Log.e(Constants.TAG, "RecentContactsOKHTTPAsyncTask.doInBackground: ",e);
                 return null;
             }
         }
@@ -110,24 +90,87 @@ public class RecentContactController extends BaseController {
         @Override
         protected void onPostExecute(String response)
         {
-            Log.i(Constants.TAG, "RecentContactsAsyncTask.doInBackground: " + response);
-            contactsController.insertRecentContactInRealm(null);
+            Log.i(Constants.TAG, "RecentContactsOKHTTPAsyncTask.doInBackground: " + response);
+
+            Contact contact = new Contact("");
+            contact.setId(groupChatId);
+            contact.setContactId(groupChatId);
+            contact.setProfileId(mProfileId);
+            JSONObject jsonObject = createJsonObject(this.groupChatId, this.action);
+            contactsController.insertRecentGroupChatIntoRealm(contact, jsonObject);
         }
     }
 
-    public String createdJSONObjectForSetRecent(String contactId, String action)
+    public void insertRecentPOSTOKHttp(String contactId, String action)
+    {
+        new RecentContactsPOSTAsyncTask(contactId, action).execute();
+    }
+
+    public class RecentContactsPOSTAsyncTask extends AsyncTask<String, Void, String>
+    {
+        private String action;
+        private String contactId;
+
+        public RecentContactsPOSTAsyncTask(String contactId, String action)
+        {
+            this.action = action;
+            this.contactId = contactId;
+        }
+        @Override
+        protected String doInBackground(String... params)
+        {
+            Log.e(Constants.TAG, "RecentContactsPOSTAsyncTask.doInBackground: START");
+
+            try
+            {
+                Log.i(Constants.TAG, "RecentContactsPOSTAsyncTask.insertRecent: ");
+                Request request = createPOSTRequestForCreation(this.contactId,this.action);
+                return executeRequest(request);
+
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "RecentContactsPOSTAsyncTask.doInBackground: ",e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String response)
+        {
+            Log.i(Constants.TAG, "RecentContactsPOSTAsyncTask.doInBackground: " + response);
+            getRecentList();
+            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+        }
+    }
+
+    private JSONObject createJsonObject(String groupChatId, String action)
+    {
+        try
+        {
+            return new JSONObject(createdStringBodyForSetRecent(groupChatId,
+                    action));
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "RecentContactsPOSTAsyncTask.createJsonObject: ERROR ", e);
+            return null;
+        }
+
+    }
+
+    public String createdStringBodyForSetRecent(String groupChatId, String action)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
-        String jsonRequest = "{\"id\":\""
-                    + contactId + "\","
+
+        return "{\"id\":\""
+                    + groupChatId + "\","
                     + "\"timestamp\": "+timestamp+","
                     + "\"action\":\""+action+"\"}";
-
-        return jsonRequest;
     }
 
 
-    public Request createGroupChatRequestForCreation(String contactId, String action)
+    public Request createGroupChatRequestForCreation(String groupChatId, String action)
     {
         try
         {
@@ -135,17 +178,42 @@ public class RecentContactController extends BaseController {
             final String version_token = "x-mycomms-version";
             final String ACCESS_TOKEN = "Bearer ";
 
-            String jsonRequest = createdJSONObjectForSetRecent(contactId, action);
+            String jsonRequest = createdStringBodyForSetRecent(groupChatId, action);
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
             RequestBody requestBody = RequestBody.create(JSON, jsonRequest);
-            Request request = new Request.Builder()
+            return new Request.Builder()
                     .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
                     .addHeader(version_token, getVersionName())
                     .url(URL_SET_RECENT)
                     .post(requestBody)
                     .build();
-            return request;
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "RecentContactController.createGroupChatRequest: ERROR ", e);
+            return null;
+        }
+    }
+
+    public Request createPOSTRequestForCreation(String contactId, String action)
+    {
+        try
+        {
+            String jsonRequest = createdStringBodyForSetRecent(contactId, action);
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+            RequestBody requestBody = RequestBody.create(JSON, jsonRequest);
+            return new Request.Builder()
+                    .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                            Utils.getHttpHeaderVersion(mContext))
+                    .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                            Utils.getHttpHeaderContentType())
+                    .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                            Utils.getHttpHeaderAuth(mContext))
+                    .url(URL_SET_RECENT)
+                    .post(requestBody)
+                    .build();
         }
         catch (Exception e)
         {
@@ -200,67 +268,12 @@ public class RecentContactController extends BaseController {
         }
     }
 
-
-
-
-    @Override
-    public void onConnectionComplete(ConnectionResponse response) {
-        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: " + response.getData().toString());
-
-        super.onConnectionComplete(response);
-        if (method==HttpConnection.POST) {
-            Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: POST");
-            String apiCall = Constants.CONTACT_API_GET_RECENTS;
-
-            contactsController.getRecentList(apiCall);
-            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-        } else{
-            Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: GET");
-            String result = response.getData().toString();
-            if (result != null && result.trim().length()>0) {
-                try {
-                    JSONObject jsonResponse = new JSONObject(result);
-
-                    contactSearchController.getContactById(jsonResponse);
-                } catch (JSONException e){
-                    Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
-                }
-            }
-        }
-    }
-
-    public void recentsListCallback(String json) {
-        Log.e(Constants.TAG, "RecentContactController.recentsListCallback: ");
-
-        try {
-            if (method == HttpConnection.POST) {
-                Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: POST");
-                String apiCall = Constants.CONTACT_API_GET_RECENTS;
-                contactsController.getRecentList(apiCall);
-                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-            } else {
-                Log.i(Constants.TAG, "RecentContactController.onConnectionComplete: GET");
-//                String result = response.body().string();
-                if (json != null && json.trim().length() > 0) {
-                    try {
-                        JSONObject jsonResponse = new JSONObject(json);
-                        contactSearchController.getContactById(jsonResponse);
-                    } catch (JSONException e) {
-                        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
-        }
-    }
-
-    public class RecentContactsAsyncTask extends AsyncTask<String, Void, String> {
+    public class RecentContactsGETAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: START");
+            Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: START");
 
-            Response response = null;
+            Response response;
             String json = null;
 
             try {
@@ -280,17 +293,33 @@ public class RecentContactController extends BaseController {
                 json = response.body().string();
 
             } catch (Exception e) {
-                Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: ",e);
+                Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: ",e);
             }
 
-            Log.e(Constants.TAG, "RecentContactsAsyncTask.doInBackground: END");
+            Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: END");
 
             return json;
         }
 
         @Override
         protected void onPostExecute(String json) {
-            recentsListCallback(json);
+            recentListCallback(json);
+        }
+
+        public void recentListCallback(String json) {
+            Log.i(Constants.TAG, "RecentContactController.recentListCallback: ");
+            try {
+                if (json != null && json.trim().length() > 0) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(json);
+                        contactSearchController.getContactById(jsonResponse);
+                    } catch (JSONException e) {
+                        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
+            }
         }
     }
 

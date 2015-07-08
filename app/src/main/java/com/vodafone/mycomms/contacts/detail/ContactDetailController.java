@@ -14,7 +14,6 @@ import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONObject;
 
-import io.realm.Realm;
 import model.Contact;
 
 /**
@@ -22,20 +21,17 @@ import model.Contact;
  */
 public class ContactDetailController extends BaseController {
 
-    private final Realm mRealm;
     private ContactDetailConnection contactDetailConnection;
     private IContactDetailConnectionCallback contactDetailConnectionCallback;
     private Context mContext;
     private RealmContactTransactions realmContactTransactions;
     private String profileId;
 
-    public ContactDetailController(Activity activity, Realm realm, String profileId) {
+    public ContactDetailController(Activity activity, String profileId) {
         super(activity);
-        this.mRealm = realm;
         this.mContext = activity;
         this.profileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(realm, profileId);
-
+        realmContactTransactions = new RealmContactTransactions(profileId);
     }
 
     void getContactDetail(String id){
@@ -66,5 +62,10 @@ public class ContactDetailController extends BaseController {
             Log.e(Constants.TAG, "ContactsController.onConnectionComplete: " + e.toString());
         }
 
+    }
+
+    public void closeRealm()
+    {
+        realmContactTransactions.closeRealm();
     }
 }

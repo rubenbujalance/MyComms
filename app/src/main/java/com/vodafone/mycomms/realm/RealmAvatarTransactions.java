@@ -18,8 +18,8 @@ public final class RealmAvatarTransactions {
 
     private static Realm mRealm;
 
-    public RealmAvatarTransactions(Realm realm) {
-        mRealm = realm;
+    public RealmAvatarTransactions() {
+        mRealm = Realm.getDefaultInstance();
     }
 
     public void insertAvatar (ContactAvatar newAvatar){
@@ -93,6 +93,18 @@ public final class RealmAvatarTransactions {
         return avatar;
     }
 
+    public void updateAvatarUrlByContactId(String contactId, String url)
+    {
+        try {
+            mRealm.beginTransaction();
+            ContactAvatar avatar = getContactAvatarByContactId(contactId);
+            avatar.setUrl(url);
+            mRealm.commitTransaction();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmAvatarTransactions.updateAvatarUrlByContactId: ",e);
+        }
+    }
+
     public void deleteContactAvatar(String field, String filter) {
         mRealm.beginTransaction();
         RealmQuery<ContactAvatar> query = mRealm.where(ContactAvatar.class);
@@ -113,5 +125,7 @@ public final class RealmAvatarTransactions {
         }
         mRealm.commitTransaction();
     }
+
+    public void closeRealm() {if(mRealm!=null) mRealm.close();}
 }
 

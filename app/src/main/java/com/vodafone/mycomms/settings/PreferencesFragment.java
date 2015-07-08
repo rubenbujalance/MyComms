@@ -110,7 +110,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -182,6 +181,12 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             }
         });
         return v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        profileController.closeRealm();
     }
 
     private void shareCurrentTime(boolean isChecked) {

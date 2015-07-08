@@ -463,6 +463,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
+        profileController.closeRealm();
     }
 
     @Override

@@ -20,18 +20,19 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.News;
 
 public class NewsController extends BaseController {
     private Context mContext;
     private NewsConnection newsConnection;
     private ArrayList<News> newsList;
+    private RealmNewsTransactions realmNewsTransactions;
 
     public NewsController(Context context) {
         super(context);
-        this.mContext = getContext();
+        mContext = context;
         newsList = new ArrayList<>();
+        realmNewsTransactions = new RealmNewsTransactions();
     }
 
     public void getNewsList(String api) {
@@ -79,10 +80,7 @@ public class NewsController extends BaseController {
                 news = mapNews(jsonObject);
                 newsList.add(news);
             }
-            Realm realm = Realm.getInstance(getContext());
-            RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(realm);
             realmNewsTransactions.insertNewsList(newsList);
-            realm.close();
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -167,5 +165,10 @@ public class NewsController extends BaseController {
         protected void onPostExecute(String json) {
             newsListCallback(json);
         }
+    }
+
+    public void closeRealm()
+    {
+        realmNewsTransactions.closeRealm();
     }
 }

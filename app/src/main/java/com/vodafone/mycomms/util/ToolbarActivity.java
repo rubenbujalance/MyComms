@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -25,7 +26,6 @@ import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
-import io.realm.Realm;
 import model.Contact;
 
 public class ToolbarActivity extends ActionBarActivity {
@@ -33,6 +33,19 @@ public class ToolbarActivity extends ActionBarActivity {
     private Toolbar mToolbar;
     private Toolbar mFooter;
     private int foregroundActivity; //0-Contacts,1-Dashboard,2-Inbox
+    RealmChatTransactions realmChatTransactions;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        realmChatTransactions = new RealmChatTransactions(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        realmChatTransactions.closeRealm();
+    }
 
     public void setForegroundActivity(int activity)
     {
@@ -138,8 +151,7 @@ public class ToolbarActivity extends ActionBarActivity {
         if (mFooter!=null) {
             ImageView unreadBubble = (ImageView) mFooter.findViewById(R.id.unread_bubble);
             TextView unreadMessagesText = (TextView) mFooter.findViewById(R.id.unread_messages);
-            Realm realm = Realm.getInstance(this);
-            RealmChatTransactions realmChatTransactions = new RealmChatTransactions(realm, this);
+
             long unreadMessages = realmChatTransactions.getAllChatPendingMessagesCount();
             if (unreadMessages > 0) {
                 unreadBubble.setVisibility(View.VISIBLE);
@@ -252,7 +264,7 @@ public class ToolbarActivity extends ActionBarActivity {
         });
     }
 
-    protected void setChatListeners(final Context context, final Contact contact)
+    protected void setChatHeaderListener(final Context context, final Contact contact)
     {
         ImageView imageContact = (ImageView) findViewById(R.id.companyLogo);
         imageContact.setOnClickListener(new View.OnClickListener() {

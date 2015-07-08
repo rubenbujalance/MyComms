@@ -155,4 +155,10 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
         Log.d(Constants.TAG, "VacationTimeSetterActivity.onConnectionNotAvailable: ");
         profileController.showToast(getString(R.string.no_internet_connection));
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        profileController.closeRealm();
+    }
 }

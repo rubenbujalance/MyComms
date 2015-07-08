@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.realm;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.vodafone.mycomms.util.Constants;
@@ -18,8 +19,13 @@ public class RealmContactTransactions {
     private Realm mRealm;
     private String mProfileId;
 
-    public RealmContactTransactions(Realm realm, String profileId) {
-        mRealm = realm;
+    public RealmContactTransactions(String profileId) {
+        mRealm = Realm.getDefaultInstance();
+        mProfileId = profileId;
+    }
+
+    public RealmContactTransactions(Context context, String profileId){
+        mRealm = Realm.getInstance(context);
         mProfileId = profileId;
     }
 
@@ -55,6 +61,18 @@ public class RealmContactTransactions {
         } catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmContactTransactions.insertContactList: " + e.toString());
+        }
+    }
+
+    public void updateProfileTimezone (String timezone){
+        try {
+            mRealm.beginTransaction();
+            UserProfile userProfile = getUserProfile();
+            userProfile.setTimezone(timezone);
+            mRealm.commitTransaction();
+        } catch (IllegalArgumentException e){
+            e.printStackTrace();
+            Log.e(Constants.TAG, "RealmContactTransactions.updateProfileTimezone: " + e.toString());
         }
     }
 
@@ -231,10 +249,10 @@ public class RealmContactTransactions {
         else return true;
     }
 
-    public UserProfile getUserProfile(String contactId){
+    public UserProfile getUserProfile(){
         try {
             RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);
-            query.equalTo(Constants.CONTACT_ID, contactId);
+            query.equalTo(Constants.CONTACT_ID, mProfileId);
                  //.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
             RealmResults<UserProfile> result1 = query.findAll();
 
@@ -362,6 +380,8 @@ public class RealmContactTransactions {
         mRealm.copyToRealmOrUpdate(updatedContact);
         mRealm.commitTransaction();
     }
+
+    public void closeRealm() {if(mRealm!=null) mRealm.close();}
 
 }
 

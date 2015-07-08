@@ -38,17 +38,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import io.realm.Realm;
 import model.Contact;
 
 public class ContactDetailMainActivity extends ToolbarActivity implements IContactDetailConnectionCallback {
-    private Realm realm;
     private Contact contact;
     private ContactDetailController controller;
     private String contactId;
     private String action;
     private String mProfileId;
     private RecentContactController mRecentContactController;
+    private RealmContactTransactions realmContactTransactions;
 
     //Views
     private ImageView ivIconStatus;
@@ -77,6 +76,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ImageView btFavourite;
 
     private boolean contactIsFavorite;
+    private FavouriteController favouriteController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,12 +89,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
 
-        realm = Realm.getInstance(this);
-        mRecentContactController = new RecentContactController(this,realm,mProfileId);
+        mRecentContactController = new RecentContactController(this, mProfileId);
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
 
         Intent intent = getIntent();
         contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
-        controller = new ContactDetailController(this, realm, mProfileId);
+        controller = new ContactDetailController(this, mProfileId);
         controller.setConnectionCallback(this);
         contact = getContact(contactId);
 
@@ -271,7 +271,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         });
 
         //Initialization of favourite icon
-        FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
+        favouriteController = new FavouriteController(ContactDetailMainActivity.this, mProfileId);
 
         if (favouriteController.contactIsFavourite(contactId)) {
             Drawable imageStar = getResources().getDrawable(imageStarOn);
@@ -296,7 +296,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     btFavourite.setTag("icon_favorite_colour");
                 }
 
-                FavouriteController favouriteController = new FavouriteController(ContactDetailMainActivity.this, realm, mProfileId);
                 favouriteController.manageFavourite(contactId);
             }
         });
@@ -576,8 +575,10 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (realm!=null)
-            realm.close();
+        favouriteController.closeRealm();
+        mRecentContactController.closeRealm();
+        controller.closeRealm();
+        realmContactTransactions.closeRealm();
     }
 
     public void loadContactInfo(){
@@ -599,7 +600,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private Contact getContact(String contactId){
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(realm, mProfileId);
         List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_CONTACT_ID, contactId);
 
         Contact contact = contactList.get(0);

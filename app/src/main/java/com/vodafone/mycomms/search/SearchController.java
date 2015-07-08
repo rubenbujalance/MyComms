@@ -48,18 +48,20 @@ public class SearchController extends BaseController
 
     public SearchController(Activity activity, String profileId) {
         super(activity);
-        this.mContext = activity;
+        mContext = activity;
+        mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(profileId);
         realmAvatarTransactions = new RealmAvatarTransactions();
         internalContactSearch = new InternalContactSearch(activity, profileId);
-        this.mProfileId = profileId;
     }
 
     public SearchController(Context context, String profileId) {
         super(context);
-        this.mContext = context;
-        this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(mContext, profileId);
+        mContext = context;
+        mProfileId = profileId;
+        realmContactTransactions = new RealmContactTransactions(profileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
+        internalContactSearch = new InternalContactSearch(mContext, profileId);
     }
 
     @Override

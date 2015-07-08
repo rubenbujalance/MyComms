@@ -14,7 +14,7 @@ public final class UserSecurity {
     private static SharedPreferences _sharedPref;
     private static String _accessToken;
     private static String _refreshToken;
-    private static long _expirationTimeMilis;
+    private static long _expirationTimeMillis;
 
     private UserSecurity(){}
 
@@ -30,9 +30,9 @@ public final class UserSecurity {
             }
             else
             {
-                _accessToken = _sharedPref.getString("accessToken", null);
-                _refreshToken = _sharedPref.getString("refreshToken", null);
-                _expirationTimeMilis = _sharedPref.getLong("expirationTimeMilis", 0);
+                _accessToken = _sharedPref.getString(Constants.PROFILE_ACCESS_TOKEN, null);
+                _refreshToken = _sharedPref.getString(Constants.PROFILE_REFRESH_TOKEN, null);
+                _expirationTimeMillis = _sharedPref.getLong(Constants.PROFILE_EXPIRATION_TIME_MILLIS, 0);
             }
 
         } catch (Exception ex) {
@@ -58,15 +58,15 @@ public final class UserSecurity {
 
             SharedPreferences.Editor editor = _sharedPref.edit();
 
-            if(accessToken!=null) editor.putString("accessToken", accessToken);
-            if(refreshToken!=null) editor.putString("refreshToken", refreshToken);
-            if(expirationTimeMilis!=0) editor.putLong("expirationTimeMilis", expirationTimeMilis);
+            if(accessToken!=null) editor.putString(Constants.PROFILE_ACCESS_TOKEN, accessToken);
+            if(refreshToken!=null) editor.putString(Constants.PROFILE_REFRESH_TOKEN, refreshToken);
+            if(expirationTimeMilis!=0) editor.putLong(Constants.PROFILE_EXPIRATION_TIME_MILLIS, expirationTimeMilis);
 
             editor.commit();
 
-            _accessToken = _sharedPref.getString("accessToken", null);
-            _refreshToken = _sharedPref.getString("refreshToken", null);
-            _expirationTimeMilis = _sharedPref.getLong("expirationTimeMilis", 0);
+            _accessToken = _sharedPref.getString(Constants.PROFILE_ACCESS_TOKEN, null);
+            _refreshToken = _sharedPref.getString(Constants.PROFILE_REFRESH_TOKEN, null);
+            _expirationTimeMillis = _sharedPref.getLong(Constants.PROFILE_EXPIRATION_TIME_MILLIS, 0);
 
         } catch (Exception ex) {
             Log.e(Constants.TAG, "UserSecurity.setTokens: \n" + ex.toString());
@@ -103,7 +103,7 @@ public final class UserSecurity {
                 return 0;
         }
 
-        return _expirationTimeMilis;
+        return _expirationTimeMillis;
     }
 
     public static boolean isUserLogged(Context context)
@@ -128,7 +128,7 @@ public final class UserSecurity {
 
         Calendar actualTime = Calendar.getInstance();
         Calendar expirationTime = Calendar.getInstance();
-        expirationTime.setTimeInMillis(_expirationTimeMilis);
+        expirationTime.setTimeInMillis(_expirationTimeMillis);
 
         return actualTime.compareTo(expirationTime) > 0;
     }
@@ -144,15 +144,15 @@ public final class UserSecurity {
 
             SharedPreferences.Editor editor = _sharedPref.edit();
 
-            editor.remove("accessToken");
-            editor.remove("refreshToken");
-            editor.remove("expirationTimeMilis");
+            editor.remove(Constants.PROFILE_ACCESS_TOKEN);
+            editor.remove(Constants.PROFILE_REFRESH_TOKEN);
+            editor.remove(Constants.PROFILE_EXPIRATION_TIME_MILLIS);
 
             editor.commit();
 
             _accessToken = null;
             _refreshToken = null;
-            _expirationTimeMilis = 0;
+            _expirationTimeMillis = 0;
 
         } catch (Exception ex) {
             Log.e(Constants.TAG, "UserSecurity.resetTokens: \n" + ex.toString());

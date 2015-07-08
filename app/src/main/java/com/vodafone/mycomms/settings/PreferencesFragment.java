@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
@@ -132,6 +133,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 editor.remove(Constants.ACCESS_TOKEN_SHARED_PREF);
                 editor.remove(Constants.PROFILE_ID_SHARED_PREF);
                 editor.commit();
+
+                ((MycommsApp)getActivity().getApplication()).appIsInitialized = false;
 
                 //Go to login page as a new task
                 Intent in = new Intent(getActivity(), LoginSignupActivity.class);

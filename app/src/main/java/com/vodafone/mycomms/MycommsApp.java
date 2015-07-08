@@ -54,7 +54,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private FilePushToServerController filePushToServerController;
     private SharedPreferences sp;
-    private boolean appIsInitialized = false;
+    public boolean appIsInitialized = false;
     FavouriteController favouriteController;
     private RecentContactController recentContactController;
     private NewsController mNewsController;

@@ -105,10 +105,10 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         String[] ids = groupChat.getMembers().split("@");
 
         RealmContactTransactions contactTransactions =
-                new RealmContactTransactions(mContext, _profile_id);
+                new RealmContactTransactions(_profile_id);
 
         RealmContactTransactions realmContactTransactions = new RealmContactTransactions
-                (mContext,_profile_id);
+                (_profile_id);
 
         UserProfile userProfile = realmContactTransactions.getUserProfile();
         Contact contact = new Contact();
@@ -190,11 +190,11 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         } else if (contact.getAvatar() != null &&
                 contact.getAvatar().length() > 0 &&
                 contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
-            viewHolder.textAvatar.setVisibility(View.INVISIBLE);
+            viewHolder.top_left_avatar_text.setVisibility(View.INVISIBLE);
             Picasso.with(mContext)
                     .load(contact.getAvatar())
                     .fit().centerCrop()
-                    .into(viewHolder.imageAvatar);
+                    .into(viewHolder.top_left_avatar);
         } else{
             String initials = "";
             if(null != contact.getFirstName() && contact.getFirstName().length() > 0)

@@ -52,6 +52,8 @@ public class GroupChat extends RealmObject
                     , String members
                     , String owners
                     , long lastMessageTime
+                    , String lastMessageText
+                    , String lastMessage_id
             )
     {
         this.id = id;
@@ -63,8 +65,8 @@ public class GroupChat extends RealmObject
         this.members = members;
         this.owners = owners;
         this.lastMessageTime = lastMessageTime;
-        this.lastMessage = "";
-        this.lastMessage_id = null;
+        this.lastMessage = lastMessageText;
+        this.lastMessage_id = lastMessage_id;
     }
 
     public String getId() {

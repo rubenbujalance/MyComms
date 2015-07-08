@@ -111,12 +111,6 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".chat.ChatMainActivity"
-            android:label="@string/title_activity_chat_main"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateVisible|adjustPan" >
-        </activity>
-        <activity
             android:name=".login.MailSentActivity"
             android:label="@string/title_activity_mail_sent"
             android:screenOrientation="portrait" >

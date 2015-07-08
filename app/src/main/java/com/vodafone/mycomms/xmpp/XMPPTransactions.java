@@ -155,9 +155,9 @@ public final class XMPPTransactions {
         return true;
     }
 
-    public static boolean sendText(String contact_id, String type, String id, String text)
+    public static boolean sendText(boolean isGroup, String contactGroupId, String id, String text)
     {
-        final String stanzaStr = buildMessageStanza(type, id, contact_id, text);
+        final String stanzaStr = buildMessageStanza(isGroup, id, contactGroupId, text);
 
         try {
             Stanza st = new Stanza() {
@@ -235,11 +235,17 @@ public final class XMPPTransactions {
         return iq;
     }
 
-    private static String buildMessageStanza(String type, String id, String contactId, String text)
+    private static String buildMessageStanza(boolean isGroup, String id, String contactGroupId,
+                                             String text)
     {
-        String message = "<"+Constants.XMPP_ELEMENT_MESSAGE+" "+Constants.XMPP_ATTR_TYPE+"=\""+type+"\" " +
+        String type;
+        if(isGroup) type = Constants.XMPP_STANZA_TYPE_GROUPCHAT;
+        else type = Constants.XMPP_STANZA_TYPE_CHAT;
+
+        String message = "<"+Constants.XMPP_ELEMENT_MESSAGE+" "+
+                    Constants.XMPP_ATTR_TYPE+"=\""+type+"\" " +
                     Constants.XMPP_ATTR_ID+"=\""+id+"\" " +
-                    Constants.XMPP_ATTR_TO+"=\""+contactId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
+                    Constants.XMPP_ATTR_TO+"=\""+contactGroupId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
                     Constants.XMPP_ATTR_FROM+"=\""+_profile_id+"@"+Constants.XMPP_PARAM_DOMAIN+"/"+_device_id+"\" " +
                     Constants.XMPP_ATTR_MEDIATYPE+"=\""+Constants.XMPP_MESSAGE_MEDIATYPE_TEXT+"\" >" +
                     "<"+Constants.XMPP_ELEMENT_BODY+">"+text+"</"+Constants.XMPP_ELEMENT_BODY+">" +

@@ -24,7 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -208,15 +207,10 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         else viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
 
         //Local time
-        String presenceDetail = "";
+        String presenceDetail;
 
         try {
             presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        try {
             assert null != presenceDetail;
             if (presenceDetail.equals("#LOCAL_TIME#")) {
                 TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
@@ -236,10 +230,9 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             } else {
                 viewHolder.textViewTime.setText(presenceDetail);
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.i(Constants.TAG, "ContactListViewArrayAdapter.getView: No presence found");
         }
-
 
         return convertView;
     }

@@ -241,11 +241,27 @@ public class InternalContactSearch
                 do
                 {
                     String phone = "";
-                    if (cursor.getString(cursor.getColumnIndex(ContactsContract
-                            .CommonDataKinds.Phone.NORMALIZED_NUMBER)) != null) {
-                        phone = cursor.getString(cursor.getColumnIndex(ContactsContract
-                                .CommonDataKinds.Phone.NORMALIZED_NUMBER)).replace(" ", "");
+                    ContentResolver cr = this.context.getContentResolver();
+                    Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id, null, null);
+                    while (phones.moveToNext()) {
+                        //TODO: Get all numbers and save them into a JSON (and show them correctly on detail)
+                        String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                        switch (type) {
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
+                                // do something with the Home number here...
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
+                                // do something with the Mobile number here...
+                                break;
+                            case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
+                                // do something with the Work number here...
+                                break;
+                        }
                     }
+                    phones.close();
+
                     contact.setPhones(phone);
                 }
                 while(cursor.moveToNext());
@@ -539,21 +555,17 @@ public class InternalContactSearch
                         , ContactsContract.CommonDataKinds.Organization.DEPARTMENT
                         , ContactsContract.CommonDataKinds.Organization.JOB_DESCRIPTION
                         , ContactsContract.CommonDataKinds.Organization.TITLE
+                        , ContactsContract.CommonDataKinds.Organization.DATA
                 };
 
-        String selection = ContactsContract.Data.CONTACT_ID +" =? "
-                + " AND "+ContactsContract.Data.MIMETYPE+" = ?";
-        String[] selectionArgs = new String[]
-                {
-                        id
-                        , ContactsContract.CommonDataKinds.Organization.COMPANY
-                };
+        String selection = ContactsContract.Data.CONTACT_ID + " = ? AND " +
+                ContactsContract.Data.MIMETYPE + " = ?";
+        String[] selectionArgs = new String[]{
+                id,
+                ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE};
 
         return cr.query(uri,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        ContactsContract.Data.CONTACT_ID + " ASC");
+                projection, selection, selectionArgs, ContactsContract.Data.CONTACT_ID + " ASC");
 
     }
 
@@ -650,7 +662,7 @@ public class InternalContactSearch
         return cr.query
                 (
                         uri
-                        , projection
+                        , null
                         , selection
                         , selectionArgs
                         , ContactsContract.Data.CONTACT_ID + " " + "ASC"

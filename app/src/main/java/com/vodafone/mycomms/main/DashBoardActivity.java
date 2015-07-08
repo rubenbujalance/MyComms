@@ -202,8 +202,8 @@ public class DashBoardActivity extends ToolbarActivity{
                             );
 
                     recentsTasksQueue.putConnection(recentContact.getUniqueId(),task);
-                    task.execute();
-                }*/
+                    task.execute();*/
+                }
                 else
                 {
                     DrawSingleRecentAsyncTask task = new DrawSingleRecentAsyncTask(recentContact.getContactId(),

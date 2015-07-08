@@ -26,10 +26,11 @@ public class ChatListHolder extends RecyclerView.ViewHolder {
 
     protected LinearLayout lay_top_right_image_hide;
     protected LinearLayout lay_bottom_both_image_hide;
+    protected LinearLayout lay_top_left_image;
 
     protected TextView badgeUnread;
     protected RelativeLayout layContainer;
-    protected LinearLayout lay_top_left_image;
+
 
     public ChatListHolder(View view)
     {

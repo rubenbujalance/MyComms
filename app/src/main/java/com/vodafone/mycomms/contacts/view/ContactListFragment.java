@@ -330,10 +330,22 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                         }
                         else
                         {
-                            in = new Intent(getActivity(), GroupChatActivity.class);
-                            in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
-                            in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
-                            startActivity(in);
+                            if(recentContactList.get(position).getId().startsWith("mg_"))
+                            {
+                                in = new Intent(getActivity(), GroupChatActivity.class);
+                                in.putExtra(Constants.GROUP_CHAT_ID, recentContactList.get(position).getId());
+                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                in.putExtra(Constants.IS_GROUP_CHAT, true);
+                                startActivity(in);
+                            }
+                            else
+                            {
+                                in = new Intent(getActivity(), GroupChatActivity.class);
+                                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
+                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                in.putExtra(Constants.IS_GROUP_CHAT, false);
+                                startActivity(in);
+                            }
                         }
 
                     }
@@ -477,7 +489,8 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                 emptyText.setText("");
             recentContactList = mContactTransactions.getAllRecentContacts();
             if (recentContactList!=null) {
-                RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter(getActivity().getApplicationContext(), recentContactList);
+                RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter
+                        (getActivity().getApplicationContext(), recentContactList, profileId);
                 if (listView != null) {
                     state = listView.onSaveInstanceState();
                     setListAdapter(recentAdapter);

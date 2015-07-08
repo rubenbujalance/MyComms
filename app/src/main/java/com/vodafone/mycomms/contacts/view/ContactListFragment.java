@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.chat.ChatMainActivity;
+import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
 import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
@@ -330,7 +330,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                         }
                         else
                         {
-                            in = new Intent(getActivity(), ChatMainActivity.class);
+                            in = new Intent(getActivity(), GroupChatActivity.class);
                             in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
                             in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
                             startActivity(in);

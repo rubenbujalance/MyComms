@@ -40,8 +40,10 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatRecyclerViewAdapter;
 import com.vodafone.mycomms.contacts.connection.IRecentContactConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
+import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.MessageSentEvent;
 import com.vodafone.mycomms.events.MessageSentStatusChanged;
 import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -94,9 +96,12 @@ public class GroupChatActivity extends ToolbarActivity implements
     private SharedPreferences sp;
     private String previousActivity;
     private String previousView;
+
     private boolean isGroupChatMode;
     private Chat _chat;
     private GroupChat _groupChat;
+    private String _contactId;
+    private String _groupId;
 
     private String photoPath = null;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -118,7 +123,6 @@ public class GroupChatActivity extends ToolbarActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat_main);
         activateToolbar();
-//        setToolbarBackground(R.drawable.toolbar_header);
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
@@ -164,9 +168,6 @@ public class GroupChatActivity extends ToolbarActivity implements
 
         if(contact_id==null || contact_id.length()==0) finish(); //Prevent from errors
 
-        //Chat listeners
-//        setChatHeaderListener(this, _contact);
-
         //Load all messages
         loadMessagesArray();
 
@@ -204,9 +205,9 @@ public class GroupChatActivity extends ToolbarActivity implements
                 dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
-        String action = Constants.CONTACTS_ACTION_SMS;
-        String id = _groupChat.getId();
-        mRecentContactController.insertRecentOKHttp(id, action);
+//        String action = Constants.CONTACTS_ACTION_SMS;
+//        String id = _groupChat.getId();
+//        mRecentContactController.insertRecentOKHttp(id, action);
 
     }
 
@@ -315,6 +316,16 @@ public class GroupChatActivity extends ToolbarActivity implements
                 top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
                 top_left_avatar_text.setText(initials);
             }
+
+            top_left_avatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent in = new Intent(GroupChatActivity.this, ContactDetailMainActivity.class);
+                    in.putExtra(Constants.CONTACT_CONTACT_ID, _contactId);
+                    in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(in);
+                }
+            });
         }
     }
 
@@ -334,9 +345,11 @@ public class GroupChatActivity extends ToolbarActivity implements
 
         this.previousActivity = in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY);
         this.isGroupChatMode = in.getBooleanExtra(Constants.IS_GROUP_CHAT, false);
+
         if(isGroupChatMode)
         {
             _groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants.GROUP_CHAT_ID));
+            _groupId = _groupChat.getId();
             loadContactIds();
         }
         else
@@ -344,6 +357,7 @@ public class GroupChatActivity extends ToolbarActivity implements
             String contactId = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
             _chat = chatTransactions.getChatByContactId(contactId);
             if(_chat==null) _chat = chatTransactions.newChatInstance(contactId);
+            _contactId = _chat.getContact_id();
             this.contactIds = new ArrayList<>();
             this.contactIds.add(contactId);
         }
@@ -385,52 +399,55 @@ public class GroupChatActivity extends ToolbarActivity implements
 
     private void sendText()
     {
-//        final String msg = etChatTextBox.getText().toString();
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                //Save to DB
-//                final ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
-//                        _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-//                        Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
-//
-//                _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
-//                final String id = chatMsg.getId();
-//
-//                chatTransactions.insertChat(_chat);
-//                chatTransactions.insertChatMessage(chatMsg);
-//
-//                //Send through XMPP
-//                if(!XMPPTransactions.sendText(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
-//                        chatMsg.getId(), msg))
-//                    return;
-//
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        //Insert in recents
-//                        String action = Constants.CONTACTS_ACTION_SMS;
-//                        mRecentContactController.insertRecent(_chat.getContact_id(), action);
-//                        mRecentContactController.setConnectionCallback(ChatMainActivity.this);
-//
-//                        //Notify app to refresh any view if necessary
-//                        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
-//                            BusProvider.getInstance().post(new MessageSentEvent());
-//                        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
-//                            //Recent List is refreshed onConnectionComplete
-//                        }
-//
-//                        _chatList.add(chatMsg);
-//                        if(_chatList.size()>50) _chatList.remove(0);
-//
-//                        refreshAdapter();
-//                        etChatTextBox.setText("");
-//                    }
-//                });
-//            }
-//        }).start();
+        String msg = etChatTextBox.getText().toString();
+        ChatMessage chatMsg;
+        //Save to DB
+        if(isGroupChatMode) {
+            chatMsg = mGroupChatTransactions.newGroupChatMessageInstance(_groupChat.getId(),
+                    Constants.CHAT_MESSAGE_DIRECTION_SENT, Constants.CHAT_MESSAGE_TYPE_TEXT,
+                    msg, "");
 
+            _groupChat = mGroupChatTransactions.updatedGroupChatInstance(_groupChat, chatMsg);
+
+            mGroupChatTransactions.insertOrUpdateGroupChat(_groupChat);
+            mGroupChatTransactions.insertGroupChatMessage(_groupId, chatMsg);
+        }
+        else {
+            chatMsg = chatTransactions.newChatMessageInstance(
+                    _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                    Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
+
+            _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+
+            chatTransactions.insertChat(_chat);
+            chatTransactions.insertChatMessage(chatMsg);
+        }
+
+        //Send through XMPP
+        String groupContactId;
+        if(isGroupChatMode) groupContactId = _groupId;
+        else groupContactId = _contactId;
+
+        if(!XMPPTransactions.sendText(isGroupChatMode, groupContactId, chatMsg.getId(), msg))
+            return;
+
+        //Insert in recents
+        String action = Constants.CONTACTS_ACTION_SMS;
+        mRecentContactController.insertRecent(_chat.getContact_id(), action);
+        mRecentContactController.setConnectionCallback(GroupChatActivity.this);
+
+//        //Notify app to refresh any view if necessary
+//        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
+            BusProvider.getInstance().post(new MessageSentEvent());
+//        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
+//            //Recent List is refreshed onConnectionComplete
+//        }
+
+        _chatList.add(chatMsg);
+        if(_chatList.size()>50) _chatList.remove(0);
+
+        refreshAdapter();
+        etChatTextBox.setText("");
     }
 
     private void imageSent(String imageUrl)
@@ -545,26 +562,25 @@ public class GroupChatActivity extends ToolbarActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-//        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
-//
-//        if(etChatTextBox.getText().toString()!=null &&
-//                etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
-//        else setSendEnabled(false);
-//
-//        final String contactId = _contact.getContactId();
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                ArrayList<ChatMessage> messages =
-//                        chatTransactions.getNotReadReceivedContactChatMessages(contactId);
-//
-//                if (messages != null && messages.size() > 0) {
-//                    XMPPTransactions.sendReadIQReceivedMessagesList(messages);
-//                    chatTransactions.setContactAllChatMessagesReceivedAsRead(contactId);
-//                }
-//            }
-//        }).start();
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+
+        if(etChatTextBox.getText().toString()!=null &&
+                etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
+        else setSendEnabled(false);
+
+        ArrayList<ChatMessage> messages;
+
+        if(isGroupChatMode)
+            messages = mGroupChatTransactions.getNotReadReceivedGroupChatMessages(_groupId);
+        else
+            messages = chatTransactions.getNotReadReceivedContactChatMessages(_contactId);
+
+        if (messages != null && messages.size() > 0) {
+            XMPPTransactions.sendReadIQReceivedMessagesList(messages);
+            if(isGroupChatMode)
+                mGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead(_groupId);
+            else chatTransactions.setContactAllChatMessagesReceivedAsRead(_contactId);
+        }
     }
 
     @Subscribe

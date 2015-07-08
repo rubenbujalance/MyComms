@@ -23,7 +23,6 @@ import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.chat.ChatMainActivity;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.connection.AsyncTaskQueue;
 import com.vodafone.mycomms.connection.ConnectionsQueue;
@@ -994,7 +993,7 @@ public class DashBoardActivity extends ToolbarActivity{
                             }
                             else
                             {
-                                Intent in = new Intent(DashBoardActivity.this, ChatMainActivity.class);
+                                Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
                                 in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
                                 in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
                                 startActivity(in);

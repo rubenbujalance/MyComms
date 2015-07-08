@@ -276,8 +276,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             if(profile_id!=null)
                 new sendAvatar().execute(profile_id);
         }
-
-        favouriteController = new FavouriteController(mContext, profile_id);
     }
 
     @Subscribe
@@ -288,6 +286,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         recentContactController = new RecentContactController(this, profile_id);
         recentContactController.getRecentList();
+        favouriteController = new FavouriteController(mContext, profile_id);
 
         XMPPTransactions.initializeMsgServerSession(this);
     }

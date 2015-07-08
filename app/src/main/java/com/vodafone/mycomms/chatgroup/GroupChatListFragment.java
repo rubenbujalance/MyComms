@@ -569,7 +569,8 @@ public class GroupChatListFragment extends ListFragment implements
                 mGroupChatTransactions.insertOrUpdateGroupChat(groupChat);
 
                 String action = Constants.CONTACTS_ACTION_SMS;
-                mRecentContactController.insertRecent(groupChat.getId(), action);
+                String id = groupChat.getId();
+                mRecentContactController.insertRecentOKHttp(id, action);
 
                 startActivityInGroupChatMode();
             }

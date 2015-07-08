@@ -26,6 +26,8 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import model.Contact;
+
 public class RecentContactController extends BaseController {
 
     private Context mContext;
@@ -81,13 +83,21 @@ public class RecentContactController extends BaseController {
         mRecentContactConnection.request();
     }
 
-    public void insertRecentOKHttp(String contactId, String action)
+    public void insertRecentOKHttp(String groupChatId, String action)
     {
-        String[] params = new String[]{contactId,action};
-        new RecentContactsOKHTTPAsyncTask().execute(params);
+        new RecentContactsOKHTTPAsyncTask(groupChatId, action).execute();
     }
 
-    public class RecentContactsOKHTTPAsyncTask extends AsyncTask<String, Void, String> {
+    public class RecentContactsOKHTTPAsyncTask extends AsyncTask<String, Void, String>
+    {
+        private String groupChatId;
+        private String action;
+
+        public RecentContactsOKHTTPAsyncTask(String groupChatId, String action)
+        {
+            this.groupChatId = groupChatId;
+            this.action = action;
+        }
         @Override
         protected String doInBackground(String... params)
         {
@@ -96,7 +106,7 @@ public class RecentContactController extends BaseController {
             try
             {
                 Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
-                Request request = createGroupChatRequestForCreation(params[0], params[1]);
+                Request request = createGroupChatRequestForCreation(this.groupChatId,this.action);
                 return executeRequest(request);
 
             }
@@ -111,15 +121,37 @@ public class RecentContactController extends BaseController {
         protected void onPostExecute(String response)
         {
             Log.i(Constants.TAG, "RecentContactsAsyncTask.doInBackground: " + response);
-            contactsController.insertRecentContactInRealm(null);
+
+            Contact contact = new Contact("");
+            contact.setId(groupChatId);
+            contact.setContactId(groupChatId);
+            contact.setProfileId(mProfileId);
+            JSONObject jsonObject = createJsonObject(this.groupChatId, this.action);
+            contactsController.insertRecentGroupChatIntoRealm(contact, jsonObject);
         }
     }
 
-    public String createdJSONObjectForSetRecent(String contactId, String action)
+    private JSONObject createJsonObject(String groupChatId, String action)
+    {
+        try
+        {
+            JSONObject jsonObject = new JSONObject(createdStringBodyForSetRecent(groupChatId,
+                    action));
+            return jsonObject;
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "RecentContactController.createJsonObject: ERROR ", e);
+            return null;
+        }
+
+    }
+
+    public String createdStringBodyForSetRecent(String groupChatId, String action)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
         String jsonRequest = "{\"id\":\""
-                    + contactId + "\","
+                    + groupChatId + "\","
                     + "\"timestamp\": "+timestamp+","
                     + "\"action\":\""+action+"\"}";
 
@@ -127,7 +159,7 @@ public class RecentContactController extends BaseController {
     }
 
 
-    public Request createGroupChatRequestForCreation(String contactId, String action)
+    public Request createGroupChatRequestForCreation(String groupChatId, String action)
     {
         try
         {
@@ -135,7 +167,7 @@ public class RecentContactController extends BaseController {
             final String version_token = "x-mycomms-version";
             final String ACCESS_TOKEN = "Bearer ";
 
-            String jsonRequest = createdJSONObjectForSetRecent(contactId, action);
+            String jsonRequest = createdStringBodyForSetRecent(groupChatId, action);
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
             RequestBody requestBody = RequestBody.create(JSON, jsonRequest);

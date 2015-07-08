@@ -2,12 +2,16 @@ package com.vodafone.mycomms.util;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import model.Contact;
 
@@ -42,10 +46,13 @@ public class InternalContactSearch
         ArrayList<String> ids = getContactsIds(keyWord);
         ArrayList<Contact> contacts = new ArrayList<>();
         Contact contact;
+        SharedPreferences sp = context.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String deviceId = sp.getString(Constants.DEVICE_ID_SHARED_PREF,"");
         for(String id : ids)
         {
             contact = new Contact("");
-            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + id);
+            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
             contact.setProfileId(profileId);
@@ -80,10 +87,13 @@ public class InternalContactSearch
         ArrayList<String> ids = getAllContactsIds();
         ArrayList<Contact> contacts = new ArrayList<>();
         Contact contact;
+        SharedPreferences sp = context.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String deviceId = sp.getString(Constants.DEVICE_ID_SHARED_PREF,"");
         for(String id : ids)
         {
             contact = new Contact("");
-            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_"+profileId+"_"+id);
+            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
             contact.setProfileId(profileId);
@@ -244,25 +254,32 @@ public class InternalContactSearch
                     ContentResolver cr = this.context.getContentResolver();
                     Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                             ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id, null, null);
+                    HashMap body = new HashMap<>();
                     while (phones.moveToNext()) {
                         //TODO: Get all numbers and save them into a JSON (and show them correctly on detail)
-                        String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).trim();
                         int type = phones.getInt(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                        body.put(Constants.CONTACT_PHONE, number);
                         switch (type) {
                             case ContactsContract.CommonDataKinds.Phone.TYPE_HOME:
-                                // do something with the Home number here...
+                                body.put(Constants.CONTACT_PHONE_HOME, number);
                                 break;
                             case ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE:
-                                // do something with the Mobile number here...
+                                body.put(Constants.CONTACT_PHONE_MOBILE, number);
                                 break;
                             case ContactsContract.CommonDataKinds.Phone.TYPE_WORK:
-                                // do something with the Work number here...
+                                body.put(Constants.CONTACT_PHONE_WORK, number);
+                                break;
+                            default:
+                                body.put(Constants.CONTACT_PHONE, number);
                                 break;
                         }
                     }
                     phones.close();
-
-                    contact.setPhones(phone);
+                    if (body!=null && !body.isEmpty()) {
+                        JSONObject json = new JSONObject(body);
+                        contact.setPhones(json.toString());
+                    }
                 }
                 while(cursor.moveToNext());
             }

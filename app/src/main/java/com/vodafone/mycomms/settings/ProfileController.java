@@ -365,8 +365,6 @@ public class ProfileController extends BaseController {
                 if(userProfile != null) {
                     isUserProfileReceived = true;
                 }
-                if (realm!=null)
-                    realm.close();
             }
         } catch (Exception e) {
             Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile" + e.getMessage());

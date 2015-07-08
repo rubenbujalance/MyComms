@@ -55,6 +55,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 
+import io.realm.Realm;
 import model.Contact;
 import model.News;
 import model.RecentContact;
@@ -70,6 +71,8 @@ public class DashBoardActivity extends ToolbarActivity{
     private String _profileId;
     private RealmNewsTransactions realmNewsTransactions;
     private RecentContactController recentController;
+    private RealmGroupChatTransactions realmGroupTransactions;
+    private RecentContactController recentContactController;
 
 
     @Override
@@ -88,7 +91,9 @@ public class DashBoardActivity extends ToolbarActivity{
         _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realmContactTransactions = new RealmContactTransactions(_profileId);
         realmNewsTransactions = new RealmNewsTransactions();
-        recentController = new RecentContactController(DashBoardActivity.this, _profileId);
+        recentController = new RecentContactController(this, _profileId);
+        realmGroupTransactions = new RealmGroupChatTransactions(this, _profileId);
+        recentContactController = new RecentContactController(this, _profileId);
 
         BusProvider.getInstance().register(this);
 
@@ -101,7 +106,7 @@ public class DashBoardActivity extends ToolbarActivity{
         loadNews();
 
         Log.i(Constants.TAG, "DashBoardActivity.onCreate: DownloadLocalContacts");
-        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, _profileId, mRealm);
+        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, _profileId);
         downloadLocalContacts.execute();
 
         BusProvider.getInstance().post(new DashboardCreatedEvent());
@@ -192,7 +197,6 @@ public class DashBoardActivity extends ToolbarActivity{
                             (
                                     recentContact.getAction()
                                     , recentContact.getUniqueId()
-                                    , profileId
                                     , recentsContainer
                                     , inflater
                                     , recentContact.getId()
@@ -207,7 +211,7 @@ public class DashBoardActivity extends ToolbarActivity{
                             recentContact.getFirstName(),recentContact.getLastName(),
                             recentContact.getAvatar(),recentContact.getAction(),
                             recentContact.getPhones(),recentContact.getEmails(),
-                            recentContact.getPlatform(),recentContact.getUniqueId(),profileId,
+                            recentContact.getPlatform(),recentContact.getUniqueId(),
                             recentsContainer,inflater);
 
                     recentsTasksQueue.putConnection(recentContact.getUniqueId(),task);
@@ -482,7 +486,6 @@ public class DashBoardActivity extends ToolbarActivity{
         TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
         LinearLayout lay_top_right_image, layout_bottom_both_images;
 
-        String profileId;
         View childRecents;
 
         //Avatar
@@ -504,8 +507,6 @@ public class DashBoardActivity extends ToolbarActivity{
         ArrayList<String> contactIds = new ArrayList<>();
         ArrayList<Contact> contacts = new ArrayList<>();
         String groupChatid;
-        RealmContactTransactions mContactTransactions;
-        RealmGroupChatTransactions mGroupChatTransactions;
         UserProfile _profile;
         ArrayList<ImageView> images = new ArrayList<>();
 
@@ -518,7 +519,6 @@ public class DashBoardActivity extends ToolbarActivity{
                 (
                         String action
                         , String recentId
-                        , String profileId
                         , LinearLayout recentsContainer
                         , LayoutInflater inflater
                         , String groupChatId
@@ -530,16 +530,12 @@ public class DashBoardActivity extends ToolbarActivity{
 
 
             this.action = action;
-            this.profileId = profileId;
             this.recentId = recentId;
             String[] ids = contactId.split("@");
             Collections.addAll(contactIds,ids);
-            this.mContactTransactions = new RealmContactTransactions(_realm,this.profileId);
-            this.mGroupChatTransactions = new RealmGroupChatTransactions(_realm,DashBoardActivity
-                    .this,profileId);
             this.groupChatid = groupChatId;
-            this.contactId = mGroupChatTransactions.getGroupChatById(this.groupChatid).getMembers();
-            this._profile = this.mContactTransactions.getUserProfile(profileId);
+            this.contactId = realmGroupTransactions.getGroupChatById(this.groupChatid).getMembers();
+            this._profile = realmContactTransactions.getUserProfile();
             loadContactsFromIds(contactIds);
             mapAvatarToContactId();
 
@@ -560,7 +556,7 @@ public class DashBoardActivity extends ToolbarActivity{
             {
                 if(!id.equals(_profile.getId()))
                 {
-                    contact = mContactTransactions.getContactById(id);
+                    contact = realmContactTransactions.getContactById(id);
                     contacts.add(contact);
                 }
             }
@@ -757,9 +753,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
             }
             //ADD RECENT
-            Realm realm = Realm.getInstance(getBaseContext());
-            RecentContactController recentController = new RecentContactController(DashBoardActivity.this, realm, profileId);
-            recentController.insertRecent(contactId, action);
+            recentContactController.insertRecent(contactId, action);
             return null;
         }
 

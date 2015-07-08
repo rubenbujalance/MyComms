@@ -111,8 +111,6 @@ public class RecentContactController extends BaseController {
         protected void onPostExecute(String response)
         {
             Log.i(Constants.TAG, "RecentContactsAsyncTask.doInBackground: " + response);
-            ContactsController contactsController = new ContactsController(mContext, mRealm,
-                    mProfileId);
             contactsController.insertRecentContactInRealm(null);
         }
     }

@@ -10,7 +10,6 @@ import com.vodafone.mycomms.util.InternalContactSearch;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import model.Contact;
 
 public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
@@ -18,15 +17,19 @@ public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
     private SearchController mSearchController;
     private Context mContext;
     private String mProfileId;
-    private Realm mRealm;
     ArrayList<Contact> contactArrayList;
 
-    public DownloadLocalContacts(Context context, String profileId, Realm realm){
+    public DownloadLocalContacts(Context context, String profileId){
         this.mContext = context;
         this.mProfileId = profileId;
-        mRealm = Realm.getInstance(context);
         internalContactSearch = new InternalContactSearch(mContext, mProfileId);
-        mSearchController = new SearchController(context, mRealm, profileId);
+
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        mSearchController = new SearchController(mContext, mProfileId);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         mSearchController.storeContactsIntoRealm(contactArrayList);
-        mRealm.close();
+        mSearchController.closeRealm();
     }
 
     public ArrayList<Contact> getAllLocalContacts() {

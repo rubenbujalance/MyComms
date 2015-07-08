@@ -205,7 +205,7 @@ public class GroupChatActivity extends ToolbarActivity implements
             }
         });
         String action = Constants.CONTACTS_ACTION_SMS;
-        String id = groupChat.getId();
+        String id = _groupChat.getId();
         mRecentContactController.insertRecentOKHttp(id, action);
 
     }

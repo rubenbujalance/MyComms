@@ -259,6 +259,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         recentController.closeRealm();
         mContactTransactions.closeRealm();
         mSearchController.closeRealm();
+        BusProvider.getInstance().unregister(this);
     }
 
     @Override
@@ -426,14 +427,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
      */
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(String id);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mContactTransactions.closeRealm();
-        contactListController.closeRealm();
-        BusProvider.getInstance().unregister(this);
     }
 
     /**

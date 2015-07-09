@@ -9,6 +9,7 @@
 
     <!--Empty ScrollView needed so the recyclerview doesn't hide the toolbar_chat-->
     <ScrollView
+        android:layout_below="@+id/no_connection_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="false">
@@ -25,6 +26,18 @@
         android:background="@color/white"
         android:visibility="visible"
         android:paddingBottom="5dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_connection_layout"
+        android:visibility="visible"
+        android:layout_below="@+id/app_bar">
+        <include
+            android:id="@+id/layout_connection_not_available"
+            layout="@layout/layout_connection_not_available"
+            />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/message_layout"

@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:id="@+id/sample_main_layout">
 
+
     <include android:id="@+id/app_bar" layout="@layout/toolbar_profile"/>
 
     <View
@@ -16,6 +17,19 @@
         android:id="@+id/sample_content_fragment"
         android:layout_weight="2"
         android:layout_width="match_parent"
-        android:layout_height="0px" />
+        android:layout_height="0dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_connection_layout"
+        android:visibility="visible">
+        <include
+            android:id="@+id/layout_connection_not_available"
+            layout="@layout/layout_connection_not_available"
+            />
+    </LinearLayout>
+
+
 
 </LinearLayout>

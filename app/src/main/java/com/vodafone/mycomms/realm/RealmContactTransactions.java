@@ -23,23 +23,6 @@ public class RealmContactTransactions {
         mProfileId = profileId;
     }
 
-    public void insertUserProfile(UserProfile userProfile){
-        Log.d(Constants.TAG, "RealmContactTransactions.insertUserProfile: " + userProfile);
-        if(userProfile == null){
-            Log.e(Constants.TAG, "RealmContactTransactions.insertUserProfile: UserProfile is null!!!!" );
-            return;
-        }
-
-        try {
-            mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(userProfile);
-
-            mRealm.commitTransaction();
-        } catch (IllegalArgumentException e){
-            Log.e(Constants.TAG, "RealmContactTransactions.insertContact: " + e.toString());
-        }
-    }
-
     public void insertContactList (ArrayList<Contact> contactArrayList){
         int size = contactArrayList.size();
         try {
@@ -55,18 +38,6 @@ public class RealmContactTransactions {
         } catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmContactTransactions.insertContactList: " + e.toString());
-        }
-    }
-
-    public void updateProfileTimezone (String timezone){
-        try {
-            mRealm.beginTransaction();
-            UserProfile userProfile = getUserProfile();
-            userProfile.setTimezone(timezone);
-            mRealm.commitTransaction();
-        } catch (IllegalArgumentException e){
-            e.printStackTrace();
-            Log.e(Constants.TAG, "RealmContactTransactions.updateProfileTimezone: " + e.toString());
         }
     }
 

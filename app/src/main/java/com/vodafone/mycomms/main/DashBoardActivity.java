@@ -99,10 +99,6 @@ public class DashBoardActivity extends ToolbarActivity{
 
         initALL();
 
-        loadRecents();
-        loadNews();
-        loadLocalContacts();
-
         BusProvider.getInstance().post(new DashboardCreatedEvent());
 
     }
@@ -310,6 +306,8 @@ public class DashBoardActivity extends ToolbarActivity{
         //RBM - It is done every time a message is received
         checkUnreadChatMessages();
         loadRecents();
+        loadNews();
+        loadLocalContacts();
     }
 
     @Subscribe

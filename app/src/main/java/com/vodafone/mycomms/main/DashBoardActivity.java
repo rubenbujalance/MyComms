@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
 
 import model.Contact;
 import model.News;
@@ -456,7 +457,8 @@ public class DashBoardActivity extends ToolbarActivity{
                 title.setText(titleStr);
                 TextView date = (TextView) child.findViewById(R.id.notice_date);
                 date.setText(dateStr);
-
+                Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
+                builder.executor(Executors.newSingleThreadExecutor());
                 if (loadFromDisk)
                     Picasso.with(DashBoardActivity.this)
                             .load(newsFile)

@@ -192,18 +192,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                 (
                         new LinearLayout.LayoutParams(width,width)
                 );
+        chatListHolder.lay_bottom_both_image_hide.setVisibility(View.VISIBLE);
 
         if(membersArray.length > 3)
         {
             chatListHolder.lay_top_right_image_hide.setVisibility(View.VISIBLE);
-            chatListHolder.lay_top_right_image_hide.setLayoutParams
-                (
-                        new LinearLayout.LayoutParams
-                                (
-                                        LinearLayout.LayoutParams.MATCH_PARENT
-                                        , LinearLayout.LayoutParams.MATCH_PARENT
-                                )
-                );
             images.add(chatListHolder.top_right_avatar);
             texts.add(chatListHolder.top_right_avatar_text);
         }

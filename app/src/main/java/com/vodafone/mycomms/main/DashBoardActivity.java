@@ -1034,11 +1034,6 @@ public class DashBoardActivity extends ToolbarActivity{
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(nameInitials);
                 }
-                else if (!platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL))
-                {
-                    recentAvatar.setImageResource(R.color.grey_middle);
-                    avatarText.setText(nameInitials);
-                }
 
                 // Recent action icon and bagdes
                 if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {

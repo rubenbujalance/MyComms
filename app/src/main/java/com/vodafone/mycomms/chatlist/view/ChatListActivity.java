@@ -3,11 +3,16 @@ package com.vodafone.mycomms.chatlist.view;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -18,6 +23,7 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 public class ChatListActivity extends ToolbarActivity{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
+    private LinearLayout lay_no_connection;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,6 +32,12 @@ public class ChatListActivity extends ToolbarActivity{
         BusProvider.getInstance().register(this);
 
         setContentView(R.layout.layout_main_activity);
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        if(APIWrapper.isConnected(ChatListActivity.this))
+            lay_no_connection.setVisibility(View.GONE);
+        else
+            lay_no_connection.setVisibility(View.VISIBLE);
 
         enableToolbarIsClicked(false);
         activateChatListToolbar();
@@ -79,5 +91,18 @@ public class ChatListActivity extends ToolbarActivity{
     @Override
     public void onBackPressed() {
         moveTaskToBack(true);
+    }
+
+    @Subscribe
+    public void onConnectivityChanged(ConnectivityChanged event)
+    {
+
+        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+                + event.getConnectivityStatus().toString());
+        if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
+                event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
+            lay_no_connection.setVisibility(View.VISIBLE);
+        else
+            lay_no_connection.setVisibility(View.GONE);
     }
 }

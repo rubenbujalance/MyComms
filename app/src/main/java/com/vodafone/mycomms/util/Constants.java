@@ -215,6 +215,7 @@ public class Constants {
 
     public static boolean isSearchBarFocusRequested = false;
     public static boolean isDashboardOrigin = false;
+    public static boolean isConnectionAvailable = true;
 
     public static final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpg");
     public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");

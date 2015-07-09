@@ -17,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -37,6 +39,7 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
@@ -60,7 +63,6 @@ import model.RecentContact;
 import model.UserProfile;
 
 public class DashBoardActivity extends ToolbarActivity{
-    private LinearLayout noConnectionLayout;
     private RealmChatTransactions _chatTx;
     private ArrayList<News> newsArrayList;
     private AsyncTaskQueue recentsTasksQueue = new AsyncTaskQueue();
@@ -70,6 +72,7 @@ public class DashBoardActivity extends ToolbarActivity{
     private RealmNewsTransactions realmNewsTransactions;
     private RealmGroupChatTransactions realmGroupTransactions;
     private RecentContactController recentContactController;
+    private LinearLayout lay_no_connection;
 
 
 
@@ -92,6 +95,8 @@ public class DashBoardActivity extends ToolbarActivity{
         realmGroupTransactions = new RealmGroupChatTransactions(this, _profileId);
         recentContactController = new RecentContactController(this, _profileId);
 
+
+
         BusProvider.getInstance().register(this);
 
         enableToolbarIsClicked(false);
@@ -108,6 +113,13 @@ public class DashBoardActivity extends ToolbarActivity{
         downloadLocalContacts.execute();
 
         BusProvider.getInstance().post(new DashboardCreatedEvent());
+
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        if(APIWrapper.isConnected(DashBoardActivity.this))
+            lay_no_connection.setVisibility(View.GONE);
+        else
+            lay_no_connection.setVisibility(View.VISIBLE);
 
     }
 
@@ -135,7 +147,6 @@ public class DashBoardActivity extends ToolbarActivity{
             });
         }
 
-        noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
         activateFooter();
 
         setFooterListeners(this);
@@ -1072,6 +1083,19 @@ public class DashBoardActivity extends ToolbarActivity{
                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
             }
         }
+    }
+
+    @Subscribe
+    public void onConnectivityChanged(ConnectivityChanged event)
+    {
+
+        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+                + event.getConnectivityStatus().toString());
+        if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
+                event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
+            lay_no_connection.setVisibility(View.VISIBLE);
+        else
+            lay_no_connection.setVisibility(View.GONE);
     }
 
 }

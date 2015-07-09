@@ -12,9 +12,13 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
@@ -22,7 +26,9 @@ import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.custom.CircleImageView;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
@@ -78,12 +84,23 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private boolean contactIsFavorite;
     private FavouriteController favouriteController;
 
+    private LinearLayout lay_no_connection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
+
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        if(APIWrapper.isConnected(ContactDetailMainActivity.this))
+            lay_no_connection.setVisibility(View.GONE);
+        else
+            lay_no_connection.setVisibility(View.VISIBLE);
+
+        BusProvider.getInstance().register(this);
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -660,5 +677,18 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     @Override
     public void onConnectionNotAvailable() {
         Log.d(Constants.TAG, "ContactDetailMainActivity.onConnectionNotAvailable: ");
+    }
+
+    @Subscribe
+    public void onConnectivityChanged(ConnectivityChanged event)
+    {
+
+        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+                + event.getConnectivityStatus().toString());
+        if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
+                event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
+            lay_no_connection.setVisibility(View.VISIBLE);
+        else
+            lay_no_connection.setVisibility(View.GONE);
     }
 }

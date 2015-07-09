@@ -6,12 +6,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.settings.connection.ISessionConnectionCallback;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -19,7 +22,7 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 public class ContactListMainActivity extends ToolbarActivity implements ContactListFragment.OnFragmentInteractionListener, ISessionConnectionCallback {
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
-    private LinearLayout noConnectionLayout;
+    private LinearLayout lay_no_connection;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,7 +30,12 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
         super.onCreate(savedInstanceState);
         BusProvider.getInstance().register(this);
         setContentView(R.layout.layout_main_activity);
-        noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        if(APIWrapper.isConnected(ContactListMainActivity.this))
+            lay_no_connection.setVisibility(View.GONE);
+        else
+            lay_no_connection.setVisibility(View.VISIBLE);
 
         enableToolbarIsClicked(false);
         activateContactListToolbar();
@@ -67,14 +75,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     @Override
     public void onFragmentInteraction(String id) {}
 
-    public void setConnectionLayoutVisibility(boolean connection){
-        if (connection){
-            noConnectionLayout.setVisibility(View.GONE);
-        } else{
-            noConnectionLayout.setVisibility(View.VISIBLE);
-        }
-    }
-
     @Override
     public void onConnectionNotAvailable() {
         Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
@@ -102,5 +102,18 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
         checkUnreadChatMessages();
+    }
+
+    @Subscribe
+    public void onConnectivityChanged(ConnectivityChanged event)
+    {
+
+        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+                + event.getConnectivityStatus().toString());
+        if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
+                event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
+            lay_no_connection.setVisibility(View.VISIBLE);
+        else
+            lay_no_connection.setVisibility(View.GONE);
     }
 }

@@ -14,7 +14,7 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.settings.connection.PasswordConnection;
 import com.vodafone.mycomms.settings.connection.ProfileConnection;
@@ -35,7 +35,7 @@ import model.UserProfile;
 
 public class ProfileController extends BaseController {
 
-    private RealmContactTransactions realmContactTransactions;
+    private RealmProfileTransactions mRealmProfileTransactions;
     private UserProfile userProfile;
     private String profileId;
 
@@ -44,7 +44,7 @@ public class ProfileController extends BaseController {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        realmContactTransactions = new RealmContactTransactions(profileId);
+        mRealmProfileTransactions = new RealmProfileTransactions();
     }
 
     /**
@@ -62,8 +62,8 @@ public class ProfileController extends BaseController {
 
         if (profileId != null && profileId.length() > 0) {
             UserProfile userProfileFromDB = null;
-            if (realmContactTransactions != null) {
-                userProfileFromDB = realmContactTransactions.getUserProfile();
+            if (mRealmProfileTransactions != null) {
+                userProfileFromDB = mRealmProfileTransactions.getUserProfile(profileId);
             }
 
             if (this.getConnectionCallback() != null && userProfileFromDB != null) {
@@ -101,7 +101,7 @@ public class ProfileController extends BaseController {
             userProfile.setCompany(company);
             userProfile.setPosition(position);
             userProfile.setOfficeLocation(officeLocation);
-            realmContactTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile);
         }
     }
 
@@ -111,7 +111,7 @@ public class ProfileController extends BaseController {
         if(userProfile != null)
         {
             userProfile.setAvatar(avatarNewURL);
-            realmContactTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile);
         }
     }
 
@@ -130,7 +130,7 @@ public class ProfileController extends BaseController {
             JSONObject json = new JSONObject(body);
             Log.d(Constants.TAG, "ProfileController.updateUserProfileSettingsInDB: " + json.toString());
             userProfile.setSettings(json.toString());
-            realmContactTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile);
         }
 
 
@@ -151,7 +151,7 @@ public class ProfileController extends BaseController {
 
     public void updateProfileTimezone(String timezone)
     {
-        realmContactTransactions.updateProfileTimezone(timezone);
+        mRealmProfileTransactions.updateProfileTimezone(timezone, profileId);
     }
 
     @Override
@@ -170,7 +170,7 @@ public class ProfileController extends BaseController {
 
                     this.userProfile = mapUserProfile(jsonResponse);
 
-                    realmContactTransactions.insertUserProfile(userProfile);
+                    mRealmProfileTransactions.insertUserProfile(userProfile);
                     Log.d(Constants.TAG, "ProfileController.onConnectionComplete: UserProfile parsed:" + printUserProfile(userProfile));
                     if(userProfile != null) {
                         isUserProfileReceived = true;
@@ -336,7 +336,7 @@ public class ProfileController extends BaseController {
     public void logoutToAPI()
     {
         try {
-            UserProfile userProfile = realmContactTransactions.getUserProfile();
+            UserProfile userProfile = mRealmProfileTransactions.getUserProfile(profileId);
             String jsonEmails = userProfile.getEmails();
             if (jsonEmails == null || jsonEmails.length() == 0) return;
 
@@ -361,7 +361,7 @@ public class ProfileController extends BaseController {
                 JSONObject jsonResponse = new JSONObject(json);
 
                 userProfile = mapUserProfile(jsonResponse);
-                realmContactTransactions.insertUserProfile(userProfile);
+                mRealmProfileTransactions.insertUserProfile(userProfile);
                 if(userProfile != null) {
                     isUserProfileReceived = true;
                 }
@@ -461,6 +461,6 @@ public class ProfileController extends BaseController {
 
     public void closeRealm()
     {
-        realmContactTransactions.closeRealm();
+        mRealmProfileTransactions.closeRealm();
     }
 }

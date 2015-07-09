@@ -157,7 +157,7 @@ public class DashBoardActivity extends ToolbarActivity{
             public void onClick(View v) {
                 //Start Favourites activity
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
-                in.putExtra(Constants.toolbar, false);
+                ((MycommsApp)getApplication()).comesFromToolbar = false;
                 in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
 //                finish();

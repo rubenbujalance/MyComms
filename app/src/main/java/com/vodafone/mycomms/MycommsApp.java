@@ -59,6 +59,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private RecentContactController recentContactController;
     private NewsController mNewsController;
     String profile_id;
+    public boolean comesFromToolbar = true;
 
     //Network listener
     private NetworkEvents networkEvents;

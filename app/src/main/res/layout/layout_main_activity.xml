@@ -25,36 +25,17 @@
         android:layout_height="0px" />
 
     <LinearLayout
-        android:id="@+id/no_connection_layout"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:background="@android:color/holo_red_light"
-        android:padding="5dp">
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical|center_horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/imageView11"
-                android:src="@android:drawable/ic_dialog_alert"
-                android:paddingRight="10dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="@string/no_internet_connection"
-                android:textColor="@android:color/white" />
-
-        </LinearLayout>
+        android:id="@+id/no_connection_layout"
+        android:visibility="gone">
+        <include
+            android:id="@+id/layout_connection_not_available"
+            layout="@layout/layout_connection_not_available"
+            />
     </LinearLayout>
+
+
     <!-- Footer -->
     <RelativeLayout android:id="@+id/footer"
                     android:layout_width="fill_parent" android:orientation="horizontal"

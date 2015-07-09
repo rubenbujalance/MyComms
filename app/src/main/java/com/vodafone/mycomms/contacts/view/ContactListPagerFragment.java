@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.IContactsConnectionCallback;
@@ -76,8 +77,17 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
         } else {
             mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
         }
+    }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+            if (((MycommsApp)getActivity().getApplication()).comesFromToolbar){
+                mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+            } else{
+                mViewPager.setCurrentItem(Constants.CONTACTS_FAVOURITE);
+                ((MycommsApp)getActivity().getApplication()).comesFromToolbar = true;
+            }
     }
 
     @Override

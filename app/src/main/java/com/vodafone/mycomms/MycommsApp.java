@@ -11,6 +11,7 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
@@ -53,11 +54,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private FilePushToServerController filePushToServerController;
     private SharedPreferences sp;
-    private boolean appIsInitialized = false;
+    public boolean appIsInitialized = false;
     FavouriteController favouriteController;
     private RecentContactController recentContactController;
     private NewsController mNewsController;
     String profile_id;
+    public boolean comesFromToolbar = true;
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -179,6 +181,14 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         //sessionController.setConnectionCallback(this);
 
         return deviceId;
+    }
+
+    public void getLocalContacts(){
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, profileId);
+        downloadLocalContacts.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override

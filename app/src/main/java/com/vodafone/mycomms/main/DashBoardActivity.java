@@ -24,11 +24,11 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.connection.AsyncTaskQueue;
 import com.vodafone.mycomms.connection.ConnectionsQueue;
-import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
@@ -104,14 +104,6 @@ public class DashBoardActivity extends ToolbarActivity{
 
         initALL();
 
-
-        loadRecents();
-        loadNews();
-
-        Log.i(Constants.TAG, "DashBoardActivity.onCreate: DownloadLocalContacts");
-        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, _profileId);
-        downloadLocalContacts.execute();
-
         BusProvider.getInstance().post(new DashboardCreatedEvent());
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
@@ -172,7 +164,7 @@ public class DashBoardActivity extends ToolbarActivity{
             public void onClick(View v) {
                 //Start Favourites activity
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
-                in.putExtra(Constants.toolbar, false);
+                ((MycommsApp)getApplication()).comesFromToolbar = false;
                 in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
 //                finish();
@@ -244,6 +236,11 @@ public class DashBoardActivity extends ToolbarActivity{
         if(newsArrayList != null){
             drawNews(newsArrayList);
         }
+    }
+
+    private void loadLocalContacts(){
+        Log.e(Constants.TAG, "DashBoardActivity.loadLocalContacts: ");
+        ((MycommsApp)getApplication()).getLocalContacts();
     }
 
     private void drawNews(ArrayList<News> newsArrayList) {
@@ -320,6 +317,8 @@ public class DashBoardActivity extends ToolbarActivity{
         //RBM - It is done every time a message is received
         checkUnreadChatMessages();
         loadRecents();
+        loadNews();
+        loadLocalContacts();
     }
 
     @Subscribe

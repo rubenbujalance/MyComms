@@ -3,6 +3,7 @@ package com.vodafone.mycomms.contacts.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,14 +124,16 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 final Target target = new Target() {
                     @Override
                     public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                        viewHolder.imageAvatar.setImageBitmap(bitmap);
-                        viewHolder.textAvatar.setVisibility(View.INVISIBLE);
+//                        if (viewHolder.imageAvatar.getTag().equals(this)) {
+                            viewHolder.imageAvatar.setImageBitmap(bitmap);
+                            viewHolder.textAvatar.setVisibility(View.INVISIBLE);
+//                        }
 
                         SaveAndShowImageAsyncTask task =
                                 new SaveAndShowImageAsyncTask(
                                         viewHolder.imageAvatar, avatarFile, bitmap, viewHolder.textAvatar);
-//                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                        task.execute();
+                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//                        task.execute();
                     }
 
                     @Override

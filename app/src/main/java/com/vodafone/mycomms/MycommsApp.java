@@ -325,7 +325,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 //        new DownloadNewsAsyncTask().execute(getApplicationContext());
         String apiCall = Constants.NEWS_API_GET;
         mNewsController.getNewsList(apiCall);
-        mNewsController.setConnectionCallback(this);
     }
 
     public class sendAvatar extends AsyncTask<String, Void, String>

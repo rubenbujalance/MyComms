@@ -42,7 +42,7 @@ public class ChatMessage extends RealmObject{
         this.setGroup_id(group_id);
 
         //Generate a random UUID
-        String id = UUID.randomUUID().toString();
+        String id = UUID.randomUUID().toString().toUpperCase().replaceAll("-","");
         this.setId(id);
     }
 

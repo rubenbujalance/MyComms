@@ -57,10 +57,10 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 
 import model.Chat;
@@ -95,7 +95,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private RealmGroupChatTransactions mGroupChatTransactions;
     private SharedPreferences sp;
     private String previousActivity;
-    private String previousView;
 
     private boolean isGroupChatMode;
     private Chat _chat;
@@ -106,7 +105,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private String photoPath = null;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_GALLERY = 2;
-    private Bitmap photoBitmap = null;
     private File multiPartFile;
     private FilePushToServerController filePushToServerController;
 
@@ -139,14 +137,14 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         if(sp==null)
         {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
+            Log.e(Constants.TAG, "GroupChatActivity.onCreate: error loading Shared Preferences");
             finish();
         }
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         if(_profile_id == null)
         {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
+            Log.e(Constants.TAG, "GroupChatActivity.onCreate: profile_id not found in Shared Preferences");
             finish();
         }
 
@@ -446,44 +444,57 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         etChatTextBox.setText("");
     }
 
-    private void imageSent(String imageUrl)
+    private void imageSent(String imageUrl, Bitmap bitmap)
     {
-//        //Save to DB
-//        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
-//                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-//                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl);
-//
-//        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
-//
-//        chatTransactions.insertChat(_chat);
-//        chatTransactions.insertChatMessage(chatMsg);
-//
-//        //Send through XMPP
-//        if (!XMPPTransactions.sendImage(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
-//                chatMsg.getId(), imageUrl))
-//            return;
-//
-//        //Download to file
-//        //TODO: Testing executeOnExecutor
-//        //new DownloadFile().execute(imageUrl, chatMsg.getId());
-//        DownloadFile downloadFile = new DownloadFile();
-//        downloadFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl, chatMsg.getId());
-//        //Insert in recents
-//        String action = Constants.CONTACTS_ACTION_SMS;
-//        mRecentContactController.insertRecent(_chat.getContact_id(), action);
-//        mRecentContactController.setConnectionCallback(this);
-//
-//        //Notify app to refresh any view if necessary
-//        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
-//            BusProvider.getInstance().post(new MessageSentEvent());
-//        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
-//            //Recent List is refreshed onConnectionComplete
-//        }
-//
-//        _chatList.add(chatMsg);
-//        if(_chatList.size()>50) _chatList.remove(0);
-//
-//        refreshAdapter();
+        Log.i(Constants.TAG, "GroupChatActivity.imageSent: ");
+        //Save to DB
+        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
+                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl);
+
+        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+
+        chatTransactions.insertChat(_chat);
+        chatTransactions.insertChatMessage(chatMsg);
+
+        //Send through XMPP
+        XMPPTransactions.sendImage(_contactId, Constants.XMPP_STANZA_TYPE_CHAT,
+                chatMsg.getId(), imageUrl);
+
+        //Save and show
+        String dirStr = getFilesDir() + Constants.CONTACT_CHAT_FILES;
+        String fileStr = "file_" + chatMsg.getId() + ".jpg";
+
+        try {
+            File dirFile = new File(dirStr);
+            if (!dirFile.exists()) dirFile.mkdirs();
+
+            File file = new File(dirStr, fileStr);
+            file.createNewFile();
+            FileOutputStream outStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outStream);
+            outStream.flush();
+            outStream.close();
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "GroupChatActivity.imageSent: ",e);
+        }
+
+        //Insert in recents
+        String action = Constants.CONTACTS_ACTION_SMS;
+        mRecentContactController.insertRecent(_chat.getContact_id(), action);
+
+        //Notify app to refresh any view if necessary
+        if (previousActivity != null && !previousActivity.equals("") && previousActivity.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
+            BusProvider.getInstance().post(new MessageSentEvent());
+        } else if (previousActivity != null && !previousActivity.equals("") && previousActivity.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
+            //Recent List is refreshed onConnectionComplete
+        }
+
+        _chatList.add(chatMsg);
+        if(_chatList.size()>50) _chatList.remove(0);
+
+        refreshAdapter();
     }
 
     private void loadMessagesArray()
@@ -653,20 +664,18 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
         {
-            photoBitmap = decodeFile(photoPath);
-            new sendFile().execute();
+            Bitmap photoBitmap = decodeFile(photoPath);
+            new sendFile().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, photoBitmap);
         }
 
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
         {
             Uri selectedImage = data.getData();
             photoPath = getRealPathFromURI(selectedImage);
-            photoBitmap = decodeFile(photoPath);
+            Bitmap photoBitmap = decodeFile(photoPath);
 
-            //TODO: Testing executeOnExecutor
-//            new sendFile().execute();
             sendFile sendFile = new sendFile();
-            sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, photoBitmap);
         }
     }
 
@@ -760,8 +769,9 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         return result;
     }
 
-    private class sendFile extends AsyncTask<Void, Void, String> {
+    private class sendFile extends AsyncTask<Object, Void, String> {
         private ProgressDialog pdia;
+        private Bitmap bitmap;
 
         @Override
         protected void onPreExecute() {
@@ -772,13 +782,15 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         }
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected String doInBackground(Object... params) {
             try
             {
+                bitmap = (Bitmap)params[0];
+
                 filePushToServerController =  new FilePushToServerController(GroupChatActivity.this);
                 multiPartFile = filePushToServerController.prepareFileToSend
                         (
-                                photoBitmap,
+                                bitmap,
                                 Constants.MULTIPART_FILE,
                                 _profile_id
                         );
@@ -791,6 +803,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                         );
 
                 String response = filePushToServerController.executeRequest();
+
                 return response;
             }
             catch (Exception e)
@@ -804,13 +817,13 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if(pdia.isShowing()) pdia.dismiss();
-            Log.d(Constants.TAG, "ChatMainActivity.sendFile: Response content: " +
+            Log.d(Constants.TAG, "GroupChatActivity.sendFile: Response content: " +
                     filePushToServerController.getAvatarURL(result));
 
             if(result!=null && result.length()>0) {
                 try {
                     JSONObject jsonImage = new JSONObject(result);
-                    imageSent(jsonImage.getString("file"));
+                    imageSent(jsonImage.getString("file"), bitmap);
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "sendFile.onPostExecute: ",e);
                 }
@@ -837,13 +850,21 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     }
 
     private class DownloadFile extends AsyncTask<String, Void, Boolean> {
+        private String param0;
+        private String param1;
+
         @Override
         protected Boolean doInBackground(String[] params) {
-            return XMPPTransactions.downloadToChatFile(params[0],params[1]);
+            Log.i(Constants.TAG, "DownloadFile.doInBackground: ");
+            param0 = params[0];
+            param1 = params[1];
+            XMPPTransactions.downloadToChatFile(param0,param1);
+            return true;
         }
 
         @Override
         protected void onPostExecute(Boolean aBoolean) {
+            Log.i(Constants.TAG, "DownloadFile.onPostExecute: ");
             refreshAdapter();
         }
     }

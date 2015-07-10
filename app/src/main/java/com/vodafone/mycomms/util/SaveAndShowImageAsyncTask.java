@@ -37,6 +37,11 @@ public class SaveAndShowImageAsyncTask extends AsyncTask<Void, Void, Void> {
         this.textView = textView;
     }
 
+    public SaveAndShowImageAsyncTask(File file, Bitmap bitmap) {
+        this.file = file;
+        this.bitmap = bitmap;
+    }
+
     @Override
     protected Void doInBackground(Void... params) {
         Log.e(Constants.TAG, "SaveAndShowImageAsyncTask.doInBackground: START " + file);

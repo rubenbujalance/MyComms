@@ -8,6 +8,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatgroup.DownloadAndSaveGroupChatAsyncTask;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageSentStatusChanged;
@@ -38,6 +39,7 @@ import java.util.Calendar;
 
 import model.Chat;
 import model.ChatMessage;
+import model.GroupChat;
 
 /**
  * Created by str_rbm on 03/06/2015.
@@ -49,8 +51,6 @@ public final class XMPPTransactions {
     private static Context _appContext;
     private static ConnectionListener _connectionListener;
     private static String _device_id;
-    private static RealmChatTransactions _chatTx;
-    private static RealmGroupChatTransactions _groupChatTx;
 
     //Control to no retry consecutive connections
     private static boolean _isConnecting = false;
@@ -68,8 +68,6 @@ public final class XMPPTransactions {
         if(_isConnecting &&
                 Calendar.getInstance().getTimeInMillis() > _lastChatMessageSentTimestamp+10000)
             _isConnecting = false;
-
-        if(_isConnecting) return;
 
         if(_isConnecting) return;
 
@@ -279,12 +277,6 @@ public final class XMPPTransactions {
 
     public static boolean saveAndNotifyStanzaReceived(XmlPullParser parser)
     {
-        //Realm initialization
-        if(_chatTx==null) {
-            _chatTx = new RealmChatTransactions(_appContext);
-            _groupChatTx = new RealmGroupChatTransactions(_appContext, _profile_id);
-        }
-
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -344,8 +336,10 @@ public final class XMPPTransactions {
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
 
+            RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
+
             //Save to DB
-            boolean changed = _chatTx.setChatMessageSentStatus(id, status);
+            boolean changed = chatTx.setChatMessageSentStatus(id, status);
 
             if(changed) {
                 //Notify to app
@@ -381,15 +375,17 @@ public final class XMPPTransactions {
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
             if(to.contains("@")) to = to.substring(0, to.indexOf("@"));
 
+            RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
+
             //Check if chat message has already been received
-            if(_chatTx.existsChatMessageById(id))
+            if(chatTx.existsChatMessageById(id))
                 return false;
 
             ChatMessage newChatMessage = null;
             String contactId = null;
 
             if(to.compareTo(_profile_id)==0) {
-                newChatMessage = _chatTx.newChatMessageInstance(from,
+                newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
                         text, "", id);
@@ -397,7 +393,7 @@ public final class XMPPTransactions {
                 contactId = from;
             }
             else if(from.compareTo(_profile_id)==0){
-                newChatMessage = _chatTx.newChatMessageInstance(to,
+                newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
                         text, "", id);
@@ -408,12 +404,12 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            Chat chat = _chatTx.getChatByContactId(contactId);
-            if(chat==null) chat = _chatTx.newChatInstance(contactId);
-            chat = _chatTx.updatedChatInstance(chat, newChatMessage);
+            Chat chat = chatTx.getChatByContactId(contactId);
+            if(chat==null) chat = chatTx.newChatInstance(contactId);
+            chat = chatTx.updatedChatInstance(chat, newChatMessage);
 
-            _chatTx.insertChat(chat);
-            _chatTx.insertChatMessage(newChatMessage);
+            chatTx.insertChat(chat);
+            chatTx.insertChatMessage(newChatMessage);
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
@@ -442,8 +438,10 @@ public final class XMPPTransactions {
 
             if(url==null) return false;
 
+            RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
+
             //Check if chat message has already been received
-            if(_chatTx.existsChatMessageById(id))
+            if(chatTx.existsChatMessageById(id))
                 return false;
 
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
@@ -453,7 +451,7 @@ public final class XMPPTransactions {
             String contactId = null;
 
             if(to.compareTo(_profile_id)==0) {
-                newChatMessage = _chatTx.newChatMessageInstance(from,
+                newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
                         "", url, id);
@@ -461,7 +459,7 @@ public final class XMPPTransactions {
                 contactId = from;
             }
             else if(from.compareTo(_profile_id)==0) {
-                newChatMessage = _chatTx.newChatMessageInstance(to,
+                newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
                         "", url, id);
@@ -472,13 +470,13 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            Chat chat = _chatTx.getChatByContactId(contactId);
+            Chat chat = chatTx.getChatByContactId(contactId);
 
-            if(chat==null) chat = _chatTx.newChatInstance(contactId);
-            chat = _chatTx.updatedChatInstance(chat, newChatMessage);
+            if(chat==null) chat = chatTx.newChatInstance(contactId);
+            chat = chatTx.updatedChatInstance(chat, newChatMessage);
 
-            _chatTx.insertChat(chat);
-            _chatTx.insertChatMessage(newChatMessage);
+            chatTx.insertChat(chat);
+            chatTx.insertChatMessage(newChatMessage);
 
             //Send IQ
             if(to.compareTo(_profile_id)==0) {
@@ -504,59 +502,69 @@ public final class XMPPTransactions {
 
     private static boolean saveAndNotifyGroupMessageReceived(XmlPullParser parser)
     {
-        if(true) return true;
-
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
-            String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
+            String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
+            String receiver = parser.getAttributeValue("", Constants.XMPP_ATTR_RECEIVER);
 
             int event = parser.next();
             if (event != XmlPullParser.START_TAG) return false;
 
             String text = parser.nextText();
+            if(groupId.contains("@")) groupId = groupId.substring(0, groupId.indexOf("@"));
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
-            if(to.contains("@")) to = to.substring(0, to.indexOf("@"));
+            if(receiver.contains("@")) receiver = receiver.substring(0, receiver.indexOf("@"));
+
+            if(receiver.compareTo(_profile_id)!=0) return false;
+
+            RealmGroupChatTransactions groupTx =
+                    new RealmGroupChatTransactions(_appContext, _profile_id);
 
             //Check if chat message has already been received
-            if(_chatTx.existsChatMessageById(id))
+            if(groupTx.existsChatMessageById(id))
                 return false;
 
             ChatMessage newChatMessage = null;
             String contactId = null;
 
-            if(to.compareTo(_profile_id)==0) {
-                newChatMessage = _chatTx.newChatMessageInstance(from,
+            if(from.compareTo(_profile_id)!=0) {
+                newChatMessage = groupTx.newGroupChatMessageInstance(groupId, from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
                         text, "", id);
-
-                contactId = from;
             }
             else if(from.compareTo(_profile_id)==0){
-                newChatMessage = _chatTx.newChatMessageInstance(to,
+                newChatMessage = groupTx.newGroupChatMessageInstance(groupId, "",
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
                         text, "", id);
-
-                contactId = to;
             }
 
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            Chat chat = _chatTx.getChatByContactId(contactId);
-            if(chat==null) chat = _chatTx.newChatInstance(contactId);
-            chat = _chatTx.updatedChatInstance(chat, newChatMessage);
+            GroupChat chat = groupTx.getGroupChatById(groupId);
 
-            _chatTx.insertChat(chat);
-            _chatTx.insertChatMessage(newChatMessage);
+            //Save ChatMessage to DB
+            groupTx.insertGroupChatMessage(groupId, newChatMessage);
+
+            if(chat==null) {
+                //Get group from API in background, and save to Realm
+                new DownloadAndSaveGroupChatAsyncTask()
+                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                                _appContext, Constants.GROUP_CHAT_API, groupId, id);
+            }
+            else {
+                chat = groupTx.updatedGroupChatInstance(chat, newChatMessage);
+                groupTx.insertOrUpdateGroupChat(chat);
+            }
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
             BusProvider.getInstance().post(chatEvent);
 
-            if(to.compareTo(_profile_id)==0) {
+            if(from.compareTo(_profile_id)!=0) {
                 notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
@@ -581,8 +589,10 @@ public final class XMPPTransactions {
 
             if(url==null) return false;
 
+            RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
+
             //Check if chat message has already been received
-            if(_chatTx.existsChatMessageById(id))
+            if(chatTx.existsChatMessageById(id))
                 return false;
 
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
@@ -592,7 +602,7 @@ public final class XMPPTransactions {
             String contactId = null;
 
             if(to.compareTo(_profile_id)==0) {
-                newChatMessage = _chatTx.newChatMessageInstance(from,
+                newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
                         "", url, id);
@@ -600,7 +610,7 @@ public final class XMPPTransactions {
                 contactId = from;
             }
             else if(from.compareTo(_profile_id)==0) {
-                newChatMessage = _chatTx.newChatMessageInstance(to,
+                newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
                         "", url, id);
@@ -611,13 +621,13 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            Chat chat = _chatTx.getChatByContactId(contactId);
+            Chat chat = chatTx.getChatByContactId(contactId);
 
-            if(chat==null) chat = _chatTx.newChatInstance(contactId);
-            chat = _chatTx.updatedChatInstance(chat, newChatMessage);
+            if(chat==null) chat = chatTx.newChatInstance(contactId);
+            chat = chatTx.updatedChatInstance(chat, newChatMessage);
 
-            _chatTx.insertChat(chat);
-            _chatTx.insertChatMessage(newChatMessage);
+            chatTx.insertChat(chat);
+            chatTx.insertChatMessage(newChatMessage);
 
             //Send IQ
             if(to.compareTo(_profile_id)==0) {
@@ -850,8 +860,8 @@ public final class XMPPTransactions {
 
     public static void closeRealm()
     {
-        _chatTx.closeRealm();
-        _groupChatTx.closeRealm();
+//        _chatTx.closeRealm();
+//        _groupChatTx.closeRealm();
     }
 
     /*

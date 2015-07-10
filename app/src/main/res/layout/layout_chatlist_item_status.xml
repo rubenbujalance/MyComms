@@ -14,7 +14,8 @@
         android:layout_alignParentTop="true"
         android:paddingTop="10dp"
         android:layout_centerHorizontal="true"
-        android:text="@string/badge" />
+        android:text="@string/badge"
+        android:visibility="invisible"/>
 
     <TextView android:id="@+id/chat_list_item_last_event_day"
         android:layout_height="match_parent"

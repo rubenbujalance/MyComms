@@ -3,6 +3,7 @@ package com.vodafone.mycomms.contacts.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -129,8 +130,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                         SaveAndShowImageAsyncTask task =
                                 new SaveAndShowImageAsyncTask(
                                         viewHolder.imageAvatar, avatarFile, bitmap, viewHolder.textAvatar);
-//                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                        task.execute();
+                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//                        task.execute();
                     }
 
                     @Override
@@ -176,7 +177,9 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewPosition.setText(contact.getPosition());
+
         String country = "";
+
         try {
             if (contact.getCountry() != null && contact.getCountry().length() > 0) {
                 if (Utils.getCountry(contact.getCountry(), mContext).get("is_special") != null) {
@@ -192,7 +195,9 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         } catch (NullPointerException e){
             Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: NullPointerException " + e);
         }
+
         viewHolder.textViewCountry.setText(country);
+
         //Icon
         String icon = "";
         try {

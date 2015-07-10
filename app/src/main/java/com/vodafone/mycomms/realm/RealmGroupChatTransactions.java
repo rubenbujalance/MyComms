@@ -70,26 +70,26 @@ public class RealmGroupChatTransactions {
         return updatedChat;
     }
 
-    public ChatMessage newGroupChatMessageInstance(String group_id,
+    public ChatMessage newGroupChatMessageInstance(String group_id, String contact_id,
                                                    String direction, int type, String text,
                                                    String resourceUri)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
-        ChatMessage chatMessage = new ChatMessage(_profile_id,"",group_id,timestamp,
+        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
                 direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
                 Constants.CHAT_MESSAGE_STATUS_NOT_SENT);
 
         return chatMessage;
     }
 
-    public ChatMessage newGroupChatMessageInstance(String group_id,
+    public ChatMessage newGroupChatMessageInstance(String group_id, String contact_id,
                                                    String direction, int type, String text,
                                                    String resourceUri, String id)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
-        ChatMessage chatMessage = new ChatMessage(_profile_id,"",group_id,timestamp,
+        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
                 direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
                 Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
 
@@ -121,19 +121,22 @@ public class RealmGroupChatTransactions {
 
             //Update associated Chat with new last message
             GroupChat chat = getGroupChatById(groupId);
-            chat.setLastMessage_id(newChatMessage.getId());
 
-            String lastText;
-            if(newChatMessage.getType()==Constants.CHAT_MESSAGE_TYPE_TEXT)
-                lastText = newChatMessage.getText();
-            else lastText = mContext.getString(R.string.image);
+            if(chat!=null) {
+                chat.setLastMessage_id(newChatMessage.getId());
 
-            if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
-                chat.setLastMessage(mContext.getResources().getString(R.string.chat_me_text) + lastText);
-            else chat.setLastMessage(lastText);
+                String lastText;
+                if (newChatMessage.getType() == Constants.CHAT_MESSAGE_TYPE_TEXT)
+                    lastText = newChatMessage.getText();
+                else lastText = mContext.getString(R.string.image);
 
-            chat.setLastMessageTime(newChatMessage.getTimestamp());
-            
+                if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
+                    chat.setLastMessage(mContext.getResources().getString(R.string.chat_me_text) + lastText);
+                else chat.setLastMessage(lastText);
+
+                chat.setLastMessageTime(newChatMessage.getTimestamp());
+            }
+
             mRealm.commitTransaction();
 
         } catch (Exception e){
@@ -243,11 +246,42 @@ public class RealmGroupChatTransactions {
                 messages.add(results.get(i));
             }
         } catch (Exception e){
-Log.e(Constants.TAG, "RealmGroupChatTransactions.getNotReadReceivedGroupChatMessages: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getNotReadReceivedGroupChatMessages: ",e);
             return null;
         }
 
         return messages;
+    }
+
+    public ChatMessage getGroupChatMessageById(String groupId){
+        ChatMessage chatMessage = null;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, groupId);
+            chatMessage = query.findFirst();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatMessageById: ", e);
+        }
+
+        return chatMessage;
+    }
+
+    public boolean existsChatMessageById(String id){
+        boolean exists = false;
+
+        try {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, id);
+            long count = query.count();
+            if(count>0) exists = true;
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.existsChatMessageById: ", e);
+            return false;
+        }
+
+        return exists;
     }
 
     public void setGroupChatAllReceivedMessagesAsRead (String groupId){

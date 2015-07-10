@@ -52,6 +52,8 @@ public class GroupChatController
     private String jsonRequest;
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
+    private String responseCode = "";
+
     public static  String URL_CREATE_GROUP_CHAT = "https://" + EndpointWrapper.getBaseURL() +
             Constants.GROUP_CHAT_API;
     public static  String URL_UPDATE_GROUP_CHAT = "https://" + EndpointWrapper.getBaseURL() +
@@ -212,6 +214,7 @@ public class GroupChatController
         try
         {
             response = client.newCall(request).execute();
+            this.responseCode = Integer.toString(response.code());
             return responseToString();
         }
         catch (Exception e)
@@ -221,7 +224,6 @@ public class GroupChatController
         }
 
     }
-
 
 
     public String responseToString()
@@ -282,8 +284,8 @@ public class GroupChatController
     public ArrayList<GroupChat> getAllGroupChatsFromAPI()
     {
         createRequest(URL_GET_ALL_GROUP_CHATS, "get");
-        executeRequest();
-        return getResponseAsGroupChats();
+        String response = executeRequest();
+        return getResponseAsGroupChats(response);
     }
 
     /**
@@ -375,12 +377,12 @@ public class GroupChatController
         }
     }
 
-    private ArrayList<GroupChat> getResponseAsGroupChats()
+    private ArrayList<GroupChat> getResponseAsGroupChats(String jsonObject)
     {
         ArrayList<GroupChat> groupChats = new ArrayList<>();
         try
         {
-            JSONArray jsonArray = new JSONArray(responseToString());
+            JSONArray jsonArray = new JSONArray(jsonObject);
             for(int i = 0; i < jsonArray.length(); i++)
             {
                 GroupChat groupChat = createNewGroupChat(jsonArray.getJSONObject(i));
@@ -451,5 +453,13 @@ public class GroupChatController
 
     public void setChatOwners(ArrayList<String> chatOwners) {
         this.chatOwners = chatOwners;
+    }
+
+    public String getResponseCode() {
+        return responseCode;
+    }
+
+    public void setResponseCode(String responseCode) {
+        this.responseCode = responseCode;
     }
 }

@@ -23,6 +23,7 @@ import com.vodafone.mycomms.chatgroup.GroupChatListActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
+import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
 public class ToolbarActivity extends ActionBarActivity {
@@ -30,18 +31,26 @@ public class ToolbarActivity extends ActionBarActivity {
     private Toolbar mToolbar;
     private Toolbar mFooter;
     private int foregroundActivity; //0-Contacts,1-Dashboard,2-Inbox
-    RealmChatTransactions realmChatTransactions;
+    private String profileId;
+    private RealmChatTransactions realmChatTransactions;
+    private RealmGroupChatTransactions realmGroupChatTransactions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realmChatTransactions = new RealmChatTransactions(this);
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        realmGroupChatTransactions = new RealmGroupChatTransactions(ToolbarActivity.this,
+                profileId);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         realmChatTransactions.closeRealm();
+        realmGroupChatTransactions.closeRealm();
     }
 
     public void setForegroundActivity(int activity)
@@ -384,4 +393,20 @@ public class ToolbarActivity extends ActionBarActivity {
         editor.apply();
     }
 
+
+    public RealmChatTransactions getRealmChatTransactions() {
+        return realmChatTransactions;
+    }
+
+    public void setRealmChatTransactions(RealmChatTransactions realmChatTransactions) {
+        this.realmChatTransactions = realmChatTransactions;
+    }
+
+    public RealmGroupChatTransactions getRealmGroupChatTransactions() {
+        return realmGroupChatTransactions;
+    }
+
+    public void setRealmGroupChatTransactions(RealmGroupChatTransactions realmGroupChatTransactions) {
+        this.realmGroupChatTransactions = realmGroupChatTransactions;
+    }
 }

@@ -35,7 +35,6 @@ import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
-import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
@@ -63,15 +62,14 @@ import model.News;
 import model.RecentContact;
 import model.UserProfile;
 
-public class DashBoardActivity extends ToolbarActivity{
-    private RealmChatTransactions _chatTx;
+public class DashBoardActivity extends ToolbarActivity
+{
     private ArrayList<News> newsArrayList;
     private AsyncTaskQueue recentsTasksQueue = new AsyncTaskQueue();
     private boolean recentsLoading = false;
     private RealmContactTransactions realmContactTransactions;
     private String _profileId;
     private RealmNewsTransactions realmNewsTransactions;
-    private RealmGroupChatTransactions realmGroupTransactions;
     private RecentContactController recentContactController;
     private LinearLayout lay_no_connection;
 
@@ -93,7 +91,6 @@ public class DashBoardActivity extends ToolbarActivity{
         _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realmContactTransactions = new RealmContactTransactions(_profileId);
         realmNewsTransactions = new RealmNewsTransactions();
-        realmGroupTransactions = new RealmGroupChatTransactions(this, _profileId);
         recentContactController = new RecentContactController(this, _profileId);
 
 
@@ -293,7 +290,6 @@ public class DashBoardActivity extends ToolbarActivity{
         realmContactTransactions.closeRealm();
         realmNewsTransactions.closeRealm();
         recentContactController.closeRealm();
-        _chatTx.closeRealm();
     }
 
     @Override
@@ -695,16 +691,13 @@ public class DashBoardActivity extends ToolbarActivity{
 
                     }
                 }
-                mapAvatarTarget.put(image,avatarTarget);
+                mapAvatarTarget.put(image, avatarTarget);
 
-                //TODO pending messages should be filled here!!!
-                /*// Badges
-                _realm = Realm.getInstance(DashBoardActivity.this);
-                _chatTx = new RealmChatTransactions(_realm, DashBoardActivity.this);
-                pendingMsgsCount = _chatTx.getChatPendingMessagesCount(contactId);*/
+                // Badges
+
+
 
                 LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
-
                 btRecents.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         try {
@@ -775,6 +768,8 @@ public class DashBoardActivity extends ToolbarActivity{
                     Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
                 }
             }
+
+            pendingMsgsCount = getRealmGroupChatTransactions().getGroupChatPendingMessagesCount(groupChatId);
 
             // Recent action icon and bagdes
             if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
@@ -938,9 +933,7 @@ public class DashBoardActivity extends ToolbarActivity{
                 }
             }
 
-            // Badges
-            _chatTx = new RealmChatTransactions(DashBoardActivity.this);
-            pendingMsgsCount = _chatTx.getChatPendingMessagesCount(contactId);
+
 
             LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
@@ -1045,6 +1038,9 @@ public class DashBoardActivity extends ToolbarActivity{
                     recentAvatar.setImageResource(R.color.grey_middle);
                     avatarText.setText(nameInitials);
                 }
+
+                // Badges
+                pendingMsgsCount = getRealmChatTransactions().getChatPendingMessagesCount(contactId);
 
                 // Recent action icon and bagdes
                 if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {

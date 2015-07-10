@@ -262,18 +262,17 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         String timeDifference = Utils.getStringChatTimeDifference(groupChat.getLastMessageTime());
         chatListHolder.textViewTime.setText(timeDifference);
 
-        //TODO how to find unread messages in group chat case???
+        //Load unread messages
         long amountUnreadMessages = groupChatTransactions.getGroupChatPendingMessagesCount(
                 getComposedChat(i).getGroupChat().getId());
 
-        /*if(count > 0) {
+        if(amountUnreadMessages > 0) {
             BadgeView badge = new BadgeView(mContext, chatListHolder.badgeUnread);
-            badge.setText(String.valueOf(count));
+            badge.setText(String.valueOf(amountUnreadMessages));
             badge.setBadgePosition(BadgeView.POSITION_CENTER);
             badge.setBadgeBackgroundColor(Color.parseColor("#0071FF"));
             badge.show();
-        }*/
-
+        }
     }
 
     private void loadComposedAvatar

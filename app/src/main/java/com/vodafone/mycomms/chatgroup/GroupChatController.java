@@ -162,43 +162,44 @@ public class GroupChatController
         {
             client = new OkHttpClient();
 
-            if(requestType.equals("post"))
+            switch (requestType)
             {
-                requestBody = RequestBody.create(JSON, this.jsonRequest);
-                request = new Request.Builder()
-                        .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
-                        .addHeader(version_token, getVersionName())
-                        .url(URL)
-                        .post(this.requestBody)
-                        .build();
-            }
-            else if(requestType.equals("put"))
-            {
-                if(null != groupChatIdForUpdate)
-                    URL = URL + "/" + groupChatIdForUpdate + "/members";
+                case "post":
+                    requestBody = RequestBody.create(JSON, this.jsonRequest);
+                    request = new Request.Builder()
+                            .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
+                            .addHeader(version_token, getVersionName())
+                            .url(URL)
+                            .post(this.requestBody)
+                            .build();
+                    break;
 
-                requestBody = RequestBody.create(JSON, this.jsonRequest);
-                request = new Request.Builder()
-                        .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
-                        .addHeader(version_token, getVersionName())
-                        .url(URL)
-                        .put(this.requestBody)
-                        .build();
-            }
-            else if(requestType.equals("get"))
-            {
-                request = new Request.Builder()
-                        .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
-                        .addHeader(version_token, getVersionName())
-                        .url(URL)
-                        .get()
-                        .build();
-            }
+                case "put":
+                    if (null != groupChatIdForUpdate)
+                        URL = URL + "/" + groupChatIdForUpdate + "/members";
 
+                    requestBody = RequestBody.create(JSON, this.jsonRequest);
+                    request = new Request.Builder()
+                            .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
+                            .addHeader(version_token, getVersionName())
+                            .url(URL)
+                            .put(this.requestBody)
+                            .build();
+                    break;
+
+                case "get":
+                    request = new Request.Builder()
+                            .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
+                            .addHeader(version_token, getVersionName())
+                            .url(URL)
+                            .get()
+                            .build();
+                    break;
+            }
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, LOG_TAG + ".createGroupChatRequest: ERROR ", e);
+            Log.e(Constants.TAG, LOG_TAG + ".createRequest: ERROR ", e);
         }
     }
 

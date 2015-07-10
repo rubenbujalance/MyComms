@@ -51,11 +51,12 @@ public class GroupChatController
     private String LOG_TAG = GroupChatController.class.getSimpleName();
     private String jsonRequest;
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    private String URL_CREATE_GROUP_CHAT = "https://" + EndpointWrapper.getBaseURL() +
+
+    public static  String URL_CREATE_GROUP_CHAT = "https://" + EndpointWrapper.getBaseURL() +
             Constants.GROUP_CHAT_API;
-    private String URL_UPDATE_GROUP_CHAT = "https://" + EndpointWrapper.getBaseURL() +
+    public static  String URL_UPDATE_GROUP_CHAT = "https://" + EndpointWrapper.getBaseURL() +
             Constants.GROUP_CHAT_API_SET_MEMBERS;
-    private String URL_GET_ALL_GROUP_CHATS = "https://" + EndpointWrapper.getBaseURL() +
+    public static  String URL_GET_ALL_GROUP_CHATS = "https://" + EndpointWrapper.getBaseURL() +
             Constants.GROUP_CHAT_API;
 
     public GroupChatController(Context context, String profileId)
@@ -64,7 +65,12 @@ public class GroupChatController
         this.profileId = profileId;
     }
 
-    public boolean isCreatedURLForCreateGroupChat()
+    /**
+     * Creates JSON body for crete group chat request
+     * @author str_oan
+     * @return true if JSON is created and false otherwise.
+     */
+    public boolean isCreatedJSONBodyForCreateGroupChat()
     {
         try
         {
@@ -96,12 +102,17 @@ public class GroupChatController
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, LOG_TAG + ".isCreatedRequestURL: ERROR ", e);
+            Log.e(Constants.TAG, LOG_TAG + ".isCreatedJSONBodyForCreateGroupChat: ERROR ", e);
             return false;
         }
     }
 
-    public boolean isCreatedURLForUpdateGroupChat()
+    /**
+     * Creates JSON body for UPDATE group chat request
+     * @author str_oan
+     * @return true if JSON is created and false otherwise.
+     */
+    public boolean isCreatedJSONBodyForUpdateGroupChat()
     {
         try
         {
@@ -131,68 +142,71 @@ public class GroupChatController
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, LOG_TAG + ".isCreatedRequestURL: ERROR ", e);
+            Log.e(Constants.TAG, LOG_TAG + ".isCreatedJSONBodyForUpdateGroupChat: ERROR ", e);
             return false;
         }
     }
 
-    public void createGroupChatRequestForCreation()
+    /**
+     * Creates request for any kind of request type and URL.
+     * @param URL
+     * @param requestType
+     */
+    public void createRequest(String URL, String requestType)
+    {
+        createRequest(URL, requestType, null);
+    }
+    public void createRequest(String URL, String requestType, String groupChatIdForUpdate)
     {
         try
         {
             client = new OkHttpClient();
-            requestBody = RequestBody.create(JSON, this.jsonRequest);
-            request = new Request.Builder()
-                    .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
-                    .addHeader(version_token, getVersionName())
-                    .url(URL_CREATE_GROUP_CHAT)
-                    .post(this.requestBody)
-                    .build();
+
+            switch (requestType)
+            {
+                case "post":
+                    requestBody = RequestBody.create(JSON, this.jsonRequest);
+                    request = new Request.Builder()
+                            .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
+                            .addHeader(version_token, getVersionName())
+                            .url(URL)
+                            .post(this.requestBody)
+                            .build();
+                    break;
+
+                case "put":
+                    if (null != groupChatIdForUpdate)
+                        URL = URL + "/" + groupChatIdForUpdate + "/members";
+
+                    requestBody = RequestBody.create(JSON, this.jsonRequest);
+                    request = new Request.Builder()
+                            .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
+                            .addHeader(version_token, getVersionName())
+                            .url(URL)
+                            .put(this.requestBody)
+                            .build();
+                    break;
+
+                case "get":
+                    request = new Request.Builder()
+                            .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
+                            .addHeader(version_token, getVersionName())
+                            .url(URL)
+                            .get()
+                            .build();
+                    break;
+            }
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, LOG_TAG + ".createGroupChatRequest: ERROR ", e);
+            Log.e(Constants.TAG, LOG_TAG + ".createRequest: ERROR ", e);
         }
     }
 
-    public void createRequestForGetAllGroupChats()
-    {
-        try
-        {
-            client = new OkHttpClient();
-            request = new Request.Builder()
-                    .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
-                    .addHeader(version_token, getVersionName())
-                    .url(URL_GET_ALL_GROUP_CHATS)
-                    .get()
-                    .build();
-        }
-        catch (Exception e)
-        {
-            Log.e(Constants.TAG, LOG_TAG + ".createGroupChatRequest: ERROR ", e);
-        }
-    }
-
-    public void createGroupChatRequestForUpdate(String groupChatId)
-    {
-        try
-        {
-            client = new OkHttpClient();
-            requestBody = RequestBody.create(JSON, this.jsonRequest);
-            URL_UPDATE_GROUP_CHAT = URL_UPDATE_GROUP_CHAT + "/" + groupChatId + "/members";
-            request = new Request.Builder()
-                    .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
-                    .addHeader(version_token, getVersionName())
-                    .url(URL_UPDATE_GROUP_CHAT)
-                    .put(this.requestBody)
-                    .build();
-        }
-        catch (Exception e)
-        {
-            Log.e(Constants.TAG, LOG_TAG + ".createGroupChatRequest: ERROR ", e);
-        }
-    }
-
+    /**
+     * Execute the request
+     * @return (String) -> response body as string
+     */
     public String executeRequest()
     {
         try
@@ -208,61 +222,7 @@ public class GroupChatController
 
     }
 
-    public String getChatId() {
-        return chatId;
-    }
 
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
-    }
-
-    public String getChatName() {
-        return chatName;
-    }
-
-    public void setChatName(String chatName) {
-        this.chatName = chatName;
-    }
-
-    public String getChatAvatar() {
-        return chatAvatar;
-    }
-
-    public void setChatAvatar(String chatAvatar) {
-        this.chatAvatar = chatAvatar;
-    }
-
-    public String getChatAbout() {
-        return chatAbout;
-    }
-
-    public void setChatAbout(String chatAbout) {
-        this.chatAbout = chatAbout;
-    }
-
-    public String getChatCreator() {
-        return chatCreator;
-    }
-
-    public void setChatCreator(String chatCreator) {
-        this.chatCreator = chatCreator;
-    }
-
-    public ArrayList<String> getChatMembers() {
-        return chatMembers;
-    }
-
-    public void setChatMembers(ArrayList<String> chatMembers) {
-        this.chatMembers = chatMembers;
-    }
-
-    public ArrayList<String> getChatOwners() {
-        return chatOwners;
-    }
-
-    public void setChatOwners(ArrayList<String> chatOwners) {
-        this.chatOwners = chatOwners;
-    }
 
     public String responseToString()
     {
@@ -290,21 +250,6 @@ public class GroupChatController
             return null;
         }
     }
-
-    public String getUpdatedGroupChatId(String response)
-    {
-        try
-        {
-            JSONObject jsonObject = new JSONObject(response);
-            return jsonObject.getString("id");
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, LOG_TAG+".convertResponseToString: " + "ERROR ",e);
-            return null;
-        }
-    }
-
 
     /**
      * Gets version name of the APP
@@ -336,12 +281,17 @@ public class GroupChatController
      */
     public ArrayList<GroupChat> getAllGroupChatsFromAPI()
     {
-        createRequestForGetAllGroupChats();
+        createRequest(URL_GET_ALL_GROUP_CHATS, "get");
         executeRequest();
         return getResponseAsGroupChats();
     }
 
-    public String insertGroupChatsIntoRealm(ArrayList<GroupChat> chats)
+    /**
+     * Inserts group chats into realm if they not exist
+     * @param chats (ArrayList<GroupChats>) group chats to be inserted
+     * @return (String) -> ids of inserted group chats separated by "@"
+     */
+    public String insertGroupChatsIntoRealmIfNotExist(ArrayList<GroupChat> chats)
     {
         RealmGroupChatTransactions realmGroupChatTransactions =
                 new RealmGroupChatTransactions(mContext, profileId);
@@ -357,6 +307,13 @@ public class GroupChatController
         }
         return insertedGroupChatIds;
     }
+
+    /**
+     * Created new group chat from JSON object
+     * @param object (JSONObject) -> object for create group chat
+     * @return (GroupChat) -> created group chat
+     * @throws Exception -> exception during creation
+     */
     private GroupChat createNewGroupChat(JSONObject object) throws Exception
     {
         String[] membersAndOwners = getMembersAndOwners(object);
@@ -437,5 +394,62 @@ public class GroupChatController
         }
 
         return groupChats;
+    }
+
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
+
+    public String getChatName() {
+        return chatName;
+    }
+
+    public void setChatName(String chatName) {
+        this.chatName = chatName;
+    }
+
+    public String getChatAvatar() {
+        return chatAvatar;
+    }
+
+    public void setChatAvatar(String chatAvatar) {
+        this.chatAvatar = chatAvatar;
+    }
+
+    public String getChatAbout() {
+        return chatAbout;
+    }
+
+    public void setChatAbout(String chatAbout) {
+        this.chatAbout = chatAbout;
+    }
+
+    public String getChatCreator() {
+        return chatCreator;
+    }
+
+    public void setChatCreator(String chatCreator) {
+        this.chatCreator = chatCreator;
+    }
+
+    public ArrayList<String> getChatMembers() {
+        return chatMembers;
+    }
+
+    public void setChatMembers(ArrayList<String> chatMembers) {
+        this.chatMembers = chatMembers;
+    }
+
+    public ArrayList<String> getChatOwners() {
+        return chatOwners;
+    }
+
+    public void setChatOwners(ArrayList<String> chatOwners) {
+        this.chatOwners = chatOwners;
     }
 }

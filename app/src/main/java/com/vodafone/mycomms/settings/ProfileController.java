@@ -61,7 +61,6 @@ public class ProfileController extends BaseController {
         Log.e(Constants.TAG, "ProfileController.getProfile: ");
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        String profileId = null;
 
         if (sharedPreferences != null) {
             profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
@@ -77,12 +76,6 @@ public class ProfileController extends BaseController {
                 ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
             }
         }
-
-//        if(profileConnection != null){
-//            profileConnection.cancel();
-//        }
-//        profileConnection = new ProfileConnection(getContext(), this);
-//        profileConnection.request();
 
         new GetProfileAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
                 (String) Constants.CONTACT_API_GET_PROFILE);
@@ -139,8 +132,6 @@ public class ProfileController extends BaseController {
             userProfile.setSettings(json.toString());
             mRealmProfileTransactions.insertUserProfile(userProfile);
         }
-
-
     }
 
     public void setUserProfile(String profileId, String profileFullName, String platforms, String timeZone){
@@ -169,12 +160,9 @@ public class ProfileController extends BaseController {
         boolean isUserProfileReceived = false;
         if(response.getUrl() != null && !response.getUrl().endsWith(UpdateSettingsConnection.URL)) {
             String result = response.getData().toString();
-
             try {
-
                 if (result != null && result.length() >= 0) {
                     JSONObject jsonResponse = new JSONObject(result);
-
                     this.userProfile = mapUserProfile(jsonResponse);
 
                     mRealmProfileTransactions.insertUserProfile(userProfile);
@@ -183,7 +171,6 @@ public class ProfileController extends BaseController {
                         isUserProfileReceived = true;
                     }
                 }
-
             } catch (Exception e) {
                 Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile" + e.getMessage());
             }
@@ -267,7 +254,6 @@ public class ProfileController extends BaseController {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());
         }
-
         return  userProfile;
     }
 
@@ -289,9 +275,6 @@ public class ProfileController extends BaseController {
         buf.append(userProfile.getOfficeLocation());
         buf.append(", settings:");
         buf.append(userProfile.getSettings());
-
-
-
         return buf.toString();
     }
 
@@ -317,7 +300,6 @@ public class ProfileController extends BaseController {
             PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
             passwordConnection.setPayLoad(json.toString());
             passwordConnection.request();
-
     }
 
     public void updateTimeZone(HashMap timeZoneHashMap) {
@@ -359,10 +341,8 @@ public class ProfileController extends BaseController {
     }
 
     public void getProfileCallback(String json) {
-        Log.e(Constants.TAG, "ProfileController.getProfileCallback: " + json);
-
+        Log.i(Constants.TAG, "ProfileController.getProfileCallback: ");
         boolean isUserProfileReceived = false;
-
         try {
             if (json != null && json.length() > 0) {
                 JSONObject jsonResponse = new JSONObject(json);
@@ -388,10 +368,7 @@ public class ProfileController extends BaseController {
 
     public class DownloadProfileAvatar extends AsyncTask<String, Void, String>
     {
-
         private Target avatarTarget;
-        private boolean loadAvatarFromDisk;
-        private String nameInitials;
         private String avatar;
         private File avatarFile;
         @Override
@@ -435,7 +412,6 @@ public class ProfileController extends BaseController {
         }
     }
 
-
     public class GetProfileAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
@@ -478,8 +454,7 @@ public class ProfileController extends BaseController {
     public class LogoutProfileAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            Log.e(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: START");
-
+            Log.i(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: START");
             Response response;
             String jsonResp = null;
 
@@ -512,10 +487,6 @@ public class ProfileController extends BaseController {
             return jsonResp;
         }
 
-//        @Override
-//        protected void onPostExecute(String json) {
-//            getProfileCallback(json);
-//        }
     }
 
     public void closeRealm()

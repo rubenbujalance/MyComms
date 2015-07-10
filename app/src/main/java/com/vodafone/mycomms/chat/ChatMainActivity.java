@@ -280,6 +280,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
     private void imageSent(String imageUrl)
     {
+        Log.i(Constants.TAG, "ChatMainActivity.imageSent: ");
         //Save to DB
         ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
                 _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
@@ -325,6 +326,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
     private void refreshAdapter()
     {
+        Log.i(Constants.TAG, "ChatMainActivity.refreshAdapter: ");
         mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList, _profile);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
@@ -614,6 +616,7 @@ public class ChatMainActivity extends ToolbarActivity {
     private class DownloadFile extends AsyncTask<String, Void, Boolean> {
         @Override
         protected Boolean doInBackground(String[] params) {
+            Log.i(Constants.TAG, "DownloadFile.doInBackground: ");
             return XMPPTransactions.downloadToChatFile(params[0],params[1]);
         }
 

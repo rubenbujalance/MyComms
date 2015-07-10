@@ -47,6 +47,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     @Override
     public int getItemViewType(int position) {
+        int test = position;
         if(chatList.get(position).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_SENT)==0)
         {
             if(chatList.get(position).getType()==Constants.CHAT_MESSAGE_TYPE_TEXT)
@@ -91,6 +92,9 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     @Override
     public void onBindViewHolder(ChatHolder chatHolder, int i)
     {
+        int test = i;
+        String test2 = chatList.get(i).getContact_id();
+        int test3 = chatHolder.getItemViewType();
         Contact contact = _contactTx.getContactById(chatList.get(i).getContact_id());
 
         if(chatList.get(i).getType()==Constants.CHAT_MESSAGE_TYPE_IMAGE)

@@ -490,8 +490,7 @@ public final class XMPPTransactions {
             }
 
             //Download to file
-            if(!downloadToChatFile(url, id))
-                return false;
+            downloadToChatFile(url, id);
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);

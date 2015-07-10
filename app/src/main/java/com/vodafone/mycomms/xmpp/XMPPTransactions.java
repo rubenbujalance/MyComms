@@ -450,7 +450,7 @@ public final class XMPPTransactions {
                 return false;
 
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
-            if(to.contains("@")) to = from.substring(0, to.indexOf("@"));
+            if(to.contains("@")) to = to.substring(0, to.indexOf("@"));
 
             ChatMessage newChatMessage = null;
             String contactId = null;
@@ -490,8 +490,7 @@ public final class XMPPTransactions {
             }
 
             //Download to file
-            if(!downloadToChatFile(url, id))
-                return false;
+            downloadToChatFile(url, id);
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);

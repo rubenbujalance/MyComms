@@ -388,10 +388,7 @@ public class ProfileController extends BaseController {
 
     public class DownloadProfileAvatar extends AsyncTask<String, Void, String>
     {
-
         private Target avatarTarget;
-        private boolean loadAvatarFromDisk;
-        private String nameInitials;
         private String avatar;
         private File avatarFile;
         @Override

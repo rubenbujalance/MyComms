@@ -343,7 +343,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             {
                 GroupChatController groupChatController = new GroupChatController(mContext, profile_id);
                 ArrayList<GroupChat> chats = groupChatController.getAllGroupChatsFromAPI();
-                return groupChatController.insertGroupChatsIntoRealm(chats);
+                return groupChatController.insertGroupChatsIntoRealmIfNotExist(chats);
             }
             catch (Exception e)
             {

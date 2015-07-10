@@ -655,9 +655,9 @@ public class GroupChatListFragment extends ListFragment implements
         mGroupChatController.setChatMembers(this.selectedContacts);
         mGroupChatController.setChatCreator(this.profileId);
         mGroupChatController.setChatOwners(this.ownersIds);
-        if(mGroupChatController.isCreatedURLForCreateGroupChat())
+        if(mGroupChatController.isCreatedJSONBodyForCreateGroupChat())
         {
-            mGroupChatController.createGroupChatRequestForCreation();
+            mGroupChatController.createRequest(mGroupChatController.URL_CREATE_GROUP_CHAT,"post");
             String response = mGroupChatController.executeRequest();
             if(null != response)
             {
@@ -686,9 +686,10 @@ public class GroupChatListFragment extends ListFragment implements
         mGroupChatController.setChatMembers(this.selectedContacts);
         mGroupChatController.setChatCreator(this.profileId);
         mGroupChatController.setChatOwners(this.ownersIds);
-        if(mGroupChatController.isCreatedURLForUpdateGroupChat())
+        if(mGroupChatController.isCreatedJSONBodyForUpdateGroupChat())
         {
-            mGroupChatController.createGroupChatRequestForUpdate(groupChatId);
+            mGroupChatController.createRequest(mGroupChatController.URL_UPDATE_GROUP_CHAT, "put", groupChatId);
+
             String response = mGroupChatController.executeRequest();
             if(null != response)
             {

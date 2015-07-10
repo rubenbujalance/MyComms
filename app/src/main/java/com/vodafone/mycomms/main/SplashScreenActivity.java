@@ -163,7 +163,8 @@ public class SplashScreenActivity extends Activity {
                 }
             }
         } catch (Exception ex) {
-            Log.e(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: \n" + ex.toString());
+            Log.e(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: \n",ex);
+            Crashlytics.logException(ex);
             finish();
         }
     }
@@ -216,6 +217,7 @@ public class SplashScreenActivity extends Activity {
                 }
             } catch(Exception ex) {
                 Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: \n" + ex.toString());
+                Crashlytics.logException(ex);
                 finish();
             }
         }
@@ -256,6 +258,7 @@ public class SplashScreenActivity extends Activity {
             }
         } catch(Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackRenewToken: \n" + ex.toString());
+            Crashlytics.logException(ex);
             finish();
         }
     }
@@ -272,6 +275,8 @@ public class SplashScreenActivity extends Activity {
             return list.size() > 0;
 
         } catch (Exception e) {
+            Log.e(Constants.TAG, "SplashScreenActivity.isDownloadManagerAvailable: ",e);
+            Crashlytics.logException(e);
             return false;
         }
     }

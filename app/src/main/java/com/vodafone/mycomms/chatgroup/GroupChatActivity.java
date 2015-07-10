@@ -167,13 +167,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         refreshAdapter();
 
-        //Load chat from db
-        Intent in = getIntent();
-        String contact_id = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
-        previousView = in.getStringExtra(Constants.CHAT_PREVIOUS_VIEW);
-
-        if(contact_id==null || contact_id.length()==0) finish(); //Prevent from errors
-
         //Load all messages
         loadMessagesArray();
 
@@ -351,7 +344,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         if(isGroupChatMode)
         {
-            _groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants.GROUP_CHAT_ID));
+            _groupChat = mGroupChatTransactions.getGroupChatById(
+                    in.getStringExtra(Constants.GROUP_CHAT_ID));
             _groupId = _groupChat.getId();
             loadContactIds();
         }
@@ -406,7 +400,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         ChatMessage chatMsg;
         //Save to DB
         if(isGroupChatMode) {
-            chatMsg = mGroupChatTransactions.newGroupChatMessageInstance(_groupChat.getId(),
+            chatMsg = mGroupChatTransactions.newGroupChatMessageInstance(_groupChat.getId(), "",
                     Constants.CHAT_MESSAGE_DIRECTION_SENT, Constants.CHAT_MESSAGE_TYPE_TEXT,
                     msg, "");
 
@@ -434,17 +428,15 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if(!XMPPTransactions.sendText(isGroupChatMode, groupContactId, chatMsg.getId(), msg))
             return;
 
-//        //Insert in recents
-//        String action = Constants.CONTACTS_ACTION_SMS;
-//        mRecentContactController.insertRecent(_chat.getContact_id(), action);
-//        mRecentContactController.setConnectionCallback(GroupChatActivity.this);
+        //Insert in recents
+        RecentContactController recentContactController = new
+                RecentContactController(this,_profile_id);
 
-//        //Notify app to refresh any view if necessary
-//        if (previousView.equals(Constants.CHAT_VIEW_CHAT_LIST)) {
-            BusProvider.getInstance().post(new MessageSentEvent());
-//        } else if (previousView.equals(Constants.CHAT_VIEW_CONTACT_LIST)) {
-//            //Recent List is refreshed onConnectionComplete
-//        }
+        if(isGroupChatMode)
+            recentContactController.insertRecentOKHttp(_groupId, Constants.CONTACTS_ACTION_SMS);
+        else recentContactController.insertRecent(_contactId, Constants.CONTACTS_ACTION_SMS);
+
+        BusProvider.getInstance().post(new MessageSentEvent());
 
         _chatList.add(chatMsg);
         if(_chatList.size()>50) _chatList.remove(0);
@@ -583,7 +575,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         {
             _chatList.add(chatMsg);
             if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
-                mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
+                mRecentContactController.insertRecent(
+                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
             }
 
             if(_chatList.size()>50) _chatList.remove(0);
@@ -694,24 +687,19 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
             builder.setCustomTitle(view);
         }
-        else
-        {
+        else {
             builder.setTitle(title);
         }
 
         builder.setItems(R.array.add_photo_chooser, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-
                 Intent in;
-
-                if(which == 0)
-                {
+                if(which == 0) {
                     in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     in.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
                     startActivityForResult(in, REQUEST_IMAGE_CAPTURE);
                 }
-                else if(which == 1)
-                {
+                else if(which == 1) {
                     in = new Intent();
                     in.setType("image/*");
                     in.setAction(Intent.ACTION_PICK);
@@ -834,10 +822,11 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     @Subscribe
     public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
-//        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
-//
-//        if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)
-//            loadMessagesArray();
+        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
+
+        if((isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().compareTo(_groupId)==0)
+                || (!isGroupChatMode && chatMsg!=null && chatMsg.getContact_id().compareTo(_contactId)==0))
+            loadMessagesArray();
     }
 
     @Subscribe

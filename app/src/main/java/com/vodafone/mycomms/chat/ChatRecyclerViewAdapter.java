@@ -111,8 +111,20 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         }
 
         if(chatList.get(i).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_SENT)==0) {
+            //Decide if show status or not
+            ChatMessage nextSentMessage = getNextSentChatMessage(i);
+            String status = null;
+
+            if((i==chatList.size()-1 || nextSentMessage==null) ||
+                    (XMPPTransactions.getXMPPStatusOrder(chatList.get(i).getStatus())==0) ||
+                    (XMPPTransactions.getXMPPStatusOrder(nextSentMessage.getStatus()) <
+                            XMPPTransactions.getXMPPStatusOrder(chatList.get(i).getStatus())))
+                status = chatList.get(i).getStatus();
+
             //Set text status
-            if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT) == 0)
+            if(status == null)
+                chatHolder.chatSentText.setVisibility(View.GONE);
+            else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT) == 0)
                 chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
             else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_SENT) == 0)
                 chatHolder.chatSentText.setText(mContext.getString(R.string.status_sent));
@@ -120,7 +132,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                 chatHolder.chatSentText.setText(mContext.getString(R.string.status_delivered));
             else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_READ) == 0)
                 chatHolder.chatSentText.setText(mContext.getString(R.string.status_read));
-            else chatHolder.chatSentText.setText("");
+            else chatHolder.chatSentText.setVisibility(View.GONE);
         }
 
         //Set message time
@@ -164,6 +176,16 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         }
 
         File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contactId+".jpg");
+
+//        if(XMPPTransactions.getXMPPStatusOrder(chatList.get(i).getStatus())==0 &&
+//                (chatHolder.getItemViewType() == Constants.RIGHT_CHAT ||
+//                    chatHolder.getItemViewType() == Constants.RIGHT_IMAGE_CHAT) &&
+//                i!=chatList.size()-1) {
+//            chatHolder.chatAvatarImage.setImageResource(R.color.red_action);
+//            chatHolder.chatAvatarText.setVisibility(View.INVISIBLE);
+//            chatHolder.chatAvatarText.setVisibility(View.VISIBLE);
+//        }
+//        else if (avatar!=null &&
 
         if (avatar!=null &&
                 avatar.length()>0 &&
@@ -210,5 +232,16 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         _chatTx.closeRealm();
+    }
+
+    private ChatMessage getNextSentChatMessage(int position)
+    {
+        for(int i=position+1; i<chatList.size(); i++)
+        {
+            if(chatList.get(i).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_SENT)==0)
+                return chatList.get(i);
+        }
+
+        return null;
     }
 }

@@ -230,7 +230,7 @@ public class RealmChatTransactions {
             if(count>0) exists = true;
 
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ", e);
+            Log.e(Constants.TAG, "RealmChatTransactions.existsChatMessageById: ", e);
             return false;
         }
 

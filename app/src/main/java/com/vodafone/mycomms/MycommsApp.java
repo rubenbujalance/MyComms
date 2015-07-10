@@ -22,7 +22,6 @@ import com.vodafone.mycomms.events.ContactListReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
-import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
@@ -267,9 +266,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Override
     public void onNewsResponse(ArrayList<News> newsList) {
         Log.e(Constants.TAG, "MyCommsApp.onNewsResponse: ");
-        //Download images is done now in DashboardActivity directly
-//        DownloadImagesAsyncTask downloadImagesAsyncTask = new DownloadImagesAsyncTask(getBaseContext(), newsList, 0);
-//        downloadImagesAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
         BusProvider.getInstance().post(event);
@@ -300,7 +296,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         recentContactController = new RecentContactController(this, profile_id);
         recentContactController.getRecentList();
         favouriteController = new FavouriteController(mContext, profile_id);
-
+        getNews();
         XMPPTransactions.initializeMsgServerSession(this);
     }
 
@@ -315,12 +311,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onEventNewsImagesReceived(NewsImagesReceivedEvent event){
         Log.i(Constants.TAG, "MycommsApp.onEventNewsImagesReceived: ");
-    }
-
-    @Subscribe
-    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
-        Log.e(Constants.TAG, "MycommsApp.onRecentContactsReceived: ");
-        getNews();
     }
 
     @Subscribe
@@ -365,7 +355,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     public void getNews() {
         Log.e(Constants.TAG, "MycommsApp.getNews: ");
-//        new DownloadNewsAsyncTask().execute(getApplicationContext());
         String apiCall = Constants.NEWS_API_GET;
         mNewsController.getNewsList(apiCall);
     }

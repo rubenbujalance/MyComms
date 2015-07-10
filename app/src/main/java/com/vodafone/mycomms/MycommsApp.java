@@ -11,12 +11,14 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.chatgroup.GroupChatController;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ContactListReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
@@ -38,6 +40,7 @@ import java.util.TimeZone;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import model.GroupChat;
 import model.News;
 import model.UserProfile;
 
@@ -318,6 +321,46 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onRecentContactsReceived(RecentContactsReceivedEvent event){
         Log.e(Constants.TAG, "MycommsApp.onRecentContactsReceived: ");
         getNews();
+    }
+
+    @Subscribe
+    public void onContactListReceived(ContactListReceivedEvent event){
+        Log.e(Constants.TAG, "MycommsApp.onContactListReceived: ");
+        new loadGroupChats().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public class loadGroupChats extends AsyncTask<String, Void, String>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try
+            {
+                GroupChatController groupChatController = new GroupChatController(mContext, profile_id);
+                ArrayList<GroupChat> chats = groupChatController.getAllGroupChatsFromAPI();
+                return groupChatController.insertGroupChatsIntoRealm(chats);
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "MyCommsApp.loadGroupChats -> doInBackground: ERROR "
+                        + e.toString());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            super.onPostExecute(result);
+            if(null == result) result = "0";
+            Log.d(Constants.TAG, "MyCommsApp.onPostExecute: Inserted group chat ids (if any): " +
+                    result);
+        }
     }
 
     public void getNews() {

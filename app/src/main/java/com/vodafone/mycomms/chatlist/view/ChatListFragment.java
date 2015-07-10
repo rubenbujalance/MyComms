@@ -26,6 +26,8 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import model.Chat;
 import model.GroupChat;
@@ -130,7 +132,6 @@ public class ChatListFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
         refreshAdapter();
     }
 
@@ -144,7 +145,27 @@ public class ChatListFragment extends Fragment{
 
     public void refreshAdapter()
     {
-        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), getComposedChat());
+        ArrayList<ComposedChat> composedChatList = getComposedChat();
+        Collections.sort(composedChatList, new Comparator<ComposedChat>() {
+            @Override
+            public int compare(ComposedChat lhs, ComposedChat rhs) {
+                long lhsTime;
+                long rhsTime;
+
+                if(lhs.getChat()==null)
+                    lhsTime = lhs.getGroupChat().getLastMessageTime();
+                else lhsTime = lhs.getChat().getLastMessageTime();
+
+                if(rhs.getChat()==null)
+                    rhsTime = rhs.getGroupChat().getLastMessageTime();
+                else rhsTime = rhs.getChat().getLastMessageTime();
+
+                if(lhsTime>rhsTime) return -1;
+                else return 1;
+            }
+        });
+
+        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), composedChatList);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 

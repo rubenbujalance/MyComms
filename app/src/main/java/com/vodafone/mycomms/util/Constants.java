@@ -236,6 +236,7 @@ public class Constants {
     public static final String IS_GROUP_CHAT = "is_group_chat";
 
     public static final String GROUP_CHAT_API = "/api/me/group";
+    public static final String SINGLE_GROUP_CHAT_API = "/api/group";
     public static final String GROUP_CHAT_API_SET_MEMBERS = "/api/group";
     public static final String GROUP_CHAT_PREFIX_ID = "mg";
 

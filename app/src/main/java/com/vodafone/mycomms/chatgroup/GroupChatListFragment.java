@@ -480,15 +480,19 @@ public class GroupChatListFragment extends ListFragment implements
                 .group_chat_participants)+": "+numberOfAddedContactsToGroupChat);
         selectedContacts.add(contact.getContactId());
 
+        if(selectedContacts.size()>1)
+            txtWrite.setVisibility(View.VISIBLE);
     }
 
     private void restContactToChatGroupEvent(Contact contact)
     {
         numberOfAddedContactsToGroupChat--;
         txtNumberParticipants.setText(getActivity().getString(R.string
-                .group_chat_participants)+": "+numberOfAddedContactsToGroupChat);
+                .group_chat_participants) + ": " + numberOfAddedContactsToGroupChat);
         selectedContacts.remove(contact.getContactId());
 
+        if(selectedContacts.size()<=1)
+            txtWrite.setVisibility(View.INVISIBLE);
     }
 
     @Override

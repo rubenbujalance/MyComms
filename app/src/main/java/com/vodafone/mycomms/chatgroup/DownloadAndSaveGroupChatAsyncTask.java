@@ -10,6 +10,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -25,7 +27,7 @@ import model.GroupChat;
 /**
  * Created by str_rbm on 09/07/2015.
  */
-public class DownloadAndSaveGroupChatAsyncTask extends AsyncTask<Object, Void, Void> {
+public class DownloadAndSaveGroupChatAsyncTask extends AsyncTask<Object, Void, GroupChat> {
 
     Context context;
     String groupId;
@@ -34,7 +36,7 @@ public class DownloadAndSaveGroupChatAsyncTask extends AsyncTask<Object, Void, V
     String chatMessageId;
 
     @Override
-    protected Void doInBackground(Object... params) {
+    protected GroupChat doInBackground(Object... params) {
         Log.e(Constants.TAG, "DownloadAndSaveGroupInfoAsyncTask.doInBackground: START");
 
         context = (Context)params[0];
@@ -47,17 +49,21 @@ public class DownloadAndSaveGroupChatAsyncTask extends AsyncTask<Object, Void, V
             SharedPreferences sp = context.getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS,
                     Context.MODE_PRIVATE);
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-            if(profileId==null)
+            if(profileId==null) {
                 Log.e(Constants.TAG, "DownloadAndSaveGroupInfoAsyncTask.doInBackground: " +
                         "Error getting profile id from Shared Preferences");
+                return null;
+            }
         } catch (Exception e) {
             Log.e(Constants.TAG, "DownloadAndSaveGroupInfoAsyncTask.doInBackground: " +
                     "Error getting profile id from Shared Preferences",e);
+            return null;
         }
 
         Response response;
         String jsonStr = null;
         RealmGroupChatTransactions groupTx = null;
+        GroupChat chat = null;
 
         try {
             OkHttpClient client = new OkHttpClient();
@@ -100,7 +106,7 @@ public class DownloadAndSaveGroupChatAsyncTask extends AsyncTask<Object, Void, V
                 groupTx =
                         new RealmGroupChatTransactions(context, profileId);
 
-                GroupChat chat = groupTx.newGroupChatInstance(
+                chat = groupTx.newGroupChatInstance(
                         groupId, profileId, membersIds, ownersIds, "", "", "");
 
                 //Set last message data
@@ -134,6 +140,15 @@ public class DownloadAndSaveGroupChatAsyncTask extends AsyncTask<Object, Void, V
 
         Log.e(Constants.TAG, "DownloadAndSaveGroupInfoAsyncTask.doInBackground: END");
 
-        return null;
+        return chat;
+    }
+
+    @Override
+    protected void onPostExecute(GroupChat chat) {
+        if(chat!=null) {
+            GroupChatCreatedEvent event = new GroupChatCreatedEvent();
+            event.setGroupChat(chat);
+            BusProvider.getInstance().post(event);
+        }
     }
 }

@@ -450,7 +450,7 @@ public final class XMPPTransactions {
                 return false;
 
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
-            if(to.contains("@")) to = from.substring(0, to.indexOf("@"));
+            if(to.contains("@")) to = to.substring(0, to.indexOf("@"));
 
             ChatMessage newChatMessage = null;
             String contactId = null;

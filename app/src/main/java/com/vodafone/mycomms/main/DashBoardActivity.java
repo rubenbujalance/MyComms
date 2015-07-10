@@ -734,7 +734,6 @@ public class DashBoardActivity extends ToolbarActivity{
         @Override
         protected void onPostExecute(Void aVoid)
         {
-
             contacts = new ArrayList<>();
             loadContactsFromIds(contactIds);
             int i = 0;

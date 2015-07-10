@@ -18,6 +18,7 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.ContactListReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
@@ -39,6 +40,7 @@ import java.util.TimeZone;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import model.ChatMessage;
 import model.GroupChat;
 import model.News;
 import model.UserProfile;
@@ -317,6 +319,25 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onContactListReceived(ContactListReceivedEvent event){
         Log.e(Constants.TAG, "MycommsApp.onContactListReceived: ");
         //new loadGroupChats().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @Subscribe
+    public void onEventChatsReceived(ChatsReceivedEvent event){
+        ChatMessage chatMsg = event.getMessage();
+
+        if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
+            RecentContactController recentContactController =
+                    new RecentContactController(this, profile_id);
+
+            if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0)
+                recentContactController.insertRecentOKHttp(
+                        chatMsg.getGroup_id(), Constants.CONTACTS_ACTION_SMS);
+            else
+                recentContactController.insertRecent(
+                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
+
+            recentContactController.closeRealm();
+        }
     }
 
     public class loadGroupChats extends AsyncTask<String, Void, String>

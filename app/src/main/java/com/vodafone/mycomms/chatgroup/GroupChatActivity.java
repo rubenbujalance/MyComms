@@ -60,6 +60,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 
 import model.Chat;
@@ -571,13 +572,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
         ChatMessage chatMsg = event.getMessage();
-        if(chatMsg!=null)
+        if((isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().compareTo(_groupId)==0)
+                || (!isGroupChatMode && chatMsg!=null && chatMsg.getContact_id().compareTo(_contactId)==0))
         {
             _chatList.add(chatMsg);
-            if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
-                mRecentContactController.insertRecent(
-                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-            }
 
             if(_chatList.size()>50) _chatList.remove(0);
             refreshAdapter();

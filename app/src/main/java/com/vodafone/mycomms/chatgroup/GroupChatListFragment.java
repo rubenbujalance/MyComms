@@ -37,6 +37,8 @@ import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.util.Constants;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -529,7 +531,7 @@ public class GroupChatListFragment extends ListFragment implements
         Log.d(Constants.TAG, "GroupChatListFragment.onConnectionNotAvailable: ");
     }
 
-    private class CreateGroupChatTask extends AsyncTask<Void, Void, Boolean>
+    private class CreateGroupChatTask extends AsyncTask<Void, Void, String>
     {
         private ProgressDialog pdia;
 
@@ -543,7 +545,7 @@ public class GroupChatListFragment extends ListFragment implements
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(Void... params) {
             try
             {
                 return createGroupChat();
@@ -556,14 +558,15 @@ public class GroupChatListFragment extends ListFragment implements
         }
 
         @Override
-        protected void onPostExecute(Boolean isGroupChatCreated)
+        protected void onPostExecute(String response)
         {
-            super.onPostExecute(isGroupChatCreated);
+            super.onPostExecute(response);
             if(pdia.isShowing()) pdia.dismiss();
-            if(!isGroupChatCreated)
+            if(!mGroupChatController.getResponseCode().startsWith("2"))
             {
                 Log.e(Constants.TAG, LOG_TAG+".CreateGroupChatTask -> onPostExecute: ERROR. " +
-                        "Impossible Create Group Chat!!!");
+                        "Impossible Create Group Chat!!! -> code: "+mGroupChatController
+                        .getResponseCode()+" Response -> "+response);
             }
             else
             {
@@ -572,6 +575,7 @@ public class GroupChatListFragment extends ListFragment implements
                 Log.i(Constants.TAG, LOG_TAG + ".CreateGroupChatTask -> Created chat is: " + chatToString);
                 mGroupChatTransactions.insertOrUpdateGroupChat(groupChat);
 
+                // Insert recent
                 String action = Constants.CONTACTS_ACTION_SMS;
                 String id = groupChat.getId();
                 mRecentContactController.insertRecentOKHttp(id, action);
@@ -597,44 +601,44 @@ public class GroupChatListFragment extends ListFragment implements
         }
 
         @Override
-        protected String doInBackground(String... params) {
-            try
-            {
-                if(updateGroupChat(params[0]))
-                    return params[0];
-                else
-                    return null;
-            }
-            catch (Exception e)
-            {
-                Log.e(Constants.TAG, LOG_TAG+".UpdateGroupChatTask -> doInBackground: ERROR ",e);
-                return null;
-            }
+        protected String doInBackground(String... params)
+        {
+            return updateGroupChat(params[0]);
         }
 
         @Override
-        protected void onPostExecute(String groupId)
+        protected void onPostExecute(String response)
         {
-            super.onPostExecute(groupId);
+            super.onPostExecute(response);
             if(pdia.isShowing()) pdia.dismiss();
-            if(null == groupId)
+            try
             {
-                Log.e(Constants.TAG, LOG_TAG+".UpdateGroupChatTask -> onPostExecute: ERROR. " +
-                        "Impossible Update Group Chat!!!");
+                if(!mGroupChatController.getResponseCode().startsWith("2"))
+                {
+                    JSONObject jsonObject = new JSONObject(response);
+                    if (!jsonObject.isNull("err")) {
+                        Log.e(Constants.TAG, LOG_TAG + ".UpdateGroupChatTask -> onPostExecute: ERROR. " +
+                                "Impossible Update Group Chat!!! -> " + jsonObject.getString("err"));
+                    }
+                    else
+                    {
+                        Log.e(Constants.TAG, LOG_TAG + ".UpdateGroupChatTask -> onPostExecute: ERROR. " +
+                                "Impossible Update Group Chat!!! -> " + response);
+                    }
+                }
+                else
+                {
+                    GroupChat updatedGroupChat = new GroupChat(groupChat);
+                    updatedGroupChat.setMembers(generateComposedMembersId(selectedContacts));
+                    updatedGroupChat.setOwners(generateComposedMembersId(ownersIds));
+                    mGroupChatTransactions.insertOrUpdateGroupChat(updatedGroupChat);
+                    startActivityInGroupChatMode();
+                }
             }
-            else
+            catch (Exception e)
             {
-
-                String chatToString = groupChat.getId() + groupChat.getProfileId()
-                        + groupChat.getMembers();
-                Log.i(Constants.TAG, LOG_TAG + ".UpdateGroupChatTask -> Updated chat is: " +
-                        chatToString);
-
-                GroupChat updatedGroupChat = new GroupChat(groupChat);
-                updatedGroupChat.setMembers(generateComposedMembersId(selectedContacts));
-                updatedGroupChat.setOwners(generateComposedMembersId(ownersIds));
-                mGroupChatTransactions.insertOrUpdateGroupChat(updatedGroupChat);
-                startActivityInGroupChatMode();
+                Log.e(Constants.TAG, LOG_TAG + ".UpdateGroupChatTask -> onPostExecute: ERROR. " +
+                        "Impossible Update Group Chat!!!");
             }
         }
     }
@@ -650,8 +654,9 @@ public class GroupChatListFragment extends ListFragment implements
         return composedId;
     }
 
-    private boolean createGroupChat()
+    private String createGroupChat()
     {
+        String response = null;
         this.ownersIds = new ArrayList<>();
         this.ownersIds.add(profileId);
 
@@ -662,11 +667,10 @@ public class GroupChatListFragment extends ListFragment implements
         if(mGroupChatController.isCreatedJSONBodyForCreateGroupChat())
         {
             mGroupChatController.createRequest(mGroupChatController.URL_CREATE_GROUP_CHAT,"post");
-            String response = mGroupChatController.executeRequest();
-            if(null != response)
+            response = mGroupChatController.executeRequest();
+            if(null != response && mGroupChatController.getResponseCode().startsWith("2"))
             {
                 String id = mGroupChatController.getCreatedGroupChatId(response);
-
                 this.groupChat = mGroupChatTransactions.newGroupChatInstance
                         (
                                 id
@@ -677,14 +681,12 @@ public class GroupChatListFragment extends ListFragment implements
                                 , ""
                                 , ""
                         );
-
-                return true;
             }
         }
-        return false;
+        return response;
     }
 
-    private boolean updateGroupChat(String groupChatId)
+    private String updateGroupChat(String groupChatId)
     {
         this.selectedContacts.add(profileId);
         mGroupChatController.setChatMembers(this.selectedContacts);
@@ -693,13 +695,9 @@ public class GroupChatListFragment extends ListFragment implements
         if(mGroupChatController.isCreatedJSONBodyForUpdateGroupChat())
         {
             mGroupChatController.createRequest(mGroupChatController.URL_UPDATE_GROUP_CHAT, "put", groupChatId);
-
-            String response = mGroupChatController.executeRequest();
-            if(null != response)
-            {
-                return true;
-            }
+            return mGroupChatController.executeRequest();
         }
-        return false;
+        else
+            return null;
     }
 }

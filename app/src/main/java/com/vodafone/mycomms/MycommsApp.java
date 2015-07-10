@@ -318,7 +318,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onContactListReceived(ContactListReceivedEvent event){
         Log.e(Constants.TAG, "MycommsApp.onContactListReceived: ");
-        new loadGroupChats().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        //new loadGroupChats().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Subscribe

@@ -20,6 +20,7 @@ import com.vodafone.mycomms.chatgroup.ComposedChat;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -154,6 +155,11 @@ public class ChatListFragment extends Fragment{
 
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
+        refreshAdapter();
+    }
+
+    @Subscribe
+    public void onEventGroupChatCreated(GroupChatCreatedEvent event){
         refreshAdapter();
     }
 

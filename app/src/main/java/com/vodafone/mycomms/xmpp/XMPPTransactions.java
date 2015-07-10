@@ -553,7 +553,7 @@ public final class XMPPTransactions {
                 //Get group from API in background, and save to Realm
                 new DownloadAndSaveGroupChatAsyncTask()
                         .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                                _appContext, Constants.GROUP_CHAT_API, groupId, id);
+                                _appContext, Constants.SINGLE_GROUP_CHAT_API, groupId, id);
             }
             else {
                 chat = groupTx.updatedGroupChatInstance(chat, newChatMessage);

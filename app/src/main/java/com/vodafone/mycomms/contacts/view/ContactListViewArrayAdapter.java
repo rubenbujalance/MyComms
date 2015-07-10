@@ -179,7 +179,9 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewPosition.setText(contact.getPosition());
+
         String country = "";
+
         try {
             if (contact.getCountry() != null && contact.getCountry().length() > 0) {
                 if (Utils.getCountry(contact.getCountry(), mContext).get("is_special") != null) {
@@ -195,7 +197,9 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         } catch (NullPointerException e){
             Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: NullPointerException " + e);
         }
+
         viewHolder.textViewCountry.setText(country);
+
         //Icon
         String icon = "";
         try {

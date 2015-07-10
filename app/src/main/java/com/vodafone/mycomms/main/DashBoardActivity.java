@@ -766,7 +766,7 @@ public class DashBoardActivity extends ToolbarActivity{
                         //Add this download to queue, to avoid duplicated downloads
                         if(null != mapAvatarFile.get(image))
                         {
-                            ConnectionsQueue.putConnection(mapAvatarFile.get(image).toString(), mapAvatarTarget.get(image));
+//                            ConnectionsQueue.putConnection(mapAvatarFile.get(image).toString(), mapAvatarTarget.get(image));
                             Picasso.with(DashBoardActivity.this)
                                     .load(avatar)
                                     .into(mapAvatarTarget.get(image));

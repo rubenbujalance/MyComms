@@ -11,15 +11,17 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.chatgroup.GroupChatController;
+import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ContactListReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
-import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.settings.ProfileController;
@@ -37,6 +39,7 @@ import java.util.TimeZone;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import model.GroupChat;
 import model.News;
 import model.UserProfile;
 
@@ -53,11 +56,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private FilePushToServerController filePushToServerController;
     private SharedPreferences sp;
-    private boolean appIsInitialized = false;
+    public boolean appIsInitialized = false;
     FavouriteController favouriteController;
     private RecentContactController recentContactController;
     private NewsController mNewsController;
     String profile_id;
+    public boolean comesFromToolbar = true;
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -181,6 +185,14 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         return deviceId;
     }
 
+    public void getLocalContacts(){
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, profileId);
+        downloadLocalContacts.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     @Override
     public void onProfileReceived(UserProfile userProfile) {
         Log.e(Constants.TAG, "MycommsApp.onProfileReceived: ");
@@ -254,9 +266,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Override
     public void onNewsResponse(ArrayList<News> newsList) {
         Log.e(Constants.TAG, "MyCommsApp.onNewsResponse: ");
-        //Download images is done now in DashboardActivity directly
-//        DownloadImagesAsyncTask downloadImagesAsyncTask = new DownloadImagesAsyncTask(getBaseContext(), newsList, 0);
-//        downloadImagesAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
         BusProvider.getInstance().post(event);
@@ -287,7 +296,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         recentContactController = new RecentContactController(this, profile_id);
         recentContactController.getRecentList();
         favouriteController = new FavouriteController(mContext, profile_id);
-
+        getNews();
         XMPPTransactions.initializeMsgServerSession(this);
     }
 
@@ -305,17 +314,49 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     @Subscribe
-    public void onRecentContactsReceived(RecentContactsReceivedEvent event){
-        Log.e(Constants.TAG, "MycommsApp.onRecentContactsReceived: ");
-        getNews();
+    public void onContactListReceived(ContactListReceivedEvent event){
+        Log.e(Constants.TAG, "MycommsApp.onContactListReceived: ");
+        new loadGroupChats().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public class loadGroupChats extends AsyncTask<String, Void, String>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try
+            {
+                GroupChatController groupChatController = new GroupChatController(mContext, profile_id);
+                ArrayList<GroupChat> chats = groupChatController.getAllGroupChatsFromAPI();
+                return groupChatController.insertGroupChatsIntoRealm(chats);
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "MyCommsApp.loadGroupChats -> doInBackground: ERROR "
+                        + e.toString());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            super.onPostExecute(result);
+            if(null == result) result = "0";
+            Log.d(Constants.TAG, "MyCommsApp.onPostExecute: Inserted group chat ids (if any): " +
+                    result);
+        }
     }
 
     public void getNews() {
         Log.e(Constants.TAG, "MycommsApp.getNews: ");
-//        new DownloadNewsAsyncTask().execute(getApplicationContext());
         String apiCall = Constants.NEWS_API_GET;
         mNewsController.getNewsList(apiCall);
-        mNewsController.setConnectionCallback(this);
     }
 
     public class sendAvatar extends AsyncTask<String, Void, String>

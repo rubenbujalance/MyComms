@@ -2,6 +2,8 @@ package com.vodafone.mycomms.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,9 +14,12 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.connection.ConnectionsQueue;
+import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.settings.connection.PasswordConnection;
 import com.vodafone.mycomms.settings.connection.ProfileConnection;
@@ -22,6 +27,7 @@ import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.settings.connection.UpdateSettingsConnection;
 import com.vodafone.mycomms.settings.connection.UpdateTimeZoneConnection;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -29,13 +35,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 
 import model.UserProfile;
 
 public class ProfileController extends BaseController {
 
-    private RealmContactTransactions realmContactTransactions;
+    private RealmProfileTransactions mRealmProfileTransactions;
     private UserProfile userProfile;
     private String profileId;
 
@@ -44,7 +51,7 @@ public class ProfileController extends BaseController {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        realmContactTransactions = new RealmContactTransactions(profileId);
+        mRealmProfileTransactions = new RealmProfileTransactions();
     }
 
     /**
@@ -62,8 +69,8 @@ public class ProfileController extends BaseController {
 
         if (profileId != null && profileId.length() > 0) {
             UserProfile userProfileFromDB = null;
-            if (realmContactTransactions != null) {
-                userProfileFromDB = realmContactTransactions.getUserProfile();
+            if (mRealmProfileTransactions != null) {
+                userProfileFromDB = mRealmProfileTransactions.getUserProfile(profileId);
             }
 
             if (this.getConnectionCallback() != null && userProfileFromDB != null) {
@@ -101,7 +108,7 @@ public class ProfileController extends BaseController {
             userProfile.setCompany(company);
             userProfile.setPosition(position);
             userProfile.setOfficeLocation(officeLocation);
-            realmContactTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile);
         }
     }
 
@@ -111,7 +118,7 @@ public class ProfileController extends BaseController {
         if(userProfile != null)
         {
             userProfile.setAvatar(avatarNewURL);
-            realmContactTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile);
         }
     }
 
@@ -130,7 +137,7 @@ public class ProfileController extends BaseController {
             JSONObject json = new JSONObject(body);
             Log.d(Constants.TAG, "ProfileController.updateUserProfileSettingsInDB: " + json.toString());
             userProfile.setSettings(json.toString());
-            realmContactTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile);
         }
 
 
@@ -151,7 +158,7 @@ public class ProfileController extends BaseController {
 
     public void updateProfileTimezone(String timezone)
     {
-        realmContactTransactions.updateProfileTimezone(timezone);
+        mRealmProfileTransactions.updateProfileTimezone(timezone, profileId);
     }
 
     @Override
@@ -170,7 +177,7 @@ public class ProfileController extends BaseController {
 
                     this.userProfile = mapUserProfile(jsonResponse);
 
-                    realmContactTransactions.insertUserProfile(userProfile);
+                    mRealmProfileTransactions.insertUserProfile(userProfile);
                     Log.d(Constants.TAG, "ProfileController.onConnectionComplete: UserProfile parsed:" + printUserProfile(userProfile));
                     if(userProfile != null) {
                         isUserProfileReceived = true;
@@ -336,7 +343,7 @@ public class ProfileController extends BaseController {
     public void logoutToAPI()
     {
         try {
-            UserProfile userProfile = realmContactTransactions.getUserProfile();
+            UserProfile userProfile = mRealmProfileTransactions.getUserProfile(profileId);
             String jsonEmails = userProfile.getEmails();
             if (jsonEmails == null || jsonEmails.length() == 0) return;
 
@@ -361,7 +368,9 @@ public class ProfileController extends BaseController {
                 JSONObject jsonResponse = new JSONObject(json);
 
                 userProfile = mapUserProfile(jsonResponse);
-                realmContactTransactions.insertUserProfile(userProfile);
+                mRealmProfileTransactions.insertUserProfile(userProfile);
+                new DownloadProfileAvatar().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
                 if(userProfile != null) {
                     isUserProfileReceived = true;
                 }
@@ -376,6 +385,56 @@ public class ProfileController extends BaseController {
             }
         }
     }
+
+    public class DownloadProfileAvatar extends AsyncTask<String, Void, String>
+    {
+
+        private Target avatarTarget;
+        private boolean loadAvatarFromDisk;
+        private String nameInitials;
+        private String avatar;
+        private File avatarFile;
+        @Override
+        protected String doInBackground(String... params)
+        {
+            avatarFile = new File(getContext().getFilesDir() + Constants.CONTACT_AVATAR_DIR,
+                    "avatar_"+profileId+".jpg");
+            avatar = userProfile.getAvatar();
+            avatarTarget = new Target()
+            {
+                @Override
+                public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from)
+                {
+                    SaveAndShowImageAsyncTask task =
+                            new SaveAndShowImageAsyncTask(null, avatarFile, bitmap);
+
+                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+                    if(avatarFile.exists()) avatarFile.delete();
+                    ConnectionsQueue.removeConnection(avatarFile.toString());
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            };
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response)
+        {
+            ConnectionsQueue.putConnection(avatarFile.toString(), avatarTarget);
+            Picasso.with(getContext())
+                    .load(avatar)
+                    .into(avatarTarget);
+        }
+    }
+
 
     public class GetProfileAsyncTask extends AsyncTask<String, Void, String> {
         @Override
@@ -461,6 +520,6 @@ public class ProfileController extends BaseController {
 
     public void closeRealm()
     {
-        realmContactTransactions.closeRealm();
+        mRealmProfileTransactions.closeRealm();
     }
 }

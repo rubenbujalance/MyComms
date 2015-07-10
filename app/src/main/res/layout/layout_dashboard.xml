@@ -188,17 +188,14 @@
     </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/no_connection_layout"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:background="@android:color/holo_red_light">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/no_internet_connection"/>
+        android:id="@+id/no_connection_layout"
+        android:visibility="gone">
+        <include
+            android:id="@+id/layout_connection_not_available"
+            layout="@layout/layout_connection_not_available"
+            />
     </LinearLayout>
     <!-- Footer -->
     <RelativeLayout android:id="@+id/footer"

@@ -49,6 +49,7 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -115,6 +116,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
+    private LinearLayout lay_no_connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +126,12 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
+
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        if(APIWrapper.isConnected(GroupChatActivity.this))
+            lay_no_connection.setVisibility(View.GONE);
+        else
+            lay_no_connection.setVisibility(View.VISIBLE);
 
         sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -536,16 +544,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         return super.onOptionsItemSelected(item);
     }
 
-    @Subscribe
-    public void onConnectivityChanged(ConnectivityChanged event) {
-        Log.e(Constants.TAG, "MycommsApp.onConnectivityChanged: "
-                + event.getConnectivityStatus().toString());
-        if(event.getConnectivityStatus()== ConnectivityStatus.MOBILE_CONNECTED ||
-                event.getConnectivityStatus()==ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
-            setSendEnabled(true);
-        else setSendEnabled(false);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -849,6 +847,27 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             refreshAdapter();
+        }
+    }
+
+    @Subscribe
+    public void onConnectivityChanged(ConnectivityChanged event)
+    {
+
+        Log.e(Constants.TAG, "GroupChatActivity.onConnectivityChanged: "
+                + event.getConnectivityStatus().toString());
+
+        if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
+                event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
+        {
+            lay_no_connection.setVisibility(View.VISIBLE);
+            setSendEnabled(false);
+        }
+
+        else
+        {
+            lay_no_connection.setVisibility(View.GONE);
+            setSendEnabled(true);
         }
     }
 }

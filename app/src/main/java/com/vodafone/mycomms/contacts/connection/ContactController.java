@@ -10,6 +10,7 @@ import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ContactListReceivedEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -58,6 +59,8 @@ public class ContactController extends BaseController {
                         getContactList(Constants.CONTACT_API_GET_CONTACTS + "&o=" + offsetPaging);
                     } else {
                         offsetPaging = 0;
+                        //Bus Event Post when contacts have been received
+                        BusProvider.getInstance().post(new ContactListReceivedEvent());
                     }
 
                 } catch (JSONException e) {

@@ -10,12 +10,17 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+
+import model.GroupChat;
 
 /**
  * Created by str_oan on 01/07/2015.
@@ -23,6 +28,7 @@ import java.util.ArrayList;
 public class GroupChatController
 {
     private Context mContext;
+    private String profileId;
 
     private OkHttpClient client;
     private Request request;
@@ -49,10 +55,13 @@ public class GroupChatController
             Constants.GROUP_CHAT_API;
     private String URL_UPDATE_GROUP_CHAT = "https://" + EndpointWrapper.getBaseURL() +
             Constants.GROUP_CHAT_API_SET_MEMBERS;
+    private String URL_GET_ALL_GROUP_CHATS = "https://" + EndpointWrapper.getBaseURL() +
+            Constants.GROUP_CHAT_API;
 
-    public GroupChatController(Context context)
+    public GroupChatController(Context context, String profileId)
     {
         this.mContext = context;
+        this.profileId = profileId;
     }
 
     public boolean isCreatedURLForCreateGroupChat()
@@ -138,6 +147,24 @@ public class GroupChatController
                     .addHeader(version_token, getVersionName())
                     .url(URL_CREATE_GROUP_CHAT)
                     .post(this.requestBody)
+                    .build();
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, LOG_TAG + ".createGroupChatRequest: ERROR ", e);
+        }
+    }
+
+    public void createRequestForGetAllGroupChats()
+    {
+        try
+        {
+            client = new OkHttpClient();
+            request = new Request.Builder()
+                    .addHeader(authorization, ACCESS_TOKEN + UserSecurity.getAccessToken(mContext))
+                    .addHeader(version_token, getVersionName())
+                    .url(URL_GET_ALL_GROUP_CHATS)
+                    .get()
                     .build();
         }
         catch (Exception e)
@@ -299,5 +326,116 @@ public class GroupChatController
             Log.e(Constants.TAG, LOG_TAG+".getVersionName: ERROR ",e);
             return "";
         }
+    }
+
+    /**
+     * Gets all group chats from server which belong to profile id as Array List.
+     * If some error has been thrown or nothing to get, return will be empty list;
+     * @author str_oan
+     * @return (ArrayList) -> list of group chats is any.
+     */
+    public ArrayList<GroupChat> getAllGroupChatsFromAPI()
+    {
+        createRequestForGetAllGroupChats();
+        executeRequest();
+        return getResponseAsGroupChats();
+    }
+
+    public String insertGroupChatsIntoRealm(ArrayList<GroupChat> chats)
+    {
+        RealmGroupChatTransactions realmGroupChatTransactions =
+                new RealmGroupChatTransactions(mContext, profileId);
+        String insertedGroupChatIds = null;
+        for(GroupChat chat : chats)
+        {
+            if(null == realmGroupChatTransactions.getGroupChatById(chat.getId()))
+            {
+                realmGroupChatTransactions.insertOrUpdateGroupChat(chat);
+                if(null == insertedGroupChatIds) insertedGroupChatIds = chat.getId();
+                else insertedGroupChatIds = insertedGroupChatIds + "@" + chat.getId();
+            }
+        }
+        return insertedGroupChatIds;
+    }
+    private GroupChat createNewGroupChat(JSONObject object) throws Exception
+    {
+        String[] membersAndOwners = getMembersAndOwners(object);
+        if(null != membersAndOwners)
+        {
+            GroupChat groupChat = new GroupChat
+                    (
+                            object.getString("id")
+                            , object.getString("creator")
+                            , object.getString("creator")
+                            , object.getString("name")
+                            , object.getString("avatar")
+                            , object.getString("about")
+                            , membersAndOwners[0]
+                            , membersAndOwners[1]
+                            , Calendar.getInstance().getTimeInMillis()
+                            , ""
+                            , ""
+                    );
+
+            return groupChat;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private String[] getMembersAndOwners(JSONObject object)
+    {
+        try
+        {
+            String[] membersAndOwners = new String[2];
+            JSONArray array = object.getJSONArray("members");
+            for(int i = 0; i < array.length(); i++)
+            {
+                JSONObject o = array.getJSONObject(i);
+                if(null == membersAndOwners[0]) membersAndOwners[0] = o.getString("id");
+                else membersAndOwners[0] = membersAndOwners[0] + "@" + o.getString("id");
+
+
+                if(null == membersAndOwners[1])
+                {
+                    if(!o.isNull("owner"))
+                        membersAndOwners[1] = o.getString("owner");
+                }
+                else
+                {
+                    if(!o.isNull("owner"))
+                        membersAndOwners[1] = membersAndOwners[1] + o.getString("owner");
+                }
+            }
+            return membersAndOwners;
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, LOG_TAG+".getMembersAndOwners: ERROR ",e);
+            return null;
+        }
+    }
+
+    private ArrayList<GroupChat> getResponseAsGroupChats()
+    {
+        ArrayList<GroupChat> groupChats = new ArrayList<>();
+        try
+        {
+            JSONArray jsonArray = new JSONArray(responseToString());
+            for(int i = 0; i < jsonArray.length(); i++)
+            {
+                GroupChat groupChat = createNewGroupChat(jsonArray.getJSONObject(i));
+                if(null != groupChat)
+                    groupChats.add(groupChat);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, LOG_TAG+".getResponseAsGroupChats: ERROR ",e);
+        }
+
+        return groupChats;
     }
 }

@@ -17,16 +17,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.connection.AsyncTaskQueue;
 import com.vodafone.mycomms.connection.ConnectionsQueue;
-import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
@@ -37,6 +39,7 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
@@ -53,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
 
 import model.Contact;
 import model.News;
@@ -60,7 +64,6 @@ import model.RecentContact;
 import model.UserProfile;
 
 public class DashBoardActivity extends ToolbarActivity{
-    private LinearLayout noConnectionLayout;
     private RealmChatTransactions _chatTx;
     private ArrayList<News> newsArrayList;
     private AsyncTaskQueue recentsTasksQueue = new AsyncTaskQueue();
@@ -70,6 +73,7 @@ public class DashBoardActivity extends ToolbarActivity{
     private RealmNewsTransactions realmNewsTransactions;
     private RealmGroupChatTransactions realmGroupTransactions;
     private RecentContactController recentContactController;
+    private LinearLayout lay_no_connection;
 
 
 
@@ -92,6 +96,8 @@ public class DashBoardActivity extends ToolbarActivity{
         realmGroupTransactions = new RealmGroupChatTransactions(this, _profileId);
         recentContactController = new RecentContactController(this, _profileId);
 
+
+
         BusProvider.getInstance().register(this);
 
         enableToolbarIsClicked(false);
@@ -99,15 +105,14 @@ public class DashBoardActivity extends ToolbarActivity{
 
         initALL();
 
-
-        loadRecents();
-        loadNews();
-
-        Log.i(Constants.TAG, "DashBoardActivity.onCreate: DownloadLocalContacts");
-        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, _profileId);
-        downloadLocalContacts.execute();
-
         BusProvider.getInstance().post(new DashboardCreatedEvent());
+
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        if(APIWrapper.isConnected(DashBoardActivity.this))
+            lay_no_connection.setVisibility(View.GONE);
+        else
+            lay_no_connection.setVisibility(View.VISIBLE);
 
     }
 
@@ -135,7 +140,6 @@ public class DashBoardActivity extends ToolbarActivity{
             });
         }
 
-        noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
         activateFooter();
 
         setFooterListeners(this);
@@ -161,7 +165,7 @@ public class DashBoardActivity extends ToolbarActivity{
             public void onClick(View v) {
                 //Start Favourites activity
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
-                in.putExtra(Constants.toolbar, false);
+                ((MycommsApp)getApplication()).comesFromToolbar = false;
                 in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
 //                finish();
@@ -233,6 +237,11 @@ public class DashBoardActivity extends ToolbarActivity{
         if(newsArrayList != null){
             drawNews(newsArrayList);
         }
+    }
+
+    private void loadLocalContacts(){
+        Log.e(Constants.TAG, "DashBoardActivity.loadLocalContacts: ");
+        ((MycommsApp)getApplication()).getLocalContacts();
     }
 
     private void drawNews(ArrayList<News> newsArrayList) {
@@ -309,6 +318,8 @@ public class DashBoardActivity extends ToolbarActivity{
         //RBM - It is done every time a message is received
         checkUnreadChatMessages();
         loadRecents();
+        loadNews();
+        loadLocalContacts();
     }
 
     @Subscribe
@@ -457,7 +468,8 @@ public class DashBoardActivity extends ToolbarActivity{
                 title.setText(titleStr);
                 TextView date = (TextView) child.findViewById(R.id.notice_date);
                 date.setText(dateStr);
-
+                Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
+                builder.executor(Executors.newSingleThreadExecutor());
                 if (loadFromDisk)
                     Picasso.with(DashBoardActivity.this)
                             .load(newsFile)
@@ -482,7 +494,7 @@ public class DashBoardActivity extends ToolbarActivity{
 
         ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
         TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
-        LinearLayout lay_top_right_image, layout_bottom_both_images;
+        LinearLayout lay_top_right_image, layout_bottom_both_images, lay_main_container;
 
         View childRecents;
 
@@ -590,6 +602,8 @@ public class DashBoardActivity extends ToolbarActivity{
             layout_bottom_both_images = (LinearLayout) childRecents.findViewById(R.id
                     .lay_bottom_both_image_hide);
             layout_bottom_both_images.setVisibility(View.VISIBLE);
+
+            lay_main_container = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
             if(contactIds.size() == 3)
                 lay_top_right_image.setVisibility(View.GONE);
@@ -720,6 +734,7 @@ public class DashBoardActivity extends ToolbarActivity{
         @Override
         protected void onPostExecute(Void aVoid)
         {
+
             contacts = new ArrayList<>();
             loadContactsFromIds(contactIds);
             int i = 0;
@@ -738,7 +753,7 @@ public class DashBoardActivity extends ToolbarActivity{
                                 .fit().centerCrop()
                                 .into(image);
                     }
-                    else if(null != mapAvatarTarget.get(image))
+                    else
                     {
                         image.setImageResource(R.color.grey_middle);
                         nameInitials = contact.getFirstName().substring(0, 1);
@@ -749,35 +764,12 @@ public class DashBoardActivity extends ToolbarActivity{
                         mapAvatarImageAndText.get(image).setText(nameInitials);
 
                         //Add this download to queue, to avoid duplicated downloads
-//                        ConnectionsQueue.putConnection(mapAvatarFile.get(image).toString(), mapAvatarTarget.get(image));
-                        Picasso.with(DashBoardActivity.this)
-                                .load(avatar)
-                                .into(mapAvatarTarget.get(image));
-                    }
-
-                    // Recent action icon and bagdes
-                    if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
-                        unread_messages.setVisibility(View.VISIBLE);
-                        unread_messages.setText(String.valueOf(pendingMsgsCount));
-                    } else {
-                        typeRecent.setVisibility(View.VISIBLE);
-
-                        int sdk = Build.VERSION.SDK_INT;
-                        if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
-                            if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                                typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                            else
-                                typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                        } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
-                            if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                                typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                            else
-                                typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                        } else {
-                            if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                                typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
-                            else
-                                typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                        if(null != mapAvatarFile.get(image))
+                        {
+//                            ConnectionsQueue.putConnection(mapAvatarFile.get(image).toString(), mapAvatarTarget.get(image));
+                            Picasso.with(DashBoardActivity.this)
+                                    .load(avatar)
+                                    .into(mapAvatarTarget.get(image));
                         }
                     }
                 }  catch (Exception e) {
@@ -785,10 +777,37 @@ public class DashBoardActivity extends ToolbarActivity{
                 }
             }
 
+            // Recent action icon and bagdes
+            if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
+                unread_messages.setVisibility(View.VISIBLE);
+                unread_messages.setText(String.valueOf(pendingMsgsCount));
+            } else {
+                typeRecent.setVisibility(View.VISIBLE);
+
+                int sdk = Build.VERSION.SDK_INT;
+                if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                } else {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                }
+            }
+
             // Names
             firstNameView.setText("Group("+contacts.size()+")");
             //Since it's finished, remove this task from queue
             recentsTasksQueue.removeConnection(recentId);
+            lay_main_container.setVisibility(View.VISIBLE);
         }
     }
 
@@ -1065,6 +1084,19 @@ public class DashBoardActivity extends ToolbarActivity{
                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
             }
         }
+    }
+
+    @Subscribe
+    public void onConnectivityChanged(ConnectivityChanged event)
+    {
+
+        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+                + event.getConnectivityStatus().toString());
+        if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
+                event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
+            lay_no_connection.setVisibility(View.VISIBLE);
+        else
+            lay_no_connection.setVisibility(View.GONE);
     }
 
 }

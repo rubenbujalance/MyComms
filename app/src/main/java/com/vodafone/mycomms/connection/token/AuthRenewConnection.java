@@ -23,9 +23,8 @@ public class AuthRenewConnection  extends BaseConnection{
         super( URL, context , listener , HttpConnection.GET, false);
         Log.d(Constants.TAG, "AuthRenewConnection.AuthRenewConnection: ");
 
-
         HashMap params = new HashMap<>();
-        params.put("refreshToken", UserSecurity.getRefreshToken(context));
+        params.put(Constants.PROFILE_REFRESH_TOKEN, UserSecurity.getRefreshToken(context));
 
         JSONObject json = null;
         if(params != null)

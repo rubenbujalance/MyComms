@@ -37,6 +37,9 @@ public class Constants {
     public static final String DEVICE_ID_SHARED_PREF = "device_Id" ;
     public static final String TIMEZONE_SHARED_PREF = "timezone" ;
     public static final String IS_TOOLBAR_CLICKED = "toolbar_clicked";
+    public static final String PROFILE_ACCESS_TOKEN = "accessToken";
+    public static final String PROFILE_REFRESH_TOKEN = "refreshToken";
+    public static final String PROFILE_EXPIRATION_TIME_MILLIS = "expirationTimeMillis";
 
     //Profile API & BD
     public static final String PROFILE_PRIVATE_TIMEZONE = "privateTimeZone";
@@ -216,6 +219,7 @@ public class Constants {
 
     public static boolean isSearchBarFocusRequested = false;
     public static boolean isDashboardOrigin = false;
+    public static boolean isConnectionAvailable = true;
 
     public static final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpg");
     public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");

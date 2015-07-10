@@ -3,10 +3,15 @@ package com.vodafone.mycomms.xmpp;
 import android.app.Service;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.DownloadAndSaveGroupChatAsyncTask;
 import com.vodafone.mycomms.events.BusProvider;
@@ -31,9 +36,9 @@ import org.xmlpull.v1.XmlPullParser;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -653,41 +658,121 @@ public final class XMPPTransactions {
 
     public static boolean downloadToChatFile(String urlStr, String chatMessageId) {
         try {
-            String dirStr = _appContext.getFilesDir() + Constants.CONTACT_CHAT_FILES;
+            Log.i(Constants.TAG, "XMPPTransactions.downloadToChatFile: ");
+//            String dirStr = _appContext.getFilesDir() + Constants.CONTACT_CHAT_FILES;
             String fileStr = "file_" + chatMessageId + ".jpg";
-
             URL url = new URL(urlStr);
+            downloadImage(url,fileStr,Constants.CONTACT_CHAT_FILES);
 
-            URLConnection ucon = url.openConnection();
-            ucon.setReadTimeout(Constants.HTTP_READ_FILE_TIMEOUT);
-            ucon.setConnectTimeout(10000);
 
-            InputStream is = ucon.getInputStream();
-            BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
+//            final File imageFile = new File(fileStr);
+//            File imagesDir = new File(dirStr);
+//            if(!imagesDir.exists()) imagesDir.mkdirs();
+//
+//            Target target = new Target() {
+//                @Override
+//                public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+//                    Log.i(Constants.TAG, "XMPPTransactions.onBitmapLoaded: ");
+//                    SaveAndShowImageAsyncTask task =
+//                            new SaveAndShowImageAsyncTask(
+//                                    imageFile, bitmap);
+//
+//                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//                }
+//
+//                @Override
+//                public void onBitmapFailed(Drawable errorDrawable) {
+//                    Log.i(Constants.TAG, "XMPPTransactions.onBitmapFailed: ");
+//                    if(imageFile.exists()) imageFile.delete();
+//                }
+//
+//                @Override
+//                public void onPrepareLoad(Drawable placeHolderDrawable) {
+//
+//                }
+//            };
+//            Log.i(Constants.TAG, "XMPPTransactions.downloadToChatFile: pre Picasso");
+//            Picasso.with(_appContext)
+//                    .load(urlStr)
+//                    .into(target);
+//            Log.i(Constants.TAG, "XMPPTransactions.downloadToChatFile: post Picasso");
 
-            File dir = new File(dirStr);
-            dir.mkdirs();
-
-            File file = new File(dirStr, fileStr);
-            if(file.exists()) file.delete();
-            file.createNewFile();
-
-            FileOutputStream outStream = new FileOutputStream(file);
-            byte[] buff = new byte[5 * 1024];
-
-            int len;
-            while ((len = inStream.read(buff)) != -1) {
-                outStream.write(buff, 0, len);
-            }
-            outStream.flush();
-            outStream.close();
-            inStream.close();
+//            URL url = new URL(urlStr);
+//            URLConnection ucon = url.openConnection();
+//            ucon.setReadTimeout(Constants.HTTP_READ_FILE_TIMEOUT);
+//            ucon.setConnectTimeout(10000);
+//
+//            InputStream is = ucon.getInputStream();
+//            BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
+//
+//            File dir = new File(dirStr);
+//            dir.mkdirs();
+//
+//            File file = new File(dirStr, fileStr);
+//            if(file.exists()) file.delete();
+//            file.createNewFile();
+//
+//            FileOutputStream outStream = new FileOutputStream(file);
+//            byte[] buff = new byte[5 * 1024];
+//
+//            int len;
+//            while ((len = inStream.read(buff)) != -1) {
+//                outStream.write(buff, 0, len);
+//            }
+//            outStream.flush();
+//            outStream.close();
+//            inStream.close();
         } catch (Exception e) {
-            e.printStackTrace();
             Log.e(Constants.TAG, "XMPPTransactions.downloadToChatFile: ",e);
             return false;
         }
 
+        return true;
+    }
+
+    private static boolean downloadImage(URL url, String fileName, String dir)
+    {
+        try {
+            File file = new File(_appContext.getFilesDir() + dir);
+            file.mkdirs();
+
+            Log.i(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: downloading image " + fileName + "...");
+            if (!okHttpDownloadFile(String.valueOf(url), dir, fileName)) {
+                File badAvatar = new File(_appContext.getFilesDir() + dir, fileName);
+                badAvatar.delete();
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "DownloadImagesAsyncTask.downloadContactAvatar: ",e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean okHttpDownloadFile(final String path, String dir, String fileName){
+
+        try {
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(path).build();
+            Response response = client.newCall(request).execute();
+            InputStream in = response.body().byteStream();
+            BufferedInputStream inStream = new BufferedInputStream(in, 1024 * 5);
+            File file = new File(_appContext.getFilesDir() + dir, fileName);
+            if (file.exists()) {
+                file.delete();
+            }
+            file.createNewFile();
+            FileOutputStream outStream = new FileOutputStream(file);
+            Bitmap bitmap = BitmapFactory.decodeStream(inStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outStream);
+            outStream.flush();
+            outStream.close();
+            inStream.close();
+        } catch (IOException e){
+            Log.e(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: ",e);
+            return false;
+        }
         return true;
     }
 

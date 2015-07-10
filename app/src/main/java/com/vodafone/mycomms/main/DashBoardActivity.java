@@ -941,7 +941,7 @@ public class DashBoardActivity extends ToolbarActivity{
             // Badges
             _chatTx = new RealmChatTransactions(DashBoardActivity.this);
             pendingMsgsCount = _chatTx.getChatPendingMessagesCount(contactId);
-
+Log.i(Constants.TAG, "DrawSingleRecentAsyncTask.doInBackground: pendingMsg " + pendingMsgsCount);
             LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
             btRecents.setOnClickListener(new View.OnClickListener() {

@@ -2,6 +2,8 @@ package com.vodafone.mycomms.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,8 +14,11 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.connection.ConnectionsQueue;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.settings.connection.PasswordConnection;
@@ -22,6 +27,7 @@ import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.settings.connection.UpdateSettingsConnection;
 import com.vodafone.mycomms.settings.connection.UpdateTimeZoneConnection;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -29,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 
 import model.UserProfile;
@@ -362,6 +369,8 @@ public class ProfileController extends BaseController {
 
                 userProfile = mapUserProfile(jsonResponse);
                 mRealmProfileTransactions.insertUserProfile(userProfile);
+                new DownloadProfileAvatar().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
                 if(userProfile != null) {
                     isUserProfileReceived = true;
                 }
@@ -376,6 +385,56 @@ public class ProfileController extends BaseController {
             }
         }
     }
+
+    public class DownloadProfileAvatar extends AsyncTask<String, Void, String>
+    {
+
+        private Target avatarTarget;
+        private boolean loadAvatarFromDisk;
+        private String nameInitials;
+        private String avatar;
+        private File avatarFile;
+        @Override
+        protected String doInBackground(String... params)
+        {
+            avatarFile = new File(getContext().getFilesDir() + Constants.CONTACT_AVATAR_DIR,
+                    "avatar_"+profileId+".jpg");
+            avatar = userProfile.getAvatar();
+            avatarTarget = new Target()
+            {
+                @Override
+                public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from)
+                {
+                    SaveAndShowImageAsyncTask task =
+                            new SaveAndShowImageAsyncTask(null, avatarFile, bitmap);
+
+                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+                    if(avatarFile.exists()) avatarFile.delete();
+                    ConnectionsQueue.removeConnection(avatarFile.toString());
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            };
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String response)
+        {
+            ConnectionsQueue.putConnection(avatarFile.toString(), avatarTarget);
+            Picasso.with(getContext())
+                    .load(avatar)
+                    .into(avatarTarget);
+        }
+    }
+
 
     public class GetProfileAsyncTask extends AsyncTask<String, Void, String> {
         @Override

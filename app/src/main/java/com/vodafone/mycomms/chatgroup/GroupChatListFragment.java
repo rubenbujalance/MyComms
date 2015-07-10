@@ -120,7 +120,7 @@ public class GroupChatListFragment extends ListFragment implements
         mSearchController = new SearchController(getActivity(), profileId);
         mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
-        mGroupChatController = new GroupChatController(getActivity());
+        mGroupChatController = new GroupChatController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
         mRecentContactController = new RecentContactController(getActivity(),profileId);
     }

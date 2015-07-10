@@ -19,6 +19,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.ComposedChat;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -34,6 +35,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     private ArrayList<ComposedChat> composedChat = new ArrayList<>();
     private Context mContext;
     private RealmChatTransactions _chatTx;
+    private RealmGroupChatTransactions groupChatTransactions;
     private RealmContactTransactions mContactTransactions;
     private String profileId;
 
@@ -41,10 +43,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     {
         mContext = context;
         _chatTx = new RealmChatTransactions(mContext);
-       this.composedChat = composedChats;
+        this.composedChat = composedChats;
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        groupChatTransactions = new RealmGroupChatTransactions(mContext, profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
     }
 
@@ -91,6 +94,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
     private void loadChat(final ChatListHolder chatListHolder, final int i)
     {
+        //Show visibility to avatars
         chatListHolder.lay_top_right_image_hide.setVisibility(View.GONE);
         chatListHolder.lay_bottom_both_image_hide.setVisibility(View.GONE);
         chatListHolder.lay_top_left_image.setLayoutParams
@@ -112,11 +116,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                 .getChat().getLastMessageTime());
         chatListHolder.textViewTime.setText(timeDifference);
 
-        long count = _chatTx.getChatPendingMessagesCount(getComposedChat(i).getChat().getContact_id());
+        long amountUnreadMessages = _chatTx.getChatPendingMessagesCount(getComposedChat(i).getChat().getContact_id());
 
-        if(count > 0) {
+        if(amountUnreadMessages > 0) {
             BadgeView badge = new BadgeView(mContext, chatListHolder.badgeUnread);
-            badge.setText(String.valueOf(count));
+            badge.setText(String.valueOf(amountUnreadMessages));
             badge.setBadgePosition(BadgeView.POSITION_CENTER);
             badge.setBadgeBackgroundColor(Color.parseColor("#0071FF"));
             badge.show();
@@ -169,7 +173,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
     private void loadGroupChat(final ChatListHolder chatListHolder, final int i)
     {
-
+        //Loads avatar visibility for group chat mode
         ArrayList<ImageView> images = new ArrayList<>();
         images.add(chatListHolder.top_left_avatar);
         images.add(chatListHolder.bottom_left_avatar);
@@ -259,7 +263,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         chatListHolder.textViewTime.setText(timeDifference);
 
         //TODO how to find unread messages in group chat case???
-        //long count = _chatTx.getChatPendingMessagesCount(getChat(i).getContact_id());
+        long amountUnreadMessages = groupChatTransactions.getGroupChatPendingMessagesCount(
+                getComposedChat(i).getGroupChat().getId());
 
         /*if(count > 0) {
             BadgeView badge = new BadgeView(mContext, chatListHolder.badgeUnread);

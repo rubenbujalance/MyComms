@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
@@ -567,8 +568,7 @@ public class DashBoardActivity extends ToolbarActivity
 
         private void mapAvatarToContactId()
         {
-            for(Contact contact : contacts)
-            {
+            for (Contact contact : contacts) {
                 mapAvatarContactId.put(contact.getContactId(), contact.getAvatar());
             }
         }
@@ -625,8 +625,14 @@ public class DashBoardActivity extends ToolbarActivity
         @Override
         protected Void doInBackground(Void... params)
         {
-            loadContactsFromIds(contactIds);
-            mapAvatarToContactId();
+            try {
+                loadContactsFromIds(contactIds);
+                mapAvatarToContactId();
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "DrawSingleGroupChatRecentAsyncTask.mapAvatarToContactId: ",e);
+                Crashlytics.logException(e);
+                return null;
+            }
 
             int i = 0;
             for(final ImageView image : images)
@@ -727,6 +733,8 @@ public class DashBoardActivity extends ToolbarActivity
         @Override
         protected void onPostExecute(Void aVoid)
         {
+            if(aVoid==null) return;
+
             contacts = new ArrayList<>();
             loadContactsFromIds(contactIds);
             int i = 0;

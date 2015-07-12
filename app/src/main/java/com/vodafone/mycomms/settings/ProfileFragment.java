@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.custom.CircleImageView;
@@ -334,12 +335,16 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         if (avatarFile!= null && avatarFile.exists())
         {
-            this.profilePicture.setImageBitmap
-                    (
-                            BitmapFactory.decodeFile(avatarFile.getAbsolutePath())
-                    );
-        }
+//            this.profilePicture.setImageBitmap
+//                    (
+//                            BitmapFactory.decodeFile(avatarFile.getAbsolutePath())
+//                    );
 
+            Picasso.with(getActivity())
+                    .load(avatarFile)
+                    .fit().centerCrop()
+                    .into(this.profilePicture);
+        }
         else
         {
             if (userProfile.getFirstName()!=null) {

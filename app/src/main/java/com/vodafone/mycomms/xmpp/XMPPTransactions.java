@@ -735,14 +735,13 @@ public final class XMPPTransactions {
             File file = new File(_appContext.getFilesDir() + dir);
             file.mkdirs();
 
-            Log.i(Constants.TAG, "DownloadImagesAsyncTask.doInBackground: downloading image " + fileName + "...");
             if (!okHttpDownloadFile(String.valueOf(url), dir, fileName)) {
                 File badAvatar = new File(_appContext.getFilesDir() + dir, fileName);
                 badAvatar.delete();
                 return false;
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "DownloadImagesAsyncTask.downloadContactAvatar: ",e);
+            Log.e(Constants.TAG, "XMPPTransactions.downloadImage: ",e);
             return false;
         }
 
@@ -769,7 +768,7 @@ public final class XMPPTransactions {
             outStream.close();
             inStream.close();
         } catch (IOException e){
-            Log.e(Constants.TAG, "DownloadImagesAsyncTask.okHttpDownloadFile: ",e);
+            Log.e(Constants.TAG, "XMPPTransactions.okHttpDownloadFile: ",e);
             return false;
         }
         return true;
@@ -799,8 +798,8 @@ public final class XMPPTransactions {
 
             _xmppConnection.sendStanza(st);
         }
-        catch (SmackException.NotConnectedException e) {
-            Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
+        catch (Exception e) {
+            Log.e(Constants.TAG, "XMPPTransactions.notifyIQMessageStatus: Error sending IQ", e);
             return false;
         }
 

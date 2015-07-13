@@ -134,17 +134,18 @@ public class ProfileController extends BaseController {
         }
     }
 
-    public void setUserProfile(String profileId, String profileFullName, String platforms, String timeZone){
+    public void setUserProfile(String profileIdfromAPI, String profileFullName, String platforms, String timeZone){
         Log.i(Constants.TAG, "ProfileController.setProfileId: ");
         SharedPreferences sp = getContext().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(Constants.PROFILE_ID_SHARED_PREF, profileId);
+        editor.putString(Constants.PROFILE_ID_SHARED_PREF, profileIdfromAPI);
         editor.putString(Constants.PROFILE_FULLNAME_SHARED_PREF, profileFullName);
         editor.putString(Constants.ACCESS_TOKEN_SHARED_PREF, UserSecurity.getAccessToken(getContext()));
         editor.putString(Constants.PLATFORMS_SHARED_PREF, platforms);
         editor.putString(Constants.TIMEZONE_SHARED_PREF, timeZone);
         editor.apply();
+        profileId = profileIdfromAPI;
     }
 
     public void updateProfileTimezone(String timezone)
@@ -179,6 +180,7 @@ public class ProfileController extends BaseController {
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
             if (response.getUrl() != null && response.getUrl().endsWith(ProfileConnection.URL)) {
                 if (isUserProfileReceived) {
+                    Log.e(Constants.TAG, "ProfileController.onConnectionComplete: userProfile " + userProfile.getTimezone());
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
                 } else {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionCompleted();

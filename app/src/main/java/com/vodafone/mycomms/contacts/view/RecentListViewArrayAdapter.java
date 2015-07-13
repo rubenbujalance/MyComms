@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.contacts.view;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -136,8 +138,19 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         String composedName = null;
         for(Contact contact : contacts)
         {
-            if(null == composedName) composedName = contact.getFirstName();
-            else composedName = composedName + ", " + contact.getFirstName();
+            try {
+                String contactFirstName = null;
+                if (null == contact.getFirstName()) {
+                    contactFirstName = "Unknown";
+                } else {
+                    contactFirstName = contact.getFirstName();
+                }
+                if (null == composedName) composedName = contactFirstName;
+                else composedName = composedName + ", " + contactFirstName;
+            } catch (Exception e){
+                Log.e(Constants.TAG, "RecentListViewArrayAdapter.getComposedName: contact first name null");
+                Crashlytics.logException(e);
+            }
         }
         return composedName;
     }

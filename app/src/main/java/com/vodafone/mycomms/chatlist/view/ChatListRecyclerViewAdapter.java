@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
@@ -237,22 +239,32 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
             }
             else
             {
-                Contact contact = mContactTransactions.getContactById(id);
-                if(null == contactName)
-                    contactName = contact.getFirstName();
-                else
-                    contactName = contactName + ", " + contact.getFirstName();
-                if(count < 4)
-                {
-                    loadComposedAvatar
-                            (
-                                    count
-                                    , id
-                                    , contact
-                                    , images
-                                    , texts
-                            );
-                    count++;
+                try {
+                    Contact contact = mContactTransactions.getContactById(id);
+                    String contactFirstName = null;
+                    if (null == contact) {
+                        contactFirstName = "Unknown";
+                    } else {
+                        contactFirstName = contact.getFirstName();
+                    }
+                    if (null == contactName)
+                        contactName = contactFirstName;
+                    else
+                        contactName = contactName + ", " + contactFirstName;
+                    if (count < 4) {
+                        loadComposedAvatar
+                                (
+                                        count
+                                        , id
+                                        , contact
+                                        , images
+                                        , texts
+                                );
+                        count++;
+                    }
+                } catch (Exception e){
+                    Log.e(Constants.TAG, "ChatListRecyclerViewAdapter.loadGroupChat: Error getting contact by Id");
+                    Crashlytics.logException(e);
                 }
             }
 

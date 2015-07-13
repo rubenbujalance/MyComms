@@ -96,10 +96,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private String profileId;
     private File multiPartFile;
     private boolean isFirstLoadNeed = true;
-
     private String avatarNewURL = null;
-
     private SharedPreferences sp;
+
+    private boolean isAvatarHasChangedAfterSelection = false, isProfileLoadedAtLeastOnce = false;
 
     public static ProfileFragment newInstance(int index, String param2) {
         ProfileFragment fragment = new ProfileFragment();
@@ -133,7 +133,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                profileEditMode(!isEditing);
 
                if(isEditing)
-                   isUpdating = updateContactData();
+                   new UpdateProfile().execute();
 
                isEditing = !isEditing;
            }
@@ -143,8 +143,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        editPhoto.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               if(isEditing)
-               {
+               if (isEditing) {
                    dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
                }
            }
@@ -158,8 +157,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                }
            }
        });
-
-
 
        return v;
    }
@@ -206,7 +203,12 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         String officeLocation = ((EditText) getActivity().findViewById(R.id.office_location)).getText().toString();
 
 
-        if(null != avatarNewURL)  profileController.updateUserAvatarInDB(avatarNewURL);
+        if(null != avatarNewURL)
+        {
+            profileController.updateUserAvatarInDB(avatarNewURL);
+            avatarNewURL = null;
+        }
+
 
         if(!profileController.isUserProfileChanged(firstName, lastName, company, position,
                 officeLocation))
@@ -286,17 +288,29 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
         {
+            isAvatarHasChangedAfterSelection = true;
             photoBitmap = decodeFile(photoPath);
-            new sendFile().execute();
+            loadAvatarIntoImageView();
         }
 
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
         {
+            isAvatarHasChangedAfterSelection = true;
             Uri selectedImage = data.getData();
             photoPath = getRealPathFromURI(selectedImage);
             photoBitmap = decodeFile(photoPath);
-            new sendFile().execute();
+            loadAvatarIntoImageView();
         }
+        else
+            isAvatarHasChangedAfterSelection = false;
+    }
+
+    private void loadAvatarIntoImageView()
+    {
+        profilePicture.setImageBitmap(photoBitmap);
+        profilePicture.setBorderWidth(2);
+        profilePicture.setBorderColor(Color.WHITE);
+
     }
 
     private void initSpinners(View v) {
@@ -395,9 +409,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         Log.d(Constants.TAG, "ProfileFragment.onResume: ");
 //        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
 //        editProfile.setVisibility(View.VISIBLE);
-        profileController.getProfile();
 
-        loadProfileImage();
+        if(!isProfileLoadedAtLeastOnce)
+        {
+            profileController.getProfile();
+            isProfileLoadedAtLeastOnce = true;
+        }
+
+
     }
 
     @Override
@@ -451,6 +470,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 //            profileInfo.setText("????????");
 
 
+                loadProfileImage();
 
                 isFirstLoadNeed = false;
             }
@@ -460,7 +480,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
      public void onPause(){
         super.onPause();
         profileController.setConnectionCallback(null);
-        Log.d(Constants.TAG, "ProfileFragment.onPause: ");
+         Log.d(Constants.TAG, "ProfileFragment.onPause: ");
 
     }
 
@@ -591,6 +611,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         return imgUri;
     }
 
+
     public Bitmap decodeFile(String path)
     {
         try
@@ -625,7 +646,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         return result;
     }
 
-    public class sendFile extends AsyncTask<Void, Void, String>
+    public class SendFile extends AsyncTask<Void, Void, String>
     {
         private ProgressDialog pdia;
 
@@ -640,9 +661,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         @Override
         protected String doInBackground(Void... params)
         {
-            try
-            {
-                filePushToServerController =  new FilePushToServerController(getActivity());
+            try {
+                filePushToServerController = new FilePushToServerController(getActivity());
                 multiPartFile = filePushToServerController.prepareFileToSend
                         (
                                 photoBitmap,
@@ -657,7 +677,12 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                                 Constants.MEDIA_TYPE_JPG
                         );
 
-                return  filePushToServerController.executeRequest();
+                String response = filePushToServerController.executeRequest();
+                Log.e(Constants.TAG, "!!!!!!!!!!!!!!!!!RESPONSE!!!!!!!!!!!!!" +
+                        response);
+
+                return response;
+
             }
             catch (Exception e)
             {
@@ -672,14 +697,82 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             if(pdia.isShowing()) pdia.dismiss();
             Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
 
-            if(null != result)
+            if(filePushToServerController.getResponseCode().startsWith("2"))
             {
-                loadNewAvatarURL(result);
+
                 profilePicture.setImageBitmap(BitmapFactory.decodeFile(multiPartFile
                         .getAbsolutePath()));
                 profilePicture.setBorderWidth(2);
+
                 profilePicture.setBorderColor(Color.WHITE);
             }
+        }
+    }
+
+
+    public class UpdateProfile extends AsyncTask<Void, Void, String>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(Void... params)
+        {
+            if(isAvatarHasChangedAfterSelection)
+            {
+                try
+                {
+                    filePushToServerController =  new FilePushToServerController(getActivity());
+                    multiPartFile = filePushToServerController.prepareFileToSend
+                            (
+                                    photoBitmap,
+                                    Constants.MULTIPART_AVATAR,
+                                    profileId
+                            );
+                    filePushToServerController.sendImageRequest
+                            (
+                                    Constants.CONTACT_API_POST_AVATAR,
+                                    Constants.MULTIPART_AVATAR,
+                                    multiPartFile,
+                                    Constants.MEDIA_TYPE_JPG
+                            );
+
+                    return  filePushToServerController.executeRequest();
+                }
+                catch (Exception e)
+                {
+                    Log.e(Constants.TAG, "ProfileFragment -> pushFileInBackground ERROR",e);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            super.onPostExecute(result);
+            if(isAvatarHasChangedAfterSelection)
+            {
+                Log.e(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
+
+                if(filePushToServerController.getResponseCode().startsWith("2"))
+                {
+                    loadNewAvatarURL(result);
+                    filePushToServerController.prepareFileToSend
+                            (
+                                    photoBitmap,
+                                    Constants.MULTIPART_AVATAR,
+                                    profileId
+                            );
+                }
+            }
+            isUpdating = updateContactData();
+            isAvatarHasChangedAfterSelection = false;
+            isUpdating = updateContactData();
         }
     }
 

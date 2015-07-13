@@ -39,6 +39,7 @@ public class FilePushToServerController extends BaseController
     private RequestBody requestBody;
     private Request request;
     private Response response;
+    private int responseCode;
 
     public FilePushToServerController(Context context)
     {
@@ -87,6 +88,7 @@ public class FilePushToServerController extends BaseController
         try
         {
             response = client.newCall(request).execute();
+            this.responseCode = response.code();
             return responseToString();
         }
         catch (Exception e)
@@ -172,28 +174,28 @@ public class FilePushToServerController extends BaseController
     {
         try
         {
-            File inputFile;
-            String profId = "new_profile";
-            if(null != profileId) profId = profileId;
-
-            File dir;
+            File inputFile, dir;
 
             if(null != multipartName && multipartName.equals(Constants.MULTIPART_AVATAR)) {
+                inputFile = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR, "avatar_" + profileId + ".jpg");
                 dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
-                inputFile = new File(dir, "avatar_" + profId + ".jpg");
             }
-            else {
-                dir = new File(mContext.getFilesDir() + Constants.CONTACT_CHAT_FILES);
-                inputFile = new File(dir, "file_" + profId + ".jpg");
+            else
+            {
+                inputFile = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR, "file_" + profileId + ".jpg");
+                dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+
             }
 
             dir.mkdirs();
+
+            inputFile.delete();
             inputFile.createNewFile();
 
             //Convert bitmap to byte array
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            fileBitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
+            fileBitmap.compress(Bitmap.CompressFormat.JPEG, 75 /*ignored for PNG*/, bos);
             byte[] bitmapdata = bos.toByteArray();
 
 
@@ -250,6 +252,14 @@ public class FilePushToServerController extends BaseController
 
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    public String getResponseCode() {
+        return Integer.toString(responseCode);
+    }
+
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
     }
 }
 

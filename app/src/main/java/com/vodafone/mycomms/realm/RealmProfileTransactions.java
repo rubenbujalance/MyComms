@@ -2,6 +2,7 @@ package com.vodafone.mycomms.realm;
 
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.util.Constants;
 
 import io.realm.Realm;
@@ -42,6 +43,9 @@ public class RealmProfileTransactions {
         } catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmProfileTransactions.updateProfileTimezone: " + e.toString());
+        } catch (Exception e){
+            Log.e(Constants.TAG, "RealmProfileTransactions.updateProfileTimezone: timezone or profile are null " , e);
+            Crashlytics.logException(e);
         }
     }
 

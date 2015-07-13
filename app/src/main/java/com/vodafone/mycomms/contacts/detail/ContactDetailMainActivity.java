@@ -257,15 +257,24 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
                     if (strPhones != null)
                     {
-                        String sms = strPhones;
-                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
-                        {
-                            JSONArray jPhones = new JSONArray(strPhones);
-                            sms = (String)((JSONObject) jPhones.get(0)).get(Constants
-                                    .CONTACT_PHONE);
-                        }
 
-                        Utils.launchSms(sms, ContactDetailMainActivity.this);
+                        if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
+                        {
+                            String sms;
+                            //TODO: Implement multiple phone choice
+//                            JSONArray jPhones = new JSONArray(strPhones);
+                            JSONObject jPhones = new JSONObject(strPhones);
+                            sms = (String)jPhones.get(Constants
+                                    .CONTACT_PHONE);
+                            Utils.launchSms(sms, ContactDetailMainActivity.this);
+                        }
+                        else
+                        {
+                            Intent in = new Intent(ContactDetailMainActivity.this, GroupChatActivity.class);
+                            in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
+                            in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
+                            startActivity(in);
+                        }
 
                         action = Constants.CONTACTS_ACTION_SMS;
                         mRecentContactController.insertRecent(contactId, action);

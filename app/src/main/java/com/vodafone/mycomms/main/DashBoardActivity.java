@@ -191,8 +191,6 @@ public class DashBoardActivity extends ToolbarActivity
                 recentContact = recentList.get(i);
                 if(recentContact.getId().startsWith("mg_"))
                 {
-                    Log.e(Constants.TAG, "DashBoardActivity.loadRecents: GroupChatRecent " +
-                            "detected!");
                     DrawSingleGroupChatRecentAsyncTask task = new DrawSingleGroupChatRecentAsyncTask
                             (
                                     recentContact.getAction()
@@ -482,7 +480,7 @@ public class DashBoardActivity extends ToolbarActivity
         }
     }
 
-    public class DrawSingleGroupChatRecentAsyncTask extends AsyncTask<Void,Void,Void>
+    public class DrawSingleGroupChatRecentAsyncTask extends AsyncTask<Void,Void,String>
     {
 
         String contactId,action,recentId;
@@ -561,7 +559,8 @@ public class DashBoardActivity extends ToolbarActivity
                 if(!id.equals(userProfile.getId()))
                 {
                     contact = realmContactTransactions.getContactById(id);
-                    contacts.add(contact);
+                    if(null != contact)
+                        contacts.add(contact);
                 }
             }
         }
@@ -623,7 +622,7 @@ public class DashBoardActivity extends ToolbarActivity
         }
 
         @Override
-        protected Void doInBackground(Void... params)
+        protected String doInBackground(Void... params)
         {
             try {
                 loadContactsFromIds(contactIds);
@@ -699,10 +698,6 @@ public class DashBoardActivity extends ToolbarActivity
                 }
                 mapAvatarTarget.put(image, avatarTarget);
 
-                // Badges
-
-
-
                 LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
                 btRecents.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -727,13 +722,13 @@ public class DashBoardActivity extends ToolbarActivity
                 });
 
             }
-            return null;
+            return Integer.toString(this.contactIds.size());
         }
 
         @Override
-        protected void onPostExecute(Void aVoid)
+        protected void onPostExecute(String result)
         {
-            if(aVoid==null) return;
+            if(result==null) return;
 
             contacts = new ArrayList<>();
             loadContactsFromIds(contactIds);

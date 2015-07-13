@@ -73,7 +73,6 @@ public class ProfileController extends BaseController {
             }
 
             if (this.getConnectionCallback() != null && userProfileFromDB != null) {
-                Log.e(Constants.TAG, "ProfileController.getProfile: userProfileFromDB " + userProfileFromDB.getTimezone());
                 ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
             }
         }
@@ -364,7 +363,6 @@ public class ProfileController extends BaseController {
 
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
             if (isUserProfileReceived) {
-                Log.e(Constants.TAG, "ProfileController.getProfileCallback: userProfile " + userProfile.getTimezone());
                 ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
             }
         }

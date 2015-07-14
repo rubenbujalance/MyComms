@@ -331,7 +331,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         recentContactController.getRecentList();
         favouriteController = new FavouriteController(mContext, profile_id);
         getNews();
-        XMPPTransactions.initializeMsgServerSession(this);
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 
     @Subscribe

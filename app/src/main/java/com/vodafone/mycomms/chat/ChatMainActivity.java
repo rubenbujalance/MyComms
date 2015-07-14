@@ -376,7 +376,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
 
         if(etChatTextBox.getText().toString()!=null &&
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();

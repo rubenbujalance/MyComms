@@ -73,7 +73,7 @@ public class ChatListActivity extends ToolbarActivity{
         //Update Pending Messages on Toolbar
         //It is done every time a message is received
         checkUnreadChatMessages();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 
     @Override

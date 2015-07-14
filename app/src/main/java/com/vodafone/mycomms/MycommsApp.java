@@ -94,6 +94,25 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         picasso = builder.build();
 
+//        OkHttpClient picassoClient = new OkHttpClient();
+//
+//        picassoClient.interceptors().add(new Interceptor() {
+//            @Override
+//            public Response intercept(Chain chain) throws IOException {
+//                Request newRequest = chain.request().newBuilder()
+//                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+//                                Utils.getHttpHeaderVersion(mContext))
+//                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+//                                Utils.getHttpHeaderContentType())
+//                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+//                                Utils.getHttpHeaderAuth(mContext))
+//                        .build();
+//                return chain.proceed(newRequest);
+//            }
+//        });
+//
+//        picasso = new Picasso.Builder(getApplicationContext()).downloader(new OkHttpDownloader(picassoClient)).build();
+
         //**********************
 
         mNewsController = new NewsController(getApplicationContext());

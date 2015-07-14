@@ -19,7 +19,9 @@ import android.widget.TextView;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
@@ -29,6 +31,7 @@ import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
@@ -527,25 +530,52 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
-                contact.getAvatar().compareTo("")!=0 &&
-                avatarFile.exists() &&
-                !contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                contact.getAvatar().compareTo("")!=0  &&
+                contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)
+                || contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL))
+        {
 
             textAvatar.setText(null);
 
-            Picasso.with(this)
-                    .load(avatarFile)
-                    .into(ivAvatar);
-
-        } else if (contact.getAvatar() != null &&
-                contact.getAvatar().length() > 0 &&
-                contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
-            textAvatar.setVisibility(View.INVISIBLE);
-            Picasso.with(this)
+            MycommsApp.picasso
                     .load(contact.getAvatar())
+                    .placeholder(R.color.grey_middle)
+                    .noFade()
                     .fit().centerCrop()
-                    .into(ivAvatar);
-        } else{
+                    .into(ivAvatar, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            textAvatar.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onError() {
+                            String initials = "";
+                            if (null != contact.getFirstName() && contact.getFirstName().length() > 0) {
+                                initials = initials + contact.getFirstName().substring(0, 1);
+
+                            }
+
+                            if (null != contact.getLastName() && contact.getLastName().length() > 0) {
+                                initials = initials + contact.getLastName().substring(0, 1);
+                            }
+                            ivAvatar.setImageResource(R.color.grey_middle);
+                            textAvatar.setVisibility(View.VISIBLE);
+                            textAvatar.setText(initials);
+                        }
+                    });
+
+        }
+        else if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0 &&
+                contact.getAvatar().compareTo("")!=0  &&
+                contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
+        {
+            AvatarSFController avatarSFController = new AvatarSFController(this, ivAvatar, textAvatar, contact.getContactId());
+            avatarSFController.getSFAvatar(contact.getAvatar());
+        }
+        else
+        {
             String initials = "";
             if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
             {

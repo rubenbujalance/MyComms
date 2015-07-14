@@ -21,6 +21,7 @@ import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vodafone.mycomms.ContactListMainActivity;
@@ -181,9 +182,9 @@ public class DashBoardActivity extends ToolbarActivity
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
             LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
-            recentsContainer.removeAllViews();
             LayoutInflater inflater = LayoutInflater.from(this);
             RecentContact recentContact;
+            recentsContainer.removeAllViews();
 
             recentList = realmContactTransactions.getAllRecentContacts();
 
@@ -333,7 +334,7 @@ public class DashBoardActivity extends ToolbarActivity
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event) {
         checkUnreadChatMessages();
-        loadRecents();
+//        loadRecents();
     }
 
     @Subscribe
@@ -880,9 +881,10 @@ public class DashBoardActivity extends ToolbarActivity
                     "avatar_"+contactId+".jpg");
 
             //Avatar image
-            if (avatarFile.exists()) { //From file if already exists
-                loadAvatarFromDisk = true;
-            } else {
+//            if (avatarFile.exists()) { //From file if already exists
+//                loadAvatarFromDisk = true;
+//            } else
+//            {
                 //Set name initials image during the download
                 if (null != firstName && firstName.length() > 0) {
                     nameInitials = firstName.substring(0, 1);
@@ -896,8 +898,8 @@ public class DashBoardActivity extends ToolbarActivity
                 //Download avatar
                 if (avatar != null &&
                         avatar.length() > 0 &&
-                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
-                        && platform.equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)) {
+//                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString()) &&
+                        platform.equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)) {
                     File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
 
                     if (!avatarsDir.exists()) avatarsDir.mkdirs();
@@ -934,9 +936,7 @@ public class DashBoardActivity extends ToolbarActivity
                     AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), recentAvatar, avatarText, contactId);
                     avatarSFController.getSFAvatar(avatar);
                 }
-            }
-
-
+//            }
 
             LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
@@ -1010,22 +1010,48 @@ public class DashBoardActivity extends ToolbarActivity
         protected void onPostExecute(Void aVoid) {
             try {
                 //Avatar
-                if (loadAvatarFromDisk) {
-                    Picasso.with(DashBoardActivity.this)
-                            .load(avatarFile)
-                            .fit().centerCrop()
-                            .into(recentAvatar);
-                    loadAvatarFromDisk = false;
-                } else if(avatarTarget!=null) {
-                    recentAvatar.setImageResource(R.color.grey_middle);
-                    avatarText.setText(nameInitials);
+//                if (loadAvatarFromDisk) {
+//                    Picasso.with(DashBoardActivity.this)
+//                            .load(avatarFile)
+//                            .fit().centerCrop()
+//                            .into(recentAvatar);
+//                    loadAvatarFromDisk = false;
+//                } else if(avatarTarget!=null) {
+//                    recentAvatar.setImageResource(R.color.grey_middle);
+//                    avatarText.setText(nameInitials);
+//
+//                    //Add this download to queue, to avoid duplicated downloads
+//                    ConnectionsQueue.putConnection(avatarFile.toString(), avatarTarget);
+//                    Picasso.with(DashBoardActivity.this)
+//                            .load(avatar)
+//                            .into(avatarTarget);
+//                }
 
-                    //Add this download to queue, to avoid duplicated downloads
-                    ConnectionsQueue.putConnection(avatarFile.toString(), avatarTarget);
-                    Picasso.with(DashBoardActivity.this)
-                            .load(avatar)
-                            .into(avatarTarget);
-                }
+                //RBM - NEW Avatar management ****************************
+                recentAvatar.setImageResource(R.color.grey_middle);
+                avatarText.setVisibility(View.VISIBLE);
+                avatarText.setText(nameInitials);
+
+                MycommsApp.picasso
+                        .load(avatar)
+                        .placeholder(R.color.grey_middle)
+                        .noFade()
+                        .fit().centerCrop()
+                        .into(recentAvatar, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                avatarText.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onError() {
+                                recentAvatar.setImageResource(R.color.grey_middle);
+                                avatarText.setVisibility(View.VISIBLE);
+                                avatarText.setText(nameInitials);
+                            }
+                        });
+
+                //********************************************************
 
                 //Local avatar
                 if (avatar != null &&

@@ -78,8 +78,8 @@ public class RealmContactTransactions {
 
     public ArrayList<Contact> getAllContacts(){
         ArrayList<Contact> contactArrayList = new ArrayList<>();
-        RealmQuery<Contact> query = mRealm.where(Contact.class).not().equalTo(Constants
-                .CONTACT_PLATFORM,Constants.PLATFORM_LOCAL);
+        RealmQuery<Contact> query = mRealm.where(Contact.class)
+                .equalTo(Constants.CONTACT_PLATFORM,Constants.PLATFORM_MY_COMMS);
         query.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
         RealmResults<Contact> result1 = query.findAll();
 
@@ -147,12 +147,13 @@ public class RealmContactTransactions {
         return contactArrayList;
     }
 
-    public ArrayList<Contact> getContactsByKeyWordWithoutLocals(String keyWord)
+    public ArrayList<Contact> getContactsByKeyWordWithoutLocalsAndSalesForce(String keyWord)
     {
         ArrayList<Contact> contactArrayList = new ArrayList<>();
         RealmResults<Contact> result = mRealm.where(Contact.class)
                 .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId)
                 .not().equalTo(Constants.CONTACT_PLATFORM, Constants.PLATFORM_LOCAL)
+                .not().equalTo(Constants.CONTACT_PLATFORM, Constants.PLATFORM_SALES_FORCE)
                 .beginGroup()
                     .contains(Constants.CONTACT_FNAME, keyWord, false)
                     .or()

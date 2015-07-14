@@ -357,6 +357,9 @@ public class ProfileController extends BaseController {
                     isUserProfileReceived = true;
                 }
             }
+            else {
+                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileConnectionError();
+            }
         } catch (Exception e) {
             Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile" + e.getMessage());
         }

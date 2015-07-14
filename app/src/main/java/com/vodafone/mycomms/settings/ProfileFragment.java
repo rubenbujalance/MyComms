@@ -306,6 +306,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private void loadAvatarIntoImageView()
     {
+        textAvatar.setText("");
         profilePicture.setImageBitmap(photoBitmap);
         profilePicture.setBorderWidth(2);
         profilePicture.setBorderColor(Color.WHITE);

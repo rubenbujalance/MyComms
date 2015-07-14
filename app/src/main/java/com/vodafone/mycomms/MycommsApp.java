@@ -11,6 +11,9 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Downloader;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.chatgroup.GroupChatController;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
@@ -64,6 +67,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private NewsController mNewsController;
     String profile_id;
     public boolean comesFromToolbar = true;
+    public static Picasso picasso;
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -82,6 +86,15 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 .build();
 
         Realm.setDefaultConfiguration(realmConfig);
+
+        //Picasso configuration
+        Downloader downloader   = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
+        Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
+        builder.downloader(downloader);
+
+        picasso = builder.build();
+
+        //**********************
 
         mNewsController = new NewsController(getApplicationContext());
 

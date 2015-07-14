@@ -259,7 +259,7 @@ public class SearchBarController implements ISearchConnectionCallback
         {
             if(isGroupChatSearch)
             {
-                contactList = mSearchController.getContactsByKeyWordWithoutLocals(keyWord);
+                contactList = mSearchController.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
             }
             else
             {

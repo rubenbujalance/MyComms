@@ -202,8 +202,11 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
         //Icon
         String icon = "";
-        try {
-            icon = new JSONObject(contact.getPresence()).getString("icon");
+        try
+        {
+            if(null != contact.getPresence())
+                icon = new JSONObject(contact.getPresence()).getString("icon");
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -214,11 +217,11 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         else viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
 
         //Local time
-        String presenceDetail;
+        String presenceDetail = "";
+        viewHolder.textViewTime.setVisibility(View.VISIBLE);
 
         try {
             presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
-            assert null != presenceDetail;
             if (presenceDetail.equals("#LOCAL_TIME#")) {
                 TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
                 Calendar currentCal = Calendar.getInstance();
@@ -239,6 +242,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             }
         } catch (Exception e) {
             Log.i(Constants.TAG, "ContactListViewArrayAdapter.getView: No presence found");
+            viewHolder.textViewTime.setVisibility(View.GONE);
         }
 
         return convertView;

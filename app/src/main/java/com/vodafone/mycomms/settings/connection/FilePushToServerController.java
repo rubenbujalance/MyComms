@@ -16,7 +16,6 @@ import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,6 +38,7 @@ public class FilePushToServerController extends BaseController
     private RequestBody requestBody;
     private Request request;
     private Response response;
+    private int responseCode;
 
     public FilePushToServerController(Context context)
     {
@@ -77,6 +77,32 @@ public class FilePushToServerController extends BaseController
                 .build();
     }
 
+    public void prepareRequestForPushAvatar(String URL, String multipartFileName, MediaType
+            mediaType, String profileId)
+    {
+        client = new OkHttpClient();
+
+        String avatarStoragePath = mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR + "avatar_" + profileId + ".jpg";
+        File sdAvatarStorageDir = new File(avatarStoragePath);
+
+        requestBody = new MultipartBuilder()
+                .type(MultipartBuilder.FORM)
+                .addFormDataPart(multipartFileName, sdAvatarStorageDir.getName(),
+                        RequestBody.create(mediaType, sdAvatarStorageDir))
+                .build();
+
+        request = new Request.Builder()
+                .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                        Utils.getHttpHeaderVersion(mContext))
+                .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                        Utils.getHttpHeaderContentType())
+                .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                        Utils.getHttpHeaderAuth(mContext))
+                .url("https://" + EndpointWrapper.getBaseURL() + URL)
+                .post(requestBody)
+                .build();
+    }
+
     /**
      * Execute the request
      * @author str_oan
@@ -87,6 +113,7 @@ public class FilePushToServerController extends BaseController
         try
         {
             response = client.newCall(request).execute();
+            this.responseCode = response.code();
             return responseToString();
         }
         catch (Exception e)
@@ -172,34 +199,27 @@ public class FilePushToServerController extends BaseController
     {
         try
         {
-            File inputFile;
-            String profId = "new_profile";
-            if(null != profileId) profId = profileId;
-
-            File dir;
+            File inputFile, dir;
 
             if(null != multipartName && multipartName.equals(Constants.MULTIPART_AVATAR)) {
+                inputFile = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR, "avatar_" + profileId + ".jpg");
                 dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
-                inputFile = new File(dir, "avatar_" + profId + ".jpg");
             }
-            else {
-                dir = new File(mContext.getFilesDir() + Constants.CONTACT_CHAT_FILES);
-                inputFile = new File(dir, "file_" + profId + ".jpg");
+            else
+            {
+                inputFile = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR, "file_" + profileId + ".jpg");
+                dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+
             }
 
             dir.mkdirs();
+
+            inputFile.delete();
             inputFile.createNewFile();
-
-            //Convert bitmap to byte array
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            fileBitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
-            byte[] bitmapdata = bos.toByteArray();
-
 
             //write the bytes in file
             FileOutputStream fos = new FileOutputStream(inputFile);
-            fos.write(bitmapdata);
+            fileBitmap.compress(Bitmap.CompressFormat.JPEG, 75, fos);
             fos.flush();
             fos.close();
 
@@ -211,6 +231,36 @@ public class FilePushToServerController extends BaseController
             return null;
         }
 
+    }
+
+    public boolean storeProfileAvatar(Bitmap imageData, String profileId) {
+        //get path to external storage (SD card)
+        String avatarStoragePath = mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR;
+        File sdAvatar = new File(avatarStoragePath, "avatar_" + profileId + ".jpg");
+
+        if(sdAvatar.exists())
+        {
+            boolean isDeleted = sdAvatar.delete();
+            Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: is file deleted? " +
+                    "" + isDeleted);
+        }
+
+        try
+        {
+            OutputStream fileOutputStream = new FileOutputStream(sdAvatar);
+            //choose another format if PNG doesn't suit you
+            imageData.compress(Bitmap.CompressFormat.JPEG, 75, fileOutputStream);
+
+            fileOutputStream.flush();
+            fileOutputStream.close();
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: ERROR ",e);
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -250,6 +300,14 @@ public class FilePushToServerController extends BaseController
 
     public void setRequest(Request request) {
         this.request = request;
+    }
+
+    public String getResponseCode() {
+        return Integer.toString(responseCode);
+    }
+
+    public void setResponseCode(int responseCode) {
+        this.responseCode = responseCode;
     }
 }
 

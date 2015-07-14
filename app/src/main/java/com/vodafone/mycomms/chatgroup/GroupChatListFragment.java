@@ -154,11 +154,10 @@ public class GroupChatListFragment extends ListFragment implements
     public void onListItemClick(ListView l, View v, int position, long id)
     {
         super.onListItemClick(l, v, position, id);
+        mSearchBarController.hideKeyboard();
         Contact contact = (Contact)l.getAdapter().getItem(position);
         if(!selectedContacts.contains(contact.getContactId()))
-        {
             addContactToChat(contact);
-        }
     }
 
     @Subscribe
@@ -294,7 +293,7 @@ public class GroupChatListFragment extends ListFragment implements
         }
         else
         {
-            contactList = mSearchController.getContactsByKeyWordWithoutLocals(keyWord);
+            contactList = mSearchController.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
         }
     }
 

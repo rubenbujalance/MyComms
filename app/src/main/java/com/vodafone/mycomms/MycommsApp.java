@@ -11,6 +11,9 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Downloader;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.chatgroup.GroupChatController;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
@@ -64,6 +67,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private NewsController mNewsController;
     String profile_id;
     public boolean comesFromToolbar = true;
+    public static Picasso picasso;
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -82,6 +86,34 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 .build();
 
         Realm.setDefaultConfiguration(realmConfig);
+
+        //Picasso configuration
+        Downloader downloader   = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
+        Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
+        builder.downloader(downloader);
+
+        picasso = builder.build();
+
+//        OkHttpClient picassoClient = new OkHttpClient();
+//
+//        picassoClient.interceptors().add(new Interceptor() {
+//            @Override
+//            public Response intercept(Chain chain) throws IOException {
+//                Request newRequest = chain.request().newBuilder()
+//                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+//                                Utils.getHttpHeaderVersion(mContext))
+//                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+//                                Utils.getHttpHeaderContentType())
+//                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+//                                Utils.getHttpHeaderAuth(mContext))
+//                        .build();
+//                return chain.proceed(newRequest);
+//            }
+//        });
+//
+//        picasso = new Picasso.Builder(getApplicationContext()).downloader(new OkHttpDownloader(picassoClient)).build();
+
+        //**********************
 
         mNewsController = new NewsController(getApplicationContext());
 
@@ -299,7 +331,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         recentContactController.getRecentList();
         favouriteController = new FavouriteController(mContext, profile_id);
         getNews();
-        XMPPTransactions.initializeMsgServerSession(this);
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
     }
 
     @Subscribe

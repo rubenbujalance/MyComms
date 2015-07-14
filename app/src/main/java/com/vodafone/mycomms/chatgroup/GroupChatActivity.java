@@ -230,8 +230,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 }
 
                 int i = 0;
-                for(Contact contact : contactList)
-                {
+                for(Contact contact : contactList) {
                     if(i>3) break;
 
                     File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
@@ -382,14 +381,16 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 if(!id.equals(_profile_id))
                 {
                     contact = contactTransactions.getContactById(id);
-                    contactList.add(contact);
+                    if(contact != null)
+                        contactList.add(contact);
                 }
             }
         }
         else
         {
             Contact contact = contactTransactions.getContactById(contactIds.get(0));
-            contactList.add(contact);
+            if(contact != null)
+                contactList.add(contact);
         }
     }
 
@@ -559,7 +560,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     @Override
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext());
+        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
 
         if(etChatTextBox.getText().toString()!=null &&
                 etChatTextBox.getText().toString().length()>0) checkXMPPConnection();

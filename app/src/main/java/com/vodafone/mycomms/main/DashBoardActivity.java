@@ -936,7 +936,7 @@ public class DashBoardActivity extends ToolbarActivity
                     AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), recentAvatar, avatarText, contactId);
                     avatarSFController.getSFAvatar(avatar);
                 }
-//            }
+//          }
 
             LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
@@ -1031,28 +1031,32 @@ public class DashBoardActivity extends ToolbarActivity
                 recentAvatar.setImageResource(R.color.grey_middle);
                 avatarText.setVisibility(View.VISIBLE);
                 avatarText.setText(nameInitials);
+                if (avatar != null &&
+                    avatar.length() > 0)
+                {
+                    MycommsApp.picasso
+                            .load(avatar)
+                            .placeholder(R.color.grey_middle)
+                            .noFade()
+                            .fit().centerCrop()
+                            .into(recentAvatar, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    avatarText.setVisibility(View.INVISIBLE);
+                                }
 
-                MycommsApp.picasso
-                        .load(avatar)
-                        .placeholder(R.color.grey_middle)
-                        .noFade()
-                        .fit().centerCrop()
-                        .into(recentAvatar, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                avatarText.setVisibility(View.INVISIBLE);
-                            }
+                                @Override
+                                public void onError() {
+                                    recentAvatar.setImageResource(R.color.grey_middle);
+                                    avatarText.setVisibility(View.VISIBLE);
+                                    avatarText.setText(nameInitials);
+                                }
+                            });
 
-                            @Override
-                            public void onError() {
-                                recentAvatar.setImageResource(R.color.grey_middle);
-                                avatarText.setVisibility(View.VISIBLE);
-                                avatarText.setText(nameInitials);
-                            }
-                        });
+                }
 
                 //********************************************************
-
+//TODO: Check if this code is necessary
                 //Local avatar
                 if (avatar != null &&
                         avatar.length() > 0 &&

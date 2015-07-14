@@ -94,7 +94,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private UserProfile userProfile;
     private String profileId;
-    private File multiPartFile;
     private boolean isFirstLoadNeed = true;
     private String avatarNewURL = null;
     private SharedPreferences sp;
@@ -349,12 +348,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         if (avatarFile!= null && avatarFile.exists())
         {
-//            this.profilePicture.setImageBitmap
-//                    (
-//                            BitmapFactory.decodeFile(avatarFile.getAbsolutePath())
-//                    );
 
-            Picasso.with(getActivity())
+            /*this.profilePicture.setImageBitmap
+                   (
+                            BitmapFactory.decodeFile(avatarFile.getAbsolutePath())
+                   );*/
+
+            Picasso.with(getActivity()).invalidate(avatarFile);
+            Picasso.with(getActivity().getApplicationContext())
                     .load(avatarFile)
                     .fit().centerCrop()
                     .into(this.profilePicture);
@@ -646,76 +647,18 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         return result;
     }
 
-    public class SendFile extends AsyncTask<Void, Void, String>
+    public class UpdateProfile extends AsyncTask<Void, Void, String>
     {
         private ProgressDialog pdia;
+        private String responseCode;
 
         @Override
-        protected void onPreExecute() {
+        protected void onPreExecute()
+        {
             super.onPreExecute();
             pdia = new ProgressDialog(getActivity());
             pdia.setMessage(getActivity().getString(R.string.progress_dialog_uploading_file));
             pdia.show();
-        }
-
-        @Override
-        protected String doInBackground(Void... params)
-        {
-            try {
-                filePushToServerController = new FilePushToServerController(getActivity());
-                multiPartFile = filePushToServerController.prepareFileToSend
-                        (
-                                photoBitmap,
-                                Constants.MULTIPART_AVATAR,
-                                profileId
-                        );
-                filePushToServerController.sendImageRequest
-                        (
-                                Constants.CONTACT_API_POST_AVATAR,
-                                Constants.MULTIPART_AVATAR,
-                                multiPartFile,
-                                Constants.MEDIA_TYPE_JPG
-                        );
-
-                String response = filePushToServerController.executeRequest();
-                Log.e(Constants.TAG, "!!!!!!!!!!!!!!!!!RESPONSE!!!!!!!!!!!!!" +
-                        response);
-
-                return response;
-
-            }
-            catch (Exception e)
-            {
-                Log.e(Constants.TAG, "ProfileFragment -> pushFileInBackground ERROR",e);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if(pdia.isShowing()) pdia.dismiss();
-            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
-
-            if(filePushToServerController.getResponseCode().startsWith("2"))
-            {
-
-                profilePicture.setImageBitmap(BitmapFactory.decodeFile(multiPartFile
-                        .getAbsolutePath()));
-                profilePicture.setBorderWidth(2);
-
-                profilePicture.setBorderColor(Color.WHITE);
-            }
-        }
-    }
-
-
-    public class UpdateProfile extends AsyncTask<Void, Void, String>
-    {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
         }
 
         @Override
@@ -726,21 +669,18 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                 try
                 {
                     filePushToServerController =  new FilePushToServerController(getActivity());
-                    multiPartFile = filePushToServerController.prepareFileToSend
-                            (
-                                    photoBitmap,
-                                    Constants.MULTIPART_AVATAR,
-                                    profileId
-                            );
-                    filePushToServerController.sendImageRequest
+                    filePushToServerController.storeProfileAvatar(photoBitmap,profileId);
+                    filePushToServerController.prepareRequestForPushAvatar
                             (
                                     Constants.CONTACT_API_POST_AVATAR,
                                     Constants.MULTIPART_AVATAR,
-                                    multiPartFile,
-                                    Constants.MEDIA_TYPE_JPG
+                                    Constants.MEDIA_TYPE_JPG,
+                                    profileId
                             );
 
-                    return  filePushToServerController.executeRequest();
+                    String response = filePushToServerController.executeRequest();
+                    this.responseCode = filePushToServerController.getResponseCode();
+                    return  response;
                 }
                 catch (Exception e)
                 {
@@ -755,19 +695,16 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         protected void onPostExecute(String result)
         {
             super.onPostExecute(result);
+            if(pdia.isShowing()) pdia.dismiss();
             if(isAvatarHasChangedAfterSelection)
             {
                 Log.e(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
 
-                if(filePushToServerController.getResponseCode().startsWith("2"))
+                if(this.responseCode.startsWith("2"))
                 {
                     loadNewAvatarURL(result);
-                    filePushToServerController.prepareFileToSend
-                            (
-                                    photoBitmap,
-                                    Constants.MULTIPART_AVATAR,
-                                    profileId
-                            );
+                    photoBitmap.recycle();
+                    photoBitmap = null;
                 }
             }
             isUpdating = updateContactData();

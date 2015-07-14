@@ -10,6 +10,7 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -92,12 +93,13 @@ public class RealmChatTransactions {
             else chat.setLastMessage(lastText);
 
             chat.setLastMessageTime(newChatMessage.getTimestamp());
-            mRealm.commitTransaction();
 
         } catch (Exception e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ", e);
             mRealm.cancelTransaction();
             return false;
+        } finally {
+            mRealm.commitTransaction();
         }
 
         return true;
@@ -110,11 +112,12 @@ public class RealmChatTransactions {
         try {
             mRealm.beginTransaction();
             chatMessage.setRead(Constants.CHAT_MESSAGE_READ);
-            mRealm.commitTransaction();
         } catch (Exception e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageAsRead: ", e);
             mRealm.cancelTransaction();
+        } finally {
+            mRealm.commitTransaction();
         }
     }
 
@@ -133,15 +136,21 @@ public class RealmChatTransactions {
 
             RealmResults<ChatMessage> results = query.findAll();
 
-            for (int i = 0; i<results.size(); i++)
-                results.get(i).setRead(Constants.CHAT_MESSAGE_READ);
+            Iterator<ChatMessage> it = results.iterator();
+            ChatMessage msg;
 
-            mRealm.commitTransaction();
+            while(it.hasNext()) {
+                msg = it.next();
+                msg.setRead(Constants.CHAT_MESSAGE_READ);
+            }
+
 
         } catch (Exception e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);
             mRealm.cancelTransaction();
+        } finally {
+            mRealm.commitTransaction();
         }
     }
 
@@ -162,12 +171,13 @@ public class RealmChatTransactions {
                 changed = true;
             }
 
-            mRealm.commitTransaction();
         } catch (Exception e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageSentStatus: ", e);
             mRealm.cancelTransaction();
             changed = false;
+        } finally {
+            mRealm.commitTransaction();
         }
 
         return changed;
@@ -331,10 +341,11 @@ public class RealmChatTransactions {
             mRealm.beginTransaction();
             mRealm.copyToRealmOrUpdate(newChat);
 
-            mRealm.commitTransaction();
         } catch (Exception e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChat: ",e);
             mRealm.cancelTransaction();
+        } finally {
+            mRealm.commitTransaction();
         }
     }
 

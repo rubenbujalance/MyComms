@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -117,10 +118,10 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                         }
                     });
             }
-//            else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)){
-//                AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.imageAvatar, viewHolder.textAvatar, contact.getContactId());
-//                avatarSFController.getSFAvatar(contact.getAvatar());
-//            }
+            else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)){
+                AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.imageAvatar, viewHolder.textAvatar, contact.getContactId());
+                avatarSFController.getSFAvatar(contact.getAvatar());
+            }
         }
         else
         {

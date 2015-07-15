@@ -78,6 +78,8 @@
                 android:textColor="#ffffffff"
                 android:layout_below="@+id/recent_avatar"
                 android:layout_centerHorizontal="true"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:shadowColor="#000000"
                 android:shadowDx="0"
                 android:shadowDy="0"
@@ -92,6 +94,8 @@
                 android:layout_alignLeft="@+id/recent_firstname"
                 android:layout_alignStart="@+id/recent_firstname"
                 android:shadowColor="#000000"
+                android:ellipsize="end"
+                android:singleLine="true"
                 android:shadowDx="0"
                 android:shadowDy="0"
                 android:shadowRadius="15" />

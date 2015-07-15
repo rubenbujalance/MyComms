@@ -558,7 +558,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private void refreshAdapter()
     {
         mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
-                _profile, isGroupChatMode);
+                _profile);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 

@@ -415,10 +415,9 @@ public final class XMPPTransactions {
             if (from == null || id == null ||
                     to==null || type==null) return false;
 
-            if(to.indexOf("@")<0) return false;
-
             if((type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0
-                        && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)!=0))
+                        && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)!=0)
+                    && type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)!=0)
                 return false;
 
             //TODO RBM - Remove after old PING solved ***********
@@ -427,6 +426,10 @@ public final class XMPPTransactions {
             }
             //****************************************************
 
+            if(from.indexOf("@")>0) from = from.substring(0, from.indexOf("@"));
+
+            if(to.indexOf("@")>0) to = to.substring(0, to.indexOf("@"));
+            else return false;
 
             if (parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
                     && type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT) == 0)
@@ -454,7 +457,9 @@ public final class XMPPTransactions {
             }
             else if (parser.getName().compareTo(Constants.XMPP_ELEMENT_IQ) == 0)
             {
-                if(type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)==0) //It's a pong
+                if(type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)==0 &&
+                        from.compareTo(Constants.XMPP_PARAM_DOMAIN)==0 &&
+                        to.compareTo(_profile_id)==0) //It's a pong
                     return handlePongReceived(parser);
                 else if(type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)==0 ||
                         type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)==0)

@@ -3,6 +3,7 @@ package com.vodafone.mycomms.realm;
 import android.content.Context;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 
@@ -105,7 +106,8 @@ public class RealmGroupChatTransactions {
 
             mRealm.commitTransaction();
         } catch (Exception e){
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: ", e);
+            Crashlytics.logException(e);
             mRealm.cancelTransaction();
         }
     }
@@ -141,6 +143,7 @@ public class RealmGroupChatTransactions {
 
         } catch (Exception e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ", e);
+            Crashlytics.logException(e);
             mRealm.cancelTransaction();
             return false;
         }
@@ -159,6 +162,7 @@ public class RealmGroupChatTransactions {
         catch (Exception e )
         {
             Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatById: ", e);
+            Crashlytics.logException(e);
             return  null;
         }
     }
@@ -179,7 +183,8 @@ public class RealmGroupChatTransactions {
             return groupChats;
         }
         catch (Exception e ) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChats: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChats: ", e);
+            Crashlytics.logException(e);
             return  null;
         }
     }
@@ -219,7 +224,8 @@ public class RealmGroupChatTransactions {
                 }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChatMessages: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChatMessages: ", e);
+            Crashlytics.logException(e);
         }
 
         return chatMessageArray;
@@ -246,7 +252,8 @@ public class RealmGroupChatTransactions {
                 messages.add(results.get(i));
             }
         } catch (Exception e){
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getNotReadReceivedGroupChatMessages: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getNotReadReceivedGroupChatMessages: ", e);
+            Crashlytics.logException(e);
             return null;
         }
 
@@ -262,6 +269,7 @@ public class RealmGroupChatTransactions {
             chatMessage = query.findFirst();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatMessageById: ", e);
+            Crashlytics.logException(e);
         }
 
         return chatMessage;
@@ -278,6 +286,7 @@ public class RealmGroupChatTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmGroupChatTransactions.existsChatMessageById: ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -304,7 +313,8 @@ public class RealmGroupChatTransactions {
             mRealm.commitTransaction();
 
         } catch (Exception e){
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead: ", e);
+            Crashlytics.logException(e);
             mRealm.cancelTransaction();
         }
     }
@@ -323,6 +333,7 @@ public class RealmGroupChatTransactions {
                     .count();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatPendingMessagesCount: ", e);
+            Crashlytics.logException(e);
         }
 
         return count;

@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
 import com.squareup.okhttp.MediaType;
@@ -210,6 +211,7 @@ public class ProfileController extends BaseController {
                     error = jsonResponse.getString("des");
                 } catch (JSONException e) {
                     Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
+                    Crashlytics.logException(e);
                 }
 
                 //Commented due to "BaseController.onConnectionError: {"err":"auth_proxy_error","des":"invalid body request"}
@@ -254,6 +256,7 @@ public class ProfileController extends BaseController {
         }catch (JSONException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());
+            Crashlytics.logException(e);
         }
         return  userProfile;
     }
@@ -338,6 +341,7 @@ public class ProfileController extends BaseController {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "ProfileController.logoutToAPI: ",e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -442,6 +446,7 @@ public class ProfileController extends BaseController {
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: ",e);
+                Crashlytics.logException(e);
             }
 
             return json;
@@ -482,6 +487,7 @@ public class ProfileController extends BaseController {
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: ",e);
+                Crashlytics.logException(e);
             }
 
             Log.i(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: END");

@@ -231,5 +231,6 @@
     <string name="progress_dialog_creating_group_chat">Creating group chat. Please wait...</string>
     <string name="progress_dialog_updating_group_chat">Updating group chat. Please wait...</string>
     <string name="group_chat">Group chat</string>
+    <string name="today">Today</string>
 
 </resources>

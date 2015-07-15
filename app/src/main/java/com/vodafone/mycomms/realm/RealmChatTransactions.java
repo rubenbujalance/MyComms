@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -96,6 +97,7 @@ public class RealmChatTransactions {
 
         } catch (Exception e){
             Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ", e);
+            Crashlytics.logException(e);
             mRealm.cancelTransaction();
             return false;
         } finally {
@@ -113,8 +115,8 @@ public class RealmChatTransactions {
             mRealm.beginTransaction();
             chatMessage.setRead(Constants.CHAT_MESSAGE_READ);
         } catch (Exception e){
-            e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageAsRead: ", e);
+            Crashlytics.logException(e);
             mRealm.cancelTransaction();
         } finally {
             mRealm.commitTransaction();
@@ -146,7 +148,6 @@ public class RealmChatTransactions {
 
 
         } catch (Exception e){
-            e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);
             mRealm.cancelTransaction();
         } finally {
@@ -172,8 +173,8 @@ public class RealmChatTransactions {
             }
 
         } catch (Exception e){
-            e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.setChatMessageSentStatus: ", e);
+            Crashlytics.logException(e);
             mRealm.cancelTransaction();
             changed = false;
         } finally {
@@ -211,6 +212,7 @@ public class RealmChatTransactions {
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getAllChatMessages: ", e);
+            Crashlytics.logException(e);
         }
 
         return chatMessageArray;
@@ -225,6 +227,7 @@ public class RealmChatTransactions {
             chatMessage = query.findFirst();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.getChatMessageById: ", e);
+            Crashlytics.logException(e);
         }
 
         return chatMessage;
@@ -241,6 +244,7 @@ public class RealmChatTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.existsChatMessageById: ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -270,8 +274,8 @@ public class RealmChatTransactions {
             }
 
         } catch (Exception e){
-            e.printStackTrace();
             Log.e(Constants.TAG, "RealmChatTransactions.getNotReadReceivedContactChatMessages: ", e);
+            Crashlytics.logException(e);
             return null;
         }
 

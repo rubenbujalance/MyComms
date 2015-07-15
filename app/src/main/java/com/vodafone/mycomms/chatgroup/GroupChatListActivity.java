@@ -65,8 +65,9 @@ public class GroupChatListActivity extends ToolbarActivity {
     public void onConnectivityChanged(ConnectivityChanged event)
     {
 
-        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+        Log.i(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
                 + event.getConnectivityStatus().toString());
+
         if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
                 event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
             lay_no_connection.setVisibility(View.VISIBLE);

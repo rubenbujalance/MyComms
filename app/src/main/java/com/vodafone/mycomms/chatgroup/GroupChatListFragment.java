@@ -11,6 +11,7 @@ import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Callback;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
 import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
@@ -39,7 +41,6 @@ import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import model.Contact;
@@ -439,28 +440,53 @@ public class GroupChatListFragment extends ListFragment implements
         chatContactsContainer.addView(contactChild);
         contactChild.setPadding(10, 20, 10, 20);
 
-        ImageView contactAvatar = (ImageView) contactChild.findViewById(R.id.group_chat_avatar);
-        File avatarFile = new File(getActivity().getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                "avatar_"+contact.getContactId()+".jpg");
+        final ImageView contactAvatar = (ImageView) contactChild.findViewById(R.id.group_chat_avatar);
+        final TextView avatarText = (TextView) contactChild.findViewById(R.id.avatarText);
+        avatarText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 
-        if (avatarFile.exists()) {
-            Picasso.with(getActivity())
-                    .load(avatarFile)
-                    .fit().centerCrop()
-                    .into(contactAvatar);
-        } else {
-            String initials = "";
-            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+
+        //Image avatar
+        String initials = "";
+        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+        {
+            initials = contact.getFirstName().substring(0,1);
+
+            if(null != contact.getLastName() && contact.getLastName().length() > 0)
             {
-                initials = contact.getFirstName().substring(0,1);
-
-                if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                {
-                    initials = initials + contact.getLastName().substring(0,1);
-                }
-
+                initials = initials + contact.getLastName().substring(0,1);
             }
-            TextView avatarText = (TextView) contactChild.findViewById(R.id.avatarText);
+        }
+
+        final String finalInitials = initials;
+
+        contactAvatar.setImageResource(R.color.grey_middle);
+        avatarText.setVisibility(View.VISIBLE);
+        avatarText.setText(finalInitials);
+
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0)
+        {
+            MycommsApp.picasso
+                    .load(contact.getAvatar())
+                    .placeholder(R.color.grey_middle)
+                    .noFade()
+                    .fit().centerCrop()
+                    .into(contactAvatar, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            avatarText.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onError() {
+                            contactAvatar.setImageResource(R.color.grey_middle);
+                            avatarText.setVisibility(View.VISIBLE);
+                            avatarText.setText(finalInitials);
+                        }
+                    });
+        }
+        else
+        {
             contactAvatar.setImageResource(R.color.grey_middle);
             avatarText.setText(initials);
         }

@@ -30,10 +30,13 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     private UserProfile _profile;
     private RealmChatTransactions _chatTx;
     private RealmContactTransactions _contactTx;
+    private boolean isGroupChatMode;
 
-    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem, UserProfile profile) {
+    public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem,
+                                   UserProfile profile, boolean isGroupChatMode) {
         mContext = context;
         this._profile = profile;
+        this.isGroupChatMode = isGroupChatMode;
 
         _chatTx = new RealmChatTransactions(mContext);
         _contactTx = new RealmContactTransactions(_profile.getId());
@@ -125,18 +128,27 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                             XMPPTransactions.getXMPPStatusOrder(chatList.get(i).getStatus())))
                 status = chatList.get(i).getStatus();
 
-            //Set text status
-            if(status == null)
+
+            //TODO -> in real version this should be implemented
+            //Hiding delivered message in group chat mode
+            if(isGroupChatMode)
                 chatHolder.chatSentText.setVisibility(View.GONE);
-            else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT) == 0)
-                chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
-            else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_SENT) == 0)
-                chatHolder.chatSentText.setText(mContext.getString(R.string.status_sent));
-            else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_DELIVERED) == 0)
-                chatHolder.chatSentText.setText(mContext.getString(R.string.status_delivered));
-            else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_READ) == 0)
-                chatHolder.chatSentText.setText(mContext.getString(R.string.status_read));
-            else chatHolder.chatSentText.setVisibility(View.GONE);
+            else
+            {
+                //Set text status
+                if(status == null)
+                    chatHolder.chatSentText.setVisibility(View.GONE);
+                else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT) == 0)
+                    chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
+                else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_SENT) == 0)
+                    chatHolder.chatSentText.setText(mContext.getString(R.string.status_sent));
+                else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_DELIVERED) == 0)
+                    chatHolder.chatSentText.setText(mContext.getString(R.string.status_delivered));
+                else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_READ) == 0)
+                    chatHolder.chatSentText.setText(mContext.getString(R.string.status_read));
+                else chatHolder.chatSentText.setVisibility(View.GONE);
+            }
+
         }
 
         //Set message time
@@ -150,7 +162,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                 previousTimestamp == 0)
         {
             chatHolder.chatSentTime.setVisibility(View.VISIBLE);
-            chatHolder.chatSentTime.setText(Utils.getStringChatTimeDifference(currentTimestamp));
+            chatHolder.chatSentTime.setText(Utils.getStringChatTimeDifference(currentTimestamp, mContext));
         }
         else
         {

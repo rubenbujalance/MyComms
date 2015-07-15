@@ -20,7 +20,7 @@ public class RealmProfileTransactions {
     public void insertUserProfile(UserProfile userProfile){
         Log.d(Constants.TAG, "RealmProfileTransactions.insertUserProfile: " + userProfile);
         if(userProfile == null){
-            Log.e(Constants.TAG, "RealmProfileTransactions.insertUserProfile: UserProfile is null!!!!" );
+            Log.e(Constants.TAG, "RealmProfileTransactions.insertUserProfile: UserProfile is null!!!!");
             return;
         }
 
@@ -30,7 +30,8 @@ public class RealmProfileTransactions {
 
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
-            Log.e(Constants.TAG, "RealmProfileTransactions.insertContact: " + e.toString());
+            Log.e(Constants.TAG, "RealmProfileTransactions.insertContact: " + e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -42,7 +43,8 @@ public class RealmProfileTransactions {
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
             e.printStackTrace();
-            Log.e(Constants.TAG, "RealmProfileTransactions.updateProfileTimezone: " + e.toString());
+            Log.e(Constants.TAG, "RealmProfileTransactions.updateProfileTimezone: " + e);
+            Crashlytics.logException(e);
         } catch (Exception e){
             Log.e(Constants.TAG, "RealmProfileTransactions.updateProfileTimezone: timezone or profile are null " , e);
             Crashlytics.logException(e);
@@ -63,6 +65,7 @@ public class RealmProfileTransactions {
             }
         }catch (Exception e ){
             Log.e(Constants.TAG, "RealmProfileTransactions.getUserProfile: " , e);
+            Crashlytics.logException(e);
             return  null;
         }
     }

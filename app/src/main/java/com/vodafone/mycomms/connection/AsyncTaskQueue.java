@@ -14,7 +14,8 @@ public class AsyncTaskQueue {
     private HashMap<String, AsyncTask> asyncTaskQueue;
 //    private static ArrayList<String> sortedKeys = new ArrayList<>();
 
-    public AsyncTaskQueue() {
+    public AsyncTaskQueue()
+    {
         asyncTaskQueue = new HashMap<>();
     }
 
@@ -47,6 +48,11 @@ public class AsyncTaskQueue {
                 Log.e(Constants.TAG, "ConnectionsQueue.removeConnection: ", e);
             }
         }
+    }
+
+    public boolean hasConnections()
+    {
+        return asyncTaskQueue.isEmpty();
     }
 
     public boolean isConnectionQueued(String key) {

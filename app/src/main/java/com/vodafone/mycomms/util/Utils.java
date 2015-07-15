@@ -288,19 +288,35 @@ public final class Utils extends Activity {
         }
     }
 
-    public static String getStringChatTimeDifference(long millis){
+    public static String getStringChatTimeDifference(long millis, Context context){
         long hours = TimeUnit.MILLISECONDS.toHours(millis);
         long days = TimeUnit.MILLISECONDS.toDays(millis);
         long currentTime = System.currentTimeMillis();
         long currentHours = TimeUnit.MILLISECONDS.toHours(currentTime);
         long currentDays = TimeUnit.MILLISECONDS.toDays(currentTime);
-        if( (currentHours-hours) < 24){
-            return getTimeFromMillis(millis);
+        if( (currentHours-hours) < 24 && (days - currentDays == 0)){
+            return context.getString(R.string.today) + " " + getTimeFromMillis(millis);
         } else if ( (currentDays - days) <= 7){
             return dayStringFormat(millis) + " " + getTimeFromMillis(millis);
         } else{
             return getDateFromMillis(millis) + " " + getTimeFromMillis(millis);
         }
+    }
+
+    private static String setAMOrPM(String time)
+    {
+        String hourFirstPart = time.substring(0,1);
+        String hourSecondPart = time.substring(1,2);
+        if(hourFirstPart.equals("0"))
+            return " a.m.";
+        else if(hourFirstPart.equals(1)
+                &&
+                (hourSecondPart.equals(0)
+                    ||hourSecondPart.equals(1)
+                    ||hourSecondPart.equals(2)))
+            return " a.m.";
+        else
+            return " p.m.";
     }
 
 

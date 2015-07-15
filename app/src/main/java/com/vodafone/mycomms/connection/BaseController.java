@@ -65,6 +65,7 @@ public class BaseController extends Controller {
             Log.d(Constants.TAG, "BaseController.onConnectionError: unauthorized --> LoginActivity");
             //BaseConnection.setNumOfFailedAuthRequest(BaseConnection.getNumOfFailedAuthRequest() + 1);
             Intent in = new Intent(getContext(), LoginActivity.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getContext().startActivity(in);
         }
 
@@ -77,12 +78,14 @@ public class BaseController extends Controller {
         if(e.getUrl() != null && e.getUrl().contains(AuthRenewConnection.URL) && e.getContent().contains(BaseConnection.VALUE_INVALID_TOKEN) ){
             Log.d(Constants.TAG, "BaseController.onConnectionError: invalid_token after AuthRenew --> LoginActivity");
             Intent in = new Intent(getContext(), LoginActivity.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getContext().startActivity(in);
         }
 
         if(e.getContent() != null && e.getContent().contains(BaseConnection.VALUE_INVALID_VERSION) ){
             Log.d(Constants.TAG, "BaseController.onConnectionError: invalid_version  --> SplashScreenActivity");
             Intent in = new Intent(getContext(), SplashScreenActivity.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getContext().startActivity(in);
         }
 

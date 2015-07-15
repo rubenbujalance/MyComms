@@ -76,6 +76,11 @@ public class DashBoardActivity extends ToolbarActivity
     private LinearLayout lay_no_connection;
 
 
+    private LinearLayout recentsContainer, recentsContainer2;
+    private boolean isCurrentRecentContainerFirst = true;
+    private int numberOfRecents = 0;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,7 +111,10 @@ public class DashBoardActivity extends ToolbarActivity
 
         BusProvider.getInstance().post(new DashboardCreatedEvent());
 
-        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
+        recentsContainer2 = (LinearLayout) findViewById(R.id.list_recents_2);
+
+
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(DashBoardActivity.this))
             lay_no_connection.setVisibility(View.GONE);
@@ -172,7 +180,7 @@ public class DashBoardActivity extends ToolbarActivity
         });
     }
 
-    private void loadRecents(){
+    private void loadRecents(LinearLayout currentRecentContainer){
         Log.e(Constants.TAG, "DashBoardActivity.loadRecents: ");
         if(recentsLoading) return;
 
@@ -181,39 +189,47 @@ public class DashBoardActivity extends ToolbarActivity
         try {
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
-            LinearLayout recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
+
             LayoutInflater inflater = LayoutInflater.from(this);
-            RecentContact recentContact;
-            recentsContainer.removeAllViews();
-
+            currentRecentContainer.removeAllViews();
             recentList = realmContactTransactions.getAllRecentContacts();
+            this.numberOfRecents = recentList.size();
 
-            for (int i = 0; i < recentList.size(); i++) {
-                recentContact = recentList.get(i);
-                if(recentContact.getId().startsWith("mg_"))
+            for (RecentContact contact: recentList)
+            {
+
+                if(contact.getId().startsWith("mg_"))
                 {
                     DrawSingleGroupChatRecentAsyncTask task = new DrawSingleGroupChatRecentAsyncTask
                             (
-                                    recentContact.getAction()
-                                    , recentContact.getUniqueId()
-                                    , recentsContainer
+                                    contact.getAction()
+                                    , contact.getUniqueId()
+                                    , currentRecentContainer
                                     , inflater
-                                    , recentContact.getId()
+                                    , contact.getId()
                             );
 
-                    recentsTasksQueue.putConnection(recentContact.getUniqueId(),task);
+                    recentsTasksQueue.putConnection(contact.getUniqueId(),task);
                     task.execute();
                 }
                 else
                 {
-                    DrawSingleRecentAsyncTask task = new DrawSingleRecentAsyncTask(recentContact.getContactId(),
-                            recentContact.getFirstName(),recentContact.getLastName(),
-                            recentContact.getAvatar(),recentContact.getAction(),
-                            recentContact.getPhones(),recentContact.getEmails(),
-                            recentContact.getPlatform(),recentContact.getUniqueId(),
-                            recentsContainer,inflater);
+                    DrawSingleRecentAsyncTask task = new DrawSingleRecentAsyncTask
+                            (
+                                    contact.getContactId()
+                                    , contact.getFirstName()
+                                    , contact.getLastName()
+                                    , contact.getAvatar()
+                                    , contact.getAction()
+                                    , contact.getPhones()
+                                    , contact.getEmails()
+                                    , contact.getPlatform()
+                                    , contact.getUniqueId()
+                                    , currentRecentContainer
+                                    , inflater
+                            );
 
-                    recentsTasksQueue.putConnection(recentContact.getUniqueId(),task);
+                    recentsTasksQueue.putConnection(contact.getUniqueId(),task);
                     task.execute();
                 }
             }
@@ -223,7 +239,6 @@ public class DashBoardActivity extends ToolbarActivity
 
         recentsLoading = false;
     }
-
 
     private void loadNews() {
         Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
@@ -313,7 +328,12 @@ public class DashBoardActivity extends ToolbarActivity
         //Update Pending Messages on Toolbar
         //RBM - It is done every time a message is received
         checkUnreadChatMessages();
-        loadRecents();
+
+        if(isCurrentRecentContainerFirst)
+            loadRecents(recentsContainer);
+        else
+            loadRecents(recentsContainer2);
+
         loadNews();
         loadLocalContacts();
     }
@@ -340,7 +360,11 @@ public class DashBoardActivity extends ToolbarActivity
     @Subscribe
     public void onRecentContactsReceived(RecentContactsReceivedEvent event) {
         Log.e(Constants.TAG, "DashBoardActivity.onRecentContactsReceived: ");
-        loadRecents();
+
+        if(isCurrentRecentContainerFirst)
+            loadRecents(recentsContainer);
+        else
+            loadRecents(recentsContainer2);
     }
 
     public class DrawSingleNewsAsyncTask extends AsyncTask<Void,Void,Void>
@@ -812,11 +836,15 @@ public class DashBoardActivity extends ToolbarActivity
                 }
 
                 // Names
-                firstNameView.setText("Group("+contacts.size()+")");
+                firstNameView.setText("Group(" + contacts.size() + ")");
                 //Since it's finished, remove this task from queue
                 recentsTasksQueue.removeConnection(recentId);
                 lay_main_container.setVisibility(View.VISIBLE);
             }
+
+            numberOfRecents --;
+            if(numberOfRecents == 0)
+                loadRecentLayout();
         }
     }
 
@@ -1118,6 +1146,10 @@ public class DashBoardActivity extends ToolbarActivity
             }  catch (Exception e) {
                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
             }
+
+            numberOfRecents --;
+            if(numberOfRecents == 0)
+                loadRecentLayout();
         }
     }
 
@@ -1133,5 +1165,22 @@ public class DashBoardActivity extends ToolbarActivity
         else
             lay_no_connection.setVisibility(View.GONE);
     }
+
+    private void loadRecentLayout()
+    {
+        if(isCurrentRecentContainerFirst)
+        {
+            isCurrentRecentContainerFirst = false;
+            recentsContainer2.setVisibility(View.GONE);
+            recentsContainer.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            isCurrentRecentContainerFirst = true;
+            recentsContainer.setVisibility(View.GONE);
+            recentsContainer2.setVisibility(View.VISIBLE);
+        }
+    }
+
 
 }

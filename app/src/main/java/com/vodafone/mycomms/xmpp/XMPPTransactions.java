@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -177,6 +178,7 @@ public final class XMPPTransactions {
                         }
                     }catch (Exception e) {
                         Log.e(Constants.TAG, "XMPPTransactions.run: ",e);
+                        Crashlytics.logException(e);
                         startPinging(miliseconds);
                     }
                 }
@@ -217,6 +219,7 @@ public final class XMPPTransactions {
 
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "XMPPTransactions.sleepThread: ", e);
+                    Crashlytics.logException(e);
                 }
             }
         });
@@ -239,6 +242,7 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -264,6 +268,7 @@ public final class XMPPTransactions {
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendText: Error sending message", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -289,6 +294,7 @@ public final class XMPPTransactions {
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendPing: Error sending message", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -313,6 +319,7 @@ public final class XMPPTransactions {
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -335,6 +342,7 @@ public final class XMPPTransactions {
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
+            Crashlytics.logException(e);
         }
 
         return true;
@@ -415,10 +423,10 @@ public final class XMPPTransactions {
             if (from == null || id == null ||
                     to==null || type==null) return false;
 
-            if((type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0
-                        && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)!=0)
-                    && type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)!=0)
-                return false;
+//            if((type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0
+//                        && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)!=0)
+//                    && type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)!=0)
+//                return false;
 
             //TODO RBM - Remove after old PING solved ***********
             if(id.startsWith("PING")) {
@@ -428,8 +436,8 @@ public final class XMPPTransactions {
 
             if(from.indexOf("@")>0) from = from.substring(0, from.indexOf("@"));
 
-            if(to.indexOf("@")>0) to = to.substring(0, to.indexOf("@"));
-            else return false;
+//            if(to.indexOf("@")>0) to = to.substring(0, to.indexOf("@"));
+//            else return false;
 
             if (parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
                     && type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT) == 0)
@@ -470,6 +478,7 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyStanzaReceived: ",e);
+            Crashlytics.logException(e);
             return false;
         }
     }
@@ -500,6 +509,7 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -520,6 +530,7 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.handlePongReceived: ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -528,6 +539,8 @@ public final class XMPPTransactions {
 
     private static boolean saveAndNotifyMessageReceived(XmlPullParser parser)
     {
+        RealmChatTransactions chatTx = null;
+
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -543,7 +556,7 @@ public final class XMPPTransactions {
             if(to.compareTo(_profile_id)==0 && from.compareTo(_profile_id)==0)
                 return false;
 
-            RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
+            chatTx = new RealmChatTransactions(_appContext);
 
             //Check if chat message has already been received
             if(chatTx.existsChatMessageById(id))
@@ -590,7 +603,10 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
+            Crashlytics.logException(e);
             return false;
+        } finally {
+            if(chatTx!=null) chatTx.closeRealm();
         }
 
         return true;
@@ -661,6 +677,7 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -738,6 +755,7 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -812,6 +830,7 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -886,6 +905,7 @@ public final class XMPPTransactions {
 //            inStream.close();
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.downloadToChatFile: ",e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -905,6 +925,7 @@ public final class XMPPTransactions {
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.downloadImage: ",e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -932,6 +953,7 @@ public final class XMPPTransactions {
             inStream.close();
         } catch (IOException e){
             Log.e(Constants.TAG, "XMPPTransactions.okHttpDownloadFile: ",e);
+            Crashlytics.logException(e);
             return false;
         }
         return true;
@@ -963,6 +985,7 @@ public final class XMPPTransactions {
         }
         catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.notifyIQMessageStatus: Error sending IQ", e);
+            Crashlytics.logException(e);
             return false;
         }
 
@@ -1006,6 +1029,7 @@ public final class XMPPTransactions {
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "XMPPOpenConnection.doInBackground: Error opening XMPP server connection", e);
+                Crashlytics.logException(e);
                 _isConnecting = false;
                 return null;
             }

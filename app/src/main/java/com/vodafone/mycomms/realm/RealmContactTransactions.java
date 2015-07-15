@@ -149,24 +149,25 @@ public class RealmContactTransactions {
 
     public ArrayList<Contact> getContactsByKeyWordWithoutLocalsAndSalesForce(String keyWord)
     {
+        if(keyWord==null || keyWord.length()<=0) return null;
+
         ArrayList<Contact> contactArrayList = new ArrayList<>();
-        RealmResults<Contact> result = mRealm.where(Contact.class)
+        String[] keywordSplit = keyWord.split(" ");
+
+        RealmQuery<Contact> query = mRealm.where(Contact.class)
                 .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId)
                 .not().equalTo(Constants.CONTACT_PLATFORM, Constants.PLATFORM_LOCAL)
-                .not().equalTo(Constants.CONTACT_PLATFORM, Constants.PLATFORM_SALES_FORCE)
-                .beginGroup()
-                    .contains(Constants.CONTACT_FNAME, keyWord, false)
-                    .or()
-                    .contains(Constants.CONTACT_LNAME, keyWord, false)
-                    .or()
-                    .contains(Constants.CONTACT_COMPANY, keyWord, false)
-                    .or()
-                    .contains(Constants.CONTACT_EMAILS, keyWord, false)
-                .endGroup()
-                .findAll();
+                .not().equalTo(Constants.CONTACT_PLATFORM, Constants.PLATFORM_SALES_FORCE);
+
+        for(String key : keywordSplit)
+        {
+            query = query.contains(Constants.CONTACT_SEARCH_HELPER, key, false);
+        }
+
+        RealmResults<Contact> result = query.findAll();
 
         if (result!=null){
-            result.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
+            result.sort(Constants.CONTACT_SORT_HELPER, RealmResults.SORT_ORDER_ASCENDING);
             for (Contact contactListItem : result)
             {
                 contactArrayList.add(contactListItem);

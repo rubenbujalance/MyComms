@@ -198,8 +198,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         final String finalInitials = initials;
 
         viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-        viewHolder.bottom_left_avatar_text.setVisibility(View.VISIBLE);
-        viewHolder.bottom_left_avatar_text.setText(finalInitials);
+        viewHolder.top_left_avatar_text.setVisibility(View.VISIBLE);
+        viewHolder.top_left_avatar_text.setText(finalInitials);
 
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0)
@@ -214,28 +214,28 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                         .into(viewHolder.top_left_avatar, new Callback() {
                             @Override
                             public void onSuccess() {
-                                viewHolder.bottom_left_avatar_text.setVisibility(View.INVISIBLE);
+                                viewHolder.top_left_avatar_text.setVisibility(View.INVISIBLE);
                             }
 
                             @Override
                             public void onError() {
                                 viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-                                viewHolder.bottom_left_avatar_text.setVisibility(View.VISIBLE);
-                                viewHolder.bottom_left_avatar_text.setText(finalInitials);
+                                viewHolder.top_left_avatar_text.setVisibility(View.VISIBLE);
+                                viewHolder.top_left_avatar_text.setText(finalInitials);
                             }
                         });
             }
             else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)){
-//                AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.top_left_avatar, viewHolder.bottom_left_avatar_text, contact.getContactId());
+//                AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.top_left_avatar, viewHolder.top_left_avatar_text, contact.getContactId());
 //                avatarSFController.getSFAvatar(contact.getAvatar());
                 viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-                viewHolder.bottom_left_avatar_text.setText(initials);
+                viewHolder.top_left_avatar_text.setText(initials);
             }
         }
         else
         {
             viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-            viewHolder.bottom_left_avatar_text.setText(initials);
+            viewHolder.top_left_avatar_text.setText(initials);
         }
 
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );

@@ -82,12 +82,13 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
     @Override
     public void onResume() {
         super.onResume();
-            if (((MycommsApp)getActivity().getApplication()).comesFromToolbar){
-                mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
-            } else{
-                mViewPager.setCurrentItem(Constants.CONTACTS_FAVOURITE);
-                ((MycommsApp)getActivity().getApplication()).comesFromToolbar = true;
-            }
+        if (((MycommsApp)getActivity().getApplication()).contactViewOrigin == Constants.CONTACTS_ALL){
+            mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
+        } else if (((MycommsApp)getActivity().getApplication()).contactViewOrigin == Constants.CONTACTS_FAVOURITE){
+            mViewPager.setCurrentItem(Constants.CONTACTS_FAVOURITE);
+        } else if (((MycommsApp)getActivity().getApplication()).contactViewOrigin == Constants.CONTACTS_RECENT){
+            mViewPager.setCurrentItem(Constants.CONTACTS_RECENT);
+        }
     }
 
     @Override
@@ -134,11 +135,11 @@ public class ContactListPagerFragment extends Fragment implements ContactListFra
                 return getString(R.string.contact_list_tab_favourites);
             else if (position == 1)
                 return getString(R.string.contact_list_tab_recents);
-            else if (position == 2){
+            else if (position == 2) {
                 return getString(R.string.contact_list_tab_contacts);
             }
             Log.wtf(Constants.TAG, "ContactListPagerAdapter.getPageTitle: Unknown page");
-            return "whatever" ;
+            return "whatever";
         }
 
         @Override

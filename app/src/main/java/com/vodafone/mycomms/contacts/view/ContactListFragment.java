@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
@@ -286,6 +287,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             if(mIndex == Constants.CONTACTS_ALL) {
                 if (contactList.get(position).getContactId()!=null && contactList.get(position).getContactId().equals(profileId))
                     in = new Intent(getActivity(), SettingsMainActivity.class);
+                ((MycommsApp)getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
                 in.putExtra(Constants.CONTACT_CONTACT_ID,contactList.get(position).getContactId() );
                 startActivity(in);
             }
@@ -293,6 +295,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             {
                 try {
                     String action = recentContactList.get(position).getAction();
+                    ((MycommsApp)getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_RECENT;
                     if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
                         String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null)
@@ -373,6 +376,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
             } else if (mIndex == Constants.CONTACTS_FAVOURITE) { {
                 if (favouriteContactList.get(position).getContactId()!=null && favouriteContactList.get(position).getContactId().equals(profileId))
                     in = new Intent(getActivity(), SettingsMainActivity.class);
+                ((MycommsApp)getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_FAVOURITE;
                 in.putExtra(Constants.CONTACT_CONTACT_ID,favouriteContactList.get(position).getContactId() );
                 startActivity(in);
             }}

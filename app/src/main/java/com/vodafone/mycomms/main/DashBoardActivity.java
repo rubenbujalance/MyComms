@@ -162,6 +162,7 @@ public class DashBoardActivity extends ToolbarActivity
                 //Start Contacts activity
                 Constants.isSearchBarFocusRequested = true;
                 Constants.isDashboardOrigin = true;
+                ((MycommsApp)getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
                 //in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
@@ -174,7 +175,7 @@ public class DashBoardActivity extends ToolbarActivity
             public void onClick(View v) {
                 //Start Favourites activity
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
-                ((MycommsApp)getApplication()).comesFromToolbar = false;
+                ((MycommsApp)getApplication()).contactViewOrigin = Constants.CONTACTS_FAVOURITE;
                 in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
 //                finish();

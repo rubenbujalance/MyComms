@@ -67,7 +67,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private RecentContactController recentContactController;
     private NewsController mNewsController;
     String profile_id;
-    public boolean comesFromToolbar = true;
+    public int contactViewOrigin = Constants.CONTACTS_ALL;
     public static Picasso picasso;
 
     //Network listener

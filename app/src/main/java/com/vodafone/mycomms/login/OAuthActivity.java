@@ -38,7 +38,7 @@ public class OAuthActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.e(Constants.TAG, "OAuthActivity.onCreate: ");
+        Log.i(Constants.TAG, "OAuthActivity.onCreate: ");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_oauth_web);
@@ -166,7 +166,7 @@ public class OAuthActivity extends Activity {
     @Subscribe
     public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
         if(!isForeground) return;
-        Log.e(Constants.TAG, "OAuthActivity.onApplicationAndProfileInitializedEvent: ");
+        Log.i(Constants.TAG, "OAuthActivity.onApplicationAndProfileInitializedEvent: ");
 
         goToApp();
     }

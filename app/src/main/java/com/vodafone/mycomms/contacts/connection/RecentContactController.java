@@ -42,7 +42,7 @@ public class RecentContactController {
     }
 
     public void getRecentList() {
-        Log.e(Constants.TAG, "RecentContactController.getRecentList: ");
+        Log.i(Constants.TAG, "RecentContactController.getRecentList: ");
 
         new RecentContactsGETAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
                 (String) Constants.CONTACT_API_GET_RECENTS);
@@ -71,7 +71,7 @@ public class RecentContactController {
         @Override
         protected String doInBackground(String... params)
         {
-            Log.e(Constants.TAG, "RecentContactsOKHTTPAsyncTask.doInBackground: START");
+            Log.i(Constants.TAG, "RecentContactsOKHTTPAsyncTask.doInBackground: START");
 
             try
             {
@@ -119,7 +119,7 @@ public class RecentContactController {
         @Override
         protected String doInBackground(String... params)
         {
-            Log.e(Constants.TAG, "RecentContactsPOSTAsyncTask.doInBackground: START");
+            Log.i(Constants.TAG, "RecentContactsPOSTAsyncTask.doInBackground: START");
 
             try
             {
@@ -271,7 +271,7 @@ public class RecentContactController {
     public class RecentContactsGETAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: START");
+            Log.i(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: START");
 
             Response response;
             String json = null;
@@ -296,7 +296,7 @@ public class RecentContactController {
                 Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: ",e);
             }
 
-            Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: END");
+            Log.i(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: END");
 
             return json;
         }

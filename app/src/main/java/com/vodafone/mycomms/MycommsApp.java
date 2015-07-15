@@ -152,7 +152,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Subscribe
     public void onConnectivityChanged(ConnectivityChanged event) {
-        Log.e(Constants.TAG, "MycommsApp.onConnectivityChanged: "
+        Log.i(Constants.TAG, "MycommsApp.onConnectivityChanged: "
                 + event.getConnectivityStatus().toString());
         if(event.getConnectivityStatus()==ConnectivityStatus.MOBILE_CONNECTED ||
                 event.getConnectivityStatus()==ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
@@ -162,7 +162,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     public void getProfileIdAndAccessToken() {
-        Log.e(Constants.TAG, "MycommsApp.getProfileIdAndAccessToken: ");
+        Log.i(Constants.TAG, "MycommsApp.getProfileIdAndAccessToken: ");
         profileController = new ProfileController(mContext);
 
         //Save profile_id if accessToken has changed
@@ -229,7 +229,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Override
     public void onProfileReceived(UserProfile userProfile) {
-        Log.e(Constants.TAG, "MycommsApp.onProfileReceived: ");
+        Log.i(Constants.TAG, "MycommsApp.onProfileReceived: ");
 
         String timeZone = TimeZone.getDefault().getID();
 
@@ -299,7 +299,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Override
     public void onNewsResponse(ArrayList<News> newsList) {
-        Log.e(Constants.TAG, "MyCommsApp.onNewsResponse: ");
+        Log.i(Constants.TAG, "MyCommsApp.onNewsResponse: ");
         NewsReceivedEvent event = new NewsReceivedEvent();
         event.setNews(newsList);
         BusProvider.getInstance().post(event);
@@ -308,7 +308,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onApplicationAndProfileInitialized(ApplicationAndProfileInitialized event)
     {
-        Log.e(Constants.TAG, "MycommsApp.onApplicationAndProfileInitialized: ");
+        Log.i(Constants.TAG, "MycommsApp.onApplicationAndProfileInitialized: ");
 
         appIsInitialized = true;
 
@@ -324,7 +324,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onDashboardCreatedEvent(DashboardCreatedEvent event)
     {
-        Log.e(Constants.TAG, "MycommsApp.onDashboardCreatedEvent: ");
+        Log.i(Constants.TAG, "MycommsApp.onDashboardCreatedEvent: ");
 
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         recentContactController = new RecentContactController(this, profile_id);
@@ -336,7 +336,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Subscribe
     public void onEventNewsReceived(NewsReceivedEvent event) {
-        Log.e(Constants.TAG, "MyCommsApp.onEventNewsReceived: ");
+        Log.i(Constants.TAG, "MyCommsApp.onEventNewsReceived: ");
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
         favouriteController.getFavouritesList(Constants.CONTACT_API_GET_FAVOURITES);
@@ -349,7 +349,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Subscribe
     public void onContactListReceived(ContactListReceivedEvent event){
-        Log.e(Constants.TAG, "MycommsApp.onContactListReceived: ");
+        Log.i(Constants.TAG, "MycommsApp.onContactListReceived: ");
         //new loadGroupChats().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -407,7 +407,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     }
 
     public void getNews() {
-        Log.e(Constants.TAG, "MycommsApp.getNews: ");
+        Log.i(Constants.TAG, "MycommsApp.getNews: ");
         String apiCall = Constants.NEWS_API_GET;
         mNewsController.getNewsList(apiCall);
     }

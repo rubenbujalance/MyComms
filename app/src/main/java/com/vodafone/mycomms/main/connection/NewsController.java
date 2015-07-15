@@ -1,7 +1,6 @@
 package com.vodafone.mycomms.main.connection;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.squareup.okhttp.Response;
@@ -9,7 +8,7 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.HttpUtil;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,7 +36,7 @@ public class NewsController{
         final String[] json = {null};
 
         try {
-            HttpUtil.get(Constants.NEWS_API_GET, mContext, new HttpUtil.HttpCallback() {
+            OKHttpWrapper.get(Constants.NEWS_API_GET, mContext, new OKHttpWrapper.HttpCallback() {
                 @Override
                 public void onFailure(Response response, IOException e) {
                     // handle failure
@@ -48,10 +47,10 @@ public class NewsController{
                 public void onSuccess(Response response) {
                     if (response.isSuccessful()) {
                         Log.i(Constants.TAG, "NewsController.onSuccess");
-                        if (response.code()<500) {
+                        if (response.code() < 500) {
                             try {
                                 json[0] = response.body().string();
-                                if (json[0]!=null){
+                                if (json[0] != null) {
                                     newsListCallback(json[0]);
                                 } else {
                                     NewsReceivedEvent event = new NewsReceivedEvent();
@@ -146,91 +145,6 @@ public class NewsController{
         return news;
     }
 
-    public class NewsListAsyncTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            Log.i(Constants.TAG, "NewsAsyncTask.doInBackground: START");
-
-            final String[] json = {null};
-
-            try {
-                HttpUtil.get(params[0], mContext, new HttpUtil.HttpCallback() {
-                    @Override
-                    public void onFailure(Response response, IOException e) {
-                        // handle failure
-                        Log.i(Constants.TAG, "NewsListAsyncTask.onSuccess: HttpUtil onFailure");
-                    }
-
-                    @Override
-                    public void onSuccess(Response response) {
-                        if (response.isSuccessful()) {
-                            Log.i(Constants.TAG, "NewsListAsyncTask.onSuccess: HttpUtil onSuccess");
-                            if (response.code()<500) {
-                                Log.i(Constants.TAG, "NewsAsyncTask.isSuccessful");
-                                try {
-                                    json[0] = response.body().string();
-                                    Log.i(Constants.TAG, "NewsListAsyncTask.onSuccess: json[0] " + json[0]);
-                                } catch (IOException e) {
-                                    Log.e(Constants.TAG, "NewsListAsyncTask.onSuccess: ", e);
-                                }
-                            } else {
-                                Log.e(Constants.TAG, "NewsAsyncTask.ErrorCode " + response.code());
-                                json[0] = null;
-                            }
-                        } else {
-                            Log.e(Constants.TAG, "NewsAsyncTask.isNOTSuccessful");
-                            json[0] = null;
-                        }
-                    }
-                });
-//                OkHttpClient client = new OkHttpClient();
-//                Request request = new Request.Builder()
-//                        .url("https://" + EndpointWrapper.getBaseNewsURL() +
-//                                params[0])
-//                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
-//                                Utils.getHttpHeaderVersion(mContext))
-//                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
-//                                Utils.getHttpHeaderContentType())
-//                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-//                                Utils.getHttpHeaderAuth(mContext))
-//                        .build();
-
-//                response = client.newCall(request).execute();
-//                if (response.isSuccessful()) {
-//                    if (response.code()<500) {
-//                        Log.i(Constants.TAG, "NewsAsyncTask.isSuccessful");
-//                        json = response.body().string();
-//                    } else {
-//                        Log.e(Constants.TAG, "NewsAsyncTask.ErrorCode " + response.code());
-//                        json = null;
-//                    }
-//                } else {
-//                    Log.e(Constants.TAG, "NewsAsyncTask.isNOTSuccessful");
-//                    json = null;
-//                }
-
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "NewsAsyncTask.doInBackground: ",e);
-            }
-
-            Log.i(Constants.TAG, "NewsAsyncTask.doInBackground: END");
-
-            return json[0];
-        }
-
-        @Override
-        protected void onPostExecute(String json) {
-            if (json!=null){
-                newsListCallback(json);
-            } else {
-                NewsReceivedEvent event = new NewsReceivedEvent();
-                event.setNews(null);
-                BusProvider.getInstance().post(event);
-            }
-        }
-
-
-    }
     public void newsListCallback(String json) {
         Log.i(Constants.TAG, "NewsController.newsListCallback");
         final JSONObject[] jsonResponse = new JSONObject[1];

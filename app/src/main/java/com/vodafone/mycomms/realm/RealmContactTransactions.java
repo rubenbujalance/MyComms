@@ -2,6 +2,7 @@ package com.vodafone.mycomms.realm;
 
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -36,8 +37,8 @@ public class RealmContactTransactions {
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
-            e.printStackTrace();
-            Log.e(Constants.TAG, "RealmContactTransactions.insertContactList: " + e.toString());
+            Log.e(Constants.TAG, "RealmContactTransactions.insertContactList: " + e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -55,7 +56,8 @@ public class RealmContactTransactions {
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
-            Log.e(Constants.TAG, "RealmContactTransactions.insertFavouriteContactList: " + e.toString());
+            Log.e(Constants.TAG, "RealmContactTransactions.insertFavouriteContactList: " + e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -72,7 +74,8 @@ public class RealmContactTransactions {
             }
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
-            Log.e(Constants.TAG, "RealmContactTransactions.insertRecentContactList: " + e.toString());
+            Log.e(Constants.TAG, "RealmContactTransactions.insertRecentContactList: " + e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -230,6 +233,7 @@ public class RealmContactTransactions {
             }
         }catch (Exception e ){
             Log.e(Constants.TAG, "RealmContactTransactions.getUserProfile: " , e);
+            Crashlytics.logException(e);
             return  null;
         }
     }

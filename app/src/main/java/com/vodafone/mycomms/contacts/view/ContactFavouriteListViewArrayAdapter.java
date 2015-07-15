@@ -9,7 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Callback;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -17,7 +18,6 @@ import com.vodafone.mycomms.util.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -78,42 +78,52 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         }
 
         //Image avatar
-        final File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
+        String initials = "";
+        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+        {
+            initials = contact.getFirstName().substring(0,1);
 
-        if (contact.getAvatar()!=null &&
-                contact.getAvatar().length()>0 &&
-                contact.getAvatar().compareTo("")!=0 &&
-                avatarFile.exists() &&
-                !contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
-
-            viewHolder.textAvatar.setText(null);
-
-            Picasso.with(mContext)
-                    .load(avatarFile) // thumbnail url goes here
-                    .fit().centerCrop()
-                    .into(viewHolder.imageAvatar);
-
-        } else if (contact.getAvatar() != null &&
-                contact.getAvatar().length() > 0 &&
-                contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
-            viewHolder.textAvatar.setVisibility(View.INVISIBLE);
-            Picasso.with(mContext)
-                    .load(contact.getAvatar())
-                    .fit().centerCrop()
-                    .into(viewHolder.imageAvatar);
-        } else{
-            String initials = "";
-            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            if(null != contact.getLastName() && contact.getLastName().length() > 0)
             {
-                initials = contact.getFirstName().substring(0,1);
-
-                if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                {
-                    initials = initials + contact.getLastName().substring(0,1);
-                }
-
+                initials = initials + contact.getLastName().substring(0,1);
             }
 
+        }
+        final String finalInitials = initials;
+
+        if (contact.getAvatar()!=null &&
+                contact.getAvatar().length()>0)
+        {
+            if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)
+                    || contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                MycommsApp.picasso
+                        .load(contact.getAvatar())
+                        .placeholder(R.color.grey_middle)
+                        .noFade()
+                        .fit().centerCrop()
+                        .into(viewHolder.imageAvatar, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                viewHolder.textAvatar.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onError() {
+                                viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
+                                viewHolder.textAvatar.setVisibility(View.VISIBLE);
+                                viewHolder.textAvatar.setText(finalInitials);
+                            }
+                        });
+            }
+            else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)){
+//                AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.top_left_avatar, viewHolder.bottom_left_avatar_text, contact.getContactId());
+//                avatarSFController.getSFAvatar(contact.getAvatar());
+                viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
+                viewHolder.textAvatar.setText(initials);
+            }
+        }
+        else
+        {
             viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
             viewHolder.textAvatar.setText(initials);
         }

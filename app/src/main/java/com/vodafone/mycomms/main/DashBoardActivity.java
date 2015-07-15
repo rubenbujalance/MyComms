@@ -87,7 +87,7 @@ public class DashBoardActivity extends ToolbarActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.e(Constants.TAG, "DashBoardActivity.onCreate: ");
+        Log.i(Constants.TAG, "DashBoardActivity.onCreate: ");
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -183,7 +183,7 @@ public class DashBoardActivity extends ToolbarActivity
     }
 
     private void loadRecents(LinearLayout currentRecentContainer){
-        Log.e(Constants.TAG, "DashBoardActivity.loadRecents: ");
+        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: ");
         if(recentsLoading) return;
 
         recentsLoading = true;
@@ -239,13 +239,14 @@ public class DashBoardActivity extends ToolbarActivity
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: ",e);
+            Crashlytics.logException(e);
         }
 
         recentsLoading = false;
     }
 
     private void loadNews() {
-        Log.e(Constants.TAG, "DashBoardActivity.loadNews: ");
+        Log.i(Constants.TAG, "DashBoardActivity.loadNews: ");
 
         newsArrayList = new ArrayList<>();
         newsArrayList = realmNewsTransactions.getAllNews();
@@ -256,12 +257,12 @@ public class DashBoardActivity extends ToolbarActivity
     }
 
     private void loadLocalContacts(){
-        Log.e(Constants.TAG, "DashBoardActivity.loadLocalContacts: ");
+        Log.i(Constants.TAG, "DashBoardActivity.loadLocalContacts: ");
         ((MycommsApp)getApplication()).getLocalContacts();
     }
 
     private void drawNews(ArrayList<News> newsArrayList) {
-        Log.e(Constants.TAG, "DashBoardActivity.drawNews: ");
+        Log.i(Constants.TAG, "DashBoardActivity.drawNews: ");
 
         try{
             LinearLayout container = (LinearLayout) findViewById(R.id.list_news);
@@ -279,6 +280,7 @@ public class DashBoardActivity extends ToolbarActivity
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "DashBoardActivity.drawNews: " + e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -352,7 +354,7 @@ public class DashBoardActivity extends ToolbarActivity
 
     @Subscribe
     public void onEventNewsReceived(NewsReceivedEvent event) {
-        Log.e(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
+        Log.i(Constants.TAG, "DashBoardActivity.onEventNewsReceived: ");
         final ArrayList<News> news = event.getNews();
         if(news != null) {
             if (newsArrayList==null || newsArrayList.size()==0) {
@@ -370,7 +372,7 @@ public class DashBoardActivity extends ToolbarActivity
 
     @Subscribe
     public void onRecentContactsReceived(RecentContactsReceivedEvent event) {
-        Log.e(Constants.TAG, "DashBoardActivity.onRecentContactsReceived: ");
+        Log.i(Constants.TAG, "DashBoardActivity.onRecentContactsReceived: ");
 
         if(isCurrentRecentContainerFirst)
         {
@@ -385,6 +387,7 @@ public class DashBoardActivity extends ToolbarActivity
         }
     }
 
+    @SuppressWarnings("ResourceType")
     public class DrawSingleNewsAsyncTask extends AsyncTask<Void,Void,Void>
     {
         LayoutInflater inflater;
@@ -428,6 +431,7 @@ public class DashBoardActivity extends ToolbarActivity
         @Override
         protected Void doInBackground(Void... params) {
 
+            //noinspection ResourceType,ResourceType
             newsImage = (ImageView) child.findViewById(R.id.notice_image);
             imageUrl = "https://" + EndpointWrapper.getBaseNewsURL() + image;
 
@@ -481,6 +485,7 @@ public class DashBoardActivity extends ToolbarActivity
                         });
             } catch (Exception e) {
                 Log.e(Constants.TAG, "DrawSingleNewsAsyncTask.onPostExecute: ",e);
+                Crashlytics.logException(e);
             }
         }
     }
@@ -640,8 +645,9 @@ public class DashBoardActivity extends ToolbarActivity
                                         RecentContactController(DashBoardActivity.this, _profileId);
                                 recentContactController.insertRecentOKHttp(groupChatId, Constants.CONTACTS_ACTION_SMS);
 
-                            } catch (Exception ex) {
-                                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ", ex);
+                            } catch (Exception e) {
+                                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecentItemClick: ", e);
+                                Crashlytics.logException(e);
                             }
                         }
                     });
@@ -741,6 +747,7 @@ public class DashBoardActivity extends ToolbarActivity
                     catch (Exception e)
                     {
                         Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
+                        Crashlytics.logException(e);
                     }
                 }
 
@@ -973,8 +980,9 @@ public class DashBoardActivity extends ToolbarActivity
                         //ADD RECENT
                         recentContactController.insertRecent(contactId, action);
                         //setListAdapterTabs();
-                    } catch (Exception ex) {
-                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ",ex);
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ", e);
+                        Crashlytics.logException(e);
                     }
                 }
             });
@@ -1070,6 +1078,7 @@ public class DashBoardActivity extends ToolbarActivity
 
             }  catch (Exception e) {
                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
+                Crashlytics.logException(e);
             }
 
             numberOfRecents --;
@@ -1082,7 +1091,7 @@ public class DashBoardActivity extends ToolbarActivity
     public void onConnectivityChanged(ConnectivityChanged event)
     {
 
-        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+        Log.i(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
                 + event.getConnectivityStatus().toString());
         if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
                 event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)

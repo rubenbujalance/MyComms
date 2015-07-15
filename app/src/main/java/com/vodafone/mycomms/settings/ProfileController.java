@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.framework.library.exception.ConnectionException;
 import com.framework.library.model.ConnectionResponse;
 import com.squareup.okhttp.MediaType;
@@ -58,7 +59,7 @@ public class ProfileController extends BaseController {
      * Get Profile, uses DB and Network also. (First loads from DB by a callback then starts network connection.
      */
     public void getProfile(){
-        Log.e(Constants.TAG, "ProfileController.getProfile: ");
+        Log.i(Constants.TAG, "ProfileController.getProfile: ");
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
@@ -156,7 +157,7 @@ public class ProfileController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response){
         super.onConnectionComplete(response);
-        Log.e(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
+        Log.i(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
 
         boolean isUserProfileReceived = false;
         if(response.getUrl() != null && !response.getUrl().endsWith(UpdateSettingsConnection.URL)) {
@@ -180,7 +181,6 @@ public class ProfileController extends BaseController {
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
             if (response.getUrl() != null && response.getUrl().endsWith(ProfileConnection.URL)) {
                 if (isUserProfileReceived) {
-                    Log.e(Constants.TAG, "ProfileController.onConnectionComplete: userProfile " + userProfile.getTimezone());
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
                 } else {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionCompleted();
@@ -211,6 +211,7 @@ public class ProfileController extends BaseController {
                     error = jsonResponse.getString("des");
                 } catch (JSONException e) {
                     Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
+                    Crashlytics.logException(e);
                 }
 
                 //Commented due to "BaseController.onConnectionError: {"err":"auth_proxy_error","des":"invalid body request"}
@@ -255,6 +256,7 @@ public class ProfileController extends BaseController {
         }catch (JSONException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());
+            Crashlytics.logException(e);
         }
         return  userProfile;
     }
@@ -282,7 +284,7 @@ public class ProfileController extends BaseController {
 
     public void updateContactData(HashMap profileHashMap) {
         JSONObject json = new JSONObject(profileHashMap);
-        Log.e(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+        Log.i(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
         UpdateProfileConnection updateProfileConnection = new UpdateProfileConnection(getContext(),this);
         updateProfileConnection.setPayLoad(json.toString());
         updateProfileConnection.request();
@@ -290,7 +292,7 @@ public class ProfileController extends BaseController {
 
     public void updateSettingsData(HashMap settingsHashMap) {
         JSONObject json = new JSONObject(settingsHashMap);
-        Log.e(Constants.TAG, "ProfileController.updateSettingsData: " + json.toString());
+        Log.i(Constants.TAG, "ProfileController.updateSettingsData: " + json.toString());
         UpdateSettingsConnection updateSettingsConnection = new UpdateSettingsConnection(getContext(),this);
         updateSettingsConnection.setPayLoad(json.toString());
         updateSettingsConnection.request();
@@ -298,7 +300,7 @@ public class ProfileController extends BaseController {
 
     public void updatePassword(HashMap passwordHashMap){
             JSONObject json = new JSONObject(passwordHashMap);
-            Log.e(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
+            Log.i(Constants.TAG, "ProfileController.updateContactData: " + json.toString());
             PasswordConnection passwordConnection = new PasswordConnection(getContext(),this);
             passwordConnection.setPayLoad(json.toString());
             passwordConnection.request();
@@ -306,7 +308,7 @@ public class ProfileController extends BaseController {
 
     public void updateTimeZone(HashMap timeZoneHashMap) {
         JSONObject json = new JSONObject(timeZoneHashMap);
-        Log.e(Constants.TAG, "ProfileController.updateTimeZone: " + json.toString());
+        Log.i(Constants.TAG, "ProfileController.updateTimeZone: " + json.toString());
         UpdateTimeZoneConnection updateTimeZoneConnection = new UpdateTimeZoneConnection(getContext(),this);
         updateTimeZoneConnection.setPayLoad(json.toString());
         updateTimeZoneConnection.request();
@@ -339,6 +341,7 @@ public class ProfileController extends BaseController {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "ProfileController.logoutToAPI: ",e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -420,7 +423,7 @@ public class ProfileController extends BaseController {
     public class GetProfileAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: START");
+            Log.i(Constants.TAG, "GetProfileAsyncTask.doInBackground: START");
 
             Response response;
             String json = null;
@@ -443,9 +446,8 @@ public class ProfileController extends BaseController {
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: ",e);
+                Crashlytics.logException(e);
             }
-
-            Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: END");
 
             return json;
         }
@@ -485,9 +487,10 @@ public class ProfileController extends BaseController {
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: ",e);
+                Crashlytics.logException(e);
             }
 
-            Log.e(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: END");
+            Log.i(Constants.TAG, "LogoutProfileAsyncTask.doInBackground: END");
 
             return jsonResp;
         }

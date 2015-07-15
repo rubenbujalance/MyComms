@@ -158,7 +158,14 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         try
         {
             if(null != contact.getPresence())
-                icon = new JSONObject(contact.getPresence()).getString("icon");
+            {
+                JSONObject jsonObject =  new JSONObject(contact.getPresence());
+                if(!jsonObject.isNull("icon"))
+                {
+                    icon = new JSONObject(contact.getPresence()).getString("icon");
+                }
+            }
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -167,7 +174,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         if(icon.compareTo("dnd")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_notdisturb);
         else if(icon.compareTo("vacation")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_vacation);
         else if(icon.compareTo("moon")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_moon);
-        else viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
+        else if(icon.compareTo("sun")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
+        else viewHolder.imageViewDayNight.setVisibility(View.GONE);
 
         //Local time
         String presenceDetail = "";

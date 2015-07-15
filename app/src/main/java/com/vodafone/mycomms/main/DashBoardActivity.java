@@ -58,7 +58,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.concurrent.Executors;
 
 import model.Contact;
 import model.News;
@@ -415,45 +414,7 @@ public class DashBoardActivity extends ToolbarActivity
         protected Void doInBackground(Void... params) {
 
             newsImage = (ImageView) child.findViewById(R.id.notice_image);
-            newsFile = new File(getFilesDir(), Constants.CONTACT_NEWS_DIR +
-                    "news_"+uuid+".jpg");
-
-            if (newsFile.exists()) {
-                loadFromDisk = true;
-            } else{
-                //Download image
-                if (image != null &&
-                        image.length() > 0) {
-                    imageUrl = "https://" + EndpointWrapper.getBaseNewsURL() + image;
-                    File imagesDir = new File(getFilesDir() + Constants.CONTACT_NEWS_DIR);
-                    if(!imagesDir.exists()) imagesDir.mkdirs();
-
-                    target = new Target() {
-                        @Override
-                        public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                            newsImage.setImageBitmap(bitmap);
-
-                            SaveAndShowImageAsyncTask task =
-                                    new SaveAndShowImageAsyncTask(
-                                            newsImage, newsFile, bitmap);
-
-                            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                            if(newsFile.exists()) newsFile.delete();
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                        }
-                    };
-
-                    newsImage.setTag(target);
-                }
-            }
+            imageUrl = "https://" + EndpointWrapper.getBaseNewsURL() + image;
 
             Long current = Calendar.getInstance().getTimeInMillis();
             final String detailImage = image;
@@ -491,17 +452,18 @@ public class DashBoardActivity extends ToolbarActivity
                 title.setText(titleStr);
                 TextView date = (TextView) child.findViewById(R.id.notice_date);
                 date.setText(dateStr);
-                Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
-                builder.executor(Executors.newSingleThreadExecutor());
-                if (loadFromDisk)
-                    Picasso.with(DashBoardActivity.this)
-                            .load(newsFile)
-                            .fit().centerInside()
-                            .into(newsImage);
-                else
-                    Picasso.with(DashBoardActivity.this)
-                            .load(imageUrl)
-                            .into(target);
+                MycommsApp.picasso
+                        .load(imageUrl)
+                        .fit().centerCrop()
+                        .into(newsImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                            }
+                            @Override
+                            public void onError() {
+                                newsImage.setImageResource(R.color.grey_middle);
+                            }
+                        });
             } catch (Exception e) {
                 Log.e(Constants.TAG, "DrawSingleNewsAsyncTask.onPostExecute: ",e);
             }

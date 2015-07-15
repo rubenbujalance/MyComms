@@ -465,7 +465,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             if(icon.compareTo("dnd")==0) ivIconStatus.setImageResource(R.mipmap.ico_notdisturb_white);
             else if(icon.compareTo("vacation")==0) ivIconStatus.setImageResource(R.mipmap.ico_vacation_white);
             else if(icon.compareTo("moon")==0) ivIconStatus.setImageResource(R.mipmap.ico_moon_white);
-            else ivIconStatus.setImageResource(R.mipmap.ico_sun_white);
+            else if(icon.compareTo("sun")==0) ivIconStatus.setImageResource(R.mipmap.ico_sun_white);
+            else ivIconStatus.setVisibility(View.GONE);
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
         }

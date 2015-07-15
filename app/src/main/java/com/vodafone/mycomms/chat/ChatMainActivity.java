@@ -327,7 +327,8 @@ public class ChatMainActivity extends ToolbarActivity {
     private void refreshAdapter()
     {
         Log.i(Constants.TAG, "ChatMainActivity.refreshAdapter: ");
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList, _profile);
+        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList,
+                _profile, false);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 

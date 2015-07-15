@@ -36,7 +36,8 @@ import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Callback;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chat.ChatRecyclerViewAdapter;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
@@ -222,7 +223,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 images.add(bottom_left_avatar);
                 images.add(bottom_right_avatar);
 
-                ArrayList<TextView> texts = new ArrayList<>();
+                final ArrayList<TextView> texts = new ArrayList<>();
                 texts.add(top_left_avatar_text);
                 texts.add(bottom_left_avatar_text);
                 texts.add(bottom_right_avatar_text);
@@ -235,36 +236,59 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 }
 
                 int i = 0;
-                for(Contact contact : contactList) {
+                for(Contact contact : contactList)
+                {
                     if(i>3) break;
 
-                    File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                            "avatar_"+contact.getContactId()+".jpg");
+                    final ImageView image = images.get(i);
+                    final TextView text = texts.get(i);
+                    text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+                    //Image avatar
+                    String initials = "";
+                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+                    {
+                        initials = contact.getFirstName().substring(0,1);
+
+                        if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                        {
+                            initials = initials + contact.getLastName().substring(0,1);
+                        }
+
+                    }
+
+                    final String finalInitials = initials;
+
+                    image.setImageResource(R.color.grey_middle);
+                    text.setVisibility(View.VISIBLE);
+                    text.setText(finalInitials);
 
                     if (contact.getAvatar()!=null &&
-                            contact.getAvatar().length()>0 &&
-                            contact.getAvatar().compareTo("")!=0 &&
-                            avatarFile.exists())
+                            contact.getAvatar().length()>0)
                     {
-
-                        Picasso.with(this)
-                                .load(avatarFile)
+                        MycommsApp.picasso
+                                .load(contact.getAvatar())
+                                .placeholder(R.color.grey_middle)
+                                .noFade()
                                 .fit().centerCrop()
-                                .into(images.get(i));
+                                .into(image, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        text.setVisibility(View.INVISIBLE);
+                                    }
 
-                    } else{
-                        String initials = "";
-                        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-                        {
-                            initials = contact.getFirstName().substring(0,1);
-
-                            if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                            {
-                                initials = initials + contact.getLastName().substring(0,1);
-                            }
-                        }
-                        images.get(i).setImageResource(R.color.grey_middle);
-                        texts.get(i).setText(initials);
+                                    @Override
+                                    public void onError() {
+                                        image.setImageResource(R.color.grey_middle);
+                                        text.setVisibility(View.VISIBLE);
+                                        text.setText(finalInitials);
+                                    }
+                                });
+                    }
+                    else
+                    {
+                        image.setImageResource(R.color.grey_middle);
+                        text.setText(initials);
                     }
                     i++;
                 }
@@ -285,34 +309,51 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 );
 
             Contact contact = contactList.get(0);
-            File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                    "avatar_"+contact.getContactId()+".jpg");
+            //Image avatar
+            String initials = "";
+            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+            {
+                initials = contact.getFirstName().substring(0,1);
+
+                if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                {
+                    initials = initials + contact.getLastName().substring(0,1);
+                }
+
+            }
+
+            final String finalInitials = initials;
+
+            top_left_avatar.setImageResource(R.color.grey_middle);
+            top_left_avatar_text.setVisibility(View.VISIBLE);
+            top_left_avatar_text.setText(finalInitials);
+            top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 
             if (contact.getAvatar()!=null &&
-                    contact.getAvatar().length()>0 &&
-                    contact.getAvatar().compareTo("")!=0 &&
-                    avatarFile.exists())
+                    contact.getAvatar().length()>0)
             {
-
-                Picasso.with(this)
-                        .load(avatarFile)
+                MycommsApp.picasso
+                        .load(contact.getAvatar())
+                        .placeholder(R.color.grey_middle)
+                        .noFade()
                         .fit().centerCrop()
-                        .into(top_left_avatar);
+                        .into(top_left_avatar, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                top_left_avatar_text.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onError() {
+                                top_left_avatar.setImageResource(R.color.grey_middle);
+                                top_left_avatar_text.setVisibility(View.VISIBLE);
+                                top_left_avatar_text.setText(finalInitials);
+                            }
+                        });
             }
             else
             {
-                String initials = "";
-                if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-                {
-                    initials = contact.getFirstName().substring(0,1);
-
-                    if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                    {
-                        initials = initials + contact.getLastName().substring(0,1);
-                    }
-                }
                 top_left_avatar.setImageResource(R.color.grey_middle);
-                top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
                 top_left_avatar_text.setText(initials);
             }
 
@@ -516,7 +557,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     private void refreshAdapter()
     {
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList, _profile);
+        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
+                _profile, isGroupChatMode);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 

@@ -141,7 +141,7 @@ public final class XMPPTransactions {
 
             accessToken = UserSecurity.getAccessToken(appContext);
             xmppConfigBuilder.setUsernameAndPassword(_profile_id, accessToken);
-//            xmppConfigBuilder.setResource(_device_id);
+            xmppConfigBuilder.setResource(_device_id);
             xmppConfigBuilder.setServiceName(Constants.XMPP_PARAM_DOMAIN);
             xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
             xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
@@ -153,7 +153,7 @@ public final class XMPPTransactions {
             XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
 
             //Set a timer to check connection every 5 seconds
-            startPinging(PINGING_TIME_MILIS);
+//            startPinging(PINGING_TIME_MILIS);
 
             //Connect to server
             xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, xmppConfigBuilder);

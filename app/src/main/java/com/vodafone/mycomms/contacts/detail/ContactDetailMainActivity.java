@@ -581,8 +581,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         if (contact.getAvatar()!=null &&
                 contact.getAvatar().length()>0 &&
                 contact.getAvatar().compareTo("")!=0  &&
-                contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)
-                || contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL))
+                (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)
+                || contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)))
         {
 
             textAvatar.setText(null);
@@ -603,7 +603,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                             String initials = "";
                             if (null != contact.getFirstName() && contact.getFirstName().length() > 0) {
                                 initials = initials + contact.getFirstName().substring(0, 1);
-
                             }
 
                             if (null != contact.getLastName() && contact.getLastName().length() > 0) {

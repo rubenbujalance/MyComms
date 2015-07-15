@@ -108,7 +108,7 @@ public final class XMPPTransactions {
         if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() ||
                 !_xmppConnection.isConnected() || force) {
 
-            Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: Connecting");
+            Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: Connecting");
 
             //Save context and reset connection
             _appContext = appContext;

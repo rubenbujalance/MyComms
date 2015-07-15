@@ -237,6 +237,7 @@ public class DashBoardActivity extends ToolbarActivity
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: ",e);
+            Crashlytics.logException(e);
         }
 
         recentsLoading = false;
@@ -277,6 +278,7 @@ public class DashBoardActivity extends ToolbarActivity
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "DashBoardActivity.drawNews: " + e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -369,6 +371,7 @@ public class DashBoardActivity extends ToolbarActivity
             loadRecents(recentsContainer2);
     }
 
+    @SuppressWarnings("ResourceType")
     public class DrawSingleNewsAsyncTask extends AsyncTask<Void,Void,Void>
     {
         LayoutInflater inflater;
@@ -413,6 +416,7 @@ public class DashBoardActivity extends ToolbarActivity
         @Override
         protected Void doInBackground(Void... params) {
 
+            //noinspection ResourceType,ResourceType
             newsImage = (ImageView) child.findViewById(R.id.notice_image);
             imageUrl = "https://" + EndpointWrapper.getBaseNewsURL() + image;
 
@@ -466,6 +470,7 @@ public class DashBoardActivity extends ToolbarActivity
                         });
             } catch (Exception e) {
                 Log.e(Constants.TAG, "DrawSingleNewsAsyncTask.onPostExecute: ",e);
+                Crashlytics.logException(e);
             }
         }
     }
@@ -627,8 +632,9 @@ public class DashBoardActivity extends ToolbarActivity
                                         RecentContactController(DashBoardActivity.this, _profileId);
                                 recentContactController.insertRecentOKHttp(groupChatId, Constants.CONTACTS_ACTION_SMS);
 
-                            } catch (Exception ex) {
-                                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ", ex);
+                            } catch (Exception e) {
+                                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecentItemClick: ", e);
+                                Crashlytics.logException(e);
                             }
                         }
                     });
@@ -728,6 +734,7 @@ public class DashBoardActivity extends ToolbarActivity
                     catch (Exception e)
                     {
                         Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
+                        Crashlytics.logException(e);
                     }
                 }
 
@@ -958,8 +965,9 @@ public class DashBoardActivity extends ToolbarActivity
                         //ADD RECENT
                         recentContactController.insertRecent(contactId, action);
                         //setListAdapterTabs();
-                    } catch (Exception ex) {
-                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ",ex);
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecntItemClick: ", e);
+                        Crashlytics.logException(e);
                     }
                 }
             });
@@ -1055,6 +1063,7 @@ public class DashBoardActivity extends ToolbarActivity
 
             }  catch (Exception e) {
                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
+                Crashlytics.logException(e);
             }
 
             numberOfRecents --;

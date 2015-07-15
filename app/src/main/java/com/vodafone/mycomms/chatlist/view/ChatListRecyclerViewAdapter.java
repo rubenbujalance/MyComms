@@ -3,6 +3,7 @@ package com.vodafone.mycomms.chatlist.view;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.TypedValue;
@@ -78,13 +79,20 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         chatListHolder.layContainer.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                int sdk = Build.VERSION.SDK_INT;
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    v.setBackground(mContext.getResources().getDrawable(R.color.grey_light));
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        v.setBackgroundDrawable(mContext.getResources().getDrawable(R.color.grey_light));
+                    else
+                        v.setBackground(mContext.getResources().getDrawable(R.color.grey_light));
                     return true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP
                         ||
                         event.getAction() == MotionEvent.ACTION_CANCEL) {
-                    v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
+                    else
+                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
                     return true;
                 } else return false;
             }

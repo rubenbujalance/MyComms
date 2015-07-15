@@ -42,6 +42,7 @@ import io.fabric.sdk.android.Fabric;
  *
  * @see SystemUiHider
  */
+@SuppressWarnings("ResourceType")
 public class SplashScreenActivity extends Activity {
 
     ProgressDialog mProgress;

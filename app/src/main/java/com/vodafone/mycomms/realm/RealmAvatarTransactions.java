@@ -2,6 +2,7 @@ package com.vodafone.mycomms.realm;
 
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public final class RealmAvatarTransactions {
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmAvatarTransactions.insertAvatar: ", e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -43,7 +45,8 @@ public final class RealmAvatarTransactions {
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
             e.printStackTrace();
-            Log.e(Constants.TAG, "RealmAvatarTransactions.insertContactList: ",e);
+            Log.e(Constants.TAG, "RealmAvatarTransactions.insertContactList: ", e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -86,8 +89,9 @@ public final class RealmAvatarTransactions {
             if (result != null && !result.isEmpty())
                 avatar = result.first();
 
-        } catch (Exception ex) {
-            Log.e(Constants.TAG, "RealmAvatarTransactions.getContactAvatarByContactId: ", ex);
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "RealmAvatarTransactions.getContactAvatarByContactId: ", e);
+            Crashlytics.logException(e);
         }
 
         return avatar;
@@ -102,6 +106,7 @@ public final class RealmAvatarTransactions {
             mRealm.commitTransaction();
         } catch (Exception e) {
             Log.e(Constants.TAG, "RealmAvatarTransactions.updateAvatarUrlByContactId: ",e);
+            Crashlytics.logException(e);
         }
     }
 

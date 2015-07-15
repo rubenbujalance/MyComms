@@ -2,6 +2,7 @@ package com.vodafone.mycomms.realm;
 
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class RealmNewsTransactions {
             mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmNewsTransactions.insertNewsList: " + e);
+            Crashlytics.logException(e);
         }
     }
 

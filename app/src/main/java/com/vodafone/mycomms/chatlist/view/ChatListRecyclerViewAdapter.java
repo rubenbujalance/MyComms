@@ -115,7 +115,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
         chatListHolder.textViewMessage.setText(composedChat.get(i).getChat().getLastMessage());
         String timeDifference = Utils.getStringChatTimeDifference(composedChat.get(i)
-                .getChat().getLastMessageTime());
+                .getChat().getLastMessageTime(), mContext);
         chatListHolder.textViewTime.setText(timeDifference);
 
         long amountUnreadMessages = _chatTx.getChatPendingMessagesCount(getComposedChat(i).getChat().getContact_id());
@@ -271,7 +271,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         }
         chatListHolder.textViewName.setText(contactName);
         chatListHolder.textViewMessage.setText(groupChat.getLastMessage());
-        String timeDifference = Utils.getStringChatTimeDifference(groupChat.getLastMessageTime());
+        String timeDifference = Utils.getStringChatTimeDifference(groupChat.getLastMessageTime(), mContext);
         chatListHolder.textViewTime.setText(timeDifference);
 
         //Load unread messages

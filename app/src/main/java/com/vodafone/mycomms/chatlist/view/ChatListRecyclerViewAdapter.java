@@ -16,7 +16,8 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.readystatesoftware.viewbadger.BadgeView;
-import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Callback;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.ComposedChat;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -25,8 +26,9 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 import model.Contact;
 import model.GroupChat;
@@ -128,34 +130,15 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
             badge.show();
         }
 
-        //Image avatar
-        File avatarFile = new File
+        Contact contact = mContactTransactions.getContactById(getComposedChat(i).getChat().getContact_id());
+
+        chatListHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+        loadComposedAvatar
                 (
-                        mContext.getFilesDir()
-                        , Constants.CONTACT_AVATAR_DIR + "avatar_"+composedChat.get(i)
-                        .getChat().getContact_id()+".jpg"
+                        contact
+                        , chatListHolder.top_left_avatar
+                        , chatListHolder.top_left_avatar_text
                 );
-
-        if (composedChat.get(i).getChat().getContact_id()!=null &&
-                composedChat.get(i).getChat().getContact_id().length()>0 &&
-                composedChat.get(i).getChat().getContact_id().compareTo("")!=0 &&
-                avatarFile.exists()) {
-
-            chatListHolder.top_left_avatar_text.setText(null);
-
-            Picasso.with(mContext)
-                    .load(avatarFile)
-                    .fit().centerCrop()
-                    .into(chatListHolder.top_left_avatar);
-
-        } else{
-            String initials = getChatMemberInitials(composedChat.get(i).getChat().getContact_id());
-
-
-            chatListHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-            chatListHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-            chatListHolder.top_left_avatar_text.setText(initials);
-        }
     }
 
     private String getChatMemberName(String contactId)
@@ -173,20 +156,50 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     }
 
 
+    private ArrayList<Contact> loadContactsFromIds
+            (
+                    ArrayList<String> ids
+            )
+    {
+        ArrayList<Contact> contacts = new ArrayList<>();
+        RealmContactTransactions realmContactTransactions =
+                new RealmContactTransactions(profileId);
+        UserProfile userProfile = realmContactTransactions.getUserProfile();
+        Contact contact = new Contact();
+        contact.setAvatar(userProfile.getAvatar());
+        contact.setFirstName(userProfile.getFirstName());
+        contact.setLastName(userProfile.getLastName());
+        contact.setContactId(userProfile.getId());
+        contact.setPlatform(userProfile.getPlatform());
+        contacts.add(contact);
+        for(String id : ids)
+        {
+            if(!id.equals(userProfile.getId()))
+            {
+                contact = realmContactTransactions.getContactById(id);
+                if(null != contact)
+                    contacts.add(contact);
+            }
+        }
+        return contacts;
+    }
+
     private void loadGroupChat(final ChatListHolder chatListHolder, final int i)
     {
+        HashMap<ImageView, TextView> hashMapImageText = new HashMap<>();
+        hashMapImageText.put(chatListHolder.top_left_avatar, chatListHolder.top_left_avatar_text);
+        hashMapImageText.put(chatListHolder.top_right_avatar, chatListHolder.top_left_avatar_text);
+        hashMapImageText.put(chatListHolder.bottom_left_avatar,chatListHolder
+                .bottom_left_avatar_text);
+        hashMapImageText.put(chatListHolder.bottom_right_avatar, chatListHolder
+                .bottom_right_avatar_text);
+
+
         //Loads avatar visibility for group chat mode
         ArrayList<ImageView> images = new ArrayList<>();
         images.add(chatListHolder.top_left_avatar);
         images.add(chatListHolder.bottom_left_avatar);
         images.add(chatListHolder.bottom_right_avatar);
-
-        ArrayList<TextView> texts = new ArrayList<>();
-        texts.add(chatListHolder.top_left_avatar_text);
-        texts.add(chatListHolder.bottom_left_avatar_text);
-        texts.add(chatListHolder.bottom_right_avatar_text);
-
-
 
         GroupChat groupChat = composedChat.get(i).getGroupChat();
         String members = groupChat.getMembers();
@@ -204,69 +217,41 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         {
             chatListHolder.lay_top_right_image_hide.setVisibility(View.VISIBLE);
             images.add(chatListHolder.top_right_avatar);
-            texts.add(chatListHolder.top_right_avatar_text);
         }
+
+        ArrayList<String> contactIds = new ArrayList<>();
+        Collections.addAll(contactIds, membersArray);
+
+        ArrayList<Contact> contacts = loadContactsFromIds(contactIds);
 
         String contactName = null;
         int count = 0;
-        for(String id : membersArray)
+        for(ImageView image : images)
         {
-            if(id.equals(profileId))
-            {
-                UserProfile userProfile = mContactTransactions.getUserProfile();
-                if(null == contactName)
-                    contactName = userProfile.getFirstName();
-                else
-                    contactName = contactName + ", " + userProfile.getFirstName();
+            Contact contact = contacts.get(count);
 
-                Contact contact = new Contact();
-                contact.setContactId(id);
-                contact.setFirstName(userProfile.getFirstName());
-                contact.setLastName(userProfile.getLastName());
-                contact.setAvatar(userProfile.getAvatar());
-                if(count < 4)
-                {
-                    loadComposedAvatar
-                            (
-                                    count
-                                    , id
-                                    , contact
-                                    , images
-                                    , texts
-                            );
-                    count++;
-                }
-            }
-            else
+            hashMapImageText.get(image).setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+            try
             {
-                try {
-                    Contact contact = mContactTransactions.getContactById(id);
-                    String contactFirstName = null;
-                    if (null == contact) {
-                        contactFirstName = "Unknown";
-                    } else {
-                        contactFirstName = contact.getFirstName();
-                    }
-                    if (null == contactName)
-                        contactName = contactFirstName;
-                    else
-                        contactName = contactName + ", " + contactFirstName;
-                    if (count < 4) {
-                        loadComposedAvatar
-                                (
-                                        count
-                                        , id
-                                        , contact
-                                        , images
-                                        , texts
-                                );
-                        count++;
-                    }
-                } catch (Exception e){
-                    Log.e(Constants.TAG, "ChatListRecyclerViewAdapter.loadGroupChat: Error getting contact by Id");
-                    Crashlytics.logException(e);
-                }
+                if (null == contactName)
+                    contactName = contact.getFirstName();
+                else
+                    contactName = contactName + ", " + contact.getFirstName();
+
+                loadComposedAvatar
+                            (
+                                     contact
+                                    , images.get(count)
+                                    , hashMapImageText.get(image)
+                            );
+            } catch (Exception e){
+                Log.e(Constants.TAG, "ChatListRecyclerViewAdapter.loadGroupChat: Error getting contact by Id");
+                Crashlytics.logException(e);
             }
+
+            count++;
+            if(count>4) break;
 
         }
         chatListHolder.textViewName.setText(contactName);
@@ -289,40 +274,56 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
     private void loadComposedAvatar
             (
-                    int count
-                    , String id
-                    , Contact contact
-                    , ArrayList<ImageView> images
-                    , ArrayList<TextView> texts
+                    Contact contact
+                    , final ImageView image
+                    , final TextView text
             )
     {
-        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                "avatar_"+id+".jpg");
+        //Image avatar
+        String initials = "";
+        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+        {
+            initials = contact.getFirstName().substring(0,1);
+
+            if(null != contact.getLastName() && contact.getLastName().length() > 0)
+            {
+                initials = initials + contact.getLastName().substring(0,1);
+            }
+        }
+
+        final String finalInitials = initials;
+
+        image.setImageResource(R.color.grey_middle);
+        text.setVisibility(View.VISIBLE);
+        text.setText(finalInitials);
 
         if (contact.getAvatar()!=null &&
-                contact.getAvatar().length()>0 &&
-                contact.getAvatar().compareTo("")!=0 &&
-                avatarFile.exists())
+                contact.getAvatar().length()>0)
         {
 
-            Picasso.with(mContext)
-                    .load(avatarFile)
+            MycommsApp.picasso
+                    .load(contact.getAvatar())
+                    .placeholder(R.color.grey_middle)
+                    .noFade()
                     .fit().centerCrop()
-                    .into(images.get(count));
+                    .into(image, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            text.setVisibility(View.INVISIBLE);
+                        }
 
-        } else{
-            String initials = "";
-            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-            {
-                initials = contact.getFirstName().substring(0,1);
-
-                if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                {
-                    initials = initials + contact.getLastName().substring(0,1);
-                }
-            }
-            images.get(count).setImageResource(R.color.grey_middle);
-            texts.get(count).setText(initials);
+                        @Override
+                        public void onError() {
+                            image.setImageResource(R.color.grey_middle);
+                            text.setVisibility(View.VISIBLE);
+                            text.setText(finalInitials);
+                        }
+                    });
+        }
+        else
+        {
+            image.setImageResource(R.color.grey_middle);
+            text.setText(initials);
         }
     }
 

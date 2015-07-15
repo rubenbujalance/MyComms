@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -79,6 +80,8 @@ public class DashBoardActivity extends ToolbarActivity
     private LinearLayout recentsContainer, recentsContainer2;
     private boolean isCurrentRecentContainerFirst = true;
     private int numberOfRecents = 0;
+
+    private HashMap<String, View> hashMapRecentIdView = new HashMap<>();
 
 
 
@@ -537,9 +540,6 @@ public class DashBoardActivity extends ToolbarActivity
         String groupChatId;
         ArrayList<ImageView> images = new ArrayList<>();
 
-        HashMap<ImageView,Target> mapAvatarTarget = new HashMap<>();
-        HashMap<String,String> mapAvatarContactId = new HashMap<>();
-        HashMap<ImageView,File> mapAvatarFile = new HashMap<>();
         HashMap<ImageView,TextView> mapAvatarImageAndText = new HashMap<>();
 
         public DrawSingleGroupChatRecentAsyncTask
@@ -578,6 +578,7 @@ public class DashBoardActivity extends ToolbarActivity
             contact.setFirstName(userProfile.getFirstName());
             contact.setLastName(userProfile.getLastName());
             contact.setContactId(userProfile.getId());
+            contact.setPlatform(userProfile.getPlatform());
             contacts.add(contact);
             for(String id : ids)
             {
@@ -590,12 +591,6 @@ public class DashBoardActivity extends ToolbarActivity
             }
         }
 
-        private void mapAvatarToContactId()
-        {
-            for (Contact contact : contacts) {
-                mapAvatarContactId.put(contact.getContactId(), contact.getAvatar());
-            }
-        }
 
         @Override
         protected void onPreExecute()
@@ -603,6 +598,8 @@ public class DashBoardActivity extends ToolbarActivity
             childRecents = inflater.inflate(R.layout.layout_group_chat_recents_dashboard, recentsContainer, false);
 
             recentsContainer.addView(childRecents);
+            hashMapRecentIdView.put(this.groupChatId,childRecents);
+
             childRecents.setPadding(10, 20, 10, 20);
 
             top_left_avatar = (ImageView) childRecents.findViewById(R.id.top_left_avatar);
@@ -647,90 +644,16 @@ public class DashBoardActivity extends ToolbarActivity
         }
 
         @Override
-        protected String doInBackground(Void... params)
-        {
-            if(null != contactIds && contactIds.size() >= 3)
+        protected String doInBackground(Void... params) {
+            if (null != contactIds && contactIds.size() >= 3)
             {
-                try {
-                    loadContactsFromIds(contactIds);
-                    mapAvatarToContactId();
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "DrawSingleGroupChatRecentAsyncTask.mapAvatarToContactId: ",e);
-                    Crashlytics.logException(e);
-                    return null;
-                }
-
-                int i = 0;
-                for(final ImageView image : images)
+                try
                 {
-                    Contact contact = contacts.get(i);
-                    i++;
-                    String avatar = mapAvatarContactId.get(contact.getContactId());
-                    avatarFile = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR,
-                            "avatar_"+contact.getContactId()+".jpg");
-                    avatarTarget = null;
-
-                    //Avatar image
-                    if (avatarFile.exists())
-                    {   //From file if already exists
-                        mapAvatarFile.put(image,avatarFile);
-                    }
-                    else
-                    {
-                        mapAvatarFile.put(image,null);
-                        //Set name initials image during the download
-                        if (null != contact.getFirstName() && contact.getFirstName().length() > 0) {
-                            nameInitials = contact.getFirstName().substring(0, 1);
-
-                            if (null != contact.getLastName() && contact.getLastName().length() > 0) {
-                                nameInitials = nameInitials + contact.getLastName().substring(0, 1);
-                            }
-                        }
-
-                        //Download avatar
-                        if (avatar != null &&
-                                avatar.length() > 0 &&
-                                !ConnectionsQueue.isConnectionAlive(avatarFile.toString())) {
-                            File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
-
-                            if(!avatarsDir.exists()) avatarsDir.mkdirs();
-
-                            avatarTarget = new Target() {
-                                @Override
-                                public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                                    image.setImageBitmap(bitmap);
-                                    mapAvatarImageAndText.get(image).setVisibility(View.INVISIBLE);
-
-                                    SaveAndShowImageAsyncTask task =
-                                            new SaveAndShowImageAsyncTask(
-                                                    image, avatarFile, bitmap, mapAvatarImageAndText.get(image));
-
-                                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                                }
-
-                                @Override
-                                public void onBitmapFailed(Drawable errorDrawable) {
-                                    if(avatarFile.exists()) avatarFile.delete();
-                                    ConnectionsQueue.removeConnection(avatarFile.toString());
-                                }
-
-                                @Override
-                                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                }
-                            };
-                            image.setTag(avatarTarget);
-
-                        }
-                    }
-                    mapAvatarTarget.put(image, avatarTarget);
-
                     LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
                     btRecents.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
                             try {
-                                if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
-                                {
+                                if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
                                     Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
                                     in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
                                     in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
@@ -739,7 +662,7 @@ public class DashBoardActivity extends ToolbarActivity
                                 }
 
                                 RecentContactController recentContactController = new
-                                        RecentContactController(DashBoardActivity.this,_profileId);
+                                        RecentContactController(DashBoardActivity.this, _profileId);
                                 recentContactController.insertRecentOKHttp(groupChatId, Constants.CONTACTS_ACTION_SMS);
 
                             } catch (Exception ex) {
@@ -748,14 +671,14 @@ public class DashBoardActivity extends ToolbarActivity
                         }
                     });
 
+                    return Integer.toString(this.contactIds.size());
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "DrawSingleGroupChatRecentAsyncTask.mapAvatarToContactId: ", e);
+                    Crashlytics.logException(e);
+                    return null;
                 }
-                return Integer.toString(this.contactIds.size());
             }
-            else
-            {
-                return Integer.toString(this.contactIds.size());
-            }
-
+            return Integer.toString(this.contactIds.size());
         }
 
         @Override
@@ -767,42 +690,81 @@ public class DashBoardActivity extends ToolbarActivity
             {
                 contacts = new ArrayList<>();
                 loadContactsFromIds(contactIds);
+
                 int i = 0;
-                for(ImageView image : images)
+                for(final ImageView image : images)
                 {
                     try
                     {
-                        Contact contact = contacts.get(i);
+                        Contact contact = this.contacts.get(i);
                         i++;
-                        String avatar = mapAvatarContactId.get(contact.getContactId());
-                        //Avatar
-                        if (null != mapAvatarFile.get(image))
+                        //Image avatar
+                        String initials = "";
+                        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
                         {
-                            Picasso.with(DashBoardActivity.this)
-                                    .load(mapAvatarFile.get(image))
-                                    .fit().centerCrop()
-                                    .into(image);
+                            initials = contact.getFirstName().substring(0,1);
+
+                            if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                            {
+                                initials = initials + contact.getLastName().substring(0,1);
+                            }
+
+                        }
+
+                        final String finalInitials = initials;
+
+                        image.setImageResource(R.color.grey_middle);
+                        mapAvatarImageAndText.get(image).setVisibility(View.VISIBLE);
+                        mapAvatarImageAndText.get(image).setText(finalInitials);
+                        mapAvatarImageAndText.get(image).setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+                        if (contact.getAvatar()!=null &&
+                                contact.getAvatar().length()>0)
+                        {
+                            if (contact.getContactId().equals(_profileId) || contact.getPlatform()
+                                .equalsIgnoreCase
+                                    (Constants
+                                    .PLATFORM_MY_COMMS)
+                                    || contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                                MycommsApp.picasso
+                                        .load(contact.getAvatar())
+                                        .placeholder(R.color.grey_middle)
+                                        .noFade()
+                                        .fit().centerCrop()
+                                        .into(image, new Callback() {
+                                            @Override
+                                            public void onSuccess() {
+                                                mapAvatarImageAndText.get(image).setVisibility(View.INVISIBLE);
+                                            }
+
+                                            @Override
+                                            public void onError() {
+                                                image.setImageResource(R.color.grey_middle);
+                                                mapAvatarImageAndText.get(image).setVisibility(View.VISIBLE);
+                                                mapAvatarImageAndText.get(image).setText(finalInitials);
+                                            }
+                                        });
+                            }
+                            else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
+                            {
+                                AvatarSFController avatarSFController = new AvatarSFController
+                                        (
+                                                DashBoardActivity.this
+                                                , image
+                                                , mapAvatarImageAndText.get(image)
+                                                , contact.getContactId()
+                                        );
+                                avatarSFController.getSFAvatar(contact.getAvatar());
+                            }
                         }
                         else
                         {
                             image.setImageResource(R.color.grey_middle);
-                            nameInitials = contact.getFirstName().substring(0, 1);
-
-                            if (null != contact.getLastName() && contact.getLastName().length() > 0) {
-                                nameInitials = nameInitials + contact.getLastName().substring(0, 1);
-                            }
-                            mapAvatarImageAndText.get(image).setText(nameInitials);
-
-                            //Add this download to queue, to avoid duplicated downloads
-                            if(null != mapAvatarFile.get(image))
-                            {
-//                            ConnectionsQueue.putConnection(mapAvatarFile.get(image).toString(), mapAvatarTarget.get(image));
-                                Picasso.with(DashBoardActivity.this)
-                                        .load(avatar)
-                                        .into(mapAvatarTarget.get(image));
-                            }
+                            mapAvatarImageAndText.get(image).setText(initials);
                         }
-                    }  catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
                     }
                 }
@@ -899,6 +861,8 @@ public class DashBoardActivity extends ToolbarActivity
             childRecents = inflater.inflate(R.layout.layout_recents_dashboard, recentsContainer, false);
 
             recentsContainer.addView(childRecents);
+            hashMapRecentIdView.put(this.contactId,childRecents);
+
             childRecents.setPadding(10, 20, 10, 20);
             recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
 
@@ -915,67 +879,63 @@ public class DashBoardActivity extends ToolbarActivity
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(Void... params)
+        {
             avatarFile = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR,
                     "avatar_"+contactId+".jpg");
 
-            //Avatar image
-//            if (avatarFile.exists()) { //From file if already exists
-//                loadAvatarFromDisk = true;
-//            } else
-//            {
-                //Set name initials image during the download
-                if (null != firstName && firstName.length() > 0) {
-                    nameInitials = firstName.substring(0, 1);
+            //Set name initials image during the download
+            if (null != firstName && firstName.length() > 0) {
+                nameInitials = firstName.substring(0, 1);
 
-                    if (null != lastName && lastName.length() > 0) {
-                        nameInitials = nameInitials + lastName.substring(0, 1);
+                if (null != lastName && lastName.length() > 0) {
+                    nameInitials = nameInitials + lastName.substring(0, 1);
+                }
+
+            }
+
+            //Download avatar
+            if (avatar != null &&
+                    avatar.length() > 0 &&
+                    platform.equalsIgnoreCase(Constants.PLATFORM_MY_COMMS))
+            {
+                File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+
+                if (!avatarsDir.exists()) avatarsDir.mkdirs();
+
+                avatarTarget = new Target() {
+                    @Override
+                    public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                        recentAvatar.setImageBitmap(bitmap);
+                        avatarText.setVisibility(View.INVISIBLE);
+
+                        SaveAndShowImageAsyncTask task =
+                                new SaveAndShowImageAsyncTask(
+                                        recentAvatar, avatarFile, bitmap, avatarText);
+
+                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     }
 
-                }
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+                        if(avatarFile.exists()) avatarFile.delete();
+                        ConnectionsQueue.removeConnection(avatarFile.toString());
+                    }
 
-                //Download avatar
-                if (avatar != null &&
-                        avatar.length() > 0 &&
-//                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString()) &&
-                        platform.equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)) {
-                    File avatarsDir = new File(getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
 
-                    if (!avatarsDir.exists()) avatarsDir.mkdirs();
-
-                    avatarTarget = new Target() {
-                        @Override
-                        public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                            recentAvatar.setImageBitmap(bitmap);
-                            avatarText.setVisibility(View.INVISIBLE);
-
-                            SaveAndShowImageAsyncTask task =
-                                    new SaveAndShowImageAsyncTask(
-                                            recentAvatar, avatarFile, bitmap, avatarText);
-
-                            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                            if(avatarFile.exists()) avatarFile.delete();
-                            ConnectionsQueue.removeConnection(avatarFile.toString());
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                        }
-                    };
-                    recentAvatar.setTag(avatarTarget);
-                } else if (avatar != null &&
-                        avatar.length() > 0 &&
-                        !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
-                        && platform.equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
-                    AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), recentAvatar, avatarText, contactId);
-                    avatarSFController.getSFAvatar(avatar);
-                }
-//          }
+                    }
+                };
+                recentAvatar.setTag(avatarTarget);
+            }
+            else if (avatar != null &&
+                    avatar.length() > 0 &&
+                    !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
+                    && platform.equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
+                AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), recentAvatar, avatarText, contactId);
+                avatarSFController.getSFAvatar(avatar);
+            }
 
             LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
@@ -1047,29 +1007,13 @@ public class DashBoardActivity extends ToolbarActivity
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            try {
-                //Avatar
-//                if (loadAvatarFromDisk) {
-//                    Picasso.with(DashBoardActivity.this)
-//                            .load(avatarFile)
-//                            .fit().centerCrop()
-//                            .into(recentAvatar);
-//                    loadAvatarFromDisk = false;
-//                } else if(avatarTarget!=null) {
-//                    recentAvatar.setImageResource(R.color.grey_middle);
-//                    avatarText.setText(nameInitials);
-//
-//                    //Add this download to queue, to avoid duplicated downloads
-//                    ConnectionsQueue.putConnection(avatarFile.toString(), avatarTarget);
-//                    Picasso.with(DashBoardActivity.this)
-//                            .load(avatar)
-//                            .into(avatarTarget);
-//                }
-
+            try
+            {
                 //RBM - NEW Avatar management ****************************
                 recentAvatar.setImageResource(R.color.grey_middle);
                 avatarText.setVisibility(View.VISIBLE);
                 avatarText.setText(nameInitials);
+                avatarText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
                 if (avatar != null &&
                     avatar.length() > 0)
                 {
@@ -1095,7 +1039,7 @@ public class DashBoardActivity extends ToolbarActivity
                 }
 
                 //********************************************************
-//TODO: Check if this code is necessary
+                //TODO: Check if this code is necessary
                 //Local avatar
                 if (avatar != null &&
                         avatar.length() > 0 &&
@@ -1185,6 +1129,14 @@ public class DashBoardActivity extends ToolbarActivity
             recentsContainer2.setVisibility(View.VISIBLE);
         }
     }
+
+    private void loadUnreadMessages()
+    {
+
+    }
+
+
+
 
 
 }

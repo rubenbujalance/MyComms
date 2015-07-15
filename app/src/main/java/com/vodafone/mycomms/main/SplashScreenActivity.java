@@ -216,7 +216,7 @@ public class SplashScreenActivity extends Activity {
                     callBackVersionCheck(null);
                 }
             } catch(Exception ex) {
-                Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: \n" + ex.toString());
+                Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: \n",ex);
                 Crashlytics.logException(ex);
                 finish();
             }
@@ -257,7 +257,7 @@ public class SplashScreenActivity extends Activity {
                 goToLogin();
             }
         } catch(Exception ex) {
-            Log.e(Constants.TAG, "SplashScreenActivity.callBackRenewToken: \n" + ex.toString());
+            Log.e(Constants.TAG, "SplashScreenActivity.callBackRenewToken: \n",ex);
             Crashlytics.logException(ex);
             finish();
         }

@@ -32,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
@@ -138,6 +139,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if(sp==null)
         {
             Log.e(Constants.TAG, "GroupChatActivity.onCreate: error loading Shared Preferences");
+            Crashlytics.logException(new Exception(
+                    "GroupChatActivity.onCreate: error loading Shared Preferences"));
             finish();
         }
 
@@ -145,6 +148,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if(_profile_id == null)
         {
             Log.e(Constants.TAG, "GroupChatActivity.onCreate: profile_id not found in Shared Preferences");
+            Crashlytics.logException(new Exception(
+                    "GroupChatActivity.onCreate: profile_id not found in Shared Preferences"));
             finish();
         }
 
@@ -479,6 +484,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "GroupChatActivity.imageSent: ",e);
+            Crashlytics.logException(e);
         }
 
         //Insert in recents
@@ -747,9 +753,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             BitmapFactory.decodeFile(path, o);
             return BitmapFactory.decodeFile(path);
         }
-        catch (Throwable e)
+        catch (Exception e)
         {
-            e.printStackTrace();
+            Log.e(Constants.TAG, "GroupChatActivity.decodeFile: ",e);
+            Crashlytics.logException(e);
         }
         return null;
     }
@@ -810,6 +817,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             catch (Exception e)
             {
                 Log.e(Constants.TAG, "FilePushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                Crashlytics.logException(e);
                 return null;
             }
         }
@@ -827,6 +835,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     imageSent(jsonImage.getString("file"), bitmap);
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "sendFile.onPostExecute: ",e);
+                    Crashlytics.logException(e);
                 }
             }
         }
@@ -874,7 +883,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     public void onConnectivityChanged(ConnectivityChanged event)
     {
 
-        Log.e(Constants.TAG, "GroupChatActivity.onConnectivityChanged: "
+        Log.i(Constants.TAG, "GroupChatActivity.onConnectivityChanged: "
                 + event.getConnectivityStatus().toString());
 
         if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&

@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.NetworkEvents;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
@@ -128,6 +129,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             networkEvents.register();
         } catch (Exception ex) {
             Log.e(Constants.TAG, "MycommsApp.onCreate: ",ex);
+            Crashlytics.logException(ex);
         }
 
         //Shared Preferences
@@ -196,6 +198,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         } catch(Exception e) {
             Log.e(Constants.TAG, "SplashScreenActivity.isProfileAvailable: ",e);
+            Crashlytics.logException(e);
             return false;
         }
     }
@@ -392,6 +395,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             {
                 Log.e(Constants.TAG, "MyCommsApp.loadGroupChats -> doInBackground: ERROR "
                         + e.toString());
+                Crashlytics.logException(e);
                 return null;
             }
         }
@@ -452,6 +456,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             catch (Exception e)
             {
                 Log.e(Constants.TAG, "FilePushToServerController.sendFile -> doInBackground: ERROR " + e.toString());
+                Crashlytics.logException(e);
                 return null;
             }
         }

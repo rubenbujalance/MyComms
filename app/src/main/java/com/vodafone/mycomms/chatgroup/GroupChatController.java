@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -105,6 +106,7 @@ public class GroupChatController
         catch (Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG + ".isCreatedJSONBodyForCreateGroupChat: ERROR ", e);
+            Crashlytics.logException(e);
             return false;
         }
     }
@@ -145,6 +147,7 @@ public class GroupChatController
         catch (Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG + ".isCreatedJSONBodyForUpdateGroupChat: ERROR ", e);
+            Crashlytics.logException(e);
             return false;
         }
     }
@@ -202,6 +205,7 @@ public class GroupChatController
         catch (Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG + ".createRequest: ERROR ", e);
+            Crashlytics.logException(e);
         }
     }
 
@@ -220,6 +224,7 @@ public class GroupChatController
         catch (Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG + ".executeRequest: ERROR ", e);
+            Crashlytics.logException(e);
             return null;
         }
 
@@ -235,6 +240,7 @@ public class GroupChatController
         catch(Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG+".convertResponseToString: " + "ERROR ",e);
+            Crashlytics.logException(e);
             return null;
         }
     }
@@ -249,6 +255,7 @@ public class GroupChatController
         catch(Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG+".convertResponseToString: " + "ERROR ",e);
+            Crashlytics.logException(e);
             return null;
         }
     }
@@ -271,6 +278,7 @@ public class GroupChatController
         catch (Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG+".getVersionName: ERROR ",e);
+            Crashlytics.logException(e);
             return "";
         }
     }
@@ -373,6 +381,7 @@ public class GroupChatController
         catch(Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG+".getMembersAndOwners: ERROR ",e);
+            Crashlytics.logException(e);
             return null;
         }
     }
@@ -393,6 +402,7 @@ public class GroupChatController
         catch (Exception e)
         {
             Log.e(Constants.TAG, LOG_TAG+".getResponseAsGroupChats: ERROR ",e);
+            Crashlytics.logException(e);
         }
 
         return groupChats;

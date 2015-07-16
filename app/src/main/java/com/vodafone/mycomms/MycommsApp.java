@@ -19,6 +19,7 @@ import com.vodafone.mycomms.chatgroup.GroupChatController;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
+import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
@@ -379,11 +380,11 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         }
     }
 
-//    @Subscribe
-//    public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
-//        recentContactController.insertPendingChatsRecent(recentChatsHashMap);
-//        recentChatsHashMap.clear();
-//    }
+    @Subscribe
+    public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
+        recentContactController.insertPendingChatsRecent(recentChatsHashMap);
+        recentChatsHashMap.clear();
+    }
 
     public class loadGroupChats extends AsyncTask<String, Void, String>
     {

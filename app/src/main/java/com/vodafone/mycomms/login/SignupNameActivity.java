@@ -31,6 +31,7 @@ import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
 import java.io.File;
 import java.util.Date;
@@ -215,6 +216,8 @@ public class SignupNameActivity extends Activity {
 
         FilePushToServerController filePushToServerController = new FilePushToServerController
                 (SignupNameActivity.this);
+        photoBitmap = Utils.adjustBitmapAsSquare(photoBitmap);
+        photoBitmap = Utils.resizeBitmapToStandardValue(photoBitmap, Constants.MAX_AVATAR_WIDTH_OR_HEIGHT);
         filePushToServerController.prepareFileToSend(photoBitmap,Constants.MULTIPART_AVATAR, null);
     }
 

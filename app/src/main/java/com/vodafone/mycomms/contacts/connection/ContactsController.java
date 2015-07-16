@@ -183,7 +183,10 @@ public class ContactsController extends BaseController {
                 contact = mapContact(jsonObject, mProfileId);
                 realmContactList.add(contact);
             }
+
+            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
             realmContactTransactions.insertContactList(realmContactList);
+            realmContactTransactions.closeRealm();
 
             //new DownloadAvatars().execute(realmContactList);
 

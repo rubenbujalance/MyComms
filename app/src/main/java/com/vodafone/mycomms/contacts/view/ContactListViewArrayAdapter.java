@@ -19,7 +19,9 @@ import com.vodafone.mycomms.util.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -183,26 +185,15 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
             if (presenceDetail.equals("#LOCAL_TIME#"))
             {
-                 /*TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
-                Calendar currentCal = Calendar.getInstance();
-
-                SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
-                sourceFormat.setTimeZone(currentCal.getTimeZone());
-
-                Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE));
-
-                SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
-                destFormat.setTimeZone(tz);
-
-                String result = destFormat.format(parsed);*/
-
                 if(null != contact.getTimezone())
                 {
-                    TimeZone tz = java.util.TimeZone.getTimeZone(contact.getTimezone());
-                    Calendar c = java.util.Calendar.getInstance(tz);
-                    String hours = Integer.toString(c.get(java.util.Calendar.HOUR_OF_DAY));
-                    String minute = Integer.toString(c.get(java.util.Calendar.MINUTE));
-                    viewHolder.textViewTime.setText(hours + ":" + minute);
+                    TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+                    Calendar c = Calendar.getInstance(tz);
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    format.setTimeZone(c.getTimeZone());
+                    Date parsed = format.parse(c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE));
+                    String result = format.format(parsed);
+                    viewHolder.textViewTime.setText(result);
                 }
                 else
                 {

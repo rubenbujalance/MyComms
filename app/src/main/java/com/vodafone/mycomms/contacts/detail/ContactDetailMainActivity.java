@@ -42,9 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -472,19 +470,13 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         }
         try {
             //Local time
-            if(contact.getTimezone()!=null && contact.getTimezone().length() > 0) {
-                TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
-
-                SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
-                sourceFormat.setTimeZone(currentCal.getTimeZone());
-                Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE));
-
-                SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
-                destFormat.setTimeZone(tz);
-
-                String result = destFormat.format(parsed);
-
-                tvLocalTime.setText(result);
+            if(contact.getTimezone()!=null && contact.getTimezone().length() > 0)
+            {
+                TimeZone tz = java.util.TimeZone.getTimeZone(contact.getTimezone());
+                Calendar c = java.util.Calendar.getInstance(tz);
+                String hours = Integer.toString(c.get(java.util.Calendar.HOUR_OF_DAY));
+                String minute = Integer.toString(c.get(java.util.Calendar.MINUTE));
+                tvLocalTime.setText(hours + ":" + minute);
             } else {
                 tvLocalTime.setText("");
             }

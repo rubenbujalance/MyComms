@@ -213,6 +213,7 @@ public class Constants {
     public static final String XMPP_ATTR_STATUS = "status";
     public static final String XMPP_ATTR_FILEURL = "fileUrl";
     public static final String XMPP_ATTR_RECEIVER = "receiver";
+    public static final String XMPP_ATTR_SENT = "sent";
 
     //Kind of files to send as multipart;
     public static final String IMAGE_FILE_TO_SEND = "image_file";

@@ -251,4 +251,6 @@ public class Constants {
     public static final String GROUP_CHAT_REALM_ABOUT = "about";
     public static final String GROUP_CHAT_REALM_MEMBERS = "members";
     public static final String GROUP_CHAT_REALM_TIMESTAMP_CREATED = "timeStampCreated";
+
+    public static final int MAX_AVATAR_WIDTH_OR_HEIGHT = 640;
 }

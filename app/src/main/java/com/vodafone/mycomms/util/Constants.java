@@ -105,11 +105,9 @@ public class Constants {
     public static final String MULTIPART_AVATAR = "avatar";
     public static final String MULTIPART_FILE = "file";
 
-
     public static final String PLATFORM_SALES_FORCE = "sf";
     public static final String PLATFORM_LOCAL = "local";
     public static final String PLATFORM_MY_COMMS = "mc";
-
 
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";
@@ -251,4 +249,11 @@ public class Constants {
     public static final String GROUP_CHAT_REALM_ABOUT = "about";
     public static final String GROUP_CHAT_REALM_MEMBERS = "members";
     public static final String GROUP_CHAT_REALM_TIMESTAMP_CREATED = "timeStampCreated";
+
+    public static final String RECENT_CHAT_ID = "Id";
+    public static final String RECENT_CHAT_TIMESTAMP = "Timestamp";
+    public static final String RECENT_CHAT_CHAT = "Chat";
+    public static final String RECENT_CHAT_GROUP_CHAT = "Group chat";
+
+
 }

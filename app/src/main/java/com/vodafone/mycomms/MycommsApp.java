@@ -69,6 +69,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     String profile_id;
     public int contactViewOrigin = Constants.CONTACTS_ALL;
     public static Picasso picasso;
+    private HashMap<String, Long> recentChatsHashMap = new HashMap<>();
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -364,13 +365,17 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             RecentContactController recentContactController =
                     new RecentContactController(this, profile_id);
 
-            if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0)
-                recentContactController.insertRecentOKHttp(
-                        chatMsg.getGroup_id(), Constants.CONTACTS_ACTION_SMS);
-            else
-                recentContactController.insertRecent(
-                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-
+            //Hashmap amb ID + TYPE
+            if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0) {
+                recentChatsHashMap.put(chatMsg.getGroup_id(), chatMsg.getTimestamp());
+            }else {
+                recentChatsHashMap.put(chatMsg.getContact_id(), chatMsg.getTimestamp());
+            }
+            int testPendingRecents = 0;
+            if (testPendingRecents == 0){
+                recentContactController.insertPendingChatsRecent(recentChatsHashMap);
+                recentChatsHashMap.clear();
+            }
             recentContactController.closeRealm();
         }
     }

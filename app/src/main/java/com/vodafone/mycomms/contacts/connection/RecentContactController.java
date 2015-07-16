@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 import model.Contact;
 
@@ -56,6 +57,11 @@ public class RecentContactController {
     public void insertRecentOKHttp(String groupChatId, String action)
     {
         new RecentContactsOKHTTPAsyncTask(groupChatId, action).execute();
+    }
+
+    public void insertPendingChatsRecent(HashMap<String, Long> recentChatsHashMap){
+        Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
+//        insertRecentPOSTOKHttp(contactId, action);
     }
 
     public class RecentContactsOKHTTPAsyncTask extends AsyncTask<String, Void, String>

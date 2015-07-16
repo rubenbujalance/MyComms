@@ -43,7 +43,7 @@ public class ContactSearchController extends BaseController {
     }
 
     public void getContactById(JSONObject jsonObject) {
-        Log.e(Constants.TAG, "ContactSearchController.getRecentList: ");
+        Log.e(Constants.TAG, "ContactSearchController.getContactById: ");
 //        if(mContactSearchConnection != null){
 //            mContactSearchConnection.cancel();
 //        }

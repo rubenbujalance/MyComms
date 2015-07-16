@@ -69,6 +69,17 @@ public class RealmChatTransactions {
         return chatMessage;
     }
 
+    public ChatMessage newChatMessageInstance(String contact_id, String direction, int type,
+                                              String text, String resourceUri, String id,
+                                              long timestamp)
+    {
+        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,"",timestamp,
+                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
+                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
+
+        return chatMessage;
+    }
+
     //INSERTS
 
     public boolean insertChatMessage (ChatMessage newChatMessage){

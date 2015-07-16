@@ -46,7 +46,6 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageSentEvent;
 import com.vodafone.mycomms.events.MessageSentStatusChanged;
-import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
@@ -181,7 +180,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         etChatTextBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                if (cs != null && cs.length() > 0) checkXMPPConnection();
+                if (cs != null && cs.length() > 0) setSendEnabled(true);
                 else setSendEnabled(false);
             }
 
@@ -562,15 +561,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
-    private void checkXMPPConnection()
-    {
-        if(XMPPTransactions.getXmppConnection()!=null &&
-                XMPPTransactions.getXmppConnection().isConnected())
-            setSendEnabled(true);
-        else
-            setSendEnabled(false);
-    }
-
     private void setSendEnabled(boolean enable)
     {
         if(!enable) {
@@ -608,10 +598,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     @Override
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+        XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
 
         if(etChatTextBox.getText().toString()!=null &&
-                etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
+                etChatTextBox.getText().toString().length()>0) setSendEnabled(true);
         else setSendEnabled(false);
 
         ArrayList<ChatMessage> messages;
@@ -890,15 +880,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if((isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().compareTo(_groupId)==0)
                 || (!isGroupChatMode && chatMsg!=null && chatMsg.getContact_id().compareTo(_contactId)==0))
             loadMessagesArray();
-    }
-
-    @Subscribe
-    public void onEventXMPPConnecting(XMPPConnectingEvent event){
-        boolean isConnecting = event.isConnecting();
-
-        if(!isConnecting)
-            checkXMPPConnection();
-        else setSendEnabled(false);
     }
 
     private class DownloadFile extends AsyncTask<String, Void, Boolean> {

@@ -669,6 +669,9 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                 try
                 {
                     filePushToServerController =  new FilePushToServerController(getActivity());
+                    photoBitmap = Utils.adjustBitmapAsSquare(photoBitmap);
+                    photoBitmap = Utils.resizeBitmapToStandardValue(photoBitmap, Constants
+                            .MAX_AVATAR_WIDTH_OR_HEIGHT);
                     filePushToServerController.storeProfileAvatar(photoBitmap,profileId);
                     filePushToServerController.prepareRequestForPushAvatar
                             (

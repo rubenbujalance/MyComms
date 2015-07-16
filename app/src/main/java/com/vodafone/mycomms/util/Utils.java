@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -305,8 +306,8 @@ public final class Utils extends Activity {
 
     private static String setAMOrPM(String time)
     {
-        String hourFirstPart = time.substring(0,1);
-        String hourSecondPart = time.substring(1,2);
+        String hourFirstPart = time.substring(0, 1);
+        String hourSecondPart = time.substring(1, 2);
         if(hourFirstPart.equals("0"))
             return " a.m.";
         else if(hourFirstPart.equals(1)
@@ -382,6 +383,43 @@ public final class Utils extends Activity {
 
     public static String getHttpHeaderContentType() {
         return "application/json; charset=utf-8";
+    }
+
+
+    public static Bitmap resizeBitmapToStandardValue(Bitmap bitmap, int maxWidthOrHeight)
+    {
+        if(bitmap.getWidth() >= maxWidthOrHeight)
+            return Bitmap.createScaledBitmap(bitmap,maxWidthOrHeight,maxWidthOrHeight, true);
+        else
+            return bitmap;
+    }
+
+    public static Bitmap adjustBitmapAsSquare(Bitmap bm)
+    {
+        if (bm.getWidth() >= bm.getHeight()){
+
+            return Bitmap.createBitmap(
+                    bm,
+                    bm.getWidth()/2 - bm.getHeight()/2,
+                    0,
+                    bm.getHeight(),
+                    bm.getHeight()
+            );
+
+        }
+        else if(bm.getWidth() < bm.getHeight())
+        {
+
+            return Bitmap.createBitmap(
+                    bm,
+                    0,
+                    bm.getHeight()/2 - bm.getWidth()/2,
+                    bm.getWidth(),
+                    bm.getWidth()
+            );
+        }
+        else
+            return bm;
     }
 
 }

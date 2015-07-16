@@ -183,21 +183,23 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
         try {
             presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
-            if (presenceDetail.equals("#LOCAL_TIME#")) {
-                TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
-                Calendar currentCal = Calendar.getInstance();
+            if (presenceDetail.equals("#LOCAL_TIME#"))
+            {
+                if(null != contact.getTimezone())
+                {
+                    TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+                    Calendar c = Calendar.getInstance(tz);
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    format.setTimeZone(c.getTimeZone());
+                    Date parsed = format.parse(c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE));
+                    String result = format.format(parsed);
+                    viewHolder.textViewTime.setText(result);
+                }
+                else
+                {
+                    viewHolder.textViewTime.setText(" ");
+                }
 
-                SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
-                sourceFormat.setTimeZone(currentCal.getTimeZone());
-
-                Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE));
-
-                SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
-                destFormat.setTimeZone(tz);
-
-                String result = destFormat.format(parsed);
-
-                viewHolder.textViewTime.setText(result);
             } else {
                 viewHolder.textViewTime.setText(presenceDetail);
             }

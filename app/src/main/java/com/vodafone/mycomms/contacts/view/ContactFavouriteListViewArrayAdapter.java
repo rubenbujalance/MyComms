@@ -18,7 +18,6 @@ import com.vodafone.mycomms.util.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -183,25 +182,27 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
 
         try {
             assert null != presenceDetail;
-            if (null != presenceDetail && presenceDetail.equals("#LOCAL_TIME#")) {
-                TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
-                Calendar currentCal = Calendar.getInstance();
-
-                SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
-                sourceFormat.setTimeZone(currentCal.getTimeZone());
-
-                Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE));
-
-                SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
-                destFormat.setTimeZone(tz);
-
-                String result = destFormat.format(parsed);
-
-                viewHolder.textViewTime.setText(result);
-            } else {
+            if (null != presenceDetail && presenceDetail.equals("#LOCAL_TIME#"))
+            {
+                if(null != contact.getTimezone())
+                {
+                    TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+                    Calendar c = Calendar.getInstance(tz);
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    format.setTimeZone(c.getTimeZone());
+                    Date parsed = format.parse(c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE));
+                    String result = format.format(parsed);
+                    viewHolder.textViewTime.setText(result);
+                }
+                else
+                {
+                    viewHolder.textViewTime.setText(" ");
+                }
+            }
+            else {
                 viewHolder.textViewTime.setText(presenceDetail);
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

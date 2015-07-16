@@ -472,21 +472,38 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         }
         try {
             //Local time
-            if(contact.getTimezone()!=null && contact.getTimezone().length() > 0) {
-                TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+            String presenceDetail = null;
 
-                SimpleDateFormat sourceFormat = new SimpleDateFormat("HH:mm");
-                sourceFormat.setTimeZone(currentCal.getTimeZone());
-                Date parsed = sourceFormat.parse(currentCal.get(Calendar.HOUR_OF_DAY) + ":" + currentCal.get(Calendar.MINUTE));
+            try {
+                presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-                SimpleDateFormat destFormat = new SimpleDateFormat("HH:mm");
-                destFormat.setTimeZone(tz);
-
-                String result = destFormat.format(parsed);
-
-                tvLocalTime.setText(result);
-            } else {
-                tvLocalTime.setText("");
+            try {
+                assert null != presenceDetail;
+                if (null != presenceDetail && presenceDetail.equals("#LOCAL_TIME#"))
+                {
+                    if(null != contact.getTimezone())
+                    {
+                        TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+                        Calendar c = Calendar.getInstance(tz);
+                        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                        format.setTimeZone(c.getTimeZone());
+                        Date parsed = format.parse(c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE));
+                        String result = format.format(parsed);
+                        tvLocalTime.setText(result);
+                    }
+                    else
+                    {
+                        tvLocalTime.setText(" ");
+                    }
+                }
+                else {
+                    tvLocalTime.setText(presenceDetail);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
         } catch (Exception ex) {

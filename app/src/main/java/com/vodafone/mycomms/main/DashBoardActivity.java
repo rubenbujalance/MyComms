@@ -1125,11 +1125,14 @@ public class DashBoardActivity extends ToolbarActivity
             ImageView typeRecent = (ImageView) view.findViewById(R.id.type_recent);
             RecentContact contact = hashMapRecentIdView.get(view);
             String action = "sms";
+            RealmChatTransactions chatTx = new RealmChatTransactions(getApplicationContext());
+            RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(
+                    getApplicationContext(), _profileId);
 
             if(contact.getContactId().startsWith("mg_"))
             {
-                long pendingMsgsCount = getRealmGroupChatTransactions()
-                        .getGroupChatPendingMessagesCount(contact.getContactId());
+                long pendingMsgsCount =
+                        groupChatTx.getGroupChatPendingMessagesCount(contact.getContactId());
                 if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
                     unread_messages.setVisibility(View.VISIBLE);
                     unread_messages.setText(String.valueOf(pendingMsgsCount));
@@ -1158,7 +1161,7 @@ public class DashBoardActivity extends ToolbarActivity
             else
             {
                 // Badges
-                long pendingMsgsCount = getRealmChatTransactions().getChatPendingMessagesCount
+                long pendingMsgsCount = chatTx.getChatPendingMessagesCount
                         (contact.getContactId());
                 action = contact.getAction();
 

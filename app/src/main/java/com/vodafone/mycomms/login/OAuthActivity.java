@@ -61,22 +61,16 @@ public class OAuthActivity extends Activity {
         //Load web view
         wvOAuth.getSettings().setJavaScriptEnabled(true);
         wvOAuth.getSettings().setSupportMultipleWindows(true);
-        wvOAuth.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                //If it is callback url, call api to get token
-                if (Uri.parse(url).getPath().compareTo("/auth/" + oauthPrefix + "/callback") == 0) {
-                    callOAuthCallback(Uri.parse(url).getPath() + "?" + Uri.parse(url).getQuery());
-                    return true;
-                }
-
-                // Otherwise, continue...
-                return false;
-            }
-
-        });
-        wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix);
         setWebViewListener();
+//        wvOAuth.setWebViewClient(new WebViewClient() {
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//
+//            }
+//
+//        });
+        wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix);
+
     }
 
     @Override
@@ -241,13 +235,22 @@ public class OAuthActivity extends Activity {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String urlNewString) {
-                if (!loadingFinished) {
-                    redirect = true;
+                //If it is callback url, call api to get token
+                if (Uri.parse(urlNewString).getPath().compareTo("/auth/" + oauthPrefix + "/callback") == 0) {
+                    callOAuthCallback(Uri.parse(urlNewString).getPath() + "?" +
+                            Uri.parse(urlNewString).getQuery());
+                    return true;
+                }
+                else {
+                    if (!loadingFinished) {
+                        redirect = true;
+                    }
+
+                    loadingFinished = false;
                 }
 
-                loadingFinished = false;
-                view.loadUrl(urlNewString);
-                return true;
+                // Otherwise, continue...
+                return false;
             }
 
             @Override

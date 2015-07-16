@@ -33,7 +33,6 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
-import org.jivesoftware.smackx.ping.PingFailedListener;
 import org.jivesoftware.smackx.ping.PingManager;
 import org.xmlpull.v1.XmlPullParser;
 
@@ -71,6 +70,7 @@ public final class XMPPTransactions {
     //Control of pings to server
     private static Thread pingThread = null;
     private static String pingWaitingID = null;
+    private static PingManager _pingManager = null;
 
     //Control of sleep when app in background
     private static Thread sleepThread = null;
@@ -255,6 +255,29 @@ public final class XMPPTransactions {
 
         Log.w(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: XMPP Server DISCONNECTED");
         return true;
+    }
+
+    public static void pingServerAndReconnect()
+    {
+//        final boolean isConnected;
+//
+//        if(_pingManager!=null) {
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        isConnected = _pingManager.pingMyServer();
+//                            initializeMsgServerSession(_appContext, true);
+//                    } catch (Exception e) {
+//                        Log.e(Constants.TAG, "XMPPTransactions.pingServerAndReconnect: " +
+//                                "Error pinging to server");
+//                    }
+//                }
+//            }).start();
+//
+//        }
+//
+//        new AsyncTask<Void,Void>()
     }
 
     public static boolean sendText(boolean isGroup, String contactGroupId, String id, String text)
@@ -1090,16 +1113,16 @@ public final class XMPPTransactions {
                 _reconnectionMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY);
 
                 PingManager.setDefaultPingInterval(10);
-                PingManager _pingManager = PingManager.getInstanceFor(_xmppConnection);
-                _pingManager.setPingInterval(10);
-                _pingManager.registerPingFailedListener(new PingFailedListener() {
-                    @Override
-                    public void pingFailed() {
-                        Log.w(Constants.TAG, "XMPPOpenConnectionTask.pingFailed: " +
-                                "Ping failed, trying to reconnect");
-                        initializeMsgServerSession(_appContext, true);
-                    }
-                });
+                _pingManager = PingManager.getInstanceFor(_xmppConnection);
+                _pingManager.setPingInterval(20);
+//                _pingManager.registerPingFailedListener(new PingFailedListener() {
+//                    @Override
+//                    public void pingFailed() {
+//                        Log.w(Constants.TAG, "XMPPOpenConnectionTask.pingFailed: " +
+//                                "Ping failed, trying to reconnect");
+//                        initializeMsgServerSession(_appContext, true);
+//                    }
+//                });
             }
 
             //Check if there is a stanza not sent

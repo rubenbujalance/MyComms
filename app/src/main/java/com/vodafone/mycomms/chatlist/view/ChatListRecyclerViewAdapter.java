@@ -196,7 +196,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     {
         HashMap<ImageView, TextView> hashMapImageText = new HashMap<>();
         hashMapImageText.put(chatListHolder.top_left_avatar, chatListHolder.top_left_avatar_text);
-        hashMapImageText.put(chatListHolder.top_right_avatar, chatListHolder.top_left_avatar_text);
+        hashMapImageText.put(chatListHolder.top_right_avatar, chatListHolder.top_right_avatar_text);
         hashMapImageText.put(chatListHolder.bottom_left_avatar,chatListHolder
                 .bottom_left_avatar_text);
         hashMapImageText.put(chatListHolder.bottom_right_avatar, chatListHolder
@@ -236,30 +236,34 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         int count = 0;
         for(ImageView image : images)
         {
-            Contact contact = contacts.get(count);
-
-            hashMapImageText.get(image).setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-
-            try
+            if(contacts.size() > count)
             {
-                if (null == contactName)
-                    contactName = contact.getFirstName();
-                else
-                    contactName = contactName + ", " + contact.getFirstName();
+                Contact contact = contacts.get(count);
 
-                loadComposedAvatar
-                            (
-                                     contact
-                                    , images.get(count)
-                                    , hashMapImageText.get(image)
-                            );
-            } catch (Exception e){
-                Log.e(Constants.TAG, "ChatListRecyclerViewAdapter.loadGroupChat: Error getting contact by Id");
-                Crashlytics.logException(e);
+                if(null != contact)
+                {
+                    hashMapImageText.get(image).setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+                    try
+                    {
+                        if (null == contactName)
+                            contactName = contact.getFirstName();
+                        else
+                            contactName = contactName + ", " + contact.getFirstName();
+
+                        loadComposedAvatar
+                                (
+                                        contact
+                                        , images.get(count)
+                                        , hashMapImageText.get(image)
+                                );
+                    } catch (Exception e){
+                        Log.e(Constants.TAG, "ChatListRecyclerViewAdapter.loadGroupChat: Error getting contact by Id");
+                        Crashlytics.logException(e);
+                    }
+                }
+                count++;
             }
-
-            count++;
-            if(count>4) break;
 
         }
         chatListHolder.textViewName.setText(contactName);

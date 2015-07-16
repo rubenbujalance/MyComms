@@ -360,19 +360,20 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onEventChatsReceived(ChatsReceivedEvent event){
         ChatMessage chatMsg = event.getMessage();
 
-        if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
-            RecentContactController recentContactController =
-                    new RecentContactController(this, profile_id);
-
-            if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0)
-                recentContactController.insertRecentOKHttp(
-                        chatMsg.getGroup_id(), Constants.CONTACTS_ACTION_SMS);
-            else
-                recentContactController.insertRecent(
-                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-
-            recentContactController.closeRealm();
-        }
+        //TODO RBM - UnComment after testing
+//        if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
+//            RecentContactController recentContactController =
+//                    new RecentContactController(this, profile_id);
+//
+//            if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0)
+//                recentContactController.insertRecentOKHttp(
+//                        chatMsg.getGroup_id(), Constants.CONTACTS_ACTION_SMS);
+//            else
+//                recentContactController.insertRecent(
+//                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
+//
+//            recentContactController.closeRealm();
+//        }
     }
 
     public class loadGroupChats extends AsyncTask<String, Void, String>

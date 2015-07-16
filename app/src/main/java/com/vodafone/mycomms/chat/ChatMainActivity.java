@@ -414,9 +414,10 @@ public class ChatMainActivity extends ToolbarActivity {
         if(chatMsg!=null)
         {
             _chatList.add(chatMsg);
-            if(chatMsg.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)) {
-                mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-            }
+//            if(chatMsg.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)) {
+//                mRecentContactController.insertRecent(
+//                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
+//            }
 
             if(_chatList.size()>50) _chatList.remove(0);
             refreshAdapter();

@@ -197,6 +197,7 @@ public class Constants {
     public static final String XMPP_MESSAGE_MEDIATYPE_IMAGE = "image";
     public static final String XMPP_STANZA_TYPE_CHAT = "chat";
     public static final String XMPP_STANZA_TYPE_GROUPCHAT = "groupchat";
+    public static final String XMPP_STANZA_TYPE_PENDINGMESSAGES = "pendingMessages";
     public static final String XMPP_STANZA_TYPE_GET = "get";
     public static final String XMPP_STANZA_TYPE_RESULT = "result";
     public static final String XMPP_ELEMENT_IQ = "iq";
@@ -206,6 +207,7 @@ public class Constants {
     public static final String XMPP_ATTR_TYPE = "type";
     public static final String XMPP_ATTR_MEDIATYPE = "mediaType";
     public static final String XMPP_ATTR_FROM = "from";
+    public static final String XMPP_ATTR_PENDING = "pending";
     public static final String XMPP_ATTR_TO = "to";
     public static final String XMPP_ATTR_ID = "id";
     public static final String XMPP_ATTR_STATUS = "status";

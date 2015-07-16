@@ -174,7 +174,7 @@ public class ProfileController extends BaseController {
                     }
                 }
             } catch (Exception e) {
-                Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile" + e.getMessage());
+                Log.e(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile",e);
             }
         }
 
@@ -364,7 +364,7 @@ public class ProfileController extends BaseController {
                 ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileConnectionError();
             }
         } catch (Exception e) {
-            Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile" + e.getMessage());
+            Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile",e);
         }
 
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {

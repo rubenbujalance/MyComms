@@ -284,7 +284,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
         {
             isAvatarHasChangedAfterSelection = true;

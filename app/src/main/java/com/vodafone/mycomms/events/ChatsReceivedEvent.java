@@ -7,6 +7,7 @@ import model.ChatMessage;
  */
 public class ChatsReceivedEvent {
     private ChatMessage message;
+    private int pendingMessages;
 
     public ChatMessage getMessage() {
         return message;
@@ -14,6 +15,14 @@ public class ChatsReceivedEvent {
 
     public void setMessage(ChatMessage message) {
         this.message = message;
+    }
+
+    public int getPendingMessages() {
+        return pendingMessages;
+    }
+
+    public void setPendingMessages(int pendingMessages) {
+        this.pendingMessages = pendingMessages;
     }
 }
 

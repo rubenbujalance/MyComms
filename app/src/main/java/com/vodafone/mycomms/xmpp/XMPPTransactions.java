@@ -69,6 +69,7 @@ public final class XMPPTransactions {
     //Control of pings to server
     private static Thread pingThread = null;
     private static String pingWaitingID = null;
+    private static boolean isPinging = false;
     private static PingManager _pingManager = null;
 
     //Control of sleep when app in background
@@ -148,7 +149,7 @@ public final class XMPPTransactions {
 
     private static void intervalPinging(final int miliseconds)
     {
-        if(pingThread!=null) pingThread.interrupt();
+        if(pingThread!=null) return;
 
         pingThread = new Thread(new Runnable() {
             @Override
@@ -157,20 +158,25 @@ public final class XMPPTransactions {
                 while(!Thread.interrupted()) {
                     try {
                         Thread.sleep(miliseconds);
-                        if(!_isConnecting) {
+                        if(!_isConnecting && !isPinging) {
                             Log.i(Constants.TAG, "XMPPTransactions.intervalPinging: Pinging...");
+                            isPinging = true;
                             sendPing();
                             Thread.sleep(3000);
                             if (pingWaitingID != null)
                                 initializeMsgServerSession(_appContext);
+
+                            isPinging = false;
                         }
                     }catch (Exception e) {
                         Log.e(Constants.TAG, "XMPPTransactions.intervalPinging: ",e);
                         Crashlytics.logException(e);
-                        intervalPinging(miliseconds);
+                        pingThread = null;
+                        isPinging = false;
                     }
                 }
                 Log.i(Constants.TAG, "XMPPTransactions.intervalPinging: END");
+                pingThread = null;
             }
         });
 
@@ -247,7 +253,7 @@ public final class XMPPTransactions {
                 Calendar.getInstance().getTimeInMillis() > _isConnectingTime+10000)
             _isConnecting = false;
 
-        if(_isConnecting) return;
+        if(_isConnecting || isPinging) return;
 
         //If it's first time, initialize
         if(_xmppConnection==null) {
@@ -262,9 +268,13 @@ public final class XMPPTransactions {
                 try {
                     Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Pinging...");
 //                    isConnected = _pingManager.pingMyServer();
+                    isPinging = true;
+
                     sendPing();
                     Thread.sleep(3000);
                     isConnected = (pingWaitingID==null);
+
+                    isPinging = false;
 
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: " +

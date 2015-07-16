@@ -371,7 +371,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 recentChatsHashMap.put(chatMsg.getContact_id(), chatMsg.getTimestamp());
             }
             Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived : pendingMessages " + pendingMessages);
-            if (pendingMessages == 0){
+            if (pendingMessages == 0 && recentChatsHashMap!=null && recentChatsHashMap.size()>0){
                 RecentContactController recentContactController =
                         new RecentContactController(this, profile_id);
                 Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived: pendingMessages 0");
@@ -385,8 +385,10 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
         Log.i(Constants.TAG, "MycommsApp.onAllPendingMessagesReceived: ");
-        recentContactController.insertPendingChatsRecent(recentChatsHashMap);
-        recentChatsHashMap.clear();
+        if(recentChatsHashMap!=null && recentChatsHashMap.size()>0) {
+            recentContactController.insertPendingChatsRecent(recentChatsHashMap);
+            recentChatsHashMap.clear();
+        }
     }
 
     public class loadGroupChats extends AsyncTask<String, Void, String>

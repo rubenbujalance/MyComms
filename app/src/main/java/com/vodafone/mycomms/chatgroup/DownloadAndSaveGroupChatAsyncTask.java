@@ -37,8 +37,6 @@ public class DownloadAndSaveGroupChatAsyncTask extends AsyncTask<Object, Void, G
 
     @Override
     protected GroupChat doInBackground(Object... params) {
-        Log.e(Constants.TAG, "DownloadAndSaveGroupInfoAsyncTask.doInBackground: START");
-
         context = (Context)params[0];
         endpoint = (String)params[1];
         groupId = (String)params[2];
@@ -137,8 +135,6 @@ public class DownloadAndSaveGroupChatAsyncTask extends AsyncTask<Object, Void, G
             Log.e(Constants.TAG, "DownloadAndSaveGroupInfoAsyncTask.doInBackground: ",e);
             groupTx.closeRealm();
         }
-
-        Log.e(Constants.TAG, "DownloadAndSaveGroupInfoAsyncTask.doInBackground: END");
 
         return chat;
     }

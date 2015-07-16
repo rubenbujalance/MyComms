@@ -360,19 +360,21 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
+        Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived: ");
         ChatMessage chatMsg = event.getMessage();
         int pendingMessages = event.getPendingMessages();
 
         if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
-            RecentContactController recentContactController =
-                    new RecentContactController(this, profile_id);
-
             if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0) {
                 recentChatsHashMap.put(chatMsg.getGroup_id(), chatMsg.getTimestamp());
             }else {
                 recentChatsHashMap.put(chatMsg.getContact_id(), chatMsg.getTimestamp());
             }
+            Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived : pendingMessages " + pendingMessages);
             if (pendingMessages == 0){
+                RecentContactController recentContactController =
+                        new RecentContactController(this, profile_id);
+                Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived: pendingMessages 0");
                 recentContactController.insertPendingChatsRecent(recentChatsHashMap);
                 recentChatsHashMap.clear();
             }
@@ -382,6 +384,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Subscribe
     public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
+        Log.i(Constants.TAG, "MycommsApp.onAllPendingMessagesReceived: ");
         recentContactController.insertPendingChatsRecent(recentChatsHashMap);
         recentChatsHashMap.clear();
     }

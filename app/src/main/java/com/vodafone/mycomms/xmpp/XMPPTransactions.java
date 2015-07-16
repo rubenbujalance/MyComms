@@ -15,6 +15,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.DownloadAndSaveGroupChatAsyncTask;
+import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageSentStatusChanged;
@@ -415,38 +416,34 @@ public final class XMPPTransactions {
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String type = parser.getAttributeValue("", Constants.XMPP_ATTR_TYPE);
 
-            if (from == null || id == null ||
-                    to==null || type==null) return false;
-
-            if(type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0
-                    && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)!=0
-                    && type.compareTo(Constants.XMPP_STANZA_TYPE_PENDINGMESSAGES)!=0)
-                return false;
+//            if(type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0
+//                    && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)!=0
+//                    && type.compareTo(Constants.XMPP_STANZA_TYPE_PENDINGMESSAGES)!=0)
+//                return false;
 
             //TODO RBM - Remove after old PING solved ***********
-            if(id.startsWith("PING")) {
+            if(id!=null && id.startsWith("PING")) {
                 return false;
             }
             //****************************************************
 
-            if(from.indexOf("@")>0) from = from.substring(0, from.indexOf("@"));
-
-//            if(to.indexOf("@")>0) to = to.substring(0, to.indexOf("@"));
-//            else return false;
-
-            if (parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
+            if (type!=null && parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
                     && type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT) == 0)
             {
+                if (from == null || id == null ||
+                        to==null || type==null) return false;
+
                 String mediaType = parser.getAttributeValue("", Constants.XMPP_ATTR_MEDIATYPE);
 
                 if(mediaType == null ||
                         mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_TEXT)==0)
                     return saveAndNotifyMessageReceived(parser);
-                else if(mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
+                else if(mediaType!=null &&
+                        mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
                     return saveAndNotifyImageReceived(parser);
                 else return false;
             }
-            else if (parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
+            else if (type!=null && parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
                     && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT) == 0)
             {
                 String mediaType = parser.getAttributeValue("", Constants.XMPP_ATTR_MEDIATYPE);
@@ -454,20 +451,24 @@ public final class XMPPTransactions {
                 if(mediaType == null ||
                         mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_TEXT)==0)
                     return saveAndNotifyGroupMessageReceived(parser);
-                else if(mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
+                else if(mediaType!=null &&
+                        mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
                     return saveAndNotifyGroupImageReceived(parser);
                 else return false;
             }
             else if (parser.getName().compareTo(Constants.XMPP_ELEMENT_IQ) == 0)
             {
-                if(type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)==0 &&
-                        from.compareTo(Constants.XMPP_PARAM_DOMAIN)==0 &&
-                        to.compareTo(_profile_id)==0) //It's a pong
-                    return handlePongReceived(parser);
-                else if(type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)==0 ||
-                        type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)==0)
+//                if(from.indexOf("@")>0) from = from.substring(0, from.indexOf("@"));
+//                if(type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)==0 &&
+//                        from.compareTo(Constants.XMPP_PARAM_DOMAIN)==0 &&
+//                        to.compareTo(_profile_id)==0) //It's a pong
+//                    return handlePongReceived(parser);
+//                else
+                if(type!=null && (type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)==0 ||
+                        type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)==0))
                     return saveAndNotifyIQReceived(parser);
-                else if(type.compareTo(Constants.XMPP_STANZA_TYPE_PENDINGMESSAGES)==0)
+                else if(type!=null &&
+                        type.compareTo(Constants.XMPP_STANZA_TYPE_PENDINGMESSAGES)==0)
                     return handlePendingMessages(parser);
                 else return false;
             }
@@ -571,7 +572,10 @@ public final class XMPPTransactions {
         RealmChatTransactions chatTx = null;
 
         try {
-            _pendingMessages--;
+            if(_pendingMessages>0) {
+                _pendingMessages--;
+                BusProvider.getInstance().post(new AllPendingMessagesReceivedEvent());
+            }
 
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -1055,11 +1059,12 @@ public final class XMPPTransactions {
             boolean resetConnection = false;
 
             try {
-                if(_xmppConnection==null) {
+                if(_xmppConnection!=null) {
+                    _xmppConnection.disconnect();
+                }
                     resetConnection = true;
                     _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
                     _xmppConnection.addConnectionListener(getConnectionListener());
-                }
 
                 // Connect to the server
                 _xmppConnection.connect();

@@ -465,7 +465,7 @@ public class DashBoardActivity extends ToolbarActivity
                             }
                             @Override
                             public void onError() {
-                                newsImage.setImageResource(R.color.grey_middle);
+//                                newsImage.setImageResource(R.color.grey_middle);
                             }
                         });
             } catch (Exception e) {

@@ -360,25 +360,30 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
         ChatMessage chatMsg = event.getMessage();
+        int pendingMessages = event.getPendingMessages();
 
         if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
             RecentContactController recentContactController =
                     new RecentContactController(this, profile_id);
 
-            //Hashmap amb ID + TYPE
             if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0) {
                 recentChatsHashMap.put(chatMsg.getGroup_id(), chatMsg.getTimestamp());
             }else {
                 recentChatsHashMap.put(chatMsg.getContact_id(), chatMsg.getTimestamp());
             }
-            int testPendingRecents = 0;
-            if (testPendingRecents == 0){
+            if (pendingMessages == 0){
                 recentContactController.insertPendingChatsRecent(recentChatsHashMap);
                 recentChatsHashMap.clear();
             }
             recentContactController.closeRealm();
         }
     }
+
+//    @Subscribe
+//    public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
+//        recentContactController.insertPendingChatsRecent(recentChatsHashMap);
+//        recentChatsHashMap.clear();
+//    }
 
     public class loadGroupChats extends AsyncTask<String, Void, String>
     {

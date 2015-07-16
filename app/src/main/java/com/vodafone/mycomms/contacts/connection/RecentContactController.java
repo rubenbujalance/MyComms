@@ -60,8 +60,8 @@ public class RecentContactController {
     }
 
     public void insertPendingChatsRecent(HashMap<String, Long> recentChatsHashMap){
-        Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
-//        insertRecentPOSTOKHttp(contactId, action);
+        Log.i(Constants.TAG, "RecentContactController.insertPendingChatsRecent: ");
+        insertPendingChatsRecentPOSTOKHttp(recentChatsHashMap);
     }
 
     public class RecentContactsOKHTTPAsyncTask extends AsyncTask<String, Void, String>
@@ -112,6 +112,11 @@ public class RecentContactController {
         new RecentContactsPOSTAsyncTask(contactId, action).execute();
     }
 
+    public void insertPendingChatsRecentPOSTOKHttp(HashMap<String, Long> recentChatsHashMap)
+    {
+        new RecentPendingChatsRecentPOSTAsyncTask(recentChatsHashMap).execute();
+    }
+
     public class RecentContactsPOSTAsyncTask extends AsyncTask<String, Void, String>
     {
         private String action;
@@ -130,7 +135,8 @@ public class RecentContactController {
             try
             {
                 Log.i(Constants.TAG, "RecentContactsPOSTAsyncTask.insertRecent: ");
-                Request request = createPOSTRequestForCreation(this.contactId,this.action);
+                String jsonRequest = createdStringBodyForSetRecent(this.contactId,this.action, null);
+                Request request = createPOSTRequestForCreation(jsonRequest);
                 return executeRequest(request);
 
             }
@@ -150,12 +156,56 @@ public class RecentContactController {
         }
     }
 
+    public class RecentPendingChatsRecentPOSTAsyncTask extends AsyncTask<String, Void, String>
+    {
+        private HashMap<String, Long> recentChatsHashMap;
+
+        public RecentPendingChatsRecentPOSTAsyncTask(HashMap<String, Long> recentChatsHashMap)
+        {
+            this.recentChatsHashMap = recentChatsHashMap;
+        }
+
+        @Override
+        protected String doInBackground(String... params)
+        {
+            Log.i(Constants.TAG, "RecentPendingChatsRecentPOSTAsyncTask.doInBackground: START");
+
+            try
+            {
+                String chatId;
+                Long timeStamp;
+                Request request = null;
+                for (HashMap.Entry<String, Long> recentChat : recentChatsHashMap.entrySet())
+                {
+                    chatId = recentChat.getKey();
+                    timeStamp = recentChat.getValue();
+                    String jsonRequest = createdStringBodyForSetRecent(chatId, Constants.CONTACTS_ACTION_SMS, timeStamp);
+                    request = createPOSTRequestForCreation(jsonRequest);
+                }
+                return executeRequest(request);
+
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "RecentPendingChatsRecentPOSTAsyncTask.doInBackground: ",e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String response)
+        {
+            Log.i(Constants.TAG, "RecentPendingChatsRecentPOSTAsyncTask.doInBackground: " + response);
+            getRecentList();
+            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+        }
+    }
+
     private JSONObject createJsonObject(String groupChatId, String action)
     {
         try
         {
-            return new JSONObject(createdStringBodyForSetRecent(groupChatId,
-                    action));
+            return new JSONObject(createdStringBodyForSetRecent(groupChatId, action, null));
         }
         catch (Exception e)
         {
@@ -165,9 +215,10 @@ public class RecentContactController {
 
     }
 
-    public String createdStringBodyForSetRecent(String groupChatId, String action)
+    public String createdStringBodyForSetRecent(String groupChatId, String action, Long timestamp)
     {
-        long timestamp = Calendar.getInstance().getTimeInMillis();
+        if (timestamp == null)
+            timestamp = Calendar.getInstance().getTimeInMillis();
 
         return "{\"id\":\""
                     + groupChatId + "\","
@@ -184,7 +235,7 @@ public class RecentContactController {
             final String version_token = "x-mycomms-version";
             final String ACCESS_TOKEN = "Bearer ";
 
-            String jsonRequest = createdStringBodyForSetRecent(groupChatId, action);
+            String jsonRequest = createdStringBodyForSetRecent(groupChatId, action, null);
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
             RequestBody requestBody = RequestBody.create(JSON, jsonRequest);
@@ -202,11 +253,10 @@ public class RecentContactController {
         }
     }
 
-    public Request createPOSTRequestForCreation(String contactId, String action)
+    public Request createPOSTRequestForCreation(String jsonRequest)
     {
         try
         {
-            String jsonRequest = createdStringBodyForSetRecent(contactId, action);
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
             RequestBody requestBody = RequestBody.create(JSON, jsonRequest);

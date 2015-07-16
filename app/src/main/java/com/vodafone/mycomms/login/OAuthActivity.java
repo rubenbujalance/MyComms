@@ -2,14 +2,17 @@ package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
@@ -31,10 +34,13 @@ import java.util.HashMap;
 
 public class OAuthActivity extends Activity {
 
-    WebView wvOAuth;
+    private WebView wvOAuth;
+    private RelativeLayout relativeContainer;
     String oauthPrefix;
-
     private boolean isForeground;
+
+    private boolean loadingFinished = true;
+    private boolean redirect = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +50,7 @@ public class OAuthActivity extends Activity {
         setContentView(R.layout.activity_oauth_web);
 
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);
+        relativeContainer = (RelativeLayout)findViewById(R.id.relative_container);
 
         //Register Otto Bus
         BusProvider.getInstance().register(this);
@@ -58,8 +65,8 @@ public class OAuthActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 //If it is callback url, call api to get token
-                if (Uri.parse(url).getPath().compareTo("/auth/"+ oauthPrefix + "/callback") == 0) {
-                    callOAuthCallback(Uri.parse(url).getPath()+"?"+Uri.parse(url).getQuery());
+                if (Uri.parse(url).getPath().compareTo("/auth/" + oauthPrefix + "/callback") == 0) {
+                    callOAuthCallback(Uri.parse(url).getPath() + "?" + Uri.parse(url).getQuery());
                     return true;
                 }
 
@@ -68,9 +75,8 @@ public class OAuthActivity extends Activity {
             }
 
         });
-
-        //Launch OAuth corresponding URL
         wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix);
+        setWebViewListener();
     }
 
     @Override
@@ -195,16 +201,26 @@ public class OAuthActivity extends Activity {
         finish();
     }
 
-    private class CallOAuthCallback extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+    private class CallOAuthCallback extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>>
+    {
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+        }
+
         @Override
         protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
             return APIWrapper.httpGetAPI((String)params[2].get("url"), params[1], OAuthActivity.this);
         }
         @Override
-        protected void onPostExecute(HashMap<String,Object> result) {
+        protected void onPostExecute(HashMap<String,Object> result)
+        {
+            super.onPostExecute(result);
             callbackOAuthCallback(result);
         }
     }
+
 
     @Override
     protected void onResume() {
@@ -216,5 +232,56 @@ public class OAuthActivity extends Activity {
     protected void onPause() {
         isForeground = false;
         super.onPause();
+    }
+
+
+    private void setWebViewListener()
+    {
+        wvOAuth.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String urlNewString) {
+                if (!loadingFinished) {
+                    redirect = true;
+                }
+
+                loadingFinished = false;
+                view.loadUrl(urlNewString);
+                return true;
+            }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap facIcon)
+            {
+                loadingFinished = false;
+                /*if(!progressDialog.isShowing())
+                    progressDialog.show();*/
+                if(relativeContainer.getVisibility() != View.VISIBLE)
+                {
+                    relativeContainer.setVisibility(View.VISIBLE);
+                    wvOAuth.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url)
+            {
+                if(!redirect){
+                    loadingFinished = true;
+                }
+
+                if(loadingFinished && !redirect){
+                    //HIDE LOADING IT HAS FINISHED
+                    if(relativeContainer.getVisibility() == View.VISIBLE)
+                    {
+                        relativeContainer.setVisibility(View.GONE);
+                        wvOAuth.setVisibility(View.VISIBLE);
+                    }
+                } else{
+                    redirect = false;
+                }
+            }
+
+        });
     }
 }

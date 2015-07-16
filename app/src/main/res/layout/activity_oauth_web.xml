@@ -3,8 +3,37 @@
     android:layout_height="match_parent"
     tools:context="com.vodafone.mycomms.login.OAuthActivity">
 
+    <RelativeLayout
+        android:id="@+id/relative_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.vodafone.mycomms.custom.CircleImageView
+            android:id="@+id/image_test"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            android:background="@drawable/icon_platform_mycomms"/>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_centerInParent="true"
+            android:visibility="visible"/>
+
+    </RelativeLayout>
+
     <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:id="@+id/wvOAuth" />
 </RelativeLayout>

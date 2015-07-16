@@ -128,7 +128,6 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                             XMPPTransactions.getXMPPStatusOrder(chatList.get(i).getStatus())))
                 status = chatList.get(i).getStatus();
 
-
             //TODO -> in real version this should be implemented
             //Hiding delivered message in group chat mode
             if(isGroupChatMode)
@@ -136,7 +135,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
             else
             {
                 //Set text status
-                if(status == null)
+                if (status == null)
                     chatHolder.chatSentText.setVisibility(View.GONE);
                 else if (chatList.get(i).getStatus().compareTo(Constants.CHAT_MESSAGE_STATUS_NOT_SENT) == 0)
                     chatHolder.chatSentText.setText(mContext.getString(R.string.status_not_sent));
@@ -162,7 +161,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                 previousTimestamp == 0)
         {
             chatHolder.chatSentTime.setVisibility(View.VISIBLE);
-            chatHolder.chatSentTime.setText(Utils.getStringChatTimeDifference(currentTimestamp, mContext));
+            chatHolder.chatSentTime.setText(Utils.getStringChatTimeDifference(currentTimestamp,mContext));
         }
         else
         {

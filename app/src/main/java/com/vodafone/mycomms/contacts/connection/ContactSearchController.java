@@ -43,7 +43,7 @@ public class ContactSearchController extends BaseController {
     }
 
     public void getContactById(JSONObject jsonObject) {
-        Log.e(Constants.TAG, "ContactSearchController.getRecentList: ");
+        Log.i(Constants.TAG, "ContactSearchController.getContactById: ");
 //        if(mContactSearchConnection != null){
 //            mContactSearchConnection.cancel();
 //        }
@@ -70,7 +70,7 @@ public class ContactSearchController extends BaseController {
     }
 
     private String getContactIdList() {
-        Log.e(Constants.TAG, "ContactSearchController.getContactIdList: ");
+        Log.i(Constants.TAG, "ContactSearchController.getContactIdList: ");
         String ids = "";
         try {
             if(mJSONRecents!=null && mJSONRecents.length()>0) {
@@ -95,7 +95,7 @@ public class ContactSearchController extends BaseController {
     @Override
     public void onConnectionComplete(ConnectionResponse response) {
         super.onConnectionComplete(response);
-        Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ");
+        Log.i(Constants.TAG, "ContactSearchController.onConnectionComplete: ");
         String result = response.getData().toString();
         if (result != null && result.trim().length()>0) {
             try {
@@ -114,15 +114,18 @@ public class ContactSearchController extends BaseController {
     }
 
     public void contactsByIdsCallback(String json) {
-        Log.e(Constants.TAG, "ContactSearchController.contactsByIdsCallback: ");
+        Log.i(Constants.TAG, "ContactSearchController.contactsByIdsCallback: ");
 //        String result = response.getData().toString();
         if (json != null && json.trim().length()>0) {
             try {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(json);
 
+                ContactsController contactsController = new ContactsController(mContext, mProfileId);
                 contactsController.insertContactListInRealm(jsonResponse);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
+                contactsController.closeRealm();
+
                 //Show Recent Contacts
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             } catch (JSONException e) {
@@ -140,8 +143,6 @@ public class ContactSearchController extends BaseController {
     public class GetContactsByIdsAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            Log.e(Constants.TAG, "GetContactsByIdsAsyncTask.doInBackground: START");
-
             String json = null;
 
             try {
@@ -164,8 +165,6 @@ public class ContactSearchController extends BaseController {
             } catch (Exception e) {
                 Log.e(Constants.TAG, "GetContactsByIdsAsyncTask.doInBackground: ",e);
             }
-
-            Log.e(Constants.TAG, "GetContactsByIdsAsyncTask.doInBackground: END");
 
             return json;
         }

@@ -157,8 +157,9 @@ public class ToolbarActivity extends ActionBarActivity {
         if (mFooter!=null) {
             ImageView unreadBubble = (ImageView) mFooter.findViewById(R.id.unread_bubble);
             TextView unreadMessagesText = (TextView) mFooter.findViewById(R.id.unread_messages);
-
+            RealmChatTransactions realmChatTransactions = new RealmChatTransactions(this);
             long unreadMessages = realmChatTransactions.getAllChatPendingMessagesCount();
+            realmChatTransactions.closeRealm();
             if (unreadMessages > 0) {
                 unreadBubble.setVisibility(View.VISIBLE);
                 unreadMessagesText.setVisibility(View.VISIBLE);

@@ -19,6 +19,7 @@ import com.vodafone.mycomms.chatgroup.GroupChatController;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
+import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
@@ -67,8 +68,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private RecentContactController recentContactController;
     private NewsController mNewsController;
     String profile_id;
-    public boolean comesFromToolbar = true;
+    public int contactViewOrigin = Constants.CONTACTS_ALL;
     public static Picasso picasso;
+    private HashMap<String, Long> recentChatsHashMap = new HashMap<>();
 
     //Network listener
     private NetworkEvents networkEvents;
@@ -358,22 +360,33 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
+        Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived: ");
         ChatMessage chatMsg = event.getMessage();
+        int pendingMessages = event.getPendingMessages();
 
-        //TODO RBM - UnComment after testing
-//        if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
-//            RecentContactController recentContactController =
-//                    new RecentContactController(this, profile_id);
-//
-//            if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0)
-//                recentContactController.insertRecentOKHttp(
-//                        chatMsg.getGroup_id(), Constants.CONTACTS_ACTION_SMS);
-//            else
-//                recentContactController.insertRecent(
-//                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-//
-//            recentContactController.closeRealm();
-//        }
+        if(chatMsg.getDirection()==Constants.CHAT_MESSAGE_DIRECTION_RECEIVED) {
+            if(chatMsg.getGroup_id()!=null && chatMsg.getGroup_id().length()>0) {
+                recentChatsHashMap.put(chatMsg.getGroup_id(), chatMsg.getTimestamp());
+            }else {
+                recentChatsHashMap.put(chatMsg.getContact_id(), chatMsg.getTimestamp());
+            }
+            Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived : pendingMessages " + pendingMessages);
+            if (pendingMessages == 0){
+                RecentContactController recentContactController =
+                        new RecentContactController(this, profile_id);
+                Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived: pendingMessages 0");
+                recentContactController.insertPendingChatsRecent(recentChatsHashMap);
+                recentChatsHashMap.clear();
+            }
+            recentContactController.closeRealm();
+        }
+    }
+
+    @Subscribe
+    public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
+        Log.i(Constants.TAG, "MycommsApp.onAllPendingMessagesReceived: ");
+        recentContactController.insertPendingChatsRecent(recentChatsHashMap);
+        recentChatsHashMap.clear();
     }
 
     public class loadGroupChats extends AsyncTask<String, Void, String>

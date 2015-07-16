@@ -44,8 +44,6 @@ public class SaveAndShowImageAsyncTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        Log.e(Constants.TAG, "SaveAndShowImageAsyncTask.doInBackground: START " + file);
-
         try {
             //Descarga del archivo local
             Log.e(Constants.TAG, "SaveAndShowImageAsyncTask.doInBackground (INICIO DownloadAvatar by Picasso: "
@@ -63,9 +61,6 @@ public class SaveAndShowImageAsyncTask extends AsyncTask<Void, Void, Void> {
             Log.e(Constants.TAG, "SaveAndShowImageAsyncTask.doInBackground: ",e);
             if(file.exists()) file.delete();
         }
-
-        Log.e(Constants.TAG, "SaveAndShowImageAsyncTask.doInBackground: END "+file);
-
         return null;
     }
 

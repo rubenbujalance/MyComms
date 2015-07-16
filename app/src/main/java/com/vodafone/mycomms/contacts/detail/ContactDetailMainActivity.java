@@ -671,14 +671,13 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                         popupView,
                         LayoutParams.MATCH_PARENT,
                         LayoutParams.MATCH_PARENT);
-                ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
-                TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
+                final ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
+                final TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
 
                 if (contact.getAvatar() != null &&
                         contact.getAvatar().length() > 0 &&
                         contact.getAvatar().compareTo("") != 0 &&
-                        avatarFile.exists() &&
-                        !contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                        !contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
 
                     textAvatar.setText(null);
 
@@ -687,14 +686,41 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                             .fit().centerCrop()
                             .into(fullAvatar);
 
+
+                    MycommsApp.picasso
+                            .load(contact.getAvatar())
+                            .placeholder(R.color.grey_middle)
+                            .noFade()
+                            .fit().centerCrop()
+                            .into(fullAvatar, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    textAvatar.setVisibility(View.INVISIBLE);
+                                }
+
+                                @Override
+                                public void onError() {
+                                    String initials = "";
+                                    if (null != contact.getFirstName() && contact.getFirstName().length() > 0) {
+                                        initials = initials + contact.getFirstName().substring(0, 1);
+                                    }
+
+                                    if (null != contact.getLastName() && contact.getLastName().length() > 0) {
+                                        initials = initials + contact.getLastName().substring(0, 1);
+                                    }
+                                    fullAvatar.setImageResource(R.color.grey_middle);
+                                    textAvatar.setVisibility(View.VISIBLE);
+                                    textAvatar.setText(initials);
+                                }
+                            });
+
                 } else if (contact.getAvatar() != null &&
                         contact.getAvatar().length() > 0 &&
-                        contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                        contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
                     textAvatar.setVisibility(View.INVISIBLE);
-                    Picasso.with(getBaseContext())
-                            .load(contact.getAvatar())
-                            .fit().centerCrop()
-                            .into(fullAvatar);
+
+                    AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), fullAvatar, textAvatar, contact.getContactId());
+                    avatarSFController.getSFAvatar(contact.getAvatar());
                 } else {
                     String initials = contact.getFirstName().substring(0, 1) +
                             contact.getLastName().substring(0, 1);

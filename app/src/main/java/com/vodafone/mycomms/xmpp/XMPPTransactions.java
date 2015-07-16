@@ -15,10 +15,10 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.DownloadAndSaveGroupChatAsyncTask;
+import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageSentStatusChanged;
-import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -32,6 +32,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.ping.PingManager;
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.BufferedInputStream;
@@ -53,6 +54,8 @@ import model.GroupChat;
  */
 public final class XMPPTransactions {
     private static XMPPTCPConnection _xmppConnection = null;
+    private static ReconnectionManager _reconnectionMgr = null;
+    private static XMPPTCPConnectionConfiguration.Builder _xmppConfigBuilder;
     private static String accessToken;
     private static String _profile_id;
     private static Context _appContext;
@@ -66,6 +69,7 @@ public final class XMPPTransactions {
     //Control of pings to server
     private static Thread pingThread = null;
     private static String pingWaitingID = null;
+    private static PingManager _pingManager = null;
 
     //Control of sleep when app in background
     private static Thread sleepThread = null;
@@ -75,47 +79,28 @@ public final class XMPPTransactions {
     private static long _lastChatMessageSentTimestamp;
 
     //Time between pings to server
-    private static final int PINGING_TIME_MILIS = 10000;
+    private static final int PINGING_TIME_MILIS = 30000;
+
+    //Pending messages handling
+    private static int _pendingMessages;
 
     /*
      * Methods
      */
 
-    public static void initializeMsgServerSession(Context appContext, boolean force)
+    public static void initializeMsgServerSession(Context appContext)
     {
-        if(_isConnecting &&
-                Calendar.getInstance().getTimeInMillis() > _isConnectingTime+10000)
-            _isConnecting = false;
-
         if(_isConnecting) return;
 
-//        //Check if haven't received confirmation of last message sent
-//        //Force reconnection if necessary
-//        if(_lastChatMessageSent != null &&
-//                Calendar.getInstance().getTimeInMillis() > _lastChatMessageSentTimestamp+5000 &&
-//                !_isConnecting)
-//        {
-//            //Disconnect and force manual reconnection
-//            try {
-//                if(_xmppConnection != null) _xmppConnection.disconnect();
-//            } catch (Exception e) {
-//                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: ", e);
-//            }
-//
-//            force = true;
-//        }
-
         //Start connection
-        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() ||
-                !_xmppConnection.isConnected() || force) {
+//        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() ||
+//                !_xmppConnection.isConnected() || force) {
 
             Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: Connecting");
 
             //Save context and reset connection
-            _appContext = appContext;
-            _isConnecting = true;
-            _isConnectingTime = Calendar.getInstance().getTimeInMillis();
-            notifyXMPPConnecting(true);
+            if(_appContext==null)
+                _appContext = appContext;
 
             //Check profile id exists
             if(_profile_id==null) {
@@ -125,63 +110,67 @@ public final class XMPPTransactions {
                 _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
             }
 
-            if (_profile_id == null) {
-                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: No profile_id found");
-                _isConnecting = false;
-                notifyXMPPConnecting(false);
-                return;
+            //Device ID
+            if(_device_id==null) {
+                _device_id = Utils.getDeviceId(_appContext.getContentResolver(),
+                        (TelephonyManager) _appContext.getSystemService(Service.TELEPHONY_SERVICE));
             }
 
-            //Device ID
-            _device_id = Utils.getDeviceId(_appContext.getContentResolver(),
-                    (TelephonyManager) _appContext.getSystemService(Service.TELEPHONY_SERVICE));
-
             //Configuration for the connection
-            XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = XMPPTCPConnectionConfiguration.builder();
-
-            accessToken = UserSecurity.getAccessToken(appContext);
-            xmppConfigBuilder.setUsernameAndPassword(_profile_id, accessToken);
-            xmppConfigBuilder.setResource(_device_id);
-            xmppConfigBuilder.setServiceName(Constants.XMPP_PARAM_DOMAIN);
-            xmppConfigBuilder.setHost(appContext.getString(R.string.xmpp_host));
-            xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
-            xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
-            xmppConfigBuilder.setDebuggerEnabled(true);
-            xmppConfigBuilder.setSendPresence(false);
-            xmppConfigBuilder.setCompressionEnabled(false);
-
-            XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
+            if(_xmppConfigBuilder==null) {
+                loadConnectionConfig();
+            }
 
             //Set a timer to check connection every 5 seconds
-//            startPinging(PINGING_TIME_MILIS);
+            intervalPinging(PINGING_TIME_MILIS);
 
             //Connect to server
-            xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, xmppConfigBuilder);
-        }
+            XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
+            xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//        }
     }
 
-    private static void startPinging(final int miliseconds)
+    private static void loadConnectionConfig()
+    {
+        _xmppConfigBuilder = XMPPTCPConnectionConfiguration.builder();
+
+        accessToken = UserSecurity.getAccessToken(_appContext);
+        _xmppConfigBuilder.setUsernameAndPassword(_profile_id, accessToken);
+        _xmppConfigBuilder.setResource(_device_id);
+        _xmppConfigBuilder.setServiceName(Constants.XMPP_PARAM_DOMAIN);
+        _xmppConfigBuilder.setHost(_appContext.getString(R.string.xmpp_host));
+        _xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
+        _xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
+        _xmppConfigBuilder.setDebuggerEnabled(true);
+        _xmppConfigBuilder.setSendPresence(false);
+        _xmppConfigBuilder.setCompressionEnabled(false);
+    }
+
+    private static void intervalPinging(final int miliseconds)
     {
         if(pingThread!=null) pingThread.interrupt();
 
         pingThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                Log.i(Constants.TAG, "XMPPTransactions.intervalPinging: START");
                 while(!Thread.interrupted()) {
                     try {
                         Thread.sleep(miliseconds);
                         if(!_isConnecting) {
+                            Log.i(Constants.TAG, "XMPPTransactions.intervalPinging: Pinging...");
                             sendPing();
                             Thread.sleep(3000);
                             if (pingWaitingID != null)
-                                initializeMsgServerSession(_appContext, true);
+                                initializeMsgServerSession(_appContext);
                         }
                     }catch (Exception e) {
-                        Log.e(Constants.TAG, "XMPPTransactions.run: ",e);
+                        Log.e(Constants.TAG, "XMPPTransactions.intervalPinging: ",e);
                         Crashlytics.logException(e);
-                        startPinging(miliseconds);
+                        intervalPinging(miliseconds);
                     }
                 }
+                Log.i(Constants.TAG, "XMPPTransactions.intervalPinging: END");
             }
         });
 
@@ -250,6 +239,52 @@ public final class XMPPTransactions {
         return true;
     }
 
+    public static void checkAndReconnectXMPP(final Context context)
+    {
+        Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP");
+
+        if(_isConnecting &&
+                Calendar.getInstance().getTimeInMillis() > _isConnectingTime+10000)
+            _isConnecting = false;
+
+        if(_isConnecting) return;
+
+        //If it's first time, initialize
+        if(_xmppConnection==null) {
+            initializeMsgServerSession(context);
+            return;
+        }
+
+        new AsyncTask<Void,Void,Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                boolean isConnected = false;
+                try {
+                    Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Pinging...");
+//                    isConnected = _pingManager.pingMyServer();
+                    sendPing();
+                    Thread.sleep(3000);
+                    isConnected = (pingWaitingID==null);
+
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: " +
+                            "Error pinging server");
+                }
+                return isConnected;
+            }
+            @Override
+            protected void onPostExecute(Boolean isConnected) {
+                super.onPostExecute(isConnected);
+                if(!isConnected) initializeMsgServerSession(context);
+
+                if(isConnected)
+                    Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Ping OK");
+                else
+                    Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Ping ERROR");
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     public static boolean sendText(boolean isGroup, String contactGroupId, String id, String text)
     {
         final String stanzaStr = buildMessageStanza(isGroup, id, contactGroupId, text);
@@ -265,6 +300,9 @@ public final class XMPPTransactions {
             _xmppConnection.sendStanza(st);
             _lastChatMessageSent = stanzaStr;
             _lastChatMessageSentTimestamp = Calendar.getInstance().getTimeInMillis();
+
+            //Check connection to keep it alive
+            checkAndReconnectXMPP(_appContext);
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendText: Error sending message", e);
@@ -401,17 +439,6 @@ public final class XMPPTransactions {
         return message;
     }
 
-    private static void xmppConnectionCallback(XMPPTCPConnection xmppConnection)
-    {
-        if(xmppConnection != null && xmppConnection.isConnected()) {
-            Log.w(Constants.TAG, "XMPPTransactions.xmppConnectionCallback: XMPP Connection established with user " + xmppConnection.getUser());
-        }
-        else {
-            Log.e(Constants.TAG, "XMPPTransactions.xmppConnectionCallback: XMPP Connection NOT established");
-            return;
-        }
-    }
-
     public static boolean saveAndNotifyStanzaReceived(XmlPullParser parser)
     {
         try {
@@ -420,38 +447,34 @@ public final class XMPPTransactions {
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String type = parser.getAttributeValue("", Constants.XMPP_ATTR_TYPE);
 
-            if (from == null || id == null ||
-                    to==null || type==null) return false;
-
-//            if((type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0
-//                        && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)!=0)
-//                    && type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)!=0)
+//            if(type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)!=0
+//                    && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)!=0
+//                    && type.compareTo(Constants.XMPP_STANZA_TYPE_PENDINGMESSAGES)!=0)
 //                return false;
 
             //TODO RBM - Remove after old PING solved ***********
-            if(id.startsWith("PING")) {
+            if(id!=null && id.startsWith("PING")) {
                 return false;
             }
             //****************************************************
 
-            if(from.indexOf("@")>0) from = from.substring(0, from.indexOf("@"));
-
-//            if(to.indexOf("@")>0) to = to.substring(0, to.indexOf("@"));
-//            else return false;
-
-            if (parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
+            if (type!=null && parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
                     && type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT) == 0)
             {
+                if (from == null || id == null ||
+                        to==null || type==null) return false;
+
                 String mediaType = parser.getAttributeValue("", Constants.XMPP_ATTR_MEDIATYPE);
 
                 if(mediaType == null ||
                         mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_TEXT)==0)
                     return saveAndNotifyMessageReceived(parser);
-                else if(mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
+                else if(mediaType!=null &&
+                        mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
                     return saveAndNotifyImageReceived(parser);
                 else return false;
             }
-            else if (parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
+            else if (type!=null && parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
                     && type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT) == 0)
             {
                 String mediaType = parser.getAttributeValue("", Constants.XMPP_ATTR_MEDIATYPE);
@@ -459,19 +482,26 @@ public final class XMPPTransactions {
                 if(mediaType == null ||
                         mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_TEXT)==0)
                     return saveAndNotifyGroupMessageReceived(parser);
-                else if(mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
+                else if(mediaType!=null &&
+                        mediaType.compareTo(Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE)==0)
                     return saveAndNotifyGroupImageReceived(parser);
                 else return false;
             }
             else if (parser.getName().compareTo(Constants.XMPP_ELEMENT_IQ) == 0)
             {
+                if(from.indexOf("@")>0) from = from.substring(0, from.indexOf("@"));
+                if(to.indexOf("@")>0) to = to.substring(0, to.indexOf("@"));
+
                 if(type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)==0 &&
                         from.compareTo(Constants.XMPP_PARAM_DOMAIN)==0 &&
-                        to.compareTo(_profile_id)==0) //It's a pong
+                        to.compareTo(_profile_id) == 0) //It's a pong
                     return handlePongReceived(parser);
-                else if(type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)==0 ||
-                        type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)==0)
+                else if(type!=null && (type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)==0 ||
+                        type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)==0))
                     return saveAndNotifyIQReceived(parser);
+                else if(type!=null &&
+                        type.compareTo(Constants.XMPP_STANZA_TYPE_PENDINGMESSAGES)==0)
+                    return handlePendingMessages(parser);
                 else return false;
             }
             else {return false;}
@@ -537,14 +567,52 @@ public final class XMPPTransactions {
         return true;
     }
 
+    private static boolean handlePendingMessages(XmlPullParser parser)
+    {
+        try {
+            String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
+            if(to==null || !to.contains("@")) return false;
+
+            to = to.substring(0, to.indexOf("@"));
+            if(to.compareTo(_profile_id)!=0) return false;
+
+            String pendingStr = parser.getAttributeValue("", Constants.XMPP_ATTR_PENDING);
+            int pending = 0;
+
+            try {
+                pending = Integer.parseInt(pendingStr);
+            } catch (Exception e) {
+                Log.i(Constants.TAG, "XMPPTransactions.handlePendingMessages: " +
+                        "Pending messages not number");
+                pending = 0;
+            }
+
+            if(pending>0) _pendingMessages = pending;
+            else _pendingMessages = 0;
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "XMPPTransactions.handlePongReceived: ", e);
+            Crashlytics.logException(e);
+            return false;
+        }
+
+        return true;
+    }
+
     private static boolean saveAndNotifyMessageReceived(XmlPullParser parser)
     {
         RealmChatTransactions chatTx = null;
 
         try {
+            if(_pendingMessages>0) {
+                _pendingMessages--;
+                BusProvider.getInstance().post(new AllPendingMessagesReceivedEvent());
+            }
+
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
+            String sentTimeStr = parser.getAttributeValue("", Constants.XMPP_ATTR_SENT);
 
             int event = parser.next();
             if (event != XmlPullParser.START_TAG) return false;
@@ -555,6 +623,15 @@ public final class XMPPTransactions {
 
             if(to.compareTo(_profile_id)==0 && from.compareTo(_profile_id)==0)
                 return false;
+
+            long sentTime = Calendar.getInstance().getTimeInMillis();
+
+            try {
+                sentTime = Long.parseLong(sentTimeStr);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyMessageReceived: " +
+                        "Error parsing sent time");
+            }
 
             chatTx = new RealmChatTransactions(_appContext);
 
@@ -569,7 +646,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
-                        text, "", id);
+                        text, "", id, sentTime);
 
                 contactId = from;
             }
@@ -577,7 +654,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
-                        text, "", id);
+                        text, "", id, sentTime);
 
                 contactId = to;
             }
@@ -594,6 +671,7 @@ public final class XMPPTransactions {
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
+            chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
             if(to.compareTo(_profile_id)==0) {
@@ -619,6 +697,7 @@ public final class XMPPTransactions {
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String url = parser.getAttributeValue("", Constants.XMPP_ATTR_FILEURL);
+            String sentTimeStr = parser.getAttributeValue("", Constants.XMPP_ATTR_SENT);
 
             if(url==null) return false;
 
@@ -634,11 +713,20 @@ public final class XMPPTransactions {
             ChatMessage newChatMessage = null;
             String contactId = null;
 
+            long sentTime = Calendar.getInstance().getTimeInMillis();
+
+            try {
+                sentTime = Long.parseLong(sentTimeStr);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyMessageReceived: " +
+                        "Error parsing sent time");
+            }
+
             if(to.compareTo(_profile_id)==0) {
                 newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                        "", url, id);
+                        "", url, id, sentTime);
 
                 contactId = from;
             }
@@ -646,7 +734,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                        "", url, id);
+                        "", url, id, sentTime);
 
                 contactId = to;
             }
@@ -673,6 +761,7 @@ public final class XMPPTransactions {
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
+            chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
         } catch (Exception e) {
@@ -691,6 +780,7 @@ public final class XMPPTransactions {
             String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String receiver = parser.getAttributeValue("", Constants.XMPP_ATTR_RECEIVER);
+            String sentTimeStr = parser.getAttributeValue("", Constants.XMPP_ATTR_SENT);
 
             int event = parser.next();
             if (event != XmlPullParser.START_TAG) return false;
@@ -701,6 +791,15 @@ public final class XMPPTransactions {
             if(receiver.contains("@")) receiver = receiver.substring(0, receiver.indexOf("@"));
 
             if(receiver.compareTo(_profile_id)!=0) return false;
+
+            long sentTime = Calendar.getInstance().getTimeInMillis();
+
+            try {
+                sentTime = Long.parseLong(sentTimeStr);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyMessageReceived: " +
+                        "Error parsing sent time");
+            }
 
             RealmGroupChatTransactions groupTx =
                     new RealmGroupChatTransactions(_appContext, _profile_id);
@@ -716,13 +815,13 @@ public final class XMPPTransactions {
                 newChatMessage = groupTx.newGroupChatMessageInstance(groupId, from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
-                        text, "", id);
+                        text, "", id, sentTime);
             }
             else if(from.compareTo(_profile_id)==0){
                 newChatMessage = groupTx.newGroupChatMessageInstance(groupId, "",
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
-                        text, "", id);
+                        text, "", id, sentTime);
             }
 
             if(newChatMessage == null) return false;
@@ -746,6 +845,7 @@ public final class XMPPTransactions {
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
+            chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
             if(from.compareTo(_profile_id)!=0) {
@@ -771,8 +871,18 @@ public final class XMPPTransactions {
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String url = parser.getAttributeValue("", Constants.XMPP_ATTR_FILEURL);
+            String sentTimeStr = parser.getAttributeValue("", Constants.XMPP_ATTR_SENT);
 
             if(url==null) return false;
+
+            long sentTime = Calendar.getInstance().getTimeInMillis();
+
+            try {
+                sentTime = Long.parseLong(sentTimeStr);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyMessageReceived: " +
+                        "Error parsing sent time");
+            }
 
             RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
 
@@ -790,7 +900,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                        "", url, id);
+                        "", url, id, sentTime);
 
                 contactId = from;
             }
@@ -798,7 +908,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                        "", url, id);
+                        "", url, id, sentTime);
 
                 contactId = to;
             }
@@ -826,6 +936,7 @@ public final class XMPPTransactions {
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
+            chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
         } catch (Exception e) {
@@ -959,13 +1070,6 @@ public final class XMPPTransactions {
         return true;
     }
 
-    private static void notifyXMPPConnecting(boolean isConnecting)
-    {
-        XMPPConnectingEvent event = new XMPPConnectingEvent();
-        event.setConnecting(isConnecting);
-        BusProvider.getInstance().post(event);
-    }
-
     public static boolean notifyIQMessageStatus(final String msgId, final String msgContactId,
                                                 final String status)
     {
@@ -1011,26 +1115,44 @@ public final class XMPPTransactions {
      * Classes
      */
 
-    static final class XMPPOpenConnectionTask extends AsyncTask<XMPPTCPConnectionConfiguration.Builder, Void, XMPPTCPConnection> {
+    static final class XMPPOpenConnectionTask extends AsyncTask<Object, Void, XMPPTCPConnection> {
         @Override
-        protected XMPPTCPConnection doInBackground(XMPPTCPConnectionConfiguration.Builder[] params)
+        protected XMPPTCPConnection doInBackground(Object... params)
         {
+            //Control to not do parallel connections
+            if(_isConnecting) {
+                return _xmppConnection;
+            }
+
             Log.i(Constants.TAG, "XMPPOpenConnectionTask.doInBackground: ");
+            boolean connectionCreated = false;
 
             try {
-                XMPPTCPConnectionConfiguration.Builder xmppConfigBuilder = params[0];
-                _xmppConnection = new XMPPTCPConnection(xmppConfigBuilder.build());
+                //Save connection start time
+                _isConnecting = true;
+                _isConnectingTime = Calendar.getInstance().getTimeInMillis();
+
+                if(_xmppConnection!=null) {
+                    _xmppConnection.disconnect();
+                }
+                else {
+                    _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
+                    _xmppConnection.addConnectionListener(getConnectionListener());
+                    connectionCreated = true;
+                }
 
                 // Connect to the server
-                _xmppConnection.addConnectionListener(getConnectionListener());
                 _xmppConnection.connect();
+
                 //Log into the server
-                _xmppConnection.login();
+                if(!_xmppConnection.isAuthenticated())
+                    _xmppConnection.login();
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "XMPPOpenConnection.doInBackground: Error opening XMPP server connection", e);
                 Crashlytics.logException(e);
                 _isConnecting = false;
+
                 return null;
             }
 
@@ -1039,9 +1161,22 @@ public final class XMPPTransactions {
             //**********************
 
             //Reconnection manager
-            ReconnectionManager reconnectionMgr = ReconnectionManager.getInstanceFor(_xmppConnection);
-            reconnectionMgr.enableAutomaticReconnection();
-            reconnectionMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY);
+            if(connectionCreated) {
+                _reconnectionMgr = ReconnectionManager.getInstanceFor(_xmppConnection);
+                _reconnectionMgr.enableAutomaticReconnection();
+                _reconnectionMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY);
+
+//                _pingManager = PingManager.getInstanceFor(_xmppConnection);
+//                _pingManager.setPingInterval(20);
+//                _pingManager.registerPingFailedListener(new PingFailedListener() {
+//                    @Override
+//                    public void pingFailed() {
+//                        Log.w(Constants.TAG, "XMPPOpenConnectionTask.pingFailed: " +
+//                                "Ping failed, trying to reconnect");
+//                        initializeMsgServerSession(_appContext, true);
+//                    }
+//                });
+            }
 
             //Check if there is a stanza not sent
             if(_lastChatMessageSent!=null) {
@@ -1057,16 +1192,12 @@ public final class XMPPTransactions {
         @Override
         protected void onPostExecute(XMPPTCPConnection xmppConnection) {
             _isConnecting = false;
-            notifyXMPPConnecting(false);
-            xmppConnectionCallback(xmppConnection);
         }
 
         @Override
         protected void onCancelled(XMPPTCPConnection xmppConnection) {
             super.onCancelled();
             _isConnecting = false;
-            notifyXMPPConnecting(false);
-            xmppConnectionCallback(xmppConnection);
         }
     }
 
@@ -1102,12 +1233,12 @@ public final class XMPPTransactions {
                 }
 
                 _isConnecting = false;
-                notifyXMPPConnecting(false);
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectionSuccessful");
             }
 
             @Override
             public void reconnectingIn(int seconds) {
+                //Save connection start time
                 _isConnecting = true;
                 _isConnectingTime = Calendar.getInstance().getTimeInMillis();
                 Log.w(Constants.TAG, "XMPPTransactions.reconnectingIn: " + seconds + " seg.");
@@ -1116,8 +1247,7 @@ public final class XMPPTransactions {
             @Override
             public void reconnectionFailed(Exception e) {
                 _isConnecting = false;
-                notifyXMPPConnecting(false);
-                Log.w(Constants.TAG, "XMPPTransactions.reconnectionFailed: Trying manually");
+                Log.w(Constants.TAG, "XMPPTransactions.reconnectionFailed: Try it manually");
             }
         };
 

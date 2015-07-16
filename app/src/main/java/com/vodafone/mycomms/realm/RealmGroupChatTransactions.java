@@ -86,10 +86,8 @@ public class RealmGroupChatTransactions {
 
     public ChatMessage newGroupChatMessageInstance(String group_id, String contact_id,
                                                    String direction, int type, String text,
-                                                   String resourceUri, String id)
+                                                   String resourceUri, String id, long timestamp)
     {
-        long timestamp = Calendar.getInstance().getTimeInMillis();
-
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
                 direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
                 Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);

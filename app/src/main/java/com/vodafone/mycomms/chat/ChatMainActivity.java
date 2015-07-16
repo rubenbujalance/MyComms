@@ -38,7 +38,6 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageSentEvent;
 import com.vodafone.mycomms.events.MessageSentStatusChanged;
-import com.vodafone.mycomms.events.XMPPConnectingEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
@@ -199,7 +198,7 @@ public class ChatMainActivity extends ToolbarActivity {
         etChatTextBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                if (cs != null && cs.length() > 0) checkXMPPConnection();
+                if (cs != null && cs.length() > 0) setSendEnabled(true);
                 else setSendEnabled(false);
             }
 
@@ -332,15 +331,6 @@ public class ChatMainActivity extends ToolbarActivity {
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
-    private void checkXMPPConnection()
-    {
-        if(XMPPTransactions.getXmppConnection()!=null &&
-                XMPPTransactions.getXmppConnection().isConnected())
-            setSendEnabled(true);
-        else
-            setSendEnabled(false);
-    }
-
     private void setSendEnabled(boolean enable)
     {
         if(!enable) {
@@ -377,10 +367,10 @@ public class ChatMainActivity extends ToolbarActivity {
 
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.initializeMsgServerSession(getApplicationContext(), false);
+        XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
 
         if(etChatTextBox.getText().toString()!=null &&
-                etChatTextBox.getText().toString().length()>0) checkXMPPConnection();
+                etChatTextBox.getText().toString().length() > 0) setSendEnabled(true);
         else setSendEnabled(false);
 
         final String contactId = _contact.getContactId();
@@ -414,9 +404,10 @@ public class ChatMainActivity extends ToolbarActivity {
         if(chatMsg!=null)
         {
             _chatList.add(chatMsg);
-            if(chatMsg.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)) {
-                mRecentContactController.insertRecent(chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
-            }
+//            if(chatMsg.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)) {
+//                mRecentContactController.insertRecent(
+//                        chatMsg.getContact_id(), Constants.CONTACTS_ACTION_SMS);
+//            }
 
             if(_chatList.size()>50) _chatList.remove(0);
             refreshAdapter();
@@ -603,15 +594,6 @@ public class ChatMainActivity extends ToolbarActivity {
 
         if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)
             loadMessagesArray();
-    }
-
-    @Subscribe
-    public void onEventXMPPConnecting(XMPPConnectingEvent event){
-        boolean isConnecting = event.isConnecting();
-
-        if(!isConnecting)
-            checkXMPPConnection();
-        else setSendEnabled(false);
     }
 
     private class DownloadFile extends AsyncTask<String, Void, Boolean> {

@@ -13,7 +13,7 @@ import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.chatgroup.DownloadAndSaveGroupChatAsyncTask;
 import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
 import com.vodafone.mycomms.events.BusProvider;
@@ -123,7 +123,7 @@ public final class XMPPTransactions {
             }
 
             //Set a timer to check connection every 5 seconds
-            intervalPinging(PINGING_TIME_MILIS);
+//            intervalPinging(PINGING_TIME_MILIS);
 
             //Connect to server
             XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
@@ -139,7 +139,7 @@ public final class XMPPTransactions {
         _xmppConfigBuilder.setUsernameAndPassword(_profile_id, accessToken);
         _xmppConfigBuilder.setResource(_device_id);
         _xmppConfigBuilder.setServiceName(Constants.XMPP_PARAM_DOMAIN);
-        _xmppConfigBuilder.setHost(_appContext.getString(R.string.xmpp_host));
+        _xmppConfigBuilder.setHost(EndpointWrapper.getXMPPHost());
         _xmppConfigBuilder.setPort(Constants.XMPP_PARAM_PORT);
         _xmppConfigBuilder.setEnabledSSLProtocols(new String[]{"TLSv1.2"});
         _xmppConfigBuilder.setDebuggerEnabled(true);
@@ -267,18 +267,17 @@ public final class XMPPTransactions {
                 boolean isConnected = false;
                 try {
                     Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Pinging...");
-//                    isConnected = _pingManager.pingMyServer();
-                    isPinging = true;
-
-                    sendPing();
-                    Thread.sleep(3000);
-                    isConnected = (pingWaitingID==null);
-
-                    isPinging = false;
+                    isConnected = _pingManager.pingMyServer();
+//                    isPinging = true;
+//
+//                    sendPing();
+//                    Thread.sleep(3000);
+//                    isConnected = (pingWaitingID==null);
+//
+//                    isPinging = false;
 
                 } catch (Exception e) {
-                    Log.e(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: " +
-                            "Error pinging server");
+                    Log.e(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: ",e);
                 }
                 return isConnected;
             }
@@ -1176,8 +1175,8 @@ public final class XMPPTransactions {
                 _reconnectionMgr.enableAutomaticReconnection();
                 _reconnectionMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY);
 
-//                _pingManager = PingManager.getInstanceFor(_xmppConnection);
-//                _pingManager.setPingInterval(20);
+                _pingManager = PingManager.getInstanceFor(_xmppConnection);
+//                _pingManager.setPingInterval(5);
 //                _pingManager.registerPingFailedListener(new PingFailedListener() {
 //                    @Override
 //                    public void pingFailed() {

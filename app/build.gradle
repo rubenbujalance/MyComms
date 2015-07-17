@@ -69,19 +69,16 @@ android {
             applicationId "com.vodafone.mycomms.i"
             resValue "string", "app_name", "MyComms-i"
             resValue "string", "app_scheme", "mycomms-i"
-            resValue "string", "xmpp_host", "int-msg.my-comms.com"
         }
         q {
             applicationId "com.vodafone.mycomms.q"
             resValue "string", "app_name", "MyComms-q"
             resValue "string", "app_scheme", "mycomms-qa"
-            resValue "string", "xmpp_host", "qa-msg.my-comms.com"
         }
         p {
             applicationId "com.vodafone.mycomms.p"
             resValue "string", "app_name", "MyComms"
             resValue "string", "app_scheme", "mycomms"
-            resValue "string", "xmpp_host", "msg.my-comms.com"
         }
     }
 

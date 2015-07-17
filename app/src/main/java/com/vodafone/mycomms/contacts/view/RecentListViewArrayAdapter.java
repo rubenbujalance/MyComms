@@ -140,19 +140,23 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         String composedName = null;
         for(Contact contact : contacts)
         {
-            try {
-                String contactFirstName = null;
-                if (null == contact.getFirstName()) {
-                    contactFirstName = "Unknown";
-                } else {
-                    contactFirstName = contact.getFirstName();
+            if(null != contact)
+            {
+                try {
+                    String contactFirstName = null;
+                    if (null == contact.getFirstName()) {
+                        contactFirstName = "Unknown";
+                    } else {
+                        contactFirstName = contact.getFirstName();
+                    }
+                    if (null == composedName) composedName = contactFirstName;
+                    else composedName = composedName + ", " + contactFirstName;
+                } catch (Exception e){
+                    Log.e(Constants.TAG, "RecentListViewArrayAdapter.getComposedName: contact first name null");
+                    Crashlytics.logException(e);
                 }
-                if (null == composedName) composedName = contactFirstName;
-                else composedName = composedName + ", " + contactFirstName;
-            } catch (Exception e){
-                Log.e(Constants.TAG, "RecentListViewArrayAdapter.getComposedName: contact first name null");
-                Crashlytics.logException(e);
             }
+
         }
         return composedName;
     }
@@ -291,48 +295,52 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         Contact cont = null;
         for(ImageView imageView : images)
         {
+
             cont = contacts.get(i);
 
-            //Image avatar
-            File avatarFile = null;
-            if (cont.getId()!=null)
-                avatarFile = new File
-                        (
-                                mContext.getFilesDir()
-                                , Constants.CONTACT_AVATAR_DIR + "avatar_"+cont.getContactId()+".jpg"
-                        );
-
-            if (cont.getAvatar()!=null &&
-                    cont.getAvatar().length()>0 &&
-                    cont.getAvatar().compareTo("")!=0 &&
-                    null != avatarFile &&
-                    avatarFile.exists())
+            if(null != cont)
             {
+                //Image avatar
+                File avatarFile = null;
+                if (cont.getId()!=null)
+                    avatarFile = new File
+                            (
+                                    mContext.getFilesDir()
+                                    , Constants.CONTACT_AVATAR_DIR + "avatar_"+cont.getContactId()+".jpg"
+                            );
 
-                imagesText.get(i).setText(null);
-
-                final File finalAvatarFile = avatarFile;
-
-                Picasso.with(mContext)
-                        .load(avatarFile) // thumbnail url goes here
-                        .fit().centerCrop()
-                        .into(imageView);
-
-            } else{
-                String initials = "";
-                if(null != cont.getFirstName() && cont.getFirstName().length() > 0)
+                if (cont.getAvatar()!=null &&
+                        cont.getAvatar().length()>0 &&
+                        cont.getAvatar().compareTo("")!=0 &&
+                        null != avatarFile &&
+                        avatarFile.exists())
                 {
-                    initials = cont.getFirstName().substring(0,1);
 
-                    if(null != cont.getLastName() && cont.getLastName().length() > 0)
+                    imagesText.get(i).setText(null);
+
+                    final File finalAvatarFile = avatarFile;
+
+                    Picasso.with(mContext)
+                            .load(avatarFile) // thumbnail url goes here
+                            .fit().centerCrop()
+                            .into(imageView);
+
+                } else{
+                    String initials = "";
+                    if(null != cont.getFirstName() && cont.getFirstName().length() > 0)
                     {
-                        initials = initials + cont.getLastName().substring(0,1);
+                        initials = cont.getFirstName().substring(0,1);
+
+                        if(null != cont.getLastName() && cont.getLastName().length() > 0)
+                        {
+                            initials = initials + cont.getLastName().substring(0,1);
+                        }
+
                     }
 
+                    imageView.setImageResource(R.color.grey_middle);
+                    imagesText.get(i).setText(initials);
                 }
-
-                imageView.setImageResource(R.color.grey_middle);
-                imagesText.get(i).setText(initials);
             }
             i++;
         }

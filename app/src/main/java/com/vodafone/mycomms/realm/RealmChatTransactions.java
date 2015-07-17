@@ -11,7 +11,6 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -149,14 +148,10 @@ public class RealmChatTransactions {
 
             RealmResults<ChatMessage> results = query.findAll();
 
-            Iterator<ChatMessage> it = results.iterator();
-            ChatMessage msg;
-
-            while(it.hasNext()) {
-                msg = it.next();
-                msg.setRead(Constants.CHAT_MESSAGE_READ);
+            for(int i = 0; i < results.size(); i++)
+            {
+                results.get(i).setRead(Constants.CHAT_MESSAGE_READ);
             }
-
 
         } catch (Exception e){
             Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);

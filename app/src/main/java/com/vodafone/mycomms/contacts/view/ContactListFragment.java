@@ -309,6 +309,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                             }
 
                             Utils.launchCall(phone, getActivity());
+                            recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                         }
                     }
                     else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
@@ -329,6 +330,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                             if(null != phone)
                             {
                                 Utils.launchSms(phone, getActivity());
+                                recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                             }
                         }
                         else
@@ -365,10 +367,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
                             }
 
                             Utils.launchEmail(email, getActivity());
+                            recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                         }
                     }
-                    //ADD RECENT
-                    recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                     setListAdapterTabs();
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);

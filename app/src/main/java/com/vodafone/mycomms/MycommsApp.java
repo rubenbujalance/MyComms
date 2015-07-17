@@ -375,7 +375,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 RecentContactController recentContactController =
                         new RecentContactController(this, profile_id);
                 Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived: pendingMessages 0");
-                recentContactController.insertPendingChatsRecent(recentChatsHashMap);
+                HashMap<String, Long> recentChatsHashMapClone = new HashMap<>();
+                recentChatsHashMapClone.putAll(recentChatsHashMap);
+                recentContactController.insertPendingChatsRecent(recentChatsHashMapClone);
                 recentChatsHashMap.clear();
             }
             recentContactController.closeRealm();
@@ -386,6 +388,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
         Log.i(Constants.TAG, "MycommsApp.onAllPendingMessagesReceived: ");
         if(recentChatsHashMap!=null && recentChatsHashMap.size()>0) {
+            HashMap<String, Long> recentChatsHashMapClone = new HashMap<>();
             recentContactController.insertPendingChatsRecent(recentChatsHashMap);
             recentChatsHashMap.clear();
         }

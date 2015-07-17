@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -93,12 +95,31 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     }
 
     @Override
-    public void onBindViewHolder(ChatHolder chatHolder, int i)
+    public void onBindViewHolder(final ChatHolder chatHolder, int i)
     {
         int test = i;
         String test2 = chatList.get(i).getContact_id();
         int test3 = chatHolder.getItemViewType();
-        Contact contact = _contactTx.getContactById(chatList.get(i).getContact_id());
+
+        Contact contact = null;
+
+        if(null != chatList.get(i).getContact_id() && chatList.get(i).getContact_id().length() >
+                0 && chatList.get(i).getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED))
+        {
+            contact = _contactTx.getContactById(chatList.get(i).getContact_id());
+        }
+        else
+        {
+            if(null != _profile)
+            {
+                contact = new Contact();
+                contact.setAvatar(_profile.getAvatar());
+                contact.setFirstName(_profile.getFirstName());
+                contact.setLastName(_profile.getLastName());
+                contact.setContactId(_profile.getId());
+                contact.setPlatform(_profile.getPlatform());
+            }
+        }
 
         if(chatList.get(i).getType()==Constants.CHAT_MESSAGE_TYPE_IMAGE)
         {
@@ -168,68 +189,54 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
             chatHolder.chatSentTime.setVisibility(View.GONE);
         }
 
-        //Set message avatar
-        String avatar;
-        String contactId;
-        String firstName;
-        String lastName;
-
-        if(chatHolder.getItemViewType() == Constants.LEFT_CHAT ||
-                chatHolder.getItemViewType() == Constants.LEFT_IMAGE_CHAT)
+        if(null != contact)
         {
-            avatar = contact.getAvatar();
-            contactId = contact.getContactId();
-            firstName = contact.getFirstName();
-            lastName = contact.getLastName();
-        }
-        else
-        {
-            avatar = _profile.getAvatar();
-            contactId = _profile.getId();
-            firstName = _profile.getFirstName();
-            lastName = _profile.getLastName();
-        }
-
-        File avatarFile = new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contactId+".jpg");
-
-//        if(XMPPTransactions.getXMPPStatusOrder(chatList.get(i).getStatus())==0 &&
-//                (chatHolder.getItemViewType() == Constants.RIGHT_CHAT ||
-//                    chatHolder.getItemViewType() == Constants.RIGHT_IMAGE_CHAT) &&
-//                i!=chatList.size()-1) {
-//            chatHolder.chatAvatarImage.setImageResource(R.color.red_action);
-//            chatHolder.chatAvatarText.setVisibility(View.INVISIBLE);
-//            chatHolder.chatAvatarText.setVisibility(View.VISIBLE);
-//        }
-//        else if (avatar!=null &&
-
-        if (avatar!=null &&
-                avatar.length()>0 &&
-                avatar.compareTo("")!=0 &&
-                avatarFile.exists()) {
-
-            chatHolder.chatAvatarText.setVisibility(View.INVISIBLE);
-
-            Picasso.with(mContext)
-                    .load(avatarFile)
-                    .fit().centerCrop()
-                    .into(chatHolder.chatAvatarImage);
-
-        } else{
+            //Image avatar
             String initials = "";
-            if(null != firstName && firstName.length() > 0)
+            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
             {
-                initials = firstName.substring(0, 1);
+                initials = contact.getFirstName().substring(0,1);
 
-                if(null != lastName && lastName.length() > 0)
+                if(null != contact.getLastName() && contact.getLastName().length() > 0)
                 {
-                    initials = initials + lastName.substring(0,1);
+                    initials = initials + contact.getLastName().substring(0,1);
                 }
-
             }
 
+            final String finalInitials = initials;
+
             chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
-            chatHolder.chatAvatarText.setText(initials);
             chatHolder.chatAvatarText.setVisibility(View.VISIBLE);
+            chatHolder.chatAvatarText.setText(finalInitials);
+
+            if (contact.getAvatar()!=null &&
+                    contact.getAvatar().length()>0)
+            {
+
+                MycommsApp.picasso
+                        .load(contact.getAvatar())
+                        .placeholder(R.color.grey_middle)
+                        .noFade()
+                        .fit().centerCrop()
+                        .into(chatHolder.chatAvatarImage, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                chatHolder.chatAvatarText.setVisibility(View.INVISIBLE);
+                            }
+
+                            @Override
+                            public void onError() {
+                                chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
+                                chatHolder.chatAvatarText.setVisibility(View.VISIBLE);
+                                chatHolder.chatAvatarText.setText(finalInitials);
+                            }
+                        });
+            }
+            else
+            {
+                chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
+                chatHolder.chatAvatarText.setText(initials);
+            }
         }
 
         //Set message as read

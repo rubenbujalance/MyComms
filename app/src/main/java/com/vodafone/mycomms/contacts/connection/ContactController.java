@@ -40,7 +40,7 @@ public class ContactController extends BaseController {
     }
 
     public void contactListCallback(String json) {
-        Log.e(Constants.TAG, "ContactController.contactListCallback: ");
+        Log.i(Constants.TAG, "ContactController.contactListCallback: ");
 
         try {
             if (json != null && json.trim().length() > 0) {
@@ -75,8 +75,6 @@ public class ContactController extends BaseController {
     public class ContactAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            Log.e(Constants.TAG, "ContactAsyncTask.doInBackground: START");
-
             Response response = null;
             String json = null;
 
@@ -99,8 +97,6 @@ public class ContactController extends BaseController {
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactAsyncTask.doInBackground: ",e);
             }
-
-            Log.e(Constants.TAG, "ContactAsyncTask.doInBackground: END");
 
             return json;
         }

@@ -162,6 +162,7 @@ public class RecentContactController {
 
         public RecentPendingChatsRecentPOSTAsyncTask(HashMap<String, Long> recentChatsHashMap)
         {
+            HashMap<String, Long> recentChatsHashMapTest = recentChatsHashMap;
             this.recentChatsHashMap = recentChatsHashMap;
         }
 
@@ -175,7 +176,7 @@ public class RecentContactController {
                 String chatId;
                 Long timeStamp;
                 Request request = null;
-                for (HashMap.Entry<String, Long> recentChat : recentChatsHashMap.entrySet())
+                for (HashMap.Entry<String, Long> recentChat : this.recentChatsHashMap.entrySet())
                 {
                     chatId = recentChat.getKey();
                     timeStamp = recentChat.getValue();
@@ -198,6 +199,7 @@ public class RecentContactController {
             Log.i(Constants.TAG, "RecentPendingChatsRecentPOSTAsyncTask.doInBackground: " + response);
             getRecentList();
             BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+            this.recentChatsHashMap.clear();
         }
     }
 

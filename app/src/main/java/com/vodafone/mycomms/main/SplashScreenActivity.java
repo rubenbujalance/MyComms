@@ -202,19 +202,22 @@ public class SplashScreenActivity extends Activity {
             String status = null;
 
             try {
-                status = (String)result.get("status");
-
-                if(result.containsKey("json")) json = (JSONObject)result.get("json");
-
-                if (status.compareTo("400") == 0 &&
-                        json.get("err") != null &&
-                        json.get("err").toString().compareTo("invalid_version") == 0) {
-
-                    callBackVersionCheck(json.get("data").toString());
-                }
-                else
+                if(result.containsKey("status"))
                 {
-                    callBackVersionCheck(null);
+                    status = (String)result.get("status");
+
+                    if(result.containsKey("json")) json = (JSONObject)result.get("json");
+
+                    if (status.compareTo("400") == 0 &&
+                            json.get("err") != null &&
+                            json.get("err").toString().compareTo("invalid_version") == 0) {
+
+                        callBackVersionCheck(json.get("data").toString());
+                    }
+                    else
+                    {
+                        callBackVersionCheck(null);
+                    }
                 }
             } catch(Exception ex) {
                 Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: \n",ex);

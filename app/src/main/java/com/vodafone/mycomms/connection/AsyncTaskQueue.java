@@ -25,11 +25,11 @@ public class AsyncTaskQueue {
             try {
                 if(asyncTaskQueue.containsKey(key)) {
                     asyncTaskQueue.get(key).cancel(false);
-                    Log.i(Constants.TAG, "AsyncTaskQueue.putConnection: Task canceled "+key);
+//                    Log.i(Constants.TAG, "AsyncTaskQueue.putConnection: Task canceled "+key);
                 }
 
                 asyncTaskQueue.put(key, task);
-                Log.i(Constants.TAG, "AsyncTaskQueue.putConnection: Task added " + key);
+//                Log.i(Constants.TAG, "AsyncTaskQueue.putConnection: Task added " + key);
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ConnectionsQueue.putConnection: ", e);
             }
@@ -42,7 +42,7 @@ public class AsyncTaskQueue {
             try {
                 if(asyncTaskQueue.containsKey(key)) {
                     asyncTaskQueue.remove(key);
-                    Log.i(Constants.TAG, "AsyncTaskQueue.removeConnection: Task removed " + key);
+//                    Log.i(Constants.TAG, "AsyncTaskQueue.removeConnection: Task removed " + key);
                 }
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ConnectionsQueue.removeConnection: ", e);

@@ -123,7 +123,7 @@ public final class XMPPTransactions {
             }
 
             //Set a timer to check connection every 5 seconds
-//            intervalPinging(PINGING_TIME_MILIS);
+            intervalPinging(PINGING_TIME_MILIS);
 
             //Connect to server
             XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
@@ -162,7 +162,7 @@ public final class XMPPTransactions {
                             Log.i(Constants.TAG, "XMPPTransactions.intervalPinging: Pinging...");
                             isPinging = true;
                             sendPing();
-                            Thread.sleep(3000);
+                            Thread.sleep(2000);
                             if (pingWaitingID != null)
                                 initializeMsgServerSession(_appContext);
 
@@ -267,17 +267,17 @@ public final class XMPPTransactions {
                 boolean isConnected = false;
                 try {
                     Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Pinging...");
-                    isConnected = _pingManager.pingMyServer();
-//                    isPinging = true;
-//
-//                    sendPing();
-//                    Thread.sleep(3000);
-//                    isConnected = (pingWaitingID==null);
-//
-//                    isPinging = false;
+//                    isConnected = _pingManager.pingMyServer();
+                    isPinging = true;
+
+                    sendPing();
+                    Thread.sleep(3000);
+                    isConnected = (pingWaitingID==null);
+
+                    isPinging = false;
 
                 } catch (Exception e) {
-                    Log.e(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: ",e);
+                    Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Pinging error caught > " + e.getMessage());
                 }
                 return isConnected;
             }
@@ -289,7 +289,7 @@ public final class XMPPTransactions {
                 if(isConnected)
                     Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Ping OK");
                 else
-                    Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Ping ERROR");
+                    Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Ping FAILED");
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -461,12 +461,6 @@ public final class XMPPTransactions {
 //                    && type.compareTo(Constants.XMPP_STANZA_TYPE_PENDINGMESSAGES)!=0)
 //                return false;
 
-            //TODO RBM - Remove after old PING solved ***********
-            if(id!=null && id.startsWith("PING")) {
-                return false;
-            }
-            //****************************************************
-
             if (type!=null && parser.getName().compareTo(Constants.XMPP_ELEMENT_MESSAGE) == 0
                     && type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT) == 0)
             {
@@ -503,10 +497,10 @@ public final class XMPPTransactions {
 
                 if(type.compareTo(Constants.XMPP_STANZA_TYPE_RESULT)==0 &&
                         from.compareTo(Constants.XMPP_PARAM_DOMAIN)==0 &&
-                        to.compareTo(_profile_id) == 0) //It's a pong
+                        to.compareTo(_profile_id) == 0 ) //It's a pong
                     return handlePongReceived(parser);
                 else if(type!=null && (type.compareTo(Constants.XMPP_STANZA_TYPE_CHAT)==0 ||
-                        type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)==0))
+                        type.compareTo(Constants.XMPP_STANZA_TYPE_GROUPCHAT)== 0))
                     return saveAndNotifyIQReceived(parser);
                 else if(type!=null &&
                         type.compareTo(Constants.XMPP_STANZA_TYPE_PENDINGMESSAGES)==0)
@@ -620,7 +614,9 @@ public final class XMPPTransactions {
         try {
             if(_pendingMessages>0) {
                 _pendingMessages--;
-                BusProvider.getInstance().post(new AllPendingMessagesReceivedEvent());
+
+                if(_pendingMessages==0)
+                    BusProvider.getInstance().post(new AllPendingMessagesReceivedEvent());
             }
 
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);

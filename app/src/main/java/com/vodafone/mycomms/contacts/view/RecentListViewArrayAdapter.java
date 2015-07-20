@@ -106,6 +106,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                 new RealmGroupChatTransactions(mContext, _profile_id);
 
         GroupChat groupChat = groupChatTransactions.getGroupChatById(groupChatId);
+        //TODO: ERROR 'java.lang.String model.GroupChat.getMembers()' on a null object reference
         String[] ids = groupChat.getMembers().split("@");
 
         RealmContactTransactions contactTransactions =

@@ -218,12 +218,13 @@ public class ContactsController extends BaseController {
     }
 
     public void insertFavouriteContactInRealm(JSONObject json){
-        JSONArray jsonArray = null;
+        JSONArray jsonArray;
         Contact contact;
         ArrayList<FavouriteContact> contactList = new ArrayList<>();
         try {
             Log.i(Constants.TAG, "ContactsController.insertFavouriteContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_FAVOURITES);
+            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
             for (int i = 0; i < jsonArray.length(); i++) {
                 contact = realmContactTransactions.getContactById(jsonArray.getString(i));
                 if (contact != null) {
@@ -234,6 +235,7 @@ public class ContactsController extends BaseController {
                 realmContactTransactions.deleteAllFavouriteContacts();
                 realmContactTransactions.insertFavouriteContactList(contactList);
             }
+            realmContactTransactions.closeRealm();
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : " + e.toString());
@@ -274,6 +276,15 @@ public class ContactsController extends BaseController {
                 contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID));
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
+                }
+                else{
+                    Contact groupContact = new Contact("");
+                    String groupChatId = jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID);
+                    groupContact.setId(groupChatId);
+                    groupContact.setContactId(groupChatId);
+                    groupContact.setProfileId(mProfileId);
+                    JSONObject jsonObject = RecentContactController.createJsonObject(groupChatId, Constants.CONTACTS_ACTION_SMS);
+                    contactList.add(mapContactToRecent(groupContact, jsonObject));
                 }
             }
             if (contactList.size()!=0) {

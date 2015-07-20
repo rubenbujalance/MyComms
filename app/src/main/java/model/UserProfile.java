@@ -186,6 +186,8 @@ public class UserProfile extends RealmObject{
     }
 
     public UserProfile(){
+        this.position = "";
+        this.officeLocation = "";
 
     }
 

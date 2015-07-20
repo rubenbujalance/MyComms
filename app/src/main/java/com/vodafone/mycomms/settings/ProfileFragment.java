@@ -19,6 +19,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Callback;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
 import com.vodafone.mycomms.custom.CircleImageView;
@@ -338,7 +340,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private void loadProfileImage()
     {
-        File avatarFile = null;
+        /*File avatarFile = null;
 
         if (profileId!=null && !profileId.equals(""))
         {
@@ -349,10 +351,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         if (avatarFile!= null && avatarFile.exists())
         {
 
-            /*this.profilePicture.setImageBitmap
+            *//*this.profilePicture.setImageBitmap
                    (
                             BitmapFactory.decodeFile(avatarFile.getAbsolutePath())
-                   );*/
+                   );*//*
 
             Picasso.with(getActivity()).invalidate(avatarFile);
             Picasso.with(getActivity().getApplicationContext())
@@ -370,6 +372,55 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             } else{
                 Log.e(Constants.TAG, "ProfileFragment.loadProfileImage: Error Getting UserProfile");
             }
+        }*/
+
+
+        //Image avatar
+        String initials = "";
+        if(null != userProfile.getFirstName() && userProfile.getFirstName().length() > 0)
+        {
+            initials = userProfile.getFirstName().substring(0,1);
+
+            if(null != userProfile.getLastName() && userProfile.getLastName().length() > 0)
+            {
+                initials = initials + userProfile.getLastName().substring(0,1);
+            }
+        }
+
+        final String finalInitials = initials;
+
+        this.profilePicture.setImageResource(R.color.grey_middle);
+        this.textAvatar.setVisibility(View.VISIBLE);
+        this.textAvatar.setText(finalInitials);
+        this.textAvatar.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+
+        if (userProfile.getAvatar()!=null &&
+                userProfile.getAvatar().length()>0)
+        {
+
+            MycommsApp.picasso
+                    .load(userProfile.getAvatar())
+                    .placeholder(R.color.grey_middle)
+                    .noFade()
+                    .fit().centerCrop()
+                    .into(this.profilePicture, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            textAvatar.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onError() {
+                            profilePicture.setImageResource(R.color.grey_middle);
+                            textAvatar.setVisibility(View.VISIBLE);
+                            textAvatar.setText(finalInitials);
+                        }
+                    });
+        }
+        else
+        {
+            this.profilePicture.setImageResource(R.color.grey_middle);
+            this.textAvatar.setText(initials);
         }
     }
 

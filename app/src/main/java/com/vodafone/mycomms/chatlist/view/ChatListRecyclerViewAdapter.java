@@ -189,6 +189,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                     contacts.add(contact);
             }
         }
+        realmContactTransactions.closeRealm();
         return contacts;
     }
 

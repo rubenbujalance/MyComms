@@ -315,6 +315,7 @@ public class GroupChatController
                 else insertedGroupChatIds = insertedGroupChatIds + "@" + chat.getId();
             }
         }
+        realmGroupChatTransactions.closeRealm();
         return insertedGroupChatIds;
     }
 

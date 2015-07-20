@@ -82,7 +82,7 @@ public class RecentContactController {
             try
             {
                 Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
-                Request request = createGroupChatRequestForCreation(this.groupChatId,this.action);
+                Request request = createGroupChatRequestForCreation(this.groupChatId, this.action);
                 return executeRequest(request);
 
             }
@@ -162,7 +162,6 @@ public class RecentContactController {
 
         public RecentPendingChatsRecentPOSTAsyncTask(HashMap<String, Long> recentChatsHashMap)
         {
-            HashMap<String, Long> recentChatsHashMapTest = recentChatsHashMap;
             this.recentChatsHashMap = recentChatsHashMap;
         }
 
@@ -182,8 +181,9 @@ public class RecentContactController {
                     timeStamp = recentChat.getValue();
                     String jsonRequest = createdStringBodyForSetRecent(chatId, Constants.CONTACTS_ACTION_SMS, timeStamp);
                     request = createPOSTRequestForCreation(jsonRequest);
+                    executeRequest(request);
                 }
-                return executeRequest(request);
+                return null;
 
             }
             catch (Exception e)
@@ -194,8 +194,7 @@ public class RecentContactController {
         }
 
         @Override
-        protected void onPostExecute(String response)
-        {
+        protected void onPostExecute(String response) {
             Log.i(Constants.TAG, "RecentPendingChatsRecentPOSTAsyncTask.doInBackground: " + response);
             getRecentList();
             BusProvider.getInstance().post(new RecentContactsReceivedEvent());
@@ -203,7 +202,7 @@ public class RecentContactController {
         }
     }
 
-    private JSONObject createJsonObject(String groupChatId, String action)
+    public static JSONObject createJsonObject(String groupChatId, String action)
     {
         try
         {
@@ -217,7 +216,7 @@ public class RecentContactController {
 
     }
 
-    public String createdStringBodyForSetRecent(String groupChatId, String action, Long timestamp)
+    public static String createdStringBodyForSetRecent(String groupChatId, String action, Long timestamp)
     {
         if (timestamp == null)
             timestamp = Calendar.getInstance().getTimeInMillis();

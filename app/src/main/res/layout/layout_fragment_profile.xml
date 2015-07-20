@@ -177,7 +177,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="@string/companyname"
-                        tools:text="Vodafone"
+                        tools:text=""
                         android:id="@+id/contact_company"/>
                 </LinearLayout>
 
@@ -197,7 +197,7 @@
                         android:layout_height="wrap_content"
                         style="@style/EditViewProfile"
                         android:hint="@string/position"
-                        tools:text="Leader"
+                        tools:text=""
                         android:id="@+id/contact_position"/>
                 </LinearLayout>
 

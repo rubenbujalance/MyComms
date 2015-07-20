@@ -99,6 +99,8 @@ public class RealmGroupChatTransactions {
     {
         if(newChat==null) return;
         try {
+            GroupChat TEST = newChat;
+            Log.i(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: newChatGroup " + newChat.getId());
             mRealm.beginTransaction();
             mRealm.copyToRealmOrUpdate(newChat);
 
@@ -153,11 +155,12 @@ public class RealmGroupChatTransactions {
     {
         try
         {
+            String test = id;
             RealmQuery<GroupChat> query = mRealm.where(GroupChat.class);
             query.equalTo(Constants.GROUP_CHAT_REALM_ID, id);
             return query.findFirst();
         }
-        catch (Exception e )
+        catch (Exception e)
         {
             Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatById: ", e);
             Crashlytics.logException(e);

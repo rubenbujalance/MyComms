@@ -104,6 +104,7 @@ public class NewsController{
 
     private ArrayList<News> loadNews(JSONObject jsonObject) {
 
+        RealmNewsTransactions realmNewsTransactions = null;
         try {
             Log.i(Constants.TAG, "NewsController.loadNews: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.NEWS_DATA);
@@ -114,13 +115,16 @@ public class NewsController{
                 news = mapNews(jsonObject);
                 newsList.add(news);
             }
-            RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions();
+            realmNewsTransactions = new RealmNewsTransactions();
             realmNewsTransactions.insertNewsList(newsList);
 
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "NewsController.showNews: " + e.toString());
             return null;
+        }
+        finally {
+            if(null!=realmNewsTransactions) realmNewsTransactions.closeRealm();
         }
         return newsList;
     }

@@ -36,6 +36,7 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
+import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -61,6 +62,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import model.Contact;
+import model.GroupChat;
 import model.News;
 import model.RecentContact;
 import model.UserProfile;
@@ -83,8 +85,6 @@ public class DashBoardActivity extends ToolbarActivity
 
     private HashMap<View, RecentContact> hashMapRecentIdView = new HashMap<>();
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,8 +103,6 @@ public class DashBoardActivity extends ToolbarActivity
         realmNewsTransactions = new RealmNewsTransactions();
         recentContactController = new RecentContactController(this, _profileId);
 
-
-
         BusProvider.getInstance().register(this);
 
         enableToolbarIsClicked(false);
@@ -117,7 +115,6 @@ public class DashBoardActivity extends ToolbarActivity
         recentsContainer = (LinearLayout) findViewById(R.id.list_recents);
         recentsContainer2 = (LinearLayout) findViewById(R.id.list_recents_2);
 
-
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(DashBoardActivity.this))
             lay_no_connection.setVisibility(View.GONE);
@@ -125,7 +122,6 @@ public class DashBoardActivity extends ToolbarActivity
             lay_no_connection.setVisibility(View.VISIBLE);
 
     }
-
 
     private void initALL(){
         int sdk = Build.VERSION.SDK_INT;
@@ -190,15 +186,15 @@ public class DashBoardActivity extends ToolbarActivity
 
         recentsLoading = true;
 
+        RealmContactTransactions realmContactTransactions = null;
         try {
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
             LayoutInflater inflater = LayoutInflater.from(this);
             currentRecentContainer.removeAllViews();
 
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(_profileId);
+            realmContactTransactions = new RealmContactTransactions(_profileId);
             recentList = realmContactTransactions.getAllRecentContacts();
-//            realmContactTransactions.closeRealm();
 
             this.numberOfRecents = recentList.size();
 
@@ -245,6 +241,10 @@ public class DashBoardActivity extends ToolbarActivity
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: ",e);
             Crashlytics.logException(e);
+        }
+        finally {
+//            if(null != realmContactTransactions)
+                //realmContactTransactions.closeRealm();
         }
 
         recentsLoading = false;
@@ -529,10 +529,8 @@ public class DashBoardActivity extends ToolbarActivity
 
         // Action icon and badges
         TextView unread_messages;
-        long pendingMsgsCount;
         ImageView typeRecent;
         RecentContact recentContact;
-
 
         ArrayList<String> contactIds = new ArrayList<>();
         ArrayList<Contact> contacts = new ArrayList<>();
@@ -541,6 +539,8 @@ public class DashBoardActivity extends ToolbarActivity
 
         HashMap<ImageView,TextView> mapAvatarImageAndText = new HashMap<>();
         HashMap<ImageView,Contact> mapAvatarImageAndContact = new HashMap<>();
+
+        boolean isEmpty = false;
 
         public DrawSingleGroupChatRecentAsyncTask
                 (
@@ -561,16 +561,22 @@ public class DashBoardActivity extends ToolbarActivity
             this.groupChatId = groupChatId;
             RealmGroupChatTransactions realmGroupChatTransactions = new
                     RealmGroupChatTransactions(DashBoardActivity.this, _profileId);
-            this.contactId = realmGroupChatTransactions.getGroupChatById(groupChatId).getMembers();
-
-            String[] ids = contactId.split("@");
-            Collections.addAll(contactIds, ids);
+            String test = groupChatId;
+            GroupChat groupChat = realmGroupChatTransactions.getGroupChatById(groupChatId);
+            if(null != groupChat && null != groupChat.getMembers() && !groupChat.getMembers().isEmpty())
+            {
+                this.contactId = groupChat.getMembers();
+                String[] ids = contactId.split("@");
+                Collections.addAll(contactIds, ids);
+            }
+            else
+            {
+                isEmpty = true;
+            }
+            realmGroupChatTransactions.closeRealm();
         }
 
-        private void loadContactsFromIds
-                (
-                        ArrayList<String> ids
-                )
+        private void loadContactsFromIds(ArrayList<String> ids)
         {
             RealmContactTransactions realmContactTransactions =
                     new RealmContactTransactions(_profileId);
@@ -604,62 +610,67 @@ public class DashBoardActivity extends ToolbarActivity
                     }
                 }
             }
+            realmContactTransactions.closeRealm();
         }
 
 
         @Override
         protected void onPreExecute()
         {
-            childRecents = inflater.inflate(R.layout.layout_group_chat_recents_dashboard, recentsContainer, false);
+            if (!isEmpty) {
+                childRecents = inflater.inflate(R.layout.layout_group_chat_recents_dashboard, recentsContainer, false);
 
-            recentsContainer.addView(childRecents);
-            hashMapRecentIdView.put(childRecents, this.recentContact);
+                recentsContainer.addView(childRecents);
+                hashMapRecentIdView.put(childRecents, this.recentContact);
 
-            childRecents.setPadding(10, 20, 10, 20);
+                childRecents.setPadding(10, 20, 10, 20);
 
-            top_left_avatar = (ImageView) childRecents.findViewById(R.id.top_left_avatar);
-            top_right_avatar = (ImageView) childRecents.findViewById(R.id.top_right_avatar);
-            bottom_left_avatar = (ImageView) childRecents.findViewById(R.id.bottom_left_avatar);
-            bottom_right_avatar = (ImageView) childRecents.findViewById(R.id.bottom_right_avatar);
+                top_left_avatar = (ImageView) childRecents.findViewById(R.id.top_left_avatar);
+                top_right_avatar = (ImageView) childRecents.findViewById(R.id.top_right_avatar);
+                bottom_left_avatar = (ImageView) childRecents.findViewById(R.id.bottom_left_avatar);
+                bottom_right_avatar = (ImageView) childRecents.findViewById(R.id.bottom_right_avatar);
 
-            top_left_avatar_text = (TextView) childRecents.findViewById(R.id.top_left_avatar_text);
-            top_right_avatar_text = (TextView) childRecents.findViewById(R.id.top_right_avatar_text);
-            bottom_left_avatar_text = (TextView) childRecents.findViewById(R.id.bottom_left_avatar_text);
-            bottom_right_avatar_text = (TextView) childRecents.findViewById(R.id.bottom_right_avatar_text);
+                top_left_avatar_text = (TextView) childRecents.findViewById(R.id.top_left_avatar_text);
+                top_right_avatar_text = (TextView) childRecents.findViewById(R.id.top_right_avatar_text);
+                bottom_left_avatar_text = (TextView) childRecents.findViewById(R.id.bottom_left_avatar_text);
+                bottom_right_avatar_text = (TextView) childRecents.findViewById(R.id.bottom_right_avatar_text);
 
-            firstNameView = (TextView) childRecents.findViewById(R.id.group_chat_recent_first_name);
+                firstNameView = (TextView) childRecents.findViewById(R.id.group_chat_recent_first_name);
 
-            lay_top_right_image = (LinearLayout) childRecents.findViewById(R.id
-                    .lay_top_right_image_hide);
-            layout_bottom_both_images = (LinearLayout) childRecents.findViewById(R.id
-                    .lay_bottom_both_image_hide);
-            layout_bottom_both_images.setVisibility(View.VISIBLE);
+                lay_top_right_image = (LinearLayout) childRecents.findViewById(R.id
+                        .lay_top_right_image_hide);
+                layout_bottom_both_images = (LinearLayout) childRecents.findViewById(R.id
+                        .lay_bottom_both_image_hide);
+                layout_bottom_both_images.setVisibility(View.VISIBLE);
 
-            lay_main_container = (LinearLayout) childRecents.findViewById(R.id.recent_content);
+                lay_main_container = (LinearLayout) childRecents.findViewById(R.id.recent_content);
 
-            if(contactIds.size() == 3)
-                lay_top_right_image.setVisibility(View.GONE);
-            else
-                lay_top_right_image.setVisibility(View.VISIBLE);
+                if (contactIds.size() == 3)
+                    lay_top_right_image.setVisibility(View.GONE);
+                else
+                    lay_top_right_image.setVisibility(View.VISIBLE);
 
-            //Action icon and badges
-            unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
-            typeRecent = (ImageView) childRecents.findViewById(R.id.type_recent);
+                //Action icon and badges
+                unread_messages = (TextView) childRecents.findViewById(R.id.unread_messages);
+                typeRecent = (ImageView) childRecents.findViewById(R.id.type_recent);
 
-            images.add(top_left_avatar);
-            images.add(bottom_left_avatar);
-            images.add(bottom_right_avatar);
-            if(contactIds.size() > 3)
-                images.add(top_right_avatar);
+                images.add(top_left_avatar);
+                images.add(bottom_left_avatar);
+                images.add(bottom_right_avatar);
+                if (contactIds.size() > 3)
+                    images.add(top_right_avatar);
 
-            mapAvatarImageAndText.put(top_left_avatar, top_left_avatar_text);
-            mapAvatarImageAndText.put(top_right_avatar, top_right_avatar_text);
-            mapAvatarImageAndText.put(bottom_left_avatar, bottom_left_avatar_text);
-            mapAvatarImageAndText.put(bottom_right_avatar, bottom_right_avatar_text);
+                mapAvatarImageAndText.put(top_left_avatar, top_left_avatar_text);
+                mapAvatarImageAndText.put(top_right_avatar, top_right_avatar_text);
+                mapAvatarImageAndText.put(bottom_left_avatar, bottom_left_avatar_text);
+                mapAvatarImageAndText.put(bottom_right_avatar, bottom_right_avatar_text);
+            }
         }
 
         @Override
         protected String doInBackground(Void... params) {
+            if (isEmpty) return null;
+
             if (null != contactIds && contactIds.size() >= 3)
             {
                 try
@@ -1133,21 +1144,21 @@ public class DashBoardActivity extends ToolbarActivity
     private void loadUnreadMessages(LinearLayout recentsContainer)
     {
 
+        RealmChatTransactions chatTx = new RealmChatTransactions(getApplicationContext());
+        RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(
+                getApplicationContext(), _profileId);
         for(int i = 0; i < recentsContainer.getChildCount(); i++)
         {
             View view = recentsContainer.getChildAt(i);
             TextView unread_messages = (TextView) view.findViewById(R.id.unread_messages);
             ImageView typeRecent = (ImageView) view.findViewById(R.id.type_recent);
             RecentContact contact = hashMapRecentIdView.get(view);
+            String contactId = contact.getContactId();
             String action = "sms";
-            RealmChatTransactions chatTx = new RealmChatTransactions(getApplicationContext());
-            RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(
-                    getApplicationContext(), _profileId);
-
-            if(contact.getContactId().startsWith("mg_"))
+            if(contactId.startsWith("mg_"))
             {
                 long pendingMsgsCount =
-                        groupChatTx.getGroupChatPendingMessagesCount(contact.getContactId());
+                        groupChatTx.getGroupChatPendingMessagesCount(contactId);
                 if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
                     unread_messages.setVisibility(View.VISIBLE);
                     unread_messages.setText(String.valueOf(pendingMsgsCount));
@@ -1206,6 +1217,24 @@ public class DashBoardActivity extends ToolbarActivity
                     }
                 }
             }
+        }
+        chatTx.closeRealm();
+        groupChatTx.closeRealm();
+    }
+
+    @Subscribe
+    public void onEventGroupChatCreated(GroupChatCreatedEvent event){
+        Log.i(Constants.TAG, "DashBoardActivity.onEventGroupChatCreated: ");
+        if(isCurrentRecentContainerFirst)
+        {
+            loadRecents(recentsContainer);
+            loadUnreadMessages(recentsContainer);
+        }
+
+        else
+        {
+            loadRecents(recentsContainer2);
+            loadUnreadMessages(recentsContainer2);
         }
     }
 

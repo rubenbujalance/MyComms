@@ -2,8 +2,6 @@ package com.vodafone.mycomms.settings;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -15,11 +13,8 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.connection.ConnectionsQueue;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.settings.connection.PasswordConnection;
@@ -28,7 +23,6 @@ import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.settings.connection.UpdateSettingsConnection;
 import com.vodafone.mycomms.settings.connection.UpdateTimeZoneConnection;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -36,7 +30,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.HashMap;
 
 import model.UserProfile;
@@ -85,9 +78,12 @@ public class ProfileController extends BaseController {
     public boolean isUserProfileChanged(String firstName, String lastName, String company, String
             position, String officeLocation)
     {
-        if(userProfile.getFirstName().equals(firstName) && userProfile.getLastName().equals(lastName)
-                && userProfile.getCompany().equals(company) && userProfile.getPosition().equals(position)
-                && userProfile.getOfficeLocation().equals(officeLocation)) {
+        if(firstName.equals(userProfile.getFirstName())
+                && lastName.equals(userProfile.getLastName())
+                && company.equals(userProfile.getCompany())
+                && position.equals(userProfile.getPosition())
+                && officeLocation.equals(userProfile.getOfficeLocation()))
+        {
             return false;
         }
         return true;
@@ -224,21 +220,24 @@ public class ProfileController extends BaseController {
         UserProfile userProfile = new UserProfile();
 
         try {
-            if (!jsonObject.isNull(Constants.CONTACT_ID)) userProfile.setId(jsonObject.getString(Constants.CONTACT_ID));
-            //if (!jsonObject.isNull(Constants.CONTACT_DATA)) contact.setId(jsonObject.getString(Constants.CONTACT_DATA));
+            if (!jsonObject.isNull(Constants.CONTACT_ID))
+                userProfile.setId(jsonObject.getString(Constants.CONTACT_ID));
             if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
                 userProfile.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))
                 userProfile.setFirstName(jsonObject.getString(Constants.CONTACT_FNAME));
             if (!jsonObject.isNull(Constants.CONTACT_LNAME))
                 userProfile.setLastName(jsonObject.getString(Constants.CONTACT_LNAME));
-            if (!jsonObject.isNull(Constants.CONTACT_AVATAR)) userProfile.setAvatar(jsonObject.getString(Constants.CONTACT_AVATAR));
+            if (!jsonObject.isNull(Constants.CONTACT_AVATAR))
+                userProfile.setAvatar(jsonObject.getString(Constants.CONTACT_AVATAR));
             if (!jsonObject.isNull(Constants.CONTACT_POSITION))
                 userProfile.setPosition(jsonObject.getString(Constants.CONTACT_POSITION));
-            if (!jsonObject.isNull(Constants.CONTACT_COMPANY)) userProfile.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
+            if (!jsonObject.isNull(Constants.CONTACT_COMPANY))
+                userProfile.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
             if (!jsonObject.isNull(Constants.CONTACT_TIMEZONE))
                 userProfile.setTimezone(jsonObject.getString(Constants.CONTACT_TIMEZONE));
-            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) userProfile.setLastSeen(jsonObject.getInt(Constants.CONTACT_LASTSEEN));
+            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN))
+                userProfile.setLastSeen(jsonObject.getInt(Constants.CONTACT_LASTSEEN));
             if (!jsonObject.isNull(Constants.CONTACT_OFFICE_LOC))
                 userProfile.setOfficeLocation(jsonObject.getString(Constants.CONTACT_OFFICE_LOC));
             if (!jsonObject.isNull(Constants.CONTACT_PHONES))
@@ -251,8 +250,10 @@ public class ProfileController extends BaseController {
                 userProfile.setPresence(jsonObject.getString(Constants.CONTACT_PRESENCE));
             if (!jsonObject.isNull(Constants.CONTACT_COUNTRY))
                 userProfile.setCountry(jsonObject.getString(Constants.CONTACT_COUNTRY));
-            if (!jsonObject.isNull(Constants.PROFILE_SETTINGS)) userProfile.setSettings(jsonObject.getString(Constants.PROFILE_SETTINGS));
-            if (!jsonObject.isNull(Constants.PROFILE_PLATFORMS)) userProfile.setPlatforms(jsonObject.getString(Constants.PROFILE_PLATFORMS));
+            if (!jsonObject.isNull(Constants.PROFILE_SETTINGS))
+                userProfile.setSettings(jsonObject.getString(Constants.PROFILE_SETTINGS));
+            if (!jsonObject.isNull(Constants.PROFILE_PLATFORMS))
+                userProfile.setPlatforms(jsonObject.getString(Constants.PROFILE_PLATFORMS));
         }catch (JSONException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());
@@ -354,8 +355,6 @@ public class ProfileController extends BaseController {
 
                 userProfile = mapUserProfile(jsonResponse);
                 mRealmProfileTransactions.insertUserProfile(userProfile);
-                new DownloadProfileAvatar().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
                 if(userProfile != null) {
                     isUserProfileReceived = true;
                 }
@@ -371,52 +370,6 @@ public class ProfileController extends BaseController {
             if (isUserProfileReceived) {
                 ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
             }
-        }
-    }
-
-    public class DownloadProfileAvatar extends AsyncTask<String, Void, String>
-    {
-        private Target avatarTarget;
-        private String avatar;
-        private File avatarFile;
-        @Override
-        protected String doInBackground(String... params)
-        {
-            avatarFile = new File(getContext().getFilesDir() + Constants.CONTACT_AVATAR_DIR,
-                    "avatar_"+profileId+".jpg");
-            avatar = userProfile.getAvatar();
-            avatarTarget = new Target()
-            {
-                @Override
-                public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from)
-                {
-                    SaveAndShowImageAsyncTask task =
-                            new SaveAndShowImageAsyncTask(null, avatarFile, bitmap);
-
-                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
-
-                @Override
-                public void onBitmapFailed(Drawable errorDrawable) {
-                    if(avatarFile.exists()) avatarFile.delete();
-                    ConnectionsQueue.removeConnection(avatarFile.toString());
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                }
-            };
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String response)
-        {
-            ConnectionsQueue.putConnection(avatarFile.toString(), avatarTarget);
-            Picasso.with(getContext())
-                    .load(avatar)
-                    .into(avatarTarget);
         }
     }
 
@@ -442,7 +395,10 @@ public class ProfileController extends BaseController {
                         .build();
 
                 response = client.newCall(request).execute();
-                json = response.body().string();
+                if(Integer.toString(response.code()).startsWith("2"))
+                    json = response.body().string();
+                else
+                    json = null;
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: ",e);
@@ -454,7 +410,8 @@ public class ProfileController extends BaseController {
 
         @Override
         protected void onPostExecute(String json) {
-            getProfileCallback(json);
+            if(null != json)
+                getProfileCallback(json);
         }
     }
 

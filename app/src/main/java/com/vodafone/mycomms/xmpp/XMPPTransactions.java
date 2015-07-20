@@ -524,12 +524,13 @@ public final class XMPPTransactions {
 
     private static boolean saveAndNotifyIQReceived(XmlPullParser parser)
     {
+        RealmChatTransactions chatTx = null;
         try {
             //Check the stanza
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
 
-            RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
+            chatTx = new RealmChatTransactions(_appContext);
 
             //Save to DB
             boolean changed = chatTx.setChatMessageSentStatus(id, status);
@@ -550,6 +551,10 @@ public final class XMPPTransactions {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
             Crashlytics.logException(e);
             return false;
+        }
+        finally {
+            if(null != chatTx)
+                chatTx.closeRealm();
         }
 
         return true;
@@ -701,6 +706,7 @@ public final class XMPPTransactions {
 
     private static boolean saveAndNotifyImageReceived(XmlPullParser parser)
     {
+        RealmChatTransactions chatTx = null;
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -710,7 +716,7 @@ public final class XMPPTransactions {
 
             if(url==null) return false;
 
-            RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
+            chatTx = new RealmChatTransactions(_appContext);
 
             //Check if chat message has already been received
             if(chatTx.existsChatMessageById(id))
@@ -778,12 +784,17 @@ public final class XMPPTransactions {
             Crashlytics.logException(e);
             return false;
         }
+        finally {
+            if(null != chatTx)
+                chatTx.closeRealm();
+        }
 
         return true;
     }
 
     private static boolean saveAndNotifyGroupMessageReceived(XmlPullParser parser)
     {
+        RealmGroupChatTransactions groupTx = null;
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -810,7 +821,7 @@ public final class XMPPTransactions {
                         "Error parsing sent time");
             }
 
-            RealmGroupChatTransactions groupTx =
+            groupTx =
                     new RealmGroupChatTransactions(_appContext, _profile_id);
 
             //Check if chat message has already been received
@@ -867,6 +878,9 @@ public final class XMPPTransactions {
             Crashlytics.logException(e);
             return false;
         }
+        finally {
+            if(null!=groupTx) groupTx.closeRealm();
+        }
 
         return true;
     }
@@ -874,7 +888,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyGroupImageReceived(XmlPullParser parser)
     {
         if(true) return true;
-
+        RealmChatTransactions chatTx = null;
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -893,7 +907,7 @@ public final class XMPPTransactions {
                         "Error parsing sent time");
             }
 
-            RealmChatTransactions chatTx = new RealmChatTransactions(_appContext);
+            chatTx = new RealmChatTransactions(_appContext);
 
             //Check if chat message has already been received
             if(chatTx.existsChatMessageById(id))
@@ -952,6 +966,10 @@ public final class XMPPTransactions {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
             Crashlytics.logException(e);
             return false;
+        }
+        finally {
+            if(null != chatTx)
+                chatTx.closeRealm();
         }
 
         return true;

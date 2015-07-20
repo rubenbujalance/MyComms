@@ -61,6 +61,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import model.Contact;
+import model.GroupChat;
 import model.News;
 import model.RecentContact;
 import model.UserProfile;
@@ -190,13 +191,14 @@ public class DashBoardActivity extends ToolbarActivity
 
         recentsLoading = true;
 
+        RealmContactTransactions realmContactTransactions = null;
         try {
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
             LayoutInflater inflater = LayoutInflater.from(this);
             currentRecentContainer.removeAllViews();
 
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(_profileId);
+            realmContactTransactions = new RealmContactTransactions(_profileId);
             recentList = realmContactTransactions.getAllRecentContacts();
 //            realmContactTransactions.closeRealm();
 
@@ -245,6 +247,10 @@ public class DashBoardActivity extends ToolbarActivity
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: ",e);
             Crashlytics.logException(e);
+        }
+        finally {
+            if(null != realmContactTransactions)
+                realmContactTransactions.closeRealm();
         }
 
         recentsLoading = false;
@@ -529,7 +535,6 @@ public class DashBoardActivity extends ToolbarActivity
 
         // Action icon and badges
         TextView unread_messages;
-        long pendingMsgsCount;
         ImageView typeRecent;
         RecentContact recentContact;
 
@@ -561,10 +566,14 @@ public class DashBoardActivity extends ToolbarActivity
             this.groupChatId = groupChatId;
             RealmGroupChatTransactions realmGroupChatTransactions = new
                     RealmGroupChatTransactions(DashBoardActivity.this, _profileId);
-            this.contactId = realmGroupChatTransactions.getGroupChatById(groupChatId).getMembers();
-
-            String[] ids = contactId.split("@");
-            Collections.addAll(contactIds, ids);
+            GroupChat groupChat = realmGroupChatTransactions.getGroupChatById(groupChatId);
+            if(null != groupChat)
+            {
+                this.contactId = groupChat.getMembers();
+                String[] ids = contactId.split("@");
+                Collections.addAll(contactIds, ids);
+            }
+            realmGroupChatTransactions.closeRealm();
         }
 
         private void loadContactsFromIds
@@ -604,6 +613,7 @@ public class DashBoardActivity extends ToolbarActivity
                     }
                 }
             }
+            realmContactTransactions.closeRealm();
         }
 
 
@@ -1133,6 +1143,9 @@ public class DashBoardActivity extends ToolbarActivity
     private void loadUnreadMessages(LinearLayout recentsContainer)
     {
 
+        RealmChatTransactions chatTx = new RealmChatTransactions(getApplicationContext());
+        RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(
+                getApplicationContext(), _profileId);
         for(int i = 0; i < recentsContainer.getChildCount(); i++)
         {
             View view = recentsContainer.getChildAt(i);
@@ -1140,10 +1153,6 @@ public class DashBoardActivity extends ToolbarActivity
             ImageView typeRecent = (ImageView) view.findViewById(R.id.type_recent);
             RecentContact contact = hashMapRecentIdView.get(view);
             String action = "sms";
-            RealmChatTransactions chatTx = new RealmChatTransactions(getApplicationContext());
-            RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(
-                    getApplicationContext(), _profileId);
-
             if(contact.getContactId().startsWith("mg_"))
             {
                 long pendingMsgsCount =
@@ -1207,6 +1216,8 @@ public class DashBoardActivity extends ToolbarActivity
                 }
             }
         }
+        chatTx.closeRealm();
+        groupChatTx.closeRealm();
     }
 
 

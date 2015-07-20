@@ -35,10 +35,12 @@ public class RealmContactTransactions {
                     mRealm.copyToRealmOrUpdate(contactArrayList.get(i));
                 }
             }
-            mRealm.commitTransaction();
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmContactTransactions.insertContactList: " + e);
             Crashlytics.logException(e);
+        }
+        finally {
+            mRealm.commitTransaction();
         }
     }
 

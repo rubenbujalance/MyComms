@@ -73,6 +73,20 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         {
             viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
             viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
+            if(null != contact.getPlatform()
+                    && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
+            {
+                viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_add_photo);
+            }
+            else if (null != contact.getPlatform()
+                    && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
+            {
+                viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_platform_mycomms);
+            }
+            else
+            {
+                viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_action_name);
+            }
         }
 
         //Image avatar

@@ -14,6 +14,7 @@ import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.InternalContactSearch;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -280,10 +281,20 @@ public class SearchController extends BaseController
                 contact.setPresence(jsonObject.getString(Constants.CONTACT_PRESENCE));
             if (!jsonObject.isNull(Constants.CONTACT_COUNTRY))
                 contact.setCountry(jsonObject.getString(Constants.CONTACT_COUNTRY));
-            contact.setSearchHelper((contact.getFirstName() + " " + contact.getLastName() + " "
-                    + contact.getCompany() + " " + contact.getEmails()).trim());
-            contact.setSortHelper((contact.getFirstName() + " " + contact.getLastName() + " "
-                    + contact.getCompany()).trim());
+            contact.setSearchHelper
+                    ((
+                                    Utils.normalizeStringNFD(contact.getFirstName()) + " " +
+                                    Utils.normalizeStringNFD(contact.getLastName()) + " " +
+                                    Utils.normalizeStringNFD(contact.getCompany()) + " " +
+                                    Utils.normalizeStringNFD(contact.getEmails())).trim()
+                    );
+
+            contact.setSortHelper
+                    ((
+                                    Utils.normalizeStringNFD(contact.getFirstName()) + " " +
+                                    Utils.normalizeStringNFD(contact.getLastName()) + " " +
+                                    Utils.normalizeStringNFD(contact.getCompany())).trim()
+                    );
         }catch (JSONException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());

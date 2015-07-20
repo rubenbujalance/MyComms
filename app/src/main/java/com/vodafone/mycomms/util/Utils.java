@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -420,6 +421,13 @@ public final class Utils extends Activity {
         }
         else
             return bm;
+    }
+
+    public static String normalizeStringNFD(String inputString)
+    {
+        String normalizedString = Normalizer.normalize(inputString, Normalizer.Form.NFD);
+        normalizedString = normalizedString.replaceAll("[^\\p{ASCII}]", "");
+        return normalizedString;
     }
 
 }

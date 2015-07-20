@@ -61,17 +61,18 @@ public class InternalContactSearch
             contact = setContactsEmailDataByContactsIds(id, contact);
             contact = setContactsPhoneDataByContactsIds(id, contact);
             contact.setSearchHelper
-                    (
-                            (contact.getFirstName() + " " +
-                                    contact.getLastName() + " "
-                                    +contact.getCompany() + " "
-                                    +contact.getEmails()).trim()
+                    ((
+                                    Utils.normalizeStringNFD(contact.getFirstName()) + " " +
+                                            Utils.normalizeStringNFD(contact.getLastName()) + " " +
+                                            Utils.normalizeStringNFD(contact.getCompany()) + " " +
+                                            Utils.normalizeStringNFD(contact.getEmails())).trim()
                     );
+
             contact.setSortHelper
-                    (
-                            (contact.getFirstName() + " " +
-                                    contact.getLastName() + " "
-                                    + contact.getCompany()).trim()
+                    ((
+                            Utils.normalizeStringNFD(contact.getFirstName()) + " " +
+                            Utils.normalizeStringNFD(contact.getLastName()) + " " +
+                            Utils.normalizeStringNFD(contact.getCompany())).trim()
                     );
             contacts.add(contact);
         }
@@ -102,17 +103,18 @@ public class InternalContactSearch
             contact = setContactsEmailDataByContactsIds(id, contact);
             contact = setContactsPhoneDataByContactsIds(id, contact);
             contact.setSearchHelper
-                    (
-                            (contact.getFirstName() + " " +
-                                    contact.getLastName() + " "
-                                    +contact.getCompany() + " "
-                                    +contact.getEmails()).trim()
+                    ((
+                                    Utils.normalizeStringNFD(contact.getFirstName()) + " " +
+                                    Utils.normalizeStringNFD(contact.getLastName()) + " " +
+                                    Utils.normalizeStringNFD(contact.getCompany()) + " " +
+                                    Utils.normalizeStringNFD(contact.getEmails())).trim()
                     );
+
             contact.setSortHelper
-                    (
-                            (contact.getFirstName() + " " +
-                                    contact.getLastName() + " "
-                                    + contact.getCompany()).trim()
+                    ((
+                                    Utils.normalizeStringNFD(contact.getFirstName()) + " " +
+                                    Utils.normalizeStringNFD(contact.getLastName()) + " " +
+                                    Utils.normalizeStringNFD(contact.getCompany())).trim()
                     );
             contacts.add(contact);
         }

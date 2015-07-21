@@ -89,7 +89,7 @@ public class RealmContactTransactions {
         RealmResults<Contact> result1 = query.findAll();
 
         if (result1!=null){
-            result1.sort(Constants.CONTACT_FNAME, RealmResults.SORT_ORDER_ASCENDING);
+            result1.sort(Constants.CONTACT_SORT_HELPER, RealmResults.SORT_ORDER_ASCENDING);
             for (Contact contactListItem : result1) {
                 contactArrayList.add(contactListItem);
             }

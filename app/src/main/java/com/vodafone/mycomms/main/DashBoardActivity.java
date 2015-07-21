@@ -1143,7 +1143,6 @@ public class DashBoardActivity extends ToolbarActivity
 
     private void loadUnreadMessages(LinearLayout recentsContainer)
     {
-
         RealmChatTransactions chatTx = new RealmChatTransactions(getApplicationContext());
         RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(
                 getApplicationContext(), _profileId);
@@ -1237,9 +1236,4 @@ public class DashBoardActivity extends ToolbarActivity
             loadUnreadMessages(recentsContainer2);
         }
     }
-
-
-
-
-
 }

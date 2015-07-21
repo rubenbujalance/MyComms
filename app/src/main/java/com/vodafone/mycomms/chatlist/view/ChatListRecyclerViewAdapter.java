@@ -310,7 +310,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         text.setVisibility(View.VISIBLE);
         text.setText(finalInitials);
 
-        if (contact.getAvatar()!=null &&
+        if (null != contact.getAvatar() &&
                 contact.getAvatar().length()>0)
         {
 

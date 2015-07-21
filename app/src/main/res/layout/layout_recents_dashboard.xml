@@ -29,8 +29,8 @@
                 android:layout_centerHorizontal="true"/>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:text="0"
                 android:id="@+id/unread_messages"
                 android:textColor="#ffffffff"
@@ -39,16 +39,16 @@
                 android:layout_marginRight="6dp"
                 android:layout_marginEnd="6dp"
                 android:background="@mipmap/blue"
-                android:autoText="false"
-                android:visibility="gone"
+                android:textSize="12sp"
+                android:visibility="invisible"
                 android:gravity="center_vertical|center_horizontal"
                 android:layout_alignTop="@+id/recent_avatar"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:id="@+id/type_recent"
                 android:layout_alignTop="@+id/recent_avatar"
                 android:layout_alignParentRight="true"

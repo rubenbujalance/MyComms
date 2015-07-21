@@ -50,17 +50,16 @@ public class RecentContactController {
     }
 
     public void insertRecent(String contactId, String action){
-        Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
         insertRecentPOSTOKHttp(contactId, action);
     }
 
     public void insertRecentOKHttp(String groupChatId, String action)
     {
+        Log.i(Constants.TAG, "RecentContactController.insertRecentOKHttp: ");
         new RecentContactsOKHTTPAsyncTask(groupChatId, action).execute();
     }
 
     public void insertPendingChatsRecent(HashMap<String, Long> recentChatsHashMap){
-        Log.i(Constants.TAG, "RecentContactController.insertPendingChatsRecent: ");
         insertPendingChatsRecentPOSTOKHttp(recentChatsHashMap);
     }
 
@@ -77,8 +76,6 @@ public class RecentContactController {
         @Override
         protected String doInBackground(String... params)
         {
-            Log.i(Constants.TAG, "RecentContactsOKHTTPAsyncTask.doInBackground: START");
-
             try
             {
                 Log.i(Constants.TAG, "RecentContactController.insertRecent: ");
@@ -96,8 +93,6 @@ public class RecentContactController {
         @Override
         protected void onPostExecute(String response)
         {
-            Log.i(Constants.TAG, "RecentContactsOKHTTPAsyncTask.doInBackground: " + response);
-
             Contact contact = new Contact("");
             contact.setId(groupChatId);
             contact.setContactId(groupChatId);
@@ -130,11 +125,8 @@ public class RecentContactController {
         @Override
         protected String doInBackground(String... params)
         {
-            Log.i(Constants.TAG, "RecentContactsPOSTAsyncTask.doInBackground: START");
-
             try
             {
-                Log.i(Constants.TAG, "RecentContactsPOSTAsyncTask.insertRecent: ");
                 String jsonRequest = createdStringBodyForSetRecent(this.contactId,this.action, null);
                 Request request = createPOSTRequestForCreation(jsonRequest);
                 return executeRequest(request);
@@ -150,9 +142,7 @@ public class RecentContactController {
         @Override
         protected void onPostExecute(String response)
         {
-            Log.i(Constants.TAG, "RecentContactsPOSTAsyncTask.doInBackground: " + response);
             getRecentList();
-            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
         }
     }
 
@@ -168,13 +158,11 @@ public class RecentContactController {
         @Override
         protected String doInBackground(String... params)
         {
-            Log.i(Constants.TAG, "RecentPendingChatsRecentPOSTAsyncTask.doInBackground: START");
-
             try
             {
                 String chatId;
                 Long timeStamp;
-                Request request = null;
+                Request request;
                 for (HashMap.Entry<String, Long> recentChat : this.recentChatsHashMap.entrySet())
                 {
                     chatId = recentChat.getKey();
@@ -195,7 +183,6 @@ public class RecentContactController {
 
         @Override
         protected void onPostExecute(String response) {
-            Log.i(Constants.TAG, "RecentPendingChatsRecentPOSTAsyncTask.doInBackground: " + response);
             getRecentList();
             BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             this.recentChatsHashMap.clear();
@@ -259,7 +246,6 @@ public class RecentContactController {
         try
         {
             MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-
             RequestBody requestBody = RequestBody.create(JSON, jsonRequest);
             return new Request.Builder()
                     .addHeader(Constants.API_HTTP_HEADER_VERSION,
@@ -328,8 +314,6 @@ public class RecentContactController {
     public class RecentContactsGETAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            Log.i(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: START");
-
             Response response;
             String json = null;
 
@@ -353,8 +337,6 @@ public class RecentContactController {
                 Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: ",e);
             }
 
-            Log.i(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: END");
-
             return json;
         }
 
@@ -370,6 +352,7 @@ public class RecentContactController {
                     try {
                         JSONObject jsonResponse = new JSONObject(json);
                         contactSearchController.getContactById(jsonResponse);
+                        BusProvider.getInstance().post(new RecentContactsReceivedEvent());
                     } catch (JSONException e) {
                         Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
                     }

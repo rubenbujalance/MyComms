@@ -267,11 +267,10 @@ public class ContactsController extends BaseController {
     }
 
     public void insertRecentContactInRealm(JSONObject json){
-        JSONArray jsonArray = null;
+        JSONArray jsonArray;
         Contact contact;
         ArrayList<RecentContact> contactList = new ArrayList<>();
         try {
-            Log.i(Constants.TAG, "ContactsController.insertRecentContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
                 contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID));
@@ -279,13 +278,14 @@ public class ContactsController extends BaseController {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
                 }
                 else{
-                    Contact groupContact = new Contact("");
-                    String groupChatId = jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID);
-                    groupContact.setId(groupChatId);
-                    groupContact.setContactId(groupChatId);
-                    groupContact.setProfileId(mProfileId);
-                    JSONObject jsonObject = RecentContactController.createJsonObject(groupChatId, Constants.CONTACTS_ACTION_SMS);
-                    contactList.add(mapContactToRecent(groupContact, jsonObject));
+                    if (jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID).startsWith("mg_")) {
+                        Contact groupContact = new Contact("");
+                        String groupChatId = jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID);
+                        groupContact.setId(groupChatId);
+                        groupContact.setContactId(groupChatId);
+                        groupContact.setProfileId(mProfileId);
+                        contactList.add(mapContactToRecent(groupContact, jsonArray.getJSONObject(i)));
+                    }
                 }
             }
             if (contactList.size()!=0) {

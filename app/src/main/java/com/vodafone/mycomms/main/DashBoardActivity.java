@@ -186,7 +186,7 @@ public class DashBoardActivity extends ToolbarActivity
 
         recentsLoading = true;
 
-        RealmContactTransactions realmContactTransactions = null;
+        RealmContactTransactions realmContactTransactions;
         try {
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
@@ -200,7 +200,6 @@ public class DashBoardActivity extends ToolbarActivity
 
             for (RecentContact contact: recentList)
             {
-
                 if(contact.getId().startsWith("mg_"))
                 {
                     DrawSingleGroupChatRecentAsyncTask task = new DrawSingleGroupChatRecentAsyncTask
@@ -241,10 +240,6 @@ public class DashBoardActivity extends ToolbarActivity
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: ",e);
             Crashlytics.logException(e);
-        }
-        finally {
-//            if(null != realmContactTransactions)
-                //realmContactTransactions.closeRealm();
         }
 
         recentsLoading = false;
@@ -423,7 +418,6 @@ public class DashBoardActivity extends ToolbarActivity
         long published_at;
 
         boolean loadFromDisk;
-        File newsFile;
         ImageView newsImage;
 
         public DrawSingleNewsAsyncTask(LayoutInflater inflater, LinearLayout container,
@@ -561,7 +555,6 @@ public class DashBoardActivity extends ToolbarActivity
             this.groupChatId = groupChatId;
             RealmGroupChatTransactions realmGroupChatTransactions = new
                     RealmGroupChatTransactions(DashBoardActivity.this, _profileId);
-            String test = groupChatId;
             GroupChat groupChat = realmGroupChatTransactions.getGroupChatById(groupChatId);
             if(null != groupChat && null != groupChat.getMembers() && !groupChat.getMembers().isEmpty())
             {

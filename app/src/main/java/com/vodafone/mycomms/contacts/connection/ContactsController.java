@@ -316,7 +316,6 @@ public class ContactsController extends BaseController {
         try {
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
-                Log.i(Constants.TAG, "ContactsController.insertRecentContactInRealm: jsonResponse: " + jsonArray.getJSONObject(i));
                 contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID));
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
@@ -328,10 +327,7 @@ public class ContactsController extends BaseController {
                         groupContact.setId(groupChatId);
                         groupContact.setContactId(groupChatId);
                         groupContact.setProfileId(mProfileId);
-                        JSONObject jsonObject = RecentContactController.createJsonObject(groupChatId, Constants.CONTACTS_ACTION_SMS);
-                        contactList.add(mapContactToRecent(groupContact, jsonObject));
-                    } else{
-                        Log.i(Constants.TAG, "ContactsController.insertRecentContactInRealm: VOID: " + jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID));
+                        contactList.add(mapContactToRecent(groupContact, jsonArray.getJSONObject(i)));
                     }
                 }
             }

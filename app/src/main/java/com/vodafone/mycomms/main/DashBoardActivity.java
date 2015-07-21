@@ -192,23 +192,18 @@ public class DashBoardActivity extends ToolbarActivity
 
             this.numberOfRecents = recentList.size();
 
-//            for (RecentContact contact: recentList)
-//            {
-            for(int i=0; i<recentList.size(); i++)
+            for (RecentContact contact: recentList)
             {
-                Log.i(Constants.TAG, "DashBoardActivity.loadRecents: i " + i);
-                Log.i(Constants.TAG, "DashBoardActivity.loadRecents: i " + recentList.get(i));
-
-                if(recentList.get(i).getId().startsWith("mg_"))
+                if(contact.getId().startsWith("mg_"))
                 {
                     DrawSingleGroupChatRecentAsyncTask task = new DrawSingleGroupChatRecentAsyncTask
                             (
-                                    recentList.get(i).getAction()
-                                    , recentList.get(i).getUniqueId()
+                                    contact.getAction()
+                                    , contact.getUniqueId()
                                     , currentRecentContainer
                                     , inflater
-                                    , recentList.get(i).getId()
-                                    , recentList.get(i)
+                                    , contact.getId()
+                                    , contact
                             );
 
                     recentsTasksQueue.putConnection(recentList.get(i).getUniqueId(),task);
@@ -218,18 +213,18 @@ public class DashBoardActivity extends ToolbarActivity
                 {
                     DrawSingleRecentAsyncTask task = new DrawSingleRecentAsyncTask
                             (
-                                    recentList.get(i).getContactId()
-                                    , recentList.get(i).getFirstName()
-                                    , recentList.get(i).getLastName()
-                                    , recentList.get(i).getAvatar()
-                                    , recentList.get(i).getAction()
-                                    , recentList.get(i).getPhones()
-                                    , recentList.get(i).getEmails()
-                                    , recentList.get(i).getPlatform()
-                                    , recentList.get(i).getUniqueId()
+                                    contact.getContactId()
+                                    , contact.getFirstName()
+                                    , contact.getLastName()
+                                    , contact.getAvatar()
+                                    , contact.getAction()
+                                    , contact.getPhones()
+                                    , contact.getEmails()
+                                    , contact.getPlatform()
+                                    , contact.getUniqueId()
                                     , currentRecentContainer
                                     , inflater
-                                    , recentList.get(i)
+                                    , contact
                             );
 
                     recentsTasksQueue.putConnection(recentList.get(i).getUniqueId(),task);
@@ -417,7 +412,6 @@ public class DashBoardActivity extends ToolbarActivity
         long published_at;
 
         boolean loadFromDisk;
-        File newsFile;
         ImageView newsImage;
 
         public DrawSingleNewsAsyncTask(LayoutInflater inflater, LinearLayout container,
@@ -555,7 +549,6 @@ public class DashBoardActivity extends ToolbarActivity
             this.groupChatId = groupChatId;
             RealmGroupChatTransactions realmGroupChatTransactions = new
                     RealmGroupChatTransactions(DashBoardActivity.this, _profileId);
-            String test = groupChatId;
             GroupChat groupChat = realmGroupChatTransactions.getGroupChatById(groupChatId);
             if(null != groupChat && null != groupChat.getMembers() && !groupChat.getMembers().isEmpty())
             {

@@ -6,24 +6,17 @@ import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.exception.ConnectionException;
-import com.framework.library.model.ConnectionResponse;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
-import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-
-import model.Contact;
 
 public class ContactSearchController extends BaseController {
 
@@ -60,15 +53,6 @@ public class ContactSearchController extends BaseController {
         }
     }
 
-    private void getContactByIdPagination(){
-        int method = HttpConnection.GET;
-        if (idList!=null && !idList.equals("")) {
-            String apiCall = Constants.CONTACT_API_GET_CONTACTS_IDS + idList + "&o=" + offsetPaging;
-            mContactSearchConnection = new ContactSearchConnection(mContext, this, method, apiCall);
-            mContactSearchConnection.request();
-        }
-    }
-
     private String getContactIdList() {
         Log.i(Constants.TAG, "ContactSearchController.getContactIdList: ");
         String ids = "";
@@ -92,26 +76,26 @@ public class ContactSearchController extends BaseController {
         return ids;
     }
 
-    @Override
-    public void onConnectionComplete(ConnectionResponse response) {
-        super.onConnectionComplete(response);
-        Log.i(Constants.TAG, "ContactSearchController.onConnectionComplete: ");
-        String result = response.getData().toString();
-        if (result != null && result.trim().length()>0) {
-            try {
-                //Check pagination
-                JSONObject jsonResponse = new JSONObject(result);
-                ArrayList<Contact> contactArrayList = contactsController.insertContactListInRealm(jsonResponse);
-
-                contactsController.insertRecentContactInRealm(mJSONRecents);
-                //Show Recents on Dashboard
-                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-//                new DownloadImagesAsyncTask(mContext, contactArrayList).execute();
-            } catch (JSONException e) {
-                Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
-            }
-        }
-    }
+//    @Override
+//    public void onConnectionComplete(ConnectionResponse response) {
+//        super.onConnectionComplete(response);
+//        Log.i(Constants.TAG, "ContactSearchController.onConnectionComplete: ");
+//        String result = response.getData().toString();
+//        if (result != null && result.trim().length()>0) {
+//            try {
+//                //Check pagination
+//                JSONObject jsonResponse = new JSONObject(result);
+//                ArrayList<Contact> contactArrayList = contactsController.insertContactListInRealm(jsonResponse);
+//
+//                contactsController.insertRecentContactInRealm(mJSONRecents);
+//                //Show Recents on Dashboard
+//                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+////                new DownloadImagesAsyncTask(mContext, contactArrayList).execute();
+//            } catch (JSONException e) {
+//                Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
+//            }
+//        }
+//    }
 
     public void contactsByIdsCallback(String json) {
         Log.i(Constants.TAG, "ContactSearchController.contactsByIdsCallback: ");
@@ -127,7 +111,7 @@ public class ContactSearchController extends BaseController {
                 contactsController.closeRealm();
 
                 //Show Recent Contacts
-                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+//                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
             }

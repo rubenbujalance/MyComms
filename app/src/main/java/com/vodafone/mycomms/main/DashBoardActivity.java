@@ -1145,73 +1145,56 @@ public class DashBoardActivity extends ToolbarActivity
         RealmChatTransactions chatTx = new RealmChatTransactions(getApplicationContext());
         RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(
                 getApplicationContext(), _profileId);
+        long pendingMsgsCount;
+        String action;
+        View view;
+        TextView unread_messages;
+        ImageView typeRecent;
+        RecentContact contact;
+
         for(int i = 0; i < recentsContainer.getChildCount(); i++)
         {
-            View view = recentsContainer.getChildAt(i);
-            TextView unread_messages = (TextView) view.findViewById(R.id.unread_messages);
-            ImageView typeRecent = (ImageView) view.findViewById(R.id.type_recent);
-            RecentContact contact = hashMapRecentIdView.get(view);
-            String action = "sms";
+            view = recentsContainer.getChildAt(i);
+            unread_messages = (TextView) view.findViewById(R.id.unread_messages);
+            typeRecent = (ImageView) view.findViewById(R.id.type_recent);
+            contact = hashMapRecentIdView.get(view);
+
             if(contact.getContactId().startsWith("mg_"))
             {
-                long pendingMsgsCount =
-                        groupChatTx.getGroupChatPendingMessagesCount(contact.getContactId());
-                if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
-                    unread_messages.setVisibility(View.VISIBLE);
-                    unread_messages.setText(String.valueOf(pendingMsgsCount));
-                } else {
-                    typeRecent.setVisibility(View.VISIBLE);
-
-                    int sdk = Build.VERSION.SDK_INT;
-                    if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                    } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                    } else {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
-                    }
-                }
+                pendingMsgsCount = groupChatTx.getGroupChatPendingMessagesCount(contact.getContactId());
+                action = "sms";
             }
             else
             {
-                // Badges
-                long pendingMsgsCount = chatTx.getChatPendingMessagesCount
-                        (contact.getContactId());
+                pendingMsgsCount = chatTx.getChatPendingMessagesCount(contact.getContactId());
                 action = contact.getAction();
+            }
 
-                // Recent action icon and bagdes
-                if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
-                    unread_messages.setVisibility(View.VISIBLE);
+            if (pendingMsgsCount > 0 && action.compareTo(Constants.CONTACTS_ACTION_SMS)==0) {
+                unread_messages.setVisibility(View.VISIBLE);
+                if(pendingMsgsCount > 99)
+                    unread_messages.setText("99+");
+                else
                     unread_messages.setText(String.valueOf(pendingMsgsCount));
-                } else {
-                    typeRecent.setVisibility(View.VISIBLE);
+            } else {
+                typeRecent.setVisibility(View.VISIBLE);
 
-                    int sdk = Build.VERSION.SDK_INT;
-                    if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
-                    } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
-                    } else {
-                        if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                            typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
-                        else
-                            typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
-                    }
+                int sdk = Build.VERSION.SDK_INT;
+                if (action.equals(Constants.CONTACTS_ACTION_CALL)) {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_phone_grey));
+                } else if (action.equals(Constants.CONTACTS_ACTION_EMAIL)) {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_mail_grey));
+                } else {
+                    if (sdk < Build.VERSION_CODES.JELLY_BEAN)
+                        typeRecent.setBackgroundDrawable(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
+                    else
+                        typeRecent.setBackground(getResources().getDrawable(R.mipmap.icon_notification_chat_grey));
                 }
             }
         }

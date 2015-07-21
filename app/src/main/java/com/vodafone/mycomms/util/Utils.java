@@ -425,9 +425,15 @@ public final class Utils extends Activity {
 
     public static String normalizeStringNFD(String inputString)
     {
-        String normalizedString = Normalizer.normalize(inputString, Normalizer.Form.NFD);
-        normalizedString = normalizedString.replaceAll("[^\\p{ASCII}]", "");
-        return normalizedString;
+        if(null != inputString)
+        {
+            String normalizedString = Normalizer.normalize(inputString, Normalizer.Form.NFD);
+            normalizedString = normalizedString.replaceAll("[^\\p{ASCII}]", "");
+            return normalizedString;
+        }
+        else
+            return "";
+
     }
 
 }

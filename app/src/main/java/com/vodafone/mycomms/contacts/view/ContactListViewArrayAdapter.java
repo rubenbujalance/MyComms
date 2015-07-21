@@ -63,30 +63,22 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         // update the item view
         Contact contact = getItem(position);
 
-        if(null != contact.getPlatform() && contact.getPlatform()
-                .equals(Constants.PLATFORM_LOCAL))
+        viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
+        if(null != contact.getPlatform()
+                && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
-            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
-            viewHolder.imageViewDayNight.setVisibility(View.GONE);
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
         }
-        else
+        else if (null != contact.getPlatform()
+                && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
         {
-            viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
-            viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
-            if(null != contact.getPlatform()
-                    && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
-            {
-                viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_add_photo);
-            }
-            else if (null != contact.getPlatform()
-                    && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
-            {
-                viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_platform_mycomms);
-            }
-            else
-            {
-                viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_action_name);
-            }
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
+        }
+        else if (null != contact.getPlatform()
+                && Constants.PLATFORM_LOCAL.equals(contact.getPlatform()))
+        {
+            viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
         //Image avatar
@@ -189,7 +181,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         else if(icon.compareTo("vacation")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_vacation);
         else if(icon.compareTo("moon")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_moon);
         else if(icon.compareTo("sun")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
-        else viewHolder.imageViewDayNight.setVisibility(View.GONE);
+        else viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
 
         //Local time
         String presenceDetail = "";
@@ -219,7 +211,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             }
         } catch (Exception e) {
             Log.i(Constants.TAG, "ContactListViewArrayAdapter.getView: No presence found");
-            viewHolder.textViewTime.setVisibility(View.GONE);
+            viewHolder.textViewTime.setVisibility(View.INVISIBLE);
         }
 
         return convertView;

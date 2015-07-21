@@ -3,30 +3,29 @@ package com.vodafone.mycomms.util;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.squareup.picasso.Callback;
-import com.vodafone.mycomms.MycommsApp;
-import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 
 import java.io.IOException;
 
+import io.realm.Realm;
+import model.RecentContact;
+
 public class AvatarSFController {
     private Context mContext;
-    final ImageView mImageView;
-    final TextView textView;
     final String contactId;
+    private String profileId;
 
-    public AvatarSFController(Context context, ImageView image, TextView textView, String contactId) {
+
+    public AvatarSFController(Context context, String contactId, String profileId)
+    {
         this.mContext = context;
-        this.mImageView = image;
-        this.textView = textView;
         this.contactId = contactId;
+        this.profileId = profileId;
     }
 
     public void getSFAvatar(String imageURL){
@@ -53,7 +52,20 @@ public class AvatarSFController {
                         .build();
 
                 response = client.newCall(request).execute();
-                responseUrl = response.request().httpUrl().toString();
+                if(Integer.toString(response.code()).startsWith("2"))
+                {
+                    ContactsController contactsController = new ContactsController(mContext, profileId);
+                    RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
+
+                    responseUrl = response.request().httpUrl().toString();
+                    RecentContact contact = realmContactTransactions.getRecentContactByContactId(contactId);
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+                    contact.setStringField1(responseUrl);
+                    realm.commitTransaction();
+                    realm.close();
+                    contactsController.insertRecentContactInRealm(contact);
+                }
 
             } catch (IOException e) {
                 Log.e(Constants.TAG, "AvatarSFController.doInBackground: ",e);
@@ -64,26 +76,11 @@ public class AvatarSFController {
         @Override
         protected void onPostExecute(String responseUrl) {
             if (responseUrl!=null){
-//                avatarSFCallback(responseUrl);
-                MycommsApp.picasso
-                        .load(responseUrl)
-                        .placeholder(R.color.grey_middle)
-                        .noFade()
-                        .fit().centerCrop()
-                        .into(mImageView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                textView.setVisibility(View.INVISIBLE);
-                            }
-
-                            @Override
-                            public void onError() {
-                                mImageView.setImageResource(R.color.grey_middle);
-                                textView.setVisibility(View.VISIBLE);
-                                textView.setText("XM");
-                            }
-                        });
+                Log.i(Constants.TAG, "AvatarSFAsyncTask.onPostExecute: ResponseURL -> " +
+                        ""+responseUrl);
             }
+            else
+                Log.e(Constants.TAG, "AvatarSFAsyncTask.onPostExecute: ERROR on download SF avatar");
         }
     }
 }

@@ -18,6 +18,7 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
+import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -237,11 +238,37 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                             }
                         });
             }
-            else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)){
-//                AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.top_left_avatar, viewHolder.top_left_avatar_text, contact.getContactId());
-//                avatarSFController.getSFAvatar(contact.getAvatar());
-                viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-                viewHolder.top_left_avatar_text.setText(initials);
+            else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
+            {
+                AvatarSFController avatarSFController = new AvatarSFController(mContext, contact.getContactId(), _profile_id);
+                avatarSFController.getSFAvatar(contact.getAvatar());
+
+                if(null != contact.getStringField1() && !"".equals(contact.getStringField1()))
+                {
+                    MycommsApp.picasso
+                            .load(contact.getStringField1())
+                            .placeholder(R.color.grey_middle)
+                            .noFade()
+                            .fit().centerCrop()
+                            .into(viewHolder.top_left_avatar, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    viewHolder.top_left_avatar_text.setVisibility(View.INVISIBLE);
+                                }
+
+                                @Override
+                                public void onError() {
+                                    viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
+                                    viewHolder.top_left_avatar_text.setVisibility(View.VISIBLE);
+                                    viewHolder.top_left_avatar_text.setText(finalInitials);
+                                }
+                            });
+                }
+                else
+                {
+                    viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
+                    viewHolder.top_left_avatar_text.setText(initials);
+                }
             }
         }
         else

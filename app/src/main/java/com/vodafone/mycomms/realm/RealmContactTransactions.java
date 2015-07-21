@@ -335,6 +335,15 @@ public class RealmContactTransactions {
         return contactArrayList;
     }
 
+    public RecentContact getRecentContactByContactId(String contactId)
+    {
+        RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
+        query.equalTo(Constants.CONTACT_CONTACT_ID, contactId);
+        query.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
+        RecentContact recentContact = query.findFirst();
+        return recentContact;
+    }
+
     public void deleteAllFavouriteContacts() {
         Log.i(Constants.TAG, "RealmContactTransactions.deleteAllFavouriteContacts: ");
         mRealm.beginTransaction();

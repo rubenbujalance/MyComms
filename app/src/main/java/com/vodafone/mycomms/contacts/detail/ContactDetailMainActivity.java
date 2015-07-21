@@ -32,7 +32,6 @@ import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
-import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
@@ -638,8 +637,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 contact.getAvatar().compareTo("")!=0  &&
                 contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
         {
-            AvatarSFController avatarSFController = new AvatarSFController(this, ivAvatar, textAvatar, contact.getContactId());
-            avatarSFController.getSFAvatar(contact.getAvatar());
+//            AvatarSFController avatarSFController = new AvatarSFController(this, ivAvatar, textAvatar, contact.getContactId());
+//            avatarSFController.getSFAvatar(contact.getAvatar());
         }
         else
         {
@@ -719,8 +718,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                         contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
                     textAvatar.setVisibility(View.INVISIBLE);
 
-                    AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), fullAvatar, textAvatar, contact.getContactId());
-                    avatarSFController.getSFAvatar(contact.getAvatar());
+//                    AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), fullAvatar, textAvatar, contact.getContactId());
+//                    avatarSFController.getSFAvatar(contact.getAvatar());
                 } else {
                     String initials = contact.getFirstName().substring(0, 1) +
                             contact.getLastName().substring(0, 1);

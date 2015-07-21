@@ -146,10 +146,9 @@ public class FavouriteController  extends BaseController {
     public class FavouritesAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
-            Log.e(Constants.TAG, "FavouritesAsyncTask.doInBackground: START");
             //String jsonBody = params[1];
             String jsonBody;
-            Response response = null;
+            Response response;
             String json = null;
 
             try {
@@ -191,8 +190,6 @@ public class FavouriteController  extends BaseController {
             } catch (Exception e) {
                 Log.e(Constants.TAG, "FavouritesAsyncTask.doInBackground: ",e);
             }
-
-            Log.e(Constants.TAG, "FavouritesAsyncTask.doInBackground: END");
 
             return json;
         }

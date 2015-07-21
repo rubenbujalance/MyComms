@@ -186,7 +186,7 @@ public class DashBoardActivity extends ToolbarActivity
 
         recentsLoading = true;
 
-        RealmContactTransactions realmContactTransactions = null;
+        RealmContactTransactions realmContactTransactions;
         try {
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
@@ -198,53 +198,53 @@ public class DashBoardActivity extends ToolbarActivity
 
             this.numberOfRecents = recentList.size();
 
-            for (RecentContact contact: recentList)
+//            for (RecentContact contact: recentList)
+//            {
+            for(int i=0; i<recentList.size(); i++)
             {
+                Log.i(Constants.TAG, "DashBoardActivity.loadRecents: i " + i);
+                Log.i(Constants.TAG, "DashBoardActivity.loadRecents: i " + recentList.get(i));
 
-                if(contact.getId().startsWith("mg_"))
+                if(recentList.get(i).getId().startsWith("mg_"))
                 {
                     DrawSingleGroupChatRecentAsyncTask task = new DrawSingleGroupChatRecentAsyncTask
                             (
-                                    contact.getAction()
-                                    , contact.getUniqueId()
+                                    recentList.get(i).getAction()
+                                    , recentList.get(i).getUniqueId()
                                     , currentRecentContainer
                                     , inflater
-                                    , contact.getId()
-                                    , contact
+                                    , recentList.get(i).getId()
+                                    , recentList.get(i)
                             );
 
-                    recentsTasksQueue.putConnection(contact.getUniqueId(),task);
+                    recentsTasksQueue.putConnection(recentList.get(i).getUniqueId(),task);
                     task.execute();
                 }
                 else
                 {
                     DrawSingleRecentAsyncTask task = new DrawSingleRecentAsyncTask
                             (
-                                    contact.getContactId()
-                                    , contact.getFirstName()
-                                    , contact.getLastName()
-                                    , contact.getAvatar()
-                                    , contact.getAction()
-                                    , contact.getPhones()
-                                    , contact.getEmails()
-                                    , contact.getPlatform()
-                                    , contact.getUniqueId()
+                                    recentList.get(i).getContactId()
+                                    , recentList.get(i).getFirstName()
+                                    , recentList.get(i).getLastName()
+                                    , recentList.get(i).getAvatar()
+                                    , recentList.get(i).getAction()
+                                    , recentList.get(i).getPhones()
+                                    , recentList.get(i).getEmails()
+                                    , recentList.get(i).getPlatform()
+                                    , recentList.get(i).getUniqueId()
                                     , currentRecentContainer
                                     , inflater
-                                    , contact
+                                    , recentList.get(i)
                             );
 
-                    recentsTasksQueue.putConnection(contact.getUniqueId(),task);
+                    recentsTasksQueue.putConnection(recentList.get(i).getUniqueId(),task);
                     task.execute();
                 }
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "Load recents error: ",e);
             Crashlytics.logException(e);
-        }
-        finally {
-//            if(null != realmContactTransactions)
-                //realmContactTransactions.closeRealm();
         }
 
         recentsLoading = false;

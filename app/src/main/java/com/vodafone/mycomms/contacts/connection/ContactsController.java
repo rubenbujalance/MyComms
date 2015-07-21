@@ -298,6 +298,23 @@ public class ContactsController extends BaseController {
         }
     }
 
+    public void insertRecentContactInRealm(RecentContact contact)
+    {
+        ArrayList<RecentContact> contactList = new ArrayList<>();
+        try
+        {
+            Log.i(Constants.TAG, "ContactsController.insertRecentContactInRealm: " + contact.getContactId());
+            if(null != contact)
+                contactList.add(contact);
+            if (contactList.size()!=0)
+                realmContactTransactions.insertRecentContactList(contactList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "ContactsController.insertRecentContactInRealm : " + e.toString());
+        }
+    }
+
     public void insertRecentGroupChatIntoRealm(Contact contact, JSONObject jsonObject)
     {
         try

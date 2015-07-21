@@ -106,6 +106,9 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                 new RealmGroupChatTransactions(mContext, _profile_id);
 
         GroupChat groupChat = groupChatTransactions.getGroupChatById(groupChatId);
+        //TODO: ERROR 'java.lang.String model.GroupChat.getMembers()' on a null object reference
+        if(groupChat==null) return null;
+
         String[] ids = groupChat.getMembers().split("@");
 
         RealmContactTransactions contactTransactions =
@@ -266,6 +269,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
     private void loadGroupChatView(RecentContact contact,RecentViewHolder viewHolder)
     {
         ArrayList<Contact> contacts = getGroupChatContacts(contact.getId());
+        if(contacts==null) return;
+
         String composedName = getComposedName(contacts);
         if(contacts.size() > 3)
             viewHolder.lay_top_right_image_hide.setVisibility(View.VISIBLE);

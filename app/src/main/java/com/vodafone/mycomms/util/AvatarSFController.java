@@ -13,19 +13,26 @@ import com.vodafone.mycomms.realm.RealmContactTransactions;
 import java.io.IOException;
 
 import io.realm.Realm;
+import model.Contact;
+import model.FavouriteContact;
 import model.RecentContact;
 
 public class AvatarSFController {
     private Context mContext;
     final String contactId;
     private String profileId;
+    private boolean withFavorites;
+    private boolean withContacts;
 
 
-    public AvatarSFController(Context context, String contactId, String profileId)
+    public AvatarSFController(Context context, String contactId, String profileId, boolean
+            withFavorites, boolean withContacts)
     {
         this.mContext = context;
         this.contactId = contactId;
         this.profileId = profileId;
+        this.withFavorites = withFavorites;
+        this.withContacts = withContacts;
     }
 
     public void getSFAvatar(String imageURL){
@@ -53,19 +60,7 @@ public class AvatarSFController {
 
                 response = client.newCall(request).execute();
                 if(Integer.toString(response.code()).startsWith("2"))
-                {
-                    ContactsController contactsController = new ContactsController(mContext, profileId);
-                    RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
-
-                    responseUrl = response.request().httpUrl().toString();
-                    RecentContact contact = realmContactTransactions.getRecentContactByContactId(contactId);
-                    Realm realm = Realm.getDefaultInstance();
-                    realm.beginTransaction();
-                    contact.setStringField1(responseUrl);
-                    realm.commitTransaction();
-                    realm.close();
-                    contactsController.insertRecentContactInRealm(contact);
-                }
+                    responseUrl = updateEachKindOfContactWithSFAvatarURL(response, withFavorites, withContacts);
 
             } catch (IOException e) {
                 Log.e(Constants.TAG, "AvatarSFController.doInBackground: ",e);
@@ -82,5 +77,42 @@ public class AvatarSFController {
             else
                 Log.e(Constants.TAG, "AvatarSFAsyncTask.onPostExecute: ERROR on download SF avatar");
         }
+    }
+
+    private String updateEachKindOfContactWithSFAvatarURL(Response response, boolean
+            withFavorites, boolean withContacts)
+    {
+        ContactsController contactsController = new ContactsController(mContext, profileId);
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
+
+        String responseUrl = response.request().httpUrl().toString();
+        RecentContact recentContact = realmContactTransactions.getRecentContactByContactId(contactId);
+        FavouriteContact favouriteContact = null;
+        Contact contact = null;
+        if(withFavorites)
+            favouriteContact = realmContactTransactions.getFavouriteContactByContactId(contactId);
+        if(withContacts)
+        contact = realmContactTransactions.getContactById(contactId);
+
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+
+        recentContact.setStringField1(responseUrl);
+        if(null != contact)
+            contact.setStringField1(responseUrl);
+        if(null != favouriteContact)
+            favouriteContact.setStringField1(responseUrl);
+
+        realm.commitTransaction();
+        contactsController.insertRecentContactInRealm(recentContact);
+        if(null != contact)
+            contactsController.insertContactInRealm(contact);
+        if(null != favouriteContact)
+            contactsController.insertFavouriteContactInRealm(favouriteContact);
+
+        realm.close();
+        contactsController.closeRealm();
+
+        return responseUrl;
     }
 }

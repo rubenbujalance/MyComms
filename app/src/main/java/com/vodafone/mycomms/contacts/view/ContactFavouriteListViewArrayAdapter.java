@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.contacts.view;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -31,10 +31,13 @@ import model.FavouriteContact;
  */
 public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<FavouriteContact> {
     private Context mContext;
+    private String profileId;
 
     public ContactFavouriteListViewArrayAdapter(Context context, List<FavouriteContact> items) {
         super(context, R.layout.layout_list_item_contact, items);
         this.mContext = context;
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        this.profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
     }
 
     @Override
@@ -83,55 +86,30 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         }
 
         //Image avatar
-        String initials = "";
-        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+        if (null != contact.getPlatform() && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
         {
-            initials = contact.getFirstName().substring(0,1);
-
-            if(null != contact.getLastName() && contact.getLastName().length() > 0)
-            {
-                initials = initials + contact.getLastName().substring(0,1);
-            }
-
+            AvatarSFController avatarSFController = new AvatarSFController
+                    (
+                            mContext
+                            , contact.getContactId()
+                            , this.profileId
+                            , true
+                            , false
+                    );
+            avatarSFController.getSFAvatar(contact.getAvatar());
         }
-        final String finalInitials = initials;
 
-        if (contact.getAvatar()!=null &&
-                contact.getAvatar().length()>0)
-        {
-            if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)
-                    || contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
-                MycommsApp.picasso
-                        .load(contact.getAvatar())
-                        .placeholder(R.color.grey_middle)
-                        .noFade()
-                        .fit().centerCrop()
-                        .into(viewHolder.imageAvatar, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                viewHolder.textAvatar.setVisibility(View.INVISIBLE);
-                            }
-
-                            @Override
-                            public void onError() {
-                                viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
-                                viewHolder.textAvatar.setVisibility(View.VISIBLE);
-                                viewHolder.textAvatar.setText(finalInitials);
-                            }
-                        });
-            }
-            else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)){
-//                AvatarSFController avatarSFController = new AvatarSFController(mContext, viewHolder.top_left_avatar, viewHolder.bottom_left_avatar_text, contact.getContactId());
-//                avatarSFController.getSFAvatar(contact.getAvatar());
-                viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
-                viewHolder.textAvatar.setText(initials);
-            }
-        }
-        else
-        {
-            viewHolder.imageAvatar.setImageResource(R.color.grey_middle);
-            viewHolder.textAvatar.setText(initials);
-        }
+        Utils.loadContactAvatar
+                (
+                        contact.getFirstName()
+                        , contact.getLastName()
+                        , viewHolder.imageAvatar
+                        , viewHolder.textAvatar
+                        , Utils.getAvatarURL(
+                                contact.getPlatform()
+                                , contact.getStringField1()
+                                , contact.getAvatar())
+                );
 
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );

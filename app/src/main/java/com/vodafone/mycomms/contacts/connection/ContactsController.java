@@ -199,6 +199,30 @@ public class ContactsController extends BaseController {
         return realmContactList;
     }
 
+    public ArrayList<Contact> insertContactInRealm(Contact contact)
+    {
+        ArrayList<Contact> realmContactList = new ArrayList<>();
+
+        try
+        {
+            Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
+
+            if(null != contact)
+                realmContactList.add(contact);
+            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
+            if(!realmContactList.isEmpty())
+                realmContactTransactions.insertContactList(realmContactList);
+            realmContactTransactions.closeRealm();
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "ContactsController.insertContactListInRealm: " + e.toString());
+            return null;
+        }
+        return realmContactList;
+    }
+
     public ArrayList<Contact> getAllContacts() {
         Log.d(Constants.TAG, "ContactsController.getAllContacts: ");
         return realmContactTransactions.getAllContacts();
@@ -239,7 +263,26 @@ public class ContactsController extends BaseController {
             realmContactTransactions.closeRealm();
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : " + e.toString());
+            Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : ",e);
+        }
+    }
+
+    public void insertFavouriteContactInRealm(FavouriteContact contact)
+    {
+        ArrayList<FavouriteContact> contactList = new ArrayList<>();
+        try
+        {
+            Log.i(Constants.TAG, "ContactsController.insertFavouriteContactInRealm: contact: " +
+                    contact.getContactId());
+            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
+            if(null != contact)
+                contactList.add(contact);
+            if (contactList.size()!=0)
+                realmContactTransactions.insertFavouriteContactList(contactList);
+            realmContactTransactions.closeRealm();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : ",e);
         }
     }
 
@@ -262,7 +305,7 @@ public class ContactsController extends BaseController {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : " + e.toString());
+            Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : " ,e);
         }
     }
 
@@ -298,7 +341,7 @@ public class ContactsController extends BaseController {
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactsController.insertRecentContactInRealm : " + e.toString());
+            Log.e(Constants.TAG, "ContactsController.insertRecentContactInRealm : ",e);
         }
     }
 
@@ -315,7 +358,7 @@ public class ContactsController extends BaseController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactsController.insertRecentContactInRealm : " + e.toString());
+            Log.e(Constants.TAG, "ContactsController.insertRecentContactInRealm : " ,e);
         }
     }
 
@@ -332,7 +375,7 @@ public class ContactsController extends BaseController {
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactsController.insertRecentGroupChatIntoRealm : " + e.toString());
+            Log.e(Constants.TAG, "ContactsController.insertRecentGroupChatIntoRealm : ",e);
         }
     }
 
@@ -398,7 +441,7 @@ public class ContactsController extends BaseController {
 
         }catch (JSONException e){
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());
+            Log.e(Constants.TAG, "ContactDBController.mapContact: ",e);
         }
         return contact;
     }
@@ -438,7 +481,7 @@ public class ContactsController extends BaseController {
                 contact.setCountry(jsonObject.getString(Constants.CONTACT_COUNTRY));
         }catch (JSONException e){
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDBController.mapFavouriteContact: " + e.toString());
+            Log.e(Constants.TAG, "ContactDBController.mapFavouriteContact: ",e);
         }
         return contact;
     }
@@ -502,7 +545,7 @@ public class ContactsController extends BaseController {
 
         }catch (JSONException e){
             e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDBController.mapRecentContact: " + e.toString());
+            Log.e(Constants.TAG, "ContactDBController.mapRecentContact: ",e);
         }
         return contact;
     }
@@ -531,7 +574,7 @@ public class ContactsController extends BaseController {
             recentContact.setAction(jsonObject.getString(Constants.CONTACT_RECENTS_ACTION));
             recentContact.setTimestamp(jsonObject.getLong(Constants.CONTACT_RECENTS_ACTION_TIME));
         } catch (JSONException e){
-            Log.e(Constants.TAG, "ContactsController.mapContactToRecent: " + e);
+            Log.e(Constants.TAG, "ContactsController.mapContactToRecent: ",e);
         }
         return recentContact;
     }

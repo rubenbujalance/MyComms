@@ -13,10 +13,14 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 
 import org.json.JSONArray;
@@ -434,6 +438,80 @@ public final class Utils extends Activity {
         else
             return "";
 
+    }
+
+    public static void loadContactAvatar(String firstName, String lastName, final ImageView
+            imageAvatar, final TextView textAvatar, String avatarURL, float textAvatarSize)
+    {
+        //Image avatar
+        String initials = "";
+        if(null != firstName && firstName.length() > 0)
+        {
+            initials = firstName.substring(0, 1);
+
+            if(null != lastName && lastName.length() > 0)
+            {
+                initials = initials + lastName.substring(0, 1);
+            }
+
+        }
+
+        final String finalInitials = initials;
+
+        imageAvatar.setImageResource(R.color.grey_middle);
+        textAvatar.setVisibility(View.VISIBLE);
+        textAvatar.setText(finalInitials);
+        if(textAvatarSize != 0)
+            textAvatar.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAvatarSize);
+
+        if (avatarURL!=null && avatarURL.length()>0)
+        {
+            MycommsApp.picasso
+                    .load(avatarURL)
+                    .placeholder(R.color.grey_middle)
+                    .noFade()
+                    .fit().centerCrop()
+                    .into(imageAvatar, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            textAvatar.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onError() {
+                            imageAvatar.setImageResource(R.color.grey_middle);
+                            textAvatar.setVisibility(View.VISIBLE);
+                            textAvatar.setText(finalInitials);
+                        }
+                    });
+        }
+        else
+        {
+            imageAvatar.setImageResource(R.color.grey_middle);
+            textAvatar.setText(initials);
+        }
+    }
+
+    public static void loadContactAvatar(String firstName, String lastName, final ImageView
+            imageAvatar, final TextView textAvatar, String avatarURL)
+    {
+        loadContactAvatar(firstName, lastName, imageAvatar, textAvatar, avatarURL, 0);
+    }
+
+    public static String getAvatarURL(String platform, String stringFiledAvatar, String avatar)
+    {
+        String avatarURL;
+        if(null != platform && Constants.PLATFORM_SALES_FORCE.equals
+                (platform))
+        {
+            if(null != stringFiledAvatar && stringFiledAvatar.length() > 0)
+                avatarURL = stringFiledAvatar;
+            else
+                avatarURL = null;
+        }
+        else
+            avatarURL = avatar;
+        return avatarURL;
     }
 
 }

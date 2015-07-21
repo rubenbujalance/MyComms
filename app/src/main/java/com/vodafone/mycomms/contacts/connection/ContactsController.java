@@ -349,18 +349,31 @@ public class ContactsController extends BaseController {
             if (!jsonObject.isNull(Constants.CONTACT_COUNTRY))
                 contact.setCountry(jsonObject.getString(Constants.CONTACT_COUNTRY));
 
-            contact.setSearchHelper(
-                    (
-                            Utils.normalizeStringNFD(contact.getFirstName()) + " " +
-                            Utils.normalizeStringNFD(contact.getLastName()) + " " +
-                            Utils.normalizeStringNFD(contact.getCompany()) + " " +
-                            Utils.normalizeStringNFD(contact.getEmails())).trim());
+            //Search Helper
+            String searchHelper = "";
+            if(contact.getFirstName()!=null && contact.getFirstName().length()>0)
+                searchHelper  += Utils.normalizeStringNFD(contact.getFirstName()) + " ";
+            if(contact.getLastName()!=null && contact.getLastName().length()>0)
+                searchHelper  += Utils.normalizeStringNFD(contact.getLastName()) + " ";
+            if(contact.getCompany()!=null && contact.getCompany().length()>0)
+                searchHelper  += Utils.normalizeStringNFD(contact.getCompany()) + " ";
+            if(contact.getEmails()!=null && contact.getEmails().length()>0)
+                searchHelper  += Utils.normalizeStringNFD(contact.getEmails()) + " ";
 
-            contact.setSortHelper(
-                    (
-                            Utils.normalizeStringNFD(contact.getFirstName()) + " " +
-                            Utils.normalizeStringNFD(contact.getLastName()) + " " +
-                            Utils.normalizeStringNFD(contact.getCompany())).trim());
+            searchHelper = searchHelper.trim();
+            contact.setSearchHelper(searchHelper);
+
+            //Sort Helper
+            String sortHelper = "";
+            if(contact.getFirstName()!=null && contact.getFirstName().length()>0)
+                sortHelper  += Utils.normalizeStringNFD(contact.getFirstName()) + " ";
+            if(contact.getLastName()!=null && contact.getLastName().length()>0)
+                sortHelper  += Utils.normalizeStringNFD(contact.getLastName()) + " ";
+            if(contact.getCompany()!=null && contact.getCompany().length()>0)
+                sortHelper  += Utils.normalizeStringNFD(contact.getCompany()) + " ";
+
+            sortHelper = sortHelper.trim();
+            contact.setSortHelper(sortHelper);
 
         }catch (JSONException e){
             e.printStackTrace();

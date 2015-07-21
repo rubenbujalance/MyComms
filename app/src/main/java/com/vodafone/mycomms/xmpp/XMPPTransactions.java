@@ -159,7 +159,6 @@ public final class XMPPTransactions {
                     try {
                         Thread.sleep(miliseconds);
                         if(!_isConnecting && !isPinging) {
-                            Log.i(Constants.TAG, "XMPPTransactions.intervalPinging: Pinging...");
                             isPinging = true;
                             sendPing();
                             Thread.sleep(2000);
@@ -266,7 +265,6 @@ public final class XMPPTransactions {
             protected Boolean doInBackground(Void... params) {
                 boolean isConnected = false;
                 try {
-                    Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP: Pinging...");
 //                    isConnected = _pingManager.pingMyServer();
                     isPinging = true;
 
@@ -649,6 +647,12 @@ public final class XMPPTransactions {
             if(chatTx.existsChatMessageById(id))
                 return false;
 
+            String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
+            if(status==null) status = Constants.CHAT_MESSAGE_STATUS_NOT_SENT;
+            String read = Constants.CHAT_MESSAGE_NOT_READ;
+            if(status.compareTo(Constants.CHAT_MESSAGE_STATUS_READ)==0)
+                read = Constants.CHAT_MESSAGE_READ;
+
             ChatMessage newChatMessage = null;
             String contactId = null;
 
@@ -656,7 +660,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
-                        text, "", id, sentTime);
+                        text, "", id, sentTime, status, read);
 
                 contactId = from;
             }
@@ -664,7 +668,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
-                        text, "", id, sentTime);
+                        text, "", id, sentTime, status, read);
 
                 contactId = to;
             }
@@ -684,7 +688,9 @@ public final class XMPPTransactions {
             chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
-            if(to.compareTo(_profile_id)==0) {
+            if(to.compareTo(_profile_id)==0 &&
+                    (getXMPPStatusOrder(status) <
+                                    getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
                 notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
@@ -721,6 +727,12 @@ public final class XMPPTransactions {
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
             if(to.contains("@")) to = to.substring(0, to.indexOf("@"));
 
+            String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
+            if(status==null) status = Constants.CHAT_MESSAGE_STATUS_NOT_SENT;
+            String read = Constants.CHAT_MESSAGE_NOT_READ;
+            if(status.compareTo(Constants.CHAT_MESSAGE_STATUS_READ)==0)
+                read = Constants.CHAT_MESSAGE_READ;
+
             ChatMessage newChatMessage = null;
             String contactId = null;
 
@@ -737,7 +749,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                        "", url, id, sentTime);
+                        "", url, id, sentTime, status, read);
 
                 contactId = from;
             }
@@ -745,7 +757,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                        "", url, id, sentTime);
+                        "", url, id, sentTime, status, read);
 
                 contactId = to;
             }
@@ -762,7 +774,9 @@ public final class XMPPTransactions {
             chatTx.insertChatMessage(newChatMessage);
 
             //Send IQ
-            if(to.compareTo(_profile_id)==0) {
+            if(to.compareTo(_profile_id)==0 &&
+                    (getXMPPStatusOrder(status) <
+                                    getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
                 notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
@@ -824,6 +838,12 @@ public final class XMPPTransactions {
             if(groupTx.existsChatMessageById(id))
                 return false;
 
+            String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
+            if(status==null) status = Constants.CHAT_MESSAGE_STATUS_NOT_SENT;
+            String read = Constants.CHAT_MESSAGE_NOT_READ;
+            if(status.compareTo(Constants.CHAT_MESSAGE_STATUS_READ)==0)
+                read = Constants.CHAT_MESSAGE_READ;
+
             ChatMessage newChatMessage = null;
             String contactId = null;
 
@@ -831,13 +851,13 @@ public final class XMPPTransactions {
                 newChatMessage = groupTx.newGroupChatMessageInstance(groupId, from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
-                        text, "", id, sentTime);
+                        text, "", id, sentTime, status, read);
             }
             else if(from.compareTo(_profile_id)==0){
                 newChatMessage = groupTx.newGroupChatMessageInstance(groupId, "",
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_TEXT,
-                        text, "", id, sentTime);
+                        text, "", id, sentTime, status, read);
             }
 
             if(newChatMessage == null) return false;
@@ -864,7 +884,9 @@ public final class XMPPTransactions {
             chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
-            if(from.compareTo(_profile_id)!=0) {
+            if(from.compareTo(_profile_id)!=0 &&
+                    (getXMPPStatusOrder(status) <
+                            getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
                 notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
@@ -912,6 +934,12 @@ public final class XMPPTransactions {
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
             if(to.contains("@")) to = from.substring(0, to.indexOf("@"));
 
+            String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
+            if(status==null) status = Constants.CHAT_MESSAGE_STATUS_NOT_SENT;
+            String read = Constants.CHAT_MESSAGE_NOT_READ;
+            if(status.compareTo(Constants.CHAT_MESSAGE_STATUS_READ)==0)
+                read = Constants.CHAT_MESSAGE_READ;
+
             ChatMessage newChatMessage = null;
             String contactId = null;
 
@@ -919,7 +947,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                        "", url, id, sentTime);
+                        "", url, id, sentTime, status, read);
 
                 contactId = from;
             }
@@ -927,7 +955,7 @@ public final class XMPPTransactions {
                 newChatMessage = chatTx.newChatMessageInstance(to,
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
-                        "", url, id, sentTime);
+                        "", url, id, sentTime, status, read);
 
                 contactId = to;
             }
@@ -944,7 +972,9 @@ public final class XMPPTransactions {
             chatTx.insertChatMessage(newChatMessage);
 
             //Send IQ
-            if(to.compareTo(_profile_id)==0) {
+            if(from.compareTo(_profile_id)!=0 &&
+                    (getXMPPStatusOrder(status) <
+                            getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
                 notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }

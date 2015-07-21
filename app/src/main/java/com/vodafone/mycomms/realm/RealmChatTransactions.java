@@ -45,36 +45,25 @@ public class RealmChatTransactions {
     //CONSTRUCTORS
 
     public ChatMessage newChatMessageInstance(String contact_id, String direction,
-                                              int type, String text, String resourceUri)
+                                              int type, String text, String resourceUri,
+                                              String status, String read)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,"",timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
-                Constants.CHAT_MESSAGE_STATUS_NOT_SENT);
-
-        return chatMessage;
-    }
-
-    public ChatMessage newChatMessageInstance(String contact_id, String direction, int type,
-                                              String text, String resourceUri, String id)
-    {
-        long timestamp = Calendar.getInstance().getTimeInMillis();
-
-        ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,"",timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
-                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
+                direction,type,text,resourceUri,read,
+                status);
 
         return chatMessage;
     }
 
     public ChatMessage newChatMessageInstance(String contact_id, String direction, int type,
                                               String text, String resourceUri, String id,
-                                              long timestamp)
+                                              long timestamp, String status, String read)
     {
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,"",timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
-                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
+            direction,type,text,resourceUri,read,
+                status, id);
 
         return chatMessage;
     }
@@ -147,10 +136,12 @@ public class RealmChatTransactions {
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ);
 
             RealmResults<ChatMessage> results = query.findAll();
+            int size = results.size();
 
-            for(int i = 0; i < results.size(); i++)
+            //Seteamos siempre el elemento 0 porque Realm recalcula la lista a cada SET
+            for(int i = 0; i < size; i++)
             {
-                results.get(i).setRead(Constants.CHAT_MESSAGE_READ);
+                results.get(0).setRead(Constants.CHAT_MESSAGE_READ);
             }
 
         } catch (Exception e){
@@ -269,7 +260,7 @@ public class RealmChatTransactions {
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_CONTACT_ID, contactId)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, "")
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
-                    .notEqualTo(Constants.CHAT_MESSAGE_FIELD_STATUS, Constants.CHAT_MESSAGE_STATUS_READ);
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ);
 
             RealmResults<ChatMessage> results = query.findAll();
 

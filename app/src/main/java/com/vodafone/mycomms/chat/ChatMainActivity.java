@@ -238,7 +238,8 @@ public class ChatMainActivity extends ToolbarActivity {
                 //Save to DB
                 final ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
                         _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                        Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
+                        Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "",
+                        Constants.CHAT_MESSAGE_STATUS_NOT_SENT, Constants.CHAT_MESSAGE_NOT_READ);
 
                 _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
                 final String id = chatMsg.getId();
@@ -283,7 +284,8 @@ public class ChatMainActivity extends ToolbarActivity {
         //Save to DB
         ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
                 _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl);
+                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl,
+                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, Constants.CHAT_MESSAGE_NOT_READ);
 
         _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
 

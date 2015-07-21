@@ -447,7 +447,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if(isGroupChatMode) {
             chatMsg = mGroupChatTransactions.newGroupChatMessageInstance(_groupChat.getId(), "",
                     Constants.CHAT_MESSAGE_DIRECTION_SENT, Constants.CHAT_MESSAGE_TYPE_TEXT,
-                    msg, "");
+                    msg, "", Constants.CHAT_MESSAGE_STATUS_NOT_SENT,
+                    Constants.CHAT_MESSAGE_NOT_READ);
 
             _groupChat = mGroupChatTransactions.updatedGroupChatInstance(_groupChat, chatMsg);
 
@@ -457,7 +458,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         else {
             chatMsg = chatTransactions.newChatMessageInstance(
                     _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                    Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "");
+                    Constants.CHAT_MESSAGE_TYPE_TEXT, msg, "",
+                    Constants.CHAT_MESSAGE_STATUS_NOT_SENT, Constants.CHAT_MESSAGE_NOT_READ);
 
             _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
 
@@ -496,7 +498,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         //Save to DB
         ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
                 _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl);
+                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl,
+                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, Constants.CHAT_MESSAGE_NOT_READ);
 
         _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
 

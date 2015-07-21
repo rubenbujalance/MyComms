@@ -73,24 +73,23 @@ public class RealmGroupChatTransactions {
 
     public ChatMessage newGroupChatMessageInstance(String group_id, String contact_id,
                                                    String direction, int type, String text,
-                                                   String resourceUri)
+                                                   String resourceUri, String status, String read)
     {
         long timestamp = Calendar.getInstance().getTimeInMillis();
 
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
-                Constants.CHAT_MESSAGE_STATUS_NOT_SENT);
+                direction,type,text,resourceUri,read,status);
 
         return chatMessage;
     }
 
     public ChatMessage newGroupChatMessageInstance(String group_id, String contact_id,
                                                    String direction, int type, String text,
-                                                   String resourceUri, String id, long timestamp)
+                                                   String resourceUri, String id, long timestamp,
+                                                   String status, String read)
     {
         ChatMessage chatMessage = new ChatMessage(_profile_id,contact_id,group_id,timestamp,
-                direction,type,text,resourceUri,Constants.CHAT_MESSAGE_NOT_READ,
-                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, id);
+                direction,type,text,resourceUri,read,status, id);
 
         return chatMessage;
     }

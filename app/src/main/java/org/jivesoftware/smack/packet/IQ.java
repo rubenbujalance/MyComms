@@ -287,6 +287,11 @@ public abstract class IQ extends Stanza {
          * RBM - Type added to MyComms. This type indicates the status of a message in chat
          */
         chat,
+
+        /**
+         * RBM - Type added to MyComms. This type indicates the status of a message in group chat
+         */
+        groupchat,
         ;
 
         /**

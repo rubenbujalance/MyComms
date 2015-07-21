@@ -2,7 +2,6 @@ package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +9,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
@@ -51,6 +51,7 @@ public class OAuthActivity extends Activity {
 
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);
         relativeContainer = (RelativeLayout)findViewById(R.id.relative_container);
+        relativeContainer.setVisibility(View.INVISIBLE);
 
         //Register Otto Bus
         BusProvider.getInstance().register(this);
@@ -61,6 +62,8 @@ public class OAuthActivity extends Activity {
         //Load web view
         wvOAuth.getSettings().setJavaScriptEnabled(true);
         wvOAuth.getSettings().setSupportMultipleWindows(true);
+        wvOAuth.getSettings().setAppCacheEnabled(false);
+        wvOAuth.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         setWebViewListener();
 //        wvOAuth.setWebViewClient(new WebViewClient() {
 //            @Override
@@ -241,49 +244,49 @@ public class OAuthActivity extends Activity {
                             Uri.parse(urlNewString).getQuery());
                     return true;
                 }
-                else {
-                    if (!loadingFinished) {
-                        redirect = true;
-                    }
-
-                    loadingFinished = false;
-                }
-
-                // Otherwise, continue...
-                return false;
+//                else {
+//                    if (!loadingFinished) {
+//                        redirect = true;
+//                    }
+//
+//                    loadingFinished = false;
+//
+                    // Otherwise, continue...
+                    return false;
+//                }
             }
 
-            @Override
-            public void onPageStarted(WebView view, String url, Bitmap facIcon)
-            {
-                loadingFinished = false;
-                /*if(!progressDialog.isShowing())
-                    progressDialog.show();*/
-                if(relativeContainer.getVisibility() != View.VISIBLE)
-                {
-                    relativeContainer.setVisibility(View.VISIBLE);
-                    wvOAuth.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url)
-            {
-                if(!redirect){
-                    loadingFinished = true;
-                }
-
-                if(loadingFinished && !redirect){
-                    //HIDE LOADING IT HAS FINISHED
-                    if(relativeContainer.getVisibility() == View.VISIBLE)
-                    {
-                        relativeContainer.setVisibility(View.GONE);
-                        wvOAuth.setVisibility(View.VISIBLE);
-                    }
-                } else{
-                    redirect = false;
-                }
-            }
+//            @Override
+//            public void onPageStarted(WebView view, String url, Bitmap facIcon)
+//            {
+//                loadingFinished = false;
+//                /*if(!progressDialog.isShowing())
+//                    progressDialog.show();*/
+//                if(relativeContainer.getVisibility() != View.VISIBLE)
+//                {
+//                    relativeContainer.setVisibility(View.VISIBLE);
+//                    wvOAuth.setVisibility(View.INVISIBLE);
+//                }
+//            }
+//
+//            @Override
+//            public void onPageFinished(WebView view, String url)
+//            {
+//                if(!redirect){
+//                    loadingFinished = true;
+//                }
+//
+//                if(loadingFinished && !redirect){
+//                    //HIDE LOADING IT HAS FINISHED
+//                    if(relativeContainer.getVisibility() == View.VISIBLE)
+//                    {
+//                        relativeContainer.setVisibility(View.GONE);
+//                        wvOAuth.setVisibility(View.VISIBLE);
+//                    }
+//                } else{
+//                    redirect = false;
+//                }
+//            }
 
         });
     }

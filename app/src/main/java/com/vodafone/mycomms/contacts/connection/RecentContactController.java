@@ -183,8 +183,8 @@ public class RecentContactController {
 
         @Override
         protected void onPostExecute(String response) {
-            getRecentList();
-            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+//            getRecentList();
+//            BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             this.recentChatsHashMap.clear();
         }
     }
@@ -352,6 +352,7 @@ public class RecentContactController {
                     try {
                         JSONObject jsonResponse = new JSONObject(json);
                         contactSearchController.getContactById(jsonResponse);
+                        Log.i(Constants.TAG, "RecentContactsGETAsyncTask.recentListCallback: onRecentContactsReceived");
                         BusProvider.getInstance().post(new RecentContactsReceivedEvent());
                     } catch (JSONException e) {
                         Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);

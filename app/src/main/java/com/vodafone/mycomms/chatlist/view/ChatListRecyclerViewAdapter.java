@@ -2,7 +2,6 @@ package com.vodafone.mycomms.chatlist.view;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.readystatesoftware.viewbadger.BadgeView;
 import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
@@ -131,12 +129,15 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         long amountUnreadMessages = _chatTx.getChatPendingMessagesCount(getComposedChat(i).getChat().getContact_id());
 
         if(amountUnreadMessages > 0) {
-            BadgeView badge = new BadgeView(mContext, chatListHolder.badgeUnread);
-            badge.setText(String.valueOf(amountUnreadMessages));
-            badge.setBadgePosition(BadgeView.POSITION_CENTER);
-            badge.setBadgeBackgroundColor(Color.parseColor("#0071FF"));
-            badge.show();
+            chatListHolder.badgeUnread.setVisibility(View.VISIBLE);
+            chatListHolder.badgeUnread.setText(Long.toString(amountUnreadMessages));
+            if(amountUnreadMessages>99)
+            {
+                chatListHolder.badgeUnread.setText("99+");
+            }
         }
+        else
+            chatListHolder.badgeUnread.setVisibility(View.GONE);
 
         Contact contact = mContactTransactions.getContactById(getComposedChat(i).getChat().getContact_id());
 
@@ -277,12 +278,15 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                 getComposedChat(i).getGroupChat().getId());
 
         if(amountUnreadMessages > 0) {
-            BadgeView badge = new BadgeView(mContext, chatListHolder.badgeUnread);
-            badge.setText(String.valueOf(amountUnreadMessages));
-            badge.setBadgePosition(BadgeView.POSITION_CENTER);
-            badge.setBadgeBackgroundColor(Color.parseColor("#0071FF"));
-            badge.show();
+            chatListHolder.badgeUnread.setVisibility(View.VISIBLE);
+            chatListHolder.badgeUnread.setText(Long.toString(amountUnreadMessages));
+            if(amountUnreadMessages>99)
+            {
+                chatListHolder.badgeUnread.setText("99+");
+            }
         }
+        else
+            chatListHolder.badgeUnread.setVisibility(View.GONE);
     }
 
     private void loadComposedAvatar

@@ -64,16 +64,22 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         // update the item view
         FavouriteContact contact = getItem(position);
 
-        if(null != contact.getPlatform() && contact.getPlatform()
-                .equals(Constants.PLATFORM_LOCAL))
+        viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
+        if(null != contact.getPlatform()
+                && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
-            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
-            viewHolder.imageViewDayNight.setVisibility(View.GONE);
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
         }
-        else
+        else if (null != contact.getPlatform()
+                && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
         {
-            viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
-            viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
+        }
+        else if (null != contact.getPlatform()
+                && Constants.PLATFORM_LOCAL.equals(contact.getPlatform()))
+        {
+            viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
         //Image avatar

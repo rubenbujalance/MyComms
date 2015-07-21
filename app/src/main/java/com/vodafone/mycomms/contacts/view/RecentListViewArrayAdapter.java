@@ -178,14 +178,20 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
 
         viewHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 
-        if(null != contact.getPlatform() && contact.getPlatform()
-                .equals(Constants.PLATFORM_LOCAL))
+        if(null != contact.getPlatform()
+                && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
-            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
         }
-        else
+        else if (null != contact.getPlatform()
+                && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
         {
-            viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
+        }
+        else if (null != contact.getPlatform()
+                && Constants.PLATFORM_LOCAL.equals(contact.getPlatform()))
+        {
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
         //Image avatar
@@ -358,7 +364,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
     /**
      * The view holder design pattern
      */
-    private static class RecentViewHolder {
+    private class RecentViewHolder {
         TextView textViewName;
         TextView textViewOccupation;
         TextView textViewCompany;

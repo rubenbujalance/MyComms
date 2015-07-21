@@ -18,9 +18,9 @@ import java.io.IOException;
 
 public class AvatarSFController {
     private Context mContext;
-    ImageView mImageView;
-    TextView textView;
-    String contactId;
+    final ImageView mImageView;
+    final TextView textView;
+    final String contactId;
 
     public AvatarSFController(Context context, ImageView image, TextView textView, String contactId) {
         this.mContext = context;

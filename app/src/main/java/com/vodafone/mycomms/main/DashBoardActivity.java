@@ -44,7 +44,6 @@ import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
-import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.SaveAndShowImageAsyncTask;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -742,17 +741,17 @@ public class DashBoardActivity extends ToolbarActivity
                                                 }
                                             });
                                 }
-                                else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
-                                {
-                                    AvatarSFController avatarSFController = new AvatarSFController
-                                            (
-                                                    DashBoardActivity.this
-                                                    , image
-                                                    , text
-                                                    , contact.getContactId()
-                                            );
-                                    avatarSFController.getSFAvatar(contact.getAvatar());
-                                }
+//                                else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
+//                                {
+//                                    AvatarSFController avatarSFController = new AvatarSFController
+//                                            (
+//                                                    DashBoardActivity.this
+//                                                    , image
+//                                                    , text
+//                                                    , contact.getContactId()
+//                                            );
+//                                    avatarSFController.getSFAvatar(contact.getAvatar());
+//                                }
                             }
                             else
                             {
@@ -923,13 +922,16 @@ public class DashBoardActivity extends ToolbarActivity
                 };
 
             }
-            else if (avatar != null &&
-                    avatar.length() > 0 &&
-                    !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
-                    && platform.equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
-                AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), recentAvatar, avatarText, contactId);
-                avatarSFController.getSFAvatar(avatar);
-            }
+//            else if (avatar != null &&
+//                    avatar.length() > 0 &&
+//                    !ConnectionsQueue.isConnectionAlive(avatarFile.toString())
+//                    && platform.equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
+////                AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), recentAvatar, avatarText, contactId);
+////                avatarSFController.getSFAvatar(avatar);
+//
+////                recentAvatar.setImageResource(R.color.grey_middle);
+////                avatarText.setText(initials);
+//            }
 
             return null;
         }

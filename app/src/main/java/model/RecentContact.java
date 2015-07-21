@@ -52,6 +52,8 @@ public class RecentContact extends RealmObject {
 
     }
 
+
+
     public RecentContact(String uniqueId, String profileId, String contactId, int
             lastInteraction, String platform, String firstName, String lastName, String avatar,
                          String phones, String emails, String position, String company, String

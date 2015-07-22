@@ -232,5 +232,6 @@
     <string name="progress_dialog_updating_group_chat">Updating group chat. Please wait...</string>
     <string name="group_chat">Group chat</string>
     <string name="today">Today</string>
+    <string name="title_activity_fullscreen_image">FullscreenImageActivity</string>
 
 </resources>

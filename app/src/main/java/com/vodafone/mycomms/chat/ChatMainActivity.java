@@ -292,10 +292,10 @@ public class ChatMainActivity extends ToolbarActivity {
         chatTransactions.insertChat(_chat);
         chatTransactions.insertChatMessage(chatMsg);
 
-        //Send through XMPP
-        if (!XMPPTransactions.sendImage(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
-                chatMsg.getId(), imageUrl))
-            return;
+//        //Send through XMPP
+//        if (!XMPPTransactions.sendImage(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
+//                chatMsg.getId(), imageUrl))
+//            return;
 
         //Download to file
         //TODO: Testing executeOnExecutor
@@ -384,7 +384,7 @@ public class ChatMainActivity extends ToolbarActivity {
                         chatTransactions.getNotReadReceivedContactChatMessages(contactId);
 
                 if (messages != null && messages.size() > 0) {
-                    XMPPTransactions.sendReadIQReceivedMessagesList(messages);
+                    XMPPTransactions.sendReadIQReceivedMessagesList(false, messages);
                     chatTransactions.setContactAllChatMessagesReceivedAsRead(contactId);
                 }
             }

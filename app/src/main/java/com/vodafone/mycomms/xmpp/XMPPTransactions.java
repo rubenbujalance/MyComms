@@ -346,9 +346,10 @@ public final class XMPPTransactions {
         return true;
     }
 
-    public static boolean sendImage(String contact_id, String type, String id, String fileUrl)
+    public static boolean sendImage(boolean isGroup, String destinationId,
+                                    String id, String fileUrl)
     {
-        final String stanzaStr = buildImageStanza(type, id, contact_id, fileUrl);
+        final String stanzaStr = buildImageStanza(isGroup, id, destinationId, fileUrl);
 
         try {
             Stanza st = new Stanza() {
@@ -363,7 +364,7 @@ public final class XMPPTransactions {
             _lastChatMessageSentTimestamp = Calendar.getInstance().getTimeInMillis();
         }
         catch (SmackException.NotConnectedException e) {
-            Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
+            Log.e(Constants.TAG, "ChatMainActivity.sendImage: Error sending message", e);
             Crashlytics.logException(e);
             return false;
         }
@@ -386,17 +387,22 @@ public final class XMPPTransactions {
             _lastChatMessageSentTimestamp = Calendar.getInstance().getTimeInMillis();
         }
         catch (SmackException.NotConnectedException e) {
-            Log.e(Constants.TAG, "ChatMainActivity.sendText: Error sending message", e);
+            Log.e(Constants.TAG, "ChatMainActivity.sendStanzaStr: Error sending message", e);
             Crashlytics.logException(e);
         }
 
         return true;
     }
 
-    private static String buildIQStanza(String type, String id, String contactId, final String status)
+    private static String buildIQStanza(boolean isGroup, String id, String destinationId,
+                                        final String status)
     {
+        String type;
+        if(isGroup) type = Constants.XMPP_STANZA_TYPE_GROUPCHAT;
+        else type = Constants.XMPP_STANZA_TYPE_CHAT;
+
         String iq = "<"+Constants.XMPP_ELEMENT_IQ+" "+Constants.XMPP_ATTR_TYPE+"=\""+type+"\" " +
-                Constants.XMPP_ATTR_TO+"=\""+contactId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
+                Constants.XMPP_ATTR_TO+"=\""+destinationId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
                 Constants.XMPP_ATTR_FROM+"=\""+_profile_id+"@"+Constants.XMPP_PARAM_DOMAIN+"/"+_device_id+"\" " +
                 Constants.XMPP_ATTR_ID+"=\""+id+"\" " +
                 Constants.XMPP_ATTR_STATUS+"=\""+status+"\"></"+Constants.XMPP_ELEMENT_IQ+">";
@@ -434,11 +440,16 @@ public final class XMPPTransactions {
         return iq;
     }
 
-    private static String buildImageStanza(String type, String id, String contactId, String fileUrl)
+    private static String buildImageStanza(boolean isGroup, String id,
+                                           String destinationId, String fileUrl)
     {
+        String type;
+        if(isGroup) type = Constants.XMPP_STANZA_TYPE_GROUPCHAT;
+        else type = Constants.XMPP_STANZA_TYPE_CHAT;
+
         String message = "<"+Constants.XMPP_ELEMENT_MESSAGE+" "+Constants.XMPP_ATTR_TYPE+"=\""+type+"\" " +
                 Constants.XMPP_ATTR_ID+"=\""+id+"\" " +
-                Constants.XMPP_ATTR_TO+"=\""+contactId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
+                Constants.XMPP_ATTR_TO+"=\""+destinationId+"@"+Constants.XMPP_PARAM_DOMAIN+"\" " +
                 Constants.XMPP_ATTR_FROM+"=\""+_profile_id+"@"+Constants.XMPP_PARAM_DOMAIN+"/"+_device_id+"\" " +
                 Constants.XMPP_ATTR_MEDIATYPE+"=\""+Constants.XMPP_MESSAGE_MEDIATYPE_IMAGE+"\" " +
                 Constants.XMPP_ATTR_FILEURL+"=\""+fileUrl+"\"/>";
@@ -691,7 +702,7 @@ public final class XMPPTransactions {
             if(to.compareTo(_profile_id)==0 &&
                     (getXMPPStatusOrder(status) <
                                     getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
-                notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
+                notifyIQMessageStatus(false, newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
 
@@ -777,7 +788,7 @@ public final class XMPPTransactions {
             if(to.compareTo(_profile_id)==0 &&
                     (getXMPPStatusOrder(status) <
                                     getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
-                notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
+                notifyIQMessageStatus(false, newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
 
@@ -827,12 +838,11 @@ public final class XMPPTransactions {
             try {
                 sentTime = Long.parseLong(sentTimeStr);
             } catch (Exception e) {
-                Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyMessageReceived: " +
+                Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyGroupMessageReceived: " +
                         "Error parsing sent time");
             }
 
-            groupTx =
-                    new RealmGroupChatTransactions(_appContext, _profile_id);
+            groupTx = new RealmGroupChatTransactions(_appContext, _profile_id);
 
             //Check if chat message has already been received
             if(groupTx.existsChatMessageById(id))
@@ -845,7 +855,6 @@ public final class XMPPTransactions {
                 read = Constants.CHAT_MESSAGE_READ;
 
             ChatMessage newChatMessage = null;
-            String contactId = null;
 
             if(from.compareTo(_profile_id)!=0) {
                 newChatMessage = groupTx.newGroupChatMessageInstance(groupId, from,
@@ -879,17 +888,17 @@ public final class XMPPTransactions {
                 groupTx.insertOrUpdateGroupChat(chat);
             }
 
+            if(from.compareTo(_profile_id)!=0 &&
+                    (getXMPPStatusOrder(status) <
+                            getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
+                notifyIQMessageStatus(true, newChatMessage.getId(), newChatMessage.getGroup_id(),
+                        Constants.CHAT_MESSAGE_STATUS_DELIVERED);
+            }
+
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
             chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
-
-            if(from.compareTo(_profile_id)!=0 &&
-                    (getXMPPStatusOrder(status) <
-                            getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
-                notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
-                        Constants.CHAT_MESSAGE_STATUS_DELIVERED);
-            }
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
@@ -905,16 +914,34 @@ public final class XMPPTransactions {
 
     private static boolean saveAndNotifyGroupImageReceived(XmlPullParser parser)
     {
-        if(true) return true;
-        RealmChatTransactions chatTx = null;
+        RealmGroupChatTransactions groupTx = null;
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
-            String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
+            String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
-            String url = parser.getAttributeValue("", Constants.XMPP_ATTR_FILEURL);
+            String receiver = parser.getAttributeValue("", Constants.XMPP_ATTR_RECEIVER);
             String sentTimeStr = parser.getAttributeValue("", Constants.XMPP_ATTR_SENT);
+            String url = parser.getAttributeValue("", Constants.XMPP_ATTR_FILEURL);
 
             if(url==null) return false;
+
+            groupTx = new RealmGroupChatTransactions(_appContext, _profile_id);
+
+            //Check if chat message has already been received
+            if(groupTx.existsChatMessageById(id))
+                return false;
+
+            if(groupId.contains("@")) groupId = groupId.substring(0, groupId.indexOf("@"));
+            if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
+            if(receiver.contains("@")) receiver = receiver.substring(0, receiver.indexOf("@"));
+
+            if(receiver.compareTo(_profile_id)!=0) return false;
+
+            String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
+            if(status==null) status = Constants.CHAT_MESSAGE_STATUS_NOT_SENT;
+            String read = Constants.CHAT_MESSAGE_NOT_READ;
+            if(status.compareTo(Constants.CHAT_MESSAGE_STATUS_READ)==0)
+                read = Constants.CHAT_MESSAGE_READ;
 
             long sentTime = Calendar.getInstance().getTimeInMillis();
 
@@ -925,63 +952,50 @@ public final class XMPPTransactions {
                         "Error parsing sent time");
             }
 
-            chatTx = new RealmChatTransactions(_appContext);
-
-            //Check if chat message has already been received
-            if(chatTx.existsChatMessageById(id))
-                return false;
-
-            if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
-            if(to.contains("@")) to = from.substring(0, to.indexOf("@"));
-
-            String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
-            if(status==null) status = Constants.CHAT_MESSAGE_STATUS_NOT_SENT;
-            String read = Constants.CHAT_MESSAGE_NOT_READ;
-            if(status.compareTo(Constants.CHAT_MESSAGE_STATUS_READ)==0)
-                read = Constants.CHAT_MESSAGE_READ;
-
             ChatMessage newChatMessage = null;
-            String contactId = null;
 
-            if(to.compareTo(_profile_id)==0) {
-                newChatMessage = chatTx.newChatMessageInstance(from,
+            if(from.compareTo(_profile_id)!=0) {
+                newChatMessage = groupTx.newGroupChatMessageInstance(groupId, from,
                         Constants.CHAT_MESSAGE_DIRECTION_RECEIVED,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
                         "", url, id, sentTime, status, read);
-
-                contactId = from;
             }
-            else if(from.compareTo(_profile_id)==0) {
-                newChatMessage = chatTx.newChatMessageInstance(to,
+            else if(from.compareTo(_profile_id)==0){
+                newChatMessage = groupTx.newGroupChatMessageInstance(groupId, "",
                         Constants.CHAT_MESSAGE_DIRECTION_SENT,
                         Constants.CHAT_MESSAGE_TYPE_IMAGE,
                         "", url, id, sentTime, status, read);
-
-                contactId = to;
             }
 
             if(newChatMessage == null) return false;
 
+            //Save ChatMessage to DB
+            groupTx.insertGroupChatMessage(groupId, newChatMessage);
+
             //Load chat and create if it didn't exist
-            Chat chat = chatTx.getChatByContactId(contactId);
+            GroupChat chat = groupTx.getGroupChatById(groupId);
 
-            if(chat==null) chat = chatTx.newChatInstance(contactId);
-            chat = chatTx.updatedChatInstance(chat, newChatMessage);
+            if(chat==null) {
+                //Get group from API in background, and save to Realm
+                new DownloadAndSaveGroupChatAsyncTask()
+                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                                _appContext, Constants.SINGLE_GROUP_CHAT_API, groupId, id);
+            }
+            else {
+                chat = groupTx.updatedGroupChatInstance(chat, newChatMessage);
+                groupTx.insertOrUpdateGroupChat(chat);
+            }
 
-            chatTx.insertChat(chat);
-            chatTx.insertChatMessage(newChatMessage);
-
-            //Send IQ
+            //Send event and IQ
             if(from.compareTo(_profile_id)!=0 &&
                     (getXMPPStatusOrder(status) <
                             getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
-                notifyIQMessageStatus(newChatMessage.getId(), newChatMessage.getContact_id(),
+                notifyIQMessageStatus(true, newChatMessage.getId(), newChatMessage.getGroup_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
 
             //Download to file
-            if(!downloadToChatFile(url, id))
-                return false;
+            downloadToChatFile(url, id);
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
@@ -994,8 +1008,7 @@ public final class XMPPTransactions {
             return false;
         }
         finally {
-            if(null != chatTx)
-                chatTx.closeRealm();
+            if(null!=groupTx) groupTx.closeRealm();
         }
 
         return true;
@@ -1123,16 +1136,16 @@ public final class XMPPTransactions {
         return true;
     }
 
-    public static boolean notifyIQMessageStatus(final String msgId, final String msgContactId,
-                                                final String status)
+    public static boolean notifyIQMessageStatus(final boolean isGroup, final String msgId,
+                                                final String destinationId, final String status)
     {
         //Sends the IQ stanza to notify
         try {
             Stanza st = new Stanza() {
                 @Override
                 public CharSequence toXML() {
-                    String message = buildIQStanza(Constants.XMPP_STANZA_TYPE_CHAT,
-                            msgId, msgContactId, status);
+                    String message = buildIQStanza(isGroup,
+                            msgId, destinationId, status);
 
                     return message;
                 }
@@ -1157,11 +1170,17 @@ public final class XMPPTransactions {
         else return 3; //Read
     }
 
-    public static void sendReadIQReceivedMessagesList(ArrayList<ChatMessage> messages)
+    public static void sendReadIQReceivedMessagesList(boolean isGroup,
+                                                      ArrayList<ChatMessage> messages)
     {
-        for(int i=0; i<messages.size(); i++)
-            notifyIQMessageStatus(messages.get(i).getId(), messages.get(i).getContact_id(),
-                    Constants.CHAT_MESSAGE_STATUS_READ);
+        for(int i=0; i<messages.size(); i++) {
+            if(isGroup)
+                notifyIQMessageStatus(isGroup, messages.get(i).getId(),
+                        messages.get(i).getGroup_id(), Constants.CHAT_MESSAGE_STATUS_READ);
+            else
+                notifyIQMessageStatus(isGroup, messages.get(i).getId(),
+                        messages.get(i).getContact_id(), Constants.CHAT_MESSAGE_STATUS_READ);
+        }
     }
 
     /*

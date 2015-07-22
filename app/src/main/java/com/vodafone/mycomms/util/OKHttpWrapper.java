@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.squareup.okhttp.Callback;
@@ -8,6 +9,10 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
+import com.vodafone.mycomms.login.LoginSignupActivity;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 
 import java.io.IOException;
 
@@ -41,10 +46,10 @@ public class OKHttpWrapper {
 //                        "150")
                 .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
                         Utils.getHttpHeaderContentType())
-//                .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-//                        Utils.getHttpHeaderAuth(context))
                 .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-                        "aasa")
+                        Utils.getHttpHeaderAuth(context))
+//                .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+//                        "aasa")
 //                .method(method, method.equals("GET") ? null : new RequestBody() {
 //                    @Override
 //                    public MediaType contentType() {
@@ -63,18 +68,12 @@ public class OKHttpWrapper {
             public void onFailure(Request request, IOException e) {
 //                Toast.makeText(context, "Error connecting", Toast.LENGTH_LONG).show();
                 Log.e(Constants.TAG, "OKHttpWrapper.onFailure: error " , e);
-                cb.onFailure(null, e);
 
-                /*
-                1. Sin conexion: Si no hay conexion o ha dado un timeout,
-                se debe devolver un onError
-                2. Error de backend (creo que es un 500): Si el backend devuelve
-                un mensaje en formato HTML (buscar el string de enconding) debe devolver un onError
-                3. Update de version: En caso de capturarlo, debe ir a la SplashScreen (esta ya se
-                ocupara de actualizar)
-                4. Unauthorized (status 4XX creo): Es porque ha expirado las credenciales.
-                Se debe lanzar un renew de usuario y si da error mandarlo a la LoginSignUpActivity
-                 */
+                OKHttpErrorReceivedEvent errorEvent = new OKHttpErrorReceivedEvent();
+                errorEvent.setErrorMessage("Connection Error");//TODO: Hardcoded Strings
+                BusProvider.getInstance().post(errorEvent);
+
+                cb.onFailure(null, e);
             }
 
             @Override
@@ -82,19 +81,31 @@ public class OKHttpWrapper {
                 Response test = response;
                 if (!response.isSuccessful()) {
                     int code = response.code();
+                    OKHttpErrorReceivedEvent errorEvent = new OKHttpErrorReceivedEvent();
                     if (code >= 500){
+                        //Backend Error
                         Log.e(Constants.TAG, "OKHttpWrapper.onResponse: error code " + code);
+                        errorEvent.setErrorMessage("Error code " + code);//TODO: Hardcoded Strings
+
                     } else if (code >=400 && code < 500){
-                        //New version
                         if (code == 400){
                             //New version
-                            //TEST OK
+                            errorEvent.setErrorMessage("Download new MyComms Version. Error code " + code);//TODO: Hardcoded Strings
+                            Intent in = new Intent(context, SplashScreenActivity.class);
+                            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(in);
                         } else if (code == 401){
                             //Unauthorized
-                            //TEST OK
+                            errorEvent.setErrorMessage("Unauthorized User. Error code " + code);//TODO: Hardcoded Strings
+                            Intent in = new Intent(context, LoginSignupActivity.class);
+                            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            context.startActivity(in);
                         } else {
-
+                            errorEvent.setErrorMessage("Error code " + code);//TODO: Hardcoded Strings
                         }
+                        if (errorEvent!=null)
+                            BusProvider.getInstance().post(errorEvent);
+
                         Log.e(Constants.TAG, "OKHttpWrapper.onResponse: error code " + code);
                     }
                     cb.onFailure(response, null);

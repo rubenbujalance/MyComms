@@ -50,40 +50,7 @@ public class RecentContactController {
             OKHttpWrapper.get(Constants.CONTACT_API_GET_RECENTS, mContext, new OKHttpWrapper.HttpCallback() {
                 @Override
                 public void onFailure(Response response, IOException e) {
-                    // handle failure
-                    try {
-                        if (null == response)
-                        {
-                            //Call Bus Event with Toast
-                            //Toast.makeText(mContext, "Connection Error " + e, Toast.LENGTH_LONG).show();
-                        }
-                        else
-                        {
-                            int code = response.code();
-                            if (code >= 500)
-                            {
-                                //Backend error
-                                //Call Bus Event with Toast
-                                //Toast.makeText(mContext, "Internal Error. Unable to access Mycomms server " + e, Toast.LENGTH_LONG).show();
-                            }
-                            else if (code >= 400 && code < 500)
-                            {
-                                if (code == 400){
-                                    //New version
-                                    //TEST OK
-                                } else if (code == 401){
-                                    //Unauthorized
-                                    //TEST OK
-                                } else {
-                                    //Call Bus Event with Toast
-                                    //Toast.makeText(mContext, "Error code " + code, Toast.LENGTH_LONG).show();
-                                }
-                            }
-                            Log.i(Constants.TAG, "RecentContactController.onFailure:");
-                        }
-                    } catch (Exception err){
-                        Log.e(Constants.TAG, "RecentContactController.onFailure: ", err);
-                    }
+                    Log.i(Constants.TAG, "RecentContactController.onFailure:");
                 }
 
                 @Override

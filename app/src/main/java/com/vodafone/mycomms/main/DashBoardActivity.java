@@ -685,7 +685,7 @@ public class DashBoardActivity extends ToolbarActivity
                         contacts = new ArrayList<>();
                         RealmContactTransactions realmTransaction =
                                 new RealmContactTransactions(_profileId);
-                        loadContactsFromIds(contactIds, realmTransaction);
+                        loadContactsFromIds(contactIds);
 
                         for(final ImageView image : images)
                         {
@@ -715,8 +715,6 @@ public class DashBoardActivity extends ToolbarActivity
                                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
                                 Crashlytics.logException(e);
                             }
-                            Utils.loadContactAvatar(contact.getFirstName(), contact.getLastName()
-                                    , image, text, contact.getAvatar());
                         }
                         // Names
                         firstNameView.setText("Group(" + contacts.size() + ")");
@@ -905,52 +903,6 @@ public class DashBoardActivity extends ToolbarActivity
                 Contact contact = realmContactTransactions.getContactById(contactId);
                 Utils.loadContactAvatar(firstName, lastName, recentAvatar, avatarText, Utils
                         .getAvatarURL(platform, contact.getStringField1(), contact.getAvatar()));
-
-                //RBM - NEW Avatar management ****************************
-                recentAvatar.setImageResource(R.color.grey_middle);
-                avatarText.setVisibility(View.VISIBLE);
-                avatarText.setText(nameInitials);
-                avatarText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-                if (avatar != null &&
-                    avatar.length() > 0)
-                {
-                    MycommsApp.picasso
-                            .load(avatar)
-                            .placeholder(R.color.grey_middle)
-                            .noFade()
-                            .fit().centerCrop()
-                            .into(recentAvatar, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    avatarText.setVisibility(View.INVISIBLE);
-                                }
-
-                                @Override
-                                public void onError() {
-                                    recentAvatar.setImageResource(R.color.grey_middle);
-                                    avatarText.setVisibility(View.VISIBLE);
-                                    avatarText.setText(nameInitials);
-                                }
-                            });
-
-                }
-
-                //********************************************************
-                //TODO: Check if this code is necessary
-                //Local avatar
-                if (avatar != null &&
-                        avatar.length() > 0 &&
-                        platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
-                    Picasso.with(DashBoardActivity.this)
-                            .load(avatar)
-                            .fit().centerCrop()
-                            .into(recentAvatar);
-                } else if  (platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL) &&
-                        avatar == null ||
-                        avatar.length() < 0) {
-                    recentAvatar.setImageResource(R.color.grey_middle);
-                    avatarText.setText(nameInitials);
-                }
 
                 // Badges
                 RealmChatTransactions realmChatTransactions = new RealmChatTransactions(getBaseContext());

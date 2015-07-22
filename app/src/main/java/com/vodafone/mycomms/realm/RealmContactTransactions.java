@@ -374,6 +374,12 @@ public class RealmContactTransactions {
         mRealm.commitTransaction();
     }
 
+    public void updateSFAvatar(Contact contact, String SF_URL) {
+        mRealm.beginTransaction();
+        contact.setStringField1(SF_URL);
+        mRealm.commitTransaction();
+    }
+
     public void setContactSFAvatarURL(String contactId, String URL)
     {
         mRealm.beginTransaction();

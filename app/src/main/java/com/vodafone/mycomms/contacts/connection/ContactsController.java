@@ -187,6 +187,30 @@ public class ContactsController extends BaseController {
 
             RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
             realmContactTransactions.insertContactList(realmContactList);
+
+            //            if(null != jsonObject.getString(Constants.CONTACT_ID) && null !=
+//                    realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID)))
+//            {
+//                String SF_URL = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+//                        .getStringField1();
+//                if(null != SF_URL)
+//                    contact.setStringField1(SF_URL);
+//            }
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                jsonObject = jsonArray.getJSONObject(i);
+
+                if(null != jsonObject.getString(Constants.CONTACT_ID)){
+                    contact = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID));
+                    if (null != contact){
+                        String SF_URL = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+                                .getStringField1();
+                        if(null != SF_URL)
+                            realmContactTransactions.updateSFAvatar(contact, SF_URL);
+                    }
+                }
+            }
+
             realmContactTransactions.closeRealm();
 
             //new DownloadAvatars().execute(realmContactList);
@@ -435,14 +459,14 @@ public class ContactsController extends BaseController {
             sortHelper = sortHelper.trim();
             contact.setSortHelper(sortHelper);
 
-            if(null != jsonObject.getString(Constants.CONTACT_ID) && null !=
-                    realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID)))
-            {
-                String SF_URL = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
-                        .getStringField1();
-                if(null != SF_URL)
-                    contact.setStringField1(SF_URL);
-            }
+//            if(null != jsonObject.getString(Constants.CONTACT_ID) && null !=
+//                    realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID)))
+//            {
+//                String SF_URL = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+//                        .getStringField1();
+//                if(null != SF_URL)
+//                    contact.setStringField1(SF_URL);
+//            }
 
 
         }catch (JSONException e){

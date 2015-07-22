@@ -18,10 +18,12 @@ import java.io.IOException;
 public class ContactController {
     private Context mContext;
     private int offsetPaging = 0;
+    private String mProfileId;
     private ContactsController contactsController;
 
     public ContactController(Context context, String profileId) {
         this.mContext = context;
+        this.mProfileId = profileId;
         contactsController = new ContactsController(mContext, profileId);
     }
 
@@ -45,8 +47,9 @@ public class ContactController {
                             if (json != null && json.trim().length() > 0) {
                                 JSONObject jsonResponse = new JSONObject(json);
 
+                                ContactsController contactsController = new ContactsController(mContext, mProfileId);
                                 contactsController.insertContactListInRealm(jsonResponse);
-
+                                contactsController.closeRealm();
                                 //Update Contact List View on every pagination
                                 BusProvider.getInstance().post(new SetContactListAdapterEvent());
 

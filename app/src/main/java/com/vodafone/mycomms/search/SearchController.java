@@ -263,13 +263,16 @@ public class SearchController extends BaseController
                 contact.setFirstName(jsonObject.getString(Constants.CONTACT_FNAME));
             if (!jsonObject.isNull(Constants.CONTACT_LNAME))
                 contact.setLastName(jsonObject.getString(Constants.CONTACT_LNAME));
-            if (!jsonObject.isNull(Constants.CONTACT_AVATAR)) contact.setAvatar(jsonObject.getString(Constants.CONTACT_AVATAR));
+            if (!jsonObject.isNull(Constants.CONTACT_AVATAR))
+                contact.setAvatar(jsonObject.getString(Constants.CONTACT_AVATAR));
             if (!jsonObject.isNull(Constants.CONTACT_POSITION))
                 contact.setPosition(jsonObject.getString(Constants.CONTACT_POSITION));
-            if (!jsonObject.isNull(Constants.CONTACT_COMPANY)) contact.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
+            if (!jsonObject.isNull(Constants.CONTACT_COMPANY))
+                contact.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
             if (!jsonObject.isNull(Constants.CONTACT_TIMEZONE))
                 contact.setTimezone(jsonObject.getString(Constants.CONTACT_TIMEZONE));
-            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) contact.setLastSeen(jsonObject.getLong(Constants.CONTACT_LASTSEEN));
+            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN))
+                contact.setLastSeen(jsonObject.getLong(Constants.CONTACT_LASTSEEN));
             if (!jsonObject.isNull(Constants.CONTACT_OFFICE_LOC))
                 contact.setOfficeLocation(jsonObject.getString(Constants.CONTACT_OFFICE_LOC));
             if (!jsonObject.isNull(Constants.CONTACT_PHONES))

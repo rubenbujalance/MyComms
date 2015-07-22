@@ -242,7 +242,7 @@ public class RealmGroupChatTransactions {
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, groupId)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
-                    .notEqualTo(Constants.CHAT_MESSAGE_FIELD_STATUS, Constants.CHAT_MESSAGE_STATUS_READ);
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ);
 
             RealmResults<ChatMessage> results = query.findAll();
 
@@ -306,16 +306,20 @@ public class RealmGroupChatTransactions {
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ);
 
             RealmResults<ChatMessage> results = query.findAll();
+            int size = results.size();
 
-            for (int i = 0; i<results.size(); i++)
-                results.get(i).setRead(Constants.CHAT_MESSAGE_READ);
-
-            mRealm.commitTransaction();
+            //Seteamos siempre el elemento 0 porque Realm recalcula la lista a cada SET
+            for(int i = 0; i < size; i++)
+            {
+                results.get(0).setRead(Constants.CHAT_MESSAGE_READ);
+            }
 
         } catch (Exception e){
             Log.e(Constants.TAG, "RealmGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead: ", e);
             Crashlytics.logException(e);
             mRealm.cancelTransaction();
+        } finally {
+            mRealm.commitTransaction();
         }
     }
 

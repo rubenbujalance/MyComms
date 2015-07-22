@@ -505,7 +505,7 @@ public class RealmChatTransactions {
 //    }
 
     public void closeRealm() {
-        if(mRealm!=null) mRealm.close();
+//        if(mRealm!=null && !Utils.isMainThread()) mRealm.close();
         contactTx.closeRealm();
     }
 

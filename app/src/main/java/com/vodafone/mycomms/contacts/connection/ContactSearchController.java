@@ -107,6 +107,8 @@ public class ContactSearchController extends BaseController {
 
                 ContactsController contactsController = new ContactsController(mContext, mProfileId);
                 contactsController.insertContactListInRealm(jsonResponse);
+                contactsController.closeRealm();
+                contactsController = new ContactsController(mContext, mProfileId);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
                 contactsController.closeRealm();
 

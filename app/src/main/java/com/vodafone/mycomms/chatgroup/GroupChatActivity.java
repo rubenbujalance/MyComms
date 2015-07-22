@@ -1,9 +1,11 @@
 package com.vodafone.mycomms.chatgroup;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,8 +15,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -60,6 +64,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -496,19 +501,37 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     {
         Log.i(Constants.TAG, "GroupChatActivity.imageSent: ");
         //Save to DB
-        ChatMessage chatMsg = chatTransactions.newChatMessageInstance(
-                _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
-                Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl,
-                Constants.CHAT_MESSAGE_STATUS_NOT_SENT, Constants.CHAT_MESSAGE_NOT_READ);
+        ChatMessage chatMsg;
 
-        _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+        if(isGroupChatMode) {
+            chatMsg = mGroupChatTransactions.newGroupChatMessageInstance(
+                    _groupChat.getId(), "", Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                    Constants.CHAT_MESSAGE_TYPE_IMAGE,"", imageUrl,
+                    Constants.CHAT_MESSAGE_STATUS_NOT_SENT, Constants.CHAT_MESSAGE_NOT_READ);
 
-        chatTransactions.insertChat(_chat);
-        chatTransactions.insertChatMessage(chatMsg);
+            _groupChat = mGroupChatTransactions.updatedGroupChatInstance(_groupChat, chatMsg);
+
+            mGroupChatTransactions.insertOrUpdateGroupChat(_groupChat);
+            mGroupChatTransactions.insertGroupChatMessage(_groupId, chatMsg);
+        }
+        else {
+            chatMsg = chatTransactions.newChatMessageInstance(
+                    _chat.getContact_id(), Constants.CHAT_MESSAGE_DIRECTION_SENT,
+                    Constants.CHAT_MESSAGE_TYPE_IMAGE, "", imageUrl,
+                    Constants.CHAT_MESSAGE_STATUS_NOT_SENT, Constants.CHAT_MESSAGE_NOT_READ);
+
+            _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
+
+            chatTransactions.insertChat(_chat);
+            chatTransactions.insertChatMessage(chatMsg);
+        }
 
         //Send through XMPP
-        XMPPTransactions.sendImage(_contactId, Constants.XMPP_STANZA_TYPE_CHAT,
-                chatMsg.getId(), imageUrl);
+        String groupContactId;
+        if(isGroupChatMode) groupContactId = _groupId;
+        else groupContactId = _contactId;
+
+        XMPPTransactions.sendImage(isGroupChatMode, groupContactId, chatMsg.getId(), imageUrl);
 
         //Save and show
         String dirStr = getFilesDir() + Constants.CONTACT_CHAT_FILES;
@@ -615,7 +638,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             messages = chatTransactions.getNotReadReceivedContactChatMessages(_contactId);
 
         if (messages != null && messages.size() > 0) {
-            XMPPTransactions.sendReadIQReceivedMessagesList(messages);
+            XMPPTransactions.sendReadIQReceivedMessagesList(isGroupChatMode, messages);
             if(isGroupChatMode)
                 mGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead(_groupId);
             else chatTransactions.setContactAllChatMessagesReceivedAsRead(_contactId);
@@ -713,11 +736,24 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
         {
             Uri selectedImage = data.getData();
-            photoPath = getRealPathFromURI(selectedImage);
-            Bitmap photoBitmap = decodeFile(photoPath);
 
-            sendFile sendFile = new sendFile();
-            sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, photoBitmap);
+            try {
+                if (Build.VERSION.SDK_INT < 19) {
+                    photoPath = getRealPathFromURI_API11to18(selectedImage);
+                } else if (Build.VERSION.SDK_INT < 22) {
+                    photoPath = getRealPathFromURI_API11to18(selectedImage);
+                } else {
+                    selectedImage = transformUriAPI22(selectedImage);
+                    photoPath = getRealPathFromURI_API11to18(selectedImage);
+                }
+
+                Bitmap photoBitmap = decodeFile(photoPath);
+
+                sendFile sendFile = new sendFile();
+                sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, photoBitmap);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "GroupChatActivity.onActivityResult: ",e);
+            }
         }
     }
 
@@ -808,6 +844,67 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             result = cursor.getString(idx);
             cursor.close();
+        }
+        return result;
+    }
+    @SuppressLint("NewApi")
+    public Uri transformUriAPI22(Uri selectedImage) {
+        if (selectedImage != null && selectedImage.toString().length() > 0) {
+            try {
+                final String extractUriFrom = selectedImage.toString();
+                String firstExtraction = extractUriFrom.contains("com.google.android.apps.photos.contentprovider") ? extractUriFrom.split("/1/")[1] : extractUriFrom;
+                firstExtraction = firstExtraction.contains("/ACTUAL") ? firstExtraction.replace("/ACTUAL", "").toString() : firstExtraction;
+
+                String secondExtraction = URLDecoder.decode(firstExtraction, "UTF-8");
+                selectedImage = Uri.parse(secondExtraction);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "GroupChatActivity.transformUriAPI22: ",e);
+            }
+        }
+
+        return selectedImage;
+    }
+
+    @SuppressLint("NewApi")
+    public String getRealPathFromURI_API19(Uri uri){
+        String filePath = "";
+        String wholeID = DocumentsContract.getDocumentId(uri);
+
+        // Split at colon, use second item in the array
+        String id = wholeID.split(":")[1];
+
+        String[] column = { MediaStore.Images.Media.DATA };
+
+        // where id is equal to
+        String sel = MediaStore.Images.Media._ID + "=?";
+
+        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                column, sel, new String[]{ id }, null);
+
+        int columnIndex = cursor.getColumnIndex(column[0]);
+
+        if (cursor.moveToFirst()) {
+            filePath = cursor.getString(columnIndex);
+        }
+        cursor.close();
+        return filePath;
+    }
+
+    @SuppressLint("NewApi")
+    public String getRealPathFromURI_API11to18(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        String result = null;
+
+        CursorLoader cursorLoader = new CursorLoader(
+                this,
+                contentUri, proj, null, null, null);
+        Cursor cursor = cursorLoader.loadInBackground();
+
+        if(cursor != null){
+            int column_index =
+                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            result = cursor.getString(column_index);
         }
         return result;
     }

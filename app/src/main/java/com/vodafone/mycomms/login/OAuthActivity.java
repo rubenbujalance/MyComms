@@ -2,6 +2,7 @@ package com.vodafone.mycomms.login;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
@@ -31,16 +31,19 @@ import com.vodafone.mycomms.util.UserSecurity;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class OAuthActivity extends Activity {
 
-    private WebView wvOAuth;
-    private RelativeLayout relativeContainer;
+    WebView wvOAuth;
     String oauthPrefix;
+
     private boolean isForeground;
 
-    private boolean loadingFinished = true;
-    private boolean redirect = false;
+    private boolean pageStarted;
+    private RelativeLayout relativeContainer;
+
+    private Map<String,String> noCacheHeaders;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +52,14 @@ public class OAuthActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_oauth_web);
 
+        //Load no-cache headers
+        noCacheHeaders = new HashMap<>(2);
+        noCacheHeaders.put("Pragma", "no-cache");
+        noCacheHeaders.put("Cache-Control", "no-cache");
+
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);
         relativeContainer = (RelativeLayout)findViewById(R.id.relative_container);
-        relativeContainer.setVisibility(View.INVISIBLE);
+//        relativeContainer.setVisibility(View.INVISIBLE);
 
         //Register Otto Bus
         BusProvider.getInstance().register(this);
@@ -63,17 +71,11 @@ public class OAuthActivity extends Activity {
         wvOAuth.getSettings().setJavaScriptEnabled(true);
         wvOAuth.getSettings().setSupportMultipleWindows(true);
         wvOAuth.getSettings().setAppCacheEnabled(false);
-        wvOAuth.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         setWebViewListener();
-//        wvOAuth.setWebViewClient(new WebViewClient() {
-//            @Override
-//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//
-//            }
-//
-//        });
-        wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix);
 
+        //Launch OAuth corresponding URL
+        wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix,
+                noCacheHeaders);
     }
 
     @Override
@@ -150,9 +152,7 @@ public class OAuthActivity extends Activity {
                 UserProfile.setOauthPrefix(oauthPrefix);
                 UserProfile.setPosition(jsonResponse.getString("position"));
 
-                Intent in = new Intent(OAuthActivity.this, SignupMailActivity.class);
-                startActivity(in);
-                finish();
+                goToSignUp();
             }
             else
             {
@@ -169,7 +169,7 @@ public class OAuthActivity extends Activity {
     @Subscribe
     public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
         if(!isForeground) return;
-        Log.i(Constants.TAG, "OAuthActivity.onApplicationAndProfileInitializedEvent: ");
+        Log.e(Constants.TAG, "OAuthActivity.onApplicationAndProfileInitializedEvent: ");
 
         goToApp();
     }
@@ -190,34 +190,34 @@ public class OAuthActivity extends Activity {
         }
     }
 
+    private void goToSignUp()
+    {
+        //Go to app
+        wvOAuth.clearCache(true);
+        Intent in = new Intent(OAuthActivity.this, SignupMailActivity.class);
+        startActivity(in);
+        finish();
+    }
+
     private void goToApp()
     {
         //Go to app
+        wvOAuth.clearCache(true);
         Intent in = new Intent(OAuthActivity.this, DashBoardActivity.class);
         startActivity(in);
         finish();
     }
 
-    private class CallOAuthCallback extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>>
-    {
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-        }
-
+    private class CallOAuthCallback extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
         @Override
         protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
             return APIWrapper.httpGetAPI((String)params[2].get("url"), params[1], OAuthActivity.this);
         }
         @Override
-        protected void onPostExecute(HashMap<String,Object> result)
-        {
-            super.onPostExecute(result);
+        protected void onPostExecute(HashMap<String,Object> result) {
             callbackOAuthCallback(result);
         }
     }
-
 
     @Override
     protected void onResume() {
@@ -240,8 +240,17 @@ public class OAuthActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, String urlNewString) {
                 //If it is callback url, call api to get token
                 if (Uri.parse(urlNewString).getPath().compareTo("/auth/" + oauthPrefix + "/callback") == 0) {
+                    relativeContainer.setVisibility(View.VISIBLE);
+                    wvOAuth.setVisibility(View.INVISIBLE);
+
                     callOAuthCallback(Uri.parse(urlNewString).getPath() + "?" +
                             Uri.parse(urlNewString).getQuery());
+//                    view.clearCache(true);
+//                    Utils.clearCacheFolder(getApplicationContext().getCacheDir(), 1);
+                    return true;
+                }
+                else {
+                    view.loadUrl(urlNewString, noCacheHeaders);
                     return true;
                 }
 //                else {
@@ -252,26 +261,32 @@ public class OAuthActivity extends Activity {
 //                    loadingFinished = false;
 //
                     // Otherwise, continue...
-                    return false;
+//                    return false;
 //                }
             }
 
-//            @Override
-//            public void onPageStarted(WebView view, String url, Bitmap facIcon)
-//            {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap facIcon)
+            {
+                super.onPageStarted(view,url,facIcon);
+                relativeContainer.setVisibility(View.VISIBLE);
+                wvOAuth.setVisibility(View.INVISIBLE);
+
 //                loadingFinished = false;
-//                /*if(!progressDialog.isShowing())
-//                    progressDialog.show();*/
 //                if(relativeContainer.getVisibility() != View.VISIBLE)
 //                {
 //                    relativeContainer.setVisibility(View.VISIBLE);
 //                    wvOAuth.setVisibility(View.INVISIBLE);
 //                }
-//            }
-//
-//            @Override
-//            public void onPageFinished(WebView view, String url)
-//            {
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url)
+            {
+                super.onPageFinished(view, url);
+                relativeContainer.setVisibility(View.INVISIBLE);
+                wvOAuth.setVisibility(View.VISIBLE);
+
 //                if(!redirect){
 //                    loadingFinished = true;
 //                }
@@ -286,7 +301,8 @@ public class OAuthActivity extends Activity {
 //                } else{
 //                    redirect = false;
 //                }
-//            }
+//                view.clearCache(true);
+            }
 
         });
     }

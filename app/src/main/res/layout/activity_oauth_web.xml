@@ -9,15 +9,15 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.vodafone.mycomms.custom.CircleImageView
-            android:id="@+id/image_test"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_centerInParent="true"
-            android:visibility="gone"
-            android:background="@drawable/icon_platform_mycomms"/>
+        <!--<com.vodafone.mycomms.custom.CircleImageView-->
+            <!--android:id="@+id/image_test"-->
+            <!--android:layout_width="50dp"-->
+            <!--android:layout_height="50dp"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:visibility="gone"-->
+            <!--android:background="@drawable/icon_platform_mycomms"/>-->
 
         <ProgressBar
             android:id="@+id/progress"
@@ -26,14 +26,13 @@
             android:layout_height="100dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_centerInParent="true"
-            android:visibility="visible"/>
+            android:layout_centerInParent="true" />
 
     </RelativeLayout>
 
     <WebView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/wvOAuth" />
 </RelativeLayout>

@@ -143,6 +143,7 @@ public class SearchController extends BaseController
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
                 contact = mapContact(jsonObject, mProfileId);
+
                 realmContactList.add(contact);
                 doRefreshAdapter = (i==jsonArray.length()-1);
                 updateContactAvatar(contact, doRefreshAdapter);
@@ -247,7 +248,7 @@ public class SearchController extends BaseController
         return true;
     }
 
-    public static Contact mapContact(JSONObject jsonObject, String profileId){
+    public Contact mapContact(JSONObject jsonObject, String profileId){
         Contact contact = new Contact();
         try {
             contact.setProfileId(profileId);
@@ -284,9 +285,9 @@ public class SearchController extends BaseController
             contact.setSearchHelper
                     ((
                                     Utils.normalizeStringNFD(contact.getFirstName()) + " " +
-                                    Utils.normalizeStringNFD(contact.getLastName()) + " " +
-                                    Utils.normalizeStringNFD(contact.getCompany()) + " " +
-                                    Utils.normalizeStringNFD(contact.getEmails())).trim()
+                                            Utils.normalizeStringNFD(contact.getLastName()) + " " +
+                                            Utils.normalizeStringNFD(contact.getCompany()) + " " +
+                                            Utils.normalizeStringNFD(contact.getEmails())).trim()
                     );
 
             contact.setSortHelper
@@ -295,6 +296,12 @@ public class SearchController extends BaseController
                                     Utils.normalizeStringNFD(contact.getLastName()) + " " +
                                     Utils.normalizeStringNFD(contact.getCompany())).trim()
                     );
+
+            String SF_URL = realmContactTransactions.getContactById(contact.getContactId())
+                    .getStringField1();
+            if(null != SF_URL)
+                contact.setStringField1(SF_URL);
+
         }catch (JSONException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: " + e.toString());

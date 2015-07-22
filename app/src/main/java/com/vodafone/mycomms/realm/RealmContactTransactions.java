@@ -368,7 +368,10 @@ public class RealmContactTransactions {
         mRealm.beginTransaction();
         Contact contact = getContactById(contactId);
         contact.setStringField1(URL);
-        mRealm.copyToRealmOrUpdate(contact);
+        contact = mRealm.copyToRealmOrUpdate(contact);
+        String updatedURL = contact.getStringField1();
+        Log.i(Constants.TAG, "RealmContactTransactions.setContactSFAvatarURL: Object Updated with" +
+                " URL" + "->"+updatedURL);
         mRealm.commitTransaction();
     }
 

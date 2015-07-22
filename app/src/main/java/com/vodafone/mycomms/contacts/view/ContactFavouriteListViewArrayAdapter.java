@@ -74,6 +74,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         if(null != contact.getPlatform()
                 && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
+            viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
         }
         else if (null != contact.getPlatform()

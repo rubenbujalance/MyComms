@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.util.TypedValue;
@@ -28,8 +27,6 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
-import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
-import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
@@ -41,7 +38,6 @@ import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
-import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,11 +55,9 @@ import model.RecentContact;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends ListFragment implements ISearchConnectionCallback, IContactsRefreshConnectionCallback {
+public class ContactListFragment extends ListFragment {
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private SlidingTabLayout mSlidingTabLayout;
-    private ViewPager mViewPager;
     private SearchController mSearchController;
     private SearchBarController mSearchBarController;
     private ArrayList<Contact> contactList;
@@ -92,10 +86,6 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-
-    private ArrayList<Contact> internalContacts = new ArrayList<>();
-    private ArrayList<Contact> realmContacts = new ArrayList<>();
 
     private SharedPreferences sp;
 
@@ -126,14 +116,15 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                refreshContent();
+//                refreshContent();
                 //Spinner is always finished after 10 seconds
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         finishSpinner();
                     }
-                }, 10000);
+//                }, 10000);
+                }, 10);
             }
         });
         if (mIndex == Constants.CONTACTS_ALL) {
@@ -215,19 +206,19 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         setListAdapterTabs();
     }
 
-    private void refreshContent(){
-
-        if (mIndex==Constants.CONTACTS_ALL) {
-            contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
-            contactListController.setConnectionCallback(this);
-        } else if (mIndex==Constants.CONTACTS_FAVOURITE) {
-            contactListController.getContactList(Constants.CONTACT_API_GET_FAVOURITES);
-            contactListController.setConnectionCallback(this);
-        } else if (mIndex==Constants.CONTACTS_RECENT) {
-            contactListController.getContactList(Constants.CONTACT_API_GET_RECENTS);
-            contactListController.setConnectionCallback(this);
-        }
-    }
+//    private void refreshContent(){
+//
+//        if (mIndex==Constants.CONTACTS_ALL) {
+//            contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
+//            contactListController.setConnectionCallback(this);
+//        } else if (mIndex==Constants.CONTACTS_FAVOURITE) {
+//            contactListController.getContactList(Constants.CONTACT_API_GET_FAVOURITES);
+//            contactListController.setConnectionCallback(this);
+//        } else if (mIndex==Constants.CONTACTS_RECENT) {
+//            contactListController.getContactList(Constants.CONTACT_API_GET_RECENTS);
+//            contactListController.setConnectionCallback(this);
+//        }
+//    }
 
     private void finishSpinner(){
         Log.i(Constants.TAG, "ContactListFragment.finishSpinner: ");
@@ -385,52 +376,35 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         }
     }
 
-    @Override
-    public void onSearchContactsResponse(ArrayList<Contact> contactList, boolean morePages, int
-            offsetPaging) {
-        Log.i(Constants.TAG, "onSearchContactsResponse: " + apiCall);
+//    @Override
+//    public void onContactsRefreshResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging) {
+//
+//        if (morePages){
+//            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: ");
+//            apiCall = Constants.CONTACT_API_GET_CONTACTS;
+//
+//            contactListController.getContactList(apiCall + "&o=" + offsetPaging);
+//            contactListController.setConnectionCallback(this);
+//        } else {
+//            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: FINISH");
+//            mSwipeRefreshLayout.setRefreshing(false);
+//            BusProvider.getInstance().post(new SetContactListAdapterEvent());
+//        }
+//    }
 
-        if (morePages)
-        {
-            mSearchController.getContactList(apiCall + "&o=" + offsetPaging);
-        }
-    }
-
-    @Override
-    public void onConnectionNotAvailable()
-    {
-        Log.d(Constants.TAG, "ContactListFragment.onConnectionNotAvailable: ");
-    }
-
-    @Override
-    public void onContactsRefreshResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging) {
-
-        if (morePages){
-            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: ");
-            apiCall = Constants.CONTACT_API_GET_CONTACTS;
-
-            contactListController.getContactList(apiCall + "&o=" + offsetPaging);
-            contactListController.setConnectionCallback(this);
-        } else {
-            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: FINISH");
-            mSwipeRefreshLayout.setRefreshing(false);
-            BusProvider.getInstance().post(new SetContactListAdapterEvent());
-        }
-    }
-
-    @Override
-    public void onFavouritesRefreshResponse() {
-        Log.i(Constants.TAG, "ContactListFragment.onFavouritesRefreshResponse: ");
-        mSwipeRefreshLayout.setRefreshing(false);
-        BusProvider.getInstance().post(new SetContactListAdapterEvent());
-    }
-
-    @Override
-    public void onRecentsRefreshResponse() {
-        Log.i(Constants.TAG, "ContactListFragment.onRecentsRefreshResponse: ");
-        mSwipeRefreshLayout.setRefreshing(false);
-        BusProvider.getInstance().post(new SetContactListAdapterEvent());
-    }
+//    @Override
+//    public void onFavouritesRefreshResponse() {
+//        Log.i(Constants.TAG, "ContactListFragment.onFavouritesRefreshResponse: ");
+//        mSwipeRefreshLayout.setRefreshing(false);
+//        BusProvider.getInstance().post(new SetContactListAdapterEvent());
+//    }
+//
+//    @Override
+//    public void onRecentsRefreshResponse() {
+//        Log.i(Constants.TAG, "ContactListFragment.onRecentsRefreshResponse: ");
+//        mSwipeRefreshLayout.setRefreshing(false);
+//        BusProvider.getInstance().post(new SetContactListAdapterEvent());
+//    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -484,6 +458,7 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
     {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
+
             favouriteContactList = mContactTransactions.getAllFavouriteContacts();
             if (favouriteContactList!=null) {
                 setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
@@ -554,7 +529,9 @@ public class ContactListFragment extends ListFragment implements ISearchConnecti
         ArrayList<Contact> contactArrayList;
         if(null == keyWord)
         {
+            RealmContactTransactions mContactTransactions = new RealmContactTransactions(profileId);
             contactArrayList = mContactTransactions.getAllContacts();
+            mContactTransactions.closeRealm();
         }
         else
         {

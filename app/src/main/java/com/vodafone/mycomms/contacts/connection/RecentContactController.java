@@ -80,8 +80,6 @@ public class RecentContactController {
         } catch (Exception e){
             Log.e(Constants.TAG, "RecentContactController.getRecentList: ", e);
         }
-//        new RecentContactsGETAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-//                (String) Constants.CONTACT_API_GET_RECENTS);
     }
 
     public void insertRecent(String contactId, String action){

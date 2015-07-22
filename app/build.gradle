@@ -163,6 +163,9 @@ dependencies {
 
     //Network listener
     compile 'com.github.pwittchen:networkevents:1.0.5'
+
+    //Image gestures
+    compile 'com.davemorrissey.labs:subsampling-scale-image-view:3.1.4'
 }
 
 apply plugin: 'jacoco'

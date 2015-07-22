@@ -12,9 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
@@ -195,87 +193,34 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
-        //Image avatar
-        String initials = "";
-        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions
+                (_profile_id);
+        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId());
+
+        if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
-            initials = contact.getFirstName().substring(0,1);
-
-            if(null != contact.getLastName() && contact.getLastName().length() > 0)
-            {
-                initials = initials + contact.getLastName().substring(0,1);
-            }
-
+            AvatarSFController avatarSFController = new AvatarSFController
+                    (
+                            mContext, contact.getContactId(), _profile_id
+                    );
+            avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
-        final String finalInitials = initials;
+        Utils.loadContactAvatar
+                (
+                        contact.getFirstName()
+                        , contact.getLastName()
+                        , viewHolder.top_left_avatar
+                        , viewHolder.top_left_avatar_text
+                        , Utils.getAvatarURL
+                                (
+                                        cont.getPlatform()
+                                        , cont.getStringField1()
+                                        , cont.getAvatar()
+                                )
+                );
 
-        viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-        viewHolder.top_left_avatar_text.setVisibility(View.VISIBLE);
-        viewHolder.top_left_avatar_text.setText(finalInitials);
-
-        if (contact.getAvatar()!=null &&
-                contact.getAvatar().length()>0)
-        {
-            if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)
-                    || contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
-                MycommsApp.picasso
-                        .load(contact.getAvatar())
-                        .placeholder(R.color.grey_middle)
-                        .noFade()
-                        .fit().centerCrop()
-                        .into(viewHolder.top_left_avatar, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                viewHolder.top_left_avatar_text.setVisibility(View.INVISIBLE);
-                            }
-
-                            @Override
-                            public void onError() {
-                                viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-                                viewHolder.top_left_avatar_text.setVisibility(View.VISIBLE);
-                                viewHolder.top_left_avatar_text.setText(finalInitials);
-                            }
-                        });
-            }
-            else if (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
-            {
-                AvatarSFController avatarSFController = new AvatarSFController(mContext, contact.getContactId(), _profile_id);
-                avatarSFController.getSFAvatar(contact.getAvatar());
-
-                if(null != contact.getStringField1() && !"".equals(contact.getStringField1()))
-                {
-                    MycommsApp.picasso
-                            .load(contact.getStringField1())
-                            .placeholder(R.color.grey_middle)
-                            .noFade()
-                            .fit().centerCrop()
-                            .into(viewHolder.top_left_avatar, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    viewHolder.top_left_avatar_text.setVisibility(View.INVISIBLE);
-                                }
-
-                                @Override
-                                public void onError() {
-                                    viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-                                    viewHolder.top_left_avatar_text.setVisibility(View.VISIBLE);
-                                    viewHolder.top_left_avatar_text.setText(finalInitials);
-                                }
-                            });
-                }
-                else
-                {
-                    viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-                    viewHolder.top_left_avatar_text.setText(initials);
-                }
-            }
-        }
-        else
-        {
-            viewHolder.top_left_avatar.setImageResource(R.color.grey_middle);
-            viewHolder.top_left_avatar_text.setText(initials);
-        }
+        mRealmContactTransactions.closeRealm();
 
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewOccupation.setText(contact.getPosition());

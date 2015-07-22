@@ -20,9 +20,6 @@ import android.widget.TextView;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
@@ -32,6 +29,7 @@ import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
@@ -40,7 +38,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -89,6 +86,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private LinearLayout lay_no_connection, lay_office_location;
     private RelativeLayout lay_phone_number, lay_email;
+    private String SF_URL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +94,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
+
+        this.SF_URL = null;
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
@@ -593,70 +593,28 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        final File avatarFile = new File(getFilesDir(), Constants.CONTACT_AVATAR_DIR + "avatar_"+contact.getContactId()+".jpg");
-
-        if (contact.getAvatar()!=null &&
-                contact.getAvatar().length()>0 &&
-                contact.getAvatar().compareTo("")!=0  &&
-                (contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_MY_COMMS)
-                || contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_LOCAL)))
+        if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
-
-            textAvatar.setText(null);
-
-            MycommsApp.picasso
-                    .load(contact.getAvatar())
-                    .placeholder(R.color.grey_middle)
-                    .noFade()
-                    .fit().centerCrop()
-                    .into(ivAvatar, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            textAvatar.setVisibility(View.INVISIBLE);
-                        }
-
-                        @Override
-                        public void onError() {
-                            String initials = "";
-                            if (null != contact.getFirstName() && contact.getFirstName().length() > 0) {
-                                initials = initials + contact.getFirstName().substring(0, 1);
-                            }
-
-                            if (null != contact.getLastName() && contact.getLastName().length() > 0) {
-                                initials = initials + contact.getLastName().substring(0, 1);
-                            }
-                            ivAvatar.setImageResource(R.color.grey_middle);
-                            textAvatar.setVisibility(View.VISIBLE);
-                            textAvatar.setText(initials);
-                        }
-                    });
-
+            AvatarSFController avatarSFController = new AvatarSFController
+                    (
+                            ContactDetailMainActivity.this, contact.getContactId(), mProfileId
+                    );
+            avatarSFController.getSFAvatar(contact.getAvatar());
         }
-        else if (contact.getAvatar()!=null &&
-                contact.getAvatar().length()>0 &&
-                contact.getAvatar().compareTo("")!=0  &&
-                contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
-        {
-//            AvatarSFController avatarSFController = new AvatarSFController(this, ivAvatar, textAvatar, contact.getContactId());
-//            avatarSFController.getSFAvatar(contact.getAvatar());
-        }
-        else
-        {
-            String initials = "";
-            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-            {
-                initials = initials + contact.getFirstName().substring(0,1);
 
-            }
-
-            if(null != contact.getLastName() && contact.getLastName().length() > 0)
-            {
-                initials = initials + contact.getLastName().substring(0,1);
-            }
-
-            ivAvatar.setImageResource(R.color.grey_middle);
-            textAvatar.setText(initials);
-        }
+        Utils.loadContactAvatar
+                (
+                        contact.getFirstName()
+                        , contact.getLastName()
+                        , ivAvatar
+                        , textAvatar
+                        , Utils.getAvatarURL
+                                (
+                                        contact.getPlatform()
+                                        , SF_URL
+                                        , contact.getAvatar()
+                                )
+                );
 
         ivAvatar.setOnClickListener(new View.OnClickListener() {
 
@@ -673,60 +631,19 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 final ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
                 final TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
 
-                if (contact.getAvatar() != null &&
-                        contact.getAvatar().length() > 0 &&
-                        contact.getAvatar().compareTo("") != 0 &&
-                        !contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
-
-                    textAvatar.setText(null);
-
-                    Picasso.with(getBaseContext())
-                            .load(avatarFile)
-                            .fit().centerCrop()
-                            .into(fullAvatar);
-
-
-                    MycommsApp.picasso
-                            .load(contact.getAvatar())
-                            .placeholder(R.color.grey_middle)
-                            .noFade()
-                            .fit().centerCrop()
-                            .into(fullAvatar, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    textAvatar.setVisibility(View.INVISIBLE);
-                                }
-
-                                @Override
-                                public void onError() {
-                                    String initials = "";
-                                    if (null != contact.getFirstName() && contact.getFirstName().length() > 0) {
-                                        initials = initials + contact.getFirstName().substring(0, 1);
-                                    }
-
-                                    if (null != contact.getLastName() && contact.getLastName().length() > 0) {
-                                        initials = initials + contact.getLastName().substring(0, 1);
-                                    }
-                                    fullAvatar.setImageResource(R.color.grey_middle);
-                                    textAvatar.setVisibility(View.VISIBLE);
-                                    textAvatar.setText(initials);
-                                }
-                            });
-
-                } else if (contact.getAvatar() != null &&
-                        contact.getAvatar().length() > 0 &&
-                        contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE)) {
-                    textAvatar.setVisibility(View.INVISIBLE);
-
-//                    AvatarSFController avatarSFController = new AvatarSFController(getBaseContext(), fullAvatar, textAvatar, contact.getContactId());
-//                    avatarSFController.getSFAvatar(contact.getAvatar());
-                } else {
-                    String initials = contact.getFirstName().substring(0, 1) +
-                            contact.getLastName().substring(0, 1);
-
-                    fullAvatar.setImageResource(R.color.grey_middle);
-                    textAvatar.setText(initials);
-                }
+                Utils.loadContactAvatar
+                        (
+                                contact.getFirstName()
+                                , contact.getLastName()
+                                , fullAvatar
+                                , textAvatar
+                                , Utils.getAvatarURL
+                                        (
+                                                contact.getPlatform()
+                                                , contact.getStringField1()
+                                                , contact.getAvatar()
+                                        )
+                        );
 
                 popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
                 popupView.setOnClickListener(new View.OnClickListener() {
@@ -742,6 +659,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactDetail()
     {
+        setSF_URL();
         loadContactStatusInfo();
         loadContactInfo();
         loadContactAvatar();
@@ -869,5 +787,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             lay_no_connection.setVisibility(View.VISIBLE);
         else
             lay_no_connection.setVisibility(View.GONE);
+    }
+
+    private void setSF_URL()
+    {
+        if(null!= this.contact.getStringField1())
+            this.SF_URL = this.contact.getStringField1();
     }
 }

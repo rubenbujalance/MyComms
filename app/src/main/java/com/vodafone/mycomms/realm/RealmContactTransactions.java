@@ -392,7 +392,9 @@ public class RealmContactTransactions {
         mRealm.commitTransaction();
     }
 
-    public void closeRealm() {if(mRealm!=null) mRealm.close();}
+    public void closeRealm() {
+        //if(mRealm!=null && !Utils.isMainThread()) mRealm.close();
+    }
 
 }
 

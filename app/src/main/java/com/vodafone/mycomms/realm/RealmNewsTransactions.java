@@ -47,5 +47,7 @@ public class RealmNewsTransactions {
         return newsArrayList;
     }
 
-    public void closeRealm() {if(mRealm!=null) mRealm.close();}
+    public void closeRealm() {
+//        if(mRealm!=null && !Utils.isMainThread()) mRealm.close();
+    }
 }

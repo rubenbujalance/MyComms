@@ -6,6 +6,7 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -361,6 +362,8 @@ public class RealmGroupChatTransactions {
         return count;
     }
 
-    public void closeRealm() {if(mRealm!=null) mRealm.close();}
+    public void closeRealm() {
+//        if(mRealm!=null && !Utils.isMainThread()) mRealm.close();
+    }
 
 }

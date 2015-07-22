@@ -10,6 +10,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Looper;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.text.format.DateUtils;
@@ -542,6 +543,10 @@ public final class Utils extends Activity {
         else
             avatarURL = avatar;
         return avatarURL;
+    }
+
+    public static boolean isMainThread() {
+        return (Looper.getMainLooper().getThread() == Thread.currentThread());
     }
 
 }

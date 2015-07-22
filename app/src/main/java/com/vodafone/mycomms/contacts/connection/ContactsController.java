@@ -36,7 +36,7 @@ public class ContactsController extends BaseController {
     private ContactConnection contactConnection;
     private IContactsConnectionCallback contactsConnectionCallback;
     private Context mContext;
-    private RealmContactTransactions realmContactTransactions;
+    private static RealmContactTransactions realmContactTransactions;
     private RealmAvatarTransactions realmAvatarTransactions;
     private String apiCall;
     private String mProfileId;
@@ -435,6 +435,16 @@ public class ContactsController extends BaseController {
             sortHelper = sortHelper.trim();
             contact.setSortHelper(sortHelper);
 
+            if(null != jsonObject.getString(Constants.CONTACT_ID) && null !=
+                    realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID)))
+            {
+                String SF_URL = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+                        .getStringField1();
+                if(null != SF_URL)
+                    contact.setStringField1(SF_URL);
+            }
+
+
         }catch (JSONException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactDBController.mapContact: ",e);
@@ -502,6 +512,7 @@ public class ContactsController extends BaseController {
         favouriteContact.setPresence(contact.getPresence());
         favouriteContact.setCountry(contact.getCountry());
         favouriteContact.setTimezone(contact.getTimezone());
+
         return favouriteContact;
     }
 

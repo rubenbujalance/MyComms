@@ -38,8 +38,9 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
     public ContactFavouriteListViewArrayAdapter(Context context, List<FavouriteContact> items) {
         super(context, R.layout.layout_list_item_contact, items);
         this.mContext = context;
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        this.profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        SharedPreferences sp = mContext.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
     }
 
     @Override
@@ -63,7 +64,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
-              viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         // update the item view
@@ -73,6 +74,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         if(null != contact.getPlatform()
                 && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
+            viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
         }
         else if (null != contact.getPlatform()
@@ -87,33 +89,33 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
-        Contact cont = realmContactTransactions.getContactById(contact.getContactId());
-        //Image avatar
-        if (null != contact.getPlatform() && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
+        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(profileId);
+        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId());
+
+        if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
             AvatarSFController avatarSFController = new AvatarSFController
                     (
-                            mContext
-                            , contact.getContactId()
-                            , this.profileId
+                            mContext, contact.getContactId(), profileId
                     );
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
         Utils.loadContactAvatar
                 (
-                        cont.getFirstName()
-                        , cont.getLastName()
+                        contact.getFirstName()
+                        , contact.getLastName()
                         , viewHolder.imageAvatar
                         , viewHolder.textAvatar
-                        , Utils.getAvatarURL(
-                                cont.getPlatform()
-                                , cont.getStringField1()
-                                , cont.getAvatar())
+                        , Utils.getAvatarURL
+                                (
+                                        cont.getPlatform()
+                                        , cont.getStringField1()
+                                        , cont.getAvatar()
+                                )
                 );
 
-        realmContactTransactions.closeRealm();
+        mRealmContactTransactions.closeRealm();
 
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );

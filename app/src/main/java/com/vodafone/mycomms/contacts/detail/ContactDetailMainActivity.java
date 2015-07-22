@@ -86,6 +86,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private LinearLayout lay_no_connection, lay_office_location;
     private RelativeLayout lay_phone_number, lay_email;
+    private String SF_URL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +94,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
+
+        this.SF_URL = null;
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
@@ -590,13 +593,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        if (null != contact.getPlatform() && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
+        if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
             AvatarSFController avatarSFController = new AvatarSFController
                     (
-                            ContactDetailMainActivity.this
-                            , contact.getContactId()
-                            , this.mProfileId
+                            ContactDetailMainActivity.this, contact.getContactId(), mProfileId
                     );
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
@@ -607,10 +608,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                         , contact.getLastName()
                         , ivAvatar
                         , textAvatar
-                        , Utils.getAvatarURL(
-                                contact.getPlatform()
-                                , contact.getStringField1()
-                                , contact.getAvatar())
+                        , Utils.getAvatarURL
+                                (
+                                        contact.getPlatform()
+                                        , SF_URL
+                                        , contact.getAvatar()
+                                )
                 );
 
         ivAvatar.setOnClickListener(new View.OnClickListener() {
@@ -634,10 +637,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                                 , contact.getLastName()
                                 , fullAvatar
                                 , textAvatar
-                                , Utils.getAvatarURL(
-                                        contact.getPlatform()
-                                        , contact.getStringField1()
-                                        , contact.getAvatar())
+                                , Utils.getAvatarURL
+                                        (
+                                                contact.getPlatform()
+                                                , contact.getStringField1()
+                                                , contact.getAvatar()
+                                        )
                         );
 
                 popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
@@ -654,6 +659,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactDetail()
     {
+        setSF_URL();
         loadContactStatusInfo();
         loadContactInfo();
         loadContactAvatar();
@@ -781,5 +787,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             lay_no_connection.setVisibility(View.VISIBLE);
         else
             lay_no_connection.setVisibility(View.GONE);
+    }
+
+    private void setSF_URL()
+    {
+        if(null!= this.contact.getStringField1())
+            this.SF_URL = this.contact.getStringField1();
     }
 }

@@ -33,8 +33,10 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
     public ContactListViewArrayAdapter(Context context, List<Contact> items) {
         super(context, R.layout.layout_list_item_contact, items);
         this.mContext = context;
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        this.profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        SharedPreferences sp = mContext.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
     }
 
     @Override
@@ -83,29 +85,27 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
-        //Image avatar
-        if (null != contact.getPlatform() && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
+        if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
             AvatarSFController avatarSFController = new AvatarSFController
                     (
-                            mContext
-                            , contact.getContactId()
-                            , this.profileId
+                           mContext, contact.getContactId(), profileId
                     );
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
-        //Image avatar
         Utils.loadContactAvatar
                 (
-                    contact.getFirstName()
-                    , contact.getLastName()
-                    , viewHolder.imageAvatar
-                    , viewHolder.textAvatar
-                    , Utils.getAvatarURL(
-                            contact.getPlatform()
-                            , contact.getStringField1()
-                            , contact.getAvatar())
+                        contact.getFirstName()
+                        , contact.getLastName()
+                        , viewHolder.imageAvatar
+                        , viewHolder.textAvatar
+                        , Utils.getAvatarURL
+                                (
+                                        contact.getPlatform()
+                                        , contact.getStringField1()
+                                        , contact.getAvatar()
+                                )
                 );
 
         viewHolder.textViewCompany.setText(contact.getCompany());

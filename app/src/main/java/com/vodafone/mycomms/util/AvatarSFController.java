@@ -9,8 +9,6 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 
-import java.io.IOException;
-
 public class AvatarSFController {
     private Context mContext;
     final String contactId;
@@ -35,25 +33,30 @@ public class AvatarSFController {
         protected String doInBackground(String... params) {
             Response response;
             String responseUrl = null;
-            try {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url(params[0])
-                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
-                                Utils.getHttpHeaderVersion(mContext))
-                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
-                                Utils.getHttpHeaderContentType())
-                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-                                Utils.getHttpHeaderAuth(mContext))
-                        .build();
+            if(null != params[0] && params[0].length() > 0)
+            {
+                try {
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url(params[0])
+                            .addHeader(Constants.API_HTTP_HEADER_VERSION,
+                                    Utils.getHttpHeaderVersion(mContext))
+                            .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                                    Utils.getHttpHeaderContentType())
+                            .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+                                    Utils.getHttpHeaderAuth(mContext))
+                            .build();
 
-                response = client.newCall(request).execute();
-                if(Integer.toString(response.code()).startsWith("2"))
-                    responseUrl = updateEachKindOfContactWithSFAvatarURL(response);
+                    response = client.newCall(request).execute();
+                    if(Integer.toString(response.code()).startsWith("2"))
+                        responseUrl = updateEachKindOfContactWithSFAvatarURL(response);
 
-            } catch (IOException e) {
-                Log.e(Constants.TAG, "AvatarSFController.doInBackground: ",e);
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "AvatarSFAsyncTask.doInBackground: URL was " + "->"+params[0]);
+                    Log.e(Constants.TAG, "AvatarSFController.doInBackground: ",e);
+                }
             }
+
             return responseUrl;
         }
 
@@ -70,10 +73,19 @@ public class AvatarSFController {
 
     private String updateEachKindOfContactWithSFAvatarURL(Response response)
     {
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
-        String responseUrl = response.request().httpUrl().toString();
-        realmContactTransactions.setContactSFAvatarURL(contactId, responseUrl);
-        return responseUrl;
+        if(null != response && Integer.toString(response.code()).startsWith("2"))
+        {
+            String responseUrl = response.request().httpUrl().toString();
+            if(null != responseUrl)
+            {
+                RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
+                realmContactTransactions.setContactSFAvatarURL(contactId, responseUrl);
+                realmContactTransactions.closeRealm();
+            }
+            return responseUrl;
+        }
+        else
+            return null;
     }
 
 

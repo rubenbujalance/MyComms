@@ -206,7 +206,7 @@ public class DashBoardActivity extends ToolbarActivity
                                     , contact
                             );
 
-                    recentsTasksQueue.putConnection(contact.getUniqueId(),task);
+                    recentsTasksQueue.putConnection(contact.getUniqueId(), task);
                     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
                 else
@@ -563,9 +563,10 @@ public class DashBoardActivity extends ToolbarActivity
             realmGroupChatTransactions.closeRealm();
         }
 
-        private void loadContactsFromIds(ArrayList<String> ids, RealmContactTransactions realmContactTransactions)
+        private void loadContactsFromIds(ArrayList<String> ids)
         {
-
+            RealmContactTransactions realmContactTransactions =
+                    new RealmContactTransactions(_profileId);
             UserProfile userProfile = realmContactTransactions.getUserProfile();
             Contact contact = new Contact();
             contact.setAvatar(userProfile.getAvatar());
@@ -573,11 +574,9 @@ public class DashBoardActivity extends ToolbarActivity
             contact.setLastName(userProfile.getLastName());
             contact.setContactId(userProfile.getId());
             contact.setPlatform(userProfile.getPlatform());
-            contacts.clear();
             contacts.add(contact);
 
             int i = 0;
-            mapAvatarImageAndContact.clear();
             mapAvatarImageAndContact.put(images.get(i), contact);
             i++;
 
@@ -598,7 +597,7 @@ public class DashBoardActivity extends ToolbarActivity
                     }
                 }
             }
-
+            realmContactTransactions.closeRealm();
         }
 
 
@@ -656,21 +655,21 @@ public class DashBoardActivity extends ToolbarActivity
         }
 
         @Override
-        protected String doInBackground(Void... params)
-        {
-            if(!isEmpty)
+        protected String doInBackground(Void... params) {
+            if (isEmpty) return null;
+
+            if (null != contactIds && contactIds.size() >= 3)
             {
-                RealmContactTransactions realmContactTransactions =
-                        new RealmContactTransactions(_profileId);
-                loadContactsFromIds(contactIds, realmContactTransactions);
-                for(final ImageView image : images)
+                try
                 {
-                    Contact contact = mapAvatarImageAndContact.get(image);
-                    loadSalesForceAvatars(contact.getPlatform(), contact.getContactId(), contact.getAvatar());
+                    return Integer.toString(this.contactIds.size());
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "DrawSingleGroupChatRecentAsyncTask.mapAvatarToContactId: ", e);
+                    Crashlytics.logException(e);
+                    return null;
                 }
-                realmContactTransactions.closeRealm();
             }
-            return null;
+            return Integer.toString(this.contactIds.size());
         }
 
         @Override
@@ -716,6 +715,8 @@ public class DashBoardActivity extends ToolbarActivity
                                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
                                 Crashlytics.logException(e);
                             }
+                            Utils.loadContactAvatar(contact.getFirstName(), contact.getLastName()
+                                    , image, text, contact.getAvatar());
                         }
                         // Names
                         firstNameView.setText("Group(" + contacts.size() + ")");
@@ -829,7 +830,15 @@ public class DashBoardActivity extends ToolbarActivity
         @Override
         protected Void doInBackground(Void... params)
         {
-            loadSalesForceAvatars(platform, contactId, avatar);
+
+            if(null != platform && Constants.PLATFORM_SALES_FORCE.equals(platform))
+            {
+                AvatarSFController avatarSFController = new AvatarSFController
+                        (
+                                DashBoardActivity.this, contactId, _profileId
+                        );
+                avatarSFController.getSFAvatar(avatar);
+            }
             return null;
         }
 
@@ -844,35 +853,27 @@ public class DashBoardActivity extends ToolbarActivity
                         try {
                             if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
                                 String strPhones = phones;
-                                if (strPhones != null)
-                                {
+                                if (strPhones != null) {
                                     String phone = strPhones;
-                                    if(!platform.equals(Constants
-                                            .PLATFORM_LOCAL))
-                                    {
+                                    if (!platform.equals(Constants
+                                            .PLATFORM_LOCAL)) {
                                         JSONArray jPhones = new JSONArray(strPhones);
-                                        phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                                        phone = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
                                     }
 
                                     Utils.launchCall(phone, DashBoardActivity.this);
                                     recentContactController.insertRecent(contactId, action);
                                 }
-                            }
-                            else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
-                            {
+                            } else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
                                 // This is LOCAL contact, then in this case the action will be Send SMS
                                 // message
-                                if(null != platform && platform.compareTo(Constants.PLATFORM_LOCAL)==0)
-                                {
+                                if (null != platform && platform.compareTo(Constants.PLATFORM_LOCAL) == 0) {
                                     String phone = phones;
-                                    if(null != phone)
-                                    {
+                                    if (null != phone) {
                                         Utils.launchSms(phone, DashBoardActivity.this);
                                         recentContactController.insertRecent(contactId, action);
                                     }
-                                }
-                                else
-                                {
+                                } else {
                                     Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
                                     in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
                                     in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
@@ -880,16 +881,13 @@ public class DashBoardActivity extends ToolbarActivity
                                     startActivity(in);
                                 }
 
-                            }
-                            else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
+                            } else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
                                 String strEmails = emails;
-                                if (strEmails != null)
-                                {
+                                if (strEmails != null) {
                                     String email = strEmails;
-                                    if(platform.compareTo(Constants.PLATFORM_LOCAL)!=0)
-                                    {
+                                    if (platform.compareTo(Constants.PLATFORM_LOCAL) != 0) {
                                         JSONArray jPhones = new JSONArray(strEmails);
-                                        email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                                        email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
                                     }
 
                                     Utils.launchEmail(email, DashBoardActivity.this);
@@ -904,44 +902,67 @@ public class DashBoardActivity extends ToolbarActivity
                         }
                     }
                 });
-
-
-                RealmContactTransactions realmContactTransactions = new RealmContactTransactions(_profileId);
                 Contact contact = realmContactTransactions.getContactById(contactId);
-                if(null != contact)
+                Utils.loadContactAvatar(firstName, lastName, recentAvatar, avatarText, Utils
+                        .getAvatarURL(platform, contact.getStringField1(), contact.getAvatar()));
+
+                //RBM - NEW Avatar management ****************************
+                recentAvatar.setImageResource(R.color.grey_middle);
+                avatarText.setVisibility(View.VISIBLE);
+                avatarText.setText(nameInitials);
+                avatarText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+                if (avatar != null &&
+                    avatar.length() > 0)
                 {
-                    String avatarURL = Utils.getAvatarURL
-                            (
-                                    contact.getPlatform()
-                                    , contact.getStringField1()
-                                    , contact.getAvatar()
-                            );
-                    Utils.loadContactAvatar
-                            (
-                                    contact.getFirstName()
-                                    , contact.getLastName()
-                                    , recentAvatar
-                                    , avatarText
-                                    , avatarURL
-                                    , 0
-                            );
+                    MycommsApp.picasso
+                            .load(avatar)
+                            .placeholder(R.color.grey_middle)
+                            .noFade()
+                            .fit().centerCrop()
+                            .into(recentAvatar, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    avatarText.setVisibility(View.INVISIBLE);
+                                }
+
+                                @Override
+                                public void onError() {
+                                    recentAvatar.setImageResource(R.color.grey_middle);
+                                    avatarText.setVisibility(View.VISIBLE);
+                                    avatarText.setText(nameInitials);
+                                }
+                            });
+
                 }
 
-                realmContactTransactions.closeRealm();
+                //********************************************************
+                //TODO: Check if this code is necessary
+                //Local avatar
+                if (avatar != null &&
+                        avatar.length() > 0 &&
+                        platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL)) {
+                    Picasso.with(DashBoardActivity.this)
+                            .load(avatar)
+                            .fit().centerCrop()
+                            .into(recentAvatar);
+                } else if  (platform.equalsIgnoreCase(Constants.PLATFORM_LOCAL) &&
+                        avatar == null ||
+                        avatar.length() < 0) {
+                    recentAvatar.setImageResource(R.color.grey_middle);
+                    avatarText.setText(nameInitials);
+                }
 
                 // Badges
                 RealmChatTransactions realmChatTransactions = new RealmChatTransactions(getBaseContext());
                 pendingMsgsCount = realmChatTransactions.getChatPendingMessagesCount(contactId);
                 realmChatTransactions.closeRealm();
 
-                //Recent contact first and last name
+                // Names
                 firstNameView.setText(firstName);
                 lastNameView.setText(lastName);
 
                 //Since it's finished, remove this task from queue
                 recentsTasksQueue.removeConnection(recentId);
-
-                realmContactTransactions.closeRealm();
 
             }  catch (Exception e) {
                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
@@ -1058,16 +1079,6 @@ public class DashBoardActivity extends ToolbarActivity
         {
             loadRecents(recentsContainer2);
             loadUnreadMessages(recentsContainer2);
-        }
-    }
-
-    private void loadSalesForceAvatars(String platform, String contactId, String avatarURL)
-    {
-        if(null != platform && Constants.PLATFORM_SALES_FORCE.equals(platform))
-        {
-            AvatarSFController avatarSFController = new AvatarSFController
-                    (DashBoardActivity.this, contactId, _profileId);
-            avatarSFController.getSFAvatar(avatarURL);
         }
     }
 }

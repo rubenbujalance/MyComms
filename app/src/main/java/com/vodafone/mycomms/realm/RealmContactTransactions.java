@@ -376,14 +376,14 @@ public class RealmContactTransactions {
 
     public void setContactSFAvatarURL(String contactId, String URL)
     {
+        mRealm.beginTransaction();
         Contact contact = getContactById(contactId);
-        if(null != contact)
-        {
-            mRealm.beginTransaction();
-            contact.setStringField1(URL);
-            mRealm.copyToRealmOrUpdate(contact);
-            mRealm.commitTransaction();
-        }
+        contact.setStringField1(URL);
+        contact = mRealm.copyToRealmOrUpdate(contact);
+        String updatedURL = contact.getStringField1();
+        Log.i(Constants.TAG, "RealmContactTransactions.setContactSFAvatarURL: Object Updated with" +
+                " URL" + "->"+updatedURL);
+        mRealm.commitTransaction();
     }
 
     public void closeRealm() {if(mRealm!=null) mRealm.close();}

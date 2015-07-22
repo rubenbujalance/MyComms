@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
@@ -19,6 +20,7 @@ import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,34 +193,34 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
+        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions
+                (_profile_id);
+        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId());
 
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(_profile_id);
-        Contact cont = realmContactTransactions.getContactById(contact.getContactId());
-        if (null != contact.getPlatform() && contact.getPlatform().equalsIgnoreCase(Constants
-                .PLATFORM_SALES_FORCE))
+        if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
             AvatarSFController avatarSFController = new AvatarSFController
                     (
-                            mContext
-                            , contact.getContactId()
-                            , _profile_id
+                            mContext, contact.getContactId(), _profile_id
                     );
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
-        //Image avatar
-        Utils.loadContactAvatar(
-                cont.getFirstName()
-                , cont.getLastName()
-                , viewHolder.top_left_avatar
-                , viewHolder.top_left_avatar_text
-                , Utils.getAvatarURL(
-                        cont.getPlatform()
-                        , cont.getStringField1()
-                        , cont.getAvatar())
-                , 0);
+        Utils.loadContactAvatar
+                (
+                        contact.getFirstName()
+                        , contact.getLastName()
+                        , viewHolder.top_left_avatar
+                        , viewHolder.top_left_avatar_text
+                        , Utils.getAvatarURL
+                                (
+                                        cont.getPlatform()
+                                        , cont.getStringField1()
+                                        , cont.getAvatar()
+                                )
+                );
 
-        realmContactTransactions.closeRealm();
+        mRealmContactTransactions.closeRealm();
 
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewOccupation.setText(contact.getPosition());

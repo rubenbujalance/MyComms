@@ -151,15 +151,18 @@ public class ProfileController extends BaseController {
     }
 
     @Override
-    public void onConnectionComplete(ConnectionResponse response){
+    public void onConnectionComplete(ConnectionResponse response)
+    {
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "ProfileController.onConnectionComplete: " + response.getUrl());
 
         boolean isUserProfileReceived = false;
-        if(response.getUrl() != null && !response.getUrl().endsWith(UpdateSettingsConnection.URL)) {
-            String result = response.getData().toString();
-            try {
-                if (result != null && result.length() >= 0) {
+        if(response.getUrl() != null && !response.getUrl().endsWith(UpdateSettingsConnection.URL))
+        {
+            try
+            {
+                String result = response.getData().toString();
+                if (result != null && result.length() > 0) {
                     JSONObject jsonResponse = new JSONObject(result);
                     this.userProfile = mapUserProfile(jsonResponse);
 

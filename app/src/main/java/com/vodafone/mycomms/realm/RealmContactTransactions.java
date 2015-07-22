@@ -291,6 +291,17 @@ public class RealmContactTransactions {
         return null;
     }
 
+    public FavouriteContact getFavouriteContactByContactId(String contactId)
+    {
+        Log.i(Constants.TAG, "RealmContactTransactions.getFavouriteContactByContactId: ");
+        RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
+        query.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
+        query.equalTo(Constants.CONTACT_CONTACT_ID, contactId);
+        FavouriteContact favouriteContact = query.findFirst();
+
+        return favouriteContact;
+    }
+
     public ArrayList<FavouriteContact> sortFavouriteContacts(ArrayList<FavouriteContact> favouriteContactsArrayList){
         int size = favouriteContactsArrayList.size();
         int notLettersStart = 0;
@@ -360,6 +371,12 @@ public class RealmContactTransactions {
     public void updateContact(Contact updatedContact) {
         mRealm.beginTransaction();
         mRealm.copyToRealmOrUpdate(updatedContact);
+        mRealm.commitTransaction();
+    }
+
+    public void updateSFAvatar(Contact contact, String SF_URL) {
+        mRealm.beginTransaction();
+        contact.setStringField1(SF_URL);
         mRealm.commitTransaction();
     }
 

@@ -64,7 +64,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
-              viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         // update the item view

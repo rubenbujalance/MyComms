@@ -675,62 +675,82 @@ public class DashBoardActivity extends ToolbarActivity
         @Override
         protected void onPostExecute(String result)
         {
-            if(result==null) return;
-
-            if(null != contactIds && contactIds.size() >= 3)
+            if(!isEmpty)
             {
-                contacts = new ArrayList<>();
-                loadContactsFromIds(contactIds);
-
-                for(final ImageView image : images)
+                try
                 {
-                    try
+
+                    if(null != contactIds && contactIds.size() >= 3)
                     {
-                        Contact contact = mapAvatarImageAndContact.get(image);
-                        final TextView text = mapAvatarImageAndText.get(image);
-                        if(null != contact)
+                        contacts = new ArrayList<>();
+                        RealmContactTransactions realmTransaction =
+                                new RealmContactTransactions(_profileId);
+                        loadContactsFromIds(contactIds);
+
+                        for(final ImageView image : images)
                         {
-                            Utils.loadContactAvatar(contact.getFirstName(), contact.getLastName()
-                                    , image, text, contact.getAvatar());
+                            try
+                            {
+                                Contact contact = mapAvatarImageAndContact.get(image);
+                                final TextView text = mapAvatarImageAndText.get(image);
+                                if(null != contact)
+                                {
+                                    Utils.loadContactAvatar
+                                            (
+                                                    contact.getFirstName()
+                                                    , contact.getLastName()
+                                                    , image
+                                                    , text
+                                                    , Utils.getAvatarURL
+                                                            (
+                                                                    contact.getPlatform()
+                                                                    , contact.getStringField1()
+                                                                    , contact.getAvatar()
+                                                            )
+                                                    , 0);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
+                                Crashlytics.logException(e);
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
-                        Crashlytics.logException(e);
-                    }
-                }
+                        // Names
+                        firstNameView.setText("Group(" + contacts.size() + ")");
+                        //Since it's finished, remove this task from queue
+                        recentsTasksQueue.removeConnection(recentId);
+                        lay_main_container.setVisibility(View.VISIBLE);
 
-                // Names
-                firstNameView.setText("Group(" + contacts.size() + ")");
-                //Since it's finished, remove this task from queue
-                recentsTasksQueue.removeConnection(recentId);
-                lay_main_container.setVisibility(View.VISIBLE);
+                        realmTransaction.closeRealm();
+                    }
+
+
+                    LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
+                    btRecents.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            try {
+                                if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
+                                    Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
+                                    in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
+                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                    in.putExtra(Constants.IS_GROUP_CHAT, true);
+                                    startActivity(in);
+                                }
+
+                            } catch (Exception e) {
+                                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecentItemClick: ", e);
+                                Crashlytics.logException(e);
+                            }
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    Log.e(Constants.TAG, "DrawSingleGroupChatRecentAsyncTask.onPostExecute: ",e);
+                    Crashlytics.logException(e);
+                }
             }
-
-            LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
-            btRecents.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    try {
-                        if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
-                            Intent in = new Intent(DashBoardActivity.this, GroupChatActivity.class);
-                            in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
-                            in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
-                            in.putExtra(Constants.IS_GROUP_CHAT, true);
-                            startActivity(in);
-                        }
-
-//                        RecentContactController recentContactController = new
-//                                RecentContactController(DashBoardActivity.this, _profileId);
-//                        recentContactController.insertRecentOKHttp(groupChatId, Constants.CONTACTS_ACTION_SMS);
-
-                    } catch (Exception e) {
-                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecentItemClick: ", e);
-                        Crashlytics.logException(e);
-                    }
-                }
-            });
-
             numberOfRecents --;
             if(numberOfRecents == 0)
                 loadRecentLayout();
@@ -821,7 +841,8 @@ public class DashBoardActivity extends ToolbarActivity
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(Void aVoid)
+        {
             try
             {
                 LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);

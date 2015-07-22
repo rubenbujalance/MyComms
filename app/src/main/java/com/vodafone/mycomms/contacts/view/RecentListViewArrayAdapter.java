@@ -192,6 +192,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         }
 
 
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(_profile_id);
+        Contact cont = realmContactTransactions.getContactById(contact.getContactId());
         if (null != contact.getPlatform() && contact.getPlatform().equalsIgnoreCase(Constants
                 .PLATFORM_SALES_FORCE))
         {
@@ -200,23 +202,23 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                             mContext
                             , contact.getContactId()
                             , _profile_id
-                            , true
-                            , false
                     );
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
         //Image avatar
         Utils.loadContactAvatar(
-                contact.getFirstName()
-                , contact.getLastName()
+                cont.getFirstName()
+                , cont.getLastName()
                 , viewHolder.top_left_avatar
                 , viewHolder.top_left_avatar_text
                 , Utils.getAvatarURL(
-                        contact.getPlatform()
-                        , contact.getStringField1()
-                        , contact.getAvatar())
+                        cont.getPlatform()
+                        , cont.getStringField1()
+                        , cont.getAvatar())
                 , 0);
+
+        realmContactTransactions.closeRealm();
 
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewOccupation.setText(contact.getPosition());

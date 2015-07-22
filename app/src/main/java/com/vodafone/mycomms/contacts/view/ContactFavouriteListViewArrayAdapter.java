@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -24,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import model.Contact;
 import model.FavouriteContact;
 
 /**
@@ -85,6 +87,8 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
+        Contact cont = realmContactTransactions.getContactById(contact.getContactId());
         //Image avatar
         if (null != contact.getPlatform() && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
         {
@@ -93,23 +97,23 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
                             mContext
                             , contact.getContactId()
                             , this.profileId
-                            , true
-                            , false
                     );
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
         Utils.loadContactAvatar
                 (
-                        contact.getFirstName()
-                        , contact.getLastName()
+                        cont.getFirstName()
+                        , cont.getLastName()
                         , viewHolder.imageAvatar
                         , viewHolder.textAvatar
                         , Utils.getAvatarURL(
-                                contact.getPlatform()
-                                , contact.getStringField1()
-                                , contact.getAvatar())
+                                cont.getPlatform()
+                                , cont.getStringField1()
+                                , cont.getAvatar())
                 );
+
+        realmContactTransactions.closeRealm();
 
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );

@@ -206,7 +206,7 @@ public class DashBoardActivity extends ToolbarActivity
                                     , contact
                             );
 
-                    recentsTasksQueue.putConnection(recentList.get(i).getUniqueId(),task);
+                    recentsTasksQueue.putConnection(contact.getUniqueId(),task);
                     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
                 else
@@ -227,7 +227,7 @@ public class DashBoardActivity extends ToolbarActivity
                                     , contact
                             );
 
-                    recentsTasksQueue.putConnection(recentList.get(i).getUniqueId(),task);
+                    recentsTasksQueue.putConnection(contact.getUniqueId(),task);
                     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
@@ -696,8 +696,19 @@ public class DashBoardActivity extends ToolbarActivity
                                 final TextView text = mapAvatarImageAndText.get(image);
                                 if(null != contact)
                                 {
-                                    Utils.loadContactAvatar(contact.getFirstName(), contact.getLastName()
-                                            , image, text, contact.getAvatar(), 0);
+                                    Utils.loadContactAvatar
+                                            (
+                                                    contact.getFirstName()
+                                                    , contact.getLastName()
+                                                    , image
+                                                    , text
+                                                    , Utils.getAvatarURL
+                                                            (
+                                                                    contact.getPlatform()
+                                                                    , contact.getStringField1()
+                                                                    , contact.getAvatar()
+                                                            )
+                                                    , 0);
                                 }
                             }
                             catch (Exception e)
@@ -896,11 +907,27 @@ public class DashBoardActivity extends ToolbarActivity
 
 
                 RealmContactTransactions realmContactTransactions = new RealmContactTransactions(_profileId);
-                recentContact = realmContactTransactions.getRecentContactByContactId(contactId);
-                String avatarURL = Utils.getAvatarURL(recentContact.getPlatform(), recentContact
-                        .getStringField1(), recentContact.getAvatar());
-                Utils.loadContactAvatar(recentContact.getFirstName(), recentContact.getLastName()
-                        , recentAvatar, avatarText, avatarURL, 0);
+                Contact contact = realmContactTransactions.getContactById(contactId);
+                if(null != contact)
+                {
+                    String avatarURL = Utils.getAvatarURL
+                            (
+                                    contact.getPlatform()
+                                    , contact.getStringField1()
+                                    , contact.getAvatar()
+                            );
+                    Utils.loadContactAvatar
+                            (
+                                    contact.getFirstName()
+                                    , contact.getLastName()
+                                    , recentAvatar
+                                    , avatarText
+                                    , avatarURL
+                                    , 0
+                            );
+                }
+
+                realmContactTransactions.closeRealm();
 
                 // Badges
                 RealmChatTransactions realmChatTransactions = new RealmChatTransactions(getBaseContext());
@@ -1039,7 +1066,7 @@ public class DashBoardActivity extends ToolbarActivity
         if(null != platform && Constants.PLATFORM_SALES_FORCE.equals(platform))
         {
             AvatarSFController avatarSFController = new AvatarSFController
-                    (DashBoardActivity.this, contactId, _profileId, false, false);
+                    (DashBoardActivity.this, contactId, _profileId);
             avatarSFController.getSFAvatar(avatarURL);
         }
     }

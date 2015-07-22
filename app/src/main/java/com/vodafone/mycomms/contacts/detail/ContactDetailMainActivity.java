@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import model.Contact;
-import model.RecentContact;
 
 public class ContactDetailMainActivity extends ToolbarActivity implements IContactDetailConnectionCallback {
     private Contact contact;
@@ -591,9 +590,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
-        final RecentContact contact = realmContactTransactions.getRecentContactByContactId
-                (contactId);
-
         if (null != contact.getPlatform() && contact.getPlatform().equalsIgnoreCase(Constants.PLATFORM_SALES_FORCE))
         {
             AvatarSFController avatarSFController = new AvatarSFController
@@ -601,8 +597,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                             ContactDetailMainActivity.this
                             , contact.getContactId()
                             , this.mProfileId
-                            , true
-                            , false
                     );
             avatarSFController.getSFAvatar(contact.getAvatar());
         }

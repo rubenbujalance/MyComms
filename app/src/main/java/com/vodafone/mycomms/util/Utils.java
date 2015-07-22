@@ -501,8 +501,7 @@ public final class Utils extends Activity {
     public static String getAvatarURL(String platform, String stringFiledAvatar, String avatar)
     {
         String avatarURL;
-        if(null != platform && Constants.PLATFORM_SALES_FORCE.equals
-                (platform))
+        if(null != platform && Constants.PLATFORM_SALES_FORCE.equals(platform))
         {
             if(null != stringFiledAvatar && stringFiledAvatar.length() > 0)
                 avatarURL = stringFiledAvatar;

@@ -91,8 +91,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                             mContext
                             , contact.getContactId()
                             , this.profileId
-                            , true
-                            , false
                     );
             avatarSFController.getSFAvatar(contact.getAvatar());
         }

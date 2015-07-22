@@ -1,15 +1,16 @@
 package com.vodafone.mycomms.chat;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatgroup.FullscreenImageActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -120,14 +121,23 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         if(chatList.get(i).getType()==Constants.CHAT_MESSAGE_TYPE_IMAGE)
         {
             String dirStr = mContext.getFilesDir() + Constants.CONTACT_CHAT_FILES;
-            String fileStr = "file_" + chatList.get(i).getId() + ".jpg";
+            final String fileStr = "file_" + chatList.get(i).getId() + ".jpg";
 
-            File image = new File(dirStr, fileStr);
+            final File image = new File(dirStr, fileStr);
 
-            Picasso.with(mContext)
+            MycommsApp.picasso
                     .load(image)
                     .fit().centerCrop()
                     .into(chatHolder.chatImage);
+
+            chatHolder.chatImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent in = new Intent(mContext, FullscreenImageActivity.class);
+                    in.putExtra("imageFilePath", image.getAbsolutePath());
+                    mContext.startActivity(in);
+                }
+            });
         }
         else
         {

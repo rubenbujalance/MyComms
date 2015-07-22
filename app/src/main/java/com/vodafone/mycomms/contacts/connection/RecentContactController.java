@@ -14,12 +14,14 @@ import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -44,9 +46,75 @@ public class RecentContactController {
 
     public void getRecentList() {
         Log.i(Constants.TAG, "RecentContactController.getRecentList: ");
+        try{
+            OKHttpWrapper.get(Constants.CONTACT_API_GET_RECENTS, mContext, new OKHttpWrapper.HttpCallback() {
+                @Override
+                public void onFailure(Response response, IOException e) {
+                    // handle failure
+                    try {
+                        if (null == response)
+                        {
+                            //Call Bus Event with Toast
+                            //Toast.makeText(mContext, "Connection Error " + e, Toast.LENGTH_LONG).show();
+                        }
+                        else
+                        {
+                            int code = response.code();
+                            if (code >= 500)
+                            {
+                                //Backend error
+                                //Call Bus Event with Toast
+                                //Toast.makeText(mContext, "Internal Error. Unable to access Mycomms server " + e, Toast.LENGTH_LONG).show();
+                            }
+                            else if (code >= 400 && code < 500)
+                            {
+                                if (code == 400){
+                                    //New version
+                                    //TEST OK
+                                } else if (code == 401){
+                                    //Unauthorized
+                                    //TEST OK
+                                } else {
+                                    //Call Bus Event with Toast
+                                    //Toast.makeText(mContext, "Error code " + code, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            Log.i(Constants.TAG, "RecentContactController.onFailure:");
+                        }
+                    } catch (Exception err){
+                        Log.e(Constants.TAG, "RecentContactController.onFailure: ", err);
+                    }
+                }
 
-        new RecentContactsGETAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                (String) Constants.CONTACT_API_GET_RECENTS);
+                @Override
+                public void onSuccess(Response response) {
+                    try {
+                        String json;
+                        if (response.isSuccessful()) {
+                            json = response.body().string();
+                            if (json != null && json.trim().length() > 0) {
+                                try {
+                                    JSONObject jsonResponse = new JSONObject(json);
+                                    contactSearchController.getContactById(jsonResponse);
+                                    Log.i(Constants.TAG, "RecentContactController.onSuccess: ");
+                                    BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+                                } catch (JSONException e) {
+                                    Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
+                                }
+                            }
+                        } else {
+                            Log.e(Constants.TAG, "NewsController.isNOTSuccessful");
+                        }
+                    } catch (IOException e){
+                        Log.e(Constants.TAG, "RecentContactController.onSuccess: ", e);
+                    }
+                }
+            });
+        } catch (Exception e){
+            Log.e(Constants.TAG, "RecentContactController.getRecentList: ", e);
+        }
+//        new RecentContactsGETAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+//                (String) Constants.CONTACT_API_GET_RECENTS);
     }
 
     public void insertRecent(String contactId, String action){
@@ -311,58 +379,58 @@ public class RecentContactController {
         }
     }
 
-    public class RecentContactsGETAsyncTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            Response response;
-            String json = null;
-
-            try {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url("https://" + EndpointWrapper.getBaseURL() +
-                            params[0])
-                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
-                                Utils.getHttpHeaderVersion(mContext))
-                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
-                                Utils.getHttpHeaderContentType())
-                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-                                Utils.getHttpHeaderAuth(mContext))
-                        .build();
-
-                response = client.newCall(request).execute();
-                json = response.body().string();
-
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: ",e);
-            }
-
-            return json;
-        }
-
-        @Override
-        protected void onPostExecute(String json) {
-            recentListCallback(json);
-        }
-
-        public void recentListCallback(String json) {
-            Log.i(Constants.TAG, "RecentContactController.recentListCallback: ");
-            try {
-                if (json != null && json.trim().length() > 0) {
-                    try {
-                        JSONObject jsonResponse = new JSONObject(json);
-                        contactSearchController.getContactById(jsonResponse);
-                        Log.i(Constants.TAG, "RecentContactsGETAsyncTask.recentListCallback: onRecentContactsReceived");
-                        BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-                    } catch (JSONException e) {
-                        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
-                    }
-                }
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
-            }
-        }
-    }
+//    public class RecentContactsGETAsyncTask extends AsyncTask<String, Void, String> {
+//        @Override
+//        protected String doInBackground(String... params) {
+//            Response response;
+//            String json = null;
+//
+//            try {
+//                OkHttpClient client = new OkHttpClient();
+//                Request request = new Request.Builder()
+//                        .url("https://" + EndpointWrapper.getBaseURL() +
+//                            params[0])
+//                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+//                                Utils.getHttpHeaderVersion(mContext))
+//                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+//                                Utils.getHttpHeaderContentType())
+//                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+//                                Utils.getHttpHeaderAuth(mContext))
+//                        .build();
+//
+//                response = client.newCall(request).execute();
+//                json = response.body().string();
+//
+//            } catch (Exception e) {
+//                Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: ",e);
+//            }
+//
+//            return json;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String json) {
+//            recentListCallback(json);
+//        }
+//
+//        public void recentListCallback(String json) {
+//            Log.i(Constants.TAG, "RecentContactController.recentListCallback: ");
+//            try {
+//                if (json != null && json.trim().length() > 0) {
+//                    try {
+//                        JSONObject jsonResponse = new JSONObject(json);
+//                        contactSearchController.getContactById(jsonResponse);
+//                        Log.i(Constants.TAG, "RecentContactsGETAsyncTask.recentListCallback: onRecentContactsReceived");
+//                        BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+//                    } catch (JSONException e) {
+//                        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
+//                    }
+//                }
+//            } catch (Exception e) {
+//                Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
+//            }
+//        }
+//    }
 
     public void closeRealm()
     {

@@ -370,11 +370,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             }else {
                 recentChatsHashMap.put(chatMsg.getContact_id(), chatMsg.getTimestamp());
             }
-            Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived : pendingMessages " + pendingMessages);
             if (pendingMessages == 0 && recentChatsHashMap!=null && recentChatsHashMap.size()>0){
                 RecentContactController recentContactController =
                         new RecentContactController(this, profile_id);
-                Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived: pendingMessages 0");
                 HashMap<String, Long> recentChatsHashMapClone = new HashMap<>();
                 recentChatsHashMapClone.putAll(recentChatsHashMap);
                 recentContactController.insertPendingChatsRecent(recentChatsHashMapClone);

@@ -36,7 +36,7 @@ public class NewsController{
         final String[] json = {null};
 
         try {
-            OKHttpWrapper.get(Constants.NEWS_API_GET, mContext, new OKHttpWrapper.HttpCallback() {
+            OKHttpWrapper.getNews(Constants.NEWS_API_GET, mContext, new OKHttpWrapper.HttpCallback() {
                 @Override
                 public void onFailure(Response response, IOException e) {
                     // handle failure

@@ -7,13 +7,9 @@ import android.util.Log;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 
 import java.io.IOException;
-
-import io.realm.Realm;
-import model.RecentContact;
 
 public class AvatarSFController {
     private Context mContext;
@@ -53,19 +49,7 @@ public class AvatarSFController {
 
                 response = client.newCall(request).execute();
                 if(Integer.toString(response.code()).startsWith("2"))
-                {
-                    ContactsController contactsController = new ContactsController(mContext, profileId);
-                    RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
-
-                    responseUrl = response.request().httpUrl().toString();
-                    RecentContact contact = realmContactTransactions.getRecentContactByContactId(contactId);
-                    Realm realm = Realm.getDefaultInstance();
-                    realm.beginTransaction();
-                    contact.setStringField1(responseUrl);
-                    realm.commitTransaction();
-                    realm.close();
-                    contactsController.insertRecentContactInRealm(contact);
-                }
+                    responseUrl = updateEachKindOfContactWithSFAvatarURL(response);
 
             } catch (IOException e) {
                 Log.e(Constants.TAG, "AvatarSFController.doInBackground: ",e);
@@ -83,4 +67,14 @@ public class AvatarSFController {
                 Log.e(Constants.TAG, "AvatarSFAsyncTask.onPostExecute: ERROR on download SF avatar");
         }
     }
+
+    private String updateEachKindOfContactWithSFAvatarURL(Response response)
+    {
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
+        String responseUrl = response.request().httpUrl().toString();
+        realmContactTransactions.setContactSFAvatarURL(contactId, responseUrl);
+        return responseUrl;
+    }
+
+
 }

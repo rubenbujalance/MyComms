@@ -25,6 +25,8 @@
                 android:id="@+id/chat_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:autoLink="web|email|map|phone"
+                android:clickable="true"
                 style="@style/ChatText"
                 tools:text="You say goodbye
                 and I say hello.

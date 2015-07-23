@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.framework.library.connection.HttpConnection;
 import com.framework.library.exception.ConnectionException;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -24,10 +23,7 @@ public class ContactSearchController extends BaseController {
 
     private Context mContext;
     private String mProfileId;
-    private ContactSearchConnection mContactSearchConnection;
     private JSONObject mJSONRecents;
-    private String idList = "";
-    private int offsetPaging = 0;
     private ContactsController contactsController;
 
     public ContactSearchController(Context appContext, String profileId) {
@@ -39,17 +35,11 @@ public class ContactSearchController extends BaseController {
 
     public void getContactById(JSONObject jsonObject) {
         Log.i(Constants.TAG, "ContactSearchController.getContactById: ");
-//        if(mContactSearchConnection != null){
-//            mContactSearchConnection.cancel();
-//        }
         mJSONRecents = jsonObject;
-        int method = HttpConnection.GET;
-        idList = getContactIdList();
-        if (idList!=null && idList.length()>0) {
+        String idList = getContactIdList();
+        if (idList !=null && idList.length()>0) {
             String apiCall = Constants.CONTACT_API_GET_CONTACTS_IDS + idList;
-//            //Get all Contacts related to Recents
-//            mContactSearchConnection = new ContactSearchConnection(mContext, this, method, apiCall);
-//            mContactSearchConnection.request();
+            //Get all Contacts related to Recents
             new GetContactsByIdsAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
                     (String) apiCall);
         }

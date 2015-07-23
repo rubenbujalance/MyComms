@@ -62,7 +62,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     private ProfileController profileController;
     private Context mContext;
-    private FilePushToServerController filePushToServerController;
     private SharedPreferences sp;
     public boolean appIsInitialized = false;
     FavouriteController favouriteController;
@@ -450,26 +449,34 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 String profile_id = params[0];
                 File file =  new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
                         "avatar_new_profile.jpg");
-                FilePushToServerController filePushToServerController =
-                        new FilePushToServerController(mContext);
+                String response = null;
+                if(sp.getBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false))
+                {
+                    if(null != file && file.exists() && file.length() != 0)
+                    {
+                        FilePushToServerController filePushToServerController =
+                                new FilePushToServerController(mContext);
 
-                filePushToServerController.sendImageRequest
-                        (
-                                Constants.CONTACT_API_POST_AVATAR,
-                                Constants.MULTIPART_AVATAR,
-                                file,
-                                Constants.MEDIA_TYPE_JPG
-                        );
+                        filePushToServerController.sendImageRequest
+                                (
+                                        Constants.CONTACT_API_POST_AVATAR,
+                                        Constants.MULTIPART_AVATAR,
+                                        file,
+                                        Constants.MEDIA_TYPE_JPG
+                                );
 
-                String response = filePushToServerController.executeRequest();
+                        response = filePushToServerController.executeRequest();
 
-                file.renameTo(new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
-                        "avatar_" + profile_id + ".jpg"));
+                        file.renameTo(new File(mContext.getFilesDir(), Constants.CONTACT_AVATAR_DIR +
+                                "avatar_" + profile_id + ".jpg"));
+                    }
+                    else
+                        Log.e(Constants.TAG, "sendAvatar.doInBackground: avatar file is null, impossible to push first avatar");
 
-                SharedPreferences.Editor editor = sp.edit();
-                editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false);
-                editor.commit();
-
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false);
+                    editor.commit();
+                }
                 return response;
             }
             catch (Exception e)
@@ -484,7 +491,10 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         protected void onPostExecute(String result)
         {
             super.onPostExecute(result);
-            Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
+            if(null != result)
+                Log.d(Constants.TAG, "FilePushToServerController.sendFile: Response content: " + result);
+            else
+                Log.e(Constants.TAG, "sendAvatar.onPostExecute: ERROR -> response is null");
         }
     }
 }

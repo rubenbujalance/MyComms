@@ -26,7 +26,7 @@ public class ContactListController extends BaseController {
         super(context);
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mContext, mProfileId);
+        contactsController = new ContactsController(mProfileId);
     }
 
     public void getContactList(String apiCall){

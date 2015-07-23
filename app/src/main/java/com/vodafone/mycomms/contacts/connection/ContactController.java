@@ -24,7 +24,7 @@ public class ContactController {
     public ContactController(Context context, String profileId) {
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mContext, profileId);
+        contactsController = new ContactsController(profileId);
     }
 
     public void getContactList(String api){
@@ -47,7 +47,7 @@ public class ContactController {
                             if (json != null && json.trim().length() > 0) {
                                 JSONObject jsonResponse = new JSONObject(json);
 
-                                ContactsController contactsController = new ContactsController(mContext, mProfileId);
+                                ContactsController contactsController = new ContactsController(mProfileId);
                                 contactsController.insertContactListInRealm(jsonResponse);
                                 contactsController.closeRealm();
                                 //Update Contact List View on every pagination

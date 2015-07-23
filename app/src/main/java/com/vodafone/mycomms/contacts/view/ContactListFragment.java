@@ -33,6 +33,7 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
@@ -199,7 +200,7 @@ public class ContactListFragment extends ListFragment {
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
-        mSearchController = new SearchController(getActivity(), profileId);
+        mSearchController = new SearchController(getActivity().getApplicationContext(), profileId);
         recentController = new RecentContactController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
 
@@ -468,7 +469,9 @@ public class ContactListFragment extends ListFragment {
             if (emptyText!=null)
                 emptyText.setText("");
             recentContactList = mContactTransactions.getAllRecentContacts();
-            if (recentContactList!=null) {
+            if (recentContactList!=null)
+            {
+                recentContactList = filterRecentList(recentContactList);
                 RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter
                         (getActivity().getApplicationContext(), recentContactList, profileId);
                 if (listView != null) {
@@ -486,6 +489,26 @@ public class ContactListFragment extends ListFragment {
                 reloadAdapter();
             }
         }
+    }
+
+    private ArrayList<RecentContact> filterRecentList(ArrayList<RecentContact> items)
+    {
+        ArrayList<RecentContact> finalList = new ArrayList<>();
+        RealmGroupChatTransactions realmGroupChatTransactions = new
+                RealmGroupChatTransactions(getActivity(), profileId);
+        for(RecentContact contact : items)
+        {
+            if(null != contact && null != contact.getId() && contact.getId().startsWith("mg_"))
+            {
+                if(null != realmGroupChatTransactions.getGroupChatById(contact.getId()))
+                    finalList.add(contact);
+            }
+
+            else if(null != contact && null != contact.getId())
+                finalList.add(contact);
+        }
+        realmGroupChatTransactions.closeRealm();
+        return finalList;
     }
 
     /**

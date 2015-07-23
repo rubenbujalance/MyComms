@@ -26,6 +26,9 @@
                 android:id="@+id/chat_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:autoLink="web|email|map|phone"
+                android:textColorLink="@color/blue_dark"
+                android:clickable="true"
                 style="@style/ChatText"
                 tools:text="I'm so tired...
                 I haven't slept today

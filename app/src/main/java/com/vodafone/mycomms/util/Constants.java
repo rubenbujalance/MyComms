@@ -261,5 +261,10 @@ public class Constants {
 
 
 
+
+    public static final String INTERNAL_URL_PATTERN_NEWS = "news/";
+    public static final String INTERNAL_URL_PATTERN_PREFIX = "mycomms://";
+
+
     public static final int MAX_AVATAR_WIDTH_OR_HEIGHT = 640;
 }

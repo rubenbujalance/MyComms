@@ -11,6 +11,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -32,7 +34,7 @@ public class ContactSearchController extends BaseController {
         super(appContext);
         this.mContext = appContext;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mContext, mProfileId);
+        contactsController = new ContactsController(mProfileId);
     }
 
     public void getContactById(JSONObject jsonObject) {
@@ -105,13 +107,13 @@ public class ContactSearchController extends BaseController {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(json);
 
-                ContactsController contactsController = new ContactsController(mContext, mProfileId);
+                ContactsController contactsController = new ContactsController(mProfileId);
                 contactsController.insertContactListInRealm(jsonResponse);
                 contactsController.closeRealm();
-                contactsController = new ContactsController(mContext, mProfileId);
+                contactsController = new ContactsController(mProfileId);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
                 contactsController.closeRealm();
-
+                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
                 //Show Recent Contacts
 //                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             } catch (JSONException e) {

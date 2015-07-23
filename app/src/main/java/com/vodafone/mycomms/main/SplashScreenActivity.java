@@ -199,7 +199,6 @@ public class SplashScreenActivity extends Activity {
         @Override
         protected void onPostExecute(HashMap<String,Object> result) {
             JSONObject json = null;
-            String text = null;
             String status = null;
 
             try {

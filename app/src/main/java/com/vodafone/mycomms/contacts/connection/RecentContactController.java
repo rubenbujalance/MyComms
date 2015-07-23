@@ -11,8 +11,6 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -40,7 +38,7 @@ public class RecentContactController {
     public RecentContactController(Context context, String profileId) {
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mContext, mProfileId);
+        contactsController = new ContactsController(mProfileId);
         contactSearchController = new ContactSearchController(mContext,mProfileId);
     }
 
@@ -64,7 +62,7 @@ public class RecentContactController {
                                     JSONObject jsonResponse = new JSONObject(json);
                                     contactSearchController.getContactById(jsonResponse);
                                     Log.i(Constants.TAG, "RecentContactController.onSuccess: ");
-                                    BusProvider.getInstance().post(new RecentContactsReceivedEvent());
+
                                 } catch (JSONException e) {
                                     Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
                                 }

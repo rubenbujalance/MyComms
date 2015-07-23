@@ -29,6 +29,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
@@ -295,8 +296,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             isAvatarHasChangedAfterSelection = true;
             Uri selectedImage = data.getData();
             photoPath = getRealPathFromURI(selectedImage);
-            photoBitmap = decodeFile(photoPath);
-            loadAvatarIntoImageView();
+            if (null != photoPath) {
+                photoBitmap = decodeFile(photoPath);
+                loadAvatarIntoImageView();
+            }
         }
         else
             isAvatarHasChangedAfterSelection = false;
@@ -603,18 +606,24 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private String getRealPathFromURI(Uri contentURI)
     {
-        String result;
-        Cursor cursor = getActivity().getContentResolver().query(contentURI, null, null, null,
-                null);
-        if (cursor == null) {
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
+        try {
+            String result;
+            Cursor cursor = getActivity().getContentResolver().query(contentURI, null, null, null,
+                    null);
+            if (cursor == null) {
+                result = contentURI.getPath();
+            } else {
+                cursor.moveToFirst();
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                result = cursor.getString(idx);
+                cursor.close();
+            }
+            return result;
+        } catch (Exception e){
+            Log.e(Constants.TAG, "ProfileFragment.getRealPathFromURI: ", e);
+            Crashlytics.logException(e);
+            return null;
         }
-        return result;
     }
 
     public class UpdateProfile extends AsyncTask<Void, Void, String>

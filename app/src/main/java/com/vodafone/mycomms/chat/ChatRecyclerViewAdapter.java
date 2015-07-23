@@ -6,13 +6,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.FullscreenImageActivity;
+import com.vodafone.mycomms.main.NewsDetailActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 
 import model.ChatMessage;
 import model.Contact;
+import model.News;
 import model.UserProfile;
 
 
@@ -155,7 +158,6 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                             XMPPTransactions.getXMPPStatusOrder(chatList.get(i).getStatus())))
                 status = chatList.get(i).getStatus();
 
-            //TODO -> in real version this should be implemented
             //Hiding delivered message in group chat mode
             if(isGroupChatMode)
                 chatHolder.chatSentText.setVisibility(View.GONE);
@@ -197,64 +199,15 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
         if(null != contact)
         {
-            //Image avatar
-            String initials = "";
-            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-            {
-                initials = contact.getFirstName().substring(0,1);
-
-                if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                {
-                    initials = initials + contact.getLastName().substring(0,1);
-                }
-            }
-
-            final String finalInitials = initials;
-
-            chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
-            chatHolder.chatAvatarText.setVisibility(View.VISIBLE);
-            chatHolder.chatAvatarText.setText(finalInitials);
-
-            if (contact.getAvatar()!=null &&
-                    contact.getAvatar().length()>0)
-            {
-
-                MycommsApp.picasso
-                        .load(contact.getAvatar())
-                        .placeholder(R.color.grey_middle)
-                        .noFade()
-                        .fit().centerCrop()
-                        .into(chatHolder.chatAvatarImage, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                chatHolder.chatAvatarText.setVisibility(View.INVISIBLE);
-                            }
-
-                            @Override
-                            public void onError() {
-                                chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
-                                chatHolder.chatAvatarText.setVisibility(View.VISIBLE);
-                                chatHolder.chatAvatarText.setText(finalInitials);
-                            }
-                        });
-            }
-            else
-            {
-                chatHolder.chatAvatarImage.setImageResource(R.color.grey_middle);
-                chatHolder.chatAvatarText.setText(initials);
-            }
+            Utils.loadContactAvatar(contact.getFirstName(), contact.getLastName(), chatHolder
+                    .chatAvatarImage, chatHolder.chatAvatarText, contact.getAvatar());
         }
 
-//        //Set message as read
-//        if(chatList.get(i).getRead().compareTo("0")==0 &&
-//                chatList.get(i).getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
-//        {
-//            XMPPTransactions.notifyIQMessageStatus(chatList.get(i).getId(),
-//                    chatList.get(i).getContact_id(),
-//                    Constants.CHAT_MESSAGE_STATUS_READ);
-//            _chatTx.setChatMessageReceivedAsRead(chatList.get(i));
-//        }
+        if(null != chatHolder.chatTextView)
+            setTextListeners(chatHolder.chatTextView);
     }
+
+
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
@@ -272,4 +225,50 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
         return null;
     }
+
+    private void setTextListeners(final TextView chatText)
+    {
+        chatText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                String text = ((TextView)v).getText().toString();
+                if(null != text && text.length() > 0)
+                {
+                    if(text.startsWith(Constants.INTERNAL_URL_PATTERN_NEWS))
+                    {
+                        String newsId = text.replace(Constants.INTERNAL_URL_PATTERN_NEWS, "");
+                        News news = getNewsById(newsId);
+                        if(null != news)
+                            startNewsActivity(news);
+                    }
+                }
+            }
+        });
+    }
+
+    private void startNewsActivity(News news)
+    {
+        Intent in = new Intent(mContext, NewsDetailActivity.class);
+        in.putExtra(Constants.NEWS_IMAGE, news.getImage());
+        in.putExtra(Constants.NEWS_TITLE, news.getTitle());
+        in.putExtra(Constants.NEWS_AUTHOR_AVATAR, news.getAuthor_avatar());
+        in.putExtra(Constants.NEWS_AUTHOR_NAME, news.getAuthor_name());
+        in.putExtra(Constants.NEWS_PUBLISHED_AT, news.getPublished_at());
+        in.putExtra(Constants.NEWS_HTML, news.getHtml());
+        in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+
+
+        mContext.startActivity(in);
+    }
+
+    private News getNewsById(String id)
+    {
+        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions();
+        News news = realmNewsTransactions.getNewById(id);
+        realmNewsTransactions.closeRealm();
+        return news;
+    }
+
+   
 }

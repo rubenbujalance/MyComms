@@ -77,6 +77,7 @@ public class SignupPincodeActivity extends Activity {
                         getIntent().getStringExtra("phoneNumber"));
 
         //Every time a key is pressed, it has to be written to the correct field
+
         etPin.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {

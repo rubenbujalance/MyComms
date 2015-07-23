@@ -203,7 +203,8 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
                     .chatAvatarImage, chatHolder.chatAvatarText, contact.getAvatar());
         }
 
-        setTextListeners(chatHolder.chatTextView);
+        if(null != chatHolder.chatTextView)
+            setTextListeners(chatHolder.chatTextView);
     }
 
 

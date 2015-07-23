@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.search;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -45,16 +44,6 @@ public class SearchController extends BaseController
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
     private String mProfileId;
-
-
-    public SearchController(Activity activity, String profileId) {
-        super(activity);
-        mContext = activity;
-        mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(profileId);
-        realmAvatarTransactions = new RealmAvatarTransactions();
-        internalContactSearch = new InternalContactSearch(activity, profileId);
-    }
 
     public SearchController(Context context, String profileId) {
         super(context);
@@ -296,14 +285,22 @@ public class SearchController extends BaseController
             contact.setSortHelper
                     ((
                                     Utils.normalizeStringNFD(contact.getFirstName()) + " " +
-                                    Utils.normalizeStringNFD(contact.getLastName()) + " " +
-                                    Utils.normalizeStringNFD(contact.getCompany())).trim()
+                                            Utils.normalizeStringNFD(contact.getLastName()) + " " +
+                                            Utils.normalizeStringNFD(contact.getCompany())).trim()
                     );
 
-            String SF_URL = realmContactTransactions.getContactById(contact.getContactId())
-                    .getStringField1();
-            if(null != SF_URL)
-                contact.setStringField1(SF_URL);
+
+            if(null != jsonObject.getString(Constants.CONTACT_ID)
+                    && null != realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+                    && null != jsonObject.getString(Constants.CONTACT_PLATFORM)
+                    && Constants.PLATFORM_SALES_FORCE.equals(jsonObject.getString(Constants
+                    .CONTACT_PLATFORM)))
+            {
+                String SF_URL = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+                        .getStringField1();
+                if(null != SF_URL)
+                    contact.setStringField1(SF_URL);
+            }
 
         }catch (JSONException e){
             e.printStackTrace();
@@ -331,6 +328,11 @@ public class SearchController extends BaseController
     {
         Log.d(Constants.TAG, "SearchController.storeContactsIntoRealm: ");
         realmContactTransactions.insertContactList(contacts);
+    }
+
+    public InternalContactSearch getInternalContactSearch()
+    {
+        return this.internalContactSearch;
     }
 
     public void closeRealm()

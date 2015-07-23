@@ -197,40 +197,44 @@ public class FilePushToServerController extends BaseController
     public File prepareFileToSend(Bitmap fileBitmap, String
             multipartName, String profileId)
     {
-        try
+        if(null != fileBitmap)
         {
-            File inputFile, dir;
-
-            if(null != multipartName && multipartName.equals(Constants.MULTIPART_AVATAR)) {
-                inputFile = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR, "avatar_" + profileId + ".jpg");
-                dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
-            }
-            else
+            try
             {
-                inputFile = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR, "file_" + profileId + ".jpg");
-                dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+                File inputFile, dir;
 
+                if(null != multipartName && multipartName.equals(Constants.MULTIPART_AVATAR)) {
+                    inputFile = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR, "avatar_" + profileId + ".jpg");
+                    dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+                }
+                else
+                {
+                    inputFile = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR, "file_" + profileId + ".jpg");
+                    dir = new File(mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR);
+
+                }
+
+                dir.mkdirs();
+
+                inputFile.delete();
+                inputFile.createNewFile();
+
+                //write the bytes in file
+                FileOutputStream fos = new FileOutputStream(inputFile);
+                fileBitmap.compress(Bitmap.CompressFormat.JPEG, 75, fos);
+                fos.flush();
+                fos.close();
+
+                return inputFile;
             }
-
-            dir.mkdirs();
-
-            inputFile.delete();
-            inputFile.createNewFile();
-
-            //write the bytes in file
-            FileOutputStream fos = new FileOutputStream(inputFile);
-            fileBitmap.compress(Bitmap.CompressFormat.JPEG, 75, fos);
-            fos.flush();
-            fos.close();
-
-            return inputFile;
+            catch(Exception e)
+            {
+                Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: ERROR ",e);
+                return null;
+            }
         }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: ERROR ",e);
+        else
             return null;
-        }
-
     }
 
     public boolean storeProfileAvatar(Bitmap imageData, String profileId) {

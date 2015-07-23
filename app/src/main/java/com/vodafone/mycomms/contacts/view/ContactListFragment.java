@@ -199,7 +199,7 @@ public class ContactListFragment extends ListFragment {
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
-        mSearchController = new SearchController(getActivity(), profileId);
+        mSearchController = new SearchController(getActivity().getApplicationContext(), profileId);
         recentController = new RecentContactController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
 

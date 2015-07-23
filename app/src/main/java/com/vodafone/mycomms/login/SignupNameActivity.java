@@ -164,14 +164,11 @@ public class SignupNameActivity extends Activity {
 
                 Intent in;
 
-                if(which == 0)
-                {
+                if (which == 0) {
                     in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     in.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
                     startActivityForResult(in, REQUEST_IMAGE_CAPTURE);
-                }
-                else if(which == 1)
-                {
+                } else if (which == 1) {
                     in = new Intent();
                     in.setType("image/*");
                     in.setAction(Intent.ACTION_PICK);
@@ -210,15 +207,18 @@ public class SignupNameActivity extends Activity {
             mPhoto.setBorderColor(Color.WHITE);
         }
 
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, true) ;
-        editor.commit();
+        if(null != photoBitmap)
+        {
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, true) ;
+            editor.commit();
 
-        FilePushToServerController filePushToServerController = new FilePushToServerController
-                (SignupNameActivity.this);
-        photoBitmap = Utils.adjustBitmapAsSquare(photoBitmap);
-        photoBitmap = Utils.resizeBitmapToStandardValue(photoBitmap, Constants.MAX_AVATAR_WIDTH_OR_HEIGHT);
-        filePushToServerController.prepareFileToSend(photoBitmap,Constants.MULTIPART_AVATAR, null);
+            FilePushToServerController filePushToServerController = new FilePushToServerController
+                    (SignupNameActivity.this);
+            photoBitmap = Utils.adjustBitmapAsSquare(photoBitmap);
+            photoBitmap = Utils.resizeBitmapToStandardValue(photoBitmap, Constants.MAX_AVATAR_WIDTH_OR_HEIGHT);
+            filePushToServerController.prepareFileToSend(photoBitmap,Constants.MULTIPART_AVATAR, null);
+        }
     }
 
     public Uri setImageUri()

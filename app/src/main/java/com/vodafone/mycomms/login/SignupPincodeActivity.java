@@ -7,8 +7,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -77,14 +78,18 @@ public class SignupPincodeActivity extends Activity {
                         getIntent().getStringExtra("phoneNumber"));
 
         //Every time a key is pressed, it has to be written to the correct field
-        etPin.setOnKeyListener(new View.OnKeyListener() {
+        etPin.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() != KeyEvent.ACTION_UP ||
-                    ((keyCode < 7 || keyCode > 16 ) && keyCode != 67) )
-                    return true;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-                String text;
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s==null || s.length()==0) return;
+
+                String text = s.toString();
+                text = text.substring(text.length()-1);
+
+                if(!text.matches("\\d+")) return;
 
                 if (nextPinPos == 1) {
                     //Start new pin
@@ -92,19 +97,15 @@ public class SignupPincodeActivity extends Activity {
                         setPinColor(Color.WHITE);
                         resetPin();
                     }
-                    text = String.valueOf((char) event.getUnicodeChar());
                     tvPin1.setText(text);
                     pin = text;
                 } else if (nextPinPos == 2) {
-                    text = String.valueOf((char) event.getUnicodeChar());
                     tvPin2.setText(text);
                     pin += text;
                 } else if (nextPinPos == 3) {
-                    text = String.valueOf((char) event.getUnicodeChar());
                     tvPin3.setText(text);
                     pin += text;
                 } else if (nextPinPos == 4) {
-                    text = String.valueOf((char) event.getUnicodeChar());
                     tvPin4.setText(text);
                     pin += text;
 
@@ -114,10 +115,49 @@ public class SignupPincodeActivity extends Activity {
 
                 if (nextPinPos < 4) nextPinPos++;
                 else nextPinPos = 1;
-
-                return true;
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
+
+//        etPin.setOnKeyListener(new View.OnKeyListener() {
+//            @Override
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                String text;
+//
+//                if (nextPinPos == 1) {
+//                    //Start new pin
+//                    if (tvPin1.getText().toString().trim().length() > 0) {
+//                        setPinColor(Color.WHITE);
+//                        resetPin();
+//                    }
+//                    text = String.valueOf((char) event.getUnicodeChar());
+//                    tvPin1.setText(text);
+//                    pin = text;
+//                } else if (nextPinPos == 2) {
+//                    text = String.valueOf((char) event.getUnicodeChar());
+//                    tvPin2.setText(text);
+//                    pin += text;
+//                } else if (nextPinPos == 3) {
+//                    text = String.valueOf((char) event.getUnicodeChar());
+//                    tvPin3.setText(text);
+//                    pin += text;
+//                } else if (nextPinPos == 4) {
+//                    text = String.valueOf((char) event.getUnicodeChar());
+//                    tvPin4.setText(text);
+//                    pin += text;
+//
+//                    if(APIWrapper.checkConnectionAndAlert(SignupPincodeActivity.this))
+//                        callPhoneCheck(pin);
+//                }
+//
+//                if (nextPinPos < 4) nextPinPos++;
+//                else nextPinPos = 1;
+//
+//                return true;
+//            }
+//        });
 
         btResendPin.setOnClickListener(new View.OnClickListener() {
             @Override

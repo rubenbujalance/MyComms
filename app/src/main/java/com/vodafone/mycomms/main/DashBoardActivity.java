@@ -343,7 +343,9 @@ public class DashBoardActivity extends ToolbarActivity
             loadUnreadMessages(recentsContainer2);
         }
         loadNews();
-        loadLocalContacts();
+
+        //TODO RBM - Uncomment after tests
+//        loadLocalContacts();
     }
 
     @Subscribe

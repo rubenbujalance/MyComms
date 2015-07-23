@@ -14,7 +14,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.chatgroup.DownloadAndSaveGroupChatAsyncTask;
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
@@ -22,6 +22,7 @@ import com.vodafone.mycomms.events.MessageSentStatusChanged;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -33,6 +34,9 @@ import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smackx.ping.PingManager;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.BufferedInputStream;
@@ -879,9 +883,8 @@ public final class XMPPTransactions {
 
             if(chat==null) {
                 //Get group from API in background, and save to Realm
-                new DownloadAndSaveGroupChatAsyncTask()
-                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                                _appContext, Constants.SINGLE_GROUP_CHAT_API, groupId, id);
+                downloadAndSaveGroupChat(id, groupId);
+
             }
             else {
                 chat = groupTx.updatedGroupChatInstance(chat, newChatMessage);
@@ -910,6 +913,83 @@ public final class XMPPTransactions {
         }
 
         return true;
+    }
+
+    private static void downloadAndSaveGroupChat(final String chatId, String groupId){
+        OKHttpWrapper.get(Constants.SINGLE_GROUP_CHAT_API + "/" + groupId, _appContext, new OKHttpWrapper.HttpCallback() {
+            @Override
+            public void onFailure(Response response, IOException e) {
+                Log.i(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onFailure:");
+            }
+
+            @Override
+            public void onSuccess(Response response) {
+                try {
+                    String jsonStr;
+                    JSONObject json;
+                    if (response.isSuccessful()) {
+                        jsonStr = response.body().string();
+                        if (jsonStr != null && jsonStr.trim().length() > 0) {
+                            try {
+                                json = new JSONObject(jsonStr);
+                                String groupId = json.getString("id");
+                                String creator = json.getString("creator");
+                                JSONArray members = json.getJSONArray("members");
+
+                                ArrayList<String> membersIds = new ArrayList<>();
+                                ArrayList<String> ownersIds = new ArrayList<>();
+                                JSONObject member;
+                                String id;
+
+                                for(int i=0; i<members.length(); i++)
+                                {
+                                    member = members.getJSONObject(i);
+                                    id = member.getString("id");
+
+                                    membersIds.add(id);
+                                    if(member.has("owner"))
+                                        ownersIds.add(id);
+                                }
+
+                                RealmGroupChatTransactions groupTx =
+                                        new RealmGroupChatTransactions(_appContext, _profile_id);
+
+                                GroupChat chat = groupTx.newGroupChatInstance(
+                                        groupId, _profile_id, membersIds, ownersIds, "", "", "");
+
+                                //Set last message data
+                                ChatMessage newChatMessage = groupTx.getGroupChatMessageById(chatId);
+                                if(newChatMessage!=null) {
+                                    chat.setLastMessage_id(newChatMessage.getId());
+
+                                    String lastText;
+                                    if (newChatMessage.getType() == Constants.CHAT_MESSAGE_TYPE_TEXT)
+                                        lastText = newChatMessage.getText();
+                                    else lastText = _appContext.getString(R.string.image);
+
+                                    if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
+                                        chat.setLastMessage(_appContext.getResources().getString(R.string.chat_me_text) + lastText);
+                                    else chat.setLastMessage(lastText);
+
+                                    chat.setLastMessageTime(newChatMessage.getTimestamp());
+                                }
+
+                                groupTx.insertOrUpdateGroupChat(chat);
+
+                                groupTx.closeRealm();
+
+                            } catch (JSONException e) {
+                                Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onConnectionComplete: ", e);
+                            }
+                        }
+                    } else {
+                        Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.isNOTSuccessful");
+                    }
+                } catch (IOException e) {
+                    Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onSuccess: ", e);
+                }
+            }
+        });
     }
 
     private static boolean saveAndNotifyGroupImageReceived(XmlPullParser parser)
@@ -977,9 +1057,7 @@ public final class XMPPTransactions {
 
             if(chat==null) {
                 //Get group from API in background, and save to Realm
-                new DownloadAndSaveGroupChatAsyncTask()
-                        .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                                _appContext, Constants.SINGLE_GROUP_CHAT_API, groupId, id);
+                downloadAndSaveGroupChat(id, groupId);
             }
             else {
                 chat = groupTx.updatedGroupChatInstance(chat, newChatMessage);

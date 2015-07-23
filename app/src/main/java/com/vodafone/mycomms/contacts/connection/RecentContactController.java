@@ -68,7 +68,7 @@ public class RecentContactController {
                                 }
                             }
                         } else {
-                            Log.e(Constants.TAG, "NewsController.isNOTSuccessful");
+                            Log.e(Constants.TAG, "RecentContactController.isNOTSuccessful");
                         }
                     } catch (IOException e){
                         Log.e(Constants.TAG, "RecentContactController.onSuccess: ", e);

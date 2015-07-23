@@ -342,8 +342,6 @@ public class DashBoardActivity extends ToolbarActivity
             loadRecents(recentsContainer2);
             loadUnreadMessages(recentsContainer2);
         }
-
-
         loadNews();
         loadLocalContacts();
     }

@@ -1,18 +1,13 @@
 package com.vodafone.mycomms.services;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.util.Constants;
 
 import java.util.Calendar;

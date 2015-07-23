@@ -182,8 +182,7 @@ public class OAuthActivity extends Activity {
 
         if(((MycommsApp)getApplication()).isProfileAvailable()) {
             goToApp();
-        }
-        else {
+        } else {
             Toast.makeText(this,
                     getString(R.string.no_internet_connection_log_in_needed),
                     Toast.LENGTH_LONG).show();
@@ -260,7 +259,7 @@ public class OAuthActivity extends Activity {
 //
 //                    loadingFinished = false;
 //
-                    // Otherwise, continue...
+                // Otherwise, continue...
 //                    return false;
 //                }
             }

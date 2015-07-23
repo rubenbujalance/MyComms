@@ -29,8 +29,7 @@ public class ContactController {
 
     public void getContactList(String api){
         Log.i(Constants.TAG, "ContactController.getContactList: " + api);
-//        new ContactAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-//                (String)apiCall);
+
         try{
             OKHttpWrapper.get(api, mContext, new OKHttpWrapper.HttpCallback() {
                 @Override
@@ -78,74 +77,6 @@ public class ContactController {
             Log.e(Constants.TAG, "ContactController.getContactList: ", e);
         }
     }
-
-//    public void contactListCallback(String json) {
-//        Log.i(Constants.TAG, "ContactController.contactListCallback: ");
-//
-//        try {
-//            if (json != null && json.trim().length() > 0) {
-//                try {
-//                    JSONObject jsonResponse = new JSONObject(json);
-//
-//                    contactsController.insertContactListInRealm(jsonResponse);
-//
-//                    //Update Contact List View on every pagination
-//                    BusProvider.getInstance().post(new SetContactListAdapterEvent());
-//
-//                    JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
-//                    if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
-//                        int pageSize = jsonPagination.getInt(Constants.CONTACT_PAGINATION_PAGESIZE);
-//                        offsetPaging = offsetPaging + pageSize;
-//                        getContactList(Constants.CONTACT_API_GET_CONTACTS + "&o=" + offsetPaging);
-//                    } else {
-//                        offsetPaging = 0;
-//                        //Bus Event Post when contacts have been received
-//                        BusProvider.getInstance().post(new ContactListReceivedEvent());
-//                    }
-//
-//                } catch (JSONException e) {
-//                    Log.e(Constants.TAG, "ContactController.contactListCallback: ", e);
-//                }
-//            }
-//        } catch (Exception e) {
-//            Log.e(Constants.TAG, "ContactController.contactListCallback: ",e);
-//        }
-//    }
-
-//    public class ContactAsyncTask extends AsyncTask<String, Void, String> {
-//        @Override
-//        protected String doInBackground(String... params) {
-//            Response response = null;
-//            String json = null;
-//
-//            try {
-//                OkHttpClient client = new OkHttpClient();
-//                Request request = new Request.Builder()
-//                        .url("https://" + EndpointWrapper.getBaseURL() +
-//                                params[0])
-//                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
-//                                Utils.getHttpHeaderVersion(mContext))
-//                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
-//                                Utils.getHttpHeaderContentType())
-//                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-//                                Utils.getHttpHeaderAuth(mContext))
-//                        .build();
-//
-//                response = client.newCall(request).execute();
-//                json = response.body().string();
-//
-//            } catch (Exception e) {
-//                Log.e(Constants.TAG, "ContactAsyncTask.doInBackground: ",e);
-//            }
-//
-//            return json;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String json) {
-//            contactListCallback(json);
-//        }
-//    }
 
     public void closeRealm()
     {

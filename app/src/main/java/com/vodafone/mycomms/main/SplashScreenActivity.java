@@ -158,6 +158,7 @@ public class SplashScreenActivity extends Activity {
                         renewToken();
                     } else {
                         ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
+                        goToApp(true);
                     }
                 } else {
                     //User not logged in

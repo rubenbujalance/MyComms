@@ -103,6 +103,9 @@ public class OKHttpWrapper {
                             Intent in = new Intent(context, LoginSignupActivity.class);
                             in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(in);
+                        } else if (code == 403){
+                            //Profile is not member of the group
+                            errorEvent.setErrorMessage("Profile is not member of the group " + code);//TODO: Hardcoded Strings
                         } else {
                             errorEvent.setErrorMessage("Error code " + code);//TODO: Hardcoded Strings
                         }

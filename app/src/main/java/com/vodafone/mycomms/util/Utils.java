@@ -18,6 +18,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -599,6 +600,17 @@ public final class Utils extends Activity {
             _userAgent = new WebView(context).getSettings().getUserAgentString();
         }
         return _userAgent;
+    }
+
+
+    public static void removeCookies()
+    {
+        final int API_LEVEL = android.os.Build.VERSION.SDK_INT;
+
+        if(API_LEVEL >= 21)
+            CookieManager.getInstance().removeSessionCookies(null);
+        else
+            CookieManager.getInstance().removeAllCookie();
     }
 
 }

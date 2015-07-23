@@ -32,7 +32,7 @@ public class ContactSearchController extends BaseController {
         super(appContext);
         this.mContext = appContext;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mContext, mProfileId);
+        contactsController = new ContactsController(mProfileId);
     }
 
     public void getContactById(JSONObject jsonObject) {
@@ -105,10 +105,10 @@ public class ContactSearchController extends BaseController {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(json);
 
-                ContactsController contactsController = new ContactsController(mContext, mProfileId);
+                ContactsController contactsController = new ContactsController(mProfileId);
                 contactsController.insertContactListInRealm(jsonResponse);
                 contactsController.closeRealm();
-                contactsController = new ContactsController(mContext, mProfileId);
+                contactsController = new ContactsController(mProfileId);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
                 contactsController.closeRealm();
 

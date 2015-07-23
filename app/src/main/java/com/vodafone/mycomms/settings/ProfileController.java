@@ -311,8 +311,13 @@ public class ProfileController extends BaseController {
     }
 
     public void updateTimeZone(HashMap timeZoneHashMap) {
-        JSONObject json = new JSONObject(timeZoneHashMap);
+        new GCMGetTokenAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, timeZoneHashMap);
+    }
+
+    private void updateTimeZoneWithDeviceId(HashMap body) {
+        JSONObject json = new JSONObject(body);
         Log.i(Constants.TAG, "ProfileController.updateTimeZone: " + json.toString());
+
         UpdateTimeZoneConnection updateTimeZoneConnection = new UpdateTimeZoneConnection(getContext(),this);
         updateTimeZoneConnection.setPayLoad(json.toString());
         updateTimeZoneConnection.request();
@@ -455,6 +460,25 @@ public class ProfileController extends BaseController {
             return jsonResp;
         }
 
+    }
+
+    private class GCMGetTokenAsyncTask extends AsyncTask<Object, Void, Object> {
+        @Override
+        protected Object doInBackground(Object... params) {
+            HashMap body = (HashMap)params[0];
+
+            String token = Utils.getGCMToken(getContext());
+            if(token!=null)
+                body.put("deviceId", token);
+
+            return body;
+        }
+
+        @Override
+        protected void onPostExecute(Object obj) {
+            HashMap body = (HashMap)obj;
+            updateTimeZoneWithDeviceId(body);
+        }
     }
 
     public void closeRealm()

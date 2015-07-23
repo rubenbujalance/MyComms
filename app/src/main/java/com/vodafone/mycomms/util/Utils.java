@@ -18,9 +18,14 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.google.android.gms.iid.InstanceID;
 import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
@@ -49,6 +54,8 @@ import java.util.concurrent.TimeUnit;
 public final class Utils extends Activity {
 
     private static HashMap<String, HashMap<String, String>> _countries = null;
+    private static String _userAgent = null;
+    private static String _gcmToken = null;
 
     public static void showAlert(Context activityContext, String title, String subtitle)
     {
@@ -547,6 +554,40 @@ public final class Utils extends Activity {
 
     public static boolean isMainThread() {
         return (Looper.getMainLooper().getThread() == Thread.currentThread());
+    }
+
+    public static String getGCMToken(Context context) {
+        if(_gcmToken==null) {
+
+            if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) ==
+                    ConnectionResult.SUCCESS) {
+                //Get deviceId
+                try {
+                    InstanceID instanceID = InstanceID.getInstance(context);
+                    String token = instanceID.getToken(Constants.GCM_SENDER_ID,
+                            GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+
+                    if (token != null && token.length() > 0)
+                        _gcmToken = token;
+
+                    Log.i(Constants.TAG, "Utils.getGCMToken: Device Token " + token);
+                } catch (Exception e) {
+                    Log.w(Constants.TAG, "Utils.getGCMToken: " +
+                            "Error getting GCM Device Token", e);
+                }
+            } else {
+                Log.i(Constants.TAG, "Utils.getGCMToken: Google Play Services not available");
+            }
+        }
+
+        return _gcmToken;
+    }
+
+    public static String getUserAgent(Context context) {
+        if(_userAgent==null) {
+            _userAgent = new WebView(context).getSettings().getUserAgentString();
+        }
+        return _userAgent;
     }
 
 }

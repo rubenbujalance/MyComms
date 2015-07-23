@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -15,13 +16,18 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.main.SplashScreenActivity;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UserSecurity;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -72,11 +78,8 @@ public class SignupPhoneActivity extends Activity {
             public void onClick(View v) {
                 if(checkData()) {
                     saveData();
-                    Intent in = new Intent(SignupPhoneActivity.this, SignupPincodeActivity.class);
-                    String dialCode = mCountry.getText().toString().trim();
-                    dialCode = dialCode.substring(dialCode.lastIndexOf(" "));
-                    in.putExtra("phoneNumber",dialCode + " " + mPhone.getText().toString());
-                    startActivity(in);
+                    if(APIWrapper.checkConnectionAndAlert(SignupPhoneActivity.this))
+                        callProfileCheck();
                 }
             }
         });
@@ -230,5 +233,91 @@ public class SignupPhoneActivity extends Activity {
     {
         UserProfile.setCountryISO(mCountry.getCodeSelected());
         UserProfile.setPhone(mPhone.getText().toString());
+    }
+
+    private void goToPincodeActivity() {
+        Intent in = new Intent(SignupPhoneActivity.this, SignupPincodeActivity.class);
+        String dialCode = mCountry.getText().toString().trim();
+        dialCode = dialCode.substring(dialCode.lastIndexOf(" "));
+        in.putExtra("phoneNumber", dialCode + " " + mPhone.getText().toString());
+        startActivity(in);
+    }
+
+    public void callProfileCheck()
+    {
+        HashMap<String, Object> body =
+                UserProfile.getHashMap();
+
+        new CheckProfileApi().execute(body, new HashMap<String,Object>());
+    }
+
+    private void callBackPhoneCheck(HashMap<String, Object> result)
+    {
+        Log.i(Constants.TAG, "SignupPhoneActivity.callBackPhoneCheck: " + result.toString());
+
+        String status = (String)result.get("status");
+
+        try {
+            if (status.compareTo("200") == 0) {
+                //User have to check e-mail
+
+                //Force hide keyboard
+                InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+                mgr.hideSoftInputFromWindow(mCountry.getWindowToken(), 0);
+                mgr.hideSoftInputFromWindow(mPhone.getWindowToken(), 0);
+
+                //Start "Email sent" activity
+                Intent in = new Intent(getApplicationContext(), MailSentActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(in);
+            }
+            else if (status.compareTo("201") == 0) {
+                //User created from OAuth, not necessary to check mail
+                //We have accessToken to go to app
+
+                //Delete the oauth from userProfile
+                UserProfile.setOauth(null);
+                UserProfile.setOauthPrefix(null);
+
+                //Force hide keyboard
+                InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+                mgr.hideSoftInputFromWindow(mCountry.getWindowToken(), 0);
+                mgr.hideSoftInputFromWindow(mPhone.getWindowToken(), 0);
+
+                //Get tokens and expiration data from http response
+                JSONObject jsonResponse = (JSONObject)result.get("json");
+                String accessToken = jsonResponse.getString("accessToken");
+                String refreshToken = jsonResponse.getString("refreshToken");
+                long expiresIn = jsonResponse.getLong("expiresIn");
+
+                UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
+
+                //Go to splashcreen which will check everything before entering app
+                Intent in = new Intent(getApplicationContext(), SplashScreenActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(in);
+                finish();
+            }
+            else
+            {
+                goToPincodeActivity();
+            }
+        } catch(Exception ex) {
+            Log.e(Constants.TAG, "SignupPhoneActivity.callBackPhoneCheck: ",ex);
+            Crashlytics.logException(ex);
+        }
+    }
+
+    private class CheckProfileApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+        @Override
+        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
+            return APIWrapper.httpPostAPI("/api/profile",params[0],params[1],
+                    SignupPhoneActivity.this);
+        }
+        @Override
+        protected void onPostExecute(HashMap<String,Object> result) {
+            callBackPhoneCheck(result);
+        }
     }
 }

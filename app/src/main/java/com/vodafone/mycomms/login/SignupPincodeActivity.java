@@ -183,13 +183,6 @@ public class SignupPincodeActivity extends Activity {
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        if(APIWrapper.checkConnectionAndAlert(SignupPincodeActivity.this))
-            callPhoneCheck(null);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_pincode, menu);

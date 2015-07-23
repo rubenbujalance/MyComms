@@ -4,13 +4,14 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.framework.library.connection.HttpConnection;
 import com.framework.library.exception.ConnectionException;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -22,32 +23,23 @@ public class ContactSearchController extends BaseController {
 
     private Context mContext;
     private String mProfileId;
-    private ContactSearchConnection mContactSearchConnection;
     private JSONObject mJSONRecents;
-    private String idList = "";
-    private int offsetPaging = 0;
     private ContactsController contactsController;
 
     public ContactSearchController(Context appContext, String profileId) {
         super(appContext);
         this.mContext = appContext;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mContext, mProfileId);
+        contactsController = new ContactsController(mProfileId);
     }
 
     public void getContactById(JSONObject jsonObject) {
         Log.i(Constants.TAG, "ContactSearchController.getContactById: ");
-//        if(mContactSearchConnection != null){
-//            mContactSearchConnection.cancel();
-//        }
         mJSONRecents = jsonObject;
-        int method = HttpConnection.GET;
-        idList = getContactIdList();
-        if (idList!=null && idList.length()>0) {
+        String idList = getContactIdList();
+        if (idList !=null && idList.length()>0) {
             String apiCall = Constants.CONTACT_API_GET_CONTACTS_IDS + idList;
-//            //Get all Contacts related to Recents
-//            mContactSearchConnection = new ContactSearchConnection(mContext, this, method, apiCall);
-//            mContactSearchConnection.request();
+            //Get all Contacts related to Recents
             new GetContactsByIdsAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
                     (String) apiCall);
         }
@@ -105,13 +97,13 @@ public class ContactSearchController extends BaseController {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(json);
 
-                ContactsController contactsController = new ContactsController(mContext, mProfileId);
+                ContactsController contactsController = new ContactsController(mProfileId);
                 contactsController.insertContactListInRealm(jsonResponse);
                 contactsController.closeRealm();
-                contactsController = new ContactsController(mContext, mProfileId);
+                contactsController = new ContactsController(mProfileId);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
                 contactsController.closeRealm();
-
+                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
                 //Show Recent Contacts
 //                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             } catch (JSONException e) {

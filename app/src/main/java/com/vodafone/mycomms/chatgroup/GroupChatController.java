@@ -254,7 +254,8 @@ public class GroupChatController
         }
         catch(Exception e)
         {
-            Log.e(Constants.TAG, LOG_TAG+".convertResponseToString: " + "ERROR ",e);
+            Log.e(Constants.TAG, "GroupChatController.getCreatedGroupChatId: ERROR -> JSON Object" +
+                    " does not contains group chat id! " + response);
             Crashlytics.logException(e);
             return null;
         }

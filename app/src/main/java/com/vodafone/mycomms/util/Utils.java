@@ -18,6 +18,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -404,37 +405,48 @@ public final class Utils extends Activity {
 
     public static Bitmap resizeBitmapToStandardValue(Bitmap bitmap, int maxWidthOrHeight)
     {
-        if(bitmap.getWidth() >= maxWidthOrHeight)
-            return Bitmap.createScaledBitmap(bitmap,maxWidthOrHeight,maxWidthOrHeight, true);
+        if(null != bitmap)
+        {
+            if(bitmap.getWidth() >= maxWidthOrHeight)
+                return Bitmap.createScaledBitmap(bitmap,maxWidthOrHeight,maxWidthOrHeight, true);
+            else
+                return bitmap;
+        }
         else
             return bitmap;
+
     }
 
     public static Bitmap adjustBitmapAsSquare(Bitmap bm)
     {
-        if (bm.getWidth() >= bm.getHeight()){
-
-            return Bitmap.createBitmap(
-                    bm,
-                    bm.getWidth()/2 - bm.getHeight()/2,
-                    0,
-                    bm.getHeight(),
-                    bm.getHeight()
-            );
-
-        }
-        else if(bm.getWidth() < bm.getHeight())
+        if(null != bm)
         {
+            if (bm.getWidth() >= bm.getHeight()){
 
-            return Bitmap.createBitmap(
-                    bm,
-                    0,
-                    bm.getHeight()/2 - bm.getWidth()/2,
-                    bm.getWidth(),
-                    bm.getWidth()
-            );
+                return Bitmap.createBitmap(
+                        bm,
+                        bm.getWidth()/2 - bm.getHeight()/2,
+                        0,
+                        bm.getHeight(),
+                        bm.getHeight()
+                );
+            }
+            else if(bm.getWidth() < bm.getHeight())
+            {
+
+                return Bitmap.createBitmap(
+                        bm,
+                        0,
+                        bm.getHeight()/2 - bm.getWidth()/2,
+                        bm.getWidth(),
+                        bm.getWidth()
+                );
+            }
+            else
+                return bm;
         }
         else
+
             return bm;
     }
 
@@ -588,6 +600,17 @@ public final class Utils extends Activity {
             _userAgent = new WebView(context).getSettings().getUserAgentString();
         }
         return _userAgent;
+    }
+
+
+    public static void removeCookies()
+    {
+        final int API_LEVEL = android.os.Build.VERSION.SDK_INT;
+
+        if(API_LEVEL >= 21)
+            CookieManager.getInstance().removeSessionCookies(null);
+        else
+            CookieManager.getInstance().removeAllCookie();
     }
 
 }

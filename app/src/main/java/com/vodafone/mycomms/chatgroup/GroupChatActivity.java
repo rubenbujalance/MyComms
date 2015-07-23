@@ -96,8 +96,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private RecentContactController mRecentContactController;
 
     private ArrayList<String> contactIds;
+    private ArrayList<String> groupChatOwnerIds;
     private ArrayList<Contact> contactList;
-    private String composedContactId = null;
     private RealmGroupChatTransactions mGroupChatTransactions;
     private SharedPreferences sp;
     private String previousActivity;
@@ -114,9 +114,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private File multiPartFile;
     private FilePushToServerController filePushToServerController;
 
-    private ImageView ivAvatarImage;
     private ImageView sendFileImage;
-    private TextView tvAvatarText;
 
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
@@ -396,6 +394,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     in.getStringExtra(Constants.GROUP_CHAT_ID));
             _groupId = _groupChat.getId();
             loadContactIds();
+            loadGroupChatOwnerIds();
         }
         else
         {
@@ -413,6 +412,13 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         String[] ids = _groupChat.getMembers().split("@");
         contactIds = new ArrayList<>();
         Collections.addAll(contactIds, ids);
+    }
+
+    private void loadGroupChatOwnerIds()
+    {
+        String ids[] = _groupChat.getOwners().split("@");
+        groupChatOwnerIds = new ArrayList<>();
+        Collections.addAll(groupChatOwnerIds, ids);
     }
 
     private void loadContactsFromIds()
@@ -676,11 +682,13 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         if(isGroupChatMode)
         {
-            if(_groupChat.getCreatorId().equals(_profile_id))
+            if(groupChatOwnerIds.contains(_profile_id))
                 imgModifyGroupChat.setVisibility(View.VISIBLE);
             else
                 imgModifyGroupChat.setVisibility(View.GONE);
         }
+        else
+            imgModifyGroupChat.setVisibility(View.GONE);
 
         etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
         tvSendChat = (TextView) findViewById(R.id.chat_send);

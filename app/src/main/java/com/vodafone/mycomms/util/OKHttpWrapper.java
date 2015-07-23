@@ -48,6 +48,9 @@ public class OKHttpWrapper {
                         Utils.getHttpHeaderContentType())
                 .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
                         Utils.getHttpHeaderAuth(context))
+                .addHeader(Constants.API_HTTP_HEADER_USER_AGENT,
+                        Utils.getUserAgent(context))
+
 //                .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
 //                        "aasa")
 //                .method(method, method.equals("GET") ? null : new RequestBody() {

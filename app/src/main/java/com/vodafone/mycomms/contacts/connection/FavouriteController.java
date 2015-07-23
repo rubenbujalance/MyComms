@@ -70,7 +70,10 @@ public class FavouriteController  extends BaseController {
                                 JSONObject jsonResponse = new JSONObject(json);
                                 contactsController.insertFavouriteContactInRealm(jsonResponse);
                             } else {
+                                RealmContactTransactions realmContactTransactions =
+                                        new RealmContactTransactions(mProfileId);
                                 realmContactTransactions.deleteAllFavouriteContacts();
+                                realmContactTransactions.closeRealm();
                             }
                             BusProvider.getInstance().post(new SetContactListAdapterEvent());
                         } else {

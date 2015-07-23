@@ -11,6 +11,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -111,7 +113,7 @@ public class ContactSearchController extends BaseController {
                 contactsController = new ContactsController(mProfileId);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
                 contactsController.closeRealm();
-
+                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
                 //Show Recent Contacts
 //                BusProvider.getInstance().post(new RecentContactsReceivedEvent());
             } catch (JSONException e) {

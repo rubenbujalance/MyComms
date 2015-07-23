@@ -47,6 +47,14 @@ public class RealmNewsTransactions {
         return newsArrayList;
     }
 
+    public News getNewById(String id)
+    {
+        RealmQuery<News> query = mRealm.where(News.class);
+        query.equalTo(Constants.NEWS_UUID, id);
+        News news = query.findFirst();
+        return news;
+    }
+    
     public void closeRealm() {
 //        if(mRealm!=null && !Utils.isMainThread()) mRealm.close();
     }

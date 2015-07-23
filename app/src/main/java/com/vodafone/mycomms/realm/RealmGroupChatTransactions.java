@@ -6,7 +6,6 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;

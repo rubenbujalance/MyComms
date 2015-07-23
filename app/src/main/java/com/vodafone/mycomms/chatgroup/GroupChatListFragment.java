@@ -42,6 +42,7 @@ import com.vodafone.mycomms.util.Constants;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import model.Contact;
 import model.GroupChat;
@@ -120,7 +121,7 @@ public class GroupChatListFragment extends ListFragment implements
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
 
-        mSearchController = new SearchController(getActivity(), profileId);
+        mSearchController = new SearchController(getActivity().getApplicationContext(), profileId);
         mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
         mGroupChatController = new GroupChatController(getActivity(), profileId);
@@ -258,10 +259,7 @@ public class GroupChatListFragment extends ListFragment implements
 
             this.ownersIds = new ArrayList<>();
             String[] ids = this.groupChat.getOwners().split("@");
-            for(String id : ids)
-            {
-                this.ownersIds.add(id);
-            }
+            Collections.addAll(ownersIds, ids);
         }
     }
 
@@ -587,25 +585,28 @@ public class GroupChatListFragment extends ListFragment implements
         {
             super.onPostExecute(response);
             if(pdia.isShowing()) pdia.dismiss();
-            if(!mGroupChatController.getResponseCode().startsWith("2"))
+            if(!mGroupChatController.getResponseCode().startsWith("2") || null == response)
             {
-                Log.e(Constants.TAG, LOG_TAG+".CreateGroupChatTask -> onPostExecute: ERROR. " +
-                        "Impossible Create Group Chat!!! -> code: "+mGroupChatController
-                        .getResponseCode()+" Response -> "+response);
+                Log.e(Constants.TAG, LOG_TAG + ".CreateGroupChatTask -> onPostExecute: ERROR. " +
+                        "Impossible Create Group Chat!!! -> code: " + mGroupChatController
+                        .getResponseCode() + " Response -> " + response);
             }
             else
             {
-                String chatToString = groupChat.getId() + groupChat.getProfileId()
-                        + groupChat.getMembers();
-                Log.i(Constants.TAG, LOG_TAG + ".CreateGroupChatTask -> Created chat is: " + chatToString);
-                mGroupChatTransactions.insertOrUpdateGroupChat(groupChat);
+                if(null != groupChat)
+                {
+                    String chatToString = groupChat.getId() + groupChat.getProfileId()
+                            + groupChat.getMembers();
+                    Log.i(Constants.TAG, LOG_TAG + ".CreateGroupChatTask -> Created chat is: " + chatToString);
+                    mGroupChatTransactions.insertOrUpdateGroupChat(groupChat);
 
-                // Insert recent
-                String action = Constants.CONTACTS_ACTION_SMS;
-                String id = groupChat.getId();
-                mRecentContactController.insertRecentOKHttp(id, action);
+                    // Insert recent
+                    String action = Constants.CONTACTS_ACTION_SMS;
+                    String id = groupChat.getId();
+                    mRecentContactController.insertRecentOKHttp(id, action);
 
-                startActivityInGroupChatMode();
+                    startActivityInGroupChatMode();
+                }
             }
         }
     }
@@ -653,11 +654,14 @@ public class GroupChatListFragment extends ListFragment implements
                 }
                 else
                 {
-                    GroupChat updatedGroupChat = new GroupChat(groupChat);
-                    updatedGroupChat.setMembers(generateComposedMembersId(selectedContacts));
-                    updatedGroupChat.setOwners(generateComposedMembersId(ownersIds));
-                    mGroupChatTransactions.insertOrUpdateGroupChat(updatedGroupChat);
-                    startActivityInGroupChatMode();
+                    if(null != groupChat)
+                    {
+                        GroupChat updatedGroupChat = new GroupChat(groupChat);
+                        updatedGroupChat.setMembers(generateComposedMembersId(selectedContacts));
+                        updatedGroupChat.setOwners(generateComposedMembersId(ownersIds));
+                        mGroupChatTransactions.insertOrUpdateGroupChat(updatedGroupChat);
+                        startActivityInGroupChatMode();
+                    }
                 }
             }
             catch (Exception e)
@@ -696,16 +700,21 @@ public class GroupChatListFragment extends ListFragment implements
             if(null != response && mGroupChatController.getResponseCode().startsWith("2"))
             {
                 String id = mGroupChatController.getCreatedGroupChatId(response);
-                this.groupChat = mGroupChatTransactions.newGroupChatInstance
-                        (
-                                id
-                                , this.profileId
-                                , this.selectedContacts
-                                , this.ownersIds
-                                , ""
-                                , ""
-                                , ""
-                        );
+                if(null != id)
+                {
+                    this.groupChat = mGroupChatTransactions.newGroupChatInstance
+                            (
+                                    id
+                                    , this.profileId
+                                    , this.selectedContacts
+                                    , this.ownersIds
+                                    , ""
+                                    , ""
+                                    , ""
+                            );
+                }
+                else
+                    response = null;
             }
         }
         return response;

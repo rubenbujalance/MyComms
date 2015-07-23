@@ -23,6 +23,7 @@ import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
@@ -142,6 +143,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                         Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(in);
                 getActivity().finish();
+
+                //Remove cookies if Sales Force login
+                Utils.removeCookies();
 
                 //Logout on server
                 profileController.logoutToAPI();

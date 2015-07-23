@@ -180,14 +180,14 @@ public class DashBoardActivity extends ToolbarActivity
 
         recentsLoading = true;
 
-        RealmContactTransactions realmContactTransactions;
+        //RealmContactTransactions realmContactTransactions;
         try {
             ArrayList<RecentContact> recentList = new ArrayList<>();
 
             LayoutInflater inflater = LayoutInflater.from(this);
             currentRecentContainer.removeAllViews();
 
-            realmContactTransactions = new RealmContactTransactions(_profileId);
+            //realmContactTransactions = new RealmContactTransactions(_profileId);
             recentList = realmContactTransactions.getAllRecentContacts();
 
             this.numberOfRecents = recentList.size();
@@ -751,9 +751,7 @@ public class DashBoardActivity extends ToolbarActivity
                     Crashlytics.logException(e);
                 }
             }
-            numberOfRecents --;
-            if(numberOfRecents == 0)
-                loadRecentLayout();
+            loadRecentLayout();
         }
     }
 
@@ -920,10 +918,7 @@ public class DashBoardActivity extends ToolbarActivity
                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
                 Crashlytics.logException(e);
             }
-
-            numberOfRecents --;
-            if(numberOfRecents == 0)
-                loadRecentLayout();
+            loadRecentLayout();
         }
     }
 
@@ -942,17 +937,21 @@ public class DashBoardActivity extends ToolbarActivity
 
     private void loadRecentLayout()
     {
-        if(isCurrentRecentContainerFirst)
+        numberOfRecents--;
+        if(numberOfRecents == 0)
         {
-            isCurrentRecentContainerFirst = false;
-            recentsContainer2.setVisibility(View.GONE);
-            recentsContainer.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            isCurrentRecentContainerFirst = true;
-            recentsContainer.setVisibility(View.GONE);
-            recentsContainer2.setVisibility(View.VISIBLE);
+            if(isCurrentRecentContainerFirst)
+            {
+                isCurrentRecentContainerFirst = false;
+                recentsContainer2.setVisibility(View.GONE);
+                recentsContainer.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                isCurrentRecentContainerFirst = true;
+                recentsContainer.setVisibility(View.GONE);
+                recentsContainer2.setVisibility(View.VISIBLE);
+            }
         }
     }
 

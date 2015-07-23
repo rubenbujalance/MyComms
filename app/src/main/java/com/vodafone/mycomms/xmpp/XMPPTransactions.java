@@ -84,7 +84,7 @@ public final class XMPPTransactions {
     private static long _lastChatMessageSentTimestamp;
 
     //Time between pings to server
-    private static final int PINGING_TIME_MILIS = 30000;
+    private static final int PINGING_TIME_MILLIS = 30000;
 
     //Pending messages handling
     private static int _pendingMessages;
@@ -127,7 +127,7 @@ public final class XMPPTransactions {
             }
 
             //Set a timer to check connection every 5 seconds
-            intervalPinging(PINGING_TIME_MILIS);
+            intervalPinging(PINGING_TIME_MILLIS);
 
             //Connect to server
             XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();

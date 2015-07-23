@@ -87,7 +87,7 @@ public class SignupPincodeActivity extends Activity {
                 if(s==null || s.length()==0) return;
 
                 String text = s.toString();
-                text = text.substring(text.length());
+                text = text.substring(text.length()-1);
 
                 if(!text.matches("\\d+")) return;
 

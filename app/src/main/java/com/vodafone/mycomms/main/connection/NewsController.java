@@ -36,7 +36,7 @@ public class NewsController{
         final String[] json = {null};
 
         try {
-            OKHttpWrapper.get(Constants.NEWS_API_GET, mContext, new OKHttpWrapper.HttpCallback() {
+            OKHttpWrapper.getNews(Constants.NEWS_API_GET, mContext, new OKHttpWrapper.HttpCallback() {
                 @Override
                 public void onFailure(Response response, IOException e) {
                     // handle failure
@@ -47,22 +47,17 @@ public class NewsController{
                 public void onSuccess(Response response) {
                     if (response.isSuccessful()) {
                         Log.i(Constants.TAG, "NewsController.onSuccess");
-                        if (response.code() < 500) {
-                            try {
-                                json[0] = response.body().string();
-                                if (json[0] != null) {
-                                    newsListCallback(json[0]);
-                                } else {
-                                    NewsReceivedEvent event = new NewsReceivedEvent();
-                                    event.setNews(null);
-                                    BusProvider.getInstance().post(event);
-                                }
-                            } catch (IOException e) {
-                                Log.e(Constants.TAG, "NewsController.onSuccess: ", e);
+                        try {
+                            json[0] = response.body().string();
+                            if (json[0] != null) {
+                                newsListCallback(json[0]);
+                            } else {
+                                NewsReceivedEvent event = new NewsReceivedEvent();
+                                event.setNews(null);
+                                BusProvider.getInstance().post(event);
                             }
-                        } else {
-                            Log.e(Constants.TAG, "NewsController.ErrorCode " + response.code());
-                            json[0] = null;
+                        } catch (IOException e) {
+                            Log.e(Constants.TAG, "NewsController.onSuccess: ", e);
                         }
                     } else {
                         Log.e(Constants.TAG, "NewsController.isNOTSuccessful");

@@ -21,6 +21,14 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- GCM -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission android:name=".permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name=".permission.C2D_MESSAGE" />
+
     <!-- *********** -->
     <!-- Appl -->
     <!-- *********** -->
@@ -166,12 +174,32 @@
             android:name=".chatgroup.GroupChatActivity"
             android:label="@string/title_activity_group_chat"
             android:screenOrientation="portrait"
+
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name=".chatgroup.FullscreenImageActivity"
             android:label="@string/title_activity_fullscreen_image" >
         </activity>
+
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name= "." />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".services.MyGcmListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

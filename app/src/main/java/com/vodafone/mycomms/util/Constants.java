@@ -12,12 +12,13 @@ public class Constants {
 
     //Parameter constants
     public static final int HTTP_READ_AVATAR_TIMEOUT = 10000;
-    public static final int HTTP_READ_FILE_TIMEOUT = 60000;
 
     //API Constants
     public static final String API_HTTP_HEADER_VERSION = "x-mycomms-version";
     public static final String API_HTTP_HEADER_CONTENTTYPE = "Content-Type";
     public static final String API_HTTP_HEADER_AUTHORIZATION = "Authorization";
+    public static final String API_HTTP_HEADER_USER_AGENT = "user-agent";
+    public static final String GCM_SENDER_ID = "1063414309124";
 
     //Chat Constants
     public static final int LEFT_CHAT = 0;

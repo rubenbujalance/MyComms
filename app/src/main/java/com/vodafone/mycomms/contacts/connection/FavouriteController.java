@@ -18,10 +18,13 @@ import com.vodafone.mycomms.events.RefreshFavouritesEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.Utils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class FavouriteController  extends BaseController {
@@ -49,13 +52,48 @@ public class FavouriteController  extends BaseController {
         apiCall = api;
         method = HttpConnection.GET;
         apiCall = api;
-        new FavouritesAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                (String)apiCall);
+
+        try{
+            OKHttpWrapper.get(apiCall, mContext, new OKHttpWrapper.HttpCallback() {
+                @Override
+                public void onFailure(Response response, IOException e) {
+                    Log.i(Constants.TAG, "FavouriteController.onFailure:");
+                }
+
+                @Override
+                public void onSuccess(Response response) {
+                    try {
+                        String json;
+                        if (response.isSuccessful()) {
+                            json = response.body().string();
+                            if (json != null && json.trim().length() > 0) {
+                                JSONObject jsonResponse = new JSONObject(json);
+                                contactsController.insertFavouriteContactInRealm(jsonResponse);
+                            } else {
+                                RealmContactTransactions realmContactTransactions =
+                                        new RealmContactTransactions(mProfileId);
+                                realmContactTransactions.deleteAllFavouriteContacts();
+                                realmContactTransactions.closeRealm();
+                            }
+                            BusProvider.getInstance().post(new SetContactListAdapterEvent());
+                        } else {
+                            Log.e(Constants.TAG, "FavouriteController.isNOTSuccessful");
+                        }
+                    } catch (IOException e) {
+                        Log.e(Constants.TAG, "FavouriteController.onSuccess: ", e);
+                    } catch (JSONException e) {
+                        Log.e(Constants.TAG, "FavouriteController.onSuccess: ", e);
+                    }
+                }
+            });
+        } catch (Exception e){
+            Log.e(Constants.TAG, "FavouriteController.getFavouritesList: ", e);
+        }
     }
 
     public void manageFavourite(String contactId){
         Log.i(Constants.TAG, "FavouriteController.manageFavourite: ");
-        JSONObject json = null;
+        JSONObject json;
         body = new HashMap<>();
         if(mFavouriteConnection != null){
             mFavouriteConnection.cancel();
@@ -110,7 +148,7 @@ public class FavouriteController  extends BaseController {
                 BusProvider.getInstance().post(new SetContactListAdapterEvent());
 
                 Log.i(Constants.TAG, "FavouriteController.favouriteListCallback: Calling ContactController");
-                contactController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
+
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactsController.favouriteListCallback: favourites", e);
             }
@@ -135,8 +173,6 @@ public class FavouriteController  extends BaseController {
                 BusProvider.getInstance().post(new SetContactListAdapterEvent());
 
                 Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: Calling ContactController");
-
-                contactController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactsController.onConnectionComplete: favourites", e);
             }

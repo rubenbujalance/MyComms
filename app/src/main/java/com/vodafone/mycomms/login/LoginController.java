@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.login;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.framework.library.exception.ConnectionException;
@@ -11,6 +12,7 @@ import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.login.connection.LoginConnection;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
@@ -31,13 +33,12 @@ public class LoginController extends BaseController {
 
     public void startLogin(String email, String password){
         Log.d(Constants.TAG, "LoginController.startLogin: ");
+
         HashMap body = new HashMap<>();
         body.put("username", email);
         body.put("password", password);
 
-        //body.put("username", "ruben_bujalance@stratesys-ts.com");
-        //body.put("password", "w9Va6Xa4J");
-        startLogin(body);
+        new GCMGetTokenAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, body);
     }
 
     private void startLogin(HashMap<String,Object> params){
@@ -90,6 +91,25 @@ public class LoginController extends BaseController {
         Log.w(Constants.TAG, "LoginController.onConnectionError: ");
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof ILoginConnectionCallback && ex.getUrl() !=null  && ex.getUrl().contains(LoginConnection.URL)){
             ((ILoginConnectionCallback)this.getConnectionCallback()).onLoginError(getContext().getString(R.string.oops_wrong_email));
+        }
+    }
+
+    private class GCMGetTokenAsyncTask extends AsyncTask<Object, Void, Object> {
+        @Override
+        protected Object doInBackground(Object... params) {
+            HashMap body = (HashMap)params[0];
+
+            String token = Utils.getGCMToken(getContext());
+            if(token!=null)
+                body.put("deviceId", token);
+
+            return body;
+        }
+
+        @Override
+        protected void onPostExecute(Object obj) {
+            HashMap body = (HashMap)obj;
+            startLogin(body);
         }
     }
 

@@ -16,6 +16,7 @@ import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.chatgroup.GroupChatController;
+import com.vodafone.mycomms.contacts.connection.ContactController;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
@@ -334,7 +335,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         recentContactController = new RecentContactController(this, profile_id);
         recentContactController.getRecentList();
-        favouriteController = new FavouriteController(mContext, profile_id);
         getNews();
         XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
     }
@@ -343,7 +343,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onEventNewsReceived(NewsReceivedEvent event) {
         Log.i(Constants.TAG, "MyCommsApp.onEventNewsReceived: ");
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
+        ContactController contactController = new ContactController(mContext, profile_id);
+        contactController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
+        FavouriteController favouriteController = new FavouriteController(mContext, profile_id);
         favouriteController.getFavouritesList(Constants.CONTACT_API_GET_FAVOURITES);
     }
 
@@ -370,11 +372,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             }else {
                 recentChatsHashMap.put(chatMsg.getContact_id(), chatMsg.getTimestamp());
             }
-            Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived : pendingMessages " + pendingMessages);
             if (pendingMessages == 0 && recentChatsHashMap!=null && recentChatsHashMap.size()>0){
                 RecentContactController recentContactController =
                         new RecentContactController(this, profile_id);
-                Log.i(Constants.TAG, "MycommsApp.onEventChatsReceived: pendingMessages 0");
                 HashMap<String, Long> recentChatsHashMapClone = new HashMap<>();
                 recentChatsHashMapClone.putAll(recentChatsHashMap);
                 recentContactController.insertPendingChatsRecent(recentChatsHashMapClone);

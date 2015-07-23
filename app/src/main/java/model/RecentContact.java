@@ -29,6 +29,7 @@ public class RecentContact extends RealmObject {
     private String action;
     private long timestamp;
 
+    //This field is used for SalesForce avatar URL
     private String stringField1;
     private String stringField2;
     private String stringField3;
@@ -51,8 +52,6 @@ public class RecentContact extends RealmObject {
     public RecentContact(){
 
     }
-
-
 
     public RecentContact(String uniqueId, String profileId, String contactId, int
             lastInteraction, String platform, String firstName, String lastName, String avatar,

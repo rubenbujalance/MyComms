@@ -23,6 +23,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -349,5 +350,18 @@ public class SplashScreenActivity extends Activity {
     protected void onPause() {
         isForeground = false;
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+    }
+
+    @Subscribe
+    public void onOKHttpErrorReceived(OKHttpErrorReceivedEvent event) {
+        Log.i(Constants.TAG, "LoginSignupActivity.onOKHttpErrorReceived: ");
+        String errorMessage = event.getErrorMessage();
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 }

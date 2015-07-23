@@ -3,12 +3,18 @@ package com.vodafone.mycomms.login;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
+import com.vodafone.mycomms.util.Constants;
 
 public class LoginSignupActivity extends Activity {
 
@@ -16,6 +22,9 @@ public class LoginSignupActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_signup_choose);
+
+        //Register Otto Bus
+        BusProvider.getInstance().register(this);
 
         Button btSignup = (Button)findViewById(R.id.btSignup);
             btSignup.setOnClickListener(new View.OnClickListener() {
@@ -57,5 +66,17 @@ public class LoginSignupActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Subscribe
+    public void onOKHttpErrorReceived(OKHttpErrorReceivedEvent event) {
+        Log.i(Constants.TAG, "LoginSignupActivity.onOKHttpErrorReceived: ");
+        String errorMessage = event.getErrorMessage();
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 }

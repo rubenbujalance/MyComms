@@ -54,6 +54,8 @@ public class RealmNewsTransactions {
         News news = query.findFirst();
         return news;
     }
-
-    public void closeRealm() {if(mRealm!=null) mRealm.close();}
+    
+    public void closeRealm() {
+//        if(mRealm!=null && !Utils.isMainThread()) mRealm.close();
+    }
 }

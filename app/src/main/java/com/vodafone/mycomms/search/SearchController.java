@@ -146,7 +146,7 @@ public class SearchController extends BaseController
 
                 realmContactList.add(contact);
                 doRefreshAdapter = (i==jsonArray.length()-1);
-                updateContactAvatar(contact, doRefreshAdapter);
+                //updateContactAvatar(contact, doRefreshAdapter);
             }
             realmContactTransactions.insertContactList(realmContactList);
         } catch (JSONException e) {

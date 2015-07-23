@@ -29,21 +29,23 @@ public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mSearchController = new SearchController(mContext, mProfileId);
+
     }
 
     @Override
     protected Void doInBackground(Void... params) {
         Log.i(Constants.TAG, "DownloadLocalContacts.doInBackground: ");
+        mSearchController = new SearchController(mContext, mProfileId);
         contactArrayList = getAllLocalContacts();
+        mSearchController.storeContactsIntoRealm(contactArrayList);
+        mSearchController.closeRealm();
         return null;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        mSearchController.storeContactsIntoRealm(contactArrayList);
-        mSearchController.closeRealm();
+
     }
 
     public ArrayList<Contact> getAllLocalContacts() {

@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
@@ -20,7 +19,6 @@ import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -274,7 +272,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             imagesText.add(viewHolder.top_right_avatar_text);
 
         int i = 0;
-        Contact cont = null;
+        Contact cont;
         for(ImageView imageView : images)
         {
 
@@ -282,47 +280,14 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
 
             if(null != cont)
             {
-                //Image avatar
-                File avatarFile = null;
-                if (cont.getId()!=null)
-                    avatarFile = new File
-                            (
-                                    mContext.getFilesDir()
-                                    , Constants.CONTACT_AVATAR_DIR + "avatar_"+cont.getContactId()+".jpg"
-                            );
-
-                if (cont.getAvatar()!=null &&
-                        cont.getAvatar().length()>0 &&
-                        cont.getAvatar().compareTo("")!=0 &&
-                        null != avatarFile &&
-                        avatarFile.exists())
-                {
-
-                    imagesText.get(i).setText(null);
-
-                    final File finalAvatarFile = avatarFile;
-
-                    Picasso.with(mContext)
-                            .load(avatarFile) // thumbnail url goes here
-                            .fit().centerCrop()
-                            .into(imageView);
-
-                } else{
-                    String initials = "";
-                    if(null != cont.getFirstName() && cont.getFirstName().length() > 0)
-                    {
-                        initials = cont.getFirstName().substring(0,1);
-
-                        if(null != cont.getLastName() && cont.getLastName().length() > 0)
-                        {
-                            initials = initials + cont.getLastName().substring(0,1);
-                        }
-
-                    }
-
-                    imageView.setImageResource(R.color.grey_middle);
-                    imagesText.get(i).setText(initials);
-                }
+                Utils.loadContactAvatar
+                        (
+                                cont.getFirstName()
+                                , cont.getLastName()
+                                , imageView
+                                , imagesText.get(i)
+                                , cont.getAvatar()
+                        );
             }
             i++;
         }

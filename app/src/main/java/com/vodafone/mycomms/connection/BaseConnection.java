@@ -16,6 +16,7 @@ import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 /**
  * Created by str_vig on 15/05/2015.
@@ -27,6 +28,7 @@ public class BaseConnection extends DefaultConnection {
 
     private static String appVersion = null;
     private static final String KEY_APP_VERSION = "x-mycomms-version";
+    private static final String KEY_USER_AGENT = "user-agent";
     private static final String KEY_CONTENT_TYPE = "Content-Type";
     private static final String VALUE_CONTENT_TYPE = "application/json; charset=utf-8";
     public static final String VALUE_UNAUTHORIZED = "unauthorized";
@@ -107,10 +109,15 @@ public class BaseConnection extends DefaultConnection {
             connection.addHeader(KEY_APP_VERSION, appVersion);
             connection.addHeader(KEY_CONTENT_TYPE, VALUE_CONTENT_TYPE);
 
+            //User-agent Header
+            String userAgent = Utils.getUserAgent(context);
+            if(userAgent!=null && userAgent.length()>0)
+                connection.addHeader(KEY_USER_AGENT, userAgent);
+
+            //Access token
             String authHeader = UserSecurity.getAccessToken(context);
             if (authHeader != null && authHeader.length() > 0) {
                 Log.d(Constants.TAG, "BaseConnection.setDefaultHeaders: Setting auth header for: " + this + ", " +  authHeader);
-               // authHeader = "rXN_WMVUp6OZew0HHJn9QACqWjZ1tNgcFCJROD6IgvMsa0MPMzGpjqA9BQz1VGQjFjfgSdFIMGxBPgy9qziJ4XLx7w6Rr6I8NOyxLN9IQX2UuLwC8J9MgtUW1RZRkLTW4VOrrj5zvecpOlv8m_FeUfX_oQSiFIzQEjtTe1cretL";
                 connection.addHeader(KEY_AUTHORIZATION, TAG_VALUE_AUTHORIZATION + authHeader);
 
                // Log.d(Constants.TAG, "BaseConnection.setDefaultHeaders: Setting auth header for: " + this + ", " + authHeader);

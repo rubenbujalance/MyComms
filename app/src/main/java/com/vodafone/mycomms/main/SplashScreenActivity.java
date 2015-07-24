@@ -158,7 +158,9 @@ public class SplashScreenActivity extends Activity {
                         renewToken();
                     } else {
                         ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
-                        goToApp(true);
+
+                        if(((MycommsApp)getApplication()).isProfileAvailable())
+                            goToApp(true);
                     }
                 } else {
                     //User not logged in
@@ -255,6 +257,8 @@ public class SplashScreenActivity extends Activity {
 
                 //Load profile and go to app
                 ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
+                if(((MycommsApp)getApplication()).isProfileAvailable())
+                    goToApp(true);
             }
             else
             {

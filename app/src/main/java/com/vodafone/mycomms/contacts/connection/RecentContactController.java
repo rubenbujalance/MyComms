@@ -38,7 +38,7 @@ public class RecentContactController {
     public RecentContactController(Context context, String profileId) {
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mContext, mProfileId);
+        contactsController = new ContactsController(mProfileId);
         contactSearchController = new ContactSearchController(mContext,mProfileId);
     }
 
@@ -68,7 +68,7 @@ public class RecentContactController {
                                 }
                             }
                         } else {
-                            Log.e(Constants.TAG, "NewsController.isNOTSuccessful");
+                            Log.e(Constants.TAG, "RecentContactController.isNOTSuccessful");
                         }
                     } catch (IOException e){
                         Log.e(Constants.TAG, "RecentContactController.onSuccess: ", e);
@@ -341,59 +341,6 @@ public class RecentContactController {
             return "";
         }
     }
-
-//    public class RecentContactsGETAsyncTask extends AsyncTask<String, Void, String> {
-//        @Override
-//        protected String doInBackground(String... params) {
-//            Response response;
-//            String json = null;
-//
-//            try {
-//                OkHttpClient client = new OkHttpClient();
-//                Request request = new Request.Builder()
-//                        .url("https://" + EndpointWrapper.getBaseURL() +
-//                            params[0])
-//                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
-//                                Utils.getHttpHeaderVersion(mContext))
-//                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
-//                                Utils.getHttpHeaderContentType())
-//                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-//                                Utils.getHttpHeaderAuth(mContext))
-//                        .build();
-//
-//                response = client.newCall(request).execute();
-//                json = response.body().string();
-//
-//            } catch (Exception e) {
-//                Log.e(Constants.TAG, "RecentContactsGETAsyncTask.doInBackground: ",e);
-//            }
-//
-//            return json;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String json) {
-//            recentListCallback(json);
-//        }
-//
-//        public void recentListCallback(String json) {
-//            Log.i(Constants.TAG, "RecentContactController.recentListCallback: ");
-//            try {
-//                if (json != null && json.trim().length() > 0) {
-//                    try {
-//                        JSONObject jsonResponse = new JSONObject(json);
-//                        contactSearchController.getContactById(jsonResponse);
-//                        Log.i(Constants.TAG, "RecentContactsGETAsyncTask.recentListCallback: onRecentContactsReceived");
-//                        BusProvider.getInstance().post(new RecentContactsReceivedEvent());
-//                    } catch (JSONException e) {
-//                        Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ", e);
-//                    }
-//                }
-//            } catch (Exception e) {
-//                Log.e(Constants.TAG, "RecentContactController.onConnectionComplete: ",e);
-//            }
-//        }
-//    }
 
     public void closeRealm()
     {

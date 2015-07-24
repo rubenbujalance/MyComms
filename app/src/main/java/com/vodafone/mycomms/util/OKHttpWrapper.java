@@ -15,6 +15,7 @@ import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class OKHttpWrapper {
 
@@ -34,8 +35,10 @@ public class OKHttpWrapper {
         call("POST", url, context, cb, EndpointWrapper.getBaseNewsURL());
     }
 
-    private static void call(String method, String url, final Context context, final HttpCallback cb, final String endPointWrapper) {
+    private static void call(String method, final String url, final Context context, final HttpCallback cb, final String endPointWrapper) {
         OkHttpClient client = new OkHttpClient();
+        client.setConnectTimeout(10, TimeUnit.SECONDS);
+        client.setReadTimeout(15, TimeUnit.SECONDS);
         Request.Builder builder = new Request.Builder();
         Request request = builder
                 .url("https://" + endPointWrapper +
@@ -85,6 +88,8 @@ public class OKHttpWrapper {
                 if (!response.isSuccessful()) {
                     int code = response.code();
                     OKHttpErrorReceivedEvent errorEvent = new OKHttpErrorReceivedEvent();
+                    errorEvent.setErrorCode(code);
+                    errorEvent.setUrl(url);
                     if (code >= 500){
                         //Backend Error
                         Log.e(Constants.TAG, "OKHttpWrapper.onResponse: error code " + code);
@@ -103,6 +108,9 @@ public class OKHttpWrapper {
                             Intent in = new Intent(context, LoginSignupActivity.class);
                             in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(in);
+                        } else if (code == 403){
+                            //Profile is not member of the group
+                            errorEvent.setErrorMessage("Profile is not member of the group " + code);//TODO: Hardcoded Strings
                         } else {
                             errorEvent.setErrorMessage("Error code " + code);//TODO: Hardcoded Strings
                         }

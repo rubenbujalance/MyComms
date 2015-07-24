@@ -1,17 +1,11 @@
 package com.vodafone.mycomms.contacts.connection;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.framework.library.connection.HttpConnection;
 import com.framework.library.model.ConnectionResponse;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RefreshFavouritesEvent;
@@ -19,7 +13,6 @@ import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
-import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,7 +36,7 @@ public class FavouriteController  extends BaseController {
         this.mContext = context;
         this.mProfileId = profileId;
         realmContactTransactions = new RealmContactTransactions(mProfileId);
-        contactsController = new ContactsController(mContext,  mProfileId);
+        contactsController = new ContactsController(mProfileId);
         contactController = new ContactController(mContext, mProfileId);
     }
 
@@ -176,63 +169,6 @@ public class FavouriteController  extends BaseController {
             } catch (Exception e) {
                 Log.e(Constants.TAG, "ContactsController.onConnectionComplete: favourites", e);
             }
-        }
-    }
-
-    public class FavouritesAsyncTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            //String jsonBody = params[1];
-            String jsonBody;
-            Response response;
-            String json = null;
-
-            try {
-
-                OkHttpClient client = new OkHttpClient();
-                Request request = null;
-                if (method == HttpConnection.GET) {
-                    request = new Request.Builder()
-                            .url("https://" + EndpointWrapper.getBaseURL() +
-                                    params[0])
-                            .addHeader(Constants.API_HTTP_HEADER_VERSION,
-                                    Utils.getHttpHeaderVersion(mContext))
-                            .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
-                                    Utils.getHttpHeaderContentType())
-                            .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-                                    Utils.getHttpHeaderAuth(mContext))
-                            .build();
-                } if (method == HttpConnection.POST || method == HttpConnection.POST) {
-                    jsonBody = params[1];
-                    MediaType JSON
-                            = MediaType.parse("application/json; charset=utf-8");
-                    RequestBody body = RequestBody.create(JSON, jsonBody);
-                    request = new Request.Builder()
-                            .url("https://" + EndpointWrapper.getBaseURL() +
-                                    params[0])
-                            .addHeader(Constants.API_HTTP_HEADER_VERSION,
-                                    Utils.getHttpHeaderVersion(mContext))
-                            .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
-                                    Utils.getHttpHeaderContentType())
-                            .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-                                    Utils.getHttpHeaderAuth(mContext))
-                            .post(body)
-                            .build();
-                }
-                response = client.newCall(request).execute();
-                json = response.body().string();
-
-
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "FavouritesAsyncTask.doInBackground: ",e);
-            }
-
-            return json;
-        }
-
-        @Override
-        protected void onPostExecute(String json) {
-            favouriteListCallback(json);
         }
     }
 

@@ -23,6 +23,7 @@ import com.vodafone.mycomms.settings.connection.UpdateProfileConnection;
 import com.vodafone.mycomms.settings.connection.UpdateSettingsConnection;
 import com.vodafone.mycomms.settings.connection.UpdateTimeZoneConnection;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -30,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import model.UserProfile;
@@ -71,8 +73,31 @@ public class ProfileController extends BaseController {
             }
         }
 
-        new GetProfileAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                (String) Constants.CONTACT_API_GET_PROFILE);
+//        new GetProfileAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+//                (String) Constants.CONTACT_API_GET_PROFILE);
+
+        OKHttpWrapper.get(Constants.CONTACT_API_GET_PROFILE, getContext(), new OKHttpWrapper.HttpCallback() {
+            @Override
+            public void onFailure(Response response, IOException e) {
+                getProfileCallback(null);
+            }
+
+            @Override
+            public void onSuccess(Response response) {
+                String json;
+
+                try {
+                    if (Integer.toString(response.code()).startsWith("2")) {
+                        json = response.body().string();
+                        getProfileCallback(json);
+                    } else {
+                        getProfileCallback(null);
+                    }
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "ProfileController.onSuccess: ", e);
+                }
+            }
+        });
     }
 
     public boolean isUserProfileChanged(String firstName, String lastName, String company, String
@@ -371,13 +396,12 @@ public class ProfileController extends BaseController {
                 ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileConnectionError();
             }
         } catch (Exception e) {
-            Log.w(Constants.TAG, "ProfileController.onConnectionComplete: Exception (handled correctly) while parsing userProfile",e);
+            Log.w(Constants.TAG, "ProfileController.onConnectionComplete: " +
+                    "Exception while parsing profile received",e);
         }
 
-        if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IProfileConnectionCallback) {
-            if (isUserProfileReceived) {
-                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
-            }
+        if (isUserProfileReceived) {
+            ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfile);
         }
     }
 
@@ -418,8 +442,7 @@ public class ProfileController extends BaseController {
 
         @Override
         protected void onPostExecute(String json) {
-            if(null != json)
-                getProfileCallback(json);
+            getProfileCallback(json);
         }
     }
 

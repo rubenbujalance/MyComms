@@ -136,6 +136,9 @@ public class OAuthActivity extends Activity {
 
                 //Load profile
                 ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
+
+                if(((MycommsApp)getApplication()).isProfileAvailable())
+                    goToApp();
             }
             else if (status.compareTo("203") == 0) {
                 //We have got user information, continue SignUp process
@@ -186,6 +189,8 @@ public class OAuthActivity extends Activity {
             Toast.makeText(this,
                     getString(R.string.no_internet_connection_log_in_needed),
                     Toast.LENGTH_LONG).show();
+
+            finish();
         }
     }
 

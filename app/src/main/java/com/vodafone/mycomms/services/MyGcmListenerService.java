@@ -14,9 +14,10 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.util.Constants;
 
-import java.util.Calendar;
+public class MyGcmListenerService extends GcmListenerService
+{
 
-public class MyGcmListenerService extends GcmListenerService {
+    private final long NOTIFICATION_ID = 1;
     public MyGcmListenerService() {
     }
 
@@ -29,12 +30,22 @@ public class MyGcmListenerService extends GcmListenerService {
         sendNotification(message);
     }
 
-    private void sendNotification(String message) {
+    private void sendNotification(String message)
+    {
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle(getString(R.string.app_name))
                         .setContentText(message);
+
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+        inboxStyle.setBigContentTitle("Messages: ");
+        inboxStyle.addLine(message);
+        mBuilder.setStyle(inboxStyle);
 
         Intent resultIntent = new Intent(this, DashBoardActivity.class);
 
@@ -56,13 +67,11 @@ public class MyGcmListenerService extends GcmListenerService {
         if(resultPendingIntent!=null)
             mBuilder.setContentIntent(resultPendingIntent);
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-
-        long notifId = Calendar.getInstance().getTimeInMillis();
-        mNotificationManager.notify((int)notifId, mBuilder.build());
+        mNotificationManager.notify
+                (
+                        (int)NOTIFICATION_ID
+                        , mBuilder.build()
+                );
     }
 
 }

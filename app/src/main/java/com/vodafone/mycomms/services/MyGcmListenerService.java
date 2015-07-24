@@ -13,65 +13,60 @@ import com.google.android.gms.gcm.GcmListenerService;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.NotificationMessages;
 
 public class MyGcmListenerService extends GcmListenerService
 {
 
-    private final long NOTIFICATION_ID = 1;
-    public MyGcmListenerService() {
+    private final String GROUP_KEY_EMAILS  = "mycomms_group_key_notifier";
+
+    public MyGcmListenerService()
+    {
     }
+
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
         Bundle test = data;
-        Log.i(Constants.TAG, "MyGcmListenerService.onMessageReceived: From-"+from+"; Message-"+message);
-
-        sendNotification(message);
+        Log.i(Constants.TAG, "MyGcmListenerService.onMessageReceived: From-" + from + "; Message-" + message);
+        //sendNotification(message);
+        NotificationMessages.sendMessage(message, this);
     }
 
     private void sendNotification(String message)
     {
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
+        int number = 0;
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(message);
-
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        inboxStyle.setBigContentTitle("Messages: ");
-        inboxStyle.addLine(message);
-        mBuilder.setStyle(inboxStyle);
+                        .setContentTitle("MyComms")
+                        .setContentText(message)
+                        .setGroup(GROUP_KEY_EMAILS)
+                        .setGroupSummary(true)
+                        .setNumber(++number);
 
         Intent resultIntent = new Intent(this, DashBoardActivity.class);
 
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(DashBoardActivity.class);
-        // Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(
                         0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_CANCEL_CURRENT
                 );
+        mBuilder.setContentIntent(resultPendingIntent);
 
-        if(resultPendingIntent!=null)
-            mBuilder.setContentIntent(resultPendingIntent);
+            NotificationManager notificationManager = (NotificationManager) getSystemService
+                    (Context.NOTIFICATION_SERVICE);
 
-        mNotificationManager.notify
-                (
-                        (int)NOTIFICATION_ID
-                        , mBuilder.build()
-                );
+        notificationManager.notify(1, mBuilder.build
+                ());
+
     }
+
+
 
 }

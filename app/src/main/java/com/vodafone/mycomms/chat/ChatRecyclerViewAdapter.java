@@ -208,7 +208,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         if(null != chatHolder.chatTextView)
             setTextListeners(chatHolder.chatTextView);
 
-        setInternalURLPatterns(chatHolder.chatTextView);
+        //setInternalURLPatterns(chatHolder.chatTextView);
     }
 
 

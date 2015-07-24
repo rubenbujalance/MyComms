@@ -267,4 +267,6 @@ public class Constants {
 
 
     public static final int MAX_AVATAR_WIDTH_OR_HEIGHT = 640;
+
+
 }

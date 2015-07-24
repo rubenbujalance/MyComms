@@ -25,10 +25,12 @@ public class RealmProfileTransactions {
         }
 
         try {
-            mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(userProfile);
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            realm.copyToRealmOrUpdate(userProfile);
 
-            mRealm.commitTransaction();
+            realm.commitTransaction();
+            realm.close();
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmProfileTransactions.insertContact: " + e);
             Crashlytics.logException(e);

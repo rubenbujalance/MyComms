@@ -223,6 +223,9 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
         //Load profile
         ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
+
+        if(((MycommsApp)getApplication()).isProfileAvailable())
+            goToApp();
     }
 
     @Override

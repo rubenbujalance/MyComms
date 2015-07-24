@@ -23,7 +23,7 @@ public class MailSentActivity extends ActionBarActivity {
     TextView mTVHavingTrouble;
     TextView mWeSent;
     Button mResendEmail;
-    String pin;
+    String pin = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +38,9 @@ public class MailSentActivity extends ActionBarActivity {
                 UserProfile.getHashMap();
         mWeSent.setText(getString(R.string.we_sent_an_email_to)+"\n"+userProfile.get("email"));
 
-        pin = (String)this.getIntent().getExtras().get("pin");
+        if(this.getIntent().getExtras()!=null &&
+                this.getIntent().getExtras().get("pin")!=null)
+            pin = (String)this.getIntent().getExtras().get("pin");
 
         mResendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,7 +88,8 @@ public class MailSentActivity extends ActionBarActivity {
     public void callPhoneCheck(String pin)
     {
         HashMap<String, Object> header = new HashMap();
-        header.put("x-otp-pin", pin);
+        if(pin!=null)
+            header.put("x-otp-pin", pin);
 
         HashMap<String, Object> body =
                 UserProfile.getHashMap();

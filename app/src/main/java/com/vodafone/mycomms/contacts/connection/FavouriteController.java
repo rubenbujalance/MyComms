@@ -115,9 +115,7 @@ public class FavouriteController  extends BaseController {
             mFavouriteConnection.setPayLoad(json.toString());
             mFavouriteConnection.request();
         }
-        //TODO: Pending Test
-//        new FavouritesAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-//                (String)apiCall, json);
+        BusProvider.getInstance().post(new SetContactListAdapterEvent());
     }
 
     public boolean contactIsFavourite(String contactId)

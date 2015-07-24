@@ -14,7 +14,7 @@ public class RealmProfileTransactions {
     private Realm mRealm;
 
     public RealmProfileTransactions() {
-        mRealm = Realm.getDefaultInstance();
+        //mRealm = Realm.getDefaultInstance();
     }
 
     public void insertUserProfile(UserProfile userProfile){
@@ -25,10 +25,12 @@ public class RealmProfileTransactions {
         }
 
         try {
-            mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(userProfile);
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            realm.copyToRealmOrUpdate(userProfile);
 
-            mRealm.commitTransaction();
+            realm.commitTransaction();
+            realm.close();
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmProfileTransactions.insertContact: " + e);
             Crashlytics.logException(e);
@@ -37,10 +39,12 @@ public class RealmProfileTransactions {
 
     public void updateProfileTimezone (String timezone, String profileId){
         try {
-            mRealm.beginTransaction();
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
             UserProfile userProfile = getUserProfile(profileId);
             userProfile.setTimezone(timezone);
-            mRealm.commitTransaction();
+            realm.commitTransaction();
+            realm.close();
         } catch (IllegalArgumentException e){
             e.printStackTrace();
             Log.e(Constants.TAG, "RealmProfileTransactions.updateProfileTimezone: " + e);
@@ -53,11 +57,12 @@ public class RealmProfileTransactions {
 
     public UserProfile getUserProfile(String profileId){
         try {
-            RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);
+            Realm realm = Realm.getDefaultInstance();
+            RealmQuery<UserProfile> query = realm.where(UserProfile.class);
             query.equalTo(Constants.CONTACT_ID, profileId);
                  //.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
             RealmResults<UserProfile> result1 = query.findAll();
-
+            realm.close();
             if (result1 != null) {
                 return result1.first();
             } else {

@@ -344,8 +344,7 @@ public class DashBoardActivity extends ToolbarActivity
         }
         loadNews();
 
-        //TODO RBM - Uncomment after tests
-//        loadLocalContacts();
+        loadLocalContacts();
     }
 
     @Subscribe

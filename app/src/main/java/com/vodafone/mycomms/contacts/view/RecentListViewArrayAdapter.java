@@ -162,6 +162,9 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
 
     private void loadContactView(RecentContact contact, final RecentViewHolder viewHolder)
     {
+        viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
+        viewHolder.textViewCompany.setVisibility(View.VISIBLE);
+
         viewHolder.lay_top_right_image_hide.setVisibility(View.GONE);
         viewHolder.lay_bottom_both_image_hide.setVisibility(View.GONE);
         viewHolder.lay_top_left_image.setLayoutParams

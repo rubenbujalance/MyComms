@@ -172,6 +172,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         //Save profile_id if accessToken has changed
         String profile_id = validateAccessToken();
         String deviceId = setDeviceId();
+
+        if(profile_id!=null)
+            BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
     }
 
     private String validateAccessToken(){
@@ -179,6 +182,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         String accessToken = UserSecurity.getAccessToken(this);
 
         String prefAccessToken = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
+
         if (prefAccessToken==null || prefAccessToken.equals("") ||
                 !prefAccessToken.equals(accessToken) ||
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "")==null ||

@@ -159,7 +159,7 @@ public class SplashScreenActivity extends Activity {
                     } else {
                         ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
 
-//                        if(((MycommsApp)getApplication()).isProfileAvailable())
+                        if(((MycommsApp)getApplication()).isProfileAvailable())
                             goToApp(true);
                     }
                 } else {
@@ -257,6 +257,8 @@ public class SplashScreenActivity extends Activity {
 
                 //Load profile and go to app
                 ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
+                if(((MycommsApp)getApplication()).isProfileAvailable())
+                    goToApp(true);
             }
             else
             {

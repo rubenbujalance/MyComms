@@ -3,6 +3,7 @@ package com.vodafone.mycomms.chat;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import model.ChatMessage;
 import model.Contact;
@@ -205,9 +207,18 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
         if(null != chatHolder.chatTextView)
             setTextListeners(chatHolder.chatTextView);
+
+        setInternalURLPatterns(chatHolder.chatTextView);
     }
 
 
+    private void setInternalURLPatterns(TextView textView)
+    {
+        Pattern pattern = Pattern.compile
+                ("\\b(mycomms)://\\b(news)/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*");
+        String scheme = "http://www.google.com";
+        Linkify.addLinks(textView, pattern, scheme);
+    }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {

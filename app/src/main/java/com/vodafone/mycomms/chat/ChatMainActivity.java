@@ -284,8 +284,6 @@ public class ChatMainActivity extends ToolbarActivity {
 //            return;
 
         //Download to file
-        //TODO: Testing executeOnExecutor
-        //new DownloadFile().execute(imageUrl, chatMsg.getId());
         DownloadFile downloadFile = new DownloadFile();
         downloadFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl, chatMsg.getId());
         //Insert in recents
@@ -417,8 +415,6 @@ public class ChatMainActivity extends ToolbarActivity {
             photoPath = getRealPathFromURI(selectedImage);
             photoBitmap = decodeFile(photoPath);
 
-            //TODO: Testing executeOnExecutor
-//            new sendFile().execute();
             sendFile sendFile = new sendFile();
             sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }

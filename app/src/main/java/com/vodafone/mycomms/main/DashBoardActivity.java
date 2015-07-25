@@ -340,7 +340,8 @@ public class DashBoardActivity extends ToolbarActivity
         }
         loadNews();
 
-        loadLocalContacts();
+        //TODO RBM 24/07/2015 - Commented to avoid OutOfmemory errors until they are solved
+//        loadLocalContacts();
 
         //Reset notifications inbox
         NotificationMessages.resetInboxMessages();

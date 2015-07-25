@@ -5,7 +5,6 @@ package com.vodafone.mycomms;
  */
 public class EndpointWrapper {
 
-    //TODO RBM - Restore to INT before releasing to QA
     private static final String baseURL = "int.my-comms.com";
     private static final String baseNewsURL = "int-news.my-comms.com";
     private static final String xmppHost = "int-msg.my-comms.com";

@@ -15,10 +15,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +33,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
@@ -57,6 +56,7 @@ import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.json.JSONObject;
@@ -139,22 +139,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
-        if(sp==null)
-        {
-            Log.e(Constants.TAG, "GroupChatActivity.onCreate: error loading Shared Preferences");
-            Crashlytics.logException(new Exception(
-                    "GroupChatActivity.onCreate: error loading Shared Preferences"));
-            finish();
-        }
-
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        if(_profile_id == null)
-        {
-            Log.e(Constants.TAG, "GroupChatActivity.onCreate: profile_id not found in Shared Preferences");
-            Crashlytics.logException(new Exception(
-                    "GroupChatActivity.onCreate: profile_id not found in Shared Preferences"));
-            finish();
-        }
 
         contactTransactions = new RealmContactTransactions(_profile_id);
         chatTransactions = new RealmChatTransactions(this);
@@ -378,7 +363,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         in.putExtra(Constants.GROUP_CHAT_ID, _groupChat.getId());
         startActivity(in);
 
-        this.finish();
+        finish();
     }
 
     private void loadExtras()
@@ -708,8 +693,13 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         sendFileImage = (ImageView) findViewById(R.id.send_image);
 
-        if(contactIds==null || contactIds.size()==0) finish(); //Prevent from errors
-
+        if(contactIds==null || contactIds.size()==0) {
+            Crashlytics.logException(new Exception("GroupChatActivity.java > " +
+                    "loadTheRestOfTheComponents: Error getting contact ids"));
+            Toast.makeText(this,
+                    getString(R.string.error_reading_data_from_server),Toast.LENGTH_LONG).show();
+            finish(); //Prevent from errors
+        }
 
         //This prevents the view focusing on the edit text and opening the keyboard
         getWindow().setSoftInputMode(
@@ -751,15 +741,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             Uri selectedImage = data.getData();
 
             try {
-                if (Build.VERSION.SDK_INT < 19) {
-                    photoPath = getRealPathFromURI_API11to18(selectedImage);
-                } else if (Build.VERSION.SDK_INT < 22) {
-                    photoPath = getRealPathFromURI_API11to18(selectedImage);
-                } else {
-                    selectedImage = transformUriAPI22(selectedImage);
-                    photoPath = getRealPathFromURI_API11to18(selectedImage);
-                }
-
+                photoPath = Utils.getRealPathFromUri(selectedImage, this);
                 Bitmap photoBitmap = decodeFile(photoPath);
 
                 sendFile sendFile = new sendFile();
@@ -860,6 +842,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         }
         return result;
     }
+
     @SuppressLint("NewApi")
     public Uri transformUriAPI22(Uri selectedImage) {
         if (selectedImage != null && selectedImage.toString().length() > 0) {
@@ -876,31 +859,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         }
 
         return selectedImage;
-    }
-
-    @SuppressLint("NewApi")
-    public String getRealPathFromURI_API19(Uri uri){
-        String filePath = "";
-        String wholeID = DocumentsContract.getDocumentId(uri);
-
-        // Split at colon, use second item in the array
-        String id = wholeID.split(":")[1];
-
-        String[] column = { MediaStore.Images.Media.DATA };
-
-        // where id is equal to
-        String sel = MediaStore.Images.Media._ID + "=?";
-
-        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                column, sel, new String[]{ id }, null);
-
-        int columnIndex = cursor.getColumnIndex(column[0]);
-
-        if (cursor.moveToFirst()) {
-            filePath = cursor.getString(columnIndex);
-        }
-        cursor.close();
-        return filePath;
     }
 
     @SuppressLint("NewApi")

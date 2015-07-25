@@ -108,12 +108,6 @@ public class SignupPhoneActivity extends Activity {
         }
 
         if(UserProfile.getPhone() != null) mPhone.setText(UserProfile.getPhone());
-
-        //Force the focus of the first field and opens the keyboard
-        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
-        mCountry.requestFocus();
     }
 
 

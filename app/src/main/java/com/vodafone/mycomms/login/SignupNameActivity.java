@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -17,14 +16,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
@@ -98,18 +98,9 @@ public class SignupNameActivity extends Activity {
             }
         });
 
-//        //Load data if comes from Salesforce signup
-//        UserProfile.setAvatar("https://www.iconaholic.com/work/bartender-icon.png");
-
         if(UserProfile.getFirstName() != null) mFirstName.setText(UserProfile.getFirstName());
         if(UserProfile.getLastName() != null) mLastName.setText(UserProfile.getLastName());
 //        if(UserProfile.getAvatar() != null) new LoadAvatarFromUrl().execute(UserProfile.getAvatar());
-
-        //Force the focus of the first field and opens the keyboard
-        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
-        mFirstName.requestFocus();
 
         sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -200,7 +191,7 @@ public class SignupNameActivity extends Activity {
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK)
         {
             Uri selectedImage = data.getData();
-            photoPath = getRealPathFromURI(selectedImage);
+            photoPath = Utils.getRealPathFromUri(selectedImage, this);
             photoBitmap = decodeFile(photoPath);
             mPhoto.setImageBitmap(photoBitmap);
             mPhoto.setBorderWidth(2);
@@ -231,54 +222,20 @@ public class SignupNameActivity extends Activity {
         return imgUri;
     }
 
-    public Bitmap decodeFile(String path) {
+    public Bitmap decodeFile(String path)
+    {
         try {
             // Decode image size
             BitmapFactory.Options o = new BitmapFactory.Options();
             o.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(path, o);
-//            // The new size we want to scale to
-//            final int REQUIRED_SIZE = 70;
-//
-//            // Find the correct scale value. It should be the power of 2.
-//            int scale = 1;
-//            while (o.outWidth / scale / 2 >= REQUIRED_SIZE && o.outHeight / scale / 2 >= REQUIRED_SIZE)
-//                scale *= 2;
-//
-//            // Decode with inSampleSize
-//            BitmapFactory.Options o2 = new BitmapFactory.Options();
-//            o2.inSampleSize = scale;
-//            return BitmapFactory.decodeFile(path, o2);
             return BitmapFactory.decodeFile(path);
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "GroupChatActivity.decodeFile: ", e);
+            Crashlytics.logException(e);
         }
+
         return null;
-    }
-
-    private String getRealPathFromURI(Uri contentURI) {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) {
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
-    }
-
-    private void loadAvatarFromUrl(String filepath)
-    {
-        //Just load the image, don't save in UserProfile, we already have the url
-        if(filepath == null) return;
-
-        Bitmap bitmapTemp = decodeFile(filepath);
-        mPhoto.setImageBitmap(bitmapTemp);
-        mPhoto.setBorderWidth(2);
-        mPhoto.setBorderColor(Color.WHITE);
     }
 
     private boolean checkData()

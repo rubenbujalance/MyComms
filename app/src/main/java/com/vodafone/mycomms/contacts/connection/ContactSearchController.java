@@ -91,8 +91,6 @@ public class ContactSearchController {
 
                 ContactsController contactsController = new ContactsController(mProfileId);
                 contactsController.insertContactListInRealm(jsonResponse);
-                contactsController.closeRealm();
-                contactsController = new ContactsController(mProfileId);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
                 contactsController.closeRealm();
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());

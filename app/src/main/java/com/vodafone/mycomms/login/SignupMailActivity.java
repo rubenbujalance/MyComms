@@ -74,12 +74,6 @@ public class SignupMailActivity extends Activity {
 
         //Load data if comes from Salesforce signup
         if(UserProfile.getMail() != null) etEmail.setText(UserProfile.getMail());
-
-        //Force the focus of the first field and opens the keyboard
-        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
-        etEmail.requestFocus();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.vodafone.mycomms.login;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
@@ -105,12 +103,6 @@ public class SignupCompanyActivity extends Activity {
         if(UserProfile.getCompanyName() != null) mCompany.setText(UserProfile.getCompanyName());
         if(UserProfile.getPosition() != null) mPosition.setText(UserProfile.getPosition());
         if(UserProfile.getOfficeLocation() != null) mOfficeLoc.setText(UserProfile.getOfficeLocation());
-
-        //Force the focus of the first field and opens the keyboard
-        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
-        mCompany.requestFocus();
     }
 
 

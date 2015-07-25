@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.util;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -11,10 +12,9 @@ import android.support.v4.app.TaskStackBuilder;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.DashBoardActivity;
-import com.vodafone.mycomms.realm.RealmChatTransactions;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
 
 /**
  * Created by str_oan on 24/07/2015.
@@ -25,9 +25,9 @@ public final class NotificationMessages extends Activity
     public static NotificationCompat.Builder mBuilder;
     public static NotificationManager mNotificationManager = null;
     public static PendingIntent resultPendingIntent;
-    public static int notifyId = 1;
+    public static int notificationId = 1;
     public static final int INBOX_LENGTH = 5;
-    public static List<String> inboxMessages;
+    public static ArrayList<String> inboxMessages;
 
     private static void createNotificationMessagesInstance(Context context)
     {
@@ -37,20 +37,16 @@ public final class NotificationMessages extends Activity
 
         mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R
-                                .mipmap.ic_launcher))
+                        .setSmallIcon(R.drawable.ic_notif_white)
+                        .setLargeIcon(BitmapFactory.decodeResource(
+                                context.getResources(), R.mipmap.ic_launcher))
                         .setContentTitle(context.getString(R.string.app_name));
 
         Intent resultIntent = new Intent(context, DashBoardActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addParentStack(DashBoardActivity.class);
         stackBuilder.addNextIntent(resultIntent);
-        resultPendingIntent =
-                stackBuilder.getPendingIntent(
-                        0,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
+        resultPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
 
         inboxMessages = new ArrayList<>();
@@ -62,39 +58,40 @@ public final class NotificationMessages extends Activity
         if(null == mNotificationManager)
             createNotificationMessagesInstance(context);
 
+        long timestamp = Calendar.getInstance().getTimeInMillis();
+
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        inboxStyle.setBigContentTitle("New unread messages: ");
-        inboxStyle.setSummaryText(getAllUnreadMessages(context) + " new messages");
+        inboxStyle.setBigContentTitle(context.getString(R.string.new_unread_messages));
+        //RBM: We can't know how many messages unread we have. They are not being saved in DB
+        //when a notification arrives, until user opens the app
         addMessageToInbox(message);
         fillInbox(inboxStyle);
+        inboxStyle.setSummaryText(inboxMessages.size() + " new messages");
         mBuilder.setStyle(inboxStyle);
         mBuilder.setWhen(System.currentTimeMillis());
-        mBuilder.setContentText(getAllUnreadMessages(context) + " new messages");
-        mBuilder.setTicker("You have new message");
+        mBuilder.setContentText(context.getString(R.string.new_unread_messages));
+        mBuilder.setTicker(context.getString(R.string.new_unread_messages));
         mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
-        mNotificationManager.notify(notifyId, mBuilder.build());
+        mBuilder.setAutoCancel(true);
+        Notification notification = mBuilder.build();
+        mNotificationManager.notify(notificationId, notification);
     }
 
-    private static void addMessageToInbox(String message)
-    {
+    private static void addMessageToInbox(String message) {
         inboxMessages.add(0, message);
-        if(inboxMessages.size() > INBOX_LENGTH)
-            inboxMessages.remove(INBOX_LENGTH - 1);
+//        if(inboxMessages.size() > INBOX_LENGTH)
+//            inboxMessages.remove(inboxMessages.size() - 1);
     }
-    private static void fillInbox(NotificationCompat.InboxStyle inboxStyle)
-    {
-        for(String message : inboxMessages)
-        {
-            inboxStyle.addLine(message);
+
+    private static void fillInbox(NotificationCompat.InboxStyle inboxStyle) {
+        for(int i=0; i<INBOX_LENGTH; i++) {
+            if(i >= inboxMessages.size()) break;
+            inboxStyle.addLine(inboxMessages.get(i));
         }
     }
 
-    private static long getAllUnreadMessages(Context context)
-    {
-        RealmChatTransactions realmChatTransactions = new RealmChatTransactions(context);
-        long unreadMessages = realmChatTransactions.getAllChatPendingMessagesCount();
-        realmChatTransactions.closeRealm();
-        return unreadMessages;
+    public static void resetInboxMessages() {
+        inboxMessages = new ArrayList<>();
     }
 
 }

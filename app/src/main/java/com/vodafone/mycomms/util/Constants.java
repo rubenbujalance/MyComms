@@ -144,6 +144,8 @@ public class Constants {
     public static final String CONTACT_API_POST_AVATAR = "/api/me/avatar";
     public static final String CONTACT_API_POST_FILE = "/api/uploadFile";
 
+    public static final String API_VERSION = "/version";
+
     public static final String PROFILE_API_LOGOUT = "/auth/logout";
 
     //Contact Avatar BD Fields
@@ -259,12 +261,10 @@ public class Constants {
     public static final String RECENT_CHAT_CHAT = "Chat";
     public static final String RECENT_CHAT_GROUP_CHAT = "Group chat";
 
-
-
-
     public static final String INTERNAL_URL_PATTERN_NEWS = "news/";
     public static final String INTERNAL_URL_PATTERN_PREFIX = "mycomms://";
 
+    public static final String DEVICE_DEFAULT_USER_AGENT = "Android";
 
     public static final int MAX_AVATAR_WIDTH_OR_HEIGHT = 640;
 

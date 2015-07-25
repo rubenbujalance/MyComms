@@ -15,6 +15,7 @@ import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
@@ -160,10 +161,15 @@ public class OAuthActivity extends Activity {
             else
             {
                 //Come back to loginActivity
+                Toast.makeText(this, getString(R.string.error_reading_data_from_server),
+                        Toast.LENGTH_LONG).show();
                 finish();
             }
         } catch(Exception ex) {
             Log.e(Constants.TAG, "OAuthActivity.callbackOAuthCallback: \n" + ex.toString());
+            Crashlytics.logException(ex);
+            Toast.makeText(this, getString(R.string.error_reading_data_from_server),
+                    Toast.LENGTH_LONG).show();
             finish();
         }
     }

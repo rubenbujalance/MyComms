@@ -36,9 +36,11 @@ public class OKHttpWrapper {
     }
 
     private static void call(String method, final String url, final Context context, final HttpCallback cb, final String endPointWrapper) {
+        Log.i(Constants.TAG, "OKHttpWrapper.call: " + url);
         OkHttpClient client = new OkHttpClient();
         client.setConnectTimeout(10, TimeUnit.SECONDS);
         client.setReadTimeout(15, TimeUnit.SECONDS);
+        client.setRetryOnConnectionFailure(false);
         Request.Builder builder = new Request.Builder();
         Request request = builder
                 .url("https://" + endPointWrapper +
@@ -84,9 +86,18 @@ public class OKHttpWrapper {
 
             @Override
             public void onResponse(Response response) throws IOException {
+                int code = response.code();
+                Log.i(Constants.TAG, "OKHttpWrapper.onResponse: " + url + " ("+code+")");
+
                 Response test = response;
+
                 if (!response.isSuccessful()) {
-                    int code = response.code();
+                    //Si es la llamada para el API version, devolver la respuesta y salir
+                    if(code==400 && url.compareTo(Constants.API_VERSION)==0) {
+                        cb.onFailure(response, null);
+                        return;
+                    }
+
                     OKHttpErrorReceivedEvent errorEvent = new OKHttpErrorReceivedEvent();
                     errorEvent.setErrorCode(code);
                     errorEvent.setUrl(url);
@@ -122,6 +133,7 @@ public class OKHttpWrapper {
                     cb.onFailure(response, null);
                     return;
                 }
+
                 cb.onSuccess(response);
             }
         });

@@ -96,13 +96,17 @@ public class ContactsController{
     }
 
     public void insertRecentContactInRealm(JSONObject json){
+        RealmContactTransactions realmContactTransactions =
+                new RealmContactTransactions(mProfileId);
+
         JSONArray jsonArray;
         Contact contact;
         ArrayList<RecentContact> contactList = new ArrayList<>();
         try {
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
-                contact = realmContactTransactions.getContactById(jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID));
+                contact = realmContactTransactions.getContactById(
+                        jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID));
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
                 }

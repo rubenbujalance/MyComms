@@ -257,17 +257,15 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                     timeZone);
 
             profileController.updateProfileTimezone(timeZone);
-
-            HashMap<String, String> body = new HashMap<String, String>();
-            if(userProfile.getTimezone() != null && !userProfile.getTimezone().equals("")) body.put("timeZone",userProfile.getTimezone());
-
-            boolean isValid  = Utils.validateStringHashMap(body);
-            if(!isValid) {
-                profileController.showToast("Info not valid");
-            } else {
-                profileController.updateTimeZone(body);
-            }
         }
+
+        //Always call timezone update, just to assure we send the deviceId
+        HashMap<String, String> body = new HashMap<>();
+
+        if(timeZone!=null && timeZone.length()>0)
+            body.put("timeZone", timeZone);
+
+        profileController.updateTimeZone(body);
 
         // Profile loaded
         // Notify application to initialize everything

@@ -454,7 +454,8 @@ public class ProfileController extends BaseController {
             String jsonResp = null;
 
             try {
-                String json = "{\"userId\":\""+params[1]+"\"}";
+                String json = "{\"userId\":\""+params[1]+"\"," +
+                        "\"deviceId\":\""+Utils.getGCMToken(getContext())+"\"}";
                 OkHttpClient client = new OkHttpClient();
                 RequestBody body = RequestBody.create(
                         MediaType.parse(Utils.getHttpHeaderContentType()), json);

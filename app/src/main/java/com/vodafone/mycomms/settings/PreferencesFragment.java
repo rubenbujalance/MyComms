@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.login.LoginSignupActivity;
+import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -123,13 +124,20 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             public void onClick(View v) {
                 Log.i(Constants.TAG, "PreferencesFragment.onClick: Logout");
 
+                SharedPreferences sp = getActivity().getSharedPreferences(
+                        Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+                String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+                //Remove User from DB
+                if(profileId!=null) {
+                    RealmProfileTransactions profileTx = new RealmProfileTransactions();
+                    profileTx.removeUserProfile(profileId);
+                }
+
                 //Reset user security data
                 UserSecurity.resetTokens(getActivity());
 
                 //Reset profile data
-                SharedPreferences sp = getActivity().getSharedPreferences(
-                        Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
                 SharedPreferences.Editor editor = sp.edit();
                 editor.remove(Constants.ACCESS_TOKEN_SHARED_PREF);
                 editor.remove(Constants.PROFILE_ID_SHARED_PREF);
@@ -137,18 +145,17 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
                 ((MycommsApp)getActivity().getApplication()).appIsInitialized = false;
 
-                //Go to login page as a new task
-                Intent in = new Intent(getActivity(), LoginSignupActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                        Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(in);
-                getActivity().finish();
-
                 //Remove cookies if Sales Force login
                 Utils.removeCookies();
 
                 //Logout on server
                 profileController.logoutToAPI();
+
+                //Go to login page as a new task
+                Intent in = new Intent(getActivity(), LoginSignupActivity.class);
+                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                        Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(in);
             }
         });
 

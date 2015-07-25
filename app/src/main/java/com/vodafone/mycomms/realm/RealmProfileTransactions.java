@@ -55,11 +55,27 @@ public class RealmProfileTransactions {
         }
     }
 
+    public void removeUserProfile (String profileId){
+        try {
+            Realm realm = Realm.getDefaultInstance();
+            RealmQuery<UserProfile> query = realm.where(UserProfile.class);
+            query.equalTo(Constants.PROFILE_ID, profileId);
+            UserProfile userProfile = query.findFirst();
+            realm.close();
+            if (userProfile != null) {
+                userProfile.removeFromRealm();
+            }
+        } catch (Exception e){
+            Log.e(Constants.TAG, "RealmProfileTransactions.removeUserProfile: " , e);
+            Crashlytics.logException(e);
+        }
+    }
+
     public UserProfile getUserProfile(String profileId){
         try {
             Realm realm = Realm.getDefaultInstance();
             RealmQuery<UserProfile> query = realm.where(UserProfile.class);
-            query.equalTo(Constants.CONTACT_ID, profileId);
+            query.equalTo(Constants.PROFILE_ID, profileId);
                  //.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
             RealmResults<UserProfile> result1 = query.findAll();
             realm.close();

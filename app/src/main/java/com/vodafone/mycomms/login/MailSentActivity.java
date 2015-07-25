@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.login;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,7 +7,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -48,12 +46,7 @@ public class MailSentActivity extends ActionBarActivity {
                 callPhoneCheck(pin);
             }
         });
-
-        //Force hide keyboard
-        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mgr.hideSoftInputFromWindow(mWeSent.getWindowToken(), 0);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

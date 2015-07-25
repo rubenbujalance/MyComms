@@ -98,22 +98,10 @@ public class ChatMainActivity extends ToolbarActivity {
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
-        if(sp==null)
-        {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: error loading Shared Preferences");
-            finish();
-        }
-
         chatTransactions = new RealmChatTransactions(this);
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         contactTransactions = new RealmContactTransactions(_profile_id);
         _profile = contactTransactions.getUserProfile();
-
-        if(_profile_id == null)
-        {
-            Log.e(Constants.TAG, "ChatMainActivity.onCreate: profile_id not found in Shared Preferences");
-            finish();
-        }
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecentContactController = new RecentContactController(this, _profile_id);
@@ -132,8 +120,6 @@ public class ChatMainActivity extends ToolbarActivity {
         Intent in = getIntent();
         String contact_id = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
         previousView = in.getStringExtra(Constants.CHAT_PREVIOUS_VIEW);
-
-        if(contact_id==null || contact_id.length()==0) finish(); //Prevent from errors
 
         //Contact and profile
         _contact = contactTransactions.getContactById(contact_id);
@@ -298,8 +284,6 @@ public class ChatMainActivity extends ToolbarActivity {
 //            return;
 
         //Download to file
-        //TODO: Testing executeOnExecutor
-        //new DownloadFile().execute(imageUrl, chatMsg.getId());
         DownloadFile downloadFile = new DownloadFile();
         downloadFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imageUrl, chatMsg.getId());
         //Insert in recents
@@ -431,8 +415,6 @@ public class ChatMainActivity extends ToolbarActivity {
             photoPath = getRealPathFromURI(selectedImage);
             photoBitmap = decodeFile(photoPath);
 
-            //TODO: Testing executeOnExecutor
-//            new sendFile().execute();
             sendFile sendFile = new sendFile();
             sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }

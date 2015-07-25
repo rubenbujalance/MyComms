@@ -25,6 +25,7 @@ import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
@@ -67,9 +68,28 @@ public class SignupPincodeActivity extends Activity {
         lnPin3 = findViewById(R.id.lnPin3);
         lnPin4 = findViewById(R.id.lnPin4);
 
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.showKeyboard(etPin, SignupPincodeActivity.this);
+            }
+        };
+
+        tvPin1.setOnClickListener(listener);
+        tvPin2.setOnClickListener(listener);
+        tvPin3.setOnClickListener(listener);
+        tvPin4.setOnClickListener(listener);
+
+        lnPin1.setOnClickListener(listener);
+        lnPin2.setOnClickListener(listener);
+        lnPin3.setOnClickListener(listener);
+        lnPin4.setOnClickListener(listener);
+
         etPin = (EditText)findViewById(R.id.etPin);
         tvPinPhoneNumber = (TextView)findViewById(R.id.tvPinPhoneNumber);
         btResendPin = (Button)findViewById(R.id.btResendPin);
+
+        resetPin();
         nextPinPos = 1;
 
         //Set the phone number text on the initial text
@@ -121,44 +141,6 @@ public class SignupPincodeActivity extends Activity {
             public void afterTextChanged(Editable s) {}
         });
 
-//        etPin.setOnKeyListener(new View.OnKeyListener() {
-//            @Override
-//            public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                String text;
-//
-//                if (nextPinPos == 1) {
-//                    //Start new pin
-//                    if (tvPin1.getText().toString().trim().length() > 0) {
-//                        setPinColor(Color.WHITE);
-//                        resetPin();
-//                    }
-//                    text = String.valueOf((char) event.getUnicodeChar());
-//                    tvPin1.setText(text);
-//                    pin = text;
-//                } else if (nextPinPos == 2) {
-//                    text = String.valueOf((char) event.getUnicodeChar());
-//                    tvPin2.setText(text);
-//                    pin += text;
-//                } else if (nextPinPos == 3) {
-//                    text = String.valueOf((char) event.getUnicodeChar());
-//                    tvPin3.setText(text);
-//                    pin += text;
-//                } else if (nextPinPos == 4) {
-//                    text = String.valueOf((char) event.getUnicodeChar());
-//                    tvPin4.setText(text);
-//                    pin += text;
-//
-//                    if(APIWrapper.checkConnectionAndAlert(SignupPincodeActivity.this))
-//                        callPhoneCheck(pin);
-//                }
-//
-//                if (nextPinPos < 4) nextPinPos++;
-//                else nextPinPos = 1;
-//
-//                return true;
-//            }
-//        });
-
         btResendPin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -174,12 +156,6 @@ public class SignupPincodeActivity extends Activity {
                 finish();
             }
         });
-
-        //Force the focus of the first field and opens the keyboard
-        InputMethodManager mgr = ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
-        mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
-        etPin.requestFocus();
     }
 
     @Override
@@ -236,15 +212,15 @@ public class SignupPincodeActivity extends Activity {
     public void resetPin()
     {
         etPin.setText("");
-        tvPin1.setText("");
-        tvPin2.setText("");
-        tvPin3.setText("");
-        tvPin4.setText("");
+        tvPin1.setText("  ");
+        tvPin2.setText("  ");
+        tvPin3.setText("  ");
+        tvPin4.setText("  ");
     }
 
     private void callBackPhoneCheck(HashMap<String, Object> result)
     {
-        Log.v(Constants.TAG, "SignupPincodeActivity.callBackPhoneCheck: " + result.toString());
+        Log.v(Constants.TAG, "SignupPincodeActivity.callBackPhoneCheck: ");
 
         JSONObject json = null;
         String text = null;

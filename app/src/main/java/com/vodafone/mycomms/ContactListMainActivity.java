@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
@@ -78,7 +79,8 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     @Override
     public void onConnectionNotAvailable() {
         Log.e(Constants.TAG, "ContactListMainActivity.onProfileConnectionError: Error reading profile from api, finishing");
-        finish();
+        Toast.makeText(this, getString(R.string.error_reading_data_from_server),
+                Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.okhttp.Response;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
@@ -27,11 +28,13 @@ import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.SystemUiHider;
 import com.vodafone.mycomms.util.UserSecurity;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -96,9 +99,71 @@ public class SplashScreenActivity extends Activity {
                 goToLogin();
 
             } else {
-                new CheckVersionApi().execute(new HashMap<String, Object>(), null);
+//                new CheckVersionApi().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
+            checkVersion();
         }
+    }
+
+    private void checkVersion() {
+        OKHttpWrapper.get(Constants.API_VERSION, SplashScreenActivity.this,
+                new OKHttpWrapper.HttpCallback() {
+                    @Override
+                    public void onFailure(Response response, IOException e) {
+                        if (response == null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(SplashScreenActivity.this,
+                                            getString(R.string.error_reading_data_from_server),
+                                            Toast.LENGTH_LONG).show();
+                                    callBackVersionCheck(null);
+                                }
+                            });
+
+                            return;
+                        }
+
+                        try {
+                            if (Integer.toString(response.code()).startsWith("4") &&
+                                    response.body() != null) {
+                                final JSONObject json = new JSONObject(response.body().string());
+
+                                if (json.get("err") != null &&
+                                        json.get("err").toString().
+                                                compareTo("invalid_version") == 0) {
+                                    final String data = json.get("data").toString();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {callBackVersionCheck(data);}
+                                    });
+                                }
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {callBackVersionCheck(null);}
+                                });
+                            }
+                        } catch (Exception ex) {
+                            Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: ", ex);
+                            Crashlytics.logException(ex);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(SplashScreenActivity.this,
+                                            getString(R.string.error_reading_data_from_server),
+                                            Toast.LENGTH_LONG).show();
+                                    callBackVersionCheck(null);
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onSuccess(Response response) {
+                        callBackVersionCheck(null);
+                    }
+                });
     }
 
     //Called when user profile has been loaded
@@ -133,6 +198,9 @@ public class SplashScreenActivity extends Activity {
                 /*
                  * New version detected! Show an alert and start the update...
                  */
+                Log.i(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: " +
+                        "New version detected");
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.new_version_available));
                 builder.setMessage(getString(R.string.must_update_to_last_application_version));
@@ -153,6 +221,9 @@ public class SplashScreenActivity extends Activity {
 
             } else {
                 //Version is correct, check login
+                Log.i(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: " +
+                        "Version OK");
+
                 if (UserSecurity.isUserLogged(this)) {
                     if (UserSecurity.hasExpired(this)) {
                         renewToken();
@@ -170,6 +241,8 @@ public class SplashScreenActivity extends Activity {
         } catch (Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: \n",ex);
             Crashlytics.logException(ex);
+            Toast.makeText(this, getString(R.string.error_reading_data_from_server),
+                    Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -190,44 +263,6 @@ public class SplashScreenActivity extends Activity {
         Intent in = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
         startActivity(in);
         finish();
-    }
-
-    private class CheckVersionApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
-
-        @Override
-        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
-            return APIWrapper.httpPostAPI("/version",params[0],params[1], SplashScreenActivity.this);
-        }
-
-        @Override
-        protected void onPostExecute(HashMap<String,Object> result) {
-            JSONObject json = null;
-            String status = null;
-
-            try {
-                if(result.containsKey("status"))
-                {
-                    status = (String)result.get("status");
-
-                    if(result.containsKey("json")) json = (JSONObject)result.get("json");
-
-                    if (status.compareTo("400") == 0 &&
-                            json.get("err") != null &&
-                            json.get("err").toString().compareTo("invalid_version") == 0) {
-
-                        callBackVersionCheck(json.get("data").toString());
-                    }
-                    else
-                    {
-                        callBackVersionCheck(null);
-                    }
-                }
-            } catch(Exception ex) {
-                Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: \n",ex);
-                Crashlytics.logException(ex);
-                finish();
-            }
-        }
     }
 
     public void renewToken()
@@ -268,6 +303,8 @@ public class SplashScreenActivity extends Activity {
         } catch(Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackRenewToken: \n",ex);
             Crashlytics.logException(ex);
+            Toast.makeText(this, getString(R.string.error_reading_data_from_server),
+                    Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -364,7 +401,7 @@ public class SplashScreenActivity extends Activity {
 
     @Subscribe
     public void onOKHttpErrorReceived(OKHttpErrorReceivedEvent event) {
-        Log.i(Constants.TAG, "LoginSignupActivity.onOKHttpErrorReceived: ");
+        Log.i(Constants.TAG, "SplashScreenActivity.onOKHttpErrorReceived: ");
         String errorMessage = event.getErrorMessage();
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }

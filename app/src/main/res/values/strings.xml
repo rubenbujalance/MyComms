@@ -98,6 +98,7 @@
     <string name="profile_list_tab_my_profile">My Profile</string>
     <string name="title_activity_profile">Profile</string>
     <string name="no_internet_connection_is_available">No Internet connection is available</string>
+    <string name="error_reading_data_from_server">Error reading data from server</string>
     <string name="no_internet_connection">No Internet Connection</string>
     <string name="connection_error">Connection error</string>
     <string name="status_not_sent">Not sent</string>
@@ -233,5 +234,8 @@
     <string name="group_chat">Group chat</string>
     <string name="today">Today</string>
     <string name="title_activity_fullscreen_image">FullscreenImageActivity</string>
+
+    <!--Push notifications-->
+    <string name="new_unread_messages">New unread messages</string>
 
 </resources>

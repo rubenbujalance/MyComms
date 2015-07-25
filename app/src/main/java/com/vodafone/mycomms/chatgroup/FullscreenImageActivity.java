@@ -24,12 +24,8 @@ public class FullscreenImageActivity extends ActionBarActivity {
 
         Intent in = getIntent();
         String filePath = in.getStringExtra("imageFilePath");
-        if(filePath==null || filePath.length()==0) finish();
+
         File file = new File(filePath);
-//        MycommsApp.picasso.
-//                load(file)
-//                .fit().centerCrop()
-//                .into(ivImage);
         ivImage.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_CROP);
         ivImage.setImage(ImageSource.uri(filePath));
 

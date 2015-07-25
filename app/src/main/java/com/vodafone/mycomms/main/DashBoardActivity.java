@@ -41,6 +41,7 @@ import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.NotificationMessages;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -87,11 +88,6 @@ public class DashBoardActivity extends ToolbarActivity
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
-        if(sp==null) {
-            Log.e(Constants.TAG, "DashBoardActivity.onCreate: error loading Shared Preferences");
-            finish();
-        }
-        
         _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realmContactTransactions = new RealmContactTransactions(_profileId);
         realmNewsTransactions = new RealmNewsTransactions();
@@ -344,7 +340,11 @@ public class DashBoardActivity extends ToolbarActivity
         }
         loadNews();
 
-        loadLocalContacts();
+        //TODO RBM 24/07/2015 - Commented to avoid OutOfmemory errors until they are solved
+//        loadLocalContacts();
+
+        //Reset notifications inbox
+        NotificationMessages.resetInboxMessages();
     }
 
     @Subscribe

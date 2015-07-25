@@ -343,7 +343,6 @@ public final class XMPPTransactions {
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendPing: Error sending message", e);
-            Crashlytics.logException(e);
             return false;
         }
 

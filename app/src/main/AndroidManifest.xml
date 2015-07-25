@@ -80,27 +80,33 @@
         </activity>
         <activity
             android:name=".login.SignupMailActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity
             android:name=".login.SignupNameActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity
             android:name=".login.SignupPassActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity
             android:name=".login.SignupPhoneActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity
             android:name=".login.SignupPincodeActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity
             android:name=".login.SignupCompanyActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity
             android:name=".main.MainActivity"
@@ -121,7 +127,8 @@
         <activity
             android:name=".login.MailSentActivity"
             android:label="@string/title_activity_mail_sent"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
         <activity
             android:name=".login.SignupTypeChooseActivity"
@@ -131,7 +138,8 @@
         <activity
             android:name=".login.LoginActivity"
             android:label="@string/title_activity_login"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity
             android:name=".settings.SettingsMainActivity"

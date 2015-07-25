@@ -247,7 +247,6 @@ public class LoginActivity extends ActionBarActivity implements ILoginConnection
 
 //                etPassword.setError(getString(R.string.oops_wrong_password), errorIcon);
         etPassword.setCompoundDrawables(null, null, errorIcon, null);
-
     }
 
     @Override

@@ -295,7 +295,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         {
             isAvatarHasChangedAfterSelection = true;
             Uri selectedImage = data.getData();
-            photoPath = getRealPathFromURI(selectedImage);
+            photoPath = Utils.getRealPathFromUri(selectedImage, getActivity());
             if (null != photoPath) {
                 photoBitmap = decodeFile(photoPath);
                 loadAvatarIntoImageView();
@@ -311,7 +311,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         profilePicture.setImageBitmap(photoBitmap);
         profilePicture.setBorderWidth(2);
         profilePicture.setBorderColor(Color.WHITE);
-
     }
 
     private void initSpinners(View v) {
@@ -585,7 +584,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         return imgUri;
     }
 
-
     public Bitmap decodeFile(String path)
     {
         try
@@ -596,13 +594,13 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             BitmapFactory.decodeFile(path, o);
             return BitmapFactory.decodeFile(path);
         }
-        catch (Throwable e)
+        catch (Exception e)
         {
-            e.printStackTrace();
+            Log.e(Constants.TAG, "GroupChatActivity.decodeFile: ",e);
+            Crashlytics.logException(e);
         }
         return null;
     }
-
 
     private String getRealPathFromURI(Uri contentURI)
     {

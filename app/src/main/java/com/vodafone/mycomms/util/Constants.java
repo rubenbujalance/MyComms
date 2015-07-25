@@ -50,6 +50,7 @@ public class Constants {
     public static final String PROFILE_DEVICE_ID = "deviceId";
     public static final String PROFILE_HOLIDAY_END_DATE = "holidayEndDate";
     public static final String PROFILE_HOLIDAY = "holiday";
+    public static final String PROFILE_ID = "id";
 
     //Footer Constants
     public static final int TOOLBAR_CONTACTS = 0;

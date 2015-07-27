@@ -405,47 +405,6 @@ public class ProfileController extends BaseController {
         }
     }
 
-    public class GetProfileAsyncTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            Log.i(Constants.TAG, "GetProfileAsyncTask.doInBackground: START");
-
-            Response response;
-            String json = null;
-
-            try {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url("https://" + EndpointWrapper.getBaseURL() +
-                                params[0])
-                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
-                                Utils.getHttpHeaderVersion(getContext()))
-                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
-                                Utils.getHttpHeaderContentType())
-                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-                                Utils.getHttpHeaderAuth(getContext()))
-                        .build();
-
-                response = client.newCall(request).execute();
-                if(Integer.toString(response.code()).startsWith("2"))
-                    json = response.body().string();
-                else
-                    json = null;
-
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "GetProfileAsyncTask.doInBackground: ",e);
-                Crashlytics.logException(e);
-            }
-
-            return json;
-        }
-
-        @Override
-        protected void onPostExecute(String json) {
-            getProfileCallback(json);
-        }
-    }
-
     public class LogoutProfileAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {

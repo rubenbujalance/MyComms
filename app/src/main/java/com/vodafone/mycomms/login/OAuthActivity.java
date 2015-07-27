@@ -53,11 +53,6 @@ public class OAuthActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_oauth_web);
 
-        //Load no-cache headers
-        noCacheHeaders = new HashMap<>(2);
-        noCacheHeaders.put("Pragma", "no-cache");
-        noCacheHeaders.put("Cache-Control", "no-cache");
-
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);
         relativeContainer = (RelativeLayout)findViewById(R.id.relative_container);
 //        relativeContainer.setVisibility(View.INVISIBLE);

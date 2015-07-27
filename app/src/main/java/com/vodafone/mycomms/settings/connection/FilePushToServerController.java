@@ -241,16 +241,34 @@ public class FilePushToServerController extends BaseController
         //get path to external storage (SD card)
         String avatarStoragePath = mContext.getFilesDir() + Constants.CONTACT_AVATAR_DIR;
         File sdAvatar = new File(avatarStoragePath, "avatar_" + profileId + ".jpg");
-
-        if(sdAvatar.exists())
-        {
-            boolean isDeleted = sdAvatar.delete();
-            Log.e(Constants.TAG, "FilePushToServerController.prepareFileToSend: is file deleted? " +
-                    "" + isDeleted);
-        }
-
         try
         {
+            if(sdAvatar.exists())
+            {
+                boolean isDeleted = sdAvatar.delete();
+                Log.i(Constants.TAG, "FilePushToServerController.prepareFileToSend: is file " +
+                        "deleted? " +
+                        "" + isDeleted);
+
+                boolean isDirCreated = sdAvatar.getParentFile().mkdirs();
+                Log.i(Constants.TAG, "FilePushToServerController.prepareFileToSend: is dir " +
+                        "created?" + isDirCreated);
+
+                boolean isFileCreated = sdAvatar.createNewFile();
+                Log.i(Constants.TAG, "FilePushToServerController.prepareFileToSend: is file " +
+                        "created?" + isFileCreated);
+            }
+            else
+            {
+                boolean isDirCreated = sdAvatar.getParentFile().mkdirs();
+                Log.i(Constants.TAG, "FilePushToServerController.prepareFileToSend: is dir " +
+                        "created?" + isDirCreated);
+
+                boolean isFileCreated = sdAvatar.createNewFile();
+                Log.i(Constants.TAG, "FilePushToServerController.prepareFileToSend: is file " +
+                        "created?" + isFileCreated);
+            }
+
             OutputStream fileOutputStream = new FileOutputStream(sdAvatar);
             //choose another format if PNG doesn't suit you
             imageData.compress(Bitmap.CompressFormat.JPEG, 75, fileOutputStream);

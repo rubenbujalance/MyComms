@@ -258,7 +258,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
     @Override
     public void onProfileReceived(UserProfile userProfile) {
-        Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: settings:" + userProfile.getSettings() );
+        Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: settings:" + userProfile.getSettings());
 
 
         JSONObject jsonSettings = null;
@@ -312,22 +312,48 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         this.doNotDisturb = doNotDisturb;
         this.privateTimeZone = privateTimeZone;
 
-        if(privateTimeZone){
-            Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
-            shareCurrentTimeSwitch.setChecked(false);
-        }else {
-            Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
-            shareCurrentTimeSwitch.setChecked(true);
+        if(privateTimeZone)
+        {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run()
+                {
+                    Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
+                    shareCurrentTimeSwitch.setChecked(false);
+                }
+            });
+
+        }else
+        {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
+                    shareCurrentTimeSwitch.setChecked(true);
+                }
+            });
         }
 
 
-        if(doNotDisturb){
+        if(doNotDisturb)
+        {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
+                    doNotDisturbSwitch.setChecked(true);
+                }
+            });
 
-            Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
-            doNotDisturbSwitch.setChecked(true);
-        }else {
-            Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
-            doNotDisturbSwitch.setChecked(false);
+        }else
+        {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
+                    doNotDisturbSwitch.setChecked(false);
+                }
+            });
         }
     }
 

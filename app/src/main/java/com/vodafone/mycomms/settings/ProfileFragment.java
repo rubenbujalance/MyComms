@@ -7,9 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -25,11 +23,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.BaseConnection;
@@ -118,6 +116,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        initSpinners(v);
        editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
        editProfile.setVisibility(View.INVISIBLE);
+
        profilePicture = (CircleImageView) v.findViewById(R.id.profile_picture);
        textAvatar = (TextView) v.findViewById(R.id.avatarText);
 
@@ -284,11 +283,17 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        if(null != this.photoBitmap)
+        {
+            if(!this.photoBitmap.isRecycled())
+                this.photoBitmap.recycle();
+        }
+
+
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
         {
             isAvatarHasChangedAfterSelection = true;
-            photoBitmap = decodeFile(photoPath);
-            loadAvatarIntoImageView();
+            new DecodeAndLoadBitmapAvatar().execute();
         }
 
         else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
@@ -296,10 +301,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             isAvatarHasChangedAfterSelection = true;
             Uri selectedImage = data.getData();
             photoPath = Utils.getRealPathFromUri(selectedImage, getActivity());
-            if (null != photoPath) {
-                photoBitmap = decodeFile(photoPath);
-                loadAvatarIntoImageView();
-            }
+            if (null != photoPath)
+                new DecodeAndLoadBitmapAvatar().execute();
         }
         else
             isAvatarHasChangedAfterSelection = false;
@@ -339,8 +342,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private void loadProfileImage()
     {
-        //Image avatar
-
         Utils.loadContactAvatar(userProfile.getFirstName(), userProfile.getLastName(), this
                 .profilePicture, this.textAvatar, userProfile.getAvatar(), 25);
     }
@@ -584,46 +585,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         return imgUri;
     }
 
-    public Bitmap decodeFile(String path)
-    {
-        try
-        {
-            // Decode image size
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(path, o);
-            return BitmapFactory.decodeFile(path);
-        }
-        catch (Exception e)
-        {
-            Log.e(Constants.TAG, "GroupChatActivity.decodeFile: ",e);
-            Crashlytics.logException(e);
-        }
-        return null;
-    }
-
-    private String getRealPathFromURI(Uri contentURI)
-    {
-        try {
-            String result;
-            Cursor cursor = getActivity().getContentResolver().query(contentURI, null, null, null,
-                    null);
-            if (cursor == null) {
-                result = contentURI.getPath();
-            } else {
-                cursor.moveToFirst();
-                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-                result = cursor.getString(idx);
-                cursor.close();
-            }
-            return result;
-        } catch (Exception e){
-            Log.e(Constants.TAG, "ProfileFragment.getRealPathFromURI: ", e);
-            Crashlytics.logException(e);
-            return null;
-        }
-    }
-
     public class UpdateProfile extends AsyncTask<Void, Void, String>
     {
         private ProgressDialog pdia;
@@ -690,6 +651,42 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             isUpdating = updateContactData();
             isAvatarHasChangedAfterSelection = false;
             isUpdating = updateContactData();
+        }
+    }
+
+
+
+
+    public class DecodeAndLoadBitmapAvatar extends AsyncTask<Void, Void, String>
+    {
+
+        private ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
+        private TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            progressBar.setVisibility(View.VISIBLE);
+            editProfile.setClickable(false);
+        }
+
+        @Override
+        protected String doInBackground(Void... params)
+        {
+            photoBitmap = Utils.decodeFile(photoPath);
+            return null;
+        }
+
+
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            super.onPostExecute(result);
+            progressBar.setVisibility(View.GONE);
+            editProfile.setClickable(true);
+            loadAvatarIntoImageView();
         }
     }
 

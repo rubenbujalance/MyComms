@@ -100,84 +100,87 @@ public class SignupMailActivity extends Activity {
 
     private void callBackEmailCheck(HashMap<String, Object> result)
     {
-        Log.v(Constants.TAG, "SignupMailActivity.callBackEmailCheck: " + result.toString());
+        if(null != result)
+        {
+            Log.v(Constants.TAG, "SignupMailActivity.callBackEmailCheck: " + result.toString());
 
-        JSONObject json = null;
-        String text = null;
-        String status = null;
+            JSONObject json = null;
+            String text = null;
+            String status = null;
 
-        status = (String)result.get("status");
+            status = (String)result.get("status");
 
-        if(result.containsKey("json")) json = (JSONObject)result.get("json");
-        else if(result.containsKey("text")) text = (String)result.get("text");
+            if(result.containsKey("json")) json = (JSONObject)result.get("json");
+            else if(result.containsKey("text")) text = (String)result.get("text");
 
-        try {
-            String title = null;
-            String subtitle = null;
-
-            if (status.compareTo("403") == 0 &&
-                    json.get("err") != null &&
-                    ((String)json.get("err")).compareTo("auth_proxy_user_error")==0) {
-                title = getString(R.string.user_already_exists);
-                subtitle = getString(R.string.the_entered_email_is_registered_2);
-            }
-            else if (status.compareTo("400") == 0 &&
-                    json.get("err") != null &&
-                    ((String)json.get("err")).compareTo("user_domain_not_allowed")==0) {
-                title = getString(R.string.uh_oh);
-                subtitle = "("+status+") "+json.get("des");
-            }
-            else if (status.compareTo("400") == 0 &&
-                    json.get("err") != null &&
-                    ((String)json.get("err")).compareTo("invalid_version")==0) {
-                title = getString(R.string.new_version_available);
-                subtitle = getString(R.string.must_update_to_last_application_version);
-            }
-            else
-            {
-                saveData();
-                Intent in = new Intent(SignupMailActivity.this, SignupNameActivity.class);
-                startActivity(in);
-            }
-
-            if(title != null)
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-                LayoutInflater inflater = getLayoutInflater();
-                View view = inflater.inflate(R.layout.cv_title_subtitle, null);
-                ((TextView) view.findViewById(R.id.tvTitle)).setText(title);
-                ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
-                builder.setCustomTitle(view);
+            try {
+                String title = null;
+                String subtitle = null;
 
                 if (status.compareTo("403") == 0 &&
                         json.get("err") != null &&
                         ((String)json.get("err")).compareTo("auth_proxy_user_error")==0) {
-                    builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent in = new Intent(SignupMailActivity.this, LoginActivity.class);
-                            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            in.putExtra("email", etEmail.getText().toString());
-                            startActivity(in);
-                            finish();
-                        }
-                    });
+                    title = getString(R.string.user_already_exists);
+                    subtitle = getString(R.string.the_entered_email_is_registered_2);
+                }
+                else if (status.compareTo("400") == 0 &&
+                        json.get("err") != null &&
+                        ((String)json.get("err")).compareTo("user_domain_not_allowed")==0) {
+                    title = getString(R.string.uh_oh);
+                    subtitle = "("+status+") "+json.get("des");
+                }
+                else if (status.compareTo("400") == 0 &&
+                        json.get("err") != null &&
+                        ((String)json.get("err")).compareTo("invalid_version")==0) {
+                    title = getString(R.string.new_version_available);
+                    subtitle = getString(R.string.must_update_to_last_application_version);
                 }
                 else
                 {
-                    builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    });
+                    saveData();
+                    Intent in = new Intent(SignupMailActivity.this, SignupNameActivity.class);
+                    startActivity(in);
                 }
 
-                builder.create();
-                builder.show();
+                if(title != null)
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                    LayoutInflater inflater = getLayoutInflater();
+                    View view = inflater.inflate(R.layout.cv_title_subtitle, null);
+                    ((TextView) view.findViewById(R.id.tvTitle)).setText(title);
+                    ((TextView) view.findViewById(R.id.tvSubtitle)).setText(subtitle);
+                    builder.setCustomTitle(view);
+
+                    if (status.compareTo("403") == 0 &&
+                            json.get("err") != null &&
+                            ((String)json.get("err")).compareTo("auth_proxy_user_error")==0) {
+                        builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent in = new Intent(SignupMailActivity.this, LoginActivity.class);
+                                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                in.putExtra("email", etEmail.getText().toString());
+                                startActivity(in);
+                                finish();
+                            }
+                        });
+                    }
+                    else
+                    {
+                        builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+
+                    builder.create();
+                    builder.show();
+                }
+            } catch(Exception ex) {
+                Log.e(Constants.TAG, "SignupMailActivity.callBackEmailCheck: \n" + ex.toString());
+                return;
             }
-        } catch(Exception ex) {
-            Log.e(Constants.TAG, "SignupMailActivity.callBackEmailCheck: \n" + ex.toString());
-            return;
         }
     }
 

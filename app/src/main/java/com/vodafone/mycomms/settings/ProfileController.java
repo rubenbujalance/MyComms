@@ -103,15 +103,23 @@ public class ProfileController extends BaseController {
     public boolean isUserProfileChanged(String firstName, String lastName, String company, String
             position, String officeLocation)
     {
-        if(firstName.equals(userProfile.getFirstName())
-                && lastName.equals(userProfile.getLastName())
-                && company.equals(userProfile.getCompany())
-                && position.equals(userProfile.getPosition())
-                && officeLocation.equals(userProfile.getOfficeLocation()))
+        if(null != this.userProfile)
+        {
+            if(firstName.equals(userProfile.getFirstName())
+                    && lastName.equals(userProfile.getLastName())
+                    && company.equals(userProfile.getCompany())
+                    && position.equals(userProfile.getPosition())
+                    && officeLocation.equals(userProfile.getOfficeLocation()))
+            {
+                return false;
+            }
+            return true;
+        }
+        else
         {
             return false;
         }
-        return true;
+
     }
 
     public void updateUserProfileInDB(String firstName, String lastName, String company, String

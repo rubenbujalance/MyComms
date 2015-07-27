@@ -3,7 +3,6 @@ package com.vodafone.mycomms.main;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -49,22 +48,21 @@ import io.fabric.sdk.android.Fabric;
 @SuppressWarnings("ResourceType")
 public class SplashScreenActivity extends Activity {
 
-    ProgressDialog mProgress;
     Context mContext;
     private boolean isForeground;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
+        Fabric.with(SplashScreenActivity.this, new Crashlytics());
 
 
 
         setContentView(R.layout.splash_screen);
-        mContext = this;
+        mContext = SplashScreenActivity.this;
 
         //Register Otto Bus
-        BusProvider.getInstance().register(this);
+        BusProvider.getInstance().register(SplashScreenActivity.this);
     }
 
     @Override
@@ -79,15 +77,15 @@ public class SplashScreenActivity extends Activity {
                 uriData.getHost().compareTo("user") == 0)
         {
             String refreshToken = uriData.getLastPathSegment();
-            UserSecurity.setTokens(null, refreshToken, 0, this);
+            UserSecurity.setTokens(null, refreshToken, 0, SplashScreenActivity.this);
             renewToken();
         }
         else {
             //Normal behaviour
-            if (!APIWrapper.isConnected(this)) {
+            if (!APIWrapper.isConnected(SplashScreenActivity.this)) {
                 //No connection, cannot check version nor profile
-                if (UserSecurity.isUserLogged(this)) {
-                    if (!UserSecurity.hasExpired(this)) {
+                if (UserSecurity.isUserLogged(SplashScreenActivity.this)) {
+                    if (!UserSecurity.hasExpired(SplashScreenActivity.this)) {
                         if(((MycommsApp)getApplication()).isProfileAvailable()) {
                             goToApp(true);
                         }
@@ -95,13 +93,11 @@ public class SplashScreenActivity extends Activity {
                 }
 
                 //No Internet connection, and user not logged in or accessToken expired
-                Toast.makeText(this,
+                Toast.makeText(SplashScreenActivity.this,
                         getString(R.string.no_internet_connection_log_in_needed),
                         Toast.LENGTH_LONG).show();
                 goToLogin();
 
-            } else {
-//                new CheckVersionApi().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
             checkVersion();
         }
@@ -185,7 +181,7 @@ public class SplashScreenActivity extends Activity {
             goToApp(false);
         }
         else {
-            Toast.makeText(this,
+            Toast.makeText(SplashScreenActivity.this,
                     getString(R.string.no_internet_connection_log_in_needed),
                     Toast.LENGTH_LONG).show();
 
@@ -203,7 +199,7 @@ public class SplashScreenActivity extends Activity {
                 Log.i(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: " +
                         "New version detected");
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
                 builder.setTitle(getString(R.string.new_version_available));
                 builder.setMessage(getString(R.string.must_update_to_last_application_version));
                 builder.setCancelable(false);
@@ -226,8 +222,8 @@ public class SplashScreenActivity extends Activity {
                 Log.i(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: " +
                         "Version OK");
 
-                if (UserSecurity.isUserLogged(this)) {
-                    if (UserSecurity.hasExpired(this)) {
+                if (UserSecurity.isUserLogged(SplashScreenActivity.this)) {
+                    if (UserSecurity.hasExpired(SplashScreenActivity.this)) {
                         renewToken();
                     } else {
                         ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
@@ -243,7 +239,8 @@ public class SplashScreenActivity extends Activity {
         } catch (Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: \n",ex);
             Crashlytics.logException(ex);
-            Toast.makeText(this, getString(R.string.error_reading_data_from_server),
+            Toast.makeText(SplashScreenActivity.this, getString(R.string
+                            .error_reading_data_from_server),
                     Toast.LENGTH_LONG).show();
             finish();
         }
@@ -270,7 +267,6 @@ public class SplashScreenActivity extends Activity {
     public void renewToken()
     {
         HashMap<String,Object> params = new HashMap<>();
-//        params.put("accessToken", UserSecurity.getAccessToken(this));
         params.put("refreshToken", UserSecurity.getRefreshToken(this));
 
         new RenewTokenAPI().execute(params, null);
@@ -290,7 +286,7 @@ public class SplashScreenActivity extends Activity {
                 String accessToken = jsonResponse.getString("accessToken");
                 long expiresIn = jsonResponse.getLong("expiresIn");
 
-                UserSecurity.setTokens(accessToken, null, expiresIn, this);
+                UserSecurity.setTokens(accessToken, null, expiresIn, SplashScreenActivity.this);
 
                 //Load profile and go to app
                 ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
@@ -305,7 +301,8 @@ public class SplashScreenActivity extends Activity {
         } catch(Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackRenewToken: \n",ex);
             Crashlytics.logException(ex);
-            Toast.makeText(this, getString(R.string.error_reading_data_from_server),
+            Toast.makeText(SplashScreenActivity.this, getString(R.string
+                            .error_reading_data_from_server),
                     Toast.LENGTH_LONG).show();
             finish();
         }
@@ -344,7 +341,7 @@ public class SplashScreenActivity extends Activity {
         manager.enqueue(request);
 
         //Show an alert to indicate the file download
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
         builder.setTitle(getString(R.string.update2));
         builder.setMessage(getString(R.string.please_check_the_download_status_in_the_notifications_bar));
         builder.setCancelable(false);
@@ -398,7 +395,7 @@ public class SplashScreenActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        BusProvider.getInstance().unregister(this);
+        BusProvider.getInstance().unregister(SplashScreenActivity.this);
     }
 
     @Subscribe

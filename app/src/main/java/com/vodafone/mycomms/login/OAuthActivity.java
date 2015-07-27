@@ -140,16 +140,26 @@ public class OAuthActivity extends Activity {
                 //We have got user information, continue SignUp process
                 //Save user data and go to signup
                 JSONObject jsonResponse = (JSONObject)result.get("json");
-                UserProfile.setMail(jsonResponse.getString("email"));
-                UserProfile.setFirstName(jsonResponse.getString("name"));
-                UserProfile.setLastName(jsonResponse.getString("lastname"));
-                UserProfile.setOfficeLocation(jsonResponse.getString("officeLocation"));
-                UserProfile.setCountryISO(jsonResponse.getString("country"));
-                UserProfile.setPhone(jsonResponse.getString("phone"));
-                UserProfile.setAvatar(jsonResponse.getString("avatar"));
-                UserProfile.setOauth(jsonResponse.getString(oauthPrefix));
-                UserProfile.setOauthPrefix(oauthPrefix);
-                UserProfile.setPosition(jsonResponse.getString("position"));
+                if(!jsonResponse.isNull("email"))
+                    UserProfile.setMail(jsonResponse.getString("email"));
+                if(!jsonResponse.isNull("name"))
+                    UserProfile.setFirstName(jsonResponse.getString("name"));
+                if(!jsonResponse.isNull("lastname"))
+                    UserProfile.setLastName(jsonResponse.getString("lastname"));
+                if(!jsonResponse.isNull("officeLocation"))
+                    UserProfile.setOfficeLocation(jsonResponse.getString("officeLocation"));
+                if(!jsonResponse.isNull("country"))
+                    UserProfile.setCountryISO(jsonResponse.getString("country"));
+                if(!jsonResponse.isNull("phone"))
+                    UserProfile.setPhone(jsonResponse.getString("phone"));
+                if(!jsonResponse.isNull("avatar"))
+                    UserProfile.setAvatar(jsonResponse.getString("avatar"));
+                if(!jsonResponse.isNull(oauthPrefix))
+                    UserProfile.setOauth(jsonResponse.getString(oauthPrefix));
+                if(!jsonResponse.isNull(oauthPrefix))
+                    UserProfile.setOauthPrefix(oauthPrefix);
+                if(!jsonResponse.isNull("position"))
+                    UserProfile.setPosition(jsonResponse.getString("position"));
 
                 goToSignUp();
             }

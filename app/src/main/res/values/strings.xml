@@ -95,7 +95,7 @@
     <!-- Section profile list tab bar titles-->
     <string name="profile_list_tab_preferences">Preferences</string>
     <string name="profile_list_tab_accounts">Accounts</string>
-    <string name="profile_list_tab_my_profile">My Profile</string>
+    <string name="profile_list_tab_my_profile">Profile</string>
     <string name="title_activity_profile">Profile</string>
     <string name="no_internet_connection_is_available">No Internet connection is available</string>
     <string name="error_reading_data_from_server">Error reading data from server</string>
@@ -202,7 +202,7 @@
     <string name="Settings">Settings</string>
     <string name="toolbar_preferences">Preferences</string>
     <string name="Profile">Profile</string>
-    <string name="toolbar_my_profile">My Profile</string>
+    <string name="toolbar_my_profile">Profile</string>
 
     <!-- Settings and Profile-->
     <string name="settings_vacation_time_activity_title">"Vacation Time"</string>
@@ -214,6 +214,11 @@
     <string name="about_version">"version "</string>
     <string name="about_build">"build "</string>
     <string name="Mycomms">MyComms</string>
+    <string name="add_accounts">Add Accounts</string>
+    <string name="set_salesforce">Salesforce</string>
+    <string name="set_local_contacts">Local Contacts</string>
+    <string name="set_vodafone_global_list">Vodafone Global List</string>
+    <string name="add_account">Add</string>
 
     <!--Progress dialog-->
 

@@ -12,6 +12,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -28,10 +29,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
-import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -46,6 +47,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -66,6 +68,8 @@ public final class Utils extends Activity {
     private static HashMap<String, HashMap<String, String>> _countries = null;
     private static String _userAgent = null;
     private static String _gcmToken = null;
+    private static String _appVersion = null;
+
 
     public static void showAlert(Context activityContext, String title, String subtitle)
     {
@@ -386,21 +390,25 @@ public final class Utils extends Activity {
     }
 
     public static String getHttpHeaderVersion(Context context) {
-        String versionHeader = "android/";
+        return "android/"+Utils.getAppVersion(context);
+    }
 
-        PackageInfo pinfo = null;
-        try {
-            pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.wtf(Constants.TAG, "Utils.getHttpHeaderVersion: Couldn't get application version:", e);
-            return versionHeader+"0.1.0";
+    public static String getAppVersion(Context context) {
+        if(_appVersion==null) {
+            PackageInfo pinfo;
+            try {
+                pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.wtf(Constants.TAG, "Utils.getHttpHeaderVersion: Couldn't get application version:", e);
+                return "0.0.0";
+            }
+
+            int versionCode = pinfo.versionCode;
+            String versionName = pinfo.versionName;
+            _appVersion = versionName + "." + versionCode;
         }
 
-        int versionCode = pinfo.versionCode;
-        String versionName = pinfo.versionName;
-        versionHeader += versionName + "." + versionCode;
-
-        return versionHeader;
+        return _appVersion;
     }
 
     public static String getHttpHeaderAuth(Context context) {
@@ -454,6 +462,59 @@ public final class Utils extends Activity {
         }
 
         return retBitmap;
+    }
+
+    public static Bitmap decodeFile(String path)
+    {
+        final int REQUIRED_SIZE = 90;
+        final int MAX_LENGTH_IN_MB_BEFORE_REDUCE = 10;
+        try
+        {
+            Bitmap avatar = null;
+            File file = new File(path);
+            //If file is more than 10 MB, we gonna reduce pixel density;
+            if(file.length()/1024/1024 > MAX_LENGTH_IN_MB_BEFORE_REDUCE)
+            {
+                // Decode image size
+                BitmapFactory.Options o = new BitmapFactory.Options();
+                o.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(new FileInputStream(path), null, o);
+
+                // Find the correct scale value. It should be the power of 2.
+                int scale = 1;
+                while(o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                        o.outHeight / scale / 2 >= REQUIRED_SIZE) {
+                    scale *= 2;
+                }
+
+                // Decode with inSampleSize
+                BitmapFactory.Options o2 = new BitmapFactory.Options();
+                o2.inSampleSize = scale;
+                avatar = BitmapFactory.decodeStream(new FileInputStream(path), null, o2);
+                avatar = Utils.adjustBitmapAsSquare(avatar);
+                avatar = Utils.resizeBitmapToStandardValue(avatar, Constants.MAX_AVATAR_WIDTH_OR_HEIGHT);
+            }
+            else
+            {
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = false;
+                options.inPreferredConfig = Bitmap.Config.RGB_565;
+                options.inDither = true;
+                // Decode image size
+                avatar = BitmapFactory.decodeFile(path, options);
+                avatar = Utils.adjustBitmapAsSquare(avatar);
+                avatar = Utils.resizeBitmapToStandardValue(avatar, Constants.MAX_AVATAR_WIDTH_OR_HEIGHT);
+            }
+
+            return avatar;
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "Utils.decodeFile: ERROR -> ",e);
+            Crashlytics.logException(e);
+        }
+        return null;
     }
 
     public static String normalizeStringNFD(String inputString)
@@ -604,11 +665,19 @@ public final class Utils extends Activity {
     public static String getUserAgent(Context context) {
         try {
             if (_userAgent == null) {
-                _userAgent = new WebView(context).getSettings().getUserAgentString();
+                String version = Utils.getAppVersion(context);
+                String appName = context.getString(R.string.app_name);
+                String deviceManuf = Build.MANUFACTURER;
+                String deviceModel = Build.MODEL;
+                String sdkVersionInt = String.valueOf(Build.VERSION.SDK_INT);
+                String sdkVersionStr = Build.VERSION.RELEASE;
+
+                _userAgent = appName+"/"+version+" ("+Constants.DEVICE_DEFAULT_USER_AGENT+
+                        "/"+sdkVersionInt+"; "+sdkVersionStr+"; "+deviceManuf+"/"+deviceModel+")";
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "Utils.getUserAgent: ");
-            _userAgent = Constants.DEVICE_DEFAULT_USER_AGENT + " " +
+            return Constants.DEVICE_DEFAULT_USER_AGENT + " " +
                     android.os.Build.VERSION.SDK_INT;
         }
         return _userAgent;
@@ -783,5 +852,4 @@ public final class Utils extends Activity {
             }
         }, 300);
     }
-
 }

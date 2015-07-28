@@ -756,27 +756,23 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        Log.i(Constants.TAG, "GroupChatActivity.onActivityResult: Image selected");
-        
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
+        try
         {
-            Bitmap photoBitmap = decodeFile(photoPath);
-            new sendFile().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, photoBitmap);
-        }
+            Log.i(Constants.TAG, "GroupChatActivity.onActivityResult: Image selected");
 
-        else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
-        {
-            Uri selectedImage = data.getData();
+            if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK)
+                new sendFile().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-            try {
+            else if(requestCode == REQUEST_IMAGE_GALLERY && resultCode == Activity.RESULT_OK)
+            {
+                Uri selectedImage = data.getData();
                 photoPath = Utils.getRealPathFromUri(selectedImage, this);
-                Bitmap photoBitmap = decodeFile(photoPath);
-
-                sendFile sendFile = new sendFile();
-                sendFile.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, photoBitmap);
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "GroupChatActivity.onActivityResult: ",e);
+                new sendFile().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
+
+        }
+        catch (Exception e) {
+            Log.e(Constants.TAG, "GroupChatActivity.onActivityResult: ",e);
         }
     }
 
@@ -908,7 +904,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         return result;
     }
 
-    private class sendFile extends AsyncTask<Object, Void, String> {
+    private class sendFile extends AsyncTask<Void, Void, String> {
         private ProgressDialog pdia;
         private Bitmap bitmap;
 
@@ -921,11 +917,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         }
 
         @Override
-        protected String doInBackground(Object... params) {
+        protected String doInBackground(Void... params) {
             try
             {
-                bitmap = (Bitmap)params[0];
-
+                bitmap = Utils.decodeFile(photoPath);
                 filePushToServerController =  new FilePushToServerController(GroupChatActivity.this);
                 multiPartFile = filePushToServerController.prepareFileToSend
                         (

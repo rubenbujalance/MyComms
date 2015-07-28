@@ -56,6 +56,8 @@ public class SplashScreenActivity extends Activity {
         super.onCreate(savedInstanceState);
         Fabric.with(SplashScreenActivity.this, new Crashlytics());
 
+
+
         setContentView(R.layout.splash_screen);
         mContext = SplashScreenActivity.this;
 

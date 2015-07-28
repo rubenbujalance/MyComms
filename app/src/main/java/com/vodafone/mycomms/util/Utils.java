@@ -29,7 +29,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
-import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -69,6 +68,8 @@ public final class Utils extends Activity {
     private static HashMap<String, HashMap<String, String>> _countries = null;
     private static String _userAgent = null;
     private static String _gcmToken = null;
+    private static String _appVersion = null;
+
 
     public static void showAlert(Context activityContext, String title, String subtitle)
     {
@@ -389,21 +390,25 @@ public final class Utils extends Activity {
     }
 
     public static String getHttpHeaderVersion(Context context) {
-        String versionHeader = "android/";
+        return "android/"+Utils.getAppVersion(context);
+    }
 
-        PackageInfo pinfo = null;
-        try {
-            pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.wtf(Constants.TAG, "Utils.getHttpHeaderVersion: Couldn't get application version:", e);
-            return versionHeader+"0.1.0";
+    public static String getAppVersion(Context context) {
+        if(_appVersion==null) {
+            PackageInfo pinfo;
+            try {
+                pinfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.wtf(Constants.TAG, "Utils.getHttpHeaderVersion: Couldn't get application version:", e);
+                return "0.0.0";
+            }
+
+            int versionCode = pinfo.versionCode;
+            String versionName = pinfo.versionName;
+            _appVersion = versionName + "." + versionCode;
         }
 
-        int versionCode = pinfo.versionCode;
-        String versionName = pinfo.versionName;
-        versionHeader += versionName + "." + versionCode;
-
-        return versionHeader;
+        return _appVersion;
     }
 
     public static String getHttpHeaderAuth(Context context) {
@@ -660,11 +665,19 @@ public final class Utils extends Activity {
     public static String getUserAgent(Context context) {
         try {
             if (_userAgent == null) {
-                _userAgent = new WebView(context).getSettings().getUserAgentString();
+                String version = Utils.getAppVersion(context);
+                String appName = context.getString(R.string.app_name);
+                String deviceManuf = Build.MANUFACTURER;
+                String deviceModel = Build.MODEL;
+                String sdkVersionInt = String.valueOf(Build.VERSION.SDK_INT);
+                String sdkVersionStr = Build.VERSION.RELEASE;
+
+                _userAgent = appName+"/"+version+" ("+Constants.DEVICE_DEFAULT_USER_AGENT+
+                        "/"+sdkVersionInt+"; "+sdkVersionStr+"; "+deviceManuf+"/"+deviceModel+")";
             }
         } catch (Exception e) {
             Log.e(Constants.TAG, "Utils.getUserAgent: ");
-            _userAgent = Constants.DEVICE_DEFAULT_USER_AGENT + " " +
+            return Constants.DEVICE_DEFAULT_USER_AGENT + " " +
                     android.os.Build.VERSION.SDK_INT;
         }
         return _userAgent;
@@ -839,5 +852,4 @@ public final class Utils extends Activity {
             }
         }, 300);
     }
-
 }

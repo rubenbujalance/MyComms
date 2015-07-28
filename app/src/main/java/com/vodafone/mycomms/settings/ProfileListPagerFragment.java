@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
@@ -47,12 +46,11 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
         @Override
         public Fragment getItem(int position) {
             Fragment fragment = null;
-            TextView editProfile = null;
             switch (position){
                 case Constants.MY_SETTINGS:
                     Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
@@ -66,6 +64,13 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
                     fragment = profileFragment;
 
                     break;
+
+                case Constants.MY_ACCOUNTS:
+                    Log.i(Constants.TAG, "ProfileListPagerAdapter.getItem: " + position);
+                    AccountsFragment accountsFragment = AccountsFragment.newInstance(position, "whatever");
+                    fragment = accountsFragment;
+
+                    break;
                 default:
                     break;
             }
@@ -76,10 +81,11 @@ public class ProfileListPagerFragment extends Fragment implements ProfileFragmen
         public CharSequence getPageTitle(int position) {
             if(position == Constants.MY_SETTINGS)
                 return getString(R.string.profile_list_tab_preferences);
-            //else if (position == Constants.ACCOUNTS)
-            //    return getString(R.string.profile_list_tab_accounts);
             else if (position == Constants.MY_PROFILE){
                 return getString(R.string.profile_list_tab_my_profile);
+            }
+            else if (position == Constants.MY_ACCOUNTS){
+                return getString(R.string.profile_list_tab_accounts);
             }
             Log.i(Constants.TAG, "getPageTitle: Unknown page");
             return "whatever" ;

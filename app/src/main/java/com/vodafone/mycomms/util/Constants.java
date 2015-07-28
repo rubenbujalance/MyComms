@@ -31,6 +31,7 @@ public class Constants {
     //Profile Constants
     public static final int MY_SETTINGS = 0;
     public static final int MY_PROFILE = 1;
+    public static final int MY_ACCOUNTS = 2;
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
     public static final String PROFILE_FULLNAME_SHARED_PREF = "mycomms_profile_fullname";
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";

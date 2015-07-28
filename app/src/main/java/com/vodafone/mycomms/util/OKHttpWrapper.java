@@ -38,26 +38,23 @@ public class OKHttpWrapper {
     private static void call(String method, final String url, final Context context, final HttpCallback cb, final String endPointWrapper) {
         Log.i(Constants.TAG, "OKHttpWrapper.call: " + url);
         OkHttpClient client = new OkHttpClient();
+
         client.setConnectTimeout(10, TimeUnit.SECONDS);
         client.setReadTimeout(15, TimeUnit.SECONDS);
         client.setRetryOnConnectionFailure(false);
+
         Request.Builder builder = new Request.Builder();
         Request request = builder
                 .url("https://" + endPointWrapper +
                         url)
                 .addHeader(Constants.API_HTTP_HEADER_VERSION,
                         Utils.getHttpHeaderVersion(context))
-//                .addHeader(Constants.API_HTTP_HEADER_VERSION,
-//                        "150")
                 .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
                         Utils.getHttpHeaderContentType())
                 .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
                         Utils.getHttpHeaderAuth(context))
                 .addHeader(Constants.API_HTTP_HEADER_USER_AGENT,
                         Utils.getUserAgent(context))
-
-//                .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
-//                        "aasa")
 //                .method(method, method.equals("GET") ? null : new RequestBody() {
 //                    @Override
 //                    public MediaType contentType() {
@@ -86,6 +83,11 @@ public class OKHttpWrapper {
 
             @Override
             public void onResponse(Response response) throws IOException {
+                if(response==null) {
+                    cb.onFailure(response, null);
+                    return;
+                }
+
                 int code = response.code();
                 Log.i(Constants.TAG, "OKHttpWrapper.onResponse: " + url + " ("+code+")");
 

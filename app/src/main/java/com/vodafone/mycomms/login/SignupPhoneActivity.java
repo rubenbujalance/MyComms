@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -53,6 +54,19 @@ public class SignupPhoneActivity extends Activity {
         mPhone.setHint(R.string.phone_number);
         mPhone.setInputType(
                 InputType.TYPE_CLASS_PHONE);
+
+        //Write SIM phone number as default
+        String phoneNumber = "";
+
+        try {
+            TelephonyManager tMgr = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+            phoneNumber = tMgr.getLine1Number();
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SignupPhoneActivity.onCreate: " +
+                    "Error obtaining SIM phone number",e);
+        }
+
+        mPhone.setText(phoneNumber);
 
         loadCountriesArray();
 

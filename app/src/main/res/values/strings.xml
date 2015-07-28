@@ -218,6 +218,7 @@
     <string name="set_salesforce">Salesforce</string>
     <string name="set_local_contacts">Local Contacts</string>
     <string name="set_vodafone_global_list">Vodafone Global List</string>
+    <string name="add_account">Add</string>
 
     <!--Progress dialog-->
 

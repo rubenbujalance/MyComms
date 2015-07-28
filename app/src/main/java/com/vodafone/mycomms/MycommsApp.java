@@ -31,6 +31,7 @@ import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
+import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
@@ -130,7 +131,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         try {
             networkEvents.register();
         } catch (Exception ex) {
-            Log.e(Constants.TAG, "MycommsApp.onCreate: ",ex);
+            Log.e(Constants.TAG, "MycommsApp.onCreate: ", ex);
             Crashlytics.logException(ex);
         }
 
@@ -328,6 +329,20 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         {
             if(profile_id!=null)
                 new sendAvatar().execute(profile_id);
+        }
+
+        if(profile_id!=null) {
+            //Set crashlytics user info
+            Crashlytics.setUserIdentifier(profile_id);
+
+            try {
+                RealmProfileTransactions ptx = new RealmProfileTransactions();
+                UserProfile userProfile = ptx.getUserProfile(profile_id);
+                Crashlytics.setUserName(userProfile.getFirstName()+" "+userProfile.getLastName());
+                Crashlytics.setUserEmail(userProfile.getEmails().split(";")[0]);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "MycommsApp.onApplicationAndProfileInitialized: ");
+            }
         }
     }
 

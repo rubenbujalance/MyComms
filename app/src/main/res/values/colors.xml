@@ -9,6 +9,7 @@
     <color name="contact_soft_blue_text">#abc5ce</color>
     <color name="contact_strong_blue_text">#587786</color>
     <color name="background_add_global_contacts">#fdb827</color>
+    <color name="background_platform">#e9e9e9</color>
 
     <!-- Chat colors-->
     <color name="white">#ffffff</color>

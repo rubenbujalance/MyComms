@@ -10,24 +10,25 @@
         android:id="@+id/add_global_contacts_container"
         android:layout_width="fill_parent"
         android:layout_height="48dp"
+        android:visibility="gone"
         android:background="@color/background_add_global_contacts">
 
         <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginTop="4dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="6dp"
             android:layout_marginBottom="0dp"
-            android:layout_marginLeft="7dp"
-            android:layout_marginStart="7dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginEnd="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/ic_add_vodafone"
             android:id="@+id/imageView15"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:text="@string/add_global_contacts"
             android:id="@+id/textView17"
             android:layout_centerVertical="true"
@@ -35,10 +36,10 @@
             android:layout_toEndOf="@+id/imageView15"/>
         <ImageView
             android:id="@+id/btn_add_global_contacts"
-            android:layout_width="15dp"
-            android:layout_height="24dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="16dp"
+            android:layout_height="28dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginStart="14dp"
             android:layout_marginRight="12dp"
             android:layout_marginEnd="12dp"
             android:background="@drawable/btn_add"

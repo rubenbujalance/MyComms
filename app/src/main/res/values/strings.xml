@@ -60,7 +60,7 @@
     <string name="title_section3">Section 3</string>
 
     <!-- Section contact list tab bar titles-->
-    <string name="contact_list_tab_favourites">Favourites</string>
+    <string name="contact_list_tab_favorites">Favorites</string>
     <string name="contact_list_tab_recents">Recents</string>
     <string name="contact_list_tab_contacts">Contacts</string>
     <string name="title_activity_toolbar">ToolbarActivity</string>
@@ -121,14 +121,14 @@
     </string-array>
     <string name="title_activity_oauth_web">OAuthWebActivity</string>
 
-    <string name="no_favourite_records">Store a list of your favourite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favourite contacts.</string>
+    <string name="no_favorite_records">Store a list of your favorite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favorite contacts.</string>
     <string name="no_recent_records">You have no recent interactions with other users</string>
     <string name="no_group_chat_records">Select the people you want to chat with</string>
     <string name="no_search_records">No results found</string>
 
     <!--Toolbar titles-->
     <string name="toolbar_title_messages">Messages</string>
-    <string name="toolbar_title_contact_list">My Contacts</string>
+    <string name="toolbar_title_contact_list">Contacts</string>
     <string name="toolbar_title_contacts">Contacts</string>
     <string name="profile_edit_mode_done">Done</string>
     <string name="profile_edit_mode_edit">Edit</string>
@@ -143,7 +143,7 @@
     <string name="dummyUser">Captain Planet</string>
     <string name="Contacts">Contacts</string>
     <string name="Recents">Recents</string>
-    <string name="Favourites">Favourites</string>
+    <string name="Favorites">Favorites</string>
     <string name="dummyShortDay">Tue</string>
     <string name="VacationTime">Vacation Time</string>
     <string name="DoNotDisturb">Do Not Disturb</string>
@@ -246,5 +246,8 @@
 
     <!--Push notifications-->
     <string name="new_unread_messages">New unread messages</string>
+
+    <!-- Add global contacts -->
+    <string name="add_global_contacts">Add Vodafone Global Address Contacts</string>
 
 </resources>

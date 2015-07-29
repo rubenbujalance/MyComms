@@ -1,4 +1,5 @@
-<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mycomms="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/abc_action_bar_default_height_material"
@@ -6,7 +7,7 @@
     mycomms:contentInsetStart="0dp"
     mycomms:theme="@style/ActionBarThemeOverlay"
     android:gravity="top"
-    android:background="@color/toolbar_selected_item"
+    android:background="@android:color/transparent"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
 
     <RelativeLayout

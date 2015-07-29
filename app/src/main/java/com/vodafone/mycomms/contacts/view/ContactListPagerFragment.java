@@ -82,8 +82,6 @@ public class ContactListPagerFragment extends Fragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mContactsController.closeRealm();
-
         BusProvider.getInstance().unregister(this);
     }
 

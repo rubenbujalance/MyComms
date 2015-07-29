@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import io.realm.Realm;
 import model.Contact;
 
 public class ContactDetailMainActivity extends ToolbarActivity implements IContactDetailConnectionCallback {
@@ -88,12 +89,15 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private RelativeLayout lay_phone_number, lay_email;
     private String SF_URL;
 
+    private Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
+        this.realm = Realm.getDefaultInstance();
 
         this.SF_URL = null;
 
@@ -668,10 +672,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        favouriteController.closeRealm();
-        mRecentContactController.closeRealm();
-        controller.closeRealm();
-        realmContactTransactions.closeRealm();
+        this.realm.close();
     }
 
     public void loadContactInfo()
@@ -740,7 +741,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private Contact getContact(String contactId){
-        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants.CONTACT_CONTACT_ID, contactId);
+        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants
+                .CONTACT_CONTACT_ID, contactId, realm);
 
         Contact contact = contactList.get(0);
         Log.d(Constants.TAG, "ContactDetailMainActivity.getContact: " + printContact(contact));

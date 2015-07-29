@@ -69,6 +69,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
+import io.realm.Realm;
 import model.Chat;
 import model.ChatMessage;
 import model.Contact;
@@ -121,6 +122,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
 
+    private Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +132,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
+
+        this.realm = Realm.getDefaultInstance();
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(GroupChatActivity.this))
@@ -144,7 +149,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         contactTransactions = new RealmContactTransactions(_profile_id);
         chatTransactions = new RealmChatTransactions(this);
         mGroupChatTransactions = new RealmGroupChatTransactions(this, _profile_id);
-        _profile = contactTransactions.getUserProfile();
+        _profile = contactTransactions.getUserProfile(realm);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecentContactController = new RecentContactController(this, _profile_id);
@@ -376,7 +381,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if(isGroupChatMode)
         {
             _groupChat = mGroupChatTransactions.getGroupChatById(
-                    in.getStringExtra(Constants.GROUP_CHAT_ID));
+                    in.getStringExtra(Constants.GROUP_CHAT_ID),realm);
             _groupId = _groupChat.getId();
             loadContactIds();
             loadGroupChatOwnerIds();
@@ -384,7 +389,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         else
         {
             String contactId = in.getStringExtra(Constants.CHAT_FIELD_CONTACT_ID);
-            _chat = chatTransactions.getChatByContactId(contactId);
+            _chat = chatTransactions.getChatByContactId(contactId, realm);
             if(_chat==null) _chat = chatTransactions.newChatInstance(contactId);
             _contactId = _chat.getContact_id();
             this.contactIds = new ArrayList<>();
@@ -421,7 +426,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             {
                 if(!id.equals(_profile_id))
                 {
-                    contact = contactTransactions.getContactById(id);
+                    contact = contactTransactions.getContactById(id, realm);
                     if(contact != null)
                         contactList.add(contact);
                 }
@@ -429,7 +434,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         }
         else
         {
-            Contact contact = contactTransactions.getContactById(contactIds.get(0));
+            Contact contact = contactTransactions.getContactById(contactIds.get(0), realm);
             if(contact != null)
                 contactList.add(contact);
         }
@@ -448,8 +453,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
             _groupChat = mGroupChatTransactions.updatedGroupChatInstance(_groupChat, chatMsg);
 
-            mGroupChatTransactions.insertOrUpdateGroupChat(_groupChat);
-            mGroupChatTransactions.insertGroupChatMessage(_groupId, chatMsg);
+            mGroupChatTransactions.insertOrUpdateGroupChat(_groupChat, realm);
+            mGroupChatTransactions.insertGroupChatMessage(_groupId, chatMsg, realm);
         }
         else {
             chatMsg = chatTransactions.newChatMessageInstance(
@@ -459,8 +464,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
             _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
 
-            chatTransactions.insertChat(_chat);
-            chatTransactions.insertChatMessage(chatMsg);
+            chatTransactions.insertChat(_chat, realm);
+            chatTransactions.insertChatMessage(chatMsg, realm);
         }
 
         //Send through XMPP
@@ -502,8 +507,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
             _groupChat = mGroupChatTransactions.updatedGroupChatInstance(_groupChat, chatMsg);
 
-            mGroupChatTransactions.insertOrUpdateGroupChat(_groupChat);
-            mGroupChatTransactions.insertGroupChatMessage(_groupId, chatMsg);
+            mGroupChatTransactions.insertOrUpdateGroupChat(_groupChat, realm);
+            mGroupChatTransactions.insertGroupChatMessage(_groupId, chatMsg, realm);
         }
         else {
             chatMsg = chatTransactions.newChatMessageInstance(
@@ -513,8 +518,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
             _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
 
-            chatTransactions.insertChat(_chat);
-            chatTransactions.insertChatMessage(chatMsg);
+            chatTransactions.insertChat(_chat, realm);
+            chatTransactions.insertChatMessage(chatMsg, realm);
         }
 
         //Send through XMPP
@@ -564,9 +569,9 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private void loadMessagesArray()
     {
         if(isGroupChatMode && _groupChat!=null)
-            _chatList = mGroupChatTransactions.getAllGroupChatMessages(_groupChat.getId());
+            _chatList = mGroupChatTransactions.getAllGroupChatMessages(_groupChat.getId(), realm);
         else if(!isGroupChatMode && _chat!=null)
-            _chatList = chatTransactions.getAllChatMessages(_chat.getContact_id());
+            _chatList = chatTransactions.getAllChatMessages(_chat.getContact_id(), realm);
 
         refreshAdapter();
     }
@@ -574,7 +579,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private void refreshAdapter()
     {
         mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
-                _profile, isGroupChatMode);
+                _profile, isGroupChatMode, realm);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
@@ -624,15 +629,15 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         ArrayList<ChatMessage> messages;
 
         if(isGroupChatMode)
-            messages = mGroupChatTransactions.getNotReadReceivedGroupChatMessages(_groupId);
+            messages = mGroupChatTransactions.getNotReadReceivedGroupChatMessages(_groupId, realm);
         else
-            messages = chatTransactions.getNotReadReceivedContactChatMessages(_contactId);
+            messages = chatTransactions.getNotReadReceivedContactChatMessages(_contactId, realm);
 
         if (messages != null && messages.size() > 0) {
             XMPPTransactions.sendReadIQReceivedMessagesList(isGroupChatMode, messages);
             if(isGroupChatMode)
-                mGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead(_groupId);
-            else chatTransactions.setContactAllChatMessagesReceivedAsRead(_contactId);
+                mGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead(_groupId, realm);
+            else chatTransactions.setContactAllChatMessagesReceivedAsRead(_contactId, realm);
         }
     }
 
@@ -655,10 +660,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mRecentContactController.closeRealm();
-        chatTransactions.closeRealm();
-        mGroupChatTransactions.closeRealm();
-        contactTransactions.closeRealm();
+        this.realm.close();
     }
 
     private void loadTheRestOfTheComponents()
@@ -941,7 +943,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     @Subscribe
     public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
-        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
+        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId(), realm);
 
         if((isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().compareTo(_groupId)==0)
                 || (!isGroupChatMode && chatMsg!=null && chatMsg.getContact_id().compareTo(_contactId)==0))

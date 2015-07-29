@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import model.Contact;
 import model.FavouriteContact;
 import model.RecentContact;
@@ -29,9 +30,10 @@ public class ContactsController{
         realmAvatarTransactions = new RealmAvatarTransactions();
     }
 
-    public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
+    public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
+    {
         ArrayList<Contact> realmContactList = new ArrayList<>();
-
+        Realm realm = Realm.getDefaultInstance();
         try {
             Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
@@ -42,30 +44,30 @@ public class ContactsController{
                 contact = mapContact(jsonObject, mProfileId);
                 realmContactList.add(contact);
             }
-
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
-            realmContactTransactions.insertContactList(realmContactList);
+            realmContactTransactions.insertContactList(realmContactList, null);
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
 
                 if(null != jsonObject.getString(Constants.CONTACT_ID)){
-                    contact = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID));
+                    contact = realmContactTransactions.getContactById(jsonObject.getString
+                            (Constants.CONTACT_ID), realm);
                     if (null != contact){
-                        String SF_URL = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+                        String SF_URL = realmContactTransactions.getContactById(jsonObject
+                                .getString(Constants.CONTACT_ID), realm)
                                 .getStringField1();
                         if(null != SF_URL)
-                            realmContactTransactions.updateSFAvatar(contact, SF_URL);
+                            realmContactTransactions.updateSFAvatar(contact, SF_URL, null);
                     }
                 }
             }
-
-            realmContactTransactions.closeRealm();
-
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactsController.insertContactListInRealm: " + e.toString());
             return null;
+        }
+        finally {
+            realm.close();
         }
         return realmContactList;
     }
@@ -74,39 +76,42 @@ public class ContactsController{
         JSONArray jsonArray;
         Contact contact;
         ArrayList<FavouriteContact> contactList = new ArrayList<>();
+        Realm realm = Realm.getDefaultInstance();
         try {
             Log.i(Constants.TAG, "ContactsController.insertFavouriteContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_FAVOURITES);
-            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
             for (int i = 0; i < jsonArray.length(); i++) {
-                contact = realmContactTransactions.getContactById(jsonArray.getString(i));
+                contact = realmContactTransactions.getContactById(jsonArray.getString(i), realm);
                 if (contact != null) {
                     contactList.add(mapContactToFavourite(contact));
                 }
             }
             if (contactList.size()!=0) {
-                realmContactTransactions.deleteAllFavouriteContacts();
-                realmContactTransactions.insertFavouriteContactList(contactList);
+                realmContactTransactions.deleteAllFavouriteContacts(null);
+                realmContactTransactions.insertFavouriteContactList(contactList, null);
             }
-            realmContactTransactions.closeRealm();
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : ",e);
         }
+        finally {
+            realm.close();
+        }
     }
 
-    public void insertRecentContactInRealm(JSONObject json){
-        RealmContactTransactions realmContactTransactions =
-                new RealmContactTransactions(mProfileId);
-
+    public void insertRecentContactInRealm(JSONObject json)
+    {
         JSONArray jsonArray;
         Contact contact;
         ArrayList<RecentContact> contactList = new ArrayList<>();
+
+        Realm realm = Realm.getDefaultInstance();
+
         try {
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
                 contact = realmContactTransactions.getContactById(
-                        jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID));
+                        jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID), realm);
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
                 }
@@ -122,11 +127,13 @@ public class ContactsController{
                 }
             }
             if (contactList.size()!=0) {
-                realmContactTransactions.insertRecentContactList(contactList);
+                realmContactTransactions.insertRecentContactList(contactList, null);
             }
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactsController.insertRecentContactInRealm : ",e);
+        }finally {
+            realm.close();
         }
     }
 
@@ -138,7 +145,7 @@ public class ContactsController{
                     + contact.getContactId());
             ArrayList<RecentContact> contactList = new ArrayList<>();
             contactList.add(mapContactToRecent(contact, jsonObject));
-            realmContactTransactions.insertRecentContactList(contactList);
+            realmContactTransactions.insertRecentContactList(contactList, null);
         }
         catch (Exception e)
         {
@@ -265,10 +272,5 @@ public class ContactsController{
             Log.e(Constants.TAG, "ContactsController.mapContactToRecent: " ,e);
         }
         return recentContact;
-    }
-
-    public void closeRealm() {
-        realmAvatarTransactions.closeRealm();
-        realmContactTransactions.closeRealm();
     }
 }

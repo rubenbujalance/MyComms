@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import io.realm.Realm;
 import model.ChatMessage;
 import model.Contact;
 import model.News;
@@ -39,12 +40,14 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     private RealmChatTransactions _chatTx;
     private RealmContactTransactions _contactTx;
     private boolean isGroupChatMode;
+    private Realm realm;
 
     public ChatRecyclerViewAdapter(Context context, ArrayList<ChatMessage> chatListItem,
-                                   UserProfile profile, boolean isGroupChatMode) {
+                                   UserProfile profile, boolean isGroupChatMode, Realm realm) {
         mContext = context;
         this._profile = profile;
         this.isGroupChatMode = isGroupChatMode;
+        this.realm = realm;
 
         _chatTx = new RealmChatTransactions(mContext);
         _contactTx = new RealmContactTransactions(_profile.getId());
@@ -108,7 +111,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         if(null != chatList.get(i).getContact_id() && chatList.get(i).getContact_id().length() >
                 0 && chatList.get(i).getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED))
         {
-            contact = _contactTx.getContactById(chatList.get(i).getContact_id());
+            contact = _contactTx.getContactById(chatList.get(i).getContact_id(), realm);
         }
         else
         {
@@ -223,7 +226,6 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-        _chatTx.closeRealm();
     }
 
     private ChatMessage getNextSentChatMessage(int position)
@@ -276,8 +278,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
     private News getNewsById(String id)
     {
         RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions();
-        News news = realmNewsTransactions.getNewById(id);
-        realmNewsTransactions.closeRealm();
+        News news = realmNewsTransactions.getNewById(id, realm);
         return news;
     }
 

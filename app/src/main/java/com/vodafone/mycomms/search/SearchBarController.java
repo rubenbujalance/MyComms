@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import io.realm.Realm;
 import model.Contact;
 
 /**
@@ -53,6 +54,8 @@ public class SearchBarController implements ISearchConnectionCallback
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
 
+    private Realm realm;
+
 
     public SearchBarController
             (
@@ -64,6 +67,7 @@ public class SearchBarController implements ISearchConnectionCallback
                     , int index
                     , ListView listView
                     , boolean isGroupChatSearch
+                    , Realm realm
             )
     {
         this.mActivity = activity;
@@ -74,6 +78,7 @@ public class SearchBarController implements ISearchConnectionCallback
         this.mIndex = index;
         this.mListView = listView;
         this.isGroupChatSearch = isGroupChatSearch;
+        this.realm = realm;
 
         sp = mActivity.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -253,7 +258,7 @@ public class SearchBarController implements ISearchConnectionCallback
     {
         if(null == keyWord)
         {
-            contactList = mContactTransactions.getAllContacts();
+            contactList = mContactTransactions.getAllContacts(realm);
         }
         else
         {

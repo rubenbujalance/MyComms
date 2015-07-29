@@ -75,13 +75,16 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     //Network listener
     private NetworkEvents networkEvents;
 
+    private Realm realm;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
 
+
         //Realm config
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext())
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this)
                 .name("mycomms.realm")
 //                .encryptionKey()
 //                .schemaVersion(1)
@@ -118,6 +121,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //**********************
 
+        this.realm = Realm.getDefaultInstance();
         mNewsController = new NewsController(getApplicationContext());
 
         //Initializations
@@ -143,13 +147,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onTerminate() {
         super.onTerminate();
         BusProvider.getInstance().unregister(this);
-
-        favouriteController.closeRealm();
-        recentContactController.closeRealm();
-        profileController.closeRealm();
-        mNewsController.closeRealm();
-        XMPPTransactions.closeRealm();
-
+        this.realm.close();
         //Network listener
         networkEvents.unregister();
     }
@@ -188,7 +186,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "")==null ||
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "").length()==0){
             profileController.setConnectionCallback(this);
-            profileController.getProfile();
+            profileController.getProfile(this.realm);
 
             return null;
         }
@@ -384,7 +382,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 recentContactController.insertPendingChatsRecent(recentChatsHashMapClone);
                 recentChatsHashMap.clear();
             }
-            recentContactController.closeRealm();
         }
     }
 

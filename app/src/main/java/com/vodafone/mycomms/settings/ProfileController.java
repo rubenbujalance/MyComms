@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 
+import io.realm.Realm;
 import model.UserProfile;
 
 public class ProfileController extends BaseController {
@@ -53,7 +54,7 @@ public class ProfileController extends BaseController {
     /**
      * Get Profile, uses DB and Network also. (First loads from DB by a callback then starts network connection.
      */
-    public void getProfile(){
+    public void getProfile(Realm realm){
         Log.i(Constants.TAG, "ProfileController.getProfile: ");
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -65,7 +66,7 @@ public class ProfileController extends BaseController {
         if (profileId != null && profileId.length() > 0) {
             UserProfile userProfileFromDB = null;
             if (mRealmProfileTransactions != null) {
-                userProfileFromDB = mRealmProfileTransactions.getUserProfile(profileId);
+                userProfileFromDB = mRealmProfileTransactions.getUserProfile(profileId, realm);
             }
 
             if (this.getConnectionCallback() != null && userProfileFromDB != null) {
@@ -131,7 +132,7 @@ public class ProfileController extends BaseController {
             userProfile.setCompany(company);
             userProfile.setPosition(position);
             userProfile.setOfficeLocation(officeLocation);
-            mRealmProfileTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile, null);
         }
     }
 
@@ -141,7 +142,7 @@ public class ProfileController extends BaseController {
         if(userProfile != null)
         {
             userProfile.setAvatar(avatarNewURL);
-            mRealmProfileTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile, null);
         }
     }
 
@@ -160,7 +161,7 @@ public class ProfileController extends BaseController {
             JSONObject json = new JSONObject(body);
             Log.d(Constants.TAG, "ProfileController.updateUserProfileSettingsInDB: " + json.toString());
             userProfile.setSettings(json.toString());
-            mRealmProfileTransactions.insertUserProfile(userProfile);
+            mRealmProfileTransactions.insertUserProfile(userProfile, null);
         }
     }
 
@@ -180,7 +181,7 @@ public class ProfileController extends BaseController {
 
     public void updateProfileTimezone(String timezone)
     {
-        mRealmProfileTransactions.updateProfileTimezone(timezone, profileId);
+        mRealmProfileTransactions.updateProfileTimezone(timezone, profileId, null);
     }
 
     @Override
@@ -199,7 +200,7 @@ public class ProfileController extends BaseController {
                     JSONObject jsonResponse = new JSONObject(result);
                     this.userProfile = mapUserProfile(jsonResponse);
 
-                    mRealmProfileTransactions.insertUserProfile(userProfile);
+                    mRealmProfileTransactions.insertUserProfile(userProfile, null);
                     Log.d(Constants.TAG, "ProfileController.onConnectionComplete: UserProfile parsed:" + printUserProfile(userProfile));
                     if(userProfile != null) {
                         isUserProfileReceived = true;
@@ -370,8 +371,9 @@ public class ProfileController extends BaseController {
 
     public void logoutToAPI()
     {
+        Realm realm = Realm.getDefaultInstance();
         try {
-            UserProfile userProfile = mRealmProfileTransactions.getUserProfile(profileId);
+            UserProfile userProfile = mRealmProfileTransactions.getUserProfile(profileId, realm);
             String jsonEmails = userProfile.getEmails();
             if (jsonEmails == null || jsonEmails.length() == 0) return;
 
@@ -385,6 +387,9 @@ public class ProfileController extends BaseController {
             Log.e(Constants.TAG, "ProfileController.logoutToAPI: ",e);
             Crashlytics.logException(e);
         }
+        finally {
+            realm.close();
+        }
     }
 
     public void getProfileCallback(String json) {
@@ -395,7 +400,7 @@ public class ProfileController extends BaseController {
                 JSONObject jsonResponse = new JSONObject(json);
 
                 userProfile = mapUserProfile(jsonResponse);
-                mRealmProfileTransactions.insertUserProfile(userProfile);
+                mRealmProfileTransactions.insertUserProfile(userProfile, null);
                 if(userProfile != null) {
                     isUserProfileReceived = true;
                 }
@@ -513,8 +518,4 @@ public class ProfileController extends BaseController {
         }
     }
 
-    public void closeRealm()
-    {
-        mRealmProfileTransactions.closeRealm();
-    }
 }

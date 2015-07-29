@@ -27,6 +27,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import model.Contact;
 import model.ContactAvatar;
 
@@ -44,11 +45,13 @@ public class SearchController extends BaseController
     private int search = Constants.CONTACTS_ALL;
     private int offsetPaging = 0;
     private String mProfileId;
+    private Realm realm;
 
-    public SearchController(Context context, String profileId) {
+    public SearchController(Context context, String profileId, Realm realm) {
         super(context);
         mContext = context;
         mProfileId = profileId;
+        this.realm = realm;
         realmContactTransactions = new RealmContactTransactions(profileId);
         realmAvatarTransactions = new RealmAvatarTransactions();
         internalContactSearch = new InternalContactSearch(mContext, profileId);
@@ -120,9 +123,10 @@ public class SearchController extends BaseController
     }
 
 
-    private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject) {
+    private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
+    {
         ArrayList<Contact> realmContactList = new ArrayList<>();
-
+        Realm realm = Realm.getDefaultInstance();
         try {
             Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
@@ -131,28 +135,33 @@ public class SearchController extends BaseController
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
-                contact = mapContact(jsonObject, mProfileId);
+                contact = mapContact(jsonObject, mProfileId, realm);
 
                 realmContactList.add(contact);
                 doRefreshAdapter = (i==jsonArray.length()-1);
                 //updateContactAvatar(contact, doRefreshAdapter);
             }
-            realmContactTransactions.insertContactList(realmContactList);
+            realmContactTransactions.insertContactList(realmContactList, realm);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "SearchController.insertContactListInRealm: " + e.toString());
             return null;
+        }
+        finally {
+            realm.close();
         }
         return realmContactList;
     }
 
     private void updateContactAvatar (Contact contact, boolean doRefreshAdapter)
     {
+        Realm realm = Realm.getDefaultInstance();
         try {
             if (contact.getAvatar()==null || contact.getAvatar().length()==0)
                 return;
 
-            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact.getContactId());
+            ContactAvatar avatar = realmAvatarTransactions.getContactAvatarByContactId(contact
+                    .getContactId(), realm);
             if (avatar == null || avatar.getUrl().compareTo(contact.getAvatar()) != 0) {
                 String filename = "avatar_" + contact.getContactId() + ".jpg";
 
@@ -165,13 +174,15 @@ public class SearchController extends BaseController
                 else
                 {
                     realmAvatarTransactions.updateAvatarUrlByContactId(
-                            contact.getContactId(), contact.getAvatar());
+                            contact.getContactId(), contact.getAvatar(), realm);
                 }
 
-                realmAvatarTransactions.insertAvatar(avatar);
+                realmAvatarTransactions.insertAvatar(avatar, realm);
             }
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactsController.updateContactAvatar: ", ex);
+        }finally {
+            realm.close();
         }
     }
 
@@ -237,7 +248,7 @@ public class SearchController extends BaseController
         return true;
     }
 
-    public Contact mapContact(JSONObject jsonObject, String profileId){
+    public Contact mapContact(JSONObject jsonObject, String profileId, Realm realm){
         Contact contact = new Contact();
         try {
             contact.setProfileId(profileId);
@@ -291,12 +302,14 @@ public class SearchController extends BaseController
 
 
             if(null != jsonObject.getString(Constants.CONTACT_ID)
-                    && null != realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+                    && null != realmContactTransactions.getContactById(jsonObject.getString
+                    (Constants.CONTACT_ID), realm)
                     && null != jsonObject.getString(Constants.CONTACT_PLATFORM)
                     && Constants.PLATFORM_SALES_FORCE.equals(jsonObject.getString(Constants
                     .CONTACT_PLATFORM)))
             {
-                String SF_URL = realmContactTransactions.getContactById(jsonObject.getString(Constants.CONTACT_ID))
+                String SF_URL = realmContactTransactions.getContactById(jsonObject.getString
+                        (Constants.CONTACT_ID), realm)
                         .getStringField1();
                 if(null != SF_URL)
                     contact.setStringField1(SF_URL);
@@ -316,18 +329,18 @@ public class SearchController extends BaseController
 
     public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
         Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
-        return realmContactTransactions.getContactsByKeyWord(keyWord);
+        return realmContactTransactions.getContactsByKeyWord(keyWord, realm);
     }
 
     public ArrayList<Contact> getContactsByKeyWordWithoutLocalsAndSalesForce(String keyWord) {
         Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
-        return realmContactTransactions.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
+        return realmContactTransactions.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord, realm);
     }
 
     public void storeContactsIntoRealm(ArrayList<Contact> contacts)
     {
         Log.d(Constants.TAG, "SearchController.storeContactsIntoRealm: ");
-        realmContactTransactions.insertContactList(contacts);
+        realmContactTransactions.insertContactList(contacts, null);
     }
 
     public InternalContactSearch getInternalContactSearch()
@@ -335,9 +348,4 @@ public class SearchController extends BaseController
         return this.internalContactSearch;
     }
 
-    public void closeRealm()
-    {
-        realmContactTransactions.closeRealm();
-        realmAvatarTransactions.closeRealm();
-    }
 }

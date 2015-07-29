@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import io.realm.Realm;
 import model.UserProfile;
 
 /**
@@ -58,6 +59,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private boolean isFirstLoad = true;
     private boolean doNotDisturb = false;
     private boolean privateTimeZone = false;
+
+    private Realm realm;
 
     /**
      * Use this factory method to create a new instance of
@@ -97,6 +100,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             mParam1 = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        this.realm = Realm.getDefaultInstance();
         profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);
     }
@@ -109,7 +113,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 //        editProfile.setVisibility(View.INVISIBLE);
 
         profileController.setConnectionCallback(this);
-        profileController.getProfile();
+        profileController.getProfile(this.realm);
 
     }
 
@@ -131,7 +135,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 //Remove User from DB
                 if(profileId!=null) {
                     RealmProfileTransactions profileTx = new RealmProfileTransactions();
-                    profileTx.removeUserProfile(profileId);
+                    profileTx.removeUserProfile(profileId, null);
                 }
 
                 //Reset user security data
@@ -200,7 +204,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     @Override
     public void onDestroy() {
         super.onDestroy();
-        profileController.closeRealm();
+        this.realm.close();
     }
 
     private void shareCurrentTime(boolean isChecked) {

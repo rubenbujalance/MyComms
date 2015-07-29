@@ -89,20 +89,13 @@ public class ContactSearchController {
                 //Check pagination
                 JSONObject jsonResponse = new JSONObject(json);
 
-                ContactsController contactsController = new ContactsController(mProfileId);
                 contactsController.insertContactListInRealm(jsonResponse);
                 contactsController.insertRecentContactInRealm(mJSONRecents);
-                contactsController.closeRealm();
                 BusProvider.getInstance().post(new RecentContactsReceivedEvent());
                 //Show Recent Contacts
             } catch (JSONException e) {
                 Log.e(Constants.TAG, "ContactSearchController.onConnectionComplete: ", e);
             }
         }
-    }
-
-    public void closeRealm()
-    {
-        contactsController.closeRealm();
     }
 }

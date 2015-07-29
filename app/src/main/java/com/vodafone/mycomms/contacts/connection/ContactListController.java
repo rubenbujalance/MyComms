@@ -81,9 +81,4 @@ public class ContactListController extends BaseController {
             }
         }
     }
-
-    public void closeRealm()
-    {
-        contactsController.closeRealm();
-    }
 }

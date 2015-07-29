@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
+import io.realm.Realm;
 import model.Chat;
 import model.ChatMessage;
 import model.GroupChat;
@@ -539,7 +540,7 @@ public final class XMPPTransactions {
             chatTx = new RealmChatTransactions(_appContext);
 
             //Save to DB
-            boolean changed = chatTx.setChatMessageSentStatus(id, status);
+            boolean changed = chatTx.setChatMessageSentStatus(id, status, null);
 
             if (changed) {
                 //Notify to app
@@ -558,11 +559,6 @@ public final class XMPPTransactions {
             Crashlytics.logException(e);
             return false;
         }
-        finally {
-            if(null != chatTx)
-                chatTx.closeRealm();
-        }
-
         return true;
     }
 
@@ -622,7 +618,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyMessageReceived(XmlPullParser parser)
     {
         RealmChatTransactions chatTx = null;
-
+        Realm realm = Realm.getDefaultInstance();
         try {
             if(_pendingMessages>0) {
                 _pendingMessages--;
@@ -658,7 +654,7 @@ public final class XMPPTransactions {
             chatTx = new RealmChatTransactions(_appContext);
 
             //Check if chat message has already been received
-            if(chatTx.existsChatMessageById(id))
+            if(chatTx.existsChatMessageById(id, realm))
                 return false;
 
             String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
@@ -690,12 +686,12 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            Chat chat = chatTx.getChatByContactId(contactId);
+            Chat chat = chatTx.getChatByContactId(contactId, realm);
             if(chat==null) chat = chatTx.newChatInstance(contactId);
             chat = chatTx.updatedChatInstance(chat, newChatMessage);
 
-            chatTx.insertChat(chat);
-            chatTx.insertChatMessage(newChatMessage);
+            chatTx.insertChat(chat, realm);
+            chatTx.insertChatMessage(newChatMessage, realm);
 
             ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
             chatEvent.setMessage(newChatMessage);
@@ -714,7 +710,7 @@ public final class XMPPTransactions {
             Crashlytics.logException(e);
             return false;
         } finally {
-            if(chatTx!=null) chatTx.closeRealm();
+            realm.close();
         }
 
         return true;
@@ -723,6 +719,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyImageReceived(XmlPullParser parser)
     {
         RealmChatTransactions chatTx = null;
+        Realm realm = Realm.getDefaultInstance();
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -735,7 +732,7 @@ public final class XMPPTransactions {
             chatTx = new RealmChatTransactions(_appContext);
 
             //Check if chat message has already been received
-            if(chatTx.existsChatMessageById(id))
+            if(chatTx.existsChatMessageById(id, realm))
                 return false;
 
             if(from.contains("@")) from = from.substring(0, from.indexOf("@"));
@@ -779,13 +776,13 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            Chat chat = chatTx.getChatByContactId(contactId);
+            Chat chat = chatTx.getChatByContactId(contactId, realm);
 
             if(chat==null) chat = chatTx.newChatInstance(contactId);
             chat = chatTx.updatedChatInstance(chat, newChatMessage);
 
-            chatTx.insertChat(chat);
-            chatTx.insertChatMessage(newChatMessage);
+            chatTx.insertChat(chat, realm);
+            chatTx.insertChatMessage(newChatMessage, realm);
 
             //Send IQ
             if(to.compareTo(_profile_id)==0 &&
@@ -809,8 +806,7 @@ public final class XMPPTransactions {
             return false;
         }
         finally {
-            if(null != chatTx)
-                chatTx.closeRealm();
+            realm.close();
         }
 
         return true;
@@ -819,6 +815,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyGroupMessageReceived(XmlPullParser parser)
     {
         RealmGroupChatTransactions groupTx = null;
+        Realm realm = Realm.getDefaultInstance();
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -848,7 +845,7 @@ public final class XMPPTransactions {
             groupTx = new RealmGroupChatTransactions(_appContext, _profile_id);
 
             //Check if chat message has already been received
-            if(groupTx.existsChatMessageById(id))
+            if(groupTx.existsChatMessageById(id, realm))
                 return false;
 
             String status = parser.getAttributeValue("", Constants.XMPP_ATTR_STATUS);
@@ -875,10 +872,10 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            GroupChat chat = groupTx.getGroupChatById(groupId);
+            GroupChat chat = groupTx.getGroupChatById(groupId, realm);
 
             //Save ChatMessage to DB
-            groupTx.insertGroupChatMessage(groupId, newChatMessage);
+            groupTx.insertGroupChatMessage(groupId, newChatMessage, null);
 
             if(chat==null) {
                 //Get group from API in background, and save to Realm
@@ -887,7 +884,7 @@ public final class XMPPTransactions {
             }
             else {
                 chat = groupTx.updatedGroupChatInstance(chat, newChatMessage);
-                groupTx.insertOrUpdateGroupChat(chat);
+                groupTx.insertOrUpdateGroupChat(chat, realm);
             }
 
             if(from.compareTo(_profile_id)!=0 &&
@@ -907,8 +904,9 @@ public final class XMPPTransactions {
             Crashlytics.logException(e);
             return false;
         }
-        finally {
-            if(null!=groupTx) groupTx.closeRealm();
+        finally
+        {
+            realm.close();
         }
 
         return true;
@@ -922,7 +920,9 @@ public final class XMPPTransactions {
             }
 
             @Override
-            public void onSuccess(Response response) {
+            public void onSuccess(Response response)
+            {
+                Realm realm = Realm.getDefaultInstance();
                 try {
                     String jsonStr;
                     JSONObject json;
@@ -957,7 +957,8 @@ public final class XMPPTransactions {
                                         groupId, _profile_id, membersIds, ownersIds, "", "", "");
 
                                 //Set last message data
-                                ChatMessage newChatMessage = groupTx.getGroupChatMessageById(chatId);
+                                ChatMessage newChatMessage = groupTx.getGroupChatMessageById
+                                        (chatId, realm);
                                 if(newChatMessage!=null) {
                                     chat.setLastMessage_id(newChatMessage.getId());
 
@@ -973,9 +974,7 @@ public final class XMPPTransactions {
                                     chat.setLastMessageTime(newChatMessage.getTimestamp());
                                 }
 
-                                groupTx.insertOrUpdateGroupChat(chat);
-
-                                groupTx.closeRealm();
+                                groupTx.insertOrUpdateGroupChat(chat, realm);
 
                             } catch (JSONException e) {
                                 Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onConnectionComplete: ", e);
@@ -987,6 +986,9 @@ public final class XMPPTransactions {
                 } catch (IOException e) {
                     Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onSuccess: ", e);
                 }
+                finally {
+                    realm.close();
+                }
             }
         });
     }
@@ -994,6 +996,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyGroupImageReceived(XmlPullParser parser)
     {
         RealmGroupChatTransactions groupTx = null;
+        Realm realm = Realm.getDefaultInstance();
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -1007,7 +1010,7 @@ public final class XMPPTransactions {
             groupTx = new RealmGroupChatTransactions(_appContext, _profile_id);
 
             //Check if chat message has already been received
-            if(groupTx.existsChatMessageById(id))
+            if(groupTx.existsChatMessageById(id, realm))
                 return false;
 
             if(groupId.contains("@")) groupId = groupId.substring(0, groupId.indexOf("@"));
@@ -1049,10 +1052,10 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Save ChatMessage to DB
-            groupTx.insertGroupChatMessage(groupId, newChatMessage);
+            groupTx.insertGroupChatMessage(groupId, newChatMessage, null);
 
             //Load chat and create if it didn't exist
-            GroupChat chat = groupTx.getGroupChatById(groupId);
+            GroupChat chat = groupTx.getGroupChatById(groupId, realm);
 
             if(chat==null) {
                 //Get group from API in background, and save to Realm
@@ -1060,7 +1063,7 @@ public final class XMPPTransactions {
             }
             else {
                 chat = groupTx.updatedGroupChatInstance(chat, newChatMessage);
-                groupTx.insertOrUpdateGroupChat(chat);
+                groupTx.insertOrUpdateGroupChat(chat, realm);
             }
 
             //Send event and IQ
@@ -1085,7 +1088,7 @@ public final class XMPPTransactions {
             return false;
         }
         finally {
-            if(null!=groupTx) groupTx.closeRealm();
+            realm.close();
         }
 
         return true;
@@ -1402,16 +1405,6 @@ public final class XMPPTransactions {
 
         return _connectionListener;
     }
-
-    public static void closeRealm()
-    {
-//        _chatTx.closeRealm();
-//        _groupChatTx.closeRealm();
-    }
-
-    /*
-     * Getters and Setters
-     */
 
     public static XMPPTCPConnection getXmppConnection() {
         return _xmppConnection;

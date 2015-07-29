@@ -341,10 +341,4 @@ public class RecentContactController {
             return "";
         }
     }
-
-    public void closeRealm()
-    {
-        contactSearchController.closeRealm();
-        contactsController.closeRealm();
-    }
 }

@@ -45,6 +45,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import model.Contact;
 import model.FavouriteContact;
 import model.RecentContact;
@@ -92,6 +93,8 @@ public class ContactListFragment extends ListFragment {
 
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
+
+    private Realm realm;
 
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
@@ -164,6 +167,7 @@ public class ContactListFragment extends ListFragment {
                         , mIndex
                         , listView
                         , false
+                        , realm
                 );
 
         mSearchBarController.initiateComponentsForSearchView(v);
@@ -184,6 +188,9 @@ public class ContactListFragment extends ListFragment {
 
         BusProvider.getInstance().register(this);
 
+        this.realm = Realm.getDefaultInstance();
+        this.realm.setAutoRefresh(true);
+
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -200,7 +207,8 @@ public class ContactListFragment extends ListFragment {
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
-        mSearchController = new SearchController(getActivity().getApplicationContext(), profileId);
+        mSearchController = new SearchController(getActivity().getApplicationContext(),
+                profileId, realm);
         recentController = new RecentContactController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
 
@@ -248,11 +256,8 @@ public class ContactListFragment extends ListFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        contactListController.closeRealm();
-        recentController.closeRealm();
-        mContactTransactions.closeRealm();
-        mSearchController.closeRealm();
         BusProvider.getInstance().unregister(this);
+        this.realm.close();
     }
 
     @Override
@@ -460,20 +465,20 @@ public class ContactListFragment extends ListFragment {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
 
-            favouriteContactList = mContactTransactions.getAllFavouriteContacts();
+            favouriteContactList = mContactTransactions.getAllFavouriteContacts(realm);
             if (favouriteContactList!=null) {
                 setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
-                        favouriteContactList));
+                        favouriteContactList, realm));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
             if (emptyText!=null)
                 emptyText.setText("");
-            recentContactList = mContactTransactions.getAllRecentContacts();
+            recentContactList = mContactTransactions.getAllRecentContacts(realm);
             if (recentContactList!=null)
             {
                 recentContactList = filterRecentList(recentContactList);
                 RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter
-                        (getActivity().getApplicationContext(), recentContactList, profileId);
+                        (getActivity().getApplicationContext(), recentContactList, profileId, realm);
                 if (listView != null) {
                     state = listView.onSaveInstanceState();
                     setListAdapter(recentAdapter);
@@ -500,14 +505,13 @@ public class ContactListFragment extends ListFragment {
         {
             if(null != contact && null != contact.getId() && contact.getId().startsWith("mg_"))
             {
-                if(null != realmGroupChatTransactions.getGroupChatById(contact.getId()))
+                if(null != realmGroupChatTransactions.getGroupChatById(contact.getId(), realm))
                     finalList.add(contact);
             }
 
             else if(null != contact && null != contact.getId())
                 finalList.add(contact);
         }
-        realmGroupChatTransactions.closeRealm();
         return finalList;
     }
 
@@ -553,8 +557,7 @@ public class ContactListFragment extends ListFragment {
         if(null == keyWord)
         {
             RealmContactTransactions mContactTransactions = new RealmContactTransactions(profileId);
-            contactArrayList = mContactTransactions.getAllContacts();
-            mContactTransactions.closeRealm();
+            contactArrayList = mContactTransactions.getAllContacts(realm);
         }
         else
         {

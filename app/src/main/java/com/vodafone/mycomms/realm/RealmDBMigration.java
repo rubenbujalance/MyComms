@@ -1,42 +1,82 @@
 package com.vodafone.mycomms.realm;
 
+import android.util.Log;
+
+import com.crashlytics.android.Crashlytics;
+import com.vodafone.mycomms.util.Constants;
+
 import io.realm.Realm;
+import io.realm.RealmMigration;
+import io.realm.internal.ColumnType;
 import io.realm.internal.Table;
+import model.GlobalContactsSettings;
 
 /**
  * Created by str_rbm on 29/06/2015.
  */
-public class RealmDBMigration implements io.realm.RealmMigration {
+public class RealmDBMigration implements RealmMigration {
     @Override
     public long execute(Realm realm, long version) {
 
+        Log.i(Constants.TAG, "RealmDBMigration.execute: Checking migration");
+
         /*
             // Version 0
-            class Chat
-                String id;
-                String firstName;
-                String lastName;
-                ...
+            Contacts, Recents, Favourites, Avatars, Chats, GroupChats, ChatsMessages,
+            UserProfile, News.
+
             // Version 1
-            class Person
-                String fullName;        // combine firstName and lastName into single field
-                int age;
+            NEW REALM CLASS
+            class GlobalContactsSettings
+                @PrimaryKey
+                private String profileId;
+
+                private String user; //This field can contain either username or email, depending on the user
+                private String password;
+                private String token;
         */
-        // Migrate from version 0 to version 1
-//        if (version == 0) {
-//            Table personTable = realm.getTable(Chat.class);
-//
-//            long fistNameIndex = getIndexForProperty(personTable, "firstName");
-//            long lastNameIndex = getIndexForProperty(personTable, "lastName");
-//            long fullNameIndex = personTable.addColumn(ColumnType.STRING, "fullName");
-//            for (int i = 0; i < personTable.size(); i++) {
-//                personTable.setString(fullNameIndex, i, personTable.getString(fistNameIndex, i) + " " +
-//                        personTable.getString(lastNameIndex, i));
-//            }
-//            personTable.removeColumn(getIndexForProperty(personTable, "firstName"));
-//            personTable.removeColumn(getIndexForProperty(personTable, "lastName"));
-//            version++;
-//        }
+        // Migrate from version 0
+        if(version==0) {
+            Log.i(Constants.TAG, "RealmDBMigration.execute: Migrating from version 0");
+
+            try {
+                Table ldapSettings = realm.getTable(GlobalContactsSettings.class);
+                if(ldapSettings.getColumnCount()==0) {
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_USER);
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_PASSWORD);
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_TOKEN);
+                    ldapSettings.addSearchIndex(
+                            ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID));
+                    ldapSettings.setPrimaryKey(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
+                }
+
+                version++;
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "RealmDBMigration.execute: ", e);
+                Crashlytics.logException(e);
+            }
+        }
+
+/*        if (version == 0) {
+            Table personTable = realm.getTable(Chat.class);
+
+            long fistNameIndex = getIndexForProperty(personTable, "firstName");
+            long lastNameIndex = getIndexForProperty(personTable, "lastName");
+            long fullNameIndex = personTable.addColumn(ColumnType.STRING, "fullName");
+            for (int i = 0; i < personTable.size(); i++) {
+                personTable.setString(fullNameIndex, i, personTable.getString(fistNameIndex, i) + " " +
+                        personTable.getString(lastNameIndex, i));
+            }
+            personTable.removeColumn(getIndexForProperty(personTable, "firstName"));
+            personTable.removeColumn(getIndexForProperty(personTable, "lastName"));
+
+            version++;
+        }*/
 
         /*
             // Version 2

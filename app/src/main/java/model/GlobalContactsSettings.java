@@ -10,13 +10,15 @@ public class GlobalContactsSettings extends RealmObject {
 
     private String user; //This field can contain either username or email, depending on the user
     private String password;
+    private String token;
 
     public GlobalContactsSettings() {}
 
-    public GlobalContactsSettings(String profileId, String user,String password) {
+    public GlobalContactsSettings(String profileId, String user,String password, String token) {
         this.setProfileId(profileId);
         this.setUser(user);
         this.setPassword(password);
+        this.setToken(token);
     }
 
 
@@ -42,5 +44,13 @@ public class GlobalContactsSettings extends RealmObject {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

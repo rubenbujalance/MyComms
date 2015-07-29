@@ -8,6 +8,7 @@ public class EndpointWrapper {
     private static final String baseURL = "int.my-comms.com";
     private static final String baseNewsURL = "int-news.my-comms.com";
     private static final String xmppHost = "int-msg.my-comms.com";
+    private static final String ldapHost = "int-msg.my-comms.com";
 
 //    private static final String baseURL = "qa.my-comms.com";
 //    private static final String baseNewsURL = "qa-news.my-comms.com";
@@ -20,5 +21,8 @@ public class EndpointWrapper {
     }
     public static String getXMPPHost() {
         return xmppHost;
+    }
+    public static String getLDAPHost() {
+        return ldapHost;
     }
 }

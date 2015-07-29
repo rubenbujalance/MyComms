@@ -35,4 +35,31 @@
     <color name="ac_subtitle">#171616</color>
     <color name="ac_label">#777</color>
 
+    <!-- ****************** -->
+    <!-- New Designs Colors -->
+    <!-- ****************** -->
+
+    <!--Core Colors-->
+    <color name="lagoon">#009dcd</color>
+    <color name="overboard">#0071ff</color>
+    <color name="strawberry">#f84545</color>
+    <color name="first_blood">#cc0000</color>
+    <color name="sunny">#fad46b</color>
+    <color name="old_banana">#f3bc65</color>
+    <color name="bruise">#a88cd5</color>
+    <color name="tudors">#9175bd</color>
+    <color name="mow">#3eb5ac</color>
+    <color name="cricket">#28948c</color>
+    <color name="burning">#f58410</color>
+    <color name="burnt_amber">#e96300</color>
+
+    <!--Shade colors -->
+    <color name="the_back_flag">#364347</color>
+    <color name="gunpowder">#5e696d</color>
+    <color name="coastal_surf">#e1eef3</color>
+    <color name="deep_blue">#061939</color>
+
+    <!--Other colors -->
+    <color name="header_background_darken">#b2051838</color>
+
 </resources>

@@ -270,5 +270,10 @@ public class Constants {
 
     public static final int MAX_AVATAR_WIDTH_OR_HEIGHT = 640;
 
+    //LDAP Settings constants
+    public static final String LDAP_SETTINGS_FIELD_PROFILE_ID = "profileId";
+    public static final String LDAP_SETTINGS_FIELD_USER = "user";
+    public static final String LDAP_SETTINGS_FIELD_PASSWORD = "password";
+    public static final String LDAP_SETTINGS_FIELD_TOKEN = "token";
 
 }

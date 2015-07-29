@@ -40,7 +40,7 @@
 
         <TextView
             android:id="@android:id/empty"
-            android:text="@string/no_favourite_records"
+            android:text="@string/no_favorite_records"
             style="@style/NoRecordsTextView"/>
 
 

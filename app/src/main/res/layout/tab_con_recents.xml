@@ -4,13 +4,13 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:padding="10dp"
-    android:background="@color/toolbar_selected_item">
+    android:background="@android:color/transparent">
 
     <ImageView
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:id="@+id/imageView5"
-        android:src="@drawable/btnrecents" />
+        android:src="@drawable/btn_recents" />
 
     <TextView
         android:layout_width="wrap_content"

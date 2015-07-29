@@ -4,8 +4,49 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clickable="false"
-    >
+    android:clickable="false">
+
+    <RelativeLayout
+        android:id="@+id/add_global_contacts_container"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:background="@color/background_add_global_contacts">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginStart="7dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/ic_add_vodafone"
+            android:id="@+id/imageView15"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            android:text="@string/add_global_contacts"
+            android:id="@+id/textView17"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/imageView15"
+            android:layout_toEndOf="@+id/imageView15"/>
+        <ImageView
+            android:id="@+id/btn_add_global_contacts"
+            android:layout_width="15dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/btn_add"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/textView17"
+            android:layout_toEndOf="@+id/textView17"/>
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/lay_search_bar_container"
@@ -17,7 +58,6 @@
                  android:layout_height="wrap_content" />
 
     </LinearLayout>
-
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -33,13 +73,14 @@
                 android:layout_width="match_parent"
                 android:layout_height = "wrap_content"
                 android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"/>
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <TextView
             android:id="@android:id/empty"
-            android:text="@string/no_favourite_records"
+            android:text="@string/no_favorite_records"
             style="@style/NoRecordsTextView"/>
 
 

@@ -5,18 +5,18 @@
     android:textAlignment="center"
     android:gravity="center_horizontal"
     android:padding="10dp"
-    android:background="@color/toolbar_selected_item">
+    android:background="@android:color/transparent">
 
     <ImageView
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:id="@+id/imageView9"
-        android:src="@drawable/btnfavourite" />
+        android:src="@drawable/btn_favorites" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/Favourites"
+        android:text="@string/Favorites"
         android:id="@+id/textView8"
         android:textColor="@color/grey_light" />
 </LinearLayout>

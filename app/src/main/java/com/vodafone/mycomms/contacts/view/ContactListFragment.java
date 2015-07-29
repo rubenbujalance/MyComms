@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
@@ -67,6 +68,7 @@ public class ContactListFragment extends ListFragment {
     protected Handler handler = new Handler();
     private RealmContactTransactions mContactTransactions;
     private ContactListViewArrayAdapter adapter;
+    private RelativeLayout addGlobalContactsContainer;
 
     private ListView listView;
     private Parcelable state;
@@ -93,6 +95,8 @@ public class ContactListFragment extends ListFragment {
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
 
+    private boolean globalContactsLoaded = false; //TODO: Create Logic
+
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
         Bundle args = new Bundle();
@@ -110,6 +114,8 @@ public class ContactListFragment extends ListFragment {
         searchView = (EditText) v.findViewById(R.id.et_search);
         cancelButton = (Button) v.findViewById(R.id.btn_cancel);
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
+
+        addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
 
         loadSearchBarEventsAndControllers(v);
 
@@ -141,6 +147,13 @@ public class ContactListFragment extends ListFragment {
                     }
                 }, 500);
                 Constants.isDashboardOrigin = false;
+            }
+            if (null != addGlobalContactsContainer) {
+                if (!globalContactsLoaded) {
+                    addGlobalContactsContainer.setVisibility(View.VISIBLE);
+                } else{
+                    addGlobalContactsContainer.setVisibility(View.GONE);
+                }
             }
         }
         else{
@@ -457,8 +470,11 @@ public class ContactListFragment extends ListFragment {
 
     public void setListAdapterTabs()
     {
-        Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
+        Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);;
+
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
+            if (null != addGlobalContactsContainer)
+                addGlobalContactsContainer.setVisibility(View.GONE);
 
             favouriteContactList = mContactTransactions.getAllFavouriteContacts();
             if (favouriteContactList!=null) {
@@ -466,6 +482,9 @@ public class ContactListFragment extends ListFragment {
                         favouriteContactList));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
+            if (null != addGlobalContactsContainer)
+                addGlobalContactsContainer.setVisibility(View.GONE);
+
             if (emptyText!=null)
                 emptyText.setText("");
             recentContactList = mContactTransactions.getAllRecentContacts();
@@ -481,6 +500,13 @@ public class ContactListFragment extends ListFragment {
                 }
             }
         }else if(mIndex == Constants.CONTACTS_ALL){
+            if (null != addGlobalContactsContainer) {
+                if (!globalContactsLoaded) {
+                    addGlobalContactsContainer.setVisibility(View.VISIBLE);
+                } else{
+                    addGlobalContactsContainer.setVisibility(View.GONE);
+                }
+            }
             if (emptyText!=null)
                 emptyText.setText("");
             contactList = loadAllContactsFromDB();
@@ -606,7 +632,6 @@ public class ContactListFragment extends ListFragment {
      */
     public void hideKeyboard()
     {
-        Log.i(Constants.TAG, "ContactListFragment.hideKeyboard: ");
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
                 ().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
@@ -615,7 +640,6 @@ public class ContactListFragment extends ListFragment {
     private void hideProgressDialog()
     {
         if(mSwipeRefreshLayout.isRefreshing())mSwipeRefreshLayout.setRefreshing(false);
-        Log.i(Constants.TAG, "ContactListFragment.hideKeyboard: ");
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
           ().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);

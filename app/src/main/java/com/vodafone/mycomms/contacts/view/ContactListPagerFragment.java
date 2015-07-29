@@ -115,7 +115,7 @@ public class ContactListPagerFragment extends Fragment{
         @Override
         public CharSequence getPageTitle(int position) {
             if(position == 0)
-                return getString(R.string.contact_list_tab_favourites);
+                return getString(R.string.contact_list_tab_favorites);
             else if (position == 1)
                 return getString(R.string.contact_list_tab_recents);
             else if (position == 2) {

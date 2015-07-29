@@ -41,19 +41,25 @@ public class RealmDBMigration implements RealmMigration {
 
             try {
                 Table ldapSettings = realm.getTable(GlobalContactsSettings.class);
-                if(ldapSettings.getColumnCount()==0) {
-                    ldapSettings.addColumn(
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID)==-1) {
+                    long columnIndex = ldapSettings.addColumn(
                             ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
-                    ldapSettings.addColumn(
-                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_USER);
-                    ldapSettings.addColumn(
-                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_PASSWORD);
-                    ldapSettings.addColumn(
-                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_TOKEN);
+                    ldapSettings.setPrimaryKey(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
+                    ldapSettings.addSearchIndex(columnIndex);
+                } else if(!ldapSettings.hasPrimaryKey()) {
+                    ldapSettings.setPrimaryKey(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
                     ldapSettings.addSearchIndex(
                             ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID));
-                    ldapSettings.setPrimaryKey(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
                 }
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_USER)==-1)
+                    ldapSettings.addColumn(
+                        ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_USER);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_PASSWORD)==-1)
+                    ldapSettings.addColumn(
+                        ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_PASSWORD);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_TOKEN)==-1)
+                    ldapSettings.addColumn(
+                        ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_TOKEN);
 
                 version++;
             } catch (Exception e) {

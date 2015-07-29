@@ -41,12 +41,12 @@ public class OKHttpWrapper {
     }
 
     public static void getLDAP(String url, Context context, HttpCallback cb) {
-        call("GET", url, null, cb, EndpointWrapper.getLDAPHost(), context);
+        call("GET", url, null, cb, null, context);
     }
 
     public static void postLDAP(String url, JSONObject jsonObject,
                                 Context context, HttpCallback cb) {
-        call("POST", url, jsonObject, cb, EndpointWrapper.getLDAPHost(), context);
+        call("POST", url, jsonObject, cb, null, context);
     }
 
     private static void call(String method, final String url, JSONObject jsonObject,
@@ -59,9 +59,13 @@ public class OKHttpWrapper {
         client.setReadTimeout(15, TimeUnit.SECONDS);
         client.setRetryOnConnectionFailure(false);
 
+        String finalUrl;
+
+        if(endPointWrapper==null) finalUrl = url;
+        else finalUrl = "https://" + endPointWrapper + url;
+
         Request.Builder builder = new Request.Builder();
-        builder.url("https://" + endPointWrapper +
-                url)
+        builder.url(finalUrl)
                 .addHeader(Constants.API_HTTP_HEADER_VERSION,
                         Utils.getHttpHeaderVersion(context))
                 .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,

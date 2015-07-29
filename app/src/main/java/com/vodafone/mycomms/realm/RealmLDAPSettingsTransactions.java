@@ -57,7 +57,7 @@ public class RealmLDAPSettingsTransactions {
     }
 
     public static void createOrUpdateData (String profileId, String user, String password,
-                                           String token, Realm realm){
+                                           String token, String tokenType, String url, Realm realm){
         Log.i(Constants.TAG, "RealmLDAPSettingsTransactions.createOrUpdateData: " +
                 "Creating/Updating LDAP data for user "+user);
 
@@ -70,13 +70,16 @@ public class RealmLDAPSettingsTransactions {
             realm.beginTransaction();
             GlobalContactsSettings settings = getSettings(profileId, realm);
             if(settings==null) {
-                settings = new GlobalContactsSettings(profileId, user, password, token);
+                settings = new GlobalContactsSettings(profileId, user, password,
+                        token, tokenType, url);
                 insertOrUpdateSettings(settings, realm);
             }
             else {
                 settings.setUser(user);
                 settings.setPassword(password);
                 settings.setToken(token);
+                settings.setTokenType(tokenType);
+                settings.setUrl(url);
             }
             realm.commitTransaction();
         } catch (IllegalArgumentException e){

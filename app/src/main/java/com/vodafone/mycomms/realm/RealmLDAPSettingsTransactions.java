@@ -24,7 +24,7 @@ public class RealmLDAPSettingsTransactions {
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.insertUpdateSettings: ", e);
             Crashlytics.logException(e);
-            realm.cancelTransaction();
+            if(realm!=null) realm.cancelTransaction();
         } finally {
             if(isNewRealm) realm.close();
         }
@@ -46,14 +46,37 @@ public class RealmLDAPSettingsTransactions {
                 return settings;
 
         } catch (IllegalArgumentException e){
-            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.getSettings: ",e);
+            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.getSettings: ", e);
             Crashlytics.logException(e);
-            realm.cancelTransaction();
         } finally {
             if(isNewRealm) realm.close();
         }
 
         return null;
+    }
+
+    public static boolean haveSettings(String profileId, Realm realm){
+        boolean isNewRealm = false;
+        long count = 0;
+
+        try {
+            if (realm == null) {
+                realm = Realm.getDefaultInstance();
+                isNewRealm = true;
+            }
+
+            count = realm.where(GlobalContactsSettings.class)
+                    .equalTo(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID, profileId)
+                    .count();
+
+        } catch (IllegalArgumentException e){
+            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.getSettings: ", e);
+            Crashlytics.logException(e);
+        } finally {
+            if(isNewRealm) realm.close();
+        }
+
+        return (count>0);
     }
 
     public static void createOrUpdateData (String profileId, String user, String password,
@@ -85,7 +108,7 @@ public class RealmLDAPSettingsTransactions {
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.setUserAndPassword: ",e);
             Crashlytics.logException(e);
-            realm.cancelTransaction();
+            if(realm!=null) realm.cancelTransaction();
         } finally {
             if(isNewRealm) realm.close();
         }

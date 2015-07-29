@@ -223,17 +223,17 @@ public class SlidingTabLayoutPreferences extends HorizontalScrollView {
 
         if (auxactivity[0].equals("com.vodafone.mycomms.ContactListMainActivity")) {
 
-            /*View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_favourites, mTabStrip, false);
+            /*View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_con_favourites, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 3;
 
-            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_recents, mTabStrip, false);
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_con_recents, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 3;
 
-            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_contacts, mTabStrip, false);
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_con_contacts, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 3;*/

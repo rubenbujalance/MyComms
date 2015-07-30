@@ -12,7 +12,7 @@
         android:layout_gravity="right"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:src="@drawable/icon_sun"
+        android:src="@drawable/ic_sun"
         />
     <!-- Local Time -->
     <TextView android:id="@+id/list_item_recent_info_time"

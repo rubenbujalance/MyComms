@@ -716,6 +716,7 @@ public class GroupChatListFragment extends ListFragment implements
             if(null != response && mGroupChatController.getResponseCode().startsWith("2"))
             {
                 String id = mGroupChatController.getCreatedGroupChatId(response);
+                this.groupChatId = id;
                 if(null != id)
                 {
                     this.groupChat = mGroupChatTransactions.newGroupChatInstance

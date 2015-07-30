@@ -655,11 +655,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             }
             isUpdating = updateContactData();
             isAvatarHasChangedAfterSelection = false;
-            isUpdating = updateContactData();
         }
     }
-
-
 
 
     public class DecodeAndLoadBitmapAvatar extends AsyncTask<Void, Void, String>

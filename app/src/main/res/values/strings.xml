@@ -213,10 +213,11 @@
     <string name="settings_label_vacation_time_not_set">Not Set</string>
     <string name="about_version">"version "</string>
     <string name="about_build">"build "</string>
-    <string name="Mycomms">MyComms</string>
+    <string name="mycomms">MyComms</string>
     <string name="add_accounts">Add Accounts</string>
-    <string name="set_salesforce">Salesforce</string>
-    <string name="set_local_contacts">Local Contacts</string>
+    <string name="salesforce">Salesforce</string>
+    <string name="local_contacts">Local Contacts</string>
+    <string name="global_contacts">Global Contacts</string>
     <string name="set_vodafone_global_list">Vodafone Global List</string>
     <string name="add_account">Add</string>
 

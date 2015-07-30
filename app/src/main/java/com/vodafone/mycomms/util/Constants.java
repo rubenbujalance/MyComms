@@ -275,5 +275,7 @@ public class Constants {
     public static final String LDAP_SETTINGS_FIELD_USER = "user";
     public static final String LDAP_SETTINGS_FIELD_PASSWORD = "password";
     public static final String LDAP_SETTINGS_FIELD_TOKEN = "token";
+    public static final String LDAP_SETTINGS_FIELD_TOKEN_TYPE = "tokenType";
+    public static final String LDAP_SETTINGS_FIELD_URL = "url";
 
 }

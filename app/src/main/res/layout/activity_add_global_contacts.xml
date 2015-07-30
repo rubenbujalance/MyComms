@@ -46,7 +46,7 @@
             android:layout_height="match_parent"
             android:text="@string/credentials_are_incorrect"
             android:textColor="@color/white"
-            android:textSize="14dp"
+            android:textSize="14sp"
             android:gravity="center"
             android:textStyle="bold"
             />
@@ -64,35 +64,55 @@
         android:layout_height="match_parent"
             android:id="@+id/content">
 
+            <TextView
+                android:id="@+id/tvInitialText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/provide_your_corporate_credentials"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:layout_marginLeft="40dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginRight="40dp"
+                android:layout_marginEnd="40dp"
+                android:layout_marginTop="14dp"
+                android:lineSpacingExtra="3dp"/>
+
+            <View
+                android:layout_width="332dp"
+                android:layout_height="1px"
+                android:background="@color/grey_light"
+                android:layout_gravity="center_horizontal"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginRight="14dp"
+                android:layout_marginEnd="14dp"
                 >
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="160dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/email"
+                    android:text="@string/windows_username"
                     android:textSize="14sp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="14dp"
-                    android:layout_marginStart="14dp"
+                    android:layout_gravity="center_vertical"
                     android:textColor="@color/grey_middle"
-                    android:layout_weight="60"/>
+                />
 
                 <EditText
                     android:id="@+id/etEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
-                    android:hint="@string/email"
-                    android:text="@string/dummyEmail"
+                    android:hint="@string/enter_email_address"
+                    android:textColorHint="@color/grey_light"
+                    android:text="luis.mesas@vodafone.com"
                     android:inputType="textEmailAddress"
                     android:background="@color/white"
                     android:textSize="14sp"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginRight="14dp"
-                    android:layout_marginEnd="14dp"
-                    android:layout_weight="40"
                     android:lines="1"/>
             </LinearLayout>
 
@@ -108,7 +128,7 @@
                 android:layout_height="50dp"
                 >
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="160dp"
                     android:layout_height="wrap_content"
                     android:text="@string/windows_password"
                     android:textSize="14sp"
@@ -116,22 +136,22 @@
                     android:layout_marginLeft="14dp"
                     android:layout_marginStart="14dp"
                     android:textColor="@color/grey_middle"
-                    android:layout_weight="60"/>
+                    />
 
                 <EditText
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="0dp"
-                    android:hint="@string/password"
-                    android:text="1234567890"
+                    android:hint="@string/enter_password"
+                    android:textColorHint="@color/grey_light"
+                    android:text="Intelygenz02"
                     android:inputType="textPassword"
                     android:background="@color/white"
                     android:textSize="14sp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="14dp"
                     android:layout_marginEnd="14dp"
-                    android:layout_weight="40"
                     android:lines="1"
                     />
             </LinearLayout>
@@ -157,6 +177,21 @@
                 android:layout_marginStart="27dp"
                 android:layout_marginRight="27dp"
                 android:layout_marginEnd="27dp" />
+
+            <TextView
+                android:id="@+id/tvExplanationText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ldap_need_help_with_your_username"
+                android:textSize="15sp"
+                android:gravity="start"
+                android:layout_marginLeft="14dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginRight="14dp"
+                android:layout_marginEnd="14dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp" />
+
 
         </LinearLayout>
 

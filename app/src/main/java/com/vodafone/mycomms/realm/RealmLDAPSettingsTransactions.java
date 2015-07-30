@@ -90,7 +90,6 @@ public class RealmLDAPSettingsTransactions {
                 realm = Realm.getDefaultInstance();
                 isNewRealm = true;
             }
-            realm.beginTransaction();
             GlobalContactsSettings settings = getSettings(profileId, realm);
             if(settings==null) {
                 settings = new GlobalContactsSettings(profileId, user, password,
@@ -98,13 +97,14 @@ public class RealmLDAPSettingsTransactions {
                 insertOrUpdateSettings(settings, realm);
             }
             else {
+                realm.beginTransaction();
                 settings.setUser(user);
                 settings.setPassword(password);
                 settings.setToken(token);
                 settings.setTokenType(tokenType);
                 settings.setUrl(url);
+                realm.commitTransaction();
             }
-            realm.commitTransaction();
         } catch (IllegalArgumentException e){
             Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.setUserAndPassword: ",e);
             Crashlytics.logException(e);

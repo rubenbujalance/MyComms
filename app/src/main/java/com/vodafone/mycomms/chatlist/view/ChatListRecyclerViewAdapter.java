@@ -55,7 +55,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         groupChatTransactions = new RealmGroupChatTransactions(mContext, profileId);
-        mContactTransactions = new RealmContactTransactions(profileId, mContext);
+        mContactTransactions = new RealmContactTransactions(profileId);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     {
         ArrayList<Contact> contacts = new ArrayList<>();
         RealmContactTransactions realmContactTransactions =
-                new RealmContactTransactions(profileId, mContext);
+                new RealmContactTransactions(profileId);
         UserProfile userProfile = realmContactTransactions.getUserProfile(realm);
         Contact contact = new Contact();
         contact.setAvatar(userProfile.getAvatar());

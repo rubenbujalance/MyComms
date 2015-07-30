@@ -50,7 +50,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         this.realm = realm;
 
         _chatTx = new RealmChatTransactions(mContext);
-        _contactTx = new RealmContactTransactions(_profile.getId(), mContext);
+        _contactTx = new RealmContactTransactions(_profile.getId());
 
         if (chatListItem!=null){
             for (ChatMessage chatListItems : chatListItem) {
@@ -277,7 +277,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
 
     private News getNewsById(String id)
     {
-        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(mContext);
+        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions();
         News news = realmNewsTransactions.getNewById(id, realm);
         return news;
     }

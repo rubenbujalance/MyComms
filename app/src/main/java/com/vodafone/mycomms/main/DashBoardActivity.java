@@ -91,12 +91,12 @@ public class DashBoardActivity extends ToolbarActivity
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
-        this.realm = Realm.getInstance(DashBoardActivity.this);
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
         _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        realmContactTransactions = new RealmContactTransactions(_profileId, DashBoardActivity.this);
-        realmNewsTransactions = new RealmNewsTransactions(DashBoardActivity.this);
+        realmContactTransactions = new RealmContactTransactions(_profileId);
+        realmNewsTransactions = new RealmNewsTransactions();
         recentContactController = new RecentContactController(this, _profileId);
 
         BusProvider.getInstance().register(this);
@@ -241,8 +241,7 @@ public class DashBoardActivity extends ToolbarActivity
         Log.i(Constants.TAG, "DashBoardActivity.loadNews: ");
 
         newsArrayList = new ArrayList<>();
-        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(DashBoardActivity
-                .this);
+        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions();
         newsArrayList = realmNewsTransactions.getAllNews(realm);
 
         if(newsArrayList != null){

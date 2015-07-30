@@ -33,7 +33,7 @@ public class RealmChatTransactions
         if(sp==null) return;
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        contactTx = new RealmContactTransactions(_profile_id, mContext);
+        contactTx = new RealmContactTransactions(_profile_id);
     }
 
     /*
@@ -76,7 +76,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             //Insert new chat message
@@ -125,7 +125,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -154,7 +154,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -197,7 +197,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -239,7 +239,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             chatMessageArray = new ArrayList<>();
@@ -280,7 +280,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
@@ -308,7 +308,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
@@ -341,7 +341,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
@@ -436,7 +436,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -466,7 +466,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             chatMessageArrayList = new ArrayList<>();
@@ -502,7 +502,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<Chat> query = mRealm.where(Chat.class);
@@ -534,7 +534,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
@@ -568,7 +568,7 @@ public class RealmChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);

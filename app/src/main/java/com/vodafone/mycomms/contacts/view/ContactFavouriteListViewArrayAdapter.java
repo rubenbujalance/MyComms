@@ -93,8 +93,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
-        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions
-                (profileId, mContext);
+        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(profileId);
         Contact cont = mRealmContactTransactions.getContactById(contact.getContactId(), realm);
 
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))

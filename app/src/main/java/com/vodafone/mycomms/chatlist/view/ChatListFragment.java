@@ -124,7 +124,7 @@ public class ChatListFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
-        this.realm = Realm.getInstance(getActivity());
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
         mChatTransactions = new RealmChatTransactions(getActivity());
         SharedPreferences sp = getActivity().getSharedPreferences(

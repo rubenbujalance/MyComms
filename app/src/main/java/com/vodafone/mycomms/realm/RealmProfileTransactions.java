@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.realm;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -13,10 +12,8 @@ import model.UserProfile;
 
 public class RealmProfileTransactions
 {
-    private Context mContext;
-    public RealmProfileTransactions(Context mContext)
+    public RealmProfileTransactions()
     {
-        this.mContext = mContext;
     }
 
     public void insertUserProfile(UserProfile userProfile, Realm realm)
@@ -31,7 +28,7 @@ public class RealmProfileTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -58,7 +55,7 @@ public class RealmProfileTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -85,7 +82,7 @@ public class RealmProfileTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -117,7 +114,7 @@ public class RealmProfileTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);

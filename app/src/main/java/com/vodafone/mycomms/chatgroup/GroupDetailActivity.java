@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import io.realm.Realm;
 import model.Contact;
 import model.GroupChat;
 
@@ -62,6 +63,8 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
 
+    private Realm mRealm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +73,8 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
+
+        this.mRealm = Realm.getDefaultInstance();
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(GroupDetailActivity.this))
@@ -85,7 +90,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         contactTransactions = new RealmContactTransactions(_profile_id);
         chatTransactions = new RealmChatTransactions(this);
         mGroupChatTransactions = new RealmGroupChatTransactions(this, _profile_id);
-        _profile = contactTransactions.getUserProfile();
+        _profile = contactTransactions.getUserProfile(this.mRealm);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -209,7 +214,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         Intent in = getIntent();
 
         _groupChat = mGroupChatTransactions.getGroupChatById(
-                in.getStringExtra(Constants.GROUP_CHAT_ID));
+                in.getStringExtra(Constants.GROUP_CHAT_ID), mRealm);
         loadContactIds();
         loadGroupChatOwnerIds();
     }
@@ -241,7 +246,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         {
             if(!id.equals(_profile_id))
             {
-                contact = contactTransactions.getContactById(id);
+                contact = contactTransactions.getContactById(id, mRealm);
                 if(contact != null)
                     contactList.add(contact);
             }
@@ -264,9 +269,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        chatTransactions.closeRealm();
-        mGroupChatTransactions.closeRealm();
-        contactTransactions.closeRealm();
+        this.mRealm.close();
     }
 
     private void loadTheRestOfTheComponents()

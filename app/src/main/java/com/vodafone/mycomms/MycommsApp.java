@@ -78,7 +78,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     //Network listener
     private NetworkEvents networkEvents;
-
     private Realm realm;
 
     @Override
@@ -99,8 +98,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 .build();
 
         Realm.setDefaultConfiguration(realmConfig);
-
-        Realm realm = Realm.getDefaultInstance();
+        Realm.migrateRealm(realmConfig);
+        this.realm = Realm.getDefaultInstance();
 
         //Shared Preferences
         sp = getSharedPreferences(
@@ -111,7 +110,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
         RealmLDAPSettingsTransactions.createOrUpdateData(profile_id, "userTest", "1234567890",
-                "lkjhewflkjhqw45 ljk2h3tljkvh234kljtvh2kl3j4htvljkh4tvqklj34hv5kljh", realm);
+                "lkjhewflkjhqw45 ljk2h3tljkvh234kljtvh2kl3j4htvljkh4tvqklj34hv5kljh",
+                "Bearer", "https://lksjasdfkljsadf.asdlkfhadsf.com/", realm);
+
 
         //Picasso configuration
         Downloader downloader   = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
@@ -141,7 +142,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //**********************
 
-        this.realm = Realm.getInstance(MycommsApp.this);
         mNewsController = new NewsController(getApplicationContext());
 
         //Initializations
@@ -350,7 +350,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
             try {
                 RealmProfileTransactions ptx = new RealmProfileTransactions();
-                UserProfile userProfile = ptx.getUserProfile(profile_id);
+                UserProfile userProfile = ptx.getUserProfile(profile_id, realm);
                 Crashlytics.setUserName(userProfile.getFirstName()+" "+userProfile.getLastName());
                 Crashlytics.setUserEmail(userProfile.getEmails().split(";")[0]);
             } catch (Exception e) {

@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.realm;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -15,10 +14,7 @@ import model.News;
 
 public class RealmNewsTransactions
 {
-    private Context mContext;
-    public RealmNewsTransactions(Context mContext)
-    {
-        this.mContext = mContext;
+    public RealmNewsTransactions(){
     }
 
     public void insertNewsList (ArrayList<News> newsArrayList, Realm realm){
@@ -28,7 +24,7 @@ public class RealmNewsTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -58,7 +54,7 @@ public class RealmNewsTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<News> query = mRealm.where(News.class);
@@ -92,7 +88,7 @@ public class RealmNewsTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<News> query = mRealm.where(News.class);

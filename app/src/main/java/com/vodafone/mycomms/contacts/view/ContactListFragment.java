@@ -201,7 +201,7 @@ public class ContactListFragment extends ListFragment {
 
         BusProvider.getInstance().register(this);
 
-        this.realm = Realm.getInstance(getActivity());
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
         if (getArguments() != null) {
@@ -219,7 +219,7 @@ public class ContactListFragment extends ListFragment {
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
-        mContactTransactions = new RealmContactTransactions(profileId, getActivity());
+        mContactTransactions = new RealmContactTransactions(profileId);
         mSearchController = new SearchController(getActivity().getApplicationContext(),
                 profileId, realm);
         recentController = new RecentContactController(getActivity(), profileId);
@@ -582,8 +582,7 @@ public class ContactListFragment extends ListFragment {
         ArrayList<Contact> contactArrayList;
         if(null == keyWord)
         {
-            RealmContactTransactions mContactTransactions = new RealmContactTransactions
-                    (profileId, getActivity());
+            RealmContactTransactions mContactTransactions = new RealmContactTransactions(profileId);
             contactArrayList = mContactTransactions.getAllContacts(realm);
         }
         else

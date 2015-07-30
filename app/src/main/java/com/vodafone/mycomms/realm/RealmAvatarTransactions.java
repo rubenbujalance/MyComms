@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.realm;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -19,10 +18,8 @@ import model.ContactAvatar;
 public final class RealmAvatarTransactions
 {
 
-    private Context mContext;
-    public RealmAvatarTransactions(Context context)
+    public RealmAvatarTransactions()
     {
-        this.mContext = context;
     }
 
     public void insertAvatar (ContactAvatar newAvatar, Realm realm)
@@ -32,7 +29,7 @@ public final class RealmAvatarTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -59,7 +56,7 @@ public final class RealmAvatarTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -87,7 +84,7 @@ public final class RealmAvatarTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             ArrayList<ContactAvatar> contactAvatarArrayList = new ArrayList<>();
@@ -122,7 +119,7 @@ public final class RealmAvatarTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             ArrayList<ContactAvatar> contactAvatarArrayList = new ArrayList<>();
@@ -158,7 +155,7 @@ public final class RealmAvatarTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ContactAvatar> query = mRealm.where(ContactAvatar.class);
@@ -190,7 +187,7 @@ public final class RealmAvatarTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -217,7 +214,7 @@ public final class RealmAvatarTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -249,7 +246,7 @@ public final class RealmAvatarTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();

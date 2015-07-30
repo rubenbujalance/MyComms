@@ -35,7 +35,7 @@ public class FavouriteController  extends BaseController {
         super(context);
         this.mContext = context;
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(mProfileId, mContext);
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
         contactsController = new ContactsController(mProfileId, mContext);
         contactController = new ContactController(mContext, mProfileId);
     }

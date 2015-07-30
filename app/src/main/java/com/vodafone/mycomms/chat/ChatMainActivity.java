@@ -98,7 +98,7 @@ public class ChatMainActivity extends ToolbarActivity {
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
-        this.realm = Realm.getInstance(ChatMainActivity.this);
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
         SharedPreferences sp = getSharedPreferences(
@@ -106,7 +106,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
         chatTransactions = new RealmChatTransactions(this);
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        contactTransactions = new RealmContactTransactions(_profile_id, ChatMainActivity.this);
+        contactTransactions = new RealmContactTransactions(_profile_id);
         _profile = contactTransactions.getUserProfile(realm);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);

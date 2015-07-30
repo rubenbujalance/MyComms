@@ -112,7 +112,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         String[] ids = groupChat.getMembers().split("@");
 
         RealmContactTransactions contactTransactions =
-                new RealmContactTransactions(_profile_id);
+                new RealmContactTransactions(_profile_id, mContext);
 
         UserProfile userProfile = contactTransactions.getUserProfile(realm);
         Contact contact = new Contact();
@@ -196,7 +196,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         }
 
         RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions
-                (_profile_id);
+                (_profile_id, mContext);
         Contact cont = mRealmContactTransactions.getContactById(contact.getContactId(), realm);
 
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))

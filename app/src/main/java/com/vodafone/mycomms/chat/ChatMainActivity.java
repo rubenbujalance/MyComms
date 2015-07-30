@@ -99,13 +99,14 @@ public class ChatMainActivity extends ToolbarActivity {
         BusProvider.getInstance().register(this);
 
         this.realm = Realm.getInstance(ChatMainActivity.this);
+        this.realm.setAutoRefresh(true);
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         chatTransactions = new RealmChatTransactions(this);
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        contactTransactions = new RealmContactTransactions(_profile_id);
+        contactTransactions = new RealmContactTransactions(_profile_id, ChatMainActivity.this);
         _profile = contactTransactions.getUserProfile(realm);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);

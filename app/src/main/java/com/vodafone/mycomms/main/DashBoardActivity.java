@@ -91,11 +91,12 @@ public class DashBoardActivity extends ToolbarActivity
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
-        this.realm = Realm.getDefaultInstance();
+        this.realm = Realm.getInstance(DashBoardActivity.this);
+        this.realm.setAutoRefresh(true);
 
         _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        realmContactTransactions = new RealmContactTransactions(_profileId);
-        realmNewsTransactions = new RealmNewsTransactions();
+        realmContactTransactions = new RealmContactTransactions(_profileId, DashBoardActivity.this);
+        realmNewsTransactions = new RealmNewsTransactions(DashBoardActivity.this);
         recentContactController = new RecentContactController(this, _profileId);
 
         BusProvider.getInstance().register(this);
@@ -177,11 +178,11 @@ public class DashBoardActivity extends ToolbarActivity
 
     private void loadRecents(LinearLayout currentRecentContainer){
         Log.i(Constants.TAG, "DashBoardActivity.loadRecents: ");
-        if(recentsLoading) return;
+        //if(recentsLoading) return;
 
-        recentsLoading = true;
-        Realm realm = Realm.getDefaultInstance();
-        try {
+        //recentsLoading = true;
+        try
+        {
             ArrayList<RecentContact> recentList = new ArrayList<>();
             LayoutInflater inflater = LayoutInflater.from(this);
             currentRecentContainer.removeAllViews();
@@ -234,18 +235,14 @@ public class DashBoardActivity extends ToolbarActivity
             Log.e(Constants.TAG, "Load recents error: ",e);
             Crashlytics.logException(e);
         }
-        finally {
-            realm.close();
-        }
-
-        recentsLoading = false;
     }
 
     private void loadNews() {
         Log.i(Constants.TAG, "DashBoardActivity.loadNews: ");
 
         newsArrayList = new ArrayList<>();
-        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions();
+        RealmNewsTransactions realmNewsTransactions = new RealmNewsTransactions(DashBoardActivity
+                .this);
         newsArrayList = realmNewsTransactions.getAllNews(realm);
 
         if(newsArrayList != null){
@@ -364,7 +361,7 @@ public class DashBoardActivity extends ToolbarActivity
         Log.i(Constants.TAG, "DashBoardActivity.onEventChatsReceived: ");
         checkUnreadChatMessages();
         int pendingMessages = event.getPendingMessages();
-        if (pendingMessages > 0)
+        if (pendingMessages == 0)
         {
             if(isCurrentRecentContainerFirst)
             {

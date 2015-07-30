@@ -133,7 +133,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
-        this.realm = Realm.getDefaultInstance();
+        this.realm = Realm.getInstance(GroupChatActivity.this);
+        this.realm.setAutoRefresh(true);
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(GroupChatActivity.this))
@@ -146,7 +147,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
 
-        contactTransactions = new RealmContactTransactions(_profile_id);
+        contactTransactions = new RealmContactTransactions(_profile_id, GroupChatActivity.this);
         chatTransactions = new RealmChatTransactions(this);
         mGroupChatTransactions = new RealmGroupChatTransactions(this, _profile_id);
         _profile = contactTransactions.getUserProfile(realm);
@@ -162,10 +163,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         loadContactsFromIds();
         loadTheRestOfTheComponents();
 
-        refreshAdapter();
-
         //Load all messages
         loadMessagesArray();
+
+        refreshAdapter();
 
         //Sent chat in grey by default
         setSendEnabled(false);

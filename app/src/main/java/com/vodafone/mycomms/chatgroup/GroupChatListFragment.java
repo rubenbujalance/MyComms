@@ -71,6 +71,7 @@ public class GroupChatListFragment extends ListFragment implements
     private String apiCall;
     private boolean isNewGroupChat;
     private GroupChat groupChat;
+    private String groupChatId;
     private RealmGroupChatTransactions mGroupChatTransactions;
     private RealmContactTransactions mContactTransactions;
     private GroupChatController mGroupChatController;
@@ -113,7 +114,8 @@ public class GroupChatListFragment extends ListFragment implements
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
         BusProvider.getInstance().register(this);
-        this.realm = Realm.getDefaultInstance();
+        this.realm = Realm.getInstance(getActivity());
+        this.realm.setAutoRefresh(true);
 
         sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -128,7 +130,7 @@ public class GroupChatListFragment extends ListFragment implements
         mSearchController = new SearchController(getActivity().getApplicationContext(),
                 profileId, realm);
         mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
-        mContactTransactions = new RealmContactTransactions(profileId);
+        mContactTransactions = new RealmContactTransactions(profileId, getActivity());
         mGroupChatController = new GroupChatController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
         mRecentContactController = new RecentContactController(getActivity(),profileId);
@@ -226,7 +228,7 @@ public class GroupChatListFragment extends ListFragment implements
     private void startActivityInGroupChatMode()
     {
         Intent in = new Intent(getActivity(), GroupChatActivity.class);
-        in.putExtra(Constants.GROUP_CHAT_ID, groupChat.getId());
+        in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
         in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.GROUP_CHAT_LIST_ACTIVITY);
         in.putExtra(Constants.IS_GROUP_CHAT, true);
         startActivity(in);
@@ -255,7 +257,7 @@ public class GroupChatListFragment extends ListFragment implements
             this.isNewGroupChat = false;
             this.groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants
                     .GROUP_CHAT_ID), realm);
-
+            this.groupChatId = in.getStringExtra(Constants.GROUP_CHAT_ID);
             this.ownersIds = new ArrayList<>();
             String[] ids = this.groupChat.getOwners().split("@");
             Collections.addAll(ownersIds, ids);
@@ -612,7 +614,7 @@ public class GroupChatListFragment extends ListFragment implements
     }
 
 
-    private class  UpdateGroupChatTask extends AsyncTask<String, Void, String>
+    private class  UpdateGroupChatTask extends AsyncTask<String, Void, Boolean>
     {
 
         private ProgressDialog pdia;
@@ -627,10 +629,10 @@ public class GroupChatListFragment extends ListFragment implements
         }
 
         @Override
-        protected String doInBackground(String... params)
+        protected Boolean doInBackground(String... params)
         {
             String response = updateGroupChat(params[0]);
-
+            Realm realm = Realm.getInstance(getActivity());
             try
             {
                 if(!mGroupChatController.getResponseCode().startsWith("2"))
@@ -645,33 +647,44 @@ public class GroupChatListFragment extends ListFragment implements
                         Log.e(Constants.TAG, LOG_TAG + ".UpdateGroupChatTask -> onPostExecute: ERROR. " +
                                 "Impossible Update Group Chat!!! -> " + response);
                     }
+                    return false;
                 }
                 else
                 {
+                    GroupChat groupChat = mGroupChatTransactions.getGroupChatById(groupChatId, realm);
                     if(null != groupChat)
                     {
-                        GroupChat updatedGroupChat = new GroupChat(groupChat);
-                        updatedGroupChat.setMembers(generateComposedMembersId(selectedContacts));
-                        updatedGroupChat.setOwners(generateComposedMembersId(ownersIds));
-                        mGroupChatTransactions.insertOrUpdateGroupChat(updatedGroupChat, null);
-                        startActivityInGroupChatMode();
+                        mGroupChatTransactions.updateGroupChatInstance
+                                (
+                                        groupChat,
+                                        generateComposedMembersId(selectedContacts),
+                                        generateComposedMembersId(ownersIds),
+                                        realm
+                                );
+                        return true;
                     }
+                    return false;
                 }
             }
             catch (Exception e)
             {
                 Log.e(Constants.TAG, LOG_TAG + ".UpdateGroupChatTask -> onPostExecute: ERROR. " +
-                        "Impossible Update Group Chat!!!");
+                        "Impossible Update Group Chat!!!", e);
+                return false;
+            }
+            finally {
+                realm.close();
             }
 
-            return null;
         }
 
         @Override
-        protected void onPostExecute(String response)
+        protected void onPostExecute(Boolean isOK)
         {
-            super.onPostExecute(response);
+            super.onPostExecute(isOK);
             if(pdia.isShowing()) pdia.dismiss();
+            if(isOK)
+                startActivityInGroupChatMode();
         }
     }
 

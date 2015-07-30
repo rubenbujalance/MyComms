@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.realm;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -17,10 +18,12 @@ import model.UserProfile;
 
 public class RealmContactTransactions {
     private String mProfileId;
+    private Context mContext;
 
-    public RealmContactTransactions(String profileId)
+    public RealmContactTransactions(String profileId, Context mContext)
     {
         mProfileId = profileId;
+        this.mContext = mContext;
     }
 
     public void insertContactList (ArrayList<Contact> contactArrayList, Realm realm){
@@ -30,7 +33,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             mRealm.beginTransaction();
@@ -64,7 +67,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             mRealm.beginTransaction();
@@ -97,7 +100,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             mRealm.beginTransaction();
@@ -131,7 +134,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             RealmQuery<Contact> query = mRealm.where(Contact.class)
@@ -199,7 +202,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             String[] keywordSplit = keyWord.split(" ");
@@ -246,7 +249,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             String[] keywordSplit = keyWord.split(" ");
@@ -292,7 +295,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             RealmQuery<Contact> query = mRealm.where(Contact.class);
@@ -326,7 +329,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             RealmQuery<Contact> query = mRealm.where(Contact.class);
@@ -359,7 +362,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             RealmQuery<Contact> query = mRealm.where(Contact.class)
@@ -390,7 +393,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);
@@ -423,7 +426,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             //Checks if the Contact is favourite. If it is, it deletes it and returns false to send it to the API
@@ -463,7 +466,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             //Checks if the Contact is favourite. If it is, it deletes it and returns false to send it to the API
@@ -498,7 +501,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             Log.i(Constants.TAG, "RealmContactTransactions.getAllFavouriteContacts: ");
@@ -535,7 +538,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             Log.i(Constants.TAG, "RealmContactTransactions.getFavouriteContactByContactId: ");
@@ -593,7 +596,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             ArrayList<RecentContact> contactArrayList = new ArrayList<>();
@@ -630,7 +633,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
@@ -658,7 +661,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             Log.i(Constants.TAG, "RealmContactTransactions.deleteAllFavouriteContacts: ");
@@ -691,7 +694,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             mRealm.beginTransaction();
@@ -717,7 +720,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             mRealm.beginTransaction();
@@ -743,7 +746,7 @@ public class RealmContactTransactions {
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getDefaultInstance();
+            mRealm = Realm.getInstance(mContext);
         try
         {
             mRealm.beginTransaction();

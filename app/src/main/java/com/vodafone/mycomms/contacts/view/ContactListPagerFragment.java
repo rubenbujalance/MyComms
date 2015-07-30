@@ -43,7 +43,7 @@ public class ContactListPagerFragment extends Fragment{
         SharedPreferences sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        mContactsController = new ContactsController(mProfileId);
+        mContactsController = new ContactsController(mProfileId, getActivity());
         BusProvider.getInstance().register(this);
 
     }

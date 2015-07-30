@@ -25,7 +25,7 @@ public class ContactSearchController {
     public ContactSearchController(Context appContext, String profileId) {
         this.mContext = appContext;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mProfileId);
+        contactsController = new ContactsController(mProfileId, mContext);
     }
 
     public void getContactById(JSONObject jsonObject) {

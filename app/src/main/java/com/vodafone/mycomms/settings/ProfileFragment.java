@@ -365,7 +365,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        this.realm = Realm.getDefaultInstance();
+        this.realm = Realm.getInstance(getActivity());
 
         if(mIndex == 0) {
             Log.i(Constants.TAG, "ProfileFragment.onCreate: " + mIndex);

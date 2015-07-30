@@ -42,13 +42,15 @@ public class ProfileController extends BaseController {
     private RealmProfileTransactions mRealmProfileTransactions;
     private UserProfile userProfile;
     private String profileId;
+    private Context mContext;
 
     public ProfileController(Context context) {
         super(context);
+        this.mContext = context;
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        mRealmProfileTransactions = new RealmProfileTransactions();
+        mRealmProfileTransactions = new RealmProfileTransactions(context);
     }
 
     /**
@@ -371,7 +373,7 @@ public class ProfileController extends BaseController {
 
     public void logoutToAPI()
     {
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(mContext);
         try {
             UserProfile userProfile = mRealmProfileTransactions.getUserProfile(profileId, realm);
             String jsonEmails = userProfile.getEmails();

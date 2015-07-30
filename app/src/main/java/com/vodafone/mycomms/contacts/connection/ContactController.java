@@ -24,7 +24,7 @@ public class ContactController {
     public ContactController(Context context, String profileId) {
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(profileId);
+        contactsController = new ContactsController(profileId, mContext);
     }
 
     public void getContactList(String api){

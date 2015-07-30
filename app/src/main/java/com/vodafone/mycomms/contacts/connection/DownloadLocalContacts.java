@@ -31,7 +31,7 @@ public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
     @Override
     protected Void doInBackground(Void... params)
     {
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(mContext);
         Log.i(Constants.TAG, "DownloadLocalContacts.doInBackground: ");
         SearchController mSearchController = new SearchController(mContext, mProfileId, realm);
         contactArrayList = mSearchController.getInternalContactSearch().getAllLocalContact();

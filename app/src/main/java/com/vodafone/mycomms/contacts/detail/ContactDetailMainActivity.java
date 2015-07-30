@@ -97,7 +97,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.contact_detail);
-        this.realm = Realm.getDefaultInstance();
+        this.realm = Realm.getInstance(ContactDetailMainActivity.this);
+        this.realm.setAutoRefresh(true);
 
         this.SF_URL = null;
 
@@ -115,7 +116,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
 
         mRecentContactController = new RecentContactController(this, mProfileId);
-        realmContactTransactions = new RealmContactTransactions(mProfileId);
+        realmContactTransactions = new RealmContactTransactions(mProfileId,
+                ContactDetailMainActivity.this);
 
         Intent intent = getIntent();
         contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);

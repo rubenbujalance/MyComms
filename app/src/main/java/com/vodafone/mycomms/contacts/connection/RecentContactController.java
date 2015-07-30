@@ -38,7 +38,7 @@ public class RecentContactController {
     public RecentContactController(Context context, String profileId) {
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mProfileId);
+        contactsController = new ContactsController(mProfileId, mContext);
         contactSearchController = new ContactSearchController(mContext,mProfileId);
     }
 

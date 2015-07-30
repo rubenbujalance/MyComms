@@ -619,7 +619,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyMessageReceived(XmlPullParser parser)
     {
         RealmChatTransactions chatTx = null;
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(_appContext);
         try {
             if(_pendingMessages>0) {
                 _pendingMessages--;
@@ -720,7 +720,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyImageReceived(XmlPullParser parser)
     {
         RealmChatTransactions chatTx = null;
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(_appContext);
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -816,7 +816,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyGroupMessageReceived(XmlPullParser parser)
     {
         RealmGroupChatTransactions groupTx = null;
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(_appContext);
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -923,7 +923,7 @@ public final class XMPPTransactions {
             @Override
             public void onSuccess(Response response)
             {
-                Realm realm = Realm.getDefaultInstance();
+                Realm realm = Realm.getInstance(_appContext);
                 try {
                     String jsonStr;
                     JSONObject json;
@@ -997,7 +997,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyGroupImageReceived(XmlPullParser parser)
     {
         RealmGroupChatTransactions groupTx = null;
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(_appContext);
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);

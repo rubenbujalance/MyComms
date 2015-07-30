@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.contacts.connection;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
@@ -23,17 +24,19 @@ public class ContactsController{
     private static RealmContactTransactions realmContactTransactions;
     private RealmAvatarTransactions realmAvatarTransactions;
     private String mProfileId;
+    private Context mContext;
 
-    public ContactsController(String profileId) {
+    public ContactsController(String profileId, Context mContext) {
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(mProfileId);
-        realmAvatarTransactions = new RealmAvatarTransactions();
+        this.mContext = mContext;
+        realmContactTransactions = new RealmContactTransactions(mProfileId, mContext);
+        realmAvatarTransactions = new RealmAvatarTransactions(mContext);
     }
 
     public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
     {
         ArrayList<Contact> realmContactList = new ArrayList<>();
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(mContext);
         try {
             Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
@@ -76,7 +79,7 @@ public class ContactsController{
         JSONArray jsonArray;
         Contact contact;
         ArrayList<FavouriteContact> contactList = new ArrayList<>();
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(mContext);
         try {
             Log.i(Constants.TAG, "ContactsController.insertFavouriteContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_FAVOURITES);
@@ -105,7 +108,7 @@ public class ContactsController{
         Contact contact;
         ArrayList<RecentContact> contactList = new ArrayList<>();
 
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(mContext);
 
         try {
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);

@@ -121,7 +121,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //**********************
 
-        this.realm = Realm.getDefaultInstance();
+        this.realm = Realm.getInstance(MycommsApp.this);
         mNewsController = new NewsController(getApplicationContext());
 
         //Initializations

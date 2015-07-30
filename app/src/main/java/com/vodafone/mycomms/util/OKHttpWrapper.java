@@ -56,7 +56,7 @@ public class OKHttpWrapper {
         OkHttpClient client = new OkHttpClient();
 
         client.setConnectTimeout(10, TimeUnit.SECONDS);
-        client.setReadTimeout(15, TimeUnit.SECONDS);
+        client.setReadTimeout(30, TimeUnit.SECONDS);
         client.setRetryOnConnectionFailure(false);
 
         String finalUrl;

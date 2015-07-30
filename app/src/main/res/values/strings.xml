@@ -4,9 +4,11 @@
     <string name="login">Login</string>
     <string name="signup">Signup</string>
     <string name="email">Email</string>
+    <string name="enter_email_address">Enter email address*</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="password">Password</string>
+    <string name="enter_password">Enter password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="country">Country</string>
     <string name="phone_number">Phone Number</string>
@@ -221,6 +223,22 @@
     <string name="set_vodafone_global_list">Vodafone Global List</string>
     <string name="add">Add</string>
     <string name="credentials_are_incorrect">Credentials are incorrect - check settings</string>
+    <string name="provide_your_corporate_credentials">
+        <![CDATA[
+        <p>Provide your Corporate credentials to access the <b>Global Contacts list</b></p>]]>
+    </string>
+    <string name="ldap_need_help_with_your_username">
+        <![CDATA[<p><font color=\"#0071ff\">* Need help with your username?</font></p>
+        <p>For most users, their <b>corporate email</b> is their <b>Windows Username</b></p>
+        <p>If you find this doesn\'t work please try the following <b>alternative</b> on your computer:</p>
+        <p>1. Press <b>CTRL-ALT-DEL</b></p>
+        <p>2. Select <b>\"Lock this computer\"</b></p>
+        <p>3. Identify your user in the screen as <b>\"Your name\" (VF-ROOT\User)</b></p>
+        <p>4. Enter VF-ROOT\User as your Windows user</p>
+        <p>If this still doesn\'t work, <b>check with your IT team</b> as your account may have a special configuration</p>
+        ]]>
+    </string>
+    <string name="windows_username">Windows Username</string>
     <string name="windows_password">Windows Password</string>
 
     <!--Progress dialog-->

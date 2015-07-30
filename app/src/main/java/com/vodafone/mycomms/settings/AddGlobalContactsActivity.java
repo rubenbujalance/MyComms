@@ -3,6 +3,7 @@ package com.vodafone.mycomms.settings;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -11,24 +12,28 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
+import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Headers;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class AddGlobalContactsActivity extends ToolbarActivity {
 
@@ -44,7 +49,12 @@ public class AddGlobalContactsActivity extends ToolbarActivity {
     private final String LDAP_AUTH_URL_KEY = "MsRtcOAuth";
     private final String LDAP_HEADER_AUTH_KEY = "WWW-Authenticate";
     private final String LDAP_TOKEN_KEY = "access_token";
-    private final String LDAP_TOKEN_TYPE_KEY = "token_type";
+    private final String LDAP_TOKEN_TYPE_KEY = "token_type";;
+    private final String LDAP_USERNAME_KEY = "username";;
+    private final String LDAP_PASSWORD_KEY = "password";
+    private final String LDAP_GRANT_TYPE_KEY = "grant_type";
+    private final String LDAP_GRANT_TYPE_VALUE = "password";
+    private final String LDAP_HEADER_CONTENT_TYPE_VALUE = "application/x-www-form-urlencoded";
 
     //Attributes
     private LinearLayout layoutErrorBar;
@@ -53,16 +63,35 @@ public class AddGlobalContactsActivity extends ToolbarActivity {
     private EditText etPassword;
     private Button btAddAccount;
 
+    //OkHttp
+    private OkHttpClient client;
+
+    //LDAP Temp
+    private String tempUrl;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_global_contacts);
+
+        client = new OkHttpClient();
+        client.setConnectTimeout(10, TimeUnit.SECONDS);
+        client.setReadTimeout(30, TimeUnit.SECONDS);
+        client.setRetryOnConnectionFailure(false);
 
         layoutErrorBar = (LinearLayout)findViewById(R.id.layoutErrorBar);
         etEmail = (EditText)findViewById(R.id.etEmail);
         etPassword = (EditText)findViewById(R.id.etPassword);
         tvError = (TextView)findViewById(R.id.tvError);
         btAddAccount = (Button)findViewById(R.id.btAddAccount);
+
+        TextView tvInitialText = (TextView)findViewById(R.id.tvInitialText);
+        tvInitialText.setText(Html.fromHtml(getString(R.string.provide_your_corporate_credentials)));
+        TextView tvExplanationText = (TextView)findViewById(R.id.tvExplanationText);
+        tvExplanationText.setText(Html.fromHtml(getString(R.string.ldap_need_help_with_your_username)));
+
+        etPassword.setTypeface(etEmail.getTypeface());
+        layoutErrorBar.setVisibility(View.GONE);
 
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
@@ -75,16 +104,26 @@ public class AddGlobalContactsActivity extends ToolbarActivity {
         btAddAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Hide error bar if shown
+                if (layoutErrorBar.getVisibility() == View.VISIBLE &&
+                        tvError.getText().toString()
+                                .compareTo(getString(R.string.credentials_are_incorrect)) == 0)
+                    layoutErrorBar.setVisibility(View.GONE);
+
                 //Start the process
-                callLDAPDiscover();
+                if (checkData()) {
+                    callLDAPDiscover();
+                } else {
+                    tvError.setText(R.string.credentials_are_incorrect);
+                    layoutErrorBar.setVisibility(View.VISIBLE);
+                }
             }
         });
 
-        etEmail.addTextChangedListener(new TextWatcher() {
+        TextWatcher textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (layoutErrorBar.getVisibility() == View.VISIBLE &&
@@ -92,11 +131,12 @@ public class AddGlobalContactsActivity extends ToolbarActivity {
                                 .compareTo(getString(R.string.credentials_are_incorrect)) == 0)
                     layoutErrorBar.setVisibility(View.GONE);
             }
-
             @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
+            public void afterTextChanged(Editable s) {}
+        };
+
+        etEmail.addTextChangedListener(textWatcher);
+        etPassword.addTextChangedListener(textWatcher);
     }
 
     @Subscribe
@@ -117,273 +157,190 @@ public class AddGlobalContactsActivity extends ToolbarActivity {
     }
 
     private void callLDAPDiscover() {
-        OKHttpWrapper.getLDAP(EndpointWrapper.getLDAPDiscover(), this,
-                new OKHttpWrapper.HttpCallback() {
-                    @Override
-                    public void onFailure(Response response, IOException e) {
-                        try {
-                            if (response == null) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvError.setText(R.string.connection_error);
-                                        layoutErrorBar.setVisibility(View.VISIBLE);
-                                    }
-                                });
-                                return;
-                            }
+        Request.Builder builder = new Request.Builder();
+        Request request = builder.url(EndpointWrapper.getLDAPDiscover()).build();
 
-                            int code = response.code();
-
-                            if (code >= 400 && code < 500) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvError.setText(R.string.credentials_are_incorrect);
-                                        layoutErrorBar.setVisibility(View.VISIBLE);
-                                    }
-                                });
-                            } else if (code >= 500) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvError.setText(R.string.error_reading_data_from_server);
-                                        layoutErrorBar.setVisibility(View.VISIBLE);
-                                    }
-                                });
-                            }
-                        } catch (Exception ex) {
-                            Log.e(Constants.TAG,
-                                    "AddGlobalContactsActivity.callLDAPDiscover: ", ex);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    tvError.setText(R.string.error_reading_data_from_server);
-                                    layoutErrorBar.setVisibility(View.VISIBLE);
-                                }
-                            });
-                            return;
-                        }
-                    }
-
-                    @Override
-                    public void onSuccess(Response response) {
-                        try {
-                            if (response.code() == 200) {
-                                JSONObject jsonObject = new JSONObject(response.body().string());
-                                String href = ((JSONObject) jsonObject.get("user"))
-                                        .getString("href");
-
-                                //If everythig is OK, continue the process
-                                callLDAPUser(href);
-                            } else {
-                                throw new Exception(
-                                        getString(R.string.error_reading_data_from_server));
-                            }
-                        } catch (Exception ex) {
-                            Log.e(Constants.TAG,
-                                    "AddGlobalContactsActivity.callLDAPDiscover: ", ex);
-                            Crashlytics.logException(ex);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    tvError.setText(R.string.credentials_are_incorrect);
-                                    layoutErrorBar.setVisibility(View.VISIBLE);
-                                }
-                            });
-                            return;
-                        }
-                    }
-                });
-    }
-
-    private void callLDAPUser(String url) {
-        OKHttpWrapper.getLDAP(url, this, new OKHttpWrapper.HttpCallback() {
+        client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Response response, IOException e) {
-                try {
-                    if (response == null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                tvError.setText(R.string.connection_error);
-                                layoutErrorBar.setVisibility(View.VISIBLE);
-                            }
-                        });
-
-                        return;
-                    }
-
-                    int code = response.code();
-
-                    if (code >= 400 && code < 500) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                tvError.setText(R.string.credentials_are_incorrect);
-                                layoutErrorBar.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    } else if (code >= 500) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                tvError.setText(R.string.error_reading_data_from_server);
-                                layoutErrorBar.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    }
-                } catch (Exception ex) {
-                    Log.e(Constants.TAG, "AddGlobalContactsActivity.callLDAPAuth: ", ex);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(AddGlobalContactsActivity.this,
-                                    getString(R.string.connection_error),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    return;
-                }
+            public void onFailure(Request request, IOException e) {
+                showMessageBarOnUIThread(getString(R.string.connection_error));
             }
 
             @Override
-            public void onSuccess(Response response) {
+            public void onResponse(Response response) {
                 try {
-                    Headers headers = response.headers();
-                    if(headers==null || headers.size()==0 ||
-                            headers.get(LDAP_HEADER_AUTH_KEY)==null) {
-                        throw new Exception(getString(R.string.error_reading_data_from_server));
-                    }
-                    else {
-                        String[] authHeader = headers.get(LDAP_HEADER_AUTH_KEY).split(",");
-                        String hrefHeader = null;
+                    int code = response.code();
 
-                        for(int i=0; i<authHeader.length; i++) {
-                            if(authHeader[i].trim().startsWith(LDAP_AUTH_URL_KEY)) {
-                                hrefHeader = authHeader[0].trim();
-                            }
-                        }
-
-                        if(hrefHeader==null) throw new Exception(
+                    if (code >= 400 && code < 500) {
+                        showMessageBarOnUIThread(getString(R.string.connection_error));
+                    } else if (code >= 500) {
+                        showMessageBarOnUIThread(
                                 getString(R.string.error_reading_data_from_server));
+                    } else if (code == 200) {
+                        JSONObject jsonObject = new JSONObject(
+                                response.body().string()).getJSONObject("_links");
+                        String href = ((JSONObject) jsonObject.get("user"))
+                                .getString("href");
 
-                        String href = hrefHeader.split("=")[1]
-                                .replaceAll("\"", "");
-
-                        //If evething it's ok, continue the process
-                        callLDAPAuth(href);
+                        //If everythig is OK, save url and continue the process
+                        tempUrl = href;
+                        callLDAPUser(href);
+                    } else {
+                        throw new Exception(
+                                getString(R.string.error_reading_data_from_server));
                     }
                 } catch (Exception ex) {
-                    Log.e(Constants.TAG, "AddGlobalContactsActivity.callLDAPAuth: ", ex);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(AddGlobalContactsActivity.this,
-                                    getString(R.string.error_reading_data_from_server),
-                                    Toast.LENGTH_LONG).show();
+                    Log.e(Constants.TAG,
+                            "AddGlobalContactsActivity.callLDAPDiscover: ", ex);
+                    Crashlytics.logException(ex);
+                    showMessageBarOnUIThread(getString(R.string.credentials_are_incorrect));
+                }
+            }
+        });
+    }
+
+    private void callLDAPUser(String url) {
+        Request.Builder builder = new Request.Builder();
+        Request request = builder.url(url).build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                showMessageBarOnUIThread(getString(R.string.connection_error));
+            }
+
+            @Override
+            public void onResponse(Response response) {
+                try {
+                    int code = response.code();
+
+                    if (code >= 400 && code < 500) {
+                        Headers headers = response.headers();
+                        if (headers == null || headers.size() == 0 ||
+                                headers.get(LDAP_HEADER_AUTH_KEY) == null) {
+                            throw new Exception(getString(R.string.error_reading_data_from_server));
+                        } else {
+                            String[] authHeader = headers.get(LDAP_HEADER_AUTH_KEY).split(",");
+                            String hrefHeader = null;
+
+                            for (int i = 0; i < authHeader.length; i++) {
+                                if (authHeader[i].trim().startsWith(LDAP_AUTH_URL_KEY)) {
+                                    hrefHeader = authHeader[0].trim();
+                                }
+                            }
+
+                            if (hrefHeader == null) throw new Exception(
+                                    getString(R.string.error_reading_data_from_server));
+
+                            String href = hrefHeader.split("=")[1]
+                                    .replaceAll("\"", "");
+
+                            //If evething it's ok, continue the process
+                            callLDAPAuth(href);
                         }
-                    });
-                    return;
+                    } else if (code >= 500) {
+                        showMessageBarOnUIThread(
+                                getString(R.string.error_reading_data_from_server));
+                    }
+                    else {
+                        showMessageBarOnUIThread(
+                                getString(R.string.error_reading_data_from_server));
+                    }
+                } catch (Exception ex) {
+                    showMessageBarOnUIThread(getString(R.string.error_reading_data_from_server));
                 }
             }
         });
     }
 
     private void callLDAPAuth(String url) {
+        RequestBody body;
         final String user = etEmail.getText().toString();
         final String password = etPassword.getText().toString();
 
-        JSONObject jsonObject = new JSONObject();
-
         try {
-            jsonObject.put("grant_type", user);
-            jsonObject.put("username", user);
-            jsonObject.put("password", password);
+            String params = LDAP_GRANT_TYPE_KEY + "=" + LDAP_GRANT_TYPE_VALUE + "&" +
+                    LDAP_USERNAME_KEY + "=" + user + "&" +
+                    LDAP_PASSWORD_KEY + "=" + password;
+
+            body = RequestBody.create(
+                    MediaType.parse(LDAP_HEADER_CONTENT_TYPE_VALUE), params);
         } catch (Exception e) {
             Log.e(Constants.TAG, "AddGlobalContactsActivity.callLDAPAuth: ",e);
-            Toast.makeText(AddGlobalContactsActivity.this,
-                    getString(R.string.credentials_are_incorrect),
-                    Toast.LENGTH_LONG).show();
+            showMessageBarOnUIThread(getString(R.string.error_reading_data_from_server));
             return;
         }
 
-        OKHttpWrapper.postLDAP(url, jsonObject, this, new OKHttpWrapper.HttpCallback() {
+        Request.Builder builder = new Request.Builder();
+        Request request = builder
+                .url(url)
+                .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+                        LDAP_HEADER_CONTENT_TYPE_VALUE)
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Response response, IOException e) {
-                try {
-                    if (response == null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                tvError.setText(R.string.connection_error);
-                                layoutErrorBar.setVisibility(View.VISIBLE);
-                            }
-                        });
-
-                        return;
-                    }
-
-                    int code = response.code();
-
-                    if (code >= 400 && code < 500) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                tvError.setText(R.string.credentials_are_incorrect);
-                                layoutErrorBar.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    } else if (code >= 500) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                tvError.setText(R.string.error_reading_data_from_server);
-                                layoutErrorBar.setVisibility(View.VISIBLE);
-                            }
-                        });
-                    }
-                } catch (Exception ex) {
-                    Log.e(Constants.TAG, "AddGlobalContactsActivity.callLDAPAuth: ", ex);
-                }
+            public void onFailure(Request request, IOException e) {
+                showMessageBarOnUIThread(getString(R.string.connection_error));
             }
 
             @Override
-            public void onSuccess(Response response) {
-                SharedPreferences sp =
-                        getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, MODE_PRIVATE);
-                String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-                if(profileId==null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            tvError.setText(R.string.error_reading_data_from_server);
-                            layoutErrorBar.setVisibility(View.VISIBLE);
-                        }
-                    });
-                    Log.e(Constants.TAG, "AddGlobalContactsActivity.callLDAPAuth: " +
-                            "Error getting profileId");
-                    Crashlytics.logException(new Exception("Error getting profileId"));
-                    return;
-                }
-
-                String token,tokenType,url;
-
+            public void onResponse(Response response) {
                 try {
-                    JSONObject jsonObject = new JSONObject(response.body().string());
-                    token = jsonObject.getString(LDAP_TOKEN_KEY);
-                    tokenType = jsonObject.getString(LDAP_TOKEN_TYPE_KEY);
-                    url = response.request().urlString();
-                    if(token==null || tokenType==null || url==null)
-                        throw new Exception("Error getting token from response");
+                    int code = response.code();
+
+                    if (code >= 400 && code < 500) {
+                        showMessageBarOnUIThread(getString(R.string.credentials_are_incorrect));
+                    } else if (code >= 200 && code < 300) {
+                        SharedPreferences sp =
+                                getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, MODE_PRIVATE);
+                        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+                        if (profileId == null) {
+                            throw new Exception("Error getting profileId");
+                        }
+
+                        String token, tokenType;
+
+                        JSONObject jsonObject = new JSONObject(response.body().string());
+                        token = jsonObject.getString(LDAP_TOKEN_KEY);
+                        tokenType = jsonObject.getString(LDAP_TOKEN_TYPE_KEY);
+
+                        if (token == null || tokenType == null || tempUrl==null)
+                            throw new Exception("Error getting token from response");
+
+                        RealmLDAPSettingsTransactions.createOrUpdateData(profileId, user, password,
+                                token, tokenType, tempUrl, null);
+
+                        //Close activity. Different transitions depending on origin activity
+                        finish();
+                    } else {
+                        showMessageBarOnUIThread(
+                                getString(R.string.error_reading_data_from_server));
+                    }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "AddGlobalContactsActivity.callLDAPAuth: ", ex);
+                    showMessageBarOnUIThread(getString(R.string.error_reading_data_from_server));
                     Crashlytics.logException(ex);
-                    return;
                 }
+            }
+        });
+    }
 
-                RealmLDAPSettingsTransactions.createOrUpdateData(profileId, user, password,
-                        token, tokenType, url, null);
+    private boolean checkData() {
+        if (etEmail.getText() != null && etEmail.getText().toString().length() > 0 &&
+                etPassword.getText() != null && etPassword.getText().toString().length() > 0)
+            return true;
+        else return false;
+    }
+
+    private void showMessageBarOnUIThread(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvError.setText(message);
+                layoutErrorBar.setVisibility(View.VISIBLE);
             }
         });
     }

@@ -104,11 +104,13 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         //Profile id
-        if(sp.contains(Constants.PROFILE_ID_SHARED_PREF))
+        if(sp.contains(Constants.PROFILE_ID_SHARED_PREF)) {
             profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        RealmLDAPSettingsTransactions.createOrUpdateData(profile_id, "userTest", "1234567890",
-                "lkjhewflkjhqw45 ljk2h3tljkvh234kljtvh2kl3j4htvljkh4tvqklj34hv5kljh", realm);
+            RealmLDAPSettingsTransactions.createOrUpdateData(profile_id, "userTest", "1234567890",
+                    "lkjhewflkjhqw45 ljk2h3tljkvh234kljtvh2kl3j4htvljkh4tvqklj34hv5kljh",
+                    "Bearer", "https://lksjasdfkljsadf.asdlkfhadsf.com/", realm);
+        }
 
         //Picasso configuration
         Downloader downloader   = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);

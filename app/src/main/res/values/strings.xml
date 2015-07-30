@@ -60,7 +60,7 @@
     <string name="title_section3">Section 3</string>
 
     <!-- Section contact list tab bar titles-->
-    <string name="contact_list_tab_favourites">Favourites</string>
+    <string name="contact_list_tab_favorites">Favorites</string>
     <string name="contact_list_tab_recents">Recents</string>
     <string name="contact_list_tab_contacts">Contacts</string>
     <string name="title_activity_toolbar">ToolbarActivity</string>
@@ -95,7 +95,7 @@
     <!-- Section profile list tab bar titles-->
     <string name="profile_list_tab_preferences">Preferences</string>
     <string name="profile_list_tab_accounts">Accounts</string>
-    <string name="profile_list_tab_my_profile">My Profile</string>
+    <string name="profile_list_tab_my_profile">Profile</string>
     <string name="title_activity_profile">Profile</string>
     <string name="no_internet_connection_is_available">No Internet connection is available</string>
     <string name="error_reading_data_from_server">Error reading data from server</string>
@@ -121,14 +121,14 @@
     </string-array>
     <string name="title_activity_oauth_web">OAuthWebActivity</string>
 
-    <string name="no_favourite_records">Store a list of your favourite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favourite contacts.</string>
+    <string name="no_favorite_records">Store a list of your favorite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favorite contacts.</string>
     <string name="no_recent_records">You have no recent interactions with other users</string>
     <string name="no_group_chat_records">Select the people you want to chat with</string>
     <string name="no_search_records">No results found</string>
 
     <!--Toolbar titles-->
     <string name="toolbar_title_messages">Messages</string>
-    <string name="toolbar_title_contact_list">My Contacts</string>
+    <string name="toolbar_title_contact_list">Contacts</string>
     <string name="toolbar_title_contacts">Contacts</string>
     <string name="profile_edit_mode_done">Done</string>
     <string name="profile_edit_mode_edit">Edit</string>
@@ -143,7 +143,7 @@
     <string name="dummyUser">Captain Planet</string>
     <string name="Contacts">Contacts</string>
     <string name="Recents">Recents</string>
-    <string name="Favourites">Favourites</string>
+    <string name="Favorites">Favorites</string>
     <string name="dummyShortDay">Tue</string>
     <string name="VacationTime">Vacation Time</string>
     <string name="DoNotDisturb">Do Not Disturb</string>
@@ -202,7 +202,7 @@
     <string name="Settings">Settings</string>
     <string name="toolbar_preferences">Preferences</string>
     <string name="Profile">Profile</string>
-    <string name="toolbar_my_profile">My Profile</string>
+    <string name="toolbar_my_profile">Profile</string>
 
     <!-- Settings and Profile-->
     <string name="settings_vacation_time_activity_title">"Vacation Time"</string>
@@ -214,6 +214,14 @@
     <string name="about_version">"version "</string>
     <string name="about_build">"build "</string>
     <string name="Mycomms">MyComms</string>
+    <string name="add_accounts">Add Accounts</string>
+    <string name="add_account">Add Account</string>
+    <string name="set_salesforce">Salesforce</string>
+    <string name="set_local_contacts">Local Contacts</string>
+    <string name="set_vodafone_global_list">Vodafone Global List</string>
+    <string name="add">Add</string>
+    <string name="credentials_are_incorrect">Credentials are incorrect - check settings</string>
+    <string name="windows_password">Windows Password</string>
 
     <!--Progress dialog-->
 
@@ -238,5 +246,8 @@
 
     <!--Push notifications-->
     <string name="new_unread_messages">New unread messages</string>
+
+    <!-- Add global contacts -->
+    <string name="add_global_contacts">Add Vodafone Global Address Contacts</string>
 
 </resources>

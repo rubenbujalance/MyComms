@@ -295,16 +295,6 @@ public class ToolbarActivity extends ActionBarActivity {
     }
 
     protected void setChatListListeners(final Context context){
-        ImageView contactsProfile = (ImageView) mToolbar.findViewById(R.id.contacts_profile);
-        contactsProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent in = new Intent(context, SettingsMainActivity.class);
-                startActivity(in);
-                //overridePendingTransition(R.anim.pull_in_down, R.anim.push_out_up);
-            }
-        });
-
         ImageView contactsAdd = (ImageView) mToolbar.findViewById(R.id.chat_add);
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override

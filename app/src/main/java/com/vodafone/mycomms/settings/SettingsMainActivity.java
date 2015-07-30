@@ -20,10 +20,7 @@ import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 
-/**
- * Created by amg on 05/05/2015.
- */
-public class SettingsMainActivity extends ToolbarActivity implements ProfileFragment.OnFragmentInteractionListener, PreferencesFragment.OnFragmentInteractionListener{
+public class SettingsMainActivity extends ToolbarActivity implements ProfileFragment.OnFragmentInteractionListener, PreferencesFragment.OnFragmentInteractionListener, AccountsFragment.OnFragmentInteractionListener{
 
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
     public static final int VACATION_TIME_SETTER_ID = 1 ;
@@ -52,7 +49,9 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
 
         activateToolbar();
 
-        setToolbarTitle(profileFullName);
+        //This sets the user name on the Settings Toolbar. Right now, it's title is only "Settings"
+//        setToolbarTitle(profileFullName);
+        setToolbarTitle(getResources().getString(R.string.Settings));
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction;

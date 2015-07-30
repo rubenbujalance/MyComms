@@ -31,6 +31,9 @@ import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
+import com.vodafone.mycomms.realm.RealmDBMigration;
+import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
+import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
@@ -44,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TimeZone;
 
+import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import model.ChatMessage;
@@ -82,16 +86,32 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         super.onCreate();
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
 
+        //Initialize Crashlytics
+        Fabric.with(getApplicationContext(), new Crashlytics());
+
 
         //Realm config
         RealmConfiguration realmConfig = new RealmConfiguration.Builder(this)
                 .name("mycomms.realm")
 //                .encryptionKey()
-//                .schemaVersion(1)
-//                .migration(new RealmDBMigration())
+                .schemaVersion(1)
+                .migration(new RealmDBMigration())
                 .build();
 
         Realm.setDefaultConfiguration(realmConfig);
+
+        Realm realm = Realm.getDefaultInstance();
+
+        //Shared Preferences
+        sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        //Profile id
+        if(sp.contains(Constants.PROFILE_ID_SHARED_PREF))
+            profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+        RealmLDAPSettingsTransactions.createOrUpdateData(profile_id, "userTest", "1234567890",
+                "lkjhewflkjhqw45 ljk2h3tljkvh234kljtvh2kl3j4htvljkh4tvqklj34hv5kljh", realm);
 
         //Picasso configuration
         Downloader downloader   = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
@@ -134,13 +154,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         try {
             networkEvents.register();
         } catch (Exception ex) {
-            Log.e(Constants.TAG, "MycommsApp.onCreate: ",ex);
+            Log.e(Constants.TAG, "MycommsApp.onCreate: ", ex);
             Crashlytics.logException(ex);
         }
-
-        //Shared Preferences
-        sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -326,6 +342,20 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         {
             if(profile_id!=null)
                 new sendAvatar().execute(profile_id);
+        }
+
+        if(profile_id!=null) {
+            //Set crashlytics user info
+            Crashlytics.setUserIdentifier(profile_id);
+
+            try {
+                RealmProfileTransactions ptx = new RealmProfileTransactions();
+                UserProfile userProfile = ptx.getUserProfile(profile_id);
+                Crashlytics.setUserName(userProfile.getFirstName()+" "+userProfile.getLastName());
+                Crashlytics.setUserEmail(userProfile.getEmails().split(";")[0]);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "MycommsApp.onApplicationAndProfileInitialized: ");
+            }
         }
     }
 

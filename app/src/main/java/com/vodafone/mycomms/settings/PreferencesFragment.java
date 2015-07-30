@@ -121,7 +121,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.layout_preferences, container, false);
+        View v = inflater.inflate(R.layout.layout_set_preferences, container, false);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {

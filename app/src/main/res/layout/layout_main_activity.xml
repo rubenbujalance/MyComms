@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/sample_main_layout"
-    android:background="@drawable/istanbul_bg_blur">
+    android:background="@drawable/toolbar_double_background_blue">
     <!--android:backgroundTint="@color/grey_dark"-->
     <!--android:backgroundTintMode="multiply"-->
 
@@ -16,7 +16,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray" />
+        android:background="@android:color/transparent" />
 
     <FrameLayout
         android:id="@+id/sample_content_fragment"

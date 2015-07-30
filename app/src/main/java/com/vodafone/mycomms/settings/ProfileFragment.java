@@ -114,7 +114,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
        BusProvider.getInstance().register(this);
 
-       View v = inflater.inflate(R.layout.layout_fragment_profile, container, false);
+       View v = inflater.inflate(R.layout.layout_set_profile, container, false);
 
        initSpinners(v);
        editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);

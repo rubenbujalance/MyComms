@@ -9,7 +9,7 @@
     android:gravity="top"
     android:visibility="visible"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText"
-    android:background="@color/toolbar_selected_item">
+    android:background="@drawable/toolbar_bg">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

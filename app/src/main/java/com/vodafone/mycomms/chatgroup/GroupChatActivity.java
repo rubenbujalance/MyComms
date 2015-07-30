@@ -32,6 +32,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -118,7 +119,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private ImageView sendFileImage;
 
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
-    private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
+    private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text
+            ,group_names, group_n_components;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
 
@@ -229,6 +231,9 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 }
 
                 int i = 0;
+                boolean profileInside = false;
+                String groupNames = "";
+                String groupNComponents = contactList.size() + " people in group"; //TODO: Hardcode
                 for(Contact contact : contactList)
                 {
                     if(i>3) break;
@@ -241,6 +246,11 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     String initials = "";
                     if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
                     {
+                        if (contact.getContactId().equals(_profile_id))
+                            profileInside = true;
+                        else
+                            groupNames = contact.getFirstName() + ", " + groupNames;
+
                         initials = contact.getFirstName().substring(0,1);
 
                         if(null != contact.getLastName() && contact.getLastName().length() > 0)
@@ -285,6 +295,11 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     }
                     i++;
                 }
+                groupNames = groupNames.substring(0, groupNames.length()-2);
+                if (profileInside)
+                    groupNames = groupNames + ", you...";
+                group_names.setText(groupNames);
+                group_n_components.setText(groupNComponents);
             }
         }
         else
@@ -674,6 +689,17 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 imgModifyGroupChat.setVisibility(View.VISIBLE);
             else
                 imgModifyGroupChat.setVisibility(View.GONE);
+
+            RelativeLayout groupInfoContainer = (RelativeLayout) findViewById(R.id.group_info_container);
+            groupInfoContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent in = new Intent(GroupChatActivity.this, GroupDetailActivity.class);
+                    in.putExtra(Constants.GROUP_CHAT_ID, _groupId);
+//                    in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(in);
+                }
+            });
         }
         else
             imgModifyGroupChat.setVisibility(View.GONE);
@@ -693,8 +719,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         lay_bottom_to_hide = (LinearLayout) findViewById(R.id.lay_bottom_both_image_hide);
         lay_bottom_to_hide.setVisibility(View.VISIBLE);
         lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
-
         sendFileImage = (ImageView) findViewById(R.id.send_image);
+
+        group_names = (TextView) findViewById(R.id.group_names);
+        group_n_components = (TextView) findViewById(R.id.group_n_components);
 
         if(contactIds==null || contactIds.size()==0) {
             Crashlytics.logException(new Exception("GroupChatActivity.java > " +

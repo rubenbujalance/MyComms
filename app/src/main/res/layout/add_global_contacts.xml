@@ -3,7 +3,7 @@
     android:id="@+id/add_global_contacts_container"
     android:layout_width="fill_parent"
     android:layout_height="48dp"
-    android:visibility="visible"
+    android:visibility="gone"
     android:background="@color/background_add_global_contacts">
 
         <ImageView

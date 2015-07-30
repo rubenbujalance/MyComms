@@ -564,6 +564,8 @@ public final class XMPPTransactions {
 
     private static boolean handlePongReceived(XmlPullParser parser)
     {
+        if(pingWaitingID==null) return false;
+
         try {
             String id = parser.getAttributeValue("", Constants.XMPP_ATTR_ID);
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
@@ -576,7 +578,6 @@ public final class XMPPTransactions {
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.handlePongReceived: ", e);
-            Crashlytics.logException(e);
             return false;
         }
 
@@ -1302,7 +1303,6 @@ public final class XMPPTransactions {
 
             } catch (Exception e) {
                 Log.e(Constants.TAG, "XMPPOpenConnection.doInBackground: Error opening XMPP server connection", e);
-                Crashlytics.logException(e);
                 _isConnecting = false;
 
                 return null;

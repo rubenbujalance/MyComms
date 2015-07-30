@@ -19,8 +19,8 @@ import model.GroupChat;
 /**
  * Created by str_oan on 01/07/2015.
  */
-public class RealmGroupChatTransactions {
-    private Realm mRealm;
+public class RealmGroupChatTransactions
+{
     private String _profile_id;
     private Context mContext;
     private String LOG_TAG = RealmGroupChatTransactions.class.getSimpleName();
@@ -28,7 +28,6 @@ public class RealmGroupChatTransactions {
     public RealmGroupChatTransactions(Context context, String profile_id)
     {
         mContext = context;
-        mRealm = Realm.getDefaultInstance();
         _profile_id = profile_id;
     }
 
@@ -94,34 +93,103 @@ public class RealmGroupChatTransactions {
         return chatMessage;
     }
 
-    public void insertOrUpdateGroupChat (GroupChat newChat)
+    public void insertOrUpdateGroupChat (GroupChat newChat, Realm realm)
     {
         if(newChat==null) return;
-        try {
+
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             GroupChat TEST = newChat;
             Log.i(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: newChatGroup " + newChat.getId());
             mRealm.beginTransaction();
             mRealm.copyToRealmOrUpdate(newChat);
-
             mRealm.commitTransaction();
-        } catch (Exception e){
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: ", e);
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: ",e);
             Crashlytics.logException(e);
             mRealm.cancelTransaction();
         }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
-    public boolean insertGroupChatMessage (String groupId, ChatMessage newChatMessage){
+    public void updateGroupChatInstance(GroupChat groupChat, String name,String avatar, String
+            about, String members, long lastMessageTime, String lastMessage, String
+            lastMessage_id,String owners, Realm realm)
+    {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
+            mRealm.beginTransaction();
+            if(null != name)
+                groupChat.setName(name);
+            if(null != avatar)
+                groupChat.setAvatar(avatar);
+            if(null != about)
+                groupChat.setAbout(about);
+            if(null != members)
+                groupChat.setMembers(members);
+            if(0 != lastMessageTime)
+                groupChat.setLastMessageTime(lastMessageTime);
+            if(null != lastMessage)
+                groupChat.setLastMessage(lastMessage);
+            if(null != lastMessage_id)
+                groupChat.setLastMessage_id(lastMessage_id);
+            if(null != owners)
+                groupChat.setOwners(owners);
+            mRealm.commitTransaction();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.updateGroupChatInstance: ",e);
+            Crashlytics.logException(e);
+            mRealm.cancelTransaction();
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
+    }
+
+    public void updateGroupChatInstance(GroupChat groupChat, String members, String owners, Realm
+            realm)
+    {
+        updateGroupChatInstance(groupChat, null, null, null, members, 0, null, null, owners, realm);
+    }
+
+    public boolean insertGroupChatMessage (String groupId, ChatMessage newChatMessage, Realm realm)
+    {
         if(newChatMessage==null) return false;
 
-        try {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             //Insert new chat message
             mRealm.beginTransaction();
             newChatMessage.setProfile_id(_profile_id);
             mRealm.copyToRealmOrUpdate(newChatMessage);
 
             //Update associated Chat with new last message
-            GroupChat chat = getGroupChatById(groupId);
+            GroupChat chat = getGroupChatById(groupId, mRealm);
 
             if(chat!=null) {
                 chat.setLastMessage_id(newChatMessage.getId());
@@ -140,18 +208,29 @@ public class RealmGroupChatTransactions {
 
             mRealm.commitTransaction();
 
-        } catch (Exception e){
-            Log.e(Constants.TAG, "RealmChatTransactions.insertChatMessage: ", e);
+            return true;
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.insertGroupChatMessage: ", e);
             Crashlytics.logException(e);
             mRealm.cancelTransaction();
             return false;
         }
-
-        return true;
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
-    public GroupChat getGroupChatById(String id)
+    public GroupChat getGroupChatById(String id, Realm realm)
     {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
         try
         {
             String test = id;
@@ -159,16 +238,26 @@ public class RealmGroupChatTransactions {
             query.equalTo(Constants.GROUP_CHAT_REALM_ID, id);
             return query.findFirst();
         }
-        catch (Exception e)
+        catch(Exception e)
         {
             Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatById: ", e);
             Crashlytics.logException(e);
-            return  null;
+            return null;
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
         }
     }
 
-    public ArrayList<GroupChat> getAllGroupChats()
+    public ArrayList<GroupChat> getAllGroupChats(Realm realm)
     {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
         try
         {
             RealmQuery<GroupChat> query = mRealm.where(GroupChat.class);
@@ -182,10 +271,16 @@ public class RealmGroupChatTransactions {
             }
             return groupChats;
         }
-        catch (Exception e ) {
+        catch(Exception e)
+        {
             Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChats: ", e);
             Crashlytics.logException(e);
-            return  null;
+            return null;
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
         }
     }
 
@@ -200,13 +295,19 @@ public class RealmGroupChatTransactions {
         return composedId;
     }
 
-    public ArrayList<ChatMessage> getAllGroupChatMessages(String group_id)
+    public ArrayList<ChatMessage> getAllGroupChatMessages(String group_id, Realm realm)
     {
         if(_profile_id==null || group_id==null) return null;
 
         ArrayList<ChatMessage> chatMessageArray = null;
 
-        try {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             chatMessageArray = new ArrayList<>();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
@@ -223,21 +324,35 @@ public class RealmGroupChatTransactions {
                     chatMessageArray.add(result1.get(i));
                 }
             }
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChatMessages: ", e);
-            Crashlytics.logException(e);
-        }
 
-        return chatMessageArray;
+            return chatMessageArray;
+        }
+        catch(Exception e) 
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllGroupChatMessages: ",e);
+            Crashlytics.logException(e);
+            return null;
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
-    public ArrayList<ChatMessage> getNotReadReceivedGroupChatMessages (String groupId){
+    public ArrayList<ChatMessage> getNotReadReceivedGroupChatMessages (String groupId, Realm realm){
         //Sets all received messages of a contact as read
         if(groupId==null) return null;
 
         ArrayList<ChatMessage> messages = null;
-
-        try {
+        
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, groupId)
@@ -251,53 +366,90 @@ public class RealmGroupChatTransactions {
                 if(messages==null) messages = new ArrayList<>();
                 messages.add(results.get(i));
             }
-        } catch (Exception e){
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getNotReadReceivedGroupChatMessages: ", e);
+            return messages;
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getNotReadReceivedGroupChatMessages: ",e);
             Crashlytics.logException(e);
             return null;
         }
-
-        return messages;
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
-    public ChatMessage getGroupChatMessageById(String groupId){
+    public ChatMessage getGroupChatMessageById(String groupId, Realm realm){
         ChatMessage chatMessage = null;
 
-        try {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, groupId);
             chatMessage = query.findFirst();
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatMessageById: ", e);
-            Crashlytics.logException(e);
+            return chatMessage;
         }
-
-        return chatMessage;
+        catch(Exception e) {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatMessageById: ",e);
+            Crashlytics.logException(e);
+            return null;
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
-    public boolean existsChatMessageById(String id){
+    public boolean existsChatMessageById(String id, Realm realm)
+    {
         boolean exists = false;
 
-        try {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, id);
             long count = query.count();
             if(count>0) exists = true;
-
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.existsChatMessageById: ", e);
+            return exists;
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.existsChatMessageById: ",e);
             Crashlytics.logException(e);
             return false;
         }
-
-        return exists;
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
-    public void setGroupChatAllReceivedMessagesAsRead (String groupId){
+    public void setGroupChatAllReceivedMessagesAsRead (String groupId, Realm realm)
+    {
         //Sets all received messages of a contact as read
         if(groupId==null) return;
 
-        try {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             mRealm.beginTransaction();
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
@@ -313,56 +465,81 @@ public class RealmGroupChatTransactions {
             {
                 results.get(0).setRead(Constants.CHAT_MESSAGE_READ);
             }
-
-        } catch (Exception e){
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead: ", e);
+            mRealm.commitTransaction();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.setGroupChatAllReceivedMessagesAsRead: ",e);
             Crashlytics.logException(e);
             mRealm.cancelTransaction();
-        } finally {
-            mRealm.commitTransaction();
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
         }
     }
 
-    public long getGroupChatPendingMessagesCount(String groupId){
+    public long getGroupChatPendingMessagesCount(String groupId, Realm realm)
+    {
         if(groupId==null || _profile_id==null) return 0;
 
-        long count = 0;
-
-        try {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+            long count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, groupId)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
                     .count();
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatPendingMessagesCount: ", e);
-            Crashlytics.logException(e);
+            return count;
         }
-
-        return count;
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatPendingMessagesCount: ",e);
+            Crashlytics.logException(e);
+            return 0;
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
-    public long getAllChatPendingMessagesCount(){
+    public long getAllChatPendingMessagesCount(Realm realm)
+    {
         if(_profile_id==null) return 0;
 
-        long count = 0;
-
-        try {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getInstance(mContext);
+        try
+        {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+            long count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
                     .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
                     .count();
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllChatPendingMessagesCount: ", e);
+            return count;
         }
-
-        return count;
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllChatPendingMessagesCount: ",e);
+            Crashlytics.logException(e);
+            return 0;
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
-
-    public void closeRealm() {
-//        if(mRealm!=null && !Utils.isMainThread()) mRealm.close();
-    }
-
 }

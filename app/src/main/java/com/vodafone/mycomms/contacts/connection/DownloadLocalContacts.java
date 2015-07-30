@@ -9,6 +9,7 @@ import com.vodafone.mycomms.util.Constants;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import model.Contact;
 
 public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
@@ -28,12 +29,14 @@ public class DownloadLocalContacts extends AsyncTask<Void, Void, Void>{
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Void doInBackground(Void... params)
+    {
+        Realm realm = Realm.getInstance(mContext);
         Log.i(Constants.TAG, "DownloadLocalContacts.doInBackground: ");
-        SearchController mSearchController = new SearchController(mContext, mProfileId);
+        SearchController mSearchController = new SearchController(mContext, mProfileId, realm);
         contactArrayList = mSearchController.getInternalContactSearch().getAllLocalContact();
         mSearchController.storeContactsIntoRealm(contactArrayList);
-        mSearchController.closeRealm();
+        realm.close();
         return null;
     }
 

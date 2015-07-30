@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+import io.realm.Realm;
 import model.UserProfile;
 
 /**
@@ -58,6 +59,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private boolean isFirstLoad = true;
     private boolean doNotDisturb = false;
     private boolean privateTimeZone = false;
+
+    private Realm realm;
 
     /**
      * Use this factory method to create a new instance of
@@ -97,6 +100,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             mParam1 = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        this.realm = Realm.getInstance(getActivity());
+        this.realm.setAutoRefresh(true);
         profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);
     }
@@ -109,7 +114,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 //        editProfile.setVisibility(View.INVISIBLE);
 
         profileController.setConnectionCallback(this);
-        profileController.getProfile();
+        profileController.getProfile(this.realm);
 
     }
 
@@ -128,11 +133,11 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                         Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
                 String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-                //Remove User from DB
-                if(profileId!=null) {
-                    RealmProfileTransactions profileTx = new RealmProfileTransactions();
-                    profileTx.removeUserProfile(profileId);
-                }
+                //Logout on server
+                profileController.logoutToAPI();
+
+                //Remove cookies if Sales Force login
+                Utils.removeCookies();
 
                 //Reset user security data
                 UserSecurity.resetTokens(getActivity());
@@ -143,13 +148,13 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 editor.remove(Constants.PROFILE_ID_SHARED_PREF);
                 editor.commit();
 
+                //Remove User from DB
+                if(profileId!=null) {
+                    RealmProfileTransactions profileTx = new RealmProfileTransactions(getActivity());
+                    profileTx.removeUserProfile(profileId, null);
+                }
+
                 ((MycommsApp)getActivity().getApplication()).appIsInitialized = false;
-
-                //Remove cookies if Sales Force login
-                Utils.removeCookies();
-
-                //Logout on server
-                profileController.logoutToAPI();
 
                 //Go to login page as a new task
                 Intent in = new Intent(getActivity(), LoginSignupActivity.class);
@@ -200,7 +205,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     @Override
     public void onDestroy() {
         super.onDestroy();
-        profileController.closeRealm();
+        this.realm.close();
     }
 
     private void shareCurrentTime(boolean isChecked) {

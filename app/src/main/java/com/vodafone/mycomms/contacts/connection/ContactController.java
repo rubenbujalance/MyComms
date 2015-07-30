@@ -24,7 +24,7 @@ public class ContactController {
     public ContactController(Context context, String profileId) {
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(profileId);
+        contactsController = new ContactsController(profileId, mContext);
     }
 
     public void getContactList(String api){
@@ -46,9 +46,7 @@ public class ContactController {
                             if (json != null && json.trim().length() > 0) {
                                 JSONObject jsonResponse = new JSONObject(json);
 
-                                ContactsController contactsController = new ContactsController(mProfileId);
                                 contactsController.insertContactListInRealm(jsonResponse);
-                                contactsController.closeRealm();
                                 //Update Contact List View on every pagination
                                 BusProvider.getInstance().post(new SetContactListAdapterEvent());
 
@@ -76,10 +74,5 @@ public class ContactController {
         } catch (Exception e){
             Log.e(Constants.TAG, "ContactController.getContactList: ", e);
         }
-    }
-
-    public void closeRealm()
-    {
-        contactsController.closeRealm();
     }
 }

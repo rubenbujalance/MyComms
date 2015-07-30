@@ -51,6 +51,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
+import io.realm.Realm;
 import model.Chat;
 import model.ChatMessage;
 import model.Contact;
@@ -85,6 +86,8 @@ public class ChatMainActivity extends ToolbarActivity {
     private RealmContactTransactions contactTransactions;
     private RecentContactController mRecentContactController;
 
+    private Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,13 +98,16 @@ public class ChatMainActivity extends ToolbarActivity {
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
+        this.realm = Realm.getInstance(ChatMainActivity.this);
+        this.realm.setAutoRefresh(true);
+
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         chatTransactions = new RealmChatTransactions(this);
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        contactTransactions = new RealmContactTransactions(_profile_id);
-        _profile = contactTransactions.getUserProfile();
+        contactTransactions = new RealmContactTransactions(_profile_id, ChatMainActivity.this);
+        _profile = contactTransactions.getUserProfile(realm);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecentContactController = new RecentContactController(this, _profile_id);
@@ -122,13 +128,13 @@ public class ChatMainActivity extends ToolbarActivity {
         previousView = in.getStringExtra(Constants.CHAT_PREVIOUS_VIEW);
 
         //Contact and profile
-        _contact = contactTransactions.getContactById(contact_id);
+        _contact = contactTransactions.getContactById(contact_id, realm);
 
         //Chat listeners
 //        setChatHeaderListener(this, _contact);
 
         //Load chat
-        _chat = chatTransactions.getChatByContactId(contact_id);
+        _chat = chatTransactions.getChatByContactId(contact_id, realm);
 
         //If there was no chat, create a new one, but not saved in db yet
         //If chat exists, load all messages
@@ -230,8 +236,8 @@ public class ChatMainActivity extends ToolbarActivity {
                 _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
                 final String id = chatMsg.getId();
 
-                chatTransactions.insertChat(_chat);
-                chatTransactions.insertChatMessage(chatMsg);
+                chatTransactions.insertChat(_chat, null);
+                chatTransactions.insertChatMessage(chatMsg, null);
 
                 //Send through XMPP
                 if(!XMPPTransactions.sendText(false, _contact.getContactId(),
@@ -275,8 +281,8 @@ public class ChatMainActivity extends ToolbarActivity {
 
         _chat = chatTransactions.updatedChatInstance(_chat, chatMsg);
 
-        chatTransactions.insertChat(_chat);
-        chatTransactions.insertChatMessage(chatMsg);
+        chatTransactions.insertChat(_chat, null);
+        chatTransactions.insertChatMessage(chatMsg, null);
 
 //        //Send through XMPP
 //        if (!XMPPTransactions.sendImage(_contact.getContactId(), Constants.XMPP_STANZA_TYPE_CHAT,
@@ -305,7 +311,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
     private void loadMessagesArray()
     {
-        _chatList = chatTransactions.getAllChatMessages(_chat.getContact_id());
+        _chatList = chatTransactions.getAllChatMessages(_chat.getContact_id(), realm);
         refreshAdapter();
     }
 
@@ -313,7 +319,7 @@ public class ChatMainActivity extends ToolbarActivity {
     {
         Log.i(Constants.TAG, "ChatMainActivity.refreshAdapter: ");
         mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(ChatMainActivity.this, _chatList,
-                _profile, false);
+                _profile, false, realm);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 
@@ -365,23 +371,21 @@ public class ChatMainActivity extends ToolbarActivity {
             @Override
             public void run() {
                 ArrayList<ChatMessage> messages =
-                        chatTransactions.getNotReadReceivedContactChatMessages(contactId);
+                        chatTransactions.getNotReadReceivedContactChatMessages(contactId,realm);
 
                 if (messages != null && messages.size() > 0) {
                     XMPPTransactions.sendReadIQReceivedMessagesList(false, messages);
-                    chatTransactions.setContactAllChatMessagesReceivedAsRead(contactId);
+                    chatTransactions.setContactAllChatMessagesReceivedAsRead(contactId, null);
                 }
             }
         }).start();
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy()
+    {
         super.onDestroy();
-        mRecentContactController.closeRealm();
-        chatTransactions.closeRealm();
-        XMPPTransactions.closeRealm();
-        contactTransactions.closeRealm();
+        this.realm.close();
     }
 
     @Subscribe
@@ -574,7 +578,7 @@ public class ChatMainActivity extends ToolbarActivity {
 
     @Subscribe
     public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
-        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId());
+        ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId(), realm);
 
         if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)
             loadMessagesArray();

@@ -44,6 +44,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import io.realm.Realm;
 import model.Contact;
 import model.GroupChat;
 
@@ -70,6 +71,7 @@ public class GroupChatListFragment extends ListFragment implements
     private String apiCall;
     private boolean isNewGroupChat;
     private GroupChat groupChat;
+    private String groupChatId;
     private RealmGroupChatTransactions mGroupChatTransactions;
     private RealmContactTransactions mContactTransactions;
     private GroupChatController mGroupChatController;
@@ -80,6 +82,8 @@ public class GroupChatListFragment extends ListFragment implements
     private ContactListController contactListController;
 
     private final String LOG_TAG = GroupChatListActivity.class.getSimpleName();
+
+    private Realm realm;
 
     public static GroupChatListFragment newInstance(int index, String param2) {
         Log.d(Constants.TAG, "ContactListFragment.newInstance: " + index);
@@ -110,6 +114,8 @@ public class GroupChatListFragment extends ListFragment implements
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
         BusProvider.getInstance().register(this);
+        this.realm = Realm.getInstance(getActivity());
+        this.realm.setAutoRefresh(true);
 
         sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -121,9 +127,10 @@ public class GroupChatListFragment extends ListFragment implements
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
 
-        mSearchController = new SearchController(getActivity().getApplicationContext(), profileId);
+        mSearchController = new SearchController(getActivity().getApplicationContext(),
+                profileId, realm);
         mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
-        mContactTransactions = new RealmContactTransactions(profileId);
+        mContactTransactions = new RealmContactTransactions(profileId, getActivity());
         mGroupChatController = new GroupChatController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
         mRecentContactController = new RecentContactController(getActivity(),profileId);
@@ -142,14 +149,8 @@ public class GroupChatListFragment extends ListFragment implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        contactListController.closeRealm();
-        mSearchController.closeRealm();
-        mGroupChatTransactions.closeRealm();
-        mContactTransactions.closeRealm();
-        contactListController.closeRealm();
-        contactListController.closeRealm();
-        mRecentContactController.closeRealm();
         BusProvider.getInstance().unregister(this);
+        this.realm.close();
     }
 
     @Override
@@ -227,7 +228,7 @@ public class GroupChatListFragment extends ListFragment implements
     private void startActivityInGroupChatMode()
     {
         Intent in = new Intent(getActivity(), GroupChatActivity.class);
-        in.putExtra(Constants.GROUP_CHAT_ID, groupChat.getId());
+        in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
         in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.GROUP_CHAT_LIST_ACTIVITY);
         in.putExtra(Constants.IS_GROUP_CHAT, true);
         startActivity(in);
@@ -255,8 +256,8 @@ public class GroupChatListFragment extends ListFragment implements
         {
             this.isNewGroupChat = false;
             this.groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants
-                    .GROUP_CHAT_ID));
-
+                    .GROUP_CHAT_ID), realm);
+            this.groupChatId = in.getStringExtra(Constants.GROUP_CHAT_ID);
             this.ownersIds = new ArrayList<>();
             String[] ids = this.groupChat.getOwners().split("@");
             Collections.addAll(ownersIds, ids);
@@ -272,7 +273,7 @@ public class GroupChatListFragment extends ListFragment implements
         {
             if(!id.equals(profileId))
             {
-                Contact contact = mContactTransactions.getContactById(id);
+                Contact contact = mContactTransactions.getContactById(id, realm);
                 addContactToChat(contact);
             }
         }
@@ -288,7 +289,7 @@ public class GroupChatListFragment extends ListFragment implements
     {
         if(null == keyWord)
         {
-            contactList = mContactTransactions.getAllContacts();
+            contactList = mContactTransactions.getAllContacts(realm);
         }
         else
         {
@@ -346,6 +347,7 @@ public class GroupChatListFragment extends ListFragment implements
                         , Constants.CONTACTS_ALL
                         , listView
                         , true
+                        , realm
                 );
 
         mSearchBarController.initiateComponentsForSearchView(v);
@@ -598,7 +600,7 @@ public class GroupChatListFragment extends ListFragment implements
                     String chatToString = groupChat.getId() + groupChat.getProfileId()
                             + groupChat.getMembers();
                     Log.i(Constants.TAG, LOG_TAG + ".CreateGroupChatTask -> Created chat is: " + chatToString);
-                    mGroupChatTransactions.insertOrUpdateGroupChat(groupChat);
+                    mGroupChatTransactions.insertOrUpdateGroupChat(groupChat, null);
 
                     // Insert recent
                     String action = Constants.CONTACTS_ACTION_SMS;
@@ -612,7 +614,7 @@ public class GroupChatListFragment extends ListFragment implements
     }
 
 
-    private class  UpdateGroupChatTask extends AsyncTask<String, Void, String>
+    private class  UpdateGroupChatTask extends AsyncTask<String, Void, Boolean>
     {
 
         private ProgressDialog pdia;
@@ -627,16 +629,10 @@ public class GroupChatListFragment extends ListFragment implements
         }
 
         @Override
-        protected String doInBackground(String... params)
+        protected Boolean doInBackground(String... params)
         {
-            return updateGroupChat(params[0]);
-        }
-
-        @Override
-        protected void onPostExecute(String response)
-        {
-            super.onPostExecute(response);
-            if(pdia.isShowing()) pdia.dismiss();
+            String response = updateGroupChat(params[0]);
+            Realm realm = Realm.getInstance(getActivity());
             try
             {
                 if(!mGroupChatController.getResponseCode().startsWith("2"))
@@ -651,24 +647,44 @@ public class GroupChatListFragment extends ListFragment implements
                         Log.e(Constants.TAG, LOG_TAG + ".UpdateGroupChatTask -> onPostExecute: ERROR. " +
                                 "Impossible Update Group Chat!!! -> " + response);
                     }
+                    return false;
                 }
                 else
                 {
+                    GroupChat groupChat = mGroupChatTransactions.getGroupChatById(groupChatId, realm);
                     if(null != groupChat)
                     {
-                        GroupChat updatedGroupChat = new GroupChat(groupChat);
-                        updatedGroupChat.setMembers(generateComposedMembersId(selectedContacts));
-                        updatedGroupChat.setOwners(generateComposedMembersId(ownersIds));
-                        mGroupChatTransactions.insertOrUpdateGroupChat(updatedGroupChat);
-                        startActivityInGroupChatMode();
+                        mGroupChatTransactions.updateGroupChatInstance
+                                (
+                                        groupChat,
+                                        generateComposedMembersId(selectedContacts),
+                                        generateComposedMembersId(ownersIds),
+                                        realm
+                                );
+                        return true;
                     }
+                    return false;
                 }
             }
             catch (Exception e)
             {
                 Log.e(Constants.TAG, LOG_TAG + ".UpdateGroupChatTask -> onPostExecute: ERROR. " +
-                        "Impossible Update Group Chat!!!");
+                        "Impossible Update Group Chat!!!", e);
+                return false;
             }
+            finally {
+                realm.close();
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isOK)
+        {
+            super.onPostExecute(isOK);
+            if(pdia.isShowing()) pdia.dismiss();
+            if(isOK)
+                startActivityInGroupChatMode();
         }
     }
 
@@ -700,6 +716,7 @@ public class GroupChatListFragment extends ListFragment implements
             if(null != response && mGroupChatController.getResponseCode().startsWith("2"))
             {
                 String id = mGroupChatController.getCreatedGroupChatId(response);
+                this.groupChatId = id;
                 if(null != id)
                 {
                     this.groupChat = mGroupChatTransactions.newGroupChatInstance

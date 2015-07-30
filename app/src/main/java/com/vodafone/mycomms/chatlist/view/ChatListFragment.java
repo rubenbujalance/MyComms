@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import io.realm.Realm;
 import model.Chat;
 import model.GroupChat;
 
@@ -41,6 +42,7 @@ public class ChatListFragment extends Fragment{
     private ChatListRecyclerViewAdapter mChatRecyclerViewAdapter;
     private RealmChatTransactions mChatTransactions;
     private RealmGroupChatTransactions mGroupChatTransactions;
+    private Realm realm;
 
     public static ChatListFragment newInstance(int index, String param2) {
         Log.d(Constants.TAG, "ContactListFragment.newInstance: " + index);
@@ -57,7 +59,8 @@ public class ChatListFragment extends Fragment{
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
 
-        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), getComposedChat());
+        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), getComposedChat
+                (), this.realm);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
 
         mRecyclerView.addOnItemTouchListener(new ChatListRecyclerItemClickListener(getActivity(),
@@ -101,8 +104,8 @@ public class ChatListFragment extends Fragment{
         ArrayList<Chat> chatList = new ArrayList<>();
         ArrayList<GroupChat> groupChats = new ArrayList<>();
         ArrayList<ComposedChat> composedChats = new ArrayList<>();
-        chatList = mChatTransactions.getAllChatsFromExistingContacts();
-        groupChats = mGroupChatTransactions.getAllGroupChats();
+        chatList = mChatTransactions.getAllChatsFromExistingContacts(realm);
+        groupChats = mGroupChatTransactions.getAllGroupChats(realm);
         for(Chat c : chatList)
         {
             ComposedChat composedChat = new ComposedChat(c,null);
@@ -121,6 +124,8 @@ public class ChatListFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
+        this.realm = Realm.getInstance(getActivity());
+        this.realm.setAutoRefresh(true);
         mChatTransactions = new RealmChatTransactions(getActivity());
         SharedPreferences sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -138,8 +143,6 @@ public class ChatListFragment extends Fragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mChatTransactions.closeRealm();
-        mGroupChatTransactions.closeRealm();
         BusProvider.getInstance().unregister(this);
     }
 
@@ -165,7 +168,8 @@ public class ChatListFragment extends Fragment{
             }
         });
 
-        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), composedChatList);
+        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(),
+                composedChatList, this.realm);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
     }
 

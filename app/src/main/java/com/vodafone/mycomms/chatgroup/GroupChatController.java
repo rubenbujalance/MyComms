@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import io.realm.Realm;
 import model.GroupChat;
 
 /**
@@ -309,14 +310,15 @@ public class GroupChatController
         String insertedGroupChatIds = null;
         for(GroupChat chat : chats)
         {
-            if(null == realmGroupChatTransactions.getGroupChatById(chat.getId()))
+            Realm realm = Realm.getInstance(mContext);
+            if(null == realmGroupChatTransactions.getGroupChatById(chat.getId(),realm))
             {
-                realmGroupChatTransactions.insertOrUpdateGroupChat(chat);
+                realmGroupChatTransactions.insertOrUpdateGroupChat(chat, null);
                 if(null == insertedGroupChatIds) insertedGroupChatIds = chat.getId();
                 else insertedGroupChatIds = insertedGroupChatIds + "@" + chat.getId();
             }
+            realm.close();
         }
-        realmGroupChatTransactions.closeRealm();
         return insertedGroupChatIds;
     }
 

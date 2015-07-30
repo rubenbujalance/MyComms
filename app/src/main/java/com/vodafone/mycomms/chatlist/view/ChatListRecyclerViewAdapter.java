@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import io.realm.Realm;
 import model.Contact;
 import model.GroupChat;
 import model.UserProfile;
@@ -41,17 +42,20 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     private RealmGroupChatTransactions groupChatTransactions;
     private RealmContactTransactions mContactTransactions;
     private String profileId;
+    private Realm realm;
 
-    public ChatListRecyclerViewAdapter(Context context, ArrayList<ComposedChat> composedChats)
+    public ChatListRecyclerViewAdapter(Context context, ArrayList<ComposedChat> composedChats,
+                                       Realm realm)
     {
         mContext = context;
+        this.realm = realm;
         _chatTx = new RealmChatTransactions(mContext);
         this.composedChat = composedChats;
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         groupChatTransactions = new RealmGroupChatTransactions(mContext, profileId);
-        mContactTransactions = new RealmContactTransactions(profileId);
+        mContactTransactions = new RealmContactTransactions(profileId, mContext);
     }
 
     @Override
@@ -126,7 +130,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                 .getChat().getLastMessageTime(), mContext);
         chatListHolder.textViewTime.setText(timeDifference);
 
-        long amountUnreadMessages = _chatTx.getChatPendingMessagesCount(getComposedChat(i).getChat().getContact_id());
+        long amountUnreadMessages = _chatTx.getChatPendingMessagesCount(getComposedChat(i)
+                .getChat().getContact_id(), realm);
 
         if(amountUnreadMessages > 0) {
             chatListHolder.badgeUnread.setVisibility(View.VISIBLE);
@@ -139,7 +144,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         else
             chatListHolder.badgeUnread.setVisibility(View.GONE);
 
-        Contact contact = mContactTransactions.getContactById(getComposedChat(i).getChat().getContact_id());
+        Contact contact = mContactTransactions.getContactById(getComposedChat(i).getChat()
+                .getContact_id(), realm);
 
         chatListHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
         loadComposedAvatar
@@ -152,14 +158,14 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
     private String getChatMemberName(String contactId)
     {
-        Contact contact = mContactTransactions.getContactById(contactId);
+        Contact contact = mContactTransactions.getContactById(contactId, realm);
         String name = contact.getFirstName() + " " + contact.getLastName();
         return  name;
     }
 
     private String getChatMemberInitials(String contactId)
     {
-        Contact contact = mContactTransactions.getContactById(contactId);
+        Contact contact = mContactTransactions.getContactById(contactId, realm);
         String name = contact.getFirstName().substring(0,1) + contact.getLastName().substring(0,1);
         return  name;
     }
@@ -172,8 +178,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     {
         ArrayList<Contact> contacts = new ArrayList<>();
         RealmContactTransactions realmContactTransactions =
-                new RealmContactTransactions(profileId);
-        UserProfile userProfile = realmContactTransactions.getUserProfile();
+                new RealmContactTransactions(profileId, mContext);
+        UserProfile userProfile = realmContactTransactions.getUserProfile(realm);
         Contact contact = new Contact();
         contact.setAvatar(userProfile.getAvatar());
         contact.setFirstName(userProfile.getFirstName());
@@ -185,12 +191,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         {
             if(!id.equals(userProfile.getId()))
             {
-                contact = realmContactTransactions.getContactById(id);
+                contact = realmContactTransactions.getContactById(id,realm);
                 if(null != contact)
                     contacts.add(contact);
             }
         }
-        realmContactTransactions.closeRealm();
         return contacts;
     }
 
@@ -275,7 +280,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
         //Load unread messages
         long amountUnreadMessages = groupChatTransactions.getGroupChatPendingMessagesCount(
-                getComposedChat(i).getGroupChat().getId());
+                getComposedChat(i).getGroupChat().getId(), realm);
 
         if(amountUnreadMessages > 0) {
             chatListHolder.badgeUnread.setVisibility(View.VISIBLE);
@@ -351,8 +356,5 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-
-        _chatTx.closeRealm();
-        mContactTransactions.closeRealm();
     }
 }

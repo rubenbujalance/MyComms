@@ -31,7 +31,7 @@ public class ContactDetailController extends BaseController {
         super(activity);
         this.mContext = activity;
         this.profileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(profileId);
+        realmContactTransactions = new RealmContactTransactions(profileId, mContext);
     }
 
     void getContactDetail(String id){
@@ -56,7 +56,7 @@ public class ContactDetailController extends BaseController {
             if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof IContactDetailConnectionCallback){
                 ((IContactDetailConnectionCallback)this.getConnectionCallback()).onContactDetailReceived(contact);
             }
-            realmContactTransactions.updateContact(contact);
+            realmContactTransactions.updateContact(contact, null);
 
         } catch (Exception e){
             Log.e(Constants.TAG, "ContactsController.onConnectionComplete: " + e.toString());
@@ -64,8 +64,4 @@ public class ContactDetailController extends BaseController {
 
     }
 
-    public void closeRealm()
-    {
-        realmContactTransactions.closeRealm();
-    }
 }

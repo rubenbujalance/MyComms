@@ -32,6 +32,7 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.GroupChatCreatedEvent;
+import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -155,7 +156,7 @@ public class DashBoardActivity extends ToolbarActivity
                 //Start Contacts activity
                 Constants.isSearchBarFocusRequested = true;
                 Constants.isDashboardOrigin = true;
-                ((MycommsApp)getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
+                ((MycommsApp) getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
                 //in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
@@ -328,7 +329,6 @@ public class DashBoardActivity extends ToolbarActivity
             loadRecents(recentsContainer);
             loadUnreadMessages(recentsContainer);
         }
-
         else
         {
             loadRecents(recentsContainer2);
@@ -372,6 +372,22 @@ public class DashBoardActivity extends ToolbarActivity
                 loadRecents(recentsContainer2);
                 loadUnreadMessages(recentsContainer2);
             }
+        }
+    }
+
+    @Subscribe
+     public void onEventMessageStatusChanged(MessageStatusChanged event){
+        Log.i(Constants.TAG, "DashBoardActivity.onEventChatsReceived: ");
+        checkUnreadChatMessages();
+        if(isCurrentRecentContainerFirst)
+        {
+            loadRecents(recentsContainer);
+            loadUnreadMessages(recentsContainer);
+        }
+        else
+        {
+            loadRecents(recentsContainer2);
+            loadUnreadMessages(recentsContainer2);
         }
     }
 

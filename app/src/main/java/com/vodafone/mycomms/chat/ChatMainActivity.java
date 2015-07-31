@@ -37,7 +37,7 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageSentEvent;
-import com.vodafone.mycomms.events.MessageSentStatusChanged;
+import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
@@ -577,7 +577,7 @@ public class ChatMainActivity extends ToolbarActivity {
     }
 
     @Subscribe
-    public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
+    public void onEventMessageStatusChanged(MessageStatusChanged event){
         ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId(), realm);
 
         if(chatMsg!=null && chatMsg.getContact_id().compareTo(_contact.getContactId())==0)

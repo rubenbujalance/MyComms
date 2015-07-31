@@ -12,6 +12,7 @@ import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -84,6 +85,11 @@ public class ChatListActivity extends ToolbarActivity{
 
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
+        checkUnreadChatMessages();
+    }
+
+    @Subscribe
+    public void onEventMessageStatusChanged(MessageStatusChanged event){
         checkUnreadChatMessages();
     }
 

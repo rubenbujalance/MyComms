@@ -382,12 +382,12 @@ public class DashBoardActivity extends ToolbarActivity
         checkUnreadChatMessages();
         if(isCurrentRecentContainerFirst)
         {
-//            loadRecents(recentsContainer);
+            loadRecents(recentsContainer);
             loadUnreadMessages(recentsContainer);
         }
         else
         {
-//            loadRecents(recentsContainer2);
+            loadRecents(recentsContainer2);
             loadUnreadMessages(recentsContainer2);
         }
     }

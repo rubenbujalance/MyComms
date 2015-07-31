@@ -120,6 +120,7 @@ public class ContactListFragment extends ListFragment {
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
         myCommsTextView = (TextView) v.findViewById(R.id.platform_mycomms_label);
 
+        //TODO: Null Object error, commented
         addGlobalContactsContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

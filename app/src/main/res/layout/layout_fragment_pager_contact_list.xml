@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:clickable="false">
 
-    <include android:id="@+id/app_global_contacts"
+    <include android:id="@+id/add_global_contacts_container"
              layout="@layout/add_global_contacts"/>
 
     <LinearLayout

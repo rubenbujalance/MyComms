@@ -3,7 +3,7 @@ package com.vodafone.mycomms.events;
 /**
  * Created by str_rbm on 04/06/2015.
  */
-public class MessageSentStatusChanged {
+public class MessageStatusChanged {
     private String id;
     private String status;
 

@@ -30,11 +30,13 @@ public class MyCommsDatePickerFragment extends DialogFragment implements DatePic
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        this.getCalendar().set(Calendar.YEAR, year);
-        this.getCalendar().set(Calendar.MONTH, month);
-        this.getCalendar().set(Calendar.DAY_OF_MONTH, day);
-        if(onDateSetListener != null){
-            onDateSetListener.onDateSet(view, year, month, day);
+        if(view.isShown()) {
+            this.getCalendar().set(Calendar.YEAR, year);
+            this.getCalendar().set(Calendar.MONTH, month);
+            this.getCalendar().set(Calendar.DAY_OF_MONTH, day);
+            if (onDateSetListener != null) {
+                onDateSetListener.onDateSet(view, year, month, day);
+            }
         }
     }
 

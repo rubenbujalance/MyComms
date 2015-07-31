@@ -188,7 +188,7 @@ public class ContactListFragment extends ListFragment {
 
         BusProvider.getInstance().register(this);
 
-        this.realm = Realm.getInstance(getActivity());
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
         if (getArguments() != null) {

@@ -372,7 +372,7 @@ public class ProfileController extends BaseController {
 
     public void logoutToAPI()
     {
-        Realm realm = Realm.getInstance(mContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             UserProfile userProfile = mRealmProfileTransactions.getUserProfile(profileId, realm);
             String jsonEmails = userProfile.getEmails();

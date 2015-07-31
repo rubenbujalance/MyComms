@@ -310,7 +310,7 @@ public class GroupChatController
         String insertedGroupChatIds = null;
         for(GroupChat chat : chats)
         {
-            Realm realm = Realm.getInstance(mContext);
+            Realm realm = Realm.getDefaultInstance();
             if(null == realmGroupChatTransactions.getGroupChatById(chat.getId(),realm))
             {
                 realmGroupChatTransactions.insertOrUpdateGroupChat(chat, null);

@@ -98,7 +98,7 @@ public class ChatMainActivity extends ToolbarActivity {
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
-        this.realm = Realm.getInstance(ChatMainActivity.this);
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
         SharedPreferences sp = getSharedPreferences(

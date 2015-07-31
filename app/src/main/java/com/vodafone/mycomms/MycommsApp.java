@@ -84,7 +84,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
 
         //Realm config
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this)
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext())
                 .name("mycomms.realm")
 //                .encryptionKey()
 //                .schemaVersion(1)
@@ -121,7 +121,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //**********************
 
-        this.realm = Realm.getInstance(MycommsApp.this);
+        this.realm = Realm.getDefaultInstance();
         mNewsController = new NewsController(getApplicationContext());
 
         //Initializations

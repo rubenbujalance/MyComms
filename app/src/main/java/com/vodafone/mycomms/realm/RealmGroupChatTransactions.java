@@ -101,7 +101,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             GroupChat TEST = newChat;
@@ -131,7 +131,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -180,7 +180,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             //Insert new chat message
@@ -230,7 +230,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             String test = id;
@@ -257,7 +257,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<GroupChat> query = mRealm.where(GroupChat.class);
@@ -305,7 +305,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             chatMessageArray = new ArrayList<>();
@@ -350,7 +350,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
@@ -388,7 +388,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
@@ -416,7 +416,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
@@ -447,7 +447,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             mRealm.beginTransaction();
@@ -488,7 +488,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
@@ -520,7 +520,7 @@ public class RealmGroupChatTransactions
         if(null != realm)
             mRealm = realm;
         else
-            mRealm = Realm.getInstance(mContext);
+            mRealm = Realm.getDefaultInstance();
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);

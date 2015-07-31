@@ -42,7 +42,7 @@ public class ToolbarActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realmChatTransactions = new RealmChatTransactions(this);
-        this.realm = Realm.getInstance(ToolbarActivity.this);
+        this.realm = Realm.getDefaultInstance();
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");

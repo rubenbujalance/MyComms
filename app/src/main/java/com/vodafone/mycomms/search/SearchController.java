@@ -126,7 +126,7 @@ public class SearchController extends BaseController
     private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
     {
         ArrayList<Contact> realmContactList = new ArrayList<>();
-        Realm realm = Realm.getInstance(mContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
@@ -155,7 +155,7 @@ public class SearchController extends BaseController
 
     private void updateContactAvatar (Contact contact, boolean doRefreshAdapter)
     {
-        Realm realm = Realm.getInstance(mContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             if (contact.getAvatar()==null || contact.getAvatar().length()==0)
                 return;

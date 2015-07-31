@@ -31,12 +31,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/platform_mycomms_label"
-            style="@style/PlatformLayoutSeparator"
-            android:text="@string/mycomms"
-            android:background="@color/background_platform"/>
-
             <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/contacts_swipe_refresh_layout"
                 android:layout_width="match_parent"
@@ -56,7 +50,6 @@
             android:id="@android:id/empty"
             android:text="@string/no_favorite_records"
             style="@style/NoRecordsTextView"/>
-
 
     </FrameLayout>
 </LinearLayout>

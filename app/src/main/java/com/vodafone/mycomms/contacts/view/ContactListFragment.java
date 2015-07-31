@@ -118,7 +118,7 @@ public class ContactListFragment extends ListFragment {
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
 
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
-        myCommsTextView = (TextView) v.findViewById(R.id.platform_mycomms_label);
+        myCommsTextView = (TextView) v.findViewById(R.id.platform_label);
 
         //TODO: Null Object error, commented
         addGlobalContactsContainer.setOnClickListener(new View.OnClickListener() {

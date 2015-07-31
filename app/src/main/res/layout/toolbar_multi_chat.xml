@@ -10,81 +10,142 @@
     android:background="@drawable/toolbar_bg"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
 
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/btn_back_white"
-            android:layout_centerVertical="true" />
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="horizontal"
+                      android:layout_weight="5"
+                      android:layout_gravity="center"
+                      android:gravity="start|center"
+            >
 
-        <RelativeLayout
-            android:id="@+id/group_info_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/img_modify_group_chat"
-            android:layout_toRightOf="@+id/back_button"
-            android:layout_toEndOf="@+id/back_button">
+            <ImageButton
+                android:id="@+id/back_button"
+                android:layout_width="22dp"
+                android:layout_height="34dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/ic_go_back"
+                android:layout_centerVertical="true" />
+
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="horizontal"
+                      android:layout_weight="3"
+                      android:layout_gravity="center"
+                      android:gravity="start|center"
+                      android:id="@+id/group_info_container"
+            >
+
+                <include android:id="@+id/layout_list_item_image"
+                         layout="@layout/layout_multi_chat_avatar_50"
+                         android:layout_width="50dp"
+                         android:layout_height="50dp"
+                    />
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:orientation="vertical"
+                          android:layout_gravity="center"
+                          android:gravity="start|center"
+                >
+
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="25dp"
+                              android:orientation="horizontal"
+                              android:layout_gravity="center"
+                              android:gravity="start|center"
+                              android:paddingLeft="2dp"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        tools:text="Albert, Ruben, Alex, Vader"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:id="@+id/group_names"
+                        />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="25dp"
+                              android:orientation="horizontal"
+                              android:layout_gravity="center"
+                              android:gravity="center"
+                    >
+                    <ImageView android:layout_width="25dp"
+                               android:layout_height="25dp"
+                               android:src="@drawable/icon_sun"
+                               android:id="@+id/img_sun"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="2dp"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:layout_gravity="center"
+                        tools:text="7 people ini group"
+                        android:textSize="12sp"
+                        android:ellipsize="end"
+                        android:textColor="@color/white"
+                        android:id="@+id/group_n_components"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="horizontal"
+                      android:layout_weight="5"
+                      android:layout_gravity="center"
+                      android:gravity="center|end"
+                      android:id="@+id/lay_phone"
+                      android:clickable="true"
+            >
+            <ImageView
+                android:id="@+id/img_phone"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/ic_phone"
+
+                />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="horizontal"
+                      android:layout_weight="5"
+                      android:layout_gravity="center"
+                      android:gravity="center|end"
+                      android:id="@+id/lay_add_member"
+                      android:clickable="true"
+            >
+            <ImageView
+                android:id="@+id/img_modify_group_chat"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/btn_add_member"
+                />
+        </LinearLayout>
 
 
-        <include android:id="@+id/layout_list_item_image"
-                 layout="@layout/layout_multi_chat_avatar_50"
-                 android:layout_width="50dp"
-                 android:layout_height = "50dp"
-                 android:layout_marginLeft="44dp"
-                 android:layout_marginStart="44dp"
-                 android:layout_alignParentTop="true"/>
-
-        <TextView
-            android:layout_width="284dp"
-            android:layout_height="22dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="2dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            tools:text="Albert, Ruben, Alex, Vader"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:id="@+id/group_names"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/layout_list_item_image"/>
-        <TextView
-            android:layout_width="164dp"
-            android:layout_height="22dp"
-            android:paddingBottom="2dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:gravity="left"
-            tools:text="7 people ini group"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:id="@+id/group_n_components"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/layout_list_item_image"
-            android:layout_alignRight="@+id/group_names"
-            android:layout_alignEnd="@+id/group_names"/>
-
-        </RelativeLayout>
-
-        <ImageView
-            android:id="@+id/img_modify_group_chat"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:clickable="true"
-            android:background="@drawable/btn_add_member"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true" />
-
-    </RelativeLayout>
+    </LinearLayout>
 
 </android.support.v7.widget.Toolbar>

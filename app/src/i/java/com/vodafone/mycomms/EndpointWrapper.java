@@ -12,6 +12,7 @@ public class EndpointWrapper {
 
 //    private static final String baseURL = "qa.my-comms.com";
 //    private static final String baseNewsURL = "qa-news.my-comms.com";
+//    private static final String xmppHost = "qa-msg.my-comms.com";
 
     public static String getBaseURL() {
         return baseURL;

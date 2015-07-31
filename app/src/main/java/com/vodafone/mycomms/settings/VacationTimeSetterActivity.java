@@ -159,6 +159,5 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        profileController.closeRealm();
     }
 }

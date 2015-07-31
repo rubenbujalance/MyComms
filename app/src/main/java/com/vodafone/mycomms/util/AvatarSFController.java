@@ -79,8 +79,7 @@ public class AvatarSFController {
             if(null != responseUrl)
             {
                 RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profileId);
-                realmContactTransactions.setContactSFAvatarURL(contactId, responseUrl);
-                realmContactTransactions.closeRealm();
+                realmContactTransactions.setContactSFAvatarURL(contactId, responseUrl, null);
             }
             return responseUrl;
         }

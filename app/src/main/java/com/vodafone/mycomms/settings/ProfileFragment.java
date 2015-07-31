@@ -44,6 +44,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 
+import io.realm.Realm;
 import model.UserProfile;
 
 /**
@@ -95,6 +96,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private boolean isFirstLoadNeed = true;
     private String avatarNewURL = null;
     private SharedPreferences sp;
+
+    private Realm realm;
 
     private boolean isAvatarHasChangedAfterSelection = false, isProfileLoadedAtLeastOnce = false;
 
@@ -362,6 +365,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+        this.realm = Realm.getDefaultInstance();
+
         if(mIndex == 0) {
             Log.i(Constants.TAG, "ProfileFragment.onCreate: " + mIndex);
         }else if(mIndex == 1 ){
@@ -386,7 +391,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         if(!isProfileLoadedAtLeastOnce)
         {
-            profileController.getProfile();
+            profileController.getProfile(realm);
             isProfileLoadedAtLeastOnce = true;
         }
 
@@ -462,7 +467,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-        profileController.closeRealm();
+        this.realm.close();
     }
 
     @Override
@@ -650,11 +655,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             }
             isUpdating = updateContactData();
             isAvatarHasChangedAfterSelection = false;
-            isUpdating = updateContactData();
         }
     }
-
-
 
 
     public class DecodeAndLoadBitmapAvatar extends AsyncTask<Void, Void, String>

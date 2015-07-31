@@ -26,7 +26,7 @@ public class ContactListController extends BaseController {
         super(context);
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mProfileId);
+        contactsController = new ContactsController(mProfileId, mContext);
     }
 
     public void getContactList(String apiCall){
@@ -80,10 +80,5 @@ public class ContactListController extends BaseController {
                 Log.e(Constants.TAG, "ContactListController.onConnectionComplete: contacts ", e);
             }
         }
-    }
-
-    public void closeRealm()
-    {
-        contactsController.closeRealm();
     }
 }

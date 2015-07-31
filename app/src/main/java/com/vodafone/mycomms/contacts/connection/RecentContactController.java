@@ -38,7 +38,7 @@ public class RecentContactController {
     public RecentContactController(Context context, String profileId) {
         this.mContext = context;
         this.mProfileId = profileId;
-        contactsController = new ContactsController(mProfileId);
+        contactsController = new ContactsController(mProfileId, mContext);
         contactSearchController = new ContactSearchController(mContext,mProfileId);
     }
 
@@ -340,11 +340,5 @@ public class RecentContactController {
             Log.e(Constants.TAG, "RecentContactController.getVersionName: ERROR ",e);
             return "";
         }
-    }
-
-    public void closeRealm()
-    {
-        contactSearchController.closeRealm();
-        contactsController.closeRealm();
     }
 }

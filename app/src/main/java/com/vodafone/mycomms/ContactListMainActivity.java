@@ -87,7 +87,6 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-        XMPPTransactions.closeRealm();
     }
 
     @Override

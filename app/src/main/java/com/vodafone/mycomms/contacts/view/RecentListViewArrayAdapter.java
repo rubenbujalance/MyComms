@@ -232,7 +232,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_SMS)) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_message));
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_EMAIL)) {
-            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.img_verify_email));
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_enrollment_email_white));
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_CALL)) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_phone));
         }

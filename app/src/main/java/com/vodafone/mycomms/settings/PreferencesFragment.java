@@ -59,6 +59,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private boolean doNotDisturb = false;
     private boolean privateTimeZone = false;
 
+    private TextView vacationTimeEnds;
+
     private Realm realm;
 
     /**
@@ -103,6 +105,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         this.realm.setAutoRefresh(true);
         profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);
+
     }
 
     @Override
@@ -121,6 +124,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_preferences, container, false);
+
+        vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {
@@ -275,11 +280,11 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
                 if(jsonSettings.has("holiday")) {
                     JSONObject jsonHoliday = jsonSettings.getJSONObject("holiday");
-                    String endDateISO = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
+                    String endDateStr = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
+                    endDateStr = endDateStr.replaceAll("Z", "+0000");
                     SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FORMAT);
-                    Date endDate = sdf.parse(endDateISO);
+                    Date endDate = sdf.parse(endDateStr);
                     this.holidayEndDate = endDate.getTime();
-                    TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
 
                     if (holidayEndDate > 0) {
                         String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
@@ -289,7 +294,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 }
             }
         } catch (Exception e){
-            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: ");
+            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: ", e);
         }
 
         try {
@@ -430,8 +435,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
                     updateHolidayText(holidayEndDate);
                     updateProfileInDb();
-
-
                 }
                 break;
             }
@@ -455,7 +458,10 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     }
 
     void updateProfileInDb(){
-        this.profileController.updateUserProfileSettingsInDB(false, this.privateTimeZone, this.holidayEndDate, this.doNotDisturb);
+        String dateISO =
+                Utils.timestampToFormatedString(holidayEndDate, Constants.API_DATE_FORMAT);
+        this.profileController.updateUserProfileSettingsInDB(
+                false, this.privateTimeZone, dateISO, this.doNotDisturb);
     }
 
 }

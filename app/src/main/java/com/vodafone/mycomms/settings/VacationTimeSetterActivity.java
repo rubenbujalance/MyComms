@@ -15,10 +15,10 @@ import android.widget.TextView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.IConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -130,11 +130,9 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
             // - Change dateFormat to yyyy-MM-dd'T'HH:mm:ss.SSSZ
 
 //            settingsHashMap.put(Constants.PROFILE_HOLIDAY, true);
-            Calendar c = Calendar.getInstance();
-            c.setTimeInMillis(holidayEndDate);
-            SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FORMAT);
-            sdf.setTimeZone(c.getTimeZone());
-            String dateISO = sdf.format(c.getTime());
+
+            String dateISO =
+                    Utils.timestampToFormatedString(holidayEndDate, Constants.API_DATE_FORMAT);
 
             HashMap holidayHashMap = new HashMap<>();
             holidayHashMap.put(Constants.PROFILE_HOLIDAY_END_DATE,  dateISO);

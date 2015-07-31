@@ -48,7 +48,7 @@ public class Constants {
     public static final String PROFILE_PHONE = "phone";
     public static final String PROFILE_EMAIL = "email";
     public static final String PROFILE_DEVICE_ID = "deviceId";
-    public static final String PROFILE_HOLIDAY_END_DATE = "holidayEndDate";
+    public static final String PROFILE_HOLIDAY_END_DATE = "endDate";
     public static final String PROFILE_HOLIDAY = "holiday";
     public static final String PROFILE_ID = "id";
 
@@ -222,6 +222,7 @@ public class Constants {
     public static final String SIMPLE_FILE_TO_SEND = "simple_file";
 
     public static final String DATE_DISPLAY_FORMAT = "MMM d, yyyy";
+    public static final String API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     public final static SimpleDateFormat SIMPLE_DATE_FORMAT_DISPLAY = new SimpleDateFormat (DATE_DISPLAY_FORMAT);
     public static String toolbar = "toolbar";
 

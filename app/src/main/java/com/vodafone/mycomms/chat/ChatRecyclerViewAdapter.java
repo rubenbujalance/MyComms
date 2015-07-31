@@ -183,6 +183,17 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
             }
 
         }
+        else if(chatList.get(i).getRead().compareTo(Constants.CHAT_MESSAGE_NOT_READ)==0) {
+            //Mark as read in DB and send IQ
+            _chatTx.setChatMessageReceivedAsRead(chatList.get(i), realm);
+
+            if(isGroupChatMode)
+                XMPPTransactions.notifyIQMessageStatus(isGroupChatMode, chatList.get(i).getId(),
+                        chatList.get(i).getGroup_id(), Constants.CHAT_MESSAGE_STATUS_READ);
+            else
+                XMPPTransactions.notifyIQMessageStatus(isGroupChatMode, chatList.get(i).getId(),
+                        chatList.get(i).getContact_id(), Constants.CHAT_MESSAGE_STATUS_READ);
+        }
 
         //Set message time
         long currentTimestamp = chatList.get(i).getTimestamp();

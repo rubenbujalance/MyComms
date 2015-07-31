@@ -177,7 +177,7 @@ public class RealmChatTransactions
         }
         catch(Exception e)
         {
-            Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ",e);
+            Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);
             Crashlytics.logException(e);
             mRealm.cancelTransaction();
         }
@@ -188,7 +188,7 @@ public class RealmChatTransactions
         }
     }
 
-    public boolean setChatMessageSentStatus (String id, String status, Realm realm){
+    public boolean setChatMessageStatus (String id, String status, Realm realm){
         //Sets a received message as read
         if(id==null || status==null) return false;
         boolean changed = false;
@@ -205,9 +205,16 @@ public class RealmChatTransactions
             ChatMessage chatMessage = getChatMessageById(id, mRealm);
             if(chatMessage==null) return false;
 
-            if(XMPPTransactions.getXMPPStatusOrder(chatMessage.getStatus()) <
-                    XMPPTransactions.getXMPPStatusOrder(status)) {
-                chatMessage.setStatus(status);
+            if(chatMessage.getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_SENT)==0) {
+                if (XMPPTransactions.getXMPPStatusOrder(chatMessage.getStatus()) <
+                        XMPPTransactions.getXMPPStatusOrder(status)) {
+                    chatMessage.setStatus(status);
+                    changed = true;
+                }
+            }
+            else if (XMPPTransactions.getXMPPStatusOrder(status)==
+                    XMPPTransactions.getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_READ)){
+                chatMessage.setRead(Constants.CHAT_MESSAGE_READ);
                 changed = true;
             }
             mRealm.commitTransaction();

@@ -381,6 +381,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 recentChatsHashMapClone.putAll(recentChatsHashMap);
                 recentContactController.insertPendingChatsRecent(recentChatsHashMapClone);
                 recentChatsHashMap.clear();
+                recentContactController.getRecentList();
             }
         }
     }

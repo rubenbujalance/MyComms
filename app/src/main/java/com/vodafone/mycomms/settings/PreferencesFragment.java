@@ -101,7 +101,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             mParam1 = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        this.realm = Realm.getInstance(getActivity());
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
         profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);

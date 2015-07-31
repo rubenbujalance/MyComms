@@ -114,7 +114,7 @@ public class GroupChatListFragment extends ListFragment implements
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
         BusProvider.getInstance().register(this);
-        this.realm = Realm.getInstance(getActivity());
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
         sp = getActivity().getSharedPreferences(
@@ -632,7 +632,7 @@ public class GroupChatListFragment extends ListFragment implements
         protected Boolean doInBackground(String... params)
         {
             String response = updateGroupChat(params[0]);
-            Realm realm = Realm.getInstance(getActivity());
+            Realm realm = Realm.getDefaultInstance();
             try
             {
                 if(!mGroupChatController.getResponseCode().startsWith("2"))

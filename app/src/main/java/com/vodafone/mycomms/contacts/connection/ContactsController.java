@@ -36,7 +36,7 @@ public class ContactsController{
     public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
     {
         ArrayList<Contact> realmContactList = new ArrayList<>();
-        Realm realm = Realm.getInstance(mContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
@@ -79,7 +79,7 @@ public class ContactsController{
         JSONArray jsonArray;
         Contact contact;
         ArrayList<FavouriteContact> contactList = new ArrayList<>();
-        Realm realm = Realm.getInstance(mContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             Log.i(Constants.TAG, "ContactsController.insertFavouriteContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_FAVOURITES);
@@ -108,7 +108,7 @@ public class ContactsController{
         Contact contact;
         ArrayList<RecentContact> contactList = new ArrayList<>();
 
-        Realm realm = Realm.getInstance(mContext);
+        Realm realm = Realm.getDefaultInstance();
 
         try {
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);

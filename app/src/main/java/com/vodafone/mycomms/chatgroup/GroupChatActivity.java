@@ -133,7 +133,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
 
-        this.realm = Realm.getInstance(GroupChatActivity.this);
+        this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);

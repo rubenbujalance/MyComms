@@ -619,7 +619,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyMessageReceived(XmlPullParser parser)
     {
         RealmChatTransactions chatTx = null;
-        Realm realm = Realm.getInstance(_appContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -649,12 +649,14 @@ public final class XMPPTransactions {
             }
 
             chatTx = new RealmChatTransactions(_appContext);
+            boolean changeStatus = false;
 
             //Check if chat message has already been received
             ChatMessage tempMsg = chatTx.getChatMessageById(id, realm);
             if(tempMsg!=null) {
                 if(getXMPPStatusOrder(status) <= getXMPPStatusOrder(tempMsg.getStatus()))
                     return false;
+                else changeStatus = true;
             }
 
             String read = Constants.CHAT_MESSAGE_NOT_READ;
@@ -691,11 +693,19 @@ public final class XMPPTransactions {
             chatTx.insertChat(chat, realm);
             chatTx.insertChatMessage(newChatMessage, realm);
 
-            //Chat received event
-            ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
-            chatEvent.setMessage(newChatMessage);
-            chatEvent.setPendingMessages(_pendingMessages);
-            BusProvider.getInstance().post(chatEvent);
+            if(changeStatus) {
+                MessageStatusChanged statusEvent = new MessageStatusChanged();
+                statusEvent.setId(id);
+                statusEvent.setStatus(status);
+                BusProvider.getInstance().post(statusEvent);
+            }
+            else {
+                //Chat received event
+                ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
+                chatEvent.setMessage(newChatMessage);
+                chatEvent.setPendingMessages(_pendingMessages);
+                BusProvider.getInstance().post(chatEvent);
+            }
 
             //All pending messages received
             if(_pendingMessages>0) {
@@ -706,9 +716,11 @@ public final class XMPPTransactions {
             }
 
             //Send IQ if needed
-            if(to.compareTo(_profile_id)==0 &&
-                    (getXMPPStatusOrder(status) <
-                                    getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
+            if(to.compareTo(_profile_id)==0
+                    && newChatMessage.getDirection()
+                        .compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0
+                    && (getXMPPStatusOrder(status) <
+                        getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
                 notifyIQMessageStatus(false, newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
@@ -727,7 +739,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyImageReceived(XmlPullParser parser)
     {
         RealmChatTransactions chatTx = null;
-        Realm realm = Realm.getInstance(_appContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String to = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -805,9 +817,11 @@ public final class XMPPTransactions {
             }
 
             //Send IQ
-            if(to.compareTo(_profile_id)==0 &&
-                    (getXMPPStatusOrder(status) <
-                                    getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
+            if(to.compareTo(_profile_id)==0
+                    && newChatMessage.getDirection()
+                        .compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0
+                    && (getXMPPStatusOrder(status) <
+                        getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
                 notifyIQMessageStatus(false, newChatMessage.getId(), newChatMessage.getContact_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
@@ -835,7 +849,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyGroupMessageReceived(XmlPullParser parser)
     {
         RealmGroupChatTransactions groupTx = null;
-        Realm realm = Realm.getInstance(_appContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -920,9 +934,11 @@ public final class XMPPTransactions {
             }
 
             //Send IQ if needed
-            if(from.compareTo(_profile_id)!=0 &&
-                    (getXMPPStatusOrder(status) <
-                            getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
+            if(from.compareTo(_profile_id)!=0
+                    && newChatMessage.getDirection()
+                        .compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0
+                    && (getXMPPStatusOrder(status) <
+                        getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
                 notifyIQMessageStatus(true, newChatMessage.getId(), newChatMessage.getGroup_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
@@ -956,7 +972,7 @@ public final class XMPPTransactions {
             @Override
             public void onSuccess(Response response)
             {
-                Realm realm = Realm.getInstance(_appContext);
+                Realm realm = Realm.getDefaultInstance();
                 try {
                     String jsonStr;
                     JSONObject json;
@@ -1030,7 +1046,7 @@ public final class XMPPTransactions {
     private static boolean saveAndNotifyGroupImageReceived(XmlPullParser parser)
     {
         RealmGroupChatTransactions groupTx = null;
-        Realm realm = Realm.getInstance(_appContext);
+        Realm realm = Realm.getDefaultInstance();
         try {
             String from = parser.getAttributeValue("", Constants.XMPP_ATTR_FROM);
             String groupId = parser.getAttributeValue("", Constants.XMPP_ATTR_TO);
@@ -1104,10 +1120,12 @@ public final class XMPPTransactions {
                 groupTx.insertOrUpdateGroupChat(chat, realm);
             }
 
-            //Send event and IQ
-            if(from.compareTo(_profile_id)!=0 &&
-                    (getXMPPStatusOrder(status) <
-                            getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
+            //Send event and IQ if needed
+            if(from.compareTo(_profile_id)!=0
+                    && newChatMessage.getDirection()
+                        .compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0
+                    && (getXMPPStatusOrder(status) <
+                        getXMPPStatusOrder(Constants.CHAT_MESSAGE_STATUS_DELIVERED))) {
                 notifyIQMessageStatus(true, newChatMessage.getId(), newChatMessage.getGroup_id(),
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }

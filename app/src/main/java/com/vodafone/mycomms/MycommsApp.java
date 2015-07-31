@@ -106,20 +106,20 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         //Profile id
-        if(sp.contains(Constants.PROFILE_ID_SHARED_PREF)) {
+        if (sp.contains(Constants.PROFILE_ID_SHARED_PREF)) {
             profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        RealmLDAPSettingsTransactions.createOrUpdateData(profile_id, "userTest", "1234567890",
-                "lkjhewflkjhqw45 ljk2h3tljkvh234kljtvh2kl3j4htvljkh4tvqklj34hv5kljh",
-                "Bearer", "https://lksjasdfkljsadf.asdlkfhadsf.com/", realm);
+            RealmLDAPSettingsTransactions.createOrUpdateData(profile_id, "userTest", "1234567890",
+                    "lkjhewflkjhqw45 ljk2h3tljkvh234kljtvh2kl3j4htvljkh4tvqklj34hv5kljh",
+                    "Bearer", "https://lksjasdfkljsadf.asdlkfhadsf.com/", realm);
 
 
-        //Picasso configuration
-        Downloader downloader   = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
-        Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
-        builder.downloader(downloader);
+            //Picasso configuration
+            Downloader downloader = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
+            Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
+            builder.downloader(downloader);
 
-        picasso = builder.build();
+            picasso = builder.build();
 
 //        OkHttpClient picassoClient = new OkHttpClient();
 //
@@ -140,22 +140,23 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 //
 //        picasso = new Picasso.Builder(getApplicationContext()).downloader(new OkHttpDownloader(picassoClient)).build();
 
-        //**********************
+            //**********************
 
-        mNewsController = new NewsController(getApplicationContext());
+            mNewsController = new NewsController(getApplicationContext());
 
-        //Initializations
-        BusProvider.getInstance().register(this);
-        mContext = getApplicationContext();
+            //Initializations
+            BusProvider.getInstance().register(this);
+            mContext = getApplicationContext();
 
-        //Network listener
-        networkEvents = new NetworkEvents(this, BusProvider.getInstance());
+            //Network listener
+            networkEvents = new NetworkEvents(this, BusProvider.getInstance());
 
-        try {
-            networkEvents.register();
-        } catch (Exception ex) {
-            Log.e(Constants.TAG, "MycommsApp.onCreate: ", ex);
-            Crashlytics.logException(ex);
+            try {
+                networkEvents.register();
+            } catch (Exception ex) {
+                Log.e(Constants.TAG, "MycommsApp.onCreate: ", ex);
+                Crashlytics.logException(ex);
+            }
         }
     }
 

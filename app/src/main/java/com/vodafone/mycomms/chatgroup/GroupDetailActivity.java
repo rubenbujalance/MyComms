@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import io.realm.Realm;
 import model.Contact;
 import model.GroupChat;
 
@@ -56,11 +57,15 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
 
     private GroupChat _groupChat;
 
-    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar, imgModifyGroupChat;
+    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text
             ,group_names, group_n_components;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
+    private LinearLayout lay_add_contact, lay_phone;
+    private ImageView img_sun;
+
+    private Realm mRealm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,8 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
+
+        this.mRealm = Realm.getDefaultInstance();
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(GroupDetailActivity.this))
@@ -85,7 +92,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         contactTransactions = new RealmContactTransactions(_profile_id);
         chatTransactions = new RealmChatTransactions(this);
         mGroupChatTransactions = new RealmGroupChatTransactions(this, _profile_id);
-        _profile = contactTransactions.getUserProfile();
+        _profile = contactTransactions.getUserProfile(this.mRealm);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -209,7 +216,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         Intent in = getIntent();
 
         _groupChat = mGroupChatTransactions.getGroupChatById(
-                in.getStringExtra(Constants.GROUP_CHAT_ID));
+                in.getStringExtra(Constants.GROUP_CHAT_ID), mRealm);
         loadContactIds();
         loadGroupChatOwnerIds();
     }
@@ -241,7 +248,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         {
             if(!id.equals(_profile_id))
             {
-                contact = contactTransactions.getContactById(id);
+                contact = contactTransactions.getContactById(id, mRealm);
                 if(contact != null)
                     contactList.add(contact);
             }
@@ -264,19 +271,15 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        chatTransactions.closeRealm();
-        mGroupChatTransactions.closeRealm();
-        contactTransactions.closeRealm();
+        this.mRealm.close();
     }
 
     private void loadTheRestOfTheComponents()
     {
-        imgModifyGroupChat = (ImageView) findViewById(R.id.img_modify_group_chat);
+        img_sun = (ImageView) findViewById(R.id.img_sun);
+            img_sun.setVisibility(View.GONE);
 
-        if(groupChatOwnerIds.contains(_profile_id))
-            imgModifyGroupChat.setVisibility(View.VISIBLE);
-        else
-            imgModifyGroupChat.setVisibility(View.GONE);
+
 
         top_left_avatar = (ImageView) findViewById(R.id.top_left_avatar);
         top_right_avatar = (ImageView) findViewById(R.id.top_right_avatar);
@@ -291,9 +294,25 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         lay_bottom_to_hide = (LinearLayout) findViewById(R.id.lay_bottom_both_image_hide);
         lay_bottom_to_hide.setVisibility(View.VISIBLE);
         lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
+        lay_phone = (LinearLayout) findViewById(R.id.lay_phone);
+        this.lay_phone.setVisibility(View.GONE);
 
         group_names = (TextView) findViewById(R.id.group_names);
         group_n_components = (TextView) findViewById(R.id.group_n_components);
+
+        lay_add_contact = (LinearLayout) findViewById(R.id.lay_add_member);
+
+        if(groupChatOwnerIds.contains(_profile_id))
+            lay_add_contact.setVisibility(View.VISIBLE);
+        else
+            lay_add_contact.setVisibility(View.GONE);
+
+        lay_add_contact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startGroupChatListActivity();
+            }
+        });
 
         if(contactIds==null || contactIds.size()==0) {
             Crashlytics.logException(new Exception("GroupDetailActivity.java > " +
@@ -313,14 +332,6 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
 
         //Set avatar
         setHeaderAvatar();
-
-        imgModifyGroupChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                startGroupChatListActivity();
-            }
-        });
     }
 
     @Subscribe

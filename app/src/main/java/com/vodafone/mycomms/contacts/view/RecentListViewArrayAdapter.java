@@ -22,6 +22,7 @@ import com.vodafone.mycomms.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import model.Contact;
 import model.GroupChat;
 import model.RecentContact;
@@ -34,13 +35,15 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
 {
     private Context mContext;
     private String _profile_id;
+    private Realm realm;
 
 
     public RecentListViewArrayAdapter(Context context, List<RecentContact> items, String
-            profileId)
+            profileId, Realm realm)
     {
         super(context, R.layout.layout_list_item_recent, items);
         this.mContext = context;
+        this.realm = realm;
         this._profile_id = profileId;
     }
 
@@ -102,7 +105,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         RealmGroupChatTransactions groupChatTransactions =
                 new RealmGroupChatTransactions(mContext, _profile_id);
 
-        GroupChat groupChat = groupChatTransactions.getGroupChatById(groupChatId);
+        GroupChat groupChat = groupChatTransactions.getGroupChatById(groupChatId, realm);
         //TODO: ERROR 'java.lang.String model.GroupChat.getMembers()' on a null object reference
         if(groupChat==null) return null;
 
@@ -111,7 +114,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         RealmContactTransactions contactTransactions =
                 new RealmContactTransactions(_profile_id);
 
-        UserProfile userProfile = contactTransactions.getUserProfile();
+        UserProfile userProfile = contactTransactions.getUserProfile(realm);
         Contact contact = new Contact();
         contact.setAvatar(userProfile.getAvatar());
         contact.setFirstName(userProfile.getFirstName());
@@ -124,13 +127,11 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         {
             if(!id.equals(_profile_id))
             {
-                contact = contactTransactions.getContactById(id);
+                contact = contactTransactions.getContactById(id,realm);
                 contacts.add(contact);
             }
         }
 
-        contactTransactions.closeRealm();
-        groupChatTransactions.closeRealm();
         return contacts;
     }
 
@@ -194,9 +195,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
-        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions
-                (_profile_id);
-        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId());
+        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(_profile_id);
+        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId(), realm);
 
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
@@ -221,7 +221,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                                 )
                 );
 
-        mRealmContactTransactions.closeRealm();
 
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewOccupation.setText(contact.getPosition());
@@ -232,7 +231,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_SMS)) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_message));
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_EMAIL)) {
-            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.img_verify_email));
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_enrollment_email_white));
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_CALL)) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_phone));
         }

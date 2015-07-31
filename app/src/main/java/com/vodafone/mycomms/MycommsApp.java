@@ -78,6 +78,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     //Network listener
     private NetworkEvents networkEvents;
+    private Realm realm;
 
     @Override
     public void onCreate() {
@@ -87,8 +88,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         //Initialize Crashlytics
         Fabric.with(getApplicationContext(), new Crashlytics());
 
+
         //Realm config
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext())
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(this)
                 .name("mycomms.realm")
 //                .encryptionKey()
                 .schemaVersion(1)
@@ -96,43 +98,65 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 .build();
 
         Realm.setDefaultConfiguration(realmConfig);
-
-        Realm realm = Realm.getDefaultInstance();
+        Realm.migrateRealm(realmConfig);
+        this.realm = Realm.getDefaultInstance();
 
         //Shared Preferences
         sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         //Profile id
-        if(sp.contains(Constants.PROFILE_ID_SHARED_PREF)) {
+        if (sp.contains(Constants.PROFILE_ID_SHARED_PREF)) {
             profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
             RealmLDAPSettingsTransactions.createOrUpdateData(profile_id, "userTest", "1234567890",
                     "lkjhewflkjhqw45 ljk2h3tljkvh234kljtvh2kl3j4htvljkh4tvqklj34hv5kljh",
                     "Bearer", "https://lksjasdfkljsadf.asdlkfhadsf.com/", realm);
-        }
 
-        //Picasso configuration
-        Downloader downloader   = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
-        Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
-        builder.downloader(downloader);
 
-        picasso = builder.build();
+            //Picasso configuration
+            Downloader downloader = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
+            Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
+            builder.downloader(downloader);
 
-        mNewsController = new NewsController(getApplicationContext());
+            picasso = builder.build();
 
-        //Initializations
-        BusProvider.getInstance().register(this);
-        mContext = getApplicationContext();
+//        OkHttpClient picassoClient = new OkHttpClient();
+//
+//        picassoClient.interceptors().add(new Interceptor() {
+//            @Override
+//            public Response intercept(Chain chain) throws IOException {
+//                Request newRequest = chain.request().newBuilder()
+//                        .addHeader(Constants.API_HTTP_HEADER_VERSION,
+//                                Utils.getHttpHeaderVersion(mContext))
+//                        .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+//                                Utils.getHttpHeaderContentType())
+//                        .addHeader(Constants.API_HTTP_HEADER_AUTHORIZATION,
+//                                Utils.getHttpHeaderAuth(mContext))
+//                        .build();
+//                return chain.proceed(newRequest);
+//            }
+//        });
+//
+//        picasso = new Picasso.Builder(getApplicationContext()).downloader(new OkHttpDownloader(picassoClient)).build();
 
-        //Network listener
-        networkEvents = new NetworkEvents(this, BusProvider.getInstance());
+            //**********************
 
-        try {
-            networkEvents.register();
-        } catch (Exception ex) {
-            Log.e(Constants.TAG, "MycommsApp.onCreate: ", ex);
-            Crashlytics.logException(ex);
+            mNewsController = new NewsController(getApplicationContext());
+
+            //Initializations
+            BusProvider.getInstance().register(this);
+            mContext = getApplicationContext();
+
+            //Network listener
+            networkEvents = new NetworkEvents(this, BusProvider.getInstance());
+
+            try {
+                networkEvents.register();
+            } catch (Exception ex) {
+                Log.e(Constants.TAG, "MycommsApp.onCreate: ", ex);
+                Crashlytics.logException(ex);
+            }
         }
     }
 
@@ -140,13 +164,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onTerminate() {
         super.onTerminate();
         BusProvider.getInstance().unregister(this);
-
-        favouriteController.closeRealm();
-        recentContactController.closeRealm();
-        profileController.closeRealm();
-        mNewsController.closeRealm();
-        XMPPTransactions.closeRealm();
-
+        this.realm.close();
         //Network listener
         networkEvents.unregister();
     }
@@ -185,7 +203,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "")==null ||
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "").length()==0){
             profileController.setConnectionCallback(this);
-            profileController.getProfile();
+            profileController.getProfile(this.realm);
 
             return null;
         }
@@ -333,7 +351,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
             try {
                 RealmProfileTransactions ptx = new RealmProfileTransactions();
-                UserProfile userProfile = ptx.getUserProfile(profile_id);
+                UserProfile userProfile = ptx.getUserProfile(profile_id, realm);
                 Crashlytics.setUserName(userProfile.getFirstName()+" "+userProfile.getLastName());
                 Crashlytics.setUserEmail(userProfile.getEmails().split(";")[0]);
             } catch (Exception e) {
@@ -395,7 +413,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 recentContactController.insertPendingChatsRecent(recentChatsHashMapClone);
                 recentChatsHashMap.clear();
             }
-            recentContactController.closeRealm();
         }
     }
 

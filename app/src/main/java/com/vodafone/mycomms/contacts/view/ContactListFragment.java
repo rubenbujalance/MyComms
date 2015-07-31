@@ -47,6 +47,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import model.Contact;
 import model.FavouriteContact;
 import model.RecentContact;
@@ -70,6 +71,7 @@ public class ContactListFragment extends ListFragment {
     private RealmContactTransactions mContactTransactions;
     private ContactListViewArrayAdapter adapter;
     private RelativeLayout addGlobalContactsContainer;
+    private TextView myCommsTextView;
 
     private ListView listView;
     private Parcelable state;
@@ -98,6 +100,8 @@ public class ContactListFragment extends ListFragment {
 
     private boolean globalContactsLoaded = false; //TODO: Create Logic
 
+    private Realm realm;
+
     public static ContactListFragment newInstance(int index, String param2) {
         ContactListFragment fragment = new ContactListFragment();
         Bundle args = new Bundle();
@@ -117,7 +121,9 @@ public class ContactListFragment extends ListFragment {
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
 
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
+        myCommsTextView = (TextView) v.findViewById(R.id.platform_label);
 
+        //TODO: Null Object error, commented
         addGlobalContactsContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,9 +170,15 @@ public class ContactListFragment extends ListFragment {
                     addGlobalContactsContainer.setVisibility(View.GONE);
                 }
             }
+            if (null != myCommsTextView){
+                myCommsTextView.setVisibility(View.VISIBLE);
+            }
         }
         else{
             hideKeyboard();
+            if (null != myCommsTextView){
+                myCommsTextView.setVisibility(View.GONE);
+            }
         }
 
         if(isProgressDialogNeeded())showProgressDialog();
@@ -186,6 +198,7 @@ public class ContactListFragment extends ListFragment {
                         , mIndex
                         , listView
                         , false
+                        , realm
                 );
 
         mSearchBarController.initiateComponentsForSearchView(v);
@@ -206,6 +219,9 @@ public class ContactListFragment extends ListFragment {
 
         BusProvider.getInstance().register(this);
 
+        this.realm = Realm.getDefaultInstance();
+        this.realm.setAutoRefresh(true);
+
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -222,7 +238,8 @@ public class ContactListFragment extends ListFragment {
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
-        mSearchController = new SearchController(getActivity().getApplicationContext(), profileId);
+        mSearchController = new SearchController(getActivity().getApplicationContext(),
+                profileId, realm);
         recentController = new RecentContactController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
 
@@ -270,11 +287,8 @@ public class ContactListFragment extends ListFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        contactListController.closeRealm();
-        recentController.closeRealm();
-        mContactTransactions.closeRealm();
-        mSearchController.closeRealm();
         BusProvider.getInstance().unregister(this);
+        this.realm.close();
     }
 
     @Override
@@ -485,10 +499,10 @@ public class ContactListFragment extends ListFragment {
             if (null != addGlobalContactsContainer)
                 addGlobalContactsContainer.setVisibility(View.GONE);
 
-            favouriteContactList = mContactTransactions.getAllFavouriteContacts();
+            favouriteContactList = mContactTransactions.getAllFavouriteContacts(realm);
             if (favouriteContactList!=null) {
                 setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
-                        favouriteContactList));
+                        favouriteContactList, realm));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
             if (null != addGlobalContactsContainer)
@@ -496,12 +510,12 @@ public class ContactListFragment extends ListFragment {
 
             if (emptyText!=null)
                 emptyText.setText("");
-            recentContactList = mContactTransactions.getAllRecentContacts();
+            recentContactList = mContactTransactions.getAllRecentContacts(realm);
             if (recentContactList!=null)
             {
                 recentContactList = filterRecentList(recentContactList);
                 RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter
-                        (getActivity().getApplicationContext(), recentContactList, profileId);
+                        (getActivity().getApplicationContext(), recentContactList, profileId, realm);
                 if (listView != null) {
                     state = listView.onSaveInstanceState();
                     setListAdapter(recentAdapter);
@@ -535,14 +549,13 @@ public class ContactListFragment extends ListFragment {
         {
             if(null != contact && null != contact.getId() && contact.getId().startsWith("mg_"))
             {
-                if(null != realmGroupChatTransactions.getGroupChatById(contact.getId()))
+                if(null != realmGroupChatTransactions.getGroupChatById(contact.getId(), realm))
                     finalList.add(contact);
             }
 
             else if(null != contact && null != contact.getId())
                 finalList.add(contact);
         }
-        realmGroupChatTransactions.closeRealm();
         return finalList;
     }
 
@@ -567,7 +580,6 @@ public class ContactListFragment extends ListFragment {
                     listView.onRestoreInstanceState(state);
             }
             if (contactList.size()!=0) {
-                Log.i(Constants.TAG, "ContactListFragment.reloadAdapter: No results from Search");
                 if (emptyText!=null)
                     emptyText.setText(getResources().getString(R.string.no_search_records));
             }
@@ -588,8 +600,7 @@ public class ContactListFragment extends ListFragment {
         if(null == keyWord)
         {
             RealmContactTransactions mContactTransactions = new RealmContactTransactions(profileId);
-            contactArrayList = mContactTransactions.getAllContacts();
-            mContactTransactions.closeRealm();
+            contactArrayList = mContactTransactions.getAllContacts(realm);
         }
         else
         {

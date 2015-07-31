@@ -11,106 +11,127 @@ import model.GlobalContactsSettings;
 
 public class RealmLDAPSettingsTransactions {
 
-    private static void insertOrUpdateSettings (GlobalContactsSettings settings, Realm realm){
-        boolean isNewRealm = false;
-        try {
-            if(realm==null) {
-                realm = Realm.getDefaultInstance();
-                isNewRealm = true;
-            }
-            realm.beginTransaction();
-            realm.copyToRealmOrUpdate(settings);
-            realm.commitTransaction();
-        } catch (IllegalArgumentException e){
-            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.insertUpdateSettings: ", e);
+    private static void insertOrUpdateSettings (GlobalContactsSettings settings, Realm realm)
+    {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getDefaultInstance();
+        try
+        {
+            mRealm.beginTransaction();
+            mRealm.copyToRealmOrUpdate(settings);
+            mRealm.commitTransaction();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.insertOrUpdateSettings: ",e);
             Crashlytics.logException(e);
-            if(realm!=null) realm.cancelTransaction();
-        } finally {
-            if(isNewRealm) realm.close();
+            mRealm.cancelTransaction();
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
         }
     }
 
-    public static GlobalContactsSettings getSettings(String profileId, Realm realm){
-        boolean isNewRealm = false;
-        try {
-            if (realm == null) {
-                realm = Realm.getDefaultInstance();
-                isNewRealm = true;
-            }
+    public static GlobalContactsSettings getSettings(String profileId, Realm realm)
+    {
 
-            RealmQuery<GlobalContactsSettings> query = realm.where(GlobalContactsSettings.class);
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getDefaultInstance();
+        try
+        {
+            RealmQuery<GlobalContactsSettings> query = mRealm.where(GlobalContactsSettings.class);
             query.equalTo(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID, profileId);
             GlobalContactsSettings settings = query.findFirst();
-
-            if (settings != null)
-                return settings;
-
-        } catch (IllegalArgumentException e){
+            return settings;
+        }
+        catch(Exception e)
+        {
             Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.getSettings: ", e);
             Crashlytics.logException(e);
-        } finally {
-            if(isNewRealm) realm.close();
+            return null;
         }
-
-        return null;
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
-    public static boolean haveSettings(String profileId, Realm realm){
-        boolean isNewRealm = false;
-        long count = 0;
-
-        try {
-            if (realm == null) {
-                realm = Realm.getDefaultInstance();
-                isNewRealm = true;
-            }
-
-            count = realm.where(GlobalContactsSettings.class)
+    public static boolean haveSettings(String profileId, Realm realm)
+    {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getDefaultInstance();
+        try
+        {
+            long count = mRealm.where(GlobalContactsSettings.class)
                     .equalTo(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID, profileId)
                     .count();
-
-        } catch (IllegalArgumentException e){
-            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.getSettings: ", e);
-            Crashlytics.logException(e);
-        } finally {
-            if(isNewRealm) realm.close();
+            return (count>0);
         }
-
-        return (count>0);
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.haveSettings: ",e);
+            Crashlytics.logException(e);
+            return false;
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
     }
 
     public static void createOrUpdateData (String profileId, String user, String password,
-                                           String token, String tokenType, String url, Realm realm){
+                                           String token, String tokenType, String url, Realm
+                                                   realm)
+    {
         Log.i(Constants.TAG, "RealmLDAPSettingsTransactions.createOrUpdateData: " +
                 "Creating/Updating LDAP data for user "+user);
 
-        boolean isNewRealm = false;
-        try {
-            if(realm==null) {
-                realm = Realm.getDefaultInstance();
-                isNewRealm = true;
-            }
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getDefaultInstance();
+        try
+        {
+            mRealm.beginTransaction();
             GlobalContactsSettings settings = getSettings(profileId, realm);
             if(settings==null) {
                 settings = new GlobalContactsSettings(profileId, user, password,
                         token, tokenType, url);
-                insertOrUpdateSettings(settings, realm);
+                mRealm.copyToRealmOrUpdate(settings);
             }
             else {
-                realm.beginTransaction();
                 settings.setUser(user);
                 settings.setPassword(password);
                 settings.setToken(token);
                 settings.setTokenType(tokenType);
                 settings.setUrl(url);
-                realm.commitTransaction();
             }
-        } catch (IllegalArgumentException e){
-            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.setUserAndPassword: ",e);
+            mRealm.commitTransaction();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.createOrUpdateData: ",e);
             Crashlytics.logException(e);
-            if(realm!=null) realm.cancelTransaction();
-        } finally {
-            if(isNewRealm) realm.close();
+            mRealm.cancelTransaction();
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
         }
     }
 }

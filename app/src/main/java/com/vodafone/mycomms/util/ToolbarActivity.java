@@ -26,6 +26,8 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
+import io.realm.Realm;
+
 public class ToolbarActivity extends ActionBarActivity {
 
     private Toolbar mToolbar;
@@ -34,11 +36,13 @@ public class ToolbarActivity extends ActionBarActivity {
     private String profileId;
     private RealmChatTransactions realmChatTransactions;
     private RealmGroupChatTransactions realmGroupChatTransactions;
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         realmChatTransactions = new RealmChatTransactions(this);
+        this.realm = Realm.getDefaultInstance();
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
@@ -49,8 +53,7 @@ public class ToolbarActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realmChatTransactions.closeRealm();
-        realmGroupChatTransactions.closeRealm();
+        this.realm.close();
     }
 
     public void setForegroundActivity(int activity)
@@ -153,13 +156,12 @@ public class ToolbarActivity extends ActionBarActivity {
         return mFooter;
     }
 
-    public void checkUnreadChatMessages() {
+    public void checkUnreadChatMessages()
+    {
         if (mFooter!=null) {
             ImageView unreadBubble = (ImageView) mFooter.findViewById(R.id.unread_bubble);
             TextView unreadMessagesText = (TextView) mFooter.findViewById(R.id.unread_messages);
-            RealmChatTransactions realmChatTransactions = new RealmChatTransactions(this);
-            long unreadMessages = realmChatTransactions.getAllChatPendingMessagesCount();
-            realmChatTransactions.closeRealm();
+            long unreadMessages = realmChatTransactions.getAllChatPendingMessagesCount(realm);
             if (unreadMessages > 0) {
                 unreadBubble.setVisibility(View.VISIBLE);
                 unreadMessagesText.setVisibility(View.VISIBLE);

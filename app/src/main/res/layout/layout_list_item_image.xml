@@ -2,7 +2,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="wrap_content"
-             android:layout_height="wrap_content">
+             android:layout_height="wrap_content"
+             android:paddingLeft="10dp"
+             android:paddingStart="10dp">
 
     <com.vodafone.mycomms.custom.CircleImageView
         android:id="@+id/companyLogo"

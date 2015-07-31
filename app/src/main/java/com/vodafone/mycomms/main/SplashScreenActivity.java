@@ -37,8 +37,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import io.fabric.sdk.android.Fabric;
-
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.

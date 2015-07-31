@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import io.realm.Realm;
 import model.Contact;
 import model.FavouriteContact;
 
@@ -34,10 +35,13 @@ import model.FavouriteContact;
 public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<FavouriteContact> {
     private Context mContext;
     private String profileId;
+    private Realm realm;
 
-    public ContactFavouriteListViewArrayAdapter(Context context, List<FavouriteContact> items) {
+    public ContactFavouriteListViewArrayAdapter(Context context, List<FavouriteContact> items,
+                                                Realm realm) {
         super(context, R.layout.layout_list_item_contact, items);
         this.mContext = context;
+        this.realm = realm;
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
@@ -90,7 +94,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         }
 
         RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(profileId);
-        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId());
+        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId(), realm);
 
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
@@ -114,8 +118,6 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
                                         , cont.getAvatar()
                                 )
                 );
-
-        mRealmContactTransactions.closeRealm();
 
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );

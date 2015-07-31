@@ -188,7 +188,6 @@ public class GroupMembersViewAdapter extends RecyclerView.Adapter<GroupHolder>{
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-        _chatTx.closeRealm();
     }
     
 }

@@ -165,7 +165,7 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_account"
+                android:text="@string/add"
                 android:id="@+id/btAddAccount"
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/bt_blue_style"

@@ -140,7 +140,7 @@
     <string name="chat_me_text">"Me: "</string>
     <string name="DummyTime">Thursday 18:40 a.m</string>
     <string name="Availability">AVAILABILITY</string>
-    <string name="dummyCountry">United States</string>
+    <string name="dummyCountry">USA</string>
     <string name="badge">badge</string>
     <string name="dummyUser">Captain Planet</string>
     <string name="Contacts">Contacts</string>
@@ -215,9 +215,8 @@
     <string name="settings_label_vacation_time_not_set">Not Set</string>
     <string name="about_version">"version "</string>
     <string name="about_build">"build "</string>
-    <string name="Mycomms">MyComms</string>
+    <string name="mycomms">MyComms</string>
     <string name="add_accounts">Add Accounts</string>
-    <string name="add_account">Add Account</string>
     <string name="set_salesforce">Salesforce</string>
     <string name="set_local_contacts">Local Contacts</string>
     <string name="set_vodafone_global_list">Vodafone Global List</string>

@@ -35,7 +35,7 @@
             android:layout_width="180dp"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
-            android:text="@string/Mycomms"
+            android:text="@string/mycomms"
             android:textSize="22sp"
             android:gravity="center"
             android:layout_centerVertical="true"

@@ -60,12 +60,25 @@ public class RealmDBMigration implements RealmMigration {
                 if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_TOKEN)==-1)
                     ldapSettings.addColumn(
                         ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_TOKEN);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_TOKEN_TYPE)==-1)
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_TOKEN_TYPE);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_URL)==-1)
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_URL);
 
-                version++;
+                version = 1;
             } catch (Exception e) {
                 Log.e(Constants.TAG, "RealmDBMigration.execute: ", e);
                 Crashlytics.logException(e);
             }
+        }
+        else {
+            Table ldapSettings = realm.getTable(GlobalContactsSettings.class);
+            for(int i=0; i<ldapSettings.getColumnCount(); i++)
+                ldapSettings.removeColumn(0);
+
+            version = 0;
         }
 
 /*        if (version == 0) {

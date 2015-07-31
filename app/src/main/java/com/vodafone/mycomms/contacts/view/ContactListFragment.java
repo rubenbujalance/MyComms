@@ -37,6 +37,7 @@ import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
+import com.vodafone.mycomms.settings.AddGlobalContactsActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -119,6 +120,14 @@ public class ContactListFragment extends ListFragment {
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
 
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
+
+        addGlobalContactsContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(getActivity(), AddGlobalContactsActivity.class);
+                startActivity(in);
+            }
+        });
 
         loadSearchBarEventsAndControllers(v);
 

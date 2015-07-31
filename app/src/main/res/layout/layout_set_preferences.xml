@@ -155,9 +155,10 @@
         <Button
             android:id="@+id/btLogout"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="51dp"
             android:layout_margin="20dp"
-            android:background="@drawable/logout_button"
+            android:background="@drawable/bt_red_style"
+            android:textAllCaps="false"
             android:singleLine="false"
             android:text="@string/Logout"
             android:textColor="#ffffff" />

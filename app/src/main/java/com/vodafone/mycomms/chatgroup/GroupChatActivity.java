@@ -48,7 +48,7 @@ import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageSentEvent;
-import com.vodafone.mycomms.events.MessageSentStatusChanged;
+import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
@@ -943,8 +943,11 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     }
 
     @Subscribe
-    public void onEventMessageSentStatusChanged(MessageSentStatusChanged event){
+    public void onEventMessageStatusChanged(MessageStatusChanged event){
         ChatMessage chatMsg = chatTransactions.getChatMessageById(event.getId(), realm);
+
+        if(chatMsg.getDirection().compareTo(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)==0)
+            return;
 
         if((isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().compareTo(_groupId)==0)
                 || (!isGroupChatMode && chatMsg!=null && chatMsg.getContact_id().compareTo(_contactId)==0))

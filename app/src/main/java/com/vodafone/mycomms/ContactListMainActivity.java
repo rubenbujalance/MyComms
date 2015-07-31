@@ -14,6 +14,7 @@ import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListPagerFragment;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.settings.connection.ISessionConnectionCallback;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -102,6 +103,11 @@ public class ContactListMainActivity extends ToolbarActivity implements ContactL
 
     @Subscribe
     public void onEventChatsReceived(ChatsReceivedEvent event){
+        checkUnreadChatMessages();
+    }
+
+    @Subscribe
+    public void onEventMessageStatusChanged(MessageStatusChanged event){
         checkUnreadChatMessages();
     }
 

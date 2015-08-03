@@ -62,6 +62,7 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -123,7 +124,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text
-            ,group_names, group_n_components;
+            ,group_names, group_n_components, contact_availability;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
     private LinearLayout lay_phone, lay_add_contact;
@@ -745,10 +746,20 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
         sendFileImage = (ImageView) findViewById(R.id.send_image);
         lay_phone = (LinearLayout) findViewById(R.id.lay_phone);
+        contact_availability = (TextView) findViewById(R.id.chat_availability);
+
         if(isGroupChatMode)
+        {
             this.lay_phone.setVisibility(View.GONE);
+            this.contact_availability.setVisibility(View.GONE);
+        }
+
         else
+        {
             this.lay_phone.setVisibility(View.VISIBLE);
+            this.contact_availability.setVisibility(View.VISIBLE);
+        }
+
 
         group_names = (TextView) findViewById(R.id.group_names);
         group_n_components = (TextView) findViewById(R.id.group_n_components);

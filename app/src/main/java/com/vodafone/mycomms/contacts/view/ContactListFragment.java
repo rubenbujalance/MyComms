@@ -71,6 +71,7 @@ public class ContactListFragment extends ListFragment {
     private RealmContactTransactions mContactTransactions;
     private ContactListViewArrayAdapter adapter;
     private RelativeLayout addGlobalContactsContainer;
+    private TextView myCommsTextView;
 
     private ListView listView;
     private Parcelable state;
@@ -120,7 +121,9 @@ public class ContactListFragment extends ListFragment {
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
 
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
+        myCommsTextView = (TextView) v.findViewById(R.id.platform_label);
 
+        //TODO: Null Object error, commented
         addGlobalContactsContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,9 +170,15 @@ public class ContactListFragment extends ListFragment {
                     addGlobalContactsContainer.setVisibility(View.GONE);
                 }
             }
+            if (null != myCommsTextView){
+                myCommsTextView.setVisibility(View.VISIBLE);
+            }
         }
         else{
             hideKeyboard();
+            if (null != myCommsTextView){
+                myCommsTextView.setVisibility(View.GONE);
+            }
         }
 
         if(isProgressDialogNeeded())showProgressDialog();
@@ -571,7 +580,6 @@ public class ContactListFragment extends ListFragment {
                     listView.onRestoreInstanceState(state);
             }
             if (contactList.size()!=0) {
-                Log.i(Constants.TAG, "ContactListFragment.reloadAdapter: No results from Search");
                 if (emptyText!=null)
                     emptyText.setText(getResources().getString(R.string.no_search_records));
             }

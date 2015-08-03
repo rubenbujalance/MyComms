@@ -9,25 +9,28 @@
         android:id="@+id/front"
         android:tag="front"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="85dp"
         android:weightSum="1"
-        android:padding="10dp">
-    <include android:id="@+id/layout_list_item_image" layout="@layout/layout_multi_chat_avatar_60"
-        android:layout_width="60dp"
-        android:layout_height = "60dp"
-        android:layout_gravity="center" />
-    <include android:id="@+id/layout_list_item_content" layout="@layout/layout_list_item_content"
-        android:layout_width="wrap_content"
-        android:layout_toRightOf="@id/layout_list_item_image"
-        android:layout_height="70dp"
-        android:layout_centerHorizontal="true"
-        android:layout_weight="1.03" />
-    <include android:id="@+id/layout_list_item_recent_info"
-        layout="@layout/layout_list_item_recent_info"
-        android:layout_width="wrap_content"
-        android:layout_height = "match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="right" />
+        android:paddingLeft="10dp"
+        android:paddingStart="10dp">
+        <include
+            android:id="@+id/layout_list_item_image"
+            layout="@layout/layout_multi_chat_avatar_60"
+            android:layout_width="60dp"
+            android:layout_height = "60dp"
+            android:layout_gravity="center" />
+        <include
+            android:id="@+id/layout_list_item_content"
+            layout="@layout/layout_list_item_content"
+            android:layout_width="0dp"
+            android:layout_height="68dp"
+            android:layout_gravity="center"
+            android:layout_weight="1.03" />
+        <include
+            android:id="@+id/layout_list_item_recent_info"
+            layout="@layout/layout_list_item_recent_info"
+            android:layout_width="wrap_content"
+            android:layout_height = "wrap_content"
+            android:layout_gravity="center" />
     </LinearLayout>
 </FrameLayout>

@@ -5,19 +5,16 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:baselineAligned="false"
-    android:background="@color/grey_toolbar"
-
-    >
+    android:background="@color/white">
 
     <LinearLayout
-
         android:layout_width="fill_parent"
         android:layout_height="40dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
-        >
+        android:baselineAligned="false">
 
         <LinearLayout
             android:id="@+id/lay_search"
@@ -25,9 +22,7 @@
             android:layout_height="40dp"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_weight="1"
-
-            >
+            android:layout_weight="1">
 
             <EditText
                 android:id="@+id/et_search"
@@ -46,14 +41,12 @@
 
         </LinearLayout>
 
-
         <LinearLayout
             android:id="@+id/lay_cancel"
             android:layout_width="fill_parent"
             android:layout_height="40dp"
             android:orientation="horizontal"
-            android:layout_weight="3"
-            >
+            android:layout_weight="3">
 
             <Button
                 android:id="@+id/btn_cancel"
@@ -61,9 +54,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/search_bar_cancel_button"
                 android:textColor="@color/blue_light"
-                android:background="@android:color/transparent"
-
-                />
+                android:background="@android:color/transparent"/>
 
         </LinearLayout>
 

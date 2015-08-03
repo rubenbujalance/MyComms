@@ -28,6 +28,8 @@ import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 import io.realm.Realm;
@@ -53,12 +55,11 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private boolean isSourceDB = true;
 
     private long holidayEndDate = 0L;
-    private boolean isOnHoliday=false;
-
-
     private boolean isFirstLoad = true;
     private boolean doNotDisturb = false;
     private boolean privateTimeZone = false;
+
+    private TextView vacationTimeEnds;
 
     private Realm realm;
 
@@ -104,6 +105,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         this.realm.setAutoRefresh(true);
         profileController = new ProfileController(getActivity());
         profileController.setConnectionCallback(this);
+
     }
 
     @Override
@@ -122,6 +124,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_preferences, container, false);
+
+        vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {
@@ -274,19 +278,23 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
                 jsonSettings = new JSONObject(userProfile.getSettings());
 
-                this.isOnHoliday = jsonSettings.getBoolean(Constants.PROFILE_HOLIDAY);
+                if(jsonSettings.has("holiday")) {
+                    JSONObject jsonHoliday = jsonSettings.getJSONObject("holiday");
+                    String endDateStr = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
+                    endDateStr = endDateStr.replaceAll("Z", "+0000");
+                    SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FORMAT);
+                    Date endDate = sdf.parse(endDateStr);
+                    this.holidayEndDate = endDate.getTime();
 
-                this.holidayEndDate = jsonSettings.getLong(Constants.PROFILE_HOLIDAY_END_DATE);
-                TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
-
-                if(holidayEndDate > 0){
-                    String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
-                    Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: setting holidayDate to:" + holidayDateToSet);
-                    vacationTimeEnds.setText(holidayDateToSet);
+                    if (holidayEndDate > 0) {
+                        String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
+                        Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: setting holidayDate to:" + holidayDateToSet);
+                        vacationTimeEnds.setText(holidayDateToSet);
+                    }
                 }
             }
         } catch (Exception e){
-            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: ");
+            Log.e(Constants.TAG, "PreferencesFragment.onProfileReceived: ", e);
         }
 
         try {
@@ -424,15 +432,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 if (resultCode == Activity.RESULT_OK) {
                     Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ACTIVITY_RESULT_OK");
                     this.holidayEndDate = data.getLongExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, 0L);
-                    if(holidayEndDate > 0L){
-                        isOnHoliday = true;
-                    }else{
-                        isOnHoliday = false;
-                    }
+
                     updateHolidayText(holidayEndDate);
                     updateProfileInDb();
-
-
                 }
                 break;
             }
@@ -456,7 +458,10 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     }
 
     void updateProfileInDb(){
-        this.profileController.updateUserProfileSettingsInDB(false, this.privateTimeZone, this.isOnHoliday, this.holidayEndDate, this.doNotDisturb);
+        String dateISO =
+                Utils.timestampToFormatedString(holidayEndDate, Constants.API_DATE_FORMAT);
+        this.profileController.updateUserProfileSettingsInDB(
+                false, this.privateTimeZone, dateISO, this.doNotDisturb);
     }
 
 }

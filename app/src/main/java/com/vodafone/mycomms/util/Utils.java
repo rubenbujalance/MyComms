@@ -852,4 +852,21 @@ public final class Utils extends Activity {
             }
         }, 300);
     }
+
+    public static String timestampToFormatedString(long timestamp, String format) {
+        String formatedDate = null;
+        if(timestamp==0) return null;
+
+        try {
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(timestamp);
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            sdf.setTimeZone(c.getTimeZone());
+            formatedDate = sdf.format(c.getTime());
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "Utils.timestampToFormatedString: ",e);
+        }
+
+        return formatedDate;
+    }
 }

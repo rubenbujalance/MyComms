@@ -328,9 +328,9 @@ public class ToolbarActivity extends ActionBarActivity {
 
         switch (selected){
             case Constants.TOOLBAR_CONTACTS:
-                layoutContacts.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
-                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
-                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
+//                layoutContacts.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
+//                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
+//                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                     footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat));
 
@@ -344,8 +344,8 @@ public class ToolbarActivity extends ActionBarActivity {
                 }
                 break;
             case Constants.TOOLBAR_DASHBOARD:
-                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
-                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
+//                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
+//                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                     footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat));
 
@@ -359,9 +359,9 @@ public class ToolbarActivity extends ActionBarActivity {
                 }
                 break;
             case Constants.TOOLBAR_RECENTS:
-                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
-                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
-                layoutRecents.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
+//                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
+//                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
+//                layoutRecents.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                     footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btnuser));

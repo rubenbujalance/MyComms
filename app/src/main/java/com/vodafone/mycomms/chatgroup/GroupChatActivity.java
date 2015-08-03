@@ -712,7 +712,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             if(groupChatOwnerIds.contains(_profile_id))
                 lay_add_contact.setVisibility(View.VISIBLE);
             else
-                lay_add_contact.setVisibility(View.GONE);
+                lay_add_contact.setVisibility(View.INVISIBLE);
 
             LinearLayout groupInfoContainer = (LinearLayout) findViewById(R.id.group_info_container);
             groupInfoContainer.setOnClickListener(new View.OnClickListener() {
@@ -726,7 +726,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             });
         }
         else
-            lay_add_contact.setVisibility(View.GONE);
+            lay_add_contact.setVisibility(View.INVISIBLE);
 
         etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
         tvSendChat = (TextView) findViewById(R.id.chat_send);

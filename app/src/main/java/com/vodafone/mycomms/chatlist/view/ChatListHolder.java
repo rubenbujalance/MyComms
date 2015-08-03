@@ -27,6 +27,7 @@ public class ChatListHolder extends RecyclerView.ViewHolder {
     protected LinearLayout lay_top_right_image_hide;
     protected LinearLayout lay_bottom_both_image_hide;
     protected LinearLayout lay_top_left_image;
+    protected TextView chat_availability;
 
     protected TextView badgeUnread;
     protected RelativeLayout layContainer;
@@ -56,5 +57,7 @@ public class ChatListHolder extends RecyclerView.ViewHolder {
         this.lay_bottom_both_image_hide = (LinearLayout) view.findViewById(R.id.lay_bottom_both_image_hide);
 
         this.lay_top_left_image = (LinearLayout) view.findViewById(R.id.lay_top_left_image);
+
+        this.chat_availability = (TextView) view.findViewById(R.id.chat_availability);
     }
 }

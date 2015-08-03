@@ -274,7 +274,7 @@ public class ToolbarActivity extends ActionBarActivity {
     }
 
     protected void setContactsListeners(final Context context){
-        ImageView contactsProfile = (ImageView) findViewById(R.id.contacts_profile);
+        LinearLayout contactsProfile = (LinearLayout) findViewById(R.id.lay_contacts_profile);
         contactsProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

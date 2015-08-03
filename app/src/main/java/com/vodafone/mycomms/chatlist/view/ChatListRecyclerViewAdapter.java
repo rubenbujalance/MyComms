@@ -130,6 +130,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                 .getChat().getLastMessageTime(), mContext);
         chatListHolder.textViewTime.setText(timeDifference);
 
+        //Show visibility to availability
+        chatListHolder.chat_availability.setVisibility(View.VISIBLE);
+
         long amountUnreadMessages = _chatTx.getChatPendingMessagesCount(getComposedChat(i)
                 .getChat().getContact_id(), realm);
 
@@ -209,6 +212,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         hashMapImageText.put(chatListHolder.bottom_right_avatar, chatListHolder
                 .bottom_right_avatar_text);
 
+
+        //Show visibility to availability
+        chatListHolder.chat_availability.setVisibility(View.GONE);
 
         //Loads avatar visibility for group chat mode
         ArrayList<ImageView> images = new ArrayList<>();

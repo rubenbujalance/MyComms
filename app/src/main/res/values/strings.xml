@@ -199,7 +199,7 @@
 
     <!--Search bar content -->
 
-    <string name="search_bar_text">Search (name, company, email)</string>
+    <string name="search_bar_text">Search</string>
     <string name="search_bar_cancel_button">Cancel</string>
     <string name="Settings">Settings</string>
     <string name="toolbar_preferences">Preferences</string>

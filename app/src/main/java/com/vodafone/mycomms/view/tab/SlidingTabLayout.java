@@ -15,7 +15,10 @@ package com.vodafone.mycomms.view.tab;/*
  */
 
 import android.content.Context;
+import android.graphics.AvoidXfermode;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v4.view.ViewPager;
@@ -28,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
@@ -70,6 +74,11 @@ public class SlidingTabLayout extends HorizontalScrollView {
         int getDividerColor(int position);
 
     }
+
+    private static final int TAB_FAVORITES = 0;
+    private static final int TAB_RECENTS = 1;
+    private static final int TAB_ALL = 2;
+
 
     private static final int TITLE_OFFSET_DIPS = 32;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
@@ -314,7 +323,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
         }
 
         @Override
-        public void onPageSelected(int position) {
+        public void onPageSelected(int position)
+        {
+            changeBackgroundImage(position);
+
             if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
                 mTabStrip.onViewPagerPageChanged(position, 0f);
                 scrollToTab(position, 0);
@@ -339,6 +351,56 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 }
             }
         }
+    }
+
+    private void changeBackgroundImage(int position)
+    {
+        View v;
+        ImageView img;
+        switch (position)
+        {
+            case TAB_ALL:
+                //all
+                v = (mTabStrip.getChildAt(TAB_ALL));
+                img = (ImageView) (mTabStrip.getChildAt(TAB_ALL)).findViewById(R.id.imageView8);
+                img.setImageResource(R.drawable.btnuser_on);
+                v.setBackgroundColor(getResources().getColor(R.color.opaque));
+
+                //recents
+                v = (mTabStrip.getChildAt(TAB_RECENTS));
+                img = (ImageView) (mTabStrip.getChildAt(TAB_RECENTS)).findViewById(R.id.imageView5);
+                img.setImageResource(R.drawable.btn_recents);
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                //favorits
+                v = (mTabStrip.getChildAt(TAB_FAVORITES));
+                img = (ImageView) (mTabStrip.getChildAt(TAB_FAVORITES)).findViewById(R.id.imageView9);
+                img.setImageResource(R.drawable.btn_favorites);
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+//            default:
+//
+//                //all
+//                v = (mTabStrip.getChildAt(TAB_ALL));
+//                img = (ImageView) (mTabStrip.getChildAt(position)).findViewById(R.id.imageView8);
+//                img.setImageResource(R.drawable.btnuser);
+//                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+//
+//                //recents
+//                v = (mTabStrip.getChildAt(TAB_RECENTS));
+//                img = (ImageView) (mTabStrip.getChildAt(position)).findViewById(R.id.imageView5);
+//                img.setImageResource(R.drawable.btn_recents);
+//                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+//
+//                //favorits
+//                v = (mTabStrip.getChildAt(TAB_FAVORITES));
+//                img = (ImageView) (mTabStrip.getChildAt(position)).findViewById(R.id.imageView9);
+//                img.setImageResource(R.drawable.btn_favorites);
+//                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+        }
+
+
+        (mTabStrip.getChildAt(position)).getBackground().setAlpha(256);
     }
 
 }

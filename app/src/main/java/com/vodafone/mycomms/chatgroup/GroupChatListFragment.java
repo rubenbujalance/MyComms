@@ -252,7 +252,7 @@ public class GroupChatListFragment extends ListFragment implements
         Intent in = getActivity().getIntent();
         if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatListActivity.class.getSimpleName()))
             isNewGroupChat = true;
-        else if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatActivity.class.getSimpleName()))
+        else //if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatActivity.class.getSimpleName()))
         {
             this.isNewGroupChat = false;
             this.groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants

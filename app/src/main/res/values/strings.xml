@@ -267,4 +267,10 @@
     <!-- Add global contacts -->
     <string name="add_global_contacts">Add Vodafone Global Address Contacts</string>
 
+    <!--Contact Detail -->
+    <string name="contact_details">Details</string>
+    <string name="contact_current_time">Current Time</string>
+    <string name="contact_last_seen">Last seen</string>
+    <string name="contact_current_location">Current Location</string>
+
 </resources>

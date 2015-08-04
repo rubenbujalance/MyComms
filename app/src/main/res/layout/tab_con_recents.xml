@@ -7,8 +7,8 @@
     android:background="@android:color/transparent">
 
     <ImageView
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="24dp"
+        android:layout_height="22dp"
         android:id="@+id/imageView5"
         android:src="@drawable/btn_recents" />
 

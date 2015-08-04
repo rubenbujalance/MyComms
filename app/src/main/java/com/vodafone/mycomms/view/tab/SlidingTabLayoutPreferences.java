@@ -26,6 +26,7 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -104,8 +105,9 @@ public class SlidingTabLayoutPreferences extends HorizontalScrollView {
 
         mTitleOffset = (int) (TITLE_OFFSET_DIPS * getResources().getDisplayMetrics().density);
 
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, getResources().getDisplayMetrics());
         mTabStrip = new SlidingTabStripPreferences(context);
-        addView(mTabStrip, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        addView(mTabStrip, LayoutParams.MATCH_PARENT, height);
     }
 
     /**

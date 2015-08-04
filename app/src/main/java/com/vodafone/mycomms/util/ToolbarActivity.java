@@ -159,11 +159,10 @@ public class ToolbarActivity extends ActionBarActivity {
     public void checkUnreadChatMessages()
     {
         if (mFooter!=null) {
-            ImageView unreadBubble = (ImageView) mFooter.findViewById(R.id.unread_bubble);
             TextView unreadMessagesText = (TextView) mFooter.findViewById(R.id.unread_messages);
             long unreadMessages = realmChatTransactions.getAllChatPendingMessagesCount(realm);
-            if (unreadMessages > 0) {
-                unreadBubble.setVisibility(View.VISIBLE);
+            if (unreadMessages > 0)
+            {
                 unreadMessagesText.setVisibility(View.VISIBLE);
                 if (unreadMessages > 99) {
                     unreadMessagesText.setTextSize(Constants.CHAT_UNREAD_MORE_THAN_99_SIZE);
@@ -172,10 +171,9 @@ public class ToolbarActivity extends ActionBarActivity {
                     unreadMessagesText.setTextSize(Constants.CHAT_UNREAD_REGULAR_SIZE);
                     unreadMessagesText.setText(String.valueOf(unreadMessages));
                 }
-            } else {
-                unreadBubble.setVisibility(View.GONE);
-                unreadMessagesText.setVisibility(View.GONE);
             }
+            else
+                unreadMessagesText.setVisibility(View.GONE);
         }
     }
 
@@ -339,15 +337,13 @@ public class ToolbarActivity extends ActionBarActivity {
                 tvChat.setTextColor(getResources().getColor(R.color.grey_middle));
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat));
-
-                    footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.land));
-                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btnuser_on));
+                    footerRecents.setImageResource(R.drawable.chat);
+                    footerHome.setImageResource(R.drawable.land);
+                    footerContacts.setImageResource(R.drawable.btnuser_on);
                 } else{
-                    footerRecents.setBackground(getResources().getDrawable(R.drawable.chat));
-
-                    footerHome.setBackground(getResources().getDrawable(R.drawable.land));
-                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btnuser_on));
+                    footerRecents.setImageResource(R.drawable.chat);
+                    footerHome.setImageResource(R.drawable.land);
+                    footerContacts.setImageResource(R.drawable.btnuser_on);
                 }
                 break;
             case Constants.TOOLBAR_DASHBOARD:
@@ -358,15 +354,13 @@ public class ToolbarActivity extends ActionBarActivity {
                 tvChat.setTextColor(getResources().getColor(R.color.grey_middle));
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat));
-
-                    footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.landselected));
-                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btnuser));
+                    footerRecents.setImageResource(R.drawable.chat);
+                    footerHome.setImageResource(R.drawable.landselected);
+                    footerContacts.setImageResource(R.drawable.btnuser);
                 } else{
-                    footerRecents.setBackground(getResources().getDrawable(R.drawable.chat));
-
-                    footerHome.setBackground(getResources().getDrawable(R.drawable.landselected));
-                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btnuser));
+                    footerRecents.setImageResource(R.drawable.chat);
+                    footerHome.setImageResource(R.drawable.landselected);
+                    footerContacts.setImageResource(R.drawable.btnuser);
                 }
                 break;
             case Constants.TOOLBAR_RECENTS:
@@ -378,14 +372,14 @@ public class ToolbarActivity extends ActionBarActivity {
                 tvChat.setTextColor(getResources().getColor(R.color.white));
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btnuser));
-                    footerHome.setBackgroundDrawable(getResources().getDrawable(R.drawable.land));
-                    footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat_on));
+                    footerContacts.setImageResource(R.drawable.btnuser);
+                    footerHome.setImageResource(R.drawable.land);
+                    footerRecents.setImageResource(R.drawable.chat_on);
 
                 }else{
-                    footerContacts.setBackground(getResources().getDrawable(R.drawable.btnuser));
-                    footerHome.setBackground(getResources().getDrawable(R.drawable.land));
-                    footerRecents.setBackground(getResources().getDrawable(R.drawable.chat_on));
+                    footerContacts.setImageResource(R.drawable.btnuser);
+                    footerHome.setImageResource(R.drawable.land);
+                    footerRecents.setImageResource(R.drawable.chat_on);
 
                 }
                 break;

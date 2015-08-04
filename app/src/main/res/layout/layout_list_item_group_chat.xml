@@ -29,7 +29,7 @@
             android:text=""
             android:layout_marginTop="45dp"
             android:layout_marginLeft="38dp"
-
+            android:background="@drawable/ic_available"
             />
         <include android:id="@+id/layout_chatlist_item_content"
                  layout="@layout/layout_chatlist_item_content"

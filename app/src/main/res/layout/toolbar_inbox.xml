@@ -35,7 +35,8 @@
             android:layout_height="30dp"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/ic_add_chat"/>
             <!--android:backgroundTint="#ffffffff" -->
 
         <TextView

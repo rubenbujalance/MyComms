@@ -27,7 +27,6 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:text=""
-            android:background="@drawable/ic_available"
             android:layout_marginTop="45dp"
             android:layout_marginLeft="38dp"
 

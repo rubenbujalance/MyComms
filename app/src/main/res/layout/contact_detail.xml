@@ -8,9 +8,9 @@
     <ImageView
         android:layout_width="24dp"
         android:layout_height="34dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
         android:id="@+id/ivBtBack"
         android:src="@drawable/icon_left_white"
         android:focusable="false" />
@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/contact_constellation"
         android:layout_marginTop="63dp"
-        android:layout_below="@+id/ivBtBack"
+        android:layout_above="@+id/contact_info_container"
         android:layout_centerHorizontal="true"/>
 
     <LinearLayout
@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:background="@drawable/round_border_white_transparent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/avatar"
+        android:layout_above="@+id/details_text"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="10dp"
@@ -48,7 +48,8 @@
         android:layout_marginRight="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom ="10dp"
-        android:layout_marginTop="39dp" android:id="@+id/linearLayout">
+        android:layout_marginTop="39dp"
+        android:id="@+id/contact_info_container">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,23 +58,25 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:orientation="horizontal">
                 <TextView
                     style="@style/ContactDetailInfoTextView"
                     android:layout_width="wrap_content"
                     android:id="@+id/contact_contact_name"
-                    android:textSize="28sp"
+                    android:textSize="24sp"
                     tools:text="James Bond"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"/>
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:id="@+id/btFavourite"
                     android:src="@mipmap/icon_favorite_colour"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginEnd="5dp"
                     android:paddingBottom="8dp"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@+id/contact_contact_name"
@@ -83,22 +86,25 @@
             <TextView
                 style="@style/ContactDetailInfoTextView"
                 android:id="@+id/contact_position"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 tools:text="Secret Agent"/>
             <TextView
                 style="@style/ContactDetailInfoTextView"
                 android:id="@+id/contact_company"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 tools:text="MI6"/>
             <TextView
                 style="@style/ContactDetailInfoTextView"
                 android:id="@+id/contact_office_location"
-                android:textSize="18sp"
+                android:textSize="15sp"
                 tools:text="London UK"/>
         </LinearLayout>
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:background="@drawable/round_border_white_2_transparent"
             android:weightSum="3">
             <LinearLayout
                 android:layout_width="0dp"
@@ -114,7 +120,7 @@
                 <TextView
                     style="@style/ContactDetailInfoTextView"
                     android:id="@+id/contact_country"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     tools:text="Macau"/>
             </LinearLayout>
             <LinearLayout
@@ -130,7 +136,7 @@
                     android:text="@string/contact_last_seen"/>
                 <TextView
                     style="@style/ContactDetailInfoTextView"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:id="@+id/contact_last_seen"
                     tools:text="21h ago"/>
             </LinearLayout>
@@ -146,7 +152,7 @@
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:id="@+id/imageView17"
-                        android:src="@mipmap/icon_moon_grey"
+                        android:src="@mipmap/icon_moon_white"
                         android:paddingBottom="8dp"
                         android:layout_centerVertical="true"
                         android:layout_alignParentLeft="true"
@@ -163,7 +169,7 @@
                     <TextView
                         style="@style/ContactDetailInfoTextView"
                         android:layout_width="wrap_content"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         tools:text="01:50"
                         android:id="@+id/contact_local_time"
                         android:layout_below="@+id/textView18"
@@ -178,23 +184,53 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/details_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
         android:textSize="22sp"
         android:text="@string/contact_details"
         android:layout_marginBottom="10dp"
-        android:id="@+id/textView19"
-        android:layout_above="@+id/imageView18"
+        android:layout_marginTop="10dp"
+        android:layout_above="@+id/details_arrow"
         android:layout_centerHorizontal="true"/>
 
     <ImageView
         android:layout_width="34dp"
         android:layout_height="24dp"
         android:src="@drawable/ic_details"
-        android:layout_marginBottom="15dp"
+        android:id="@+id/details_arrow"
+        android:layout_marginBottom="10dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/imageView18"/>
+        android:layout_centerHorizontal="true"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bt_sms" android:layout_alignTop="@+id/avatar"
+        android:layout_alignLeft="@+id/avatar" android:layout_alignStart="@+id/avatar"
+        android:layout_marginTop="19dp"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bt_email" android:layout_alignTop="@+id/bt_sms"
+        android:layout_alignRight="@+id/avatar" android:layout_alignEnd="@+id/avatar"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/bt_call" android:layout_alignBottom="@+id/avatar"
+        android:layout_alignLeft="@+id/avatar" android:layout_alignStart="@+id/avatar"
+        android:layout_marginBottom="19dp"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btemail" android:layout_alignBottom="@+id/avatar"
+        android:layout_alignLeft="@+id/avatar" android:layout_alignStart="@+id/avatar"
+        android:layout_marginBottom="19dp"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btcall" android:layout_alignBottom="@+id/avatar"
+        android:layout_alignLeft="@+id/avatar" android:layout_alignStart="@+id/avatar"
+        android:layout_marginBottom="19dp"/>
 
 </RelativeLayout>

@@ -6,10 +6,14 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -20,6 +24,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
+import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
@@ -61,7 +66,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private TextView tvPhoneNumber;
     private TextView tvEmail;
     private TextView tvOfficeLocation;
-    private ImageView ivAvatar;
+    private CircleImageView ivAvatar;
     private int imageStarOn;
     private int imageStarOff;
     private TextView textAvatar;
@@ -129,7 +134,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvPhoneNumber = (TextView) findViewById(R.id.contact_phone_number);
         tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
-        ivAvatar = (ImageView)findViewById(R.id.avatar);
+        ivAvatar = (CircleImageView)findViewById(R.id.avatar);
         imageStarOn = R.mipmap.icon_favorite_colour;
         imageStarOff = R.mipmap.icon_favorite_grey;
         textAvatar = (TextView)findViewById(R.id.avatarText);
@@ -344,7 +349,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         });
 
         loadContactDetail();
-
         setButtonsVisibility();
     }
 
@@ -588,6 +592,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactAvatar()
     {
+        Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactAvatar: TEST");
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
             AvatarSFController avatarSFController = new AvatarSFController
@@ -597,59 +602,58 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
-//        Utils.loadContactAvatar
-//                (
-//                        contact.getFirstName()
-//                        , contact.getLastName()
-//                        , ivAvatar
-//                        , textAvatar
-//                        , Utils.getAvatarURL
-//                                (
-//                                        contact.getPlatform()
-//                                        , SF_URL
-//                                        , contact.getAvatar()
-//                                )
-//                );
-//
-//        ivAvatar.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View arg0) {
-//                LayoutInflater layoutInflater
-//                        = (LayoutInflater) getBaseContext()
-//                        .getSystemService(LAYOUT_INFLATER_SERVICE);
-//                final View popupView = layoutInflater.inflate(R.layout.layout_contact_detail_zoom, null);
-//                final PopupWindow popupWindow = new PopupWindow(
-//                        popupView,
-//                        LayoutParams.MATCH_PARENT,
-//                        LayoutParams.MATCH_PARENT);
-//                final ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
-//                final TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
-//
-//                Utils.loadContactAvatar
-//                        (
-//                                contact.getFirstName()
-//                                , contact.getLastName()
-//                                , fullAvatar
-//                                , textAvatar
-//                                , Utils.getAvatarURL
-//                                        (
-//                                                contact.getPlatform()
-//                                                , contact.getStringField1()
-//                                                , contact.getAvatar()
-//                                        )
-//                        );
-//
-//                popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
-//                popupView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View arg0) {
-//                        popupWindow.dismiss();
-//                    }
-//                });
-//            }
-//        });
+        Utils.loadContactAvatar
+                (
+                        contact.getFirstName()
+                        , contact.getLastName()
+                        , ivAvatar
+                        , textAvatar
+                        , Utils.getAvatarURL
+                                (
+                                        contact.getPlatform()
+                                        , SF_URL
+                                        , contact.getAvatar()
+                                )
+                );
 
+        ivAvatar.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                LayoutInflater layoutInflater
+                        = (LayoutInflater) getBaseContext()
+                        .getSystemService(LAYOUT_INFLATER_SERVICE);
+                final View popupView = layoutInflater.inflate(R.layout.layout_contact_detail_zoom, null);
+                final PopupWindow popupWindow = new PopupWindow(
+                        popupView,
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT);
+                final ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
+                final TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
+
+                Utils.loadContactAvatar
+                        (
+                                contact.getFirstName()
+                                , contact.getLastName()
+                                , fullAvatar
+                                , textAvatar
+                                , Utils.getAvatarURL
+                                        (
+                                                contact.getPlatform()
+                                                , contact.getStringField1()
+                                                , contact.getAvatar()
+                                        )
+                        );
+
+                popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
+                popupView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View arg0) {
+                        popupWindow.dismiss();
+                    }
+                });
+            }
+        });
     }
 
     private void loadContactDetail()

@@ -26,14 +26,75 @@
             android:id="@+id/layout_connection_not_available"
             layout="@layout/layout_connection_not_available"/>
     </LinearLayout>
-    <ImageView
-        android:id="@+id/avatar"
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/contact_constellation"
-        android:layout_marginTop="63dp"
         android:layout_above="@+id/contact_info_container"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true">
+
+        <com.vodafone.mycomms.custom.CircleImageView
+            android:id="@+id/avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/profile_mock_avatar"
+            android:layout_above="@+id/prof_mail"
+            android:layout_toRightOf="@+id/prof_phone"
+            android:layout_toEndOf="@+id/prof_phone"/>
+        <TextView
+            android:id="@+id/avatarText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="50sp"
+            tools:text="AM"
+            android:visibility="gone"
+            android:textColor="@color/grey_dark"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+        <ImageView
+            android:id="@+id/empty_constellation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/profile_ellipse"
+            android:padding="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+        <ImageView
+            android:id="@+id/prof_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_prof_phone"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+        <ImageView
+            android:id="@+id/prof_calendar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_prof_calendar"
+            android:layout_below="@+id/avatar"
+            android:layout_alignRight="@+id/empty_constellation"
+            android:layout_alignEnd="@+id/empty_constellation"/>
+        <ImageView
+            android:id="@+id/prof_mail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_prof_mail"
+            android:layout_alignBottom="@+id/empty_constellation"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+        <ImageView
+            android:id="@+id/prof_chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_prof_chat"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/empty_constellation"
+            android:layout_alignEnd="@+id/empty_constellation"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:orientation="vertical"
@@ -102,14 +163,14 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp"
-            android:background="@drawable/round_border_white_2_transparent"
             android:weightSum="3">
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@drawable/border_white_transparent"
                 android:orientation="vertical"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginEnd="2dp"
                 android:layout_weight="1">
@@ -127,6 +188,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:background="@drawable/border_white_transparent"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginEnd="2dp"
                 android:layout_weight="1">
@@ -143,6 +207,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_white_transparent"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:orientation="vertical"
                 android:layout_weight="1">
                 <RelativeLayout
@@ -203,34 +270,5 @@
         android:layout_marginBottom="10dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/bt_sms" android:layout_alignTop="@+id/avatar"
-        android:layout_alignLeft="@+id/avatar" android:layout_alignStart="@+id/avatar"
-        android:layout_marginTop="19dp"/>
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/bt_email" android:layout_alignTop="@+id/bt_sms"
-        android:layout_alignRight="@+id/avatar" android:layout_alignEnd="@+id/avatar"/>
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/bt_call" android:layout_alignBottom="@+id/avatar"
-        android:layout_alignLeft="@+id/avatar" android:layout_alignStart="@+id/avatar"
-        android:layout_marginBottom="19dp"/>
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btemail" android:layout_alignBottom="@+id/avatar"
-        android:layout_alignLeft="@+id/avatar" android:layout_alignStart="@+id/avatar"
-        android:layout_marginBottom="19dp"/>
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btcall" android:layout_alignBottom="@+id/avatar"
-        android:layout_alignLeft="@+id/avatar" android:layout_alignStart="@+id/avatar"
-        android:layout_marginBottom="19dp"/>
 
 </RelativeLayout>

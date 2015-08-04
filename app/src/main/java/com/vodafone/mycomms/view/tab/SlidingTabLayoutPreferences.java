@@ -168,7 +168,7 @@ public class SlidingTabLayoutPreferences extends HorizontalScrollView {
         if (viewPager != null) {
             populateTabStrip();
             viewPager.setOnPageChangeListener(new InternalViewPagerListener());
-            changeBackgroundImage(Constants.MY_SETTINGS);
+            changeSlideBarStateColor(Constants.MY_SETTINGS);
         }
     }
 
@@ -306,7 +306,7 @@ public class SlidingTabLayoutPreferences extends HorizontalScrollView {
         @Override
         public void onPageSelected(int position)
         {
-            changeBackgroundImage(position);
+            changeSlideBarStateColor(position);
 
             if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
                 mTabStrip.onViewPagerPageChanged(position, 0f);
@@ -342,10 +342,11 @@ public class SlidingTabLayoutPreferences extends HorizontalScrollView {
         }
     }
 
-    private void changeBackgroundImage(int position)
+    private void changeSlideBarStateColor(int position)
     {
         View v;
         ImageView img;
+        TextView tv;
         mTabStrip.setSelectedIndicatorColors(getResources().getColor(R.color.transparent));
         switch (position)
         {
@@ -354,18 +355,24 @@ public class SlidingTabLayoutPreferences extends HorizontalScrollView {
                 v = (mTabStrip.getChildAt(Constants.MY_SETTINGS));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_SETTINGS)).findViewById(R.id.img_preferences);
                 img.setImageResource(R.drawable.ic_set_preferences);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_SETTINGS)).findViewById(R.id.tv_preferences);
+                tv.setTextColor(getResources().getColor(R.color.white));
                 v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
 
                 //profile
                 v = (mTabStrip.getChildAt(Constants.MY_PROFILE));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_PROFILE)).findViewById(R.id.img_profile);
                 img.setImageResource(R.drawable.ic_set_profile_off);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_PROFILE)).findViewById(R.id.tv_profile);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
                 v.setBackgroundColor(getResources().getColor(R.color.transparent));
 
                 //accounts
                 v = (mTabStrip.getChildAt(Constants.MY_ACCOUNTS));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_ACCOUNTS)).findViewById(R.id.img_accounts);
                 img.setImageResource(R.drawable.ic_set_accounts_off);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_ACCOUNTS)).findViewById(R.id.tv_accounts);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
                 v.setBackgroundColor(getResources().getColor(R.color.transparent));
 
                 break;
@@ -375,18 +382,24 @@ public class SlidingTabLayoutPreferences extends HorizontalScrollView {
                 v = (mTabStrip.getChildAt(Constants.MY_SETTINGS));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_SETTINGS)).findViewById(R.id.img_preferences);
                 img.setImageResource(R.drawable.ic_set_preferences_off);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_SETTINGS)).findViewById(R.id.tv_preferences);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
                 v.setBackgroundColor(getResources().getColor(R.color.transparent));
 
                 //recents
                 v = (mTabStrip.getChildAt(Constants.MY_PROFILE));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_PROFILE)).findViewById(R.id.img_profile);
                 img.setImageResource(R.drawable.ic_set_profile);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_PROFILE)).findViewById(R.id.tv_profile);
+                tv.setTextColor(getResources().getColor(R.color.white));
                 v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
 
                 //favorits
                 v = (mTabStrip.getChildAt(Constants.MY_ACCOUNTS));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_ACCOUNTS)).findViewById(R.id.img_accounts);
                 img.setImageResource(R.drawable.ic_set_accounts_off);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_ACCOUNTS)).findViewById(R.id.tv_accounts);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
                 v.setBackgroundColor(getResources().getColor(R.color.transparent));
 
                 break;
@@ -396,18 +409,24 @@ public class SlidingTabLayoutPreferences extends HorizontalScrollView {
                 v = (mTabStrip.getChildAt(Constants.MY_SETTINGS));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_SETTINGS)).findViewById(R.id.img_preferences);
                 img.setImageResource(R.drawable.ic_set_preferences_off);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_SETTINGS)).findViewById(R.id.tv_preferences);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
                 v.setBackgroundColor(getResources().getColor(R.color.transparent));
 
                 //recents
                 v = (mTabStrip.getChildAt(Constants.MY_PROFILE));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_PROFILE)).findViewById(R.id.img_profile);
                 img.setImageResource(R.drawable.ic_set_profile_off);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_PROFILE)).findViewById(R.id.tv_profile);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
                 v.setBackgroundColor(getResources().getColor(R.color.transparent));
 
                 //favorits
                 v = (mTabStrip.getChildAt(Constants.MY_ACCOUNTS));
                 img = (ImageView) (mTabStrip.getChildAt(Constants.MY_ACCOUNTS)).findViewById(R.id.img_accounts);
                 img.setImageResource(R.drawable.ic_set_accounts);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.MY_ACCOUNTS)).findViewById(R.id.tv_accounts);
+                tv.setTextColor(getResources().getColor(R.color.white));
                 v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
 
                 break;

@@ -17,6 +17,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Favorites"
-        android:id="@+id/textView8"
+        android:id="@+id/tv_favourites_contacts"
         android:textColor="@color/grey_light" />
 </LinearLayout>

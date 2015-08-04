@@ -326,11 +326,18 @@ public class ToolbarActivity extends ActionBarActivity {
         ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);
         ImageView footerRecents = (ImageView) findViewById(R.id.footer_recents);
 
+        TextView tvContacts = (TextView) findViewById(R.id.tv_contacts);
+        TextView tvChat = (TextView) findViewById(R.id.tv_chat);
+
         switch (selected){
             case Constants.TOOLBAR_CONTACTS:
 //                layoutContacts.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
 //                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
 //                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                tvContacts.setTextColor(getResources().getColor(R.color.white));
+                tvChat.setTextColor(getResources().getColor(R.color.grey_middle));
+
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                     footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat));
 
@@ -346,6 +353,10 @@ public class ToolbarActivity extends ActionBarActivity {
             case Constants.TOOLBAR_DASHBOARD:
 //                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
 //                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                tvContacts.setTextColor(getResources().getColor(R.color.grey_middle));
+                tvChat.setTextColor(getResources().getColor(R.color.grey_middle));
+
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                     footerRecents.setBackgroundDrawable(getResources().getDrawable(R.drawable.chat));
 
@@ -362,6 +373,9 @@ public class ToolbarActivity extends ActionBarActivity {
 //                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
 //                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
 //                layoutRecents.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
+
+                tvContacts.setTextColor(getResources().getColor(R.color.grey_middle));
+                tvChat.setTextColor(getResources().getColor(R.color.white));
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                     footerContacts.setBackgroundDrawable(getResources().getDrawable(R.drawable.btnuser));

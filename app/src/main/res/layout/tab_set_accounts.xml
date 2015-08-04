@@ -14,9 +14,9 @@
         android:src="@drawable/ic_set_accounts" />
 
     <TextView
+        android:id="@+id/tv_accounts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="4dp"
         android:textColor="@android:color/white"
         android:text="@string/profile_list_tab_accounts"/>
 

@@ -15,10 +15,7 @@ package com.vodafone.mycomms.view.tab;/*
  */
 
 import android.content.Context;
-import android.graphics.AvoidXfermode;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v4.view.ViewPager;
@@ -74,11 +71,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
         int getDividerColor(int position);
 
     }
-
-    private static final int TAB_FAVORITES = 0;
-    private static final int TAB_RECENTS = 1;
-    private static final int TAB_ALL = 2;
-
 
     private static final int TITLE_OFFSET_DIPS = 32;
     private static final int TAB_VIEW_PADDING_DIPS = 16;
@@ -174,8 +166,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         mViewPager = viewPager;
         if (viewPager != null) {
-            viewPager.setOnPageChangeListener(new InternalViewPagerListener());
             populateTabStrip();
+            viewPager.setOnPageChangeListener(new InternalViewPagerListener());
+            changeBackgroundImage(Constants.CONTACTS_ALL);
         }
     }
 
@@ -247,18 +240,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 3;
 
-        } else if (auxactivity[0].equals("com.vodafone.mycomms.settings.SettingsMainActivity")) {
-            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_set_profile, mTabStrip, false);
-            tabView.setOnClickListener(tabClickListener);
-            mTabStrip.addView(tabView);
-            tabView.getLayoutParams().width = width / 2;
-
-            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_set_preferences, mTabStrip, false);
-            tabView.setOnClickListener(tabClickListener);
-            mTabStrip.addView(tabView);
-            tabView.getLayoutParams().width = width / 2;
         }
-
     }
 
     @Override
@@ -291,6 +273,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
         private int mScrollState;
+
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -339,6 +322,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
             BusProvider.getInstance().post(new SetContactListAdapterEvent());
         }
 
+
+
     }
 
     private class TabClickListener implements OnClickListener {
@@ -357,50 +342,73 @@ public class SlidingTabLayout extends HorizontalScrollView {
     {
         View v;
         ImageView img;
+        mTabStrip.setSelectedIndicatorColors(getResources().getColor(R.color.transparent));
         switch (position)
         {
-            case TAB_ALL:
+            case Constants.CONTACTS_ALL:
                 //all
-                v = (mTabStrip.getChildAt(TAB_ALL));
-                img = (ImageView) (mTabStrip.getChildAt(TAB_ALL)).findViewById(R.id.imageView8);
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_ALL));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.imageView8);
                 img.setImageResource(R.drawable.btnuser_on);
-                v.setBackgroundColor(getResources().getColor(R.color.opaque));
+                v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
 
                 //recents
-                v = (mTabStrip.getChildAt(TAB_RECENTS));
-                img = (ImageView) (mTabStrip.getChildAt(TAB_RECENTS)).findViewById(R.id.imageView5);
-                img.setImageResource(R.drawable.btn_recents);
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_RECENT));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.imageView5);
+                img.setImageResource(R.drawable.ic_recent_not_pressed);
                 v.setBackgroundColor(getResources().getColor(R.color.transparent));
 
                 //favorits
-                v = (mTabStrip.getChildAt(TAB_FAVORITES));
-                img = (ImageView) (mTabStrip.getChildAt(TAB_FAVORITES)).findViewById(R.id.imageView9);
-                img.setImageResource(R.drawable.btn_favorites);
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.imageView9);
+                img.setImageResource(R.drawable.ic_favourites_not_pressed);
                 v.setBackgroundColor(getResources().getColor(R.color.transparent));
 
-//            default:
-//
-//                //all
-//                v = (mTabStrip.getChildAt(TAB_ALL));
-//                img = (ImageView) (mTabStrip.getChildAt(position)).findViewById(R.id.imageView8);
-//                img.setImageResource(R.drawable.btnuser);
-//                v.setBackgroundColor(getResources().getColor(R.color.transparent));
-//
-//                //recents
-//                v = (mTabStrip.getChildAt(TAB_RECENTS));
-//                img = (ImageView) (mTabStrip.getChildAt(position)).findViewById(R.id.imageView5);
-//                img.setImageResource(R.drawable.btn_recents);
-//                v.setBackgroundColor(getResources().getColor(R.color.transparent));
-//
-//                //favorits
-//                v = (mTabStrip.getChildAt(TAB_FAVORITES));
-//                img = (ImageView) (mTabStrip.getChildAt(position)).findViewById(R.id.imageView9);
-//                img.setImageResource(R.drawable.btn_favorites);
-//                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+                break;
+
+            case Constants.CONTACTS_RECENT:
+                //all
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_ALL));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.imageView8);
+                img.setImageResource(R.drawable.btnuser);
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                //recents
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_RECENT));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.imageView5);
+                img.setImageResource(R.drawable.btn_recents);
+                v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
+
+                //favorits
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.imageView9);
+                img.setImageResource(R.drawable.ic_favourites_not_pressed);
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                break;
+
+            case Constants.CONTACTS_FAVOURITE:
+                //all
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_ALL));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.imageView8);
+                img.setImageResource(R.drawable.btnuser);
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                //recents
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_RECENT));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.imageView5);
+                img.setImageResource(R.drawable.ic_recent_not_pressed);
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                //favorits
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.imageView9);
+                img.setImageResource(R.drawable.btn_favorites);
+                v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
+
+                break;
         }
 
-
-        (mTabStrip.getChildAt(position)).getBackground().setAlpha(256);
     }
 
 }

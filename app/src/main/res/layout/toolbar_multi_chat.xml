@@ -67,7 +67,6 @@
                         android:text=""
                         android:visibility="gone"
                         android:background="@drawable/ic_available"
-
                         />
                 </RelativeLayout>
             </LinearLayout>

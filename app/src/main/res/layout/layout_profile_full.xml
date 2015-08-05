@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -38,7 +39,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:id="@+id/avatar"
-                    android:src="@drawable/cartoon_round_contact_image_example"
+                    tools:src="@drawable/profile_mock_avatar"
                     android:layout_marginLeft="15dp" />
 
                 <LinearLayout

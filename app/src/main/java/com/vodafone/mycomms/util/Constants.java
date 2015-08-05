@@ -98,6 +98,7 @@ public class Constants {
     public static final String CONTACT_LOCAL_CONTENT= "local_contact";
     public static final String CONTACT_SORT_HELPER= "sortHelper";
     public static final String CONTACT_SEARCH_HELPER= "searchHelper";
+    public static final String CONTACT_DETAIL_INFO= "detailInfo";
 
     public static final String CONTACT_PHONE_WORK = "phone_work";
     public static final String CONTACT_PHONE_HOME = "phone_home";

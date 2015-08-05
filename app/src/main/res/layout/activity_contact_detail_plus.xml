@@ -11,7 +11,7 @@
         android:background="@android:color/transparent">
 
         <com.vodafone.mycomms.custom.CircleImageView
-            android:id="@+id/contact_avatar"
+            android:id="@+id/avatar"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginRight="15dp"
@@ -23,7 +23,7 @@
             android:layout_gravity="center_vertical"
             android:orientation="vertical">
             <TextView
-                android:id="@+id/contact_name"
+                android:id="@+id/contact_contact_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
@@ -52,7 +52,7 @@
                 style="@style/ContactDetailPlusLabel"
                 android:text="@string/phone_lower"/>
             <TextView
-                android:id="@+id/contact_phone"
+                android:id="@+id/contact_phone_number"
                 style="@style/ContactDetailPlusTextValue"
                 tools:text="(481) 516 2342"/>
         </LinearLayout>
@@ -77,24 +77,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:orientation="vertical"
-            android:layout_weight="3">
+            android:layout_weight="4">
             <TextView
                 style="@style/ContactDetailPlusLabel"
                 android:text="@string/email_lower"/>
             <TextView
                 android:id="@+id/contact_email"
                 style="@style/ContactDetailPlusTextValue"
-                tools:text="(481) 516 2342"/>
+                tools:text="black_widow_00@avengers.com"/>
         </LinearLayout>
-        <ImageView
-            android:layout_weight="1"
-            style="@style/ContactDetailPlusIcon"
-            android:src="@drawable/btn_mail_white"
-            android:visibility="invisible"/>
         <ImageView
             android:id="@+id/btn_email"
             android:layout_weight="1"
             style="@style/ContactDetailPlusIcon"
+            android:paddingRight="12dp"
+            android:paddingEnd="12dp"
             android:src="@drawable/btn_mail_white"/>
     </LinearLayout>
 
@@ -102,7 +99,7 @@
         android:weightSum="5"
         style="@style/ContactDetailPlusLinear">
         <LinearLayout
-            android:layout_weight="3"
+            android:layout_weight="4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -111,19 +108,25 @@
                 style="@style/ContactDetailPlusLabel"
                 android:text="@string/office_location_lower"/>
             <TextView
-                android:id="@+id/contact_location"
+                android:id="@+id/contact_office_location"
                 style="@style/ContactDetailPlusTextValue"
                 tools:text="Stark Tower\n5th Avenue New York"/>
         </LinearLayout>
         <ImageView
             android:layout_weight="1"
             style="@style/ContactDetailPlusIcon"
-            android:src="@drawable/btn_mail_white"
-            android:visibility="invisible"/>
-        <ImageView
-            android:layout_weight="1"
-            style="@style/ContactDetailPlusIcon"
             android:src="@drawable/btn_location_white"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/no_connection_layout"
+        android:orientation="vertical"
+        android:gravity="bottom"
+        android:visibility="gone">
+        <include
+            android:id="@+id/layout_connection_not_available"
+            layout="@layout/layout_connection_not_available"/>
+    </LinearLayout>
 </LinearLayout>

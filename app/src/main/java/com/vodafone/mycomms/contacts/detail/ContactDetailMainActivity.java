@@ -102,7 +102,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         this.SF_URL = null;
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(ContactDetailMainActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else
@@ -157,7 +156,10 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             public void onClick(View v) {
                 try {
                     Intent in = new Intent(ContactDetailMainActivity.this, ContactDetailsPlusActivity.class);
-                    in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//                    in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    String contactDetail[] = loadContactExtra();
+
+                    in.putExtra(Constants.CONTACT_DETAIL_INFO, contactDetail);
                     startActivity(in);
                 } catch (Exception e) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", e);
@@ -365,6 +367,44 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         loadContactDetail();
         setButtonsVisibility();
+    }
+
+    private String[] loadContactExtra() {
+
+        String contactDetail[] = new String[6];
+        if (null != contact.getFirstName())
+            contactDetail[0] = contact.getFirstName();
+        else
+            contactDetail[0] = "";
+        if(null != contact.getLastName())
+            contactDetail[0] = contact.getFirstName() + " " + contact.getLastName();
+
+        contactDetail[1] = contact.getAvatar();
+
+        if(null != contact.getPhones() && contact.getPhones().length() > 0)
+        {
+            if(null != getElementFromJsonArrayString(contact.getPhones(), Constants.CONTACT_PHONE))
+                contactDetail[2] = getElementFromJsonArrayString(contact.getPhones(), Constants.CONTACT_PHONE);
+            else
+                contactDetail[2] = "";
+        }
+        else
+            contactDetail[2] = "";
+
+        if(null != contact.getEmails() && contact.getEmails().length() > 0)
+        {
+            if(null != getElementFromJsonArrayString(contact.getEmails(), Constants.CONTACT_EMAIL))
+                contactDetail[3] = getElementFromJsonArrayString(contact.getEmails(), Constants.CONTACT_EMAIL);
+            else
+                contactDetail[3] = "";
+        }
+        else
+            contactDetail[3] = "";
+
+        contactDetail[4] = contact.getOfficeLocation();
+        contactDetail[5] = contact.getPosition();
+
+        return contactDetail;
     }
 
     private void setButtonsVisibility()
@@ -790,8 +830,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     @Subscribe
     public void onConnectivityChanged(ConnectivityChanged event)
     {
-
-        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+        Log.e(Constants.TAG, "ContactDetailMainActivity.onConnectivityChanged: "
                 + event.getConnectivityStatus().toString());
         if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
                 event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)

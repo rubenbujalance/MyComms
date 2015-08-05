@@ -79,7 +79,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ImageView btEmailBar;
     private ImageView btChatBar;
     private ImageView btCallBar;
-    private ImageView btFavourite;
+    private ImageView btFavourite, btnDetailsPlus;
 
     private boolean contactIsFavorite;
     private FavouriteController favouriteController;
@@ -150,6 +150,21 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 //        btEmailBar = (ImageView)findViewById(R.id.btemail);
 //        btCallBar = (ImageView)findViewById(R.id.btcall);
         btFavourite = (ImageView)findViewById(R.id.btFavourite);
+        btnDetailsPlus = (ImageView)findViewById(R.id.details_plus);
+
+        btnDetailsPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent in = new Intent(ContactDetailMainActivity.this, ContactDetailsPlusActivity.class);
+                    in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(in);
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", e);
+                }
+            }
+        });
+
 
 //        btCall.setOnClickListener(new View.OnClickListener() {
 //            @Override

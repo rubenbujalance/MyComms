@@ -95,7 +95,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        setContentView(R.layout.contact_detail);
+        setContentView(R.layout.activity_contact_detail);
         this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 

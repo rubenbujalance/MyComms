@@ -10,6 +10,6 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_contact_details_plus);
+        setContentView(R.layout.activity_contact_detail_plus);
     }
 }

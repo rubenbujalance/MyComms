@@ -4,6 +4,7 @@
     <string name="login">Login</string>
     <string name="signup">Signup</string>
     <string name="email">Email</string>
+    <string name="email_lower">email</string>
     <string name="enter_email_address">Enter email address*</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
@@ -53,7 +54,6 @@
     <string name="new_version_available">New Version Available</string>
     <string name="must_update_to_last_application_version">Must update to last application version</string>
     <string name="update">Update!</string>
-    <string name="office_location">Office Location</string>
     <string name="title_activity_main">MainActivity</string>
 
 
@@ -157,9 +157,9 @@
     <string name="Edit">Edit</string>
     <string name="Sent">Sent</string>
     <string name="dummyAddress">742, Evergreen Terrace</string>
-    <string name="officelocation">Office Location</string>
+    <string name="office_location">Office Location</string>
+    <string name="office_location_lower">office location</string>
     <string name="dummyEmail">ruben_bujalance@stratesys-ts.com</string>
-    <string name="PhoneNumber">Phone Number</string>
     <string name="repeatPassword">Repeat Password</string>
     <string name="additional">Additional</string>
     <string name="additionalinformation">Additional Information</string>
@@ -175,7 +175,8 @@
     <string name="dummyUserfull">Smith Doe, John</string>
     <string name="dummylastseen">Seen 2d ago</string>
     <string name="mobile">mobile</string>
-    <string name="Phone">Phone</string>
+    <string name="phone">Phone</string>
+    <string name="phone_lower">phone</string>
     <string name="latestNews">Latest News</string>
     <string name="Logout">Logout</string>
     <string name="Chat">"Chat   "</string>

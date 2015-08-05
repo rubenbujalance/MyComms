@@ -38,9 +38,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/profile_mock_avatar"
-            android:layout_above="@+id/prof_mail"
-            android:layout_toRightOf="@+id/prof_phone"
-            android:layout_toEndOf="@+id/prof_phone"/>
+            android:layout_above="@+id/btn_prof_email"
+            android:layout_toRightOf="@+id/btn_prof_phone"
+            android:layout_toEndOf="@+id/btn_prof_phone"/>
         <TextView
             android:id="@+id/avatarText"
             android:layout_width="wrap_content"
@@ -63,7 +63,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
         <ImageView
-            android:id="@+id/prof_phone"
+            android:id="@+id/btn_prof_phone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/btn_prof_phone"
@@ -71,7 +71,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
         <ImageView
-            android:id="@+id/prof_calendar"
+            android:id="@+id/btn_prof_calendar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/btn_prof_calendar"
@@ -79,7 +79,7 @@
             android:layout_alignRight="@+id/empty_constellation"
             android:layout_alignEnd="@+id/empty_constellation"/>
         <ImageView
-            android:id="@+id/prof_mail"
+            android:id="@+id/btn_prof_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/btn_prof_mail"
@@ -87,7 +87,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
         <ImageView
-            android:id="@+id/prof_chat"
+            android:id="@+id/btn_prof_chat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/btn_prof_chat"
@@ -101,7 +101,7 @@
         android:layout_width="match_parent"
         android:background="@drawable/round_border_white_transparent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/details_text"
+        android:layout_above="@+id/details_container"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="10dp"
@@ -186,7 +186,7 @@
             </LinearLayout>
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:background="@drawable/border_white_transparent"
                 android:paddingTop="10dp"
@@ -218,7 +218,7 @@
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:id="@+id/imageView17"
+                        android:id="@+id/ivStatus"
                         android:src="@mipmap/icon_moon_white"
                         android:paddingBottom="8dp"
                         android:layout_centerVertical="true"
@@ -230,8 +230,8 @@
                         android:textSize="12sp"
                         android:text="@string/contact_current_time"
                         android:id="@+id/textView18"
-                        android:layout_toRightOf="@+id/imageView17"
-                        android:layout_toEndOf="@+id/imageView17"
+                        android:layout_toRightOf="@+id/ivStatus"
+                        android:layout_toEndOf="@+id/ivStatus"
                         />
                     <TextView
                         style="@style/ContactDetailInfoTextView"
@@ -250,25 +250,30 @@
         </TableRow>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/details_text"
+    <LinearLayout
+        android:id="@+id/details_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:textSize="22sp"
-        android:text="@string/contact_details"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_above="@+id/details_plus"
-        android:layout_centerHorizontal="true"/>
-
-    <ImageView
-        android:layout_width="34dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_details"
-        android:id="@+id/details_plus"
-        android:layout_marginBottom="10dp"
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:text="@string/contact_details"
+            android:layout_marginBottom="10dp"/>
+
+        <ImageView
+            android:layout_width="34dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_details"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

@@ -10,13 +10,30 @@
         style="@style/ContactDetailPlusLinear"
         android:background="@android:color/transparent">
 
-        <com.vodafone.mycomms.custom.CircleImageView
-            android:id="@+id/avatar"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginRight="15dp"
-            android:layout_marginEnd="15dp"
-            android:src="@drawable/profile_mock_avatar"/>
+            android:layout_marginEnd="15dp">
+            <com.vodafone.mycomms.custom.CircleImageView
+                android:id="@+id/avatar"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/profile_mock_avatar"/>
+            <TextView
+                android:id="@+id/avatarText"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:textSize="35sp"
+                tools:text="AM"
+                android:visibility="gone"
+                android:textColor="@color/grey_dark"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,12 +74,12 @@
                 tools:text="(481) 516 2342"/>
         </LinearLayout>
         <ImageView
-            android:id="@+id/btn_chat"
+            android:id="@+id/btn_prof_chat"
             android:layout_weight="1"
             style="@style/ContactDetailPlusIcon"
             android:src="@drawable/btn_chat_white"/>
         <ImageView
-            android:id="@+id/btn_sms"
+            android:id="@+id/btn_prof_phone"
             android:layout_weight="1"
             style="@style/ContactDetailPlusIcon"
             android:src="@drawable/btn_phone_white"/>
@@ -87,7 +104,7 @@
                 tools:text="black_widow_00@avengers.com"/>
         </LinearLayout>
         <ImageView
-            android:id="@+id/btn_email"
+            android:id="@+id/btn_prof_email"
             android:layout_weight="1"
             style="@style/ContactDetailPlusIcon"
             android:paddingRight="12dp"

@@ -131,8 +131,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvContactName = (TextView) findViewById(R.id.contact_contact_name);
         tvCompany = (TextView) findViewById(R.id.contact_company);
         tvPosition = (TextView) findViewById(R.id.contact_position);
-        tvPhoneNumber = (TextView) findViewById(R.id.contact_phone_number);
-        tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
         imageStarOn = R.mipmap.icon_favorite_colour;

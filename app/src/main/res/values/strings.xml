@@ -29,6 +29,7 @@
     <string name="we_need_your_picture">We Need Your Picture!</string>
     <string name="please_share_your_smile">Please share your smile with your colleagues</string>
     <string name="cancel">Cancel</string>
+    <string name="home">Home</string>
     <string name="incorrect_format">Incorrect format</string>
     <string name="add_a_photo_to_continue">Add a photo to continue</string>
     <string name="resend_code">Resend Code</string>
@@ -139,7 +140,7 @@
     <!-- Chat Strings -->
     <string name="chat_me_text">"Me: "</string>
     <string name="DummyTime">Thursday 18:40 a.m</string>
-    <string name="Availability">AVAILABILITY</string>
+    <string name="availability">Availability</string>
     <string name="dummyCountry">USA</string>
     <string name="badge">badge</string>
     <string name="dummyUser">Captain Planet</string>
@@ -174,6 +175,7 @@
     <string name="dummyPosition">Senior Enterprise Manager</string>
     <string name="dummyUserfull">Smith Doe, John</string>
     <string name="dummylastseen">Seen 2d ago</string>
+    <string name="job_title">Job Title</string>
     <string name="mobile">mobile</string>
     <string name="Phone">Phone</string>
     <string name="latestNews">Latest News</string>
@@ -184,14 +186,15 @@
     <string name="about_my_comms">About MyComms</string>
     <string name="name">Name</string>
     <string name="dummyday">Tuesday 28th April</string>
-    <string name="ABOUT">ABOUT</string>
+    <string name="about">About</string>
+    <string name="personal_info">Personal Info</string>
     <string name="emailbutton">Email Button</string>
     <string name="Send">Send</string>
     <string name="sharecurrenttime">Share current time</string>
     <string name="dummyCompany2">Planet Earth Company</string>
     <string name="typemessage">Type a message...</string>
     <string name="dummylastseen2">Seen long time ago</string>
-    <string name="SharingSettings">SHARING SETTINGS</string>
+    <string name="sharing_settings">Sharing Settings</string>
     <string name="ButtonChat">Button Chat</string>
     <string name="Delivered">Delivered</string>
     <string name="editphoto">edit photo</string>

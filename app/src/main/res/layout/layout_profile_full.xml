@@ -241,7 +241,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/officelocation"
+                        android:text="@string/office_location"
                         android:id="@+id/officelocationTitle"
                         android:textColor="#ff999999" />
 

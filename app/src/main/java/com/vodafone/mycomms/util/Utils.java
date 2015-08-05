@@ -8,6 +8,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -868,5 +869,11 @@ public final class Utils extends Activity {
         }
 
         return formatedDate;
+    }
+
+    public static String getProfileId(Context context){
+        SharedPreferences sp = context.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        return sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
     }
 }

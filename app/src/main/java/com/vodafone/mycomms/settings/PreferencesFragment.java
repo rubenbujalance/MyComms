@@ -97,6 +97,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -124,8 +127,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_preferences, container, false);
-
-        vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {

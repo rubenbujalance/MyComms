@@ -40,15 +40,6 @@ public class OKHttpWrapper {
         call("POST", url, jsonObject, cb, EndpointWrapper.getBaseNewsURL(), context);
     }
 
-    public static void getLDAP(String url, Context context, HttpCallback cb) {
-        call("GET", url, null, cb, null, context);
-    }
-
-    public static void postLDAP(String url, JSONObject jsonObject,
-                                Context context, HttpCallback cb) {
-        call("POST", url, jsonObject, cb, null, context);
-    }
-
     private static void call(String method, final String url, JSONObject jsonObject,
                              final HttpCallback cb, final String endPointWrapper,
                              final Context context) {

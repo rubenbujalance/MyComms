@@ -278,5 +278,6 @@ public class Constants {
     public static final String LDAP_SETTINGS_FIELD_TOKEN = "token";
     public static final String LDAP_SETTINGS_FIELD_TOKEN_TYPE = "tokenType";
     public static final String LDAP_SETTINGS_FIELD_URL = "url";
+    public static final String LDAP_API_CALL_PLATFORM = "ly";
 
 }

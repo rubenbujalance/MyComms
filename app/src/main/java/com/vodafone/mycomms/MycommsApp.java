@@ -89,6 +89,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         Fabric.with(getApplicationContext(), new Crashlytics());
 
         //Realm config
+
         RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext())
                 .name("mycomms.realm")
 //                .encryptionKey()

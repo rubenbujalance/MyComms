@@ -67,11 +67,12 @@ public class ContactsController{
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactsController.insertContactListInRealm: " + e.toString());
-            return null;
+            realmContactList = null;
         }
         finally {
             realm.close();
         }
+
         return realmContactList;
     }
 

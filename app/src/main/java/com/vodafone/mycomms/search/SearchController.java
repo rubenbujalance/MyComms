@@ -71,7 +71,6 @@ public class SearchController extends BaseController
 
         if (result != null && result.trim().length()>0)
         {
-
             try
             {
                 jsonResponse = new JSONObject(result);
@@ -122,8 +121,7 @@ public class SearchController extends BaseController
         searchConnection.request();
     }
 
-
-    private ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
+    public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
     {
         ArrayList<Contact> realmContactList = new ArrayList<>();
         Realm realm = Realm.getDefaultInstance();
@@ -131,21 +129,18 @@ public class SearchController extends BaseController
             Log.i(Constants.TAG, "ContactsController.insertContactListInRealm: ");
             JSONArray jsonArray = jsonObject.getJSONArray(Constants.CONTACT_DATA);
             Contact contact;
-            boolean doRefreshAdapter;
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);
                 contact = mapContact(jsonObject, mProfileId, realm);
 
                 realmContactList.add(contact);
-                doRefreshAdapter = (i==jsonArray.length()-1);
-                //updateContactAvatar(contact, doRefreshAdapter);
             }
             realmContactTransactions.insertContactList(realmContactList, realm);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "SearchController.insertContactListInRealm: " + e.toString());
-            return null;
+            realmContactList = null;
         }
         finally {
             realm.close();

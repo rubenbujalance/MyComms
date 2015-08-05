@@ -14,15 +14,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,19 +37,18 @@ import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
+import model.GlobalContactsSettings;
 
 /**
  * Created by str_oan on 26/06/2015.
  */
-public class SearchBarController implements ISearchConnectionCallback
-{
+public class SearchBarController {
     private EditText searchView;
     private Activity mActivity;
     private Button cancelButton;
     private LinearLayout layCancel;
     private SearchController mSearchController;
     private ArrayList<Contact> contactList;
-    private String apiCall;
     private SharedPreferences sp;
     private LinearLayout laySearchBar;
     private ContactListViewArrayAdapter mAdapter;
@@ -143,7 +149,6 @@ public class SearchBarController implements ISearchConnectionCallback
                 }
 
                 searchAllContacts(searchView.getText().toString());
-                BusProvider.getInstance().post(new ReloadAdapterEvent());
             }
 
             @Override
@@ -241,12 +246,10 @@ public class SearchBarController implements ISearchConnectionCallback
         else if(keyWord.length() >= 3)
         {
             loadAllContactsFromServer(keyWord);
-            if(!isGroupChatSearch)
-            {
-                //loadLocalContacts(keyWord);
-            }
             loadAllContactsFromDB(keyWord);
         }
+
+        BusProvider.getInstance().post(new ReloadAdapterEvent());
     }
 
     /**
@@ -286,9 +289,104 @@ public class SearchBarController implements ISearchConnectionCallback
      */
     private void loadAllContactsFromServer(String keyWord)
     {
-        buildRequestForSearchContacts(keyWord);
-        mSearchController.getContactList(apiCall);
-        mSearchController.setConnectionCallback(this);
+        loadAllContactsFromPlatforms(keyWord);
+        loadAllContactsFromLDAP(keyWord);
+    }
+
+    private void loadAllContactsFromPlatforms(String keyWord) {
+        String apiCall = buildRequestForSearchContacts(keyWord);
+//        mSearchController.getContactList(apiCall);
+//        mSearchController.setConnectionCallback(this);
+
+        OKHttpWrapper.get(apiCall, mActivity, new OKHttpWrapper.HttpCallback() {
+            @Override
+            public void onFailure(Response response, IOException e) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(Constants.TAG, "SearchBarController.run: ", new Exception(
+                                mActivity.getString(R.string.error_reading_data_from_server)));
+                        Toast.makeText(mActivity,
+                                R.string.error_reading_data_from_server, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess(Response response) {
+                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Success - " +
+                        response.request().urlString());
+
+                try {
+                    String result = response.body().string();
+
+                    if (result != null && result.trim().length() > 0) {
+
+                        JSONObject jsonResponse = new JSONObject(result).getJSONObject(Constants.CONTACT_DATA);
+                        //                        JSONObject jsonPagination =
+                        //                                jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
+                        //                        if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES))
+                        //                        {
+                        //                            morePages = true;
+                        //                            int pageSize = jsonPagination.getInt(
+                        //                                    Constants.CONTACT_PAGINATION_PAGESIZE);
+                        //                            search = Constants.CONTACTS_ALL;
+                        //                        }
+
+                        ArrayList<Contact> realmContactList =
+                                mSearchController.insertContactListInRealm(jsonResponse);
+
+                        BusProvider.getInstance().post(new ReloadAdapterEvent());
+                    }
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromServer: ", e);
+                }
+            }
+        });
+    }
+
+    private void loadAllContactsFromLDAP(String keyWord)
+    {
+        String apiCall = buildRequestForSearchLDAPContacts(keyWord);
+//        mSearchController.getContactList(apiCall);
+//        mSearchController.setConnectionCallback(this);
+
+        OKHttpWrapper.get(apiCall, mActivity, new OKHttpWrapper.HttpCallback() {
+            @Override
+            public void onFailure(Response response, IOException e) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: ", new Exception(
+                                mActivity.getString(R.string.error_reading_data_from_server)));
+                        Toast.makeText(mActivity,
+                                R.string.error_reading_data_from_server, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess(Response response) {
+                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Success - "+
+                        response.request().urlString());
+                try
+                {
+                    String result = response.body().string();
+
+                    if (result != null && result.trim().length()>0)
+                    {
+                        JSONObject jsonResponse = new JSONObject(result)
+                                .getJSONObject(Constants.CONTACT_DATA);
+                        ArrayList<Contact> realmContactList =
+                                mSearchController.insertContactListInRealm(jsonResponse);
+
+                        BusProvider.getInstance().post(new ReloadAdapterEvent());
+                    }
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromServer: ", e);
+                }
+            }
+        });
     }
 
     /**
@@ -296,12 +394,41 @@ public class SearchBarController implements ISearchConnectionCallback
      * @author str_oan
      * @param keyWord (String) -> key word for make search;
      */
-    private void buildRequestForSearchContacts(String keyWord)
+    private String buildRequestForSearchContacts(String keyWord)
     {
         String basicCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
         String content = sp.getString(Constants.PLATFORMS_SHARED_PREF, "mc");
         content = content.replace("[","").replace("]","").replace("\"","");
-        apiCall = basicCall+content+"&t="+keyWord;
+        String apiCall = basicCall+content+"&t="+keyWord;
+
+        return apiCall;
+    }
+
+    /**
+     * Builds request string for search the contacts in LDAP
+     * @author str_rbm
+     * @param keyWord (String) -> key word for make search;
+     */
+    private String buildRequestForSearchLDAPContacts(String keyWord)
+    {
+        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+        GlobalContactsSettings ldapSettings =
+                RealmLDAPSettingsTransactions.getSettings(profileId, null);
+
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode(ldapSettings.getToken(), "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode(ldapSettings.getTokenType(), "utf-8");
+            apiCall += "&url=" + URLEncoder.encode(ldapSettings.getUrl(), "utf-8");
+            apiCall += "&t=" + URLEncoder.encode(keyWord, "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.buildRequestForSearchLDAPContacts: ", e);
+        }
+
+        return apiCall;
     }
 
     /**
@@ -326,15 +453,15 @@ public class SearchBarController implements ISearchConnectionCallback
     }
 
 
-    @Override
-    public void onSearchContactsResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging) {
-
-    }
-
-    @Override
-    public void onConnectionNotAvailable() {
-
-    }
+//    @Override
+//    public void onSearchContactsResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging) {
+//
+//    }
+//
+//    @Override
+//    public void onConnectionNotAvailable() {
+//
+//    }
 
     public ArrayList<Contact> getContactList()
     {

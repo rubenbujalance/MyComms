@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
@@ -314,6 +315,13 @@ public class AddGlobalContactsActivity extends ToolbarActivity {
                                 token, tokenType, tempUrl, null);
 
                         //Close activity. Different transitions depending on origin activity
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(AddGlobalContactsActivity.this,
+                                        R.string.global_contacts_settings_added, Toast.LENGTH_LONG);
+                            }
+                        });
                         finish();
                     } else {
                         showMessageBarOnUIThread(

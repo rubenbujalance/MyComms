@@ -35,6 +35,7 @@ import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
+import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.AddGlobalContactsActivity;
@@ -97,8 +98,6 @@ public class ContactListFragment extends ListFragment {
 
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
-
-    private boolean globalContactsLoaded = false; //TODO: Create Logic
 
     private Realm realm;
 
@@ -163,13 +162,7 @@ public class ContactListFragment extends ListFragment {
                 }, 500);
                 Constants.isDashboardOrigin = false;
             }
-            if (null != addGlobalContactsContainer) {
-                if (!globalContactsLoaded) {
-                    addGlobalContactsContainer.setVisibility(View.VISIBLE);
-                } else{
-                    addGlobalContactsContainer.setVisibility(View.GONE);
-                }
-            }
+
             if (null != myCommsTextView){
                 myCommsTextView.setVisibility(View.VISIBLE);
             }
@@ -244,6 +237,16 @@ public class ContactListFragment extends ListFragment {
         contactListController = new ContactListController(getActivity(), profileId);
 
         setListAdapterTabs();
+    }
+
+    @Override
+    public void onResume() {
+        if (!RealmLDAPSettingsTransactions.haveSettings(profileId, realm) &&
+                mIndex == Constants.CONTACTS_ALL)
+            addGlobalContactsContainer.setVisibility(View.VISIBLE);
+        else addGlobalContactsContainer.setVisibility(View.GONE);
+
+        super.onResume();
     }
 
 //    private void refreshContent(){
@@ -496,18 +499,12 @@ public class ContactListFragment extends ListFragment {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);;
 
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
-            if (null != addGlobalContactsContainer)
-                addGlobalContactsContainer.setVisibility(View.GONE);
-
             favouriteContactList = mContactTransactions.getAllFavouriteContacts(realm);
             if (favouriteContactList!=null) {
                 setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
                         favouriteContactList, realm));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
-            if (null != addGlobalContactsContainer)
-                addGlobalContactsContainer.setVisibility(View.GONE);
-
             if (emptyText!=null)
                 emptyText.setText("");
             recentContactList = mContactTransactions.getAllRecentContacts(realm);
@@ -523,13 +520,6 @@ public class ContactListFragment extends ListFragment {
                 }
             }
         }else if(mIndex == Constants.CONTACTS_ALL){
-            if (null != addGlobalContactsContainer) {
-                if (!globalContactsLoaded) {
-                    addGlobalContactsContainer.setVisibility(View.VISIBLE);
-                } else{
-                    addGlobalContactsContainer.setVisibility(View.GONE);
-                }
-            }
             if (emptyText!=null)
                 emptyText.setText("");
             contactList = loadAllContactsFromDB();
@@ -565,7 +555,8 @@ public class ContactListFragment extends ListFragment {
      */
     private void reloadAdapter()
     {
-        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(
+                getActivity().getApplicationContext(), contactList);
         if (contactList!=null) {
             if (listView != null)
                 state = listView.onSaveInstanceState();

@@ -266,5 +266,9 @@
 
     <!-- Add global contacts -->
     <string name="add_global_contacts">Add Vodafone Global Address Contacts</string>
+    <string name="global_contacts_settings_added">
+        Global Contacts Address settings added successfully</string>
+
+    <string name="title_activity_add_global_contacts">AddGlobalContactsActivity</string>
 
 </resources>

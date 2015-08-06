@@ -242,18 +242,17 @@ public class SearchBarController {
      */
     private void searchAllContacts(String keyWord)
     {
-        if(keyWord.length() == 0)
-        {
-            loadAllContactsFromDB();
-        }
-        else if(keyWord.length() > 0 && keyWord.length() < 3)
-        {
-            loadAllContactsFromDB(keyWord);
-        }
-        else if(keyWord.length() >= 3)
-        {
-            loadAllContactsFromServer(keyWord);
-            loadAllContactsFromDB(keyWord);
+        if(keyWord!=null) {
+            if (keyWord.length() == 0) {
+                loadAllContactsFromDB();
+            } else if (keyWord.length() > 0 && keyWord.length() < 3) {
+                loadAllContactsFromDB(keyWord);
+            } else if (keyWord.length() >= 3) {
+                loadAllContactsFromServer(keyWord);
+                loadAllContactsFromDB(keyWord);
+            }
+
+            BusProvider.getInstance().post(new ReloadAdapterEvent());
         }
     }
 
@@ -388,7 +387,7 @@ public class SearchBarController {
                     gcController.callLDAPAuthProcess(user, password, mActivity,
                         new GlobalContactsController.GlobalContactsCallback() {
                             @Override
-                            public void onFailure(String error, int errorCode) {
+                            public void onFailure(final String error, final int errorCode) {
                                 //If renew failure, delete local token and show bar
                                 Log.i(Constants.TAG,
                                         "SearchBarController.loadAllContactsFromLDAP: RENEW");
@@ -401,10 +400,9 @@ public class SearchBarController {
                                     mActivity.runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: ", new Exception(
-                                                    mActivity.getString(R.string.error_reading_data_from_server)));
-                                            Toast.makeText(mActivity, R.string.error_reading_data_from_server,
-                                                    Toast.LENGTH_LONG).show();
+                                            Log.e(Constants.TAG, "SearchBarController." +
+                                                    "loadAllContactsFromLDAP: (" + errorCode + ") ",
+                                                    new Exception(error));
                                         }
                                     });
                                 }

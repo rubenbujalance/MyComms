@@ -85,7 +85,9 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
     }
 
     private void loadContactInfo() {
+        final String platform = contactDetailInfo[7];
         String fullName;
+
         if (null != contactDetailInfo[0]) //First Name
             fullName = contactDetailInfo[0];
         else
@@ -96,33 +98,75 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
 
         if(null != contactDetailInfo[2] && contactDetailInfo[2].length() > 0) //Phones
         {
-            if(null != Utils.getElementFromJsonArrayString(contactDetailInfo[2], Constants.CONTACT_PHONE))
-                tvPhoneNumber.setText(Utils.getElementFromJsonArrayString(contactDetailInfo[2], Constants.CONTACT_PHONE));
+            if (platform.equals(Constants.PLATFORM_LOCAL))
+            {
+                if (null != Utils.getElementFromJsonObjectString(contactDetailInfo[2], Constants.CONTACT_PHONE))
+                    tvPhoneNumber.setText(Utils.getElementFromJsonObjectString(contactDetailInfo[2], Constants.CONTACT_PHONE));
+            }
             else
-                tvPhoneNumber.setText("");
+            {
+                if (null != Utils.getElementFromJsonArrayString(contactDetailInfo[2], Constants.CONTACT_PHONE))
+                    tvPhoneNumber.setText(Utils.getElementFromJsonArrayString(contactDetailInfo[2], Constants.CONTACT_PHONE));
+                else
+                    tvPhoneNumber.setText("");
+            }
         }
-        else
-            tvPhoneNumber.setText("");
+        else {
+            if (!platform.equals(Constants.PLATFORM_LOCAL))
+                tvPhoneNumber.setText("");
+            else {
+                LinearLayout layoutPhone = (LinearLayout) findViewById(R.id.layout_phone);
+                layoutPhone.setVisibility(View.GONE);
+            }
+        }
 
         if(null != contactDetailInfo[3] && contactDetailInfo[3].length() > 0) //Emails
         {
-            if(null != Utils.getElementFromJsonArrayString(contactDetailInfo[3], Constants.CONTACT_EMAIL))
-                tvEmail.setText(Utils.getElementFromJsonArrayString(contactDetailInfo[3], Constants.CONTACT_EMAIL));
+            if (platform.equals(Constants.PLATFORM_LOCAL))
+            {
+                tvEmail.setText(contactDetailInfo[3]);
+//                if (null != Utils.getElementFromJsonObjectString(contactDetailInfo[3], Constants.CONTACT_EMAIL))
+//                    tvEmail.setText(Utils.getElementFromJsonObjectString(contactDetailInfo[3], Constants.CONTACT_EMAIL));
+//                else
+//                    tvEmail.setText("");
+            }
             else
-                tvEmail.setText("");
+            {
+                if (null != Utils.getElementFromJsonArrayString(contactDetailInfo[3], Constants.CONTACT_EMAIL))
+                    tvEmail.setText(Utils.getElementFromJsonArrayString(contactDetailInfo[3], Constants.CONTACT_EMAIL));
+                else
+                    tvEmail.setText("");
+            }
         }
-        else
-            tvEmail.setText("");
+        else {
+            if (!platform.equals(Constants.PLATFORM_LOCAL))
+                tvEmail.setText("");
+            else {
+                LinearLayout layoutEmail = (LinearLayout) findViewById(R.id.layout_email);
+                layoutEmail.setVisibility(View.GONE);
+            }
+        }
 
+        if (platform.equals(Constants.PLATFORM_LOCAL)){
+            LinearLayout layoutLocation = (LinearLayout) findViewById(R.id.layout_location);
+            if (null != contactDetailInfo[4] && !contactDetailInfo[4].equals("")) {
+                TextView contactOfficeLabel = (TextView) findViewById(R.id.contact_location_label);
+                contactOfficeLabel.setText(getResources().getString(R.string.address));
+                tvOfficeLocation.setText(contactDetailInfo[4]);
+            }
+            else
+                layoutLocation.setVisibility(View.GONE);
+        } else {
+            TextView contactOfficeLabel = (TextView) findViewById(R.id.contact_location_label);
+            contactOfficeLabel.setText(getResources().getString(R.string.office_location));
+        }
         tvOfficeLocation.setText(contactDetailInfo[4]);
         tvPosition.setText(contactDetailInfo[5]);
 
         loadContactAvatar();
-
     }
 
     private void loadContactAvatar() {
-        String test = contactDetailInfo[6];
         Utils.loadContactAvatar
         (
             contactDetailInfo[0] //FirstName

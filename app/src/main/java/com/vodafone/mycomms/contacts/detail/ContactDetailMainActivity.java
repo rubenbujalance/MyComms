@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
@@ -347,9 +348,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 else
                     tvOfficeLocation.setVisibility(View.VISIBLE);
 
-                tvLocalTime.setVisibility(View.INVISIBLE);
-                tvCountry.setVisibility(View.INVISIBLE);
-                tvLastSeen.setVisibility(View.INVISIBLE);
+                TableRow infoRow = (TableRow) findViewById(R.id.contact_info_row);
+                infoRow.setVisibility(View.GONE);
+//                tvLocalTime.setVisibility(View.INVISIBLE);
+//                tvCountry.setVisibility(View.INVISIBLE);
+//                tvLastSeen.setVisibility(View.INVISIBLE);
             }
 //            else
 //            {

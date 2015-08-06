@@ -353,7 +353,7 @@ public final class Utils extends Activity {
 
 
     public static String getElementFromJsonArrayString(String jsonArrayString, String key){
-        Log.d(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonArrayString + ", key=" + key);
+        Log.i(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonArrayString + ", key=" + key);
         JSONObject jsonObject = null;
         String result = null;
         try {
@@ -365,10 +365,34 @@ public final class Utils extends Activity {
                 }
             }
 
-            Log.d(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonObject != null ? jsonObject.toString() : "null" );
+            Log.i(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonObject != null ? jsonObject.toString() : "null");
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "Utils.getElementFromJsonArrayString: " ,e);
+        }
+        return result;
+    }
+
+    public static String getElementFromJsonObjectString(String json, String key){
+        JSONObject jsonObject;
+        String result = "";
+        try {
+            jsonObject = new JSONObject(json);
+            if (key.equals(Constants.CONTACT_PHONE)){
+                //TODO: Pending show all telephone numbers of Contact
+                if (!jsonObject.isNull(Constants.CONTACT_PHONE_WORK)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_WORK);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE_HOME)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_HOME);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE_MOBILE)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_MOBILE);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " , e);
         }
         return result;
     }

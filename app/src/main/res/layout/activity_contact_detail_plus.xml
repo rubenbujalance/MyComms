@@ -74,6 +74,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_phone"
         style="@style/ContactDetailPlusLinear"
         android:weightSum="5">
         <LinearLayout
@@ -104,6 +105,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_email"
         style="@style/ContactDetailPlusLinear"
         android:weightSum="5">
         <LinearLayout
@@ -130,6 +132,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_location"
         android:weightSum="5"
         style="@style/ContactDetailPlusLinear">
         <LinearLayout
@@ -139,6 +142,7 @@
             android:layout_gravity="center_vertical"
             android:orientation="vertical">
             <TextView
+                android:id="@+id/contact_location_label"
                 style="@style/ContactDetailPlusLabel"
                 android:text="@string/office_location"/>
             <TextView

@@ -13,7 +13,6 @@ import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
-import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 
 import org.json.JSONObject;
@@ -38,15 +37,6 @@ public class OKHttpWrapper {
     public static void postNews(String url, Context context,
                                 HttpCallback cb, JSONObject jsonObject) {
         call("POST", url, jsonObject, cb, EndpointWrapper.getBaseNewsURL(), context);
-    }
-
-    public static void getLDAP(String url, Context context, HttpCallback cb) {
-        call("GET", url, null, cb, null, context);
-    }
-
-    public static void postLDAP(String url, JSONObject jsonObject,
-                                Context context, HttpCallback cb) {
-        call("POST", url, jsonObject, cb, null, context);
     }
 
     private static void call(String method, final String url, JSONObject jsonObject,
@@ -135,10 +125,10 @@ public class OKHttpWrapper {
                             context.startActivity(in);
                         } else if (code == 401){
                             //Unauthorized
-                            errorEvent.setErrorMessage("Unauthorized User. Error code " + code);//TODO: Hardcoded Strings
-                            Intent in = new Intent(context, LoginSignupActivity.class);
-                            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(in);
+//                            errorEvent.setErrorMessage("Unauthorized User. Error code " + code);//TODO: Hardcoded Strings
+//                            Intent in = new Intent(context, LoginSignupActivity.class);
+//                            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            context.startActivity(in);
                         } else if (code == 403){
                             //Profile is not member of the group
                             errorEvent.setErrorMessage("Profile is not member of the group " + code);//TODO: Hardcoded Strings

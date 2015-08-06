@@ -112,6 +112,7 @@ public class Constants {
     public static final String PLATFORM_SALES_FORCE = "sf";
     public static final String PLATFORM_LOCAL = "local";
     public static final String PLATFORM_MY_COMMS = "mc";
+    public static final String PLATFORM_GLOBAL_CONTACTS = "ly";
 
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";
@@ -279,5 +280,6 @@ public class Constants {
     public static final String LDAP_SETTINGS_FIELD_TOKEN = "token";
     public static final String LDAP_SETTINGS_FIELD_TOKEN_TYPE = "tokenType";
     public static final String LDAP_SETTINGS_FIELD_URL = "url";
+    public static final String LDAP_API_CALL_PLATFORM = "ly";
 
 }

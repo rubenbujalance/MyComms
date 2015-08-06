@@ -40,7 +40,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
     private ImageView btnEmail;
     private ImageView btnPhone;
 
-    private LinearLayout lay_no_connection;
+    private LinearLayout layNoConnection, linLayoutClose;
 
     private String contactDetailInfo[];
 
@@ -51,11 +51,11 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
 
         BusProvider.getInstance().register(this);
 
-        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        layNoConnection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(ContactDetailsPlusActivity.this))
-            lay_no_connection.setVisibility(View.GONE);
+            layNoConnection.setVisibility(View.GONE);
         else
-            lay_no_connection.setVisibility(View.VISIBLE);
+            layNoConnection.setVisibility(View.VISIBLE);
 
         initLayoutObjects();
         contactDetailInfo = getContactInformation();
@@ -75,6 +75,8 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
         btnChat = (ImageView)findViewById(R.id.btn_prof_chat);
         btnEmail = (ImageView)findViewById(R.id.btn_prof_email);
         btnPhone = (ImageView)findViewById(R.id.btn_prof_phone);
+
+        linLayoutClose = (LinearLayout) findViewById(R.id.layout_close);
     }
 
     private String[] getContactInformation() {
@@ -120,8 +122,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
     }
 
     private void loadContactAvatar() {
-        //TODO: Check if checking of salesforce and local is necessary
-        String test[] = contactDetailInfo;
+        String test = contactDetailInfo[6];
         Utils.loadContactAvatar
         (
             contactDetailInfo[0] //FirstName
@@ -131,7 +132,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
             , Utils.getAvatarURL
                     (
                             contactDetailInfo[7] //Platform
-                            , null
+                            , contactDetailInfo[9] //SF Avatar
                             , contactDetailInfo[6] //Avatar
                     )
         );
@@ -156,7 +157,6 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
                         {
                             String sms;
                             //TODO: Implement multiple phone choice
-//                            JSONArray jPhones = new JSONArray(strPhones);
                             JSONObject jPhones = new JSONObject(strPhones);
                             sms = (String)jPhones.get(Constants
                                     .CONTACT_PHONE);
@@ -172,7 +172,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
                         recentContactController.insertRecent(contactId, Constants.CONTACTS_ACTION_SMS);
                     }
                 } catch (Exception ex) {
-                    Log.e(Constants.TAG, "ContactDetailsPlusActivity.onClick: ", ex);
+                    Log.e(Constants.TAG, "ContactDetailsPlusActivity.btnChatonClick: ", ex);
                 }
             }
         });
@@ -196,7 +196,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
                         recentContactController.insertRecent(contactId, Constants.CONTACTS_ACTION_EMAIL);
                     }
                 } catch (Exception ex) {
-                    Log.e(Constants.TAG, "ContactDetailsPlusActivity.onClick: ", ex);
+                    Log.e(Constants.TAG, "ContactDetailsPlusActivity.btnEmailonClick: ", ex);
                 }
             }
         });
@@ -221,7 +221,18 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
                         recentContactController.insertRecent(contactId, Constants.CONTACTS_ACTION_CALL);
                     }
                 } catch (Exception ex) {
-                    Log.e(Constants.TAG, "ContactDetailsPlusActivity.onClick: ", ex);
+                    Log.e(Constants.TAG, "ContactDetailsPlusActivity.btnPhoneonClick: ", ex);
+                }
+            }
+        });
+
+        linLayoutClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    finish();
+                } catch (Exception ex) {
+                    Log.e(Constants.TAG, "ContactDetailsPlusActivity.linLayoutCloseonClick: ", ex);
                 }
             }
         });
@@ -234,8 +245,8 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
                 + event.getConnectivityStatus().toString());
         if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
                 event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
-            lay_no_connection.setVisibility(View.VISIBLE);
+            layNoConnection.setVisibility(View.VISIBLE);
         else
-            lay_no_connection.setVisibility(View.GONE);
+            layNoConnection.setVisibility(View.GONE);
     }
 }

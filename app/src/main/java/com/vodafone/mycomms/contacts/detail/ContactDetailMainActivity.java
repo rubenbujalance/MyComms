@@ -282,7 +282,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private String[] loadContactExtra() {
 
-        String contactDetail[] = new String[9];
+        String contactDetail[] = new String[10];
 
         contactDetail[0] = contact.getFirstName();
         contactDetail[1] = contact.getLastName();
@@ -295,6 +295,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         contactDetail[6] = contact.getAvatar();
         contactDetail[7] = contact.getPlatform();
         contactDetail[8] = contact.getContactId();
+        contactDetail[9] = contact.getStringField1(); //SFAvatar
 
         return contactDetail;
     }

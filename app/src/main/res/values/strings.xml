@@ -159,7 +159,6 @@
     <string name="Sent">Sent</string>
     <string name="dummyAddress">742, Evergreen Terrace</string>
     <string name="office_location">Office Location</string>
-    <string name="office_location_lower">office location</string>
     <string name="dummyEmail">ruben_bujalance@stratesys-ts.com</string>
     <string name="repeatPassword">Repeat Password</string>
     <string name="additional">Additional</string>

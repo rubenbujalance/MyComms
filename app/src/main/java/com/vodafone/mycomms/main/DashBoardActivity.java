@@ -337,7 +337,8 @@ public class DashBoardActivity extends ToolbarActivity
         }
         loadNews();
 
-        loadLocalContacts();
+        //TODO RBM - Commented to make it work in JJ phone (lots of local contacts)
+//        loadLocalContacts();
 
         //Reset notifications inbox
         NotificationMessages.resetInboxMessages();

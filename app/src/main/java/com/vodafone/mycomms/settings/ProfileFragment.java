@@ -20,13 +20,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +43,6 @@ import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.zip.GZIPOutputStream;
 
 import io.realm.Realm;
 import model.UserProfile;

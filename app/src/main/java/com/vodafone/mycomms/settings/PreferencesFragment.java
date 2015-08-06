@@ -103,18 +103,12 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         }
         this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
-        profileController = new ProfileController(getActivity());
-        profileController.setConnectionCallback(this);
-
     }
 
     @Override
     public void onResume(){
         super.onResume();
         Log.d(Constants.TAG, "PreferencesFragment.onResume: ");
-//        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-//        editProfile.setVisibility(View.INVISIBLE);
-
         profileController.setConnectionCallback(this);
         profileController.getProfile(this.realm);
 
@@ -125,7 +119,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_preferences, container, false);
 
-        vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+        vacationTimeEnds = (TextView)v.findViewById(R.id.settings_preferences_vacation_time_value);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {
@@ -133,38 +127,11 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             public void onClick(View v) {
                 Log.i(Constants.TAG, "PreferencesFragment.onClick: Logout");
 
-                SharedPreferences sp = getActivity().getSharedPreferences(
-                        Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-                String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
                 //Logout on server
                 profileController.logoutToAPI();
-
-                //Remove cookies if Sales Force login
-                Utils.removeCookies();
-
-                //Reset user security data
-                UserSecurity.resetTokens(getActivity());
-
-                //Reset profile data
-                SharedPreferences.Editor editor = sp.edit();
-                editor.remove(Constants.ACCESS_TOKEN_SHARED_PREF);
-                editor.remove(Constants.PROFILE_ID_SHARED_PREF);
-                editor.commit();
-
-                //Remove User from DB
-                if(profileId!=null) {
-                    RealmProfileTransactions profileTx = new RealmProfileTransactions(getActivity());
-                    profileTx.removeUserProfile(profileId, null);
-                }
-
                 ((MycommsApp)getActivity().getApplication()).appIsInitialized = false;
 
-                //Go to login page as a new task
-                Intent in = new Intent(getActivity(), LoginSignupActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                        Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(in);
+
             }
         });
 
@@ -203,6 +170,10 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 startActivity(intent);
             }
         });
+
+        profileController = new ProfileController(getActivity());
+        profileController.setConnectionCallback(this);
+
         return v;
     }
 
@@ -287,9 +258,15 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                     this.holidayEndDate = endDate.getTime();
 
                     if (holidayEndDate > 0) {
-                        String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
+                        final String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
                         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: setting holidayDate to:" + holidayDateToSet);
-                        vacationTimeEnds.setText(holidayDateToSet);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                vacationTimeEnds.setText(holidayDateToSet);
+                            }
+                        });
+
                     }
                 }
             }

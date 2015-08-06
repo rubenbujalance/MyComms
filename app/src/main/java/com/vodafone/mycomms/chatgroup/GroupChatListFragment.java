@@ -293,7 +293,8 @@ public class GroupChatListFragment extends ListFragment implements
         }
         else
         {
-            contactList = mSearchController.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
+            contactList = mSearchController
+                    .getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
         }
     }
 
@@ -348,6 +349,7 @@ public class GroupChatListFragment extends ListFragment implements
                         , listView
                         , true
                         , realm
+                        , null
                 );
 
         mSearchBarController.initiateComponentsForSearchView(v);

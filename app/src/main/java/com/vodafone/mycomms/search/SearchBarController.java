@@ -18,11 +18,13 @@ import android.widget.Toast;
 
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
+import com.vodafone.mycomms.settings.globalcontacts.GlobalContactsController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 
@@ -56,12 +58,13 @@ public class SearchBarController {
     private ListView mListView;
     private boolean isGroupChatSearch;
     private RealmContactTransactions mContactTransactions;
+    private ContactListFragment contactListFragment;
+    private String profileId;
 
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
 
     private Realm realm;
-
 
     public SearchBarController
             (
@@ -74,6 +77,7 @@ public class SearchBarController {
                     , ListView listView
                     , boolean isGroupChatSearch
                     , Realm realm
+                    , ContactListFragment contactListFragment
             )
     {
         this.mActivity = activity;
@@ -85,9 +89,12 @@ public class SearchBarController {
         this.mListView = listView;
         this.isGroupChatSearch = isGroupChatSearch;
         this.realm = realm;
+        this.contactListFragment = contactListFragment;
 
         sp = mActivity.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
     }
 
@@ -248,8 +255,6 @@ public class SearchBarController {
             loadAllContactsFromServer(keyWord);
             loadAllContactsFromDB(keyWord);
         }
-
-        BusProvider.getInstance().post(new ReloadAdapterEvent());
     }
 
     /**
@@ -259,6 +264,8 @@ public class SearchBarController {
      */
     private void loadAllContactsFromDB(String keyWord)
     {
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>"+keyWord);
+
         if(null == keyWord)
         {
             contactList = mContactTransactions.getAllContacts(realm);
@@ -267,7 +274,8 @@ public class SearchBarController {
         {
             if(isGroupChatSearch)
             {
-                contactList = mSearchController.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
+                contactList = mSearchController
+                        .getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
             }
             else
             {
@@ -279,6 +287,7 @@ public class SearchBarController {
 
     private void loadAllContactsFromDB()
     {
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: <No Filter>");
         loadAllContactsFromDB(null);
     }
 
@@ -289,14 +298,28 @@ public class SearchBarController {
      */
     private void loadAllContactsFromServer(String keyWord)
     {
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Keyword>" + keyWord);
+
         loadAllContactsFromPlatforms(keyWord);
-        loadAllContactsFromLDAP(keyWord);
+
+        GlobalContactsSettings settings =
+                RealmLDAPSettingsTransactions.getSettings(profileId, realm);
+
+        String user = settings.getUser();
+        String password = settings.getPassword();
+
+        String apiCall = buildRequestForSearchLDAPContacts(keyWord, realm, null);
+
+        loadAllContactsFromLDAP(apiCall, keyWord, false, user, password);
     }
 
-    private void loadAllContactsFromPlatforms(String keyWord) {
+    private void loadAllContactsFromPlatforms(final String keyWord) {
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromPlatforms: Keyword>"+keyWord);
+
         String apiCall = buildRequestForSearchContacts(keyWord);
 //        mSearchController.getContactList(apiCall);
 //        mSearchController.setConnectionCallback(this);
+
 
         OKHttpWrapper.get(apiCall, mActivity, new OKHttpWrapper.HttpCallback() {
             @Override
@@ -314,7 +337,7 @@ public class SearchBarController {
 
             @Override
             public void onSuccess(Response response) {
-                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Success - " +
+                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromPlatforms: Success - " +
                         response.request().urlString());
 
                 try {
@@ -322,52 +345,96 @@ public class SearchBarController {
 
                     if (result != null && result.trim().length() > 0) {
 
-                        JSONObject jsonResponse = new JSONObject(result).getJSONObject(Constants.CONTACT_DATA);
-                        //                        JSONObject jsonPagination =
-                        //                                jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
-                        //                        if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES))
-                        //                        {
-                        //                            morePages = true;
-                        //                            int pageSize = jsonPagination.getInt(
-                        //                                    Constants.CONTACT_PAGINATION_PAGESIZE);
-                        //                            search = Constants.CONTACTS_ALL;
-                        //                        }
+                        JSONObject jsonResponse = new JSONObject(result);
 
                         ArrayList<Contact> realmContactList =
                                 mSearchController.insertContactListInRealm(jsonResponse);
 
-                        BusProvider.getInstance().post(new ReloadAdapterEvent());
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadAllContactsFromDB(keyWord);
+                                BusProvider.getInstance().post(new ReloadAdapterEvent());
+                            }
+                        });
                     }
                 } catch (Exception e) {
-                    Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromServer: ", e);
+                    Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromPlatforms: ", e);
                 }
             }
         });
     }
 
-    private void loadAllContactsFromLDAP(String keyWord)
+    private void loadAllContactsFromLDAP(final String apiCall, final String keyWord,
+                                         final boolean retrying, final String user,
+                                         final String password)
     {
-        String apiCall = buildRequestForSearchLDAPContacts(keyWord);
-//        mSearchController.getContactList(apiCall);
-//        mSearchController.setConnectionCallback(this);
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: " +
+                "KeyWord>"+keyWord+"; Retrying>"+retrying);
 
         OKHttpWrapper.get(apiCall, mActivity, new OKHttpWrapper.HttpCallback() {
             @Override
             public void onFailure(Response response, IOException e) {
-                mActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: ", new Exception(
-                                mActivity.getString(R.string.error_reading_data_from_server)));
-                        Toast.makeText(mActivity,
-                                R.string.error_reading_data_from_server, Toast.LENGTH_LONG).show();
-                    }
-                });
+                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP - Failure: " +
+                        "KeyWord>"+keyWord+"; Retrying>"+retrying);
+
+                //If have received an Unauthorized response, renew LDAP credentials and retry
+                //If already have retried, show LDAP Warning Bar
+                if(response!=null && response.code()==401 && !retrying) {
+
+                    //In case of Unauthorized, do a renew LDAP credentials
+                    GlobalContactsController gcController = new GlobalContactsController();
+
+                    gcController.callLDAPAuthProcess(user, password, mActivity,
+                        new GlobalContactsController.GlobalContactsCallback() {
+                            @Override
+                            public void onFailure(String error, int errorCode) {
+                                //If renew failure, delete local token and show bar
+                                Log.i(Constants.TAG,
+                                        "SearchBarController.loadAllContactsFromLDAP: RENEW");
+
+                                if(errorCode>=400 && errorCode<500) {
+                                    RealmLDAPSettingsTransactions.deleteTokenData(profileId, null);
+                                    contactListFragment.showLDAPSettingsBar(true);
+                                }
+                                else {
+                                    mActivity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: ", new Exception(
+                                                    mActivity.getString(R.string.error_reading_data_from_server)));
+                                            Toast.makeText(mActivity, R.string.error_reading_data_from_server,
+                                                    Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onSuccess(GlobalContactsSettings settings) {
+                                //If renew success, retry search
+                                String apiCall =
+                                        buildRequestForSearchLDAPContacts(keyWord, null, settings);
+                                loadAllContactsFromLDAP(apiCall, keyWord, true, user, password);
+                            }
+                        });
+                }
+                else {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: ", new Exception(
+                                    mActivity.getString(R.string.error_reading_data_from_server)));
+                            Toast.makeText(mActivity, R.string.error_reading_data_from_server,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
             }
 
             @Override
             public void onSuccess(Response response) {
-                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Success - "+
+                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: Success - " +
                         response.request().urlString());
                 try
                 {
@@ -375,15 +442,20 @@ public class SearchBarController {
 
                     if (result != null && result.trim().length()>0)
                     {
-                        JSONObject jsonResponse = new JSONObject(result)
-                                .getJSONObject(Constants.CONTACT_DATA);
+                        JSONObject jsonResponse = new JSONObject(result);
                         ArrayList<Contact> realmContactList =
                                 mSearchController.insertContactListInRealm(jsonResponse);
 
-                        BusProvider.getInstance().post(new ReloadAdapterEvent());
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadAllContactsFromDB(keyWord);
+                                BusProvider.getInstance().post(new ReloadAdapterEvent());
+                            }
+                        });
                     }
                 } catch (Exception e) {
-                    Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromServer: ", e);
+                    Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: ", e);
                 }
             }
         });
@@ -409,12 +481,16 @@ public class SearchBarController {
      * @author str_rbm
      * @param keyWord (String) -> key word for make search;
      */
-    private String buildRequestForSearchLDAPContacts(String keyWord)
+    private String buildRequestForSearchLDAPContacts(String keyWord, Realm realm,
+                                                     GlobalContactsSettings ldapSettings)
     {
-        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        GlobalContactsSettings ldapSettings =
-                RealmLDAPSettingsTransactions.getSettings(profileId, null);
+        if(ldapSettings==null) {
+            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+            ldapSettings =
+                    RealmLDAPSettingsTransactions.getSettings(profileId, realm);
+        }
 
         String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
 

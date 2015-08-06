@@ -111,6 +111,7 @@ public class Constants {
     public static final String PLATFORM_SALES_FORCE = "sf";
     public static final String PLATFORM_LOCAL = "local";
     public static final String PLATFORM_MY_COMMS = "mc";
+    public static final String PLATFORM_GLOBAL_CONTACTS = "ly";
 
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";

@@ -94,9 +94,10 @@ public class RealmLDAPSettingsTransactions {
         return false;
     }
 
-    public static void createOrUpdateData (String profileId, String user, String password,
-                                                String token, String tokenType, String url, Realm
-                                                        realm)
+    public static GlobalContactsSettings createOrUpdateData (String profileId, String user,
+                                                             String password, String token,
+                                                             String tokenType, String url,
+                                                             Realm realm)
     {
         Log.i(Constants.TAG, "RealmLDAPSettingsTransactions.createOrUpdateData: " +
                 "Creating/Updating LDAP data for user "+user);
@@ -109,26 +110,29 @@ public class RealmLDAPSettingsTransactions {
         try
         {
             mRealm.beginTransaction();
-            GlobalContactsSettings settings = getSettings(profileId, realm);
-            if(settings==null) {
-                settings = new GlobalContactsSettings(profileId, user, password,
+//            GlobalContactsSettings settings = getSettings(profileId, realm);
+//            if(settings==null) {
+            GlobalContactsSettings settings = new GlobalContactsSettings(profileId, user, password,
                         token, tokenType, url);
                 mRealm.copyToRealmOrUpdate(settings);
-            }
-            else {
-                settings.setUser(user);
-                settings.setPassword(password);
-                settings.setToken(token);
-                settings.setTokenType(tokenType);
-                settings.setUrl(url);
-            }
+//            }
+//            else {
+//                settings.setUser(user);
+//                settings.setPassword(password);
+//                settings.setToken(token);
+//                settings.setTokenType(tokenType);
+//                settings.setUrl(url);
+//            }
             mRealm.commitTransaction();
+
+            return settings;
         }
         catch(Exception e)
         {
             Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.createOrUpdateData: ",e);
             Crashlytics.logException(e);
             mRealm.cancelTransaction();
+            return null;
         }
         finally
         {

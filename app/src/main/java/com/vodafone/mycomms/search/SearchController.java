@@ -327,9 +327,11 @@ public class SearchController extends BaseController
         return realmContactTransactions.getContactsByKeyWord(keyWord, realm);
     }
 
-    public ArrayList<Contact> getContactsByKeyWordWithoutLocalsAndSalesForce(String keyWord) {
+    public ArrayList<Contact> getContactsByKeyWordWithoutLocalsAndSalesForce(
+            String keyWord) {
         Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
-        return realmContactTransactions.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord, realm);
+        return realmContactTransactions
+                .getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord, realm);
     }
 
     public void storeContactsIntoRealm(ArrayList<Contact> contacts)

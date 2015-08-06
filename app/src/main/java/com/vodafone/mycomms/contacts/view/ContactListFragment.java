@@ -38,7 +38,7 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
-import com.vodafone.mycomms.settings.AddGlobalContactsActivity;
+import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -192,6 +192,7 @@ public class ContactListFragment extends ListFragment {
                         , listView
                         , false
                         , realm
+                        , this
                 );
 
         mSearchBarController.initiateComponentsForSearchView(v);
@@ -243,10 +244,15 @@ public class ContactListFragment extends ListFragment {
     public void onResume() {
         if (!RealmLDAPSettingsTransactions.haveSettings(profileId, realm) &&
                 mIndex == Constants.CONTACTS_ALL)
-            addGlobalContactsContainer.setVisibility(View.VISIBLE);
-        else addGlobalContactsContainer.setVisibility(View.GONE);
+            showLDAPSettingsBar(true);
+        else showLDAPSettingsBar(false);
 
         super.onResume();
+    }
+
+    public void showLDAPSettingsBar(boolean show) {
+        if(show) addGlobalContactsContainer.setVisibility(View.VISIBLE);
+        else addGlobalContactsContainer.setVisibility(View.GONE);
     }
 
 //    private void refreshContent(){

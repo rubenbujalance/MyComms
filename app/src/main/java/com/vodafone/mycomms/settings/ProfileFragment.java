@@ -22,9 +22,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -78,9 +78,9 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private ProfileController profileController;
     private boolean isUpdating = false;
 
-    private CircleImageView profilePicture;
+    private CircleImageView profilePicture, opaqueFilter;
+    private ImageView imgTakePhoto;
     private TextView textAvatar;
-    private TextView editPhoto;
     private TextView editProfile;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -96,6 +96,9 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private boolean isFirstLoadNeed = true;
     private String avatarNewURL = null;
     private SharedPreferences sp;
+
+    private LinearLayout layout_error_edit_profile;
+    private TextView tv_error_on_edit;
 
     private Realm realm;
 
@@ -121,7 +124,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        editProfile.setVisibility(View.INVISIBLE);
 
        profilePicture = (CircleImageView) v.findViewById(R.id.profile_picture);
+       opaqueFilter = (CircleImageView) v.findViewById(R.id.opaque_filter);
        textAvatar = (TextView) v.findViewById(R.id.avatarText);
+       imgTakePhoto = (ImageView) v.findViewById(R.id.img_take_photo);
+       imgTakePhoto.setVisibility(View.GONE);
+
 
        Log.i(Constants.TAG, "ProfileFragment.onCreateView: ");
        editProfile.setOnClickListener(new View.OnClickListener() {
@@ -129,24 +136,14 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
            public void onClick(View v) {
                Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
 
-               if(isUpdating && !isEditing) return;
+               if (isUpdating && !isEditing) return;
 
                profileEditMode(!isEditing);
 
-               if(isEditing)
+               if (isEditing)
                    new UpdateProfile().execute();
 
                isEditing = !isEditing;
-           }
-       });
-
-       editPhoto = (TextView) v.findViewById(R.id.edit_photo);
-       editPhoto.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               if (isEditing) {
-                   dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
-               }
            }
        });
 
@@ -159,49 +156,35 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
            }
        });
 
+       profileController = new ProfileController(getActivity());
+       profileController.setConnectionCallback(this);
+
        return v;
    }
 
-    private boolean updateContactData() {
+    private boolean updateContactData()
+    {
         Log.d(Constants.TAG, "ProfileFragment.updateContactData: ");
         if(!BaseConnection.isConnected(this.getActivity())){
             profileController.showToast("Not connected. Can't save details.");
             return false;
         }
 
-        String password = ((EditText) getActivity().findViewById(R.id.profile_password)).getText().toString();
-        String repeatPassword = ((EditText) getActivity().findViewById(R.id.profile_password_repeat)).getText().toString();
-
-        if((password != null && password.length() > 0) && (repeatPassword == null || repeatPassword.length() == 0)){
-            profileController.showToast("Passwords don't match");
+        if(isShowErrorOnEditProfile())
+        {
+            isEditing = true;
+            isUpdating = true;
             return false;
-        }else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0)){
-            profileController.showToast("Passwords don't match");
-            return false;
-        }else if( password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0 && !password.equals(repeatPassword)){
-            profileController.showToast("Passwords don't match");
-            return false;
-        }else if(password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0  && password.equals(repeatPassword) ){
-            HashMap newPasswordHashMap = new HashMap<>();
-            newPasswordHashMap.put("password", password);
-            profileController.updatePassword(newPasswordHashMap);
         }
 
-        String firstName = ((EditText) getActivity().findViewById(R.id.profile_name)).getText().toString();
-        String lastName = ((EditText) getActivity().findViewById(R.id.profile_surname)).getText().toString();
-
-        ((SettingsMainActivity)getActivity()).setMainActivityTitle(firstName + " " + lastName);
-
+        String firstName = ((EditText) getActivity().findViewById(R.id.et_first_name_content)).getText().toString();
+        String lastName = ((EditText) getActivity().findViewById(R.id.et_last_name_content)).getText().toString();
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(Constants.PROFILE_FULLNAME_SHARED_PREF, firstName + " " + lastName);
         editor.apply();
-
-//      EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
-//      EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
-
-        String company = ((EditText) getActivity().findViewById(R.id.contact_company)).getText().toString();
-        String position = ((EditText) getActivity().findViewById(R.id.contact_position)).getText().toString();
-        String officeLocation = ((EditText) getActivity().findViewById(R.id.office_location)).getText().toString();
+        String company = ((EditText) getActivity().findViewById(R.id.et_company_content)).getText().toString();
+        String position = ((EditText) getActivity().findViewById(R.id.et_job_title_content)).getText().toString();
+        String officeLocation = ((EditText) getActivity().findViewById(R.id.et_home_content)).getText().toString();
 
 
         if(null != avatarNewURL)
@@ -209,7 +192,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileController.updateUserAvatarInDB(avatarNewURL);
             avatarNewURL = null;
         }
-
 
         if(!profileController.isUserProfileChanged(firstName, lastName, company, position,
                 officeLocation))
@@ -242,44 +224,63 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         return  true;
     }
 
+    private boolean isShowErrorOnEditProfile()
+    {
+        String password = ((EditText) getActivity().findViewById(R.id.et_password_content)).getText().toString();
+        String repeatPassword = ((EditText) getActivity().findViewById(R.id.et_confirm_password_content)).getText().toString();
+        layout_error_edit_profile.setVisibility(View.GONE);
+
+
+        if((password != null && password.length() > 0) && (repeatPassword == null || repeatPassword.length() == 0)){
+            tv_error_on_edit.setText("Passwords don't match");
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            return true;
+        }else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0)){
+            tv_error_on_edit.setText("Passwords don't match");
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            return true;
+        }else if( password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0 && !password.equals(repeatPassword)){
+            tv_error_on_edit.setText("Passwords don't match");
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            return true;
+        }else if(password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0  && password.equals(repeatPassword) ){
+            HashMap newPasswordHashMap = new HashMap<>();
+            newPasswordHashMap.put("password", password);
+            profileController.updatePassword(newPasswordHashMap);
+            layout_error_edit_profile.setVisibility(View.GONE);
+            return false;
+        }
+        else
+            return true;
+    }
+
     private void profileEditMode(boolean isEditing) {
         Log.i(Constants.TAG, "ProfileFragment.profileEditMode: " + isEditing);
 
-        LinearLayout passwordLayout = (LinearLayout) getActivity().findViewById(R.id.password_layout);
         if (isEditing){
-            passwordLayout.setVisibility(View.VISIBLE);
             editProfile.setText(getActivity().getString(R.string.profile_edit_mode_done));
-            editPhoto.setVisibility(View.VISIBLE);
+            opaqueFilter.setVisibility(View.VISIBLE);
+            imgTakePhoto.setVisibility(View.VISIBLE);
 
         }else{
             editProfile.setText(getActivity().getString(R.string.profile_edit_mode_edit));
-            editPhoto.setVisibility(View.GONE);
-            passwordLayout.setVisibility(View.GONE);
+            imgTakePhoto.setVisibility(View.GONE);
+            opaqueFilter.setVisibility(View.GONE);
         }
 
-        EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
+        EditText profileName = (EditText) getActivity().findViewById(R.id.et_first_name_content);
         profileName.setEnabled(isEditing);
-        EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
+        EditText profileSurname = (EditText) getActivity().findViewById(R.id.et_last_name_content);
         profileSurname.setEnabled(isEditing);
-       // EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
-       // profilePhoneNumber.setEnabled(isEditing);
-       // EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
-      //  profileEmail.setEnabled(isEditing);
-        EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
+        EditText profileCompany = (EditText) getActivity().findViewById(R.id.et_company_content);
         profileCompany.setEnabled(isEditing);
-        EditText profilePosition = (EditText) getActivity().findViewById(R.id.contact_position);
+        EditText profilePosition = (EditText) getActivity().findViewById(R.id.et_job_title_content);
         profilePosition.setEnabled(isEditing);
-
-//        EditText profileDepartment = (EditText) getActivity().findViewById(R.id.department);
-//        profileDepartment.setEnabled(isEditing);
-        EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.office_location);
+        EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.et_home_content);
         profileOfficeLocation.setEnabled(isEditing);
-//        EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
-//        profileInfo.setEnabled(isEditing);
-
-        EditText password = (EditText) getActivity().findViewById(R.id.profile_password);
+        EditText password = (EditText) getActivity().findViewById(R.id.et_password_content);
         password.setEnabled(isEditing);
-        EditText repeatPassword = (EditText) getActivity().findViewById(R.id.profile_password_repeat);
+        EditText repeatPassword = (EditText) getActivity().findViewById(R.id.et_confirm_password_content);
         repeatPassword.setEnabled(isEditing);
     }
 
@@ -320,7 +321,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     }
 
     private void initSpinners(View v) {
-        Spinner spinnerPhone = (Spinner) v.findViewById(R.id.spinner_phone);
+//        Spinner spinnerPhone = (Spinner) v.findViewById(R.id.spinner_phone);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.phones_array, android.R.layout.simple_spinner_item);
@@ -328,10 +329,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         if (adapter != null) {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // Apply the adapter to the spinner
-            spinnerPhone.setAdapter(adapter);
+//            spinnerPhone.setAdapter(adapter);
         }
 
-        Spinner spinnerEmail = (Spinner) v.findViewById(R.id.spinner_email);
+//        Spinner spinnerEmail = (Spinner) v.findViewById(R.id.spinner_email);
         // Create an ArrayAdapter using the string array and a default spinner layout
         adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.email_array, android.R.layout.simple_spinner_item);
@@ -339,7 +340,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         if (adapter != null) {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // Apply the adapter to the spinner
-            spinnerEmail.setAdapter(adapter);
+//            spinnerEmail.setAdapter(adapter);
         }
     }
 
@@ -375,8 +376,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             Log.i(Constants.TAG, "ProfileFragment.onCreate: " + mIndex);
         }
 
-        profileController = new ProfileController(getActivity());
-        profileController.setConnectionCallback(this);
+
 
         this.sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -425,34 +425,24 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                 this.userProfile = userProfile;
                 this.profileId = userProfile.getId();
                 Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
-                EditText profileName = (EditText) getActivity().findViewById(R.id.profile_name);
+                EditText profileName = (EditText) getActivity().findViewById(R.id.et_first_name_content);
                 profileName.setText(userProfile.getFirstName());
-                EditText profileSurname = (EditText) getActivity().findViewById(R.id.profile_surname);
+                EditText profileSurname = (EditText) getActivity().findViewById(R.id.et_last_name_content);
                 profileSurname.setText(userProfile.getLastName());
-                EditText profilePhoneNumber = (EditText) getActivity().findViewById(R.id.phone_number1);
-                String phone = Utils.getElementFromJsonArrayString(userProfile.getPhones(), Constants.PROFILE_PHONE);
-                profilePhoneNumber.setText(phone);
-                EditText profileEmail = (EditText) getActivity().findViewById(R.id.email1);
-                String email = Utils.getElementFromJsonArrayString(userProfile.getEmails(), Constants.PROFILE_EMAIL);
-                profileEmail.setText(email);
-                EditText profileCompany = (EditText) getActivity().findViewById(R.id.contact_company);
+                EditText profileCompany = (EditText) getActivity().findViewById(R.id.et_company_content);
                 profileCompany.setText(userProfile.getCompany());
-                EditText profilePosition = (EditText) getActivity().findViewById(R.id.contact_position);
+                EditText profilePosition = (EditText) getActivity().findViewById(R.id.et_job_title_content);
                 profilePosition.setText(userProfile.getPosition());
-
-//          EditText profileDepartment = (EditText) getActivity().findViewById(R.id.department);
-//          profileDepartment.setText("????????");
-
-                EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.office_location);
+                EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.et_home_content);
                 profileOfficeLocation.setText(userProfile.getOfficeLocation());
-//            EditText profileInfo = (EditText) getActivity().findViewById(R.id.contact_additional_info);
-//            profileInfo.setText("????????");
-
-
                 loadProfileImage();
 
                 isFirstLoadNeed = false;
             }
+            layout_error_edit_profile = (LinearLayout) getActivity().findViewById(R.id.lay_error_edit);
+            tv_error_on_edit = (TextView) getActivity().findViewById(R.id.tv_error_on_edit);
+            layout_error_edit_profile.setVisibility(View.GONE);
+
         }
     }
 

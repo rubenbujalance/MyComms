@@ -26,6 +26,7 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
     public static final int VACATION_TIME_SETTER_ID = 1 ;
     public static final String VACATION_TIME_END_VALUE = "vacationTimeEndValue";
     private LinearLayout lay_no_connection;
+    private LinearLayout lay_exit_preferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,15 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
         setContentView(R.layout.layout_profile_activity);
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+        lay_exit_preferences = (LinearLayout) findViewById(R.id.lay_exit_preferences);
+
+        lay_exit_preferences.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         if(APIWrapper.isConnected(SettingsMainActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else

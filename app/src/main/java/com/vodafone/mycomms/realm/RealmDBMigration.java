@@ -73,13 +73,6 @@ public class RealmDBMigration implements RealmMigration {
                 Crashlytics.logException(e);
             }
         }
-        else {
-            Table ldapSettings = realm.getTable(GlobalContactsSettings.class);
-            for(int i=0; i<ldapSettings.getColumnCount(); i++)
-                ldapSettings.removeColumn(0);
-
-            version = 0;
-        }
 
 /*        if (version == 0) {
             Table personTable = realm.getTable(Chat.class);

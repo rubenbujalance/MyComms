@@ -725,6 +725,8 @@ public final class XMPPTransactions {
                         Constants.CHAT_MESSAGE_STATUS_DELIVERED);
             }
 
+            return true;
+
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
             Crashlytics.logException(e);
@@ -732,8 +734,6 @@ public final class XMPPTransactions {
         } finally {
             realm.close();
         }
-
-        return true;
     }
 
     private static boolean saveAndNotifyImageReceived(XmlPullParser parser)
@@ -834,6 +834,8 @@ public final class XMPPTransactions {
             chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
+            return true;
+
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
             Crashlytics.logException(e);
@@ -842,8 +844,6 @@ public final class XMPPTransactions {
         finally {
             realm.close();
         }
-
-        return true;
     }
 
     private static boolean saveAndNotifyGroupMessageReceived(XmlPullParser parser)
@@ -949,6 +949,8 @@ public final class XMPPTransactions {
             chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
+            return true;
+
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
             Crashlytics.logException(e);
@@ -958,8 +960,6 @@ public final class XMPPTransactions {
         {
             realm.close();
         }
-
-        return true;
     }
 
     private static void downloadAndSaveGroupChat(final String chatId, String groupId){
@@ -1147,6 +1147,8 @@ public final class XMPPTransactions {
             chatEvent.setPendingMessages(_pendingMessages);
             BusProvider.getInstance().post(chatEvent);
 
+            return true;
+
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.saveMessageToDB: ", e);
             Crashlytics.logException(e);
@@ -1155,8 +1157,6 @@ public final class XMPPTransactions {
         finally {
             realm.close();
         }
-
-        return true;
     }
 
     public static boolean downloadToChatFile(String urlStr, String chatMessageId) {

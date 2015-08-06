@@ -236,6 +236,20 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
+        btnCalendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               try
+               {
+                   Utils.launchCalendar(contact.getFirstName(), ContactDetailMainActivity.this);
+               }
+               catch (Exception e)
+               {
+                   Log.e(Constants.TAG, "ContactDetailMainActivity.btnCalendaronClick: ",e);
+               }
+            }
+        });
+
         //Initialization of favourite icon
         favouriteController = new FavouriteController(ContactDetailMainActivity.this, mProfileId);
 
@@ -313,68 +327,39 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             Drawable imageStar = getResources().getDrawable(imageStarOff);
             btFavourite.setImageDrawable(imageStar);
         }
-        if(null != contact.getPlatform() )
+
+        if(null != contact.getPlatform() && contact.getPlatform().equals(Constants.PLATFORM_LOCAL) )
         {
-//            if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL) || contact
-//                    .getPlatform().equals(Constants.PLATFORM_SALES_FORCE))
-//            {
-//                btChatBar.setVisibility(View.GONE);
-//            }
-//            else
-//            {
-//                btChatBar.setVisibility(View.VISIBLE);
-//            }
-
-            if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
-            {
-//
-//                if(null == contact.getPhones() || contact.getPhones().length() <= 0)
-//                {
-//                    btnPhone.setVisibility(View.GONE);
-//                    btCallBar.setVisibility(View.GONE);
-//                    btnChat.setVisibility(View.GONE);
-//                }
-//                else
-//                {
-//                    btnPhone.setVisibility(View.VISIBLE);
-//                    btCallBar.setVisibility(View.VISIBLE);
-//                    btnChat.setVisibility(View.VISIBLE);
-//                }
-
-                if(null == contact.getOfficeLocation() || contact.getOfficeLocation().length() <= 0)
-                {
-                    tvOfficeLocation.setVisibility(View.GONE);
-                }
-                else
-                    tvOfficeLocation.setVisibility(View.VISIBLE);
-
-                TableRow infoRow = (TableRow) findViewById(R.id.contact_info_row);
-                infoRow.setVisibility(View.GONE);
-//                tvLocalTime.setVisibility(View.INVISIBLE);
-//                tvCountry.setVisibility(View.INVISIBLE);
-//                tvLastSeen.setVisibility(View.INVISIBLE);
-            }
-//            else
-//            {
-//                if(null == contact.getPhones() || contact.getPhones().length() <= 0)
-//                {
-//                    btCallBar.setVisibility(View.GONE);
-//                }
-//                else
-//                {
-//                    btCallBar.setVisibility(View.VISIBLE);
-//                }
-
-//                if(null == contact.getEmails() || contact.getEmails().length() <= 0)
-//                {
-//                    btEmailBar.setVisibility(View.GONE);
-//                }
-//                else
-//                {
-//                    btEmailBar.setVisibility(View.VISIBLE);
-//                }
-//            }
+            TableRow infoRow = (TableRow) findViewById(R.id.contact_info_row);
+            infoRow.setVisibility(View.GONE);
         }
+
+        if(null == contact.getPhones() || contact.getPhones().length() <= 0)
+        {
+            btnPhone.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_phone_off));
+            btnChat.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_chat_off));
+            btnPhone.setOnClickListener(null);
+            btnChat.setOnClickListener(null);
+        }
+        else
+        {
+            btnPhone.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_phone));
+            btnChat.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_chat));
+        }
+
+        if(null == contact.getEmails() || contact.getEmails().length() <= 0){
+            btnEmail.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_email_off));
+            btnEmail.setOnClickListener(null);
+        }
+        else
+            btnEmail.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_email));
+
+        if(null == contact.getOfficeLocation() || contact.getOfficeLocation().length() <= 0)
+        {
+            tvOfficeLocation.setVisibility(View.GONE);
+        }
+        else
+            tvOfficeLocation.setVisibility(View.VISIBLE);
     }
 
     private void loadContactStatusInfo()

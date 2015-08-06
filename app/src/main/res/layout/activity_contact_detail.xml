@@ -82,7 +82,7 @@
             android:id="@+id/btn_prof_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/btn_prof_mail"
+            android:src="@drawable/btn_prof_email"
             android:layout_alignBottom="@+id/empty_constellation"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>

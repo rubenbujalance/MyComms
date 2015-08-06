@@ -68,7 +68,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:contentDescription="@string/emailbutton"
-                android:src="@drawable/ic_enrroll_mail_white"
+                android:src="@drawable/ic_enrroll_email_white"
                 android:layout_gravity="center"
                 android:layout_marginRight="10dp" />
         </LinearLayout>

@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.CalendarContract;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -213,6 +214,24 @@ public final class Utils extends Activity {
         sendIntent.setData(Uri.parse(url));
 //                        sendIntent.putExtra("sms_body", x);
         context.startActivity(sendIntent);
+    }
+
+    public static void launchCalendar(String name, Context context){
+        Calendar beginTime = Calendar.getInstance();
+        beginTime.setTimeInMillis(System.currentTimeMillis());
+        Calendar endTime = Calendar.getInstance();
+        endTime.setTimeInMillis(System.currentTimeMillis() + 3600000); //plus one day
+
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(CalendarContract.Events.CONTENT_URI)
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
+                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
+                .putExtra(CalendarContract.Events.TITLE, context.getResources().getString(R.string.new_meeting) + " " + name)
+                .putExtra(CalendarContract.Events.DESCRIPTION, "My Comms")
+//                .putExtra(CalendarContract.Events.EVENT_LOCATION, "Location")
+//                .putExtra(Intent.EXTRA_EMAIL, "test@test.com")
+                .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
+        context.startActivity(intent);
     }
     
     public static String getStringTimeDifference(int millis){

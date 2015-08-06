@@ -128,7 +128,7 @@
             style="@style/ContactDetailPlusIcon"
             android:paddingRight="12dp"
             android:paddingEnd="12dp"
-            android:src="@drawable/btn_mail_white"/>
+            android:src="@drawable/btn_email_white"/>
     </LinearLayout>
 
     <LinearLayout

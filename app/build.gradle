@@ -169,6 +169,7 @@ dependencies {
 
     //GCM
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
+
 }
 
 apply plugin: 'jacoco'

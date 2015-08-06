@@ -15,18 +15,17 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,12 +39,10 @@ import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
-import com.vodafone.mycomms.view.tab.SlidingTabLayout;
 
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.zip.GZIPOutputStream;
 
 import io.realm.Realm;
 import model.UserProfile;
@@ -59,18 +56,8 @@ import model.UserProfile;
  */
 public class ProfileFragment extends Fragment implements IProfileConnectionCallback{
 
-    private SlidingTabLayout mSlidingTabLayout;
-    private ViewPager mViewPager;
-
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    private final int REQUEST_CAMERA = 0;
-    private final int SELECT_FILE = 1;
-
-    private static int RESULT_LOAD_IMAGE = 1;
-    private static int TAKE_OR_PICK = 0;
-    private static int RESULT_OK = 1;
 
     private int mIndex;
     private String mParam2;
@@ -84,7 +71,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private CircleImageView profilePicture, opaqueFilter;
     private ImageView imgTakePhoto;
     private TextView textAvatar;
-    private TextView editProfile;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_GALLERY = 2;
@@ -104,8 +90,23 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private TextView tv_error_on_edit;
 
     private Realm realm;
+    private TextView editProfile;
 
-    private boolean isAvatarHasChangedAfterSelection = false, isProfileLoadedAtLeastOnce = false;
+    private TextView
+            tv_password_indicator, tv_confirm_password_indicator,
+            tv_first_name_indicator, tv_last_name_indicator, tv_job_title_indicator,
+            tv_company_indicator, tv_home_indicator;
+
+    private EditText
+            et_password_content, et_confirm_password_content, et_first_name_content,
+            et_last_name_content, et_job_title_content, et_company_content, et_home_content;
+
+
+    private boolean
+            isAvatarHasChangedAfterSelection = false
+            , isProfileLoadedAtLeastOnce = false
+            , isPasswordHasChanged = false
+            , isErrorOnEditHasProduced = false;
 
     public static ProfileFragment newInstance(int index, String param2) {
         ProfileFragment fragment = new ProfileFragment();
@@ -117,77 +118,149 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     }
 
    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState)
+   {
        BusProvider.getInstance().register(this);
-
-       View v = inflater.inflate(R.layout.layout_set_profile, container, false);
-
-       initSpinners(v);
-       editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-       editProfile.setVisibility(View.INVISIBLE);
-
-       profilePicture = (CircleImageView) v.findViewById(R.id.profile_picture);
-       opaqueFilter = (CircleImageView) v.findViewById(R.id.opaque_filter);
-       textAvatar = (TextView) v.findViewById(R.id.avatarText);
-       imgTakePhoto = (ImageView) v.findViewById(R.id.img_take_photo);
-       imgTakePhoto.setVisibility(View.GONE);
-
-
        Log.i(Constants.TAG, "ProfileFragment.onCreateView: ");
-       editProfile.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
-
-               if (isUpdating && !isEditing) return;
-
-               profileEditMode(!isEditing);
-
-               if (isEditing)
-                   new UpdateProfile().execute();
-
-               isEditing = !isEditing;
-           }
-       });
-
-       profilePicture.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               if (isEditing) {
-                   dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
-               }
-           }
-       });
-
+       View v = inflater.inflate(R.layout.layout_set_profile, container, false);
+       initSpinners();
+       createViewsAndEvents(v);
        profileController = new ProfileController(getActivity());
        profileController.setConnectionCallback(this);
-
        return v;
    }
 
-    private boolean updateContactData()
+    private void createViewsAndEvents(View v)
     {
+        //getActivity() in this case because takes view from ToolBarActivity
+        editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
+        editProfile.setVisibility(View.INVISIBLE);
+
+        profilePicture = (CircleImageView) v.findViewById(R.id.profile_picture);
+        opaqueFilter = (CircleImageView) v.findViewById(R.id.opaque_filter);
+        textAvatar = (TextView) v.findViewById(R.id.avatarText);
+        imgTakePhoto = (ImageView) v.findViewById(R.id.img_take_photo);
+        imgTakePhoto.setVisibility(View.GONE);
+
+        tv_password_indicator = (TextView) v.findViewById(R.id.tv_password_indicator);
+        et_password_content = (EditText) v.findViewById(R.id.et_password_content);
+        et_password_content.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                isPasswordHasChanged = true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        tv_confirm_password_indicator = (TextView) v.findViewById(R.id.tv_confirm_password_indicator);
+        et_confirm_password_content = (EditText) v.findViewById(R.id.et_confirm_password_content);
+        et_confirm_password_content.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                isPasswordHasChanged = true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        tv_first_name_indicator = (TextView) v.findViewById(R.id.tv_first_name_indicator);
+        tv_last_name_indicator = (TextView) v.findViewById(R.id.tv_last_name_indicator);
+        tv_job_title_indicator = (TextView) v.findViewById(R.id.tv_job_title_indicator);
+        tv_company_indicator = (TextView) v.findViewById(R.id.tv_company_indicator);
+        tv_home_indicator = (TextView) v.findViewById(R.id.tv_home_indicator);
+
+        et_first_name_content = (EditText) v.findViewById(R.id.et_first_name_content);
+        et_last_name_content = (EditText) v.findViewById(R.id.et_last_name_content);
+        et_job_title_content = (EditText) v.findViewById(R.id.et_job_title_content);
+        et_company_content = (EditText) v.findViewById(R.id.et_company_content);
+        et_home_content = (EditText) v.findViewById(R.id.et_home_content);
+
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
+                if (isUpdating && !isEditing)
+                    return;
+
+                if (isEditing)
+                    new UpdateProfile().execute();
+                else
+                {
+                    profileEditMode(true);
+                    isEditing = !isEditing;
+                }
+
+            }
+        });
+
+        profilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isEditing)
+                    dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+            }
+        });
+
+    }
+
+    private boolean updateContactData() {
         Log.d(Constants.TAG, "ProfileFragment.updateContactData: ");
-        if(!BaseConnection.isConnected(this.getActivity())){
+        if (!BaseConnection.isConnected(this.getActivity())) {
             profileController.showToast("Not connected. Can't save details.");
             return false;
         }
 
-        if(isShowErrorOnEditProfile())
+        if (isShowErrorOnEditProfile())
         {
+            profileEditMode(true);
             isEditing = true;
             isUpdating = true;
-            return false;
+            return true;
+        }
+        else
+        {
+            profileEditMode(false);
+            isErrorOnEditHasProduced = false;
+            isEditing = !isEditing;
+            //Update password if needed
+            if(isPasswordHasChanged)
+            {
+                String password = et_password_content.getText().toString();
+                HashMap newPasswordHashMap = new HashMap<>();
+                newPasswordHashMap.put("password", password);
+                profileController.updatePassword(newPasswordHashMap);
+            }
         }
 
-        String firstName = ((EditText) getActivity().findViewById(R.id.et_first_name_content)).getText().toString();
-        String lastName = ((EditText) getActivity().findViewById(R.id.et_last_name_content)).getText().toString();
+        String firstName = et_first_name_content.getText().toString();
+        String lastName = et_last_name_content.getText().toString();
+
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(Constants.PROFILE_FULLNAME_SHARED_PREF, firstName + " " + lastName);
         editor.apply();
-        String company = ((EditText) getActivity().findViewById(R.id.et_company_content)).getText().toString();
-        String position = ((EditText) getActivity().findViewById(R.id.et_job_title_content)).getText().toString();
-        String officeLocation = ((EditText) getActivity().findViewById(R.id.et_home_content)).getText().toString();
+
+        String company = et_company_content.getText().toString();
+        String position = et_job_title_content.getText().toString();
+        String officeLocation = et_home_content.getText().toString();
 
 
         if(null != avatarNewURL)
@@ -227,34 +300,169 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         return  true;
     }
 
-    private boolean isShowErrorOnEditProfile()
-    {
-        String password = ((EditText) getActivity().findViewById(R.id.et_password_content)).getText().toString();
-        String repeatPassword = ((EditText) getActivity().findViewById(R.id.et_confirm_password_content)).getText().toString();
+    private boolean isShowErrorOnEditProfile() {
+        String password = et_password_content.getText().toString();
+        String repeatPassword = et_confirm_password_content.getText().toString();
+        String firstName = et_first_name_content.getText().toString();
+        String lastName = et_last_name_content.getText().toString();
+        String job = et_job_title_content.getText().toString();
+        String company = et_company_content.getText().toString();
+        String home = et_home_content.getText().toString();
         layout_error_edit_profile.setVisibility(View.GONE);
 
+        return
+                !isPasswordCorrect(password, repeatPassword)
+                || !isFirstNameCorrect(firstName)
+                || !isLastNameCorrect(lastName)
+                || !isJobTitleNameCorrect(job)
+                || !isCompanyCorrect(company)
+                || !isHomeCorrect(home);
+    }
 
-        if((password != null && password.length() > 0) && (repeatPassword == null || repeatPassword.length() == 0)){
-            tv_error_on_edit.setText("Passwords don't match");
-            layout_error_edit_profile.setVisibility(View.VISIBLE);
-            return true;
-        }else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0)){
-            tv_error_on_edit.setText("Passwords don't match");
-            layout_error_edit_profile.setVisibility(View.VISIBLE);
-            return true;
-        }else if( password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0 && !password.equals(repeatPassword)){
-            tv_error_on_edit.setText("Passwords don't match");
-            layout_error_edit_profile.setVisibility(View.VISIBLE);
-            return true;
-        }else if(password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0  && password.equals(repeatPassword) ){
-            HashMap newPasswordHashMap = new HashMap<>();
-            newPasswordHashMap.put("password", password);
-            profileController.updatePassword(newPasswordHashMap);
+    private boolean isHomeCorrect(String home)
+    {
+        if(home != null && home.length() > 0)
+        {
             layout_error_edit_profile.setVisibility(View.GONE);
-            return false;
+            tv_home_indicator.setTextColor(getResources().getColor(R.color.contact_soft_grey));
+            et_home_content.setTextColor(getResources().getColor(R.color.ac_subtitle));
+            return true;
         }
         else
+        {
+            tv_error_on_edit.setText(getResources().getString(R.string.error_home_not_null));
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            tv_home_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_home_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
+    }
+
+    private boolean isCompanyCorrect(String company)
+    {
+        if(company != null && company.length() > 0)
+        {
+            layout_error_edit_profile.setVisibility(View.GONE);
+            tv_company_indicator.setTextColor(getResources().getColor(R.color.contact_soft_grey));
+            et_company_content.setTextColor(getResources().getColor(R.color.ac_subtitle));
             return true;
+        }
+        else
+        {
+            tv_error_on_edit.setText(getResources().getString(R.string.error_company_not_null));
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            tv_company_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_company_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
+    }
+
+    private boolean isJobTitleNameCorrect(String job)
+    {
+        if(job != null && job.length() > 0)
+        {
+            layout_error_edit_profile.setVisibility(View.GONE);
+            tv_job_title_indicator.setTextColor(getResources().getColor(R.color.contact_soft_grey));
+            et_job_title_content.setTextColor(getResources().getColor(R.color.ac_subtitle));
+            return true;
+        }
+        else
+        {
+            tv_error_on_edit.setText(getResources().getString(R.string.error_job_title_not_null));
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            tv_job_title_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_job_title_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
+    }
+
+    private boolean isLastNameCorrect(String secondName)
+    {
+        if(secondName != null && secondName.length() > 0)
+        {
+            layout_error_edit_profile.setVisibility(View.GONE);
+            tv_last_name_indicator.setTextColor(getResources().getColor(R.color.contact_soft_grey));
+            et_last_name_content.setTextColor(getResources().getColor(R.color.ac_subtitle));
+            return true;
+        }
+        else
+        {
+            tv_error_on_edit.setText(getResources().getString(R.string.error_last_name_not_null));
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            tv_last_name_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_last_name_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
+    }
+
+    private boolean isFirstNameCorrect(String firstName)
+    {
+        if(firstName != null && firstName.length() > 0)
+        {
+            layout_error_edit_profile.setVisibility(View.GONE);
+            tv_first_name_indicator.setTextColor(getResources().getColor(R.color.contact_soft_grey));
+            et_first_name_content.setTextColor(getResources().getColor(R.color.ac_subtitle));
+            return true;
+        }
+        else
+        {
+            tv_error_on_edit.setText(getResources().getString(R.string.error_first_name_not_null));
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            tv_first_name_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_first_name_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
+    }
+
+    private boolean isPasswordCorrect(String password, String repeatPassword)
+    {
+        if((password != null && password.length() > 0) && (repeatPassword == null || repeatPassword.length() == 0))
+        {
+            tv_error_on_edit.setText(getResources().getString(R.string.error_password_do_not_match));
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            tv_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_password_content.setTextColor(getResources().getColor(R.color.red_action));
+            tv_confirm_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_confirm_password_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
+        else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0))
+        {
+            tv_error_on_edit.setText(getResources().getString(R.string.error_password_do_not_match));
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            tv_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_password_content.setTextColor(getResources().getColor(R.color.red_action));
+            tv_confirm_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_confirm_password_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
+        else if( password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0 && !password.equals(repeatPassword))
+        {
+            tv_error_on_edit.setText(getResources().getString(R.string.error_password_do_not_match));
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            tv_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_password_content.setTextColor(getResources().getColor(R.color.red_action));
+            tv_confirm_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_confirm_password_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
+        else if(password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0  && password.equals(repeatPassword) )
+        {
+            layout_error_edit_profile.setVisibility(View.GONE);
+            tv_password_indicator.setTextColor(getResources().getColor(R.color.contact_soft_grey));
+            et_password_content.setTextColor(getResources().getColor(R.color.ac_subtitle));
+            tv_confirm_password_indicator.setTextColor(getResources().getColor(R.color.contact_soft_grey));
+            et_confirm_password_content.setTextColor(getResources().getColor(R.color.ac_subtitle));
+            return true;
+        }
+        else
+        {
+            tv_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_password_content.setTextColor(getResources().getColor(R.color.red_action));
+            tv_confirm_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
+            et_confirm_password_content.setTextColor(getResources().getColor(R.color.red_action));
+            return false;
+        }
     }
 
     private void profileEditMode(boolean isEditing) {
@@ -271,20 +479,13 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             opaqueFilter.setVisibility(View.GONE);
         }
 
-        EditText profileName = (EditText) getActivity().findViewById(R.id.et_first_name_content);
-        profileName.setEnabled(isEditing);
-        EditText profileSurname = (EditText) getActivity().findViewById(R.id.et_last_name_content);
-        profileSurname.setEnabled(isEditing);
-        EditText profileCompany = (EditText) getActivity().findViewById(R.id.et_company_content);
-        profileCompany.setEnabled(isEditing);
-        EditText profilePosition = (EditText) getActivity().findViewById(R.id.et_job_title_content);
-        profilePosition.setEnabled(isEditing);
-        EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.et_home_content);
-        profileOfficeLocation.setEnabled(isEditing);
-        EditText password = (EditText) getActivity().findViewById(R.id.et_password_content);
-        password.setEnabled(isEditing);
-        EditText repeatPassword = (EditText) getActivity().findViewById(R.id.et_confirm_password_content);
-        repeatPassword.setEnabled(isEditing);
+        et_first_name_content.setEnabled(isEditing);
+        et_last_name_content.setEnabled(isEditing);
+        et_company_content.setEnabled(isEditing);
+        et_job_title_content.setEnabled(isEditing);
+        et_home_content.setEnabled(isEditing);
+        et_password_content.setEnabled(isEditing);
+        et_confirm_password_content.setEnabled(isEditing);
     }
 
     @Override
@@ -323,28 +524,18 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         profilePicture.setBorderColor(Color.WHITE);
     }
 
-    private void initSpinners(View v) {
-//        Spinner spinnerPhone = (Spinner) v.findViewById(R.id.spinner_phone);
-        // Create an ArrayAdapter using the string array and a default spinner layout
+    private void initSpinners()
+    {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.phones_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        if (adapter != null) {
+        if (adapter != null)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            // Apply the adapter to the spinner
-//            spinnerPhone.setAdapter(adapter);
-        }
 
-//        Spinner spinnerEmail = (Spinner) v.findViewById(R.id.spinner_email);
-        // Create an ArrayAdapter using the string array and a default spinner layout
         adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.email_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        if (adapter != null) {
+
+        if (adapter != null)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            // Apply the adapter to the spinner
-//            spinnerEmail.setAdapter(adapter);
-        }
     }
 
     private void loadProfileImage()
@@ -368,7 +559,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             mIndex = getArguments().getInt(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
         this.realm = Realm.getDefaultInstance();
 
         if(mIndex == 0) {
@@ -379,8 +569,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             Log.i(Constants.TAG, "ProfileFragment.onCreate: " + mIndex);
         }
 
-
-
         this.sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
     }
@@ -389,16 +577,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     public void onResume(){
         super.onResume();
         Log.d(Constants.TAG, "ProfileFragment.onResume: ");
-//        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-//        editProfile.setVisibility(View.VISIBLE);
-
         if(!isProfileLoadedAtLeastOnce)
         {
             profileController.getProfile(realm);
             isProfileLoadedAtLeastOnce = true;
         }
-
-
     }
 
     @Override
@@ -419,7 +602,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     }
 
     @Override
-    public void onProfileReceived(UserProfile userProfile)
+    public void onProfileReceived(final UserProfile userProfile)
     {
         if(userProfile != null)
         {
@@ -428,24 +611,27 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
                 this.userProfile = userProfile;
                 this.profileId = userProfile.getId();
                 Log.d(Constants.TAG, "ProfileFragment.onProfileReceived: ");
-                EditText profileName = (EditText) getActivity().findViewById(R.id.et_first_name_content);
-                profileName.setText(userProfile.getFirstName());
-                EditText profileSurname = (EditText) getActivity().findViewById(R.id.et_last_name_content);
-                profileSurname.setText(userProfile.getLastName());
-                EditText profileCompany = (EditText) getActivity().findViewById(R.id.et_company_content);
-                profileCompany.setText(userProfile.getCompany());
-                EditText profilePosition = (EditText) getActivity().findViewById(R.id.et_job_title_content);
-                profilePosition.setText(userProfile.getPosition());
-                EditText profileOfficeLocation = (EditText) getActivity().findViewById(R.id.et_home_content);
-                profileOfficeLocation.setText(userProfile.getOfficeLocation());
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        et_first_name_content.setText(userProfile.getFirstName());
+                        et_last_name_content.setText(userProfile.getLastName());
+                        et_company_content.setText(userProfile.getCompany());
+                        et_job_title_content.setText(userProfile.getPosition());
+                        et_home_content.setText(userProfile.getOfficeLocation());
+                    }
+                });
                 loadProfileImage();
-
                 isFirstLoadNeed = false;
             }
-            layout_error_edit_profile = (LinearLayout) getActivity().findViewById(R.id.lay_error_edit);
-            tv_error_on_edit = (TextView) getActivity().findViewById(R.id.tv_error_on_edit);
-            layout_error_edit_profile.setVisibility(View.GONE);
-
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    layout_error_edit_profile = (LinearLayout) getActivity().findViewById(R.id.lay_error_edit);
+                    tv_error_on_edit = (TextView) getActivity().findViewById(R.id.tv_error_on_edit);
+                    layout_error_edit_profile.setVisibility(View.GONE);
+                }
+            });
         }
     }
 
@@ -453,7 +639,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         super.onPause();
         profileController.setConnectionCallback(null);
          Log.d(Constants.TAG, "ProfileFragment.onPause: ");
-
     }
 
     @Override
@@ -468,8 +653,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         Log.d(Constants.TAG, "ProfileFragment.onProfileConnectionError: ");
         isUpdating = false;
     }
-
-
 
     @Override
     public void onUpdateProfileConnectionError() {

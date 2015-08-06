@@ -377,11 +377,13 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     icon = jsonObject.getString("icon");
                 }
             }
+
             if(icon.compareTo("dnd")==0) ivIconStatus.setImageResource(R.mipmap.ico_notdisturb_white);
             else if(icon.compareTo("vacation")==0) ivIconStatus.setImageResource(R.mipmap.ico_vacation_white);
             else if(icon.compareTo("moon")==0) ivIconStatus.setImageResource(R.mipmap.ico_moon_white);
             else if(icon.compareTo("sun")==0) ivIconStatus.setImageResource(R.mipmap.ico_sun_white);
-            else ivIconStatus.setVisibility(View.GONE);
+            else ivIconStatus.setVisibility(View.INVISIBLE);
+
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
         }
@@ -447,7 +449,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 if(days >= 1) lastSeenStr = days + "d";
                 else if(hours >=1) lastSeenStr = hours + "h";
                 else if(minutes >=1) lastSeenStr = minutes + "m";
-                else if(minutes < 1) lastSeenStr = "less then a minute";
+                else if(minutes < 1) lastSeenStr = "seconds";
 
                 if(null == lastSeenStr)
                 {
@@ -455,7 +457,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 }
                 else
                 {
-                    tvLastSeen.setText("Seen " + lastSeenStr + " ago");
+                    tvLastSeen.setText(lastSeenStr + " ago");
                 }
             }
         } catch (Exception ex) {
@@ -474,12 +476,19 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
-        Utils.loadContactAvatar
+        String test1 = contact.getFirstName();
+        String test2 = contact.getLastName();
+        CircleImageView test3 = ivAvatar;
+        TextView test4 = textAvatar;
+        String test5 = contact.getAvatar();
+        String test6 = SF_URL;
+
+        Utils.loadContactAvatarDetail
                 (
                         contact.getFirstName()
                         , contact.getLastName()
-                        , ivAvatar
-                        , textAvatar
+                        , this.ivAvatar
+                        , this.textAvatar
                         , Utils.getAvatarURL
                                 (
                                         contact.getPlatform()

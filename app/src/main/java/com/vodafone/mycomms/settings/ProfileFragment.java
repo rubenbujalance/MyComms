@@ -100,6 +100,9 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private String avatarNewURL = null;
     private SharedPreferences sp;
 
+    private LinearLayout layout_error_edit_profile;
+    private TextView tv_error_on_edit;
+
     private Realm realm;
 
     private boolean isAvatarHasChangedAfterSelection = false, isProfileLoadedAtLeastOnce = false;
@@ -136,11 +139,11 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
            public void onClick(View v) {
                Log.i(Constants.TAG, "ProfileFragment.onClick: editProfile, isEditing= " + isEditing + "isUpdating=" + isUpdating);
 
-               if(isUpdating && !isEditing) return;
+               if (isUpdating && !isEditing) return;
 
                profileEditMode(!isEditing);
 
-               if(isEditing)
+               if (isEditing)
                    new UpdateProfile().execute();
 
                isEditing = !isEditing;
@@ -150,44 +153,32 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
        profilePicture.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               if (isEditing)
-               {
+               if (isEditing) {
                    dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
                }
            }
        });
 
+       profileController = new ProfileController(getActivity());
+       profileController.setConnectionCallback(this);
+
        return v;
    }
 
-    private boolean updateContactData() {
+    private boolean updateContactData()
+    {
         Log.d(Constants.TAG, "ProfileFragment.updateContactData: ");
         if(!BaseConnection.isConnected(this.getActivity())){
             profileController.showToast("Not connected. Can't save details.");
             return false;
         }
 
-        String password = ((EditText) getActivity().findViewById(R.id.et_password_content)).getText().toString();
-        String repeatPassword = ((EditText) getActivity().findViewById(R.id.et_confirm_password_content)).getText().toString();
-
-        //TODO -> START this should be error layout
-
-        if((password != null && password.length() > 0) && (repeatPassword == null || repeatPassword.length() == 0)){
-            profileController.showToast("Passwords don't match");
+        if(isShowErrorOnEditProfile())
+        {
+            isEditing = true;
+            isUpdating = true;
             return false;
-        }else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0)){
-            profileController.showToast("Passwords don't match");
-            return false;
-        }else if( password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0 && !password.equals(repeatPassword)){
-            profileController.showToast("Passwords don't match");
-            return false;
-        }else if(password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0  && password.equals(repeatPassword) ){
-            HashMap newPasswordHashMap = new HashMap<>();
-            newPasswordHashMap.put("password", password);
-            profileController.updatePassword(newPasswordHashMap);
         }
-
-        //TODO -> END this should be error layout
 
         String firstName = ((EditText) getActivity().findViewById(R.id.et_first_name_content)).getText().toString();
         String lastName = ((EditText) getActivity().findViewById(R.id.et_last_name_content)).getText().toString();
@@ -204,7 +195,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             profileController.updateUserAvatarInDB(avatarNewURL);
             avatarNewURL = null;
         }
-
 
         if(!profileController.isUserProfileChanged(firstName, lastName, company, position,
                 officeLocation))
@@ -235,6 +225,36 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         profileController.updateContactData(newProfileHashMap);
         return  true;
+    }
+
+    private boolean isShowErrorOnEditProfile()
+    {
+        String password = ((EditText) getActivity().findViewById(R.id.et_password_content)).getText().toString();
+        String repeatPassword = ((EditText) getActivity().findViewById(R.id.et_confirm_password_content)).getText().toString();
+        layout_error_edit_profile.setVisibility(View.GONE);
+
+
+        if((password != null && password.length() > 0) && (repeatPassword == null || repeatPassword.length() == 0)){
+            tv_error_on_edit.setText("Passwords don't match");
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            return true;
+        }else if ((repeatPassword != null && repeatPassword.length() > 0) && (password == null || password.length() == 0)){
+            tv_error_on_edit.setText("Passwords don't match");
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            return true;
+        }else if( password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0 && !password.equals(repeatPassword)){
+            tv_error_on_edit.setText("Passwords don't match");
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
+            return true;
+        }else if(password != null && password.length() > 0 && repeatPassword != null && repeatPassword.length() > 0  && password.equals(repeatPassword) ){
+            HashMap newPasswordHashMap = new HashMap<>();
+            newPasswordHashMap.put("password", password);
+            profileController.updatePassword(newPasswordHashMap);
+            layout_error_edit_profile.setVisibility(View.GONE);
+            return false;
+        }
+        else
+            return true;
     }
 
     private void profileEditMode(boolean isEditing) {
@@ -359,8 +379,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             Log.i(Constants.TAG, "ProfileFragment.onCreate: " + mIndex);
         }
 
-        profileController = new ProfileController(getActivity());
-        profileController.setConnectionCallback(this);
+
 
         this.sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -423,6 +442,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
                 isFirstLoadNeed = false;
             }
+            layout_error_edit_profile = (LinearLayout) getActivity().findViewById(R.id.lay_error_edit);
+            tv_error_on_edit = (TextView) getActivity().findViewById(R.id.tv_error_on_edit);
+            layout_error_edit_profile.setVisibility(View.GONE);
+
         }
     }
 

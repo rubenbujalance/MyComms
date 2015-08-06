@@ -14,7 +14,7 @@
         android:layout_gravity="right"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        tools:src="@drawable/ic_enrroll_mail_white"
+        tools:src="@drawable/ic_enrroll_email_white"
         />
     <!-- Local Time -->
     <TextView android:id="@+id/list_item_recent_info_time"

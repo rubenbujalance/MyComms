@@ -7,6 +7,23 @@
               tools:context="com.vodafone.mycomms.contacts.detail.ContactDetailsPlusActivity">
 
     <LinearLayout
+        android:id="@+id/layout_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="12dp"
+        android:paddingStart="12dp"
+        android:paddingRight="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="12dp">
+        <ImageView
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:id="@+id/ivBtBack"
+            android:src="@drawable/ic_cancel_and_exit"
+            android:focusable="false" />
+    </LinearLayout>
+
+    <LinearLayout
         style="@style/ContactDetailPlusLinear"
         android:background="@android:color/transparent">
 
@@ -57,6 +74,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_phone"
         style="@style/ContactDetailPlusLinear"
         android:weightSum="5">
         <LinearLayout
@@ -87,6 +105,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_email"
         style="@style/ContactDetailPlusLinear"
         android:weightSum="5">
         <LinearLayout
@@ -109,10 +128,11 @@
             style="@style/ContactDetailPlusIcon"
             android:paddingRight="12dp"
             android:paddingEnd="12dp"
-            android:src="@drawable/btn_mail_white"/>
+            android:src="@drawable/btn_email_white"/>
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_location"
         android:weightSum="5"
         style="@style/ContactDetailPlusLinear">
         <LinearLayout
@@ -122,8 +142,9 @@
             android:layout_gravity="center_vertical"
             android:orientation="vertical">
             <TextView
+                android:id="@+id/contact_location_label"
                 style="@style/ContactDetailPlusLabel"
-                android:text="@string/office_location_lower"/>
+                android:text="@string/office_location"/>
             <TextView
                 android:id="@+id/contact_office_location"
                 style="@style/ContactDetailPlusTextValue"

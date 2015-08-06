@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
@@ -235,6 +236,20 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
+        btnCalendar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               try
+               {
+                   Utils.launchCalendar(contact.getFirstName(), ContactDetailMainActivity.this);
+               }
+               catch (Exception e)
+               {
+                   Log.e(Constants.TAG, "ContactDetailMainActivity.btnCalendaronClick: ",e);
+               }
+            }
+        });
+
         //Initialization of favourite icon
         favouriteController = new FavouriteController(ContactDetailMainActivity.this, mProfileId);
 
@@ -282,7 +297,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private String[] loadContactExtra() {
 
-        String contactDetail[] = new String[9];
+        String contactDetail[] = new String[10];
 
         contactDetail[0] = contact.getFirstName();
         contactDetail[1] = contact.getLastName();
@@ -295,6 +310,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         contactDetail[6] = contact.getAvatar();
         contactDetail[7] = contact.getPlatform();
         contactDetail[8] = contact.getContactId();
+        contactDetail[9] = contact.getStringField1(); //SFAvatar
 
         return contactDetail;
     }
@@ -311,66 +327,39 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             Drawable imageStar = getResources().getDrawable(imageStarOff);
             btFavourite.setImageDrawable(imageStar);
         }
-        if(null != contact.getPlatform() )
+
+        if(null != contact.getPlatform() && contact.getPlatform().equals(Constants.PLATFORM_LOCAL) )
         {
-//            if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL) || contact
-//                    .getPlatform().equals(Constants.PLATFORM_SALES_FORCE))
-//            {
-//                btChatBar.setVisibility(View.GONE);
-//            }
-//            else
-//            {
-//                btChatBar.setVisibility(View.VISIBLE);
-//            }
-
-            if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
-            {
-//
-//                if(null == contact.getPhones() || contact.getPhones().length() <= 0)
-//                {
-//                    btnPhone.setVisibility(View.GONE);
-//                    btCallBar.setVisibility(View.GONE);
-//                    btnChat.setVisibility(View.GONE);
-//                }
-//                else
-//                {
-//                    btnPhone.setVisibility(View.VISIBLE);
-//                    btCallBar.setVisibility(View.VISIBLE);
-//                    btnChat.setVisibility(View.VISIBLE);
-//                }
-
-                if(null == contact.getOfficeLocation() || contact.getOfficeLocation().length() <= 0)
-                {
-                    tvOfficeLocation.setVisibility(View.GONE);
-                }
-                else
-                    tvOfficeLocation.setVisibility(View.VISIBLE);
-
-                tvLocalTime.setVisibility(View.INVISIBLE);
-                tvCountry.setVisibility(View.INVISIBLE);
-                tvLastSeen.setVisibility(View.INVISIBLE);
-            }
-//            else
-//            {
-//                if(null == contact.getPhones() || contact.getPhones().length() <= 0)
-//                {
-//                    btCallBar.setVisibility(View.GONE);
-//                }
-//                else
-//                {
-//                    btCallBar.setVisibility(View.VISIBLE);
-//                }
-
-//                if(null == contact.getEmails() || contact.getEmails().length() <= 0)
-//                {
-//                    btEmailBar.setVisibility(View.GONE);
-//                }
-//                else
-//                {
-//                    btEmailBar.setVisibility(View.VISIBLE);
-//                }
-//            }
+            TableRow infoRow = (TableRow) findViewById(R.id.contact_info_row);
+            infoRow.setVisibility(View.GONE);
         }
+
+        if(null == contact.getPhones() || contact.getPhones().length() <= 0)
+        {
+            btnPhone.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_phone_off));
+            btnChat.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_chat_off));
+            btnPhone.setOnClickListener(null);
+            btnChat.setOnClickListener(null);
+        }
+        else
+        {
+            btnPhone.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_phone));
+            btnChat.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_chat));
+        }
+
+        if(null == contact.getEmails() || contact.getEmails().length() <= 0){
+            btnEmail.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_email_off));
+            btnEmail.setOnClickListener(null);
+        }
+        else
+            btnEmail.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_email));
+
+        if(null == contact.getOfficeLocation() || contact.getOfficeLocation().length() <= 0)
+        {
+            tvOfficeLocation.setVisibility(View.GONE);
+        }
+        else
+            tvOfficeLocation.setVisibility(View.VISIBLE);
     }
 
     private void loadContactStatusInfo()
@@ -388,11 +377,13 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     icon = jsonObject.getString("icon");
                 }
             }
+
             if(icon.compareTo("dnd")==0) ivIconStatus.setImageResource(R.mipmap.ico_notdisturb_white);
             else if(icon.compareTo("vacation")==0) ivIconStatus.setImageResource(R.mipmap.ico_vacation_white);
             else if(icon.compareTo("moon")==0) ivIconStatus.setImageResource(R.mipmap.ico_moon_white);
             else if(icon.compareTo("sun")==0) ivIconStatus.setImageResource(R.mipmap.ico_sun_white);
-            else ivIconStatus.setVisibility(View.GONE);
+            else ivIconStatus.setVisibility(View.INVISIBLE);
+
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
         }
@@ -458,7 +449,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 if(days >= 1) lastSeenStr = days + "d";
                 else if(hours >=1) lastSeenStr = hours + "h";
                 else if(minutes >=1) lastSeenStr = minutes + "m";
-                else if(minutes < 1) lastSeenStr = "less then a minute";
+                else if(minutes < 1) lastSeenStr = "seconds";
 
                 if(null == lastSeenStr)
                 {
@@ -466,7 +457,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 }
                 else
                 {
-                    tvLastSeen.setText("Seen " + lastSeenStr + " ago");
+                    tvLastSeen.setText(lastSeenStr + " ago");
                 }
             }
         } catch (Exception ex) {
@@ -485,12 +476,19 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
-        Utils.loadContactAvatar
+        String test1 = contact.getFirstName();
+        String test2 = contact.getLastName();
+        CircleImageView test3 = ivAvatar;
+        TextView test4 = textAvatar;
+        String test5 = contact.getAvatar();
+        String test6 = SF_URL;
+
+        Utils.loadContactAvatarDetail
                 (
                         contact.getFirstName()
                         , contact.getLastName()
-                        , ivAvatar
-                        , textAvatar
+                        , this.ivAvatar
+                        , this.textAvatar
                         , Utils.getAvatarURL
                                 (
                                         contact.getPlatform()

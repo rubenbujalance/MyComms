@@ -159,7 +159,7 @@
     <string name="Sent">Sent</string>
     <string name="dummyAddress">742, Evergreen Terrace</string>
     <string name="office_location">Office Location</string>
-    <string name="office_location_lower">office location</string>
+    <string name="address">Address</string>
     <string name="dummyEmail">ruben_bujalance@stratesys-ts.com</string>
     <string name="repeatPassword">Repeat Password</string>
     <string name="additional">Additional</string>
@@ -200,6 +200,7 @@
     <string name="Delivered">Delivered</string>
     <string name="editphoto">edit photo</string>
     <string name="image">Image</string>
+    <string name="new_meeting">New meeting with</string>
 
     <!--Search bar content -->
 

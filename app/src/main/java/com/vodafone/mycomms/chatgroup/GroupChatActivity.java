@@ -25,14 +25,11 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -123,7 +120,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text
-            ,group_names, group_n_components;
+            ,group_names, group_n_components, contact_availability;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
     private LinearLayout lay_phone, lay_add_contact;
@@ -631,28 +628,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_chat_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
@@ -712,7 +687,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             if(groupChatOwnerIds.contains(_profile_id))
                 lay_add_contact.setVisibility(View.VISIBLE);
             else
-                lay_add_contact.setVisibility(View.GONE);
+                lay_add_contact.setVisibility(View.INVISIBLE);
 
             LinearLayout groupInfoContainer = (LinearLayout) findViewById(R.id.group_info_container);
             groupInfoContainer.setOnClickListener(new View.OnClickListener() {
@@ -726,7 +701,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             });
         }
         else
-            lay_add_contact.setVisibility(View.GONE);
+            lay_add_contact.setVisibility(View.INVISIBLE);
 
         etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
         tvSendChat = (TextView) findViewById(R.id.chat_send);
@@ -745,10 +720,20 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
         sendFileImage = (ImageView) findViewById(R.id.send_image);
         lay_phone = (LinearLayout) findViewById(R.id.lay_phone);
+        contact_availability = (TextView) findViewById(R.id.chat_availability);
+
         if(isGroupChatMode)
+        {
             this.lay_phone.setVisibility(View.GONE);
+            this.contact_availability.setVisibility(View.GONE);
+        }
+
         else
+        {
             this.lay_phone.setVisibility(View.VISIBLE);
+            this.contact_availability.setVisibility(View.VISIBLE);
+        }
+
 
         group_names = (TextView) findViewById(R.id.group_names);
         group_n_components = (TextView) findViewById(R.id.group_n_components);

@@ -1,6 +1,10 @@
 <resources>
 
+    <color name="opaque_black">#80000000</color>
+    <color name="opaque_maroon">#A0603000</color>
     <color name="black_overlay">#66000000</color>
+
+    <color name="text_dark_color">#2e332f</color>
 
     <!-- Contacts colors-->
     <color name="grey_toolbar">#f2f2f2</color>
@@ -12,12 +16,16 @@
     <color name="background_platform">#e9e9e9</color>
     <color name="contact_soft_grey">#7b808c</color>
     <color name="contact_soft_black">#051838</color>
+    <color name="white_transparent">#20ffffff</color>
+    <color name="white_alpha80">#80ffffff</color>
+    <color name="white_alpha10">#10ffffff</color>
 
     <!-- Chat colors-->
     <color name="white">#ffffff</color>
     <color name="grey_chat">#f8f8f8</color>
     <color name="grey_sent">#aaaaaa</color>
     <color name="grey_chat_name">#a1a1a1</color>
+    <color name="grey_chat_sent_top_line">#CCCED2</color>
 
     <!--Profile colors-->
     <color name="grey_profile_background">#f2f2f2</color>
@@ -25,6 +33,7 @@
     <!-- MyComms Assets description colors-->
     <color name="grey_dark">#252525</color>
     <color name="grey_middle">#9d9d9d</color>
+    <color name="profile_lay_separator">#d9d9d9</color>
     <color name="grey_mycomms">#b0b0b0</color>
     <color name="grey_light">#eeeeee</color>
     <color name="dark_blue_action">#688391</color>

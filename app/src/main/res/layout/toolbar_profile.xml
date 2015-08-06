@@ -17,14 +17,20 @@
         android:background="@android:color/transparent"
         android:orientation="horizontal">
 
-        <!--<ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/ivBtBack"
-            android:src="@drawable/btn_back_white"
-            android:background="@android:color/transparent"
-            android:layout_centerVertical="true"
-            android:paddingLeft="10dp"/>-->
+        <LinearLayout android:layout_width="60dp"
+                      android:layout_height="match_parent"
+                      android:gravity="center"
+                      android:id="@+id/lay_exit_preferences"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/img_exit_preferences"
+                android:src="@drawable/ic_cancel_and_exit"
+                android:background="@android:color/transparent"
+                />
+        </LinearLayout>
+
 
         <TextView
             style="@style/ActionBar.TitleText"

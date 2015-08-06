@@ -4,6 +4,7 @@
     <string name="login">Login</string>
     <string name="signup">Signup</string>
     <string name="email">Email</string>
+    <string name="email_lower">email</string>
     <string name="enter_email_address">Enter email address*</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
@@ -29,6 +30,7 @@
     <string name="we_need_your_picture">We Need Your Picture!</string>
     <string name="please_share_your_smile">Please share your smile with your colleagues</string>
     <string name="cancel">Cancel</string>
+    <string name="home">Home</string>
     <string name="incorrect_format">Incorrect format</string>
     <string name="add_a_photo_to_continue">Add a photo to continue</string>
     <string name="resend_code">Resend Code</string>
@@ -53,7 +55,6 @@
     <string name="new_version_available">New Version Available</string>
     <string name="must_update_to_last_application_version">Must update to last application version</string>
     <string name="update">Update!</string>
-    <string name="office_location">Office Location</string>
     <string name="title_activity_main">MainActivity</string>
 
 
@@ -139,7 +140,7 @@
     <!-- Chat Strings -->
     <string name="chat_me_text">"Me: "</string>
     <string name="DummyTime">Thursday 18:40 a.m</string>
-    <string name="Availability">AVAILABILITY</string>
+    <string name="availability">Availability</string>
     <string name="dummyCountry">USA</string>
     <string name="badge">badge</string>
     <string name="dummyUser">Captain Planet</string>
@@ -157,9 +158,9 @@
     <string name="Edit">Edit</string>
     <string name="Sent">Sent</string>
     <string name="dummyAddress">742, Evergreen Terrace</string>
-    <string name="officelocation">Office Location</string>
+    <string name="office_location">Office Location</string>
+    <string name="office_location_lower">office location</string>
     <string name="dummyEmail">ruben_bujalance@stratesys-ts.com</string>
-    <string name="PhoneNumber">Phone Number</string>
     <string name="repeatPassword">Repeat Password</string>
     <string name="additional">Additional</string>
     <string name="additionalinformation">Additional Information</string>
@@ -174,8 +175,10 @@
     <string name="dummyPosition">Senior Enterprise Manager</string>
     <string name="dummyUserfull">Smith Doe, John</string>
     <string name="dummylastseen">Seen 2d ago</string>
+    <string name="job_title">Job Title</string>
     <string name="mobile">mobile</string>
-    <string name="Phone">Phone</string>
+    <string name="phone">Phone</string>
+    <string name="phone_lower">phone</string>
     <string name="latestNews">Latest News</string>
     <string name="Logout">Logout</string>
     <string name="Chat">"Chat   "</string>
@@ -184,14 +187,15 @@
     <string name="about_my_comms">About MyComms</string>
     <string name="name">Name</string>
     <string name="dummyday">Tuesday 28th April</string>
-    <string name="ABOUT">ABOUT</string>
+    <string name="about">About</string>
+    <string name="personal_info">Personal Info</string>
     <string name="emailbutton">Email Button</string>
     <string name="Send">Send</string>
     <string name="sharecurrenttime">Share current time</string>
     <string name="dummyCompany2">Planet Earth Company</string>
     <string name="typemessage">Type a message...</string>
     <string name="dummylastseen2">Seen long time ago</string>
-    <string name="SharingSettings">SHARING SETTINGS</string>
+    <string name="sharing_settings">Sharing Settings</string>
     <string name="ButtonChat">Button Chat</string>
     <string name="Delivered">Delivered</string>
     <string name="editphoto">edit photo</string>
@@ -199,7 +203,7 @@
 
     <!--Search bar content -->
 
-    <string name="search_bar_text">Search (name, company, email)</string>
+    <string name="search_bar_text">Search</string>
     <string name="search_bar_cancel_button">Cancel</string>
     <string name="Settings">Settings</string>
     <string name="toolbar_preferences">Preferences</string>
@@ -270,5 +274,12 @@
         Global Contacts Address settings added successfully</string>
 
     <string name="title_activity_add_global_contacts">AddGlobalContactsActivity</string>
+
+    <!--Contact Detail -->
+    <string name="contact_details">Details</string>
+    <string name="contact_current_time">Current Time</string>
+    <string name="contact_last_seen">Last seen</string>
+    <string name="contact_current_location">Current Location</string>
+    <string name="title_activity_contact_details_plus">ContactDetailsPlusActivity</string>
 
 </resources>

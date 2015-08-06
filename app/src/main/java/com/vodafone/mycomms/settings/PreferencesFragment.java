@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -60,6 +61,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private boolean privateTimeZone = false;
 
     private TextView vacationTimeEnds;
+    private ImageView vactaionTimeArrow;
 
     private Realm realm;
 
@@ -127,6 +129,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_preferences, container, false);
+
+        vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+        vactaionTimeArrow = (ImageView) getActivity().findViewById(R.id.about_arrow_right_top);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {
@@ -291,6 +296,13 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                         String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
                         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: setting holidayDate to:" + holidayDateToSet);
                         vacationTimeEnds.setText(holidayDateToSet);
+                        vacationTimeEnds.setVisibility(View.VISIBLE);
+                        vactaionTimeArrow.setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        vacationTimeEnds.setVisibility(View.GONE);
+                        vactaionTimeArrow.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -445,7 +457,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     void updateHolidayText(long holidayEndDate){
         Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: " + holidayEndDate);
         this.holidayEndDate = holidayEndDate;
+
         TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+        ImageView vactaionTimeArrow = (ImageView) getActivity().findViewById(R.id.about_arrow_right_top);
 
         String holidayDateToSet = null;
         if(holidayEndDate > 0){
@@ -456,6 +470,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
         Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: setting holidayDate to:" + holidayDateToSet);
         vacationTimeEnds.setText(holidayDateToSet);
+        vacationTimeEnds.setVisibility(View.VISIBLE);
+        vactaionTimeArrow.setVisibility(View.GONE);
     }
 
     void updateProfileInDb(){

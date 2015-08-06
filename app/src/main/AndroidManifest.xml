@@ -25,8 +25,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <permission android:name=".permission.C2D_MESSAGE"
+    <permission
+        android:name=".permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name=".permission.C2D_MESSAGE" />
 
     <!-- *********** -->
@@ -107,13 +109,6 @@
             android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity
-            android:name=".main.MainActivity"
-            android:label="@string/title_activity_main"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light"
-            android:uiOptions="splitActionBarWhenNarrow" >
-        </activity>
-        <activity
             android:name=".contacts.detail.ContactDetailMainActivity"
             android:screenOrientation="portrait" >
         </activity>
@@ -180,14 +175,12 @@
             android:name=".chatgroup.GroupChatActivity"
             android:label="@string/title_activity_group_chat"
             android:screenOrientation="portrait"
-
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name=".chatgroup.GroupDetailActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
-
         <activity
             android:name=".chatgroup.FullscreenImageActivity"
             android:label="@string/title_activity_fullscreen_image"
@@ -202,18 +195,18 @@
             android:windowSoftInputMode="adjustPan" >
         </activity>
 
-        <!--Receiver for push notifications-->
+        <!-- Receiver for push notifications -->
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name= "." />
+                <category android:name="." />
             </intent-filter>
         </receiver>
 
-        <!--Service for push notifications-->
+        <!-- Service for push notifications -->
         <service
             android:name=".services.MyGcmListenerService"
             android:exported="false" >
@@ -222,6 +215,11 @@
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
             </intent-filter>
         </service>
+
+        <activity
+            android:name=".contacts.detail.ContactDetailsPlusActivity"
+            android:label="@string/title_activity_contact_details_plus" >
+        </activity>
     </application>
 
 </manifest>

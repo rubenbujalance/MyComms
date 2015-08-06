@@ -25,8 +25,8 @@ public class Constants {
     public static final int RIGHT_CHAT = 1;
     public static final int LEFT_IMAGE_CHAT = 2;
     public static final int RIGHT_IMAGE_CHAT = 3;
-    public static final float CHAT_UNREAD_REGULAR_SIZE = 9; //9sp
-    public static final float CHAT_UNREAD_MORE_THAN_99_SIZE = 7; //7sp
+    public static final float CHAT_UNREAD_REGULAR_SIZE = 12; //9sp
+    public static final float CHAT_UNREAD_MORE_THAN_99_SIZE = 9; //7sp
 
     //Profile Constants
     public static final int MY_SETTINGS = 0;
@@ -98,6 +98,7 @@ public class Constants {
     public static final String CONTACT_LOCAL_CONTENT= "local_contact";
     public static final String CONTACT_SORT_HELPER= "sortHelper";
     public static final String CONTACT_SEARCH_HELPER= "searchHelper";
+    public static final String CONTACT_DETAIL_INFO= "detailInfo";
 
     public static final String CONTACT_PHONE_WORK = "phone_work";
     public static final String CONTACT_PHONE_HOME = "phone_home";

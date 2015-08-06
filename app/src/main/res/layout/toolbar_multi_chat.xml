@@ -46,11 +46,32 @@
                       android:id="@+id/group_info_container"
             >
 
-                <include android:id="@+id/layout_list_item_image"
-                         layout="@layout/layout_multi_chat_avatar_50"
-                         android:layout_width="50dp"
-                         android:layout_height="50dp"
-                    />
+            <LinearLayout android:layout_width="50dp"
+                          android:layout_height="50dp"
+                >
+                <RelativeLayout android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                    >
+                    <include android:id="@+id/layout_list_item_image"
+                             layout="@layout/layout_multi_chat_avatar_50"
+                             android:layout_width="50dp"
+                             android:layout_height="50dp"
+                        />
+
+                    <TextView
+                        android:id="@+id/chat_availability"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginTop="35dp"
+                        android:layout_marginLeft="35dp"
+                        android:text=""
+                        android:visibility="gone"
+                        android:background="@drawable/ic_available"
+                        />
+                </RelativeLayout>
+            </LinearLayout>
+
+
 
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="match_parent"

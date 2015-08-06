@@ -23,7 +23,7 @@
                 android:layout_height="60dp"
                 android:id="@+id/recent_avatar"
                 tools:background="@color/grey_light"
-                tools:src="@drawable/cartoon_round_contact_image_example"
+                tools:src="@drawable/profile_mock_avatar"
                 android:layout_marginTop="5dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"/>

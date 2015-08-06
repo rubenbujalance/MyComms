@@ -98,7 +98,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 .build();
 
         Realm.setDefaultConfiguration(realmConfig);
-        Realm.migrateRealm(realmConfig);
         this.realm = Realm.getDefaultInstance();
 
         //Shared Preferences

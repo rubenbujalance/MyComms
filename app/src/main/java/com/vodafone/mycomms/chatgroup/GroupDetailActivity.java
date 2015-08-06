@@ -305,7 +305,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         if(groupChatOwnerIds.contains(_profile_id))
             lay_add_contact.setVisibility(View.VISIBLE);
         else
-            lay_add_contact.setVisibility(View.GONE);
+            lay_add_contact.setVisibility(View.INVISIBLE);
 
         lay_add_contact.setOnClickListener(new View.OnClickListener() {
             @Override

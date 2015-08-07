@@ -83,6 +83,11 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         {
             viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
+        }else if (null != contact.getPlatform()
+                && Constants.PLATFORM_GLOBAL_CONTACTS.equals(contact.getPlatform()))
+        {
+            viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_add_vodafone);
         }
 
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
@@ -136,7 +141,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         String icon = "";
         try
         {
-            if(null != contact.getPresence())
+            if(null != contact.getPresence() && contact.getPresence().length()>0)
             {
                 JSONObject jsonObject =  new JSONObject(contact.getPresence());
                 if(!jsonObject.isNull("icon"))
@@ -144,11 +149,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                     icon = new JSONObject(contact.getPresence()).getString("icon");
                 }
             }
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        } catch (JSONException e) {}
 
         if(icon.compareTo("dnd")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_notdisturb);
         else if(icon.compareTo("vacation")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_vacation);

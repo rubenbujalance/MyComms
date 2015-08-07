@@ -191,6 +191,7 @@
                                 android:background="@color/white"
                                 android:enabled="false"
                                 android:textSize="15sp"
+                                android:maxLines="1"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/first_name"
                                 />
@@ -260,6 +261,7 @@
                                 android:background="@color/white"
                                 android:enabled="false"
                                 android:textSize="15sp"
+                                android:maxLines="1"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/last_name"
                                 />
@@ -330,6 +332,7 @@
                                 android:enabled="false"
                                 android:textSize="15sp"
                                 android:textColor="@color/ac_subtitle"
+                                android:maxLines="1"
                                 android:text="@string/job_title"
                                 />
                         </LinearLayout>
@@ -398,6 +401,7 @@
                                 android:background="@color/white"
                                 android:enabled="false"
                                 android:textSize="15sp"
+                                android:maxLines="1"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/company"
                                 />
@@ -468,6 +472,7 @@
                                 android:background="@color/white"
                                 android:enabled="false"
                                 android:textSize="15sp"
+                                android:maxLines="1"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/home"
                                 />
@@ -511,6 +516,18 @@
                     android:layout_height="2dp"
                     android:background="@color/profile_lay_separator"
                     >
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/TextViewProfile"
+                        android:text="@string/office_location"/>
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/EditViewProfile"
+                        android:hint="@string/Office"
+                        tools:text="Barcelona"
+                        android:id="@+id/office_location"/>
                 </LinearLayout>
 
                 <LinearLayout

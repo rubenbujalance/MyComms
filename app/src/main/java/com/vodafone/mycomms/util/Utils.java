@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.CalendarContract;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -214,7 +215,25 @@ public final class Utils extends Activity {
 //                        sendIntent.putExtra("sms_body", x);
         context.startActivity(sendIntent);
     }
-    
+
+    public static void launchCalendar(String name, Context context){
+        Calendar beginTime = Calendar.getInstance();
+        beginTime.setTimeInMillis(System.currentTimeMillis());
+        Calendar endTime = Calendar.getInstance();
+        endTime.setTimeInMillis(System.currentTimeMillis() + 3600000); //plus one day
+
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(CalendarContract.Events.CONTENT_URI)
+                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
+                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
+                .putExtra(CalendarContract.Events.TITLE, context.getResources().getString(R.string.new_meeting) + " " + name)
+                .putExtra(CalendarContract.Events.DESCRIPTION, "My Comms")
+//                .putExtra(CalendarContract.Events.EVENT_LOCATION, "Location")
+//                .putExtra(Intent.EXTRA_EMAIL, "test@test.com")
+                .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
+        context.startActivity(intent);
+    }
+
     public static String getStringTimeDifference(int millis){
         long timeDiffMilis = millis;
         long minutes = timeDiffMilis / 60000;
@@ -353,7 +372,7 @@ public final class Utils extends Activity {
 
 
     public static String getElementFromJsonArrayString(String jsonArrayString, String key){
-        Log.d(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonArrayString + ", key=" + key);
+        Log.i(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonArrayString + ", key=" + key);
         JSONObject jsonObject = null;
         String result = null;
         try {
@@ -365,10 +384,34 @@ public final class Utils extends Activity {
                 }
             }
 
-            Log.d(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonObject != null ? jsonObject.toString() : "null" );
+            Log.i(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonObject != null ? jsonObject.toString() : "null");
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "Utils.getElementFromJsonArrayString: " ,e);
+        }
+        return result;
+    }
+
+    public static String getElementFromJsonObjectString(String json, String key){
+        JSONObject jsonObject;
+        String result = "";
+        try {
+            jsonObject = new JSONObject(json);
+            if (key.equals(Constants.CONTACT_PHONE)){
+                //TODO: Pending show all telephone numbers of Contact
+                if (!jsonObject.isNull(Constants.CONTACT_PHONE_WORK)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_WORK);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE_HOME)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_HOME);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE_MOBILE)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE_MOBILE);
+                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE)){
+                    result = jsonObject.getString(Constants.CONTACT_PHONE);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " , e);
         }
         return result;
     }
@@ -580,8 +623,57 @@ public final class Utils extends Activity {
         imageAvatar.setImageResource(R.color.grey_middle);
         textAvatar.setVisibility(View.VISIBLE);
         textAvatar.setText(finalInitials);
+
         if(textAvatarSize != 0)
             textAvatar.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAvatarSize);
+
+        if (avatarURL!=null && avatarURL.length()>0)
+        {
+            MycommsApp.picasso
+                    .load(avatarURL)
+                    .placeholder(R.color.grey_middle)
+                    .noFade()
+                    .fit().centerCrop()
+                    .into(imageAvatar, new Callback() {
+                        @Override
+                        public void onSuccess() {
+                            textAvatar.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onError() {
+                            imageAvatar.setImageResource(R.color.grey_middle);
+                            textAvatar.setVisibility(View.VISIBLE);
+                            textAvatar.setText(finalInitials);
+                        }
+                    });
+        }
+        else
+        {
+            imageAvatar.setImageResource(R.color.grey_middle);
+            textAvatar.setText(initials);
+        }
+    }
+
+    public static void loadContactAvatarDetail(String firstName, String lastName, final ImageView
+            imageAvatar, final TextView textAvatar, String avatarURL)
+    {
+        //Image avatar
+        String initials = "";
+        if(null != firstName && firstName.length() > 0)
+        {
+            initials = firstName.substring(0, 1);
+
+            if(null != lastName && lastName.length() > 0)
+            {
+                initials = initials + lastName.substring(0, 1);
+            }
+        }
+        final String finalInitials = initials;
+
+        imageAvatar.setImageResource(R.color.grey_middle);
+        textAvatar.setVisibility(View.VISIBLE);
+        textAvatar.setText(finalInitials);
 
         if (avatarURL!=null && avatarURL.length()>0)
         {

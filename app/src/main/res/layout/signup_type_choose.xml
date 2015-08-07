@@ -62,7 +62,7 @@
         android:id="@+id/btSignupMail"
         style="@style/button_text"
         android:background="@drawable/bt_grey_style"
-        android:drawableLeft="@drawable/ic_enrroll_mail_white"
+        android:drawableLeft="@drawable/ic_enrroll_email_white"
         android:textAllCaps="false"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"

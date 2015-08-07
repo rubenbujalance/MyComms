@@ -8,13 +8,13 @@
               android:paddingEnd="12dp">
 
     <ImageView android:id="@+id/list_item_recent_type_image"
-        android:paddingTop="8dp"
-        android:paddingBottom="7dp"
-        android:layout_gravity="right"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        tools:src="@drawable/ic_enrroll_email_white"
-        />
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="7dp"
+        android:layout_gravity="center"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        tools:src="@drawable/ic_rec_email_grey"/>
+
     <!-- Local Time -->
     <TextView android:id="@+id/list_item_recent_info_time"
         android:layout_height="wrap_content"
@@ -25,8 +25,6 @@
         android:orientation="vertical"
         android:layout_gravity="right"
         tools:text="@string/dummyHour"
-        android:textColor="@color/contact_soft_grey"
-        />
-
+        android:textColor="@color/contact_soft_grey"/>
 
 </LinearLayout>

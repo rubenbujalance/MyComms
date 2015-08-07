@@ -229,11 +229,11 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         if(contact.getAction().equals("")) {
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_error_tooltip));
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_SMS)) {
-            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_message));
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_rec_chat_grey));
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_EMAIL)) {
-            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_enrollment_email_white));
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_rec_email_grey));
         } else if (contact.getAction().equals(Constants.CONTACTS_ACTION_CALL)) {
-            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_phone));
+            viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_rec_phone_grey));
         }
         viewHolder.textViewTime.setText(Utils.getStringChatTimeDifference(contact.getTimestamp(), mContext));
     }
@@ -294,7 +294,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             i++;
         }
 
-        viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_recent_message));
+        viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_rec_chat_grey));
         viewHolder.textViewTime.setText(Utils.getStringChatTimeDifference(contact.getTimestamp(), mContext));
         viewHolder.textViewName.setText(composedName);
         viewHolder.textViewOccupation.setText(mContext.getString(R.string.group_chat));

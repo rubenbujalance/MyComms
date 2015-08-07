@@ -263,7 +263,7 @@ public class SearchBarController {
      */
     private void loadAllContactsFromDB(String keyWord)
     {
-        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>"+keyWord);
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>" + keyWord);
 
         if(null == keyWord)
         {
@@ -299,17 +299,21 @@ public class SearchBarController {
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Keyword>" + keyWord);
 
+        //Other platforms: SalesForce, ...
         loadAllContactsFromPlatforms(keyWord);
 
-        GlobalContactsSettings settings =
-                RealmLDAPSettingsTransactions.getSettings(profileId, realm);
+        //Global Contacts
+        if(RealmLDAPSettingsTransactions.haveSettings(profileId, realm)) {
+            GlobalContactsSettings settings =
+                    RealmLDAPSettingsTransactions.getSettings(profileId, realm);
 
-        String user = settings.getUser();
-        String password = settings.getPassword();
+            String user = settings.getUser();
+            String password = settings.getPassword();
 
-        String apiCall = buildRequestForSearchLDAPContacts(keyWord, realm, null);
+            String apiCall = buildRequestForSearchLDAPContacts(keyWord, realm, null);
 
-        loadAllContactsFromLDAP(apiCall, keyWord, false, user, password);
+            loadAllContactsFromLDAP(apiCall, keyWord, false, user, password);
+        }
     }
 
     private void loadAllContactsFromPlatforms(final String keyWord) {

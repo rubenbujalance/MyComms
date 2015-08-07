@@ -20,8 +20,14 @@ import com.vodafone.mycomms.util.UserSecurity;
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
@@ -30,6 +36,8 @@ import org.robolectric.annotation.Config;
 import org.robolectric.res.builder.RobolectricPackageManager;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.httpclient.FakeHttp;
+
+import io.realm.Realm;
 
 import static com.vodafone.mycomms.constants.Constants.ACCESS_TOKEN;
 import static com.vodafone.mycomms.constants.Constants.EXPIRES_IN;
@@ -41,14 +49,21 @@ import static com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+        manifest = "/app/src/main/AndroidManifest.xml")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
+@PrepareForTest(Realm.class)
 public class SplashScreenActivityTest {
+
+    @Rule
+    public PowerMockRule rule = new PowerMockRule();
 
     Activity activity;
 
     @Before
     public void setUp() throws Exception {
-
+        PowerMockito.mockStatic(Realm.class);
+        Mockito.when(Realm.getDefaultInstance()).thenCallRealMethod();
     }
 
 //    @Test

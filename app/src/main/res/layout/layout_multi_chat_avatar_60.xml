@@ -3,7 +3,6 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp" xmlns:tools="http://schemas.android.com/tools">
 
-
     <LinearLayout
         android:id="@+id/lay_main_container"
         android:layout_width="match_parent"
@@ -174,8 +173,5 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-
-
 
 </RelativeLayout>

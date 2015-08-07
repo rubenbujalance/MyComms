@@ -28,7 +28,6 @@ import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class ForgotPassActivityTest {
 
-
     Activity activity;
     Button btSend;
     EditText etEmail;
@@ -67,5 +66,4 @@ public class ForgotPassActivityTest {
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
     }
-
 }

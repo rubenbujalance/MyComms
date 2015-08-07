@@ -240,6 +240,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
             images.add(chatListHolder.top_right_avatar);
         }
 
+        chatListHolder.bottom_left_chat_availability.setVisibility(View.VISIBLE);
+        chatListHolder.bottom_right_chat_availability.setVisibility(View.VISIBLE);
+        chatListHolder.top_left_chat_availability.setVisibility(View.VISIBLE);
+        chatListHolder.top_right_chat_availability.setVisibility(View.VISIBLE);
+
         ArrayList<String> contactIds = new ArrayList<>();
         Collections.addAll(contactIds, membersArray);
 

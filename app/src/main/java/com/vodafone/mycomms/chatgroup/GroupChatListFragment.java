@@ -711,6 +711,11 @@ public class GroupChatListFragment extends ListFragment implements
         mGroupChatController.setChatMembers(this.selectedContacts);
         mGroupChatController.setChatCreator(this.profileId);
         mGroupChatController.setChatOwners(this.ownersIds);
+        //Added new fields here
+        mGroupChatController.setChatName("TestName");
+        mGroupChatController.setChatAbout("TestAbout");
+        mGroupChatController.setChatAvatar("http://www.google.com");
+
         if(mGroupChatController.isCreatedJSONBodyForCreateGroupChat())
         {
             mGroupChatController.createRequest(mGroupChatController.URL_CREATE_GROUP_CHAT,"post");
@@ -727,9 +732,9 @@ public class GroupChatListFragment extends ListFragment implements
                                     , this.profileId
                                     , this.selectedContacts
                                     , this.ownersIds
-                                    , ""
-                                    , ""
-                                    , ""
+                                    , "TestName"
+                                    , "TestAbout"
+                                    , "http://www.google.com"
                             );
                 }
                 else

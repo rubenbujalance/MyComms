@@ -169,6 +169,16 @@
                         android:layout_width="10dp"
                         android:layout_height="10dp"
                         style="@style/ChatAvailabilityForGroupAvatar"/>
+                    <ImageView
+                        android:id="@+id/recent_chat_availability"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:background="@drawable/ic_not_available"
+                        android:visibility="gone"
+                        android:layout_gravity="right|bottom"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"/>
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>

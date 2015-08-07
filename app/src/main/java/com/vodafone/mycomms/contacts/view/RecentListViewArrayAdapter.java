@@ -28,15 +28,11 @@ import model.GroupChat;
 import model.RecentContact;
 import model.UserProfile;
 
-/**
- * Created by str_vig on 28/04/2015.
- */
 public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
 {
     private Context mContext;
     private String _profile_id;
     private Realm realm;
-
 
     public RecentListViewArrayAdapter(Context context, List<RecentContact> items, String
             profileId, Realm realm)
@@ -80,6 +76,12 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             viewHolder.lay_bottom_both_image_hide = (LinearLayout) convertView.findViewById(R.id.lay_bottom_both_image_hide);
 
             viewHolder.lay_top_left_image = (LinearLayout) convertView.findViewById(R.id.lay_top_left_image);
+
+            viewHolder.recent_chat_availability = (ImageView) convertView.findViewById(R.id.recent_chat_availability);
+            viewHolder.bottom_right_chat_availability = (ImageView) convertView.findViewById(R.id.bottom_right_chat_availability);
+            viewHolder.bottom_left_chat_availability = (ImageView) convertView.findViewById(R.id.bottom_left_chat_availability);
+            viewHolder.top_right_chat_availability = (ImageView) convertView.findViewById(R.id.top_right_chat_availability);
+            viewHolder.top_left_chat_availability = (ImageView) convertView.findViewById(R.id.top_left_chat_availability);
             convertView.setTag(viewHolder);
         }
         else
@@ -177,6 +179,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                                 )
                 );
 
+        viewHolder.top_left_chat_availability.setVisibility(View.GONE);
+
         viewHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 
         if(null != contact.getPlatform()
@@ -221,8 +225,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                                 )
                 );
 
-
-        viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
+        viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName());
         viewHolder.textViewOccupation.setText(contact.getPosition());
         viewHolder.textViewCompany.setText(contact.getCompany());
 
@@ -236,6 +239,12 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_rec_phone_grey));
         }
         viewHolder.textViewTime.setText(Utils.getStringChatTimeDifference(contact.getTimestamp(), mContext));
+
+        viewHolder.bottom_right_chat_availability.setVisibility(View.VISIBLE);
+        viewHolder.bottom_left_chat_availability.setVisibility(View.VISIBLE);
+        viewHolder.top_right_chat_availability.setVisibility(View.VISIBLE);
+        viewHolder.top_left_chat_availability.setVisibility(View.VISIBLE);
+        viewHolder.recent_chat_availability.setVisibility(View.GONE);
     }
 
     private void loadGroupChatView(RecentContact contact,RecentViewHolder viewHolder)
@@ -298,6 +307,12 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         viewHolder.textViewTime.setText(Utils.getStringChatTimeDifference(contact.getTimestamp(), mContext));
         viewHolder.textViewName.setText(composedName);
         viewHolder.textViewOccupation.setText(mContext.getString(R.string.group_chat));
+
+        viewHolder.bottom_right_chat_availability.setVisibility(View.GONE);
+        viewHolder.bottom_left_chat_availability.setVisibility(View.GONE);
+        viewHolder.top_right_chat_availability.setVisibility(View.GONE);
+        viewHolder.top_left_chat_availability.setVisibility(View.GONE);
+        viewHolder.recent_chat_availability.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -311,6 +326,12 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         TextView textViewRecentItemTime;
         ImageView imageViewRecentType;
         ImageView imageCompanyLogo;
+
+        ImageView recent_chat_availability;
+        ImageView bottom_right_chat_availability;
+        ImageView bottom_left_chat_availability;
+        ImageView top_right_chat_availability;
+        ImageView top_left_chat_availability;
 
         ImageView top_left_avatar;
         ImageView top_right_avatar;

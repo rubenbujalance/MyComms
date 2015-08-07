@@ -58,15 +58,14 @@
                              android:layout_height="50dp"
                         />
 
-                    <TextView
+                    <ImageView
                         android:id="@+id/chat_availability"
                         android:layout_width="15dp"
                         android:layout_height="15dp"
                         android:layout_marginTop="35dp"
                         android:layout_marginLeft="35dp"
-                        android:text=""
                         android:visibility="gone"
-                        android:background="@drawable/ic_available"
+                        android:background="@drawable/ic_not_available"
                         />
                 </RelativeLayout>
             </LinearLayout>

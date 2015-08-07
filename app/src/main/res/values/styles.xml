@@ -189,6 +189,14 @@
         <item name="android:textSize">10sp</item>
     </style>
 
+    <style name="ChatAvailabilityForGroupAvatar">
+        <item name="android:visibility">gone</item>
+        <item name="android:background">@drawable/ic_not_available</item>
+        <item name="android:layout_alignParentBottom">true</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_alignParentEnd">true</item>
+    </style>
+
     <!--Profile styles-->
     <style name="ProfileBox">
         <item name="android:paddingLeft">10dp</item>

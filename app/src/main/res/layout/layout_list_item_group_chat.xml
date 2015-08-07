@@ -22,14 +22,13 @@
                  android:layout_height = "60dp"
                  android:layout_gravity="center"
                  android:layout_centerVertical="true" />
-        <TextView
+        <ImageView
             android:id="@+id/chat_availability"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:text=""
             android:layout_marginTop="45dp"
             android:layout_marginLeft="38dp"
-            android:background="@drawable/ic_available"
+            android:background="@drawable/ic_not_available"
             />
         <include android:id="@+id/layout_chatlist_item_content"
                  layout="@layout/layout_chatlist_item_content"

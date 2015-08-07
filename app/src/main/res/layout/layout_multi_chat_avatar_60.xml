@@ -48,8 +48,13 @@
                         android:textColor="@color/grey_dark"
                         android:layout_gravity="center"
                         android:gravity="center"/>
-                </RelativeLayout>
 
+                    <ImageView
+                        android:id="@+id/top_left_chat_availability"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        style="@style/ChatAvailabilityForGroupAvatar"/>
+                </RelativeLayout>
 
             </LinearLayout>
 
@@ -82,6 +87,12 @@
                         android:textColor="@color/grey_dark"
                         android:layout_gravity="center"
                         android:gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/top_right_chat_availability"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        style="@style/ChatAvailabilityForGroupAvatar"/>
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
@@ -120,6 +131,12 @@
                         android:textColor="@color/grey_dark"
                         android:layout_gravity="center"
                         android:gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/bottom_left_chat_availability"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        style="@style/ChatAvailabilityForGroupAvatar"/>
                 </RelativeLayout>
             </LinearLayout>
 
@@ -148,6 +165,11 @@
                         android:textColor="@color/grey_dark"
                         android:layout_gravity="center"
                         android:gravity="center"/>
+                    <ImageView
+                        android:id="@+id/bottom_right_chat_availability"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        style="@style/ChatAvailabilityForGroupAvatar"/>
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>

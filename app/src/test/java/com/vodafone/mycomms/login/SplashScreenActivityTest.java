@@ -62,6 +62,8 @@ public class SplashScreenActivityTest {
 
     @Before
     public void setUp() throws Exception {
+        PowerMockito.mockStatic(Realm.class);
+        Mockito.when(Realm.getDefaultInstance()).thenCallRealMethod();
     }
 
 //    @Test
@@ -77,9 +79,6 @@ public class SplashScreenActivityTest {
 
     @Test
     public void testCheckVersionNoNetworkConnectionUserLoggedOk() throws Exception {
-        PowerMockito.mockStatic(Realm.class);
-        Mockito.when(Realm.getDefaultInstance()).thenReturn(null);
-
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);

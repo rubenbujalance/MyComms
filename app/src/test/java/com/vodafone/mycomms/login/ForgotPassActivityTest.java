@@ -66,5 +66,4 @@ public class ForgotPassActivityTest {
         btSend.performClick();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
     }
-
 }

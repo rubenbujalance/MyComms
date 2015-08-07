@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -480,12 +481,19 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
 
         et_first_name_content.setEnabled(isEditing);
+        et_first_name_content.setEllipsize(TextUtils.TruncateAt.END);
         et_last_name_content.setEnabled(isEditing);
+        et_last_name_content.setEllipsize(TextUtils.TruncateAt.END);
         et_company_content.setEnabled(isEditing);
+        et_company_content.setEllipsize(TextUtils.TruncateAt.END);
         et_job_title_content.setEnabled(isEditing);
+        et_job_title_content.setEllipsize(TextUtils.TruncateAt.END);
         et_home_content.setEnabled(isEditing);
+        et_home_content.setEllipsize(TextUtils.TruncateAt.END);
         et_password_content.setEnabled(isEditing);
+        et_password_content.setEllipsize(TextUtils.TruncateAt.END);
         et_confirm_password_content.setEnabled(isEditing);
+        et_confirm_password_content.setEllipsize(TextUtils.TruncateAt.END);
     }
 
     @Override

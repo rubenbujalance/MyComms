@@ -155,7 +155,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="7"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -180,7 +180,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="5"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -192,6 +192,7 @@
                                 android:enabled="false"
                                 android:textSize="15sp"
                                 android:maxLines="1"
+                                android:ellipsize="end"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/first_name"
                                 />
@@ -225,7 +226,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="7"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -250,7 +251,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="5"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -262,6 +263,7 @@
                                 android:enabled="false"
                                 android:textSize="15sp"
                                 android:maxLines="1"
+                                android:ellipsize="end"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/last_name"
                                 />
@@ -295,7 +297,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="7"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -320,7 +322,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="5"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -331,6 +333,7 @@
                                 android:background="@color/white"
                                 android:enabled="false"
                                 android:textSize="15sp"
+                                android:ellipsize="end"
                                 android:textColor="@color/ac_subtitle"
                                 android:maxLines="1"
                                 android:text="@string/job_title"
@@ -365,7 +368,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="7"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -390,7 +393,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="5"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -402,6 +405,7 @@
                                 android:enabled="false"
                                 android:textSize="15sp"
                                 android:maxLines="1"
+                                android:ellipsize="end"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/company"
                                 />
@@ -436,7 +440,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="7"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -461,7 +465,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="5"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -473,6 +477,7 @@
                                 android:enabled="false"
                                 android:textSize="15sp"
                                 android:maxLines="1"
+                                android:ellipsize="end"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/home"
                                 />
@@ -514,6 +519,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="2dp"
+                    android:orientation="horizontal"
                     android:background="@color/profile_lay_separator"
                     >
                     <TextView
@@ -556,7 +562,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="7"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -581,7 +587,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="5"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -593,6 +599,7 @@
                                 android:inputType="textPassword"
                                 android:enabled="false"
                                 android:textSize="15sp"
+                                android:ellipsize="end"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/company"
                                 />
@@ -626,7 +633,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="7"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -651,7 +658,7 @@
                             android:layout_marginEnd="15dp"
                             android:layout_marginBottom="10dp"
                             android:textSize="15sp"
-                            android:layout_weight="1"
+                            android:layout_weight="5"
                             android:layout_gravity="center"
                             android:gravity="center"
                             >
@@ -663,6 +670,7 @@
                                 android:inputType="textPassword"
                                 android:enabled="false"
                                 android:textSize="15sp"
+                                android:ellipsize="end"
                                 android:textColor="@color/ac_subtitle"
                                 android:text="@string/company"
                                 />

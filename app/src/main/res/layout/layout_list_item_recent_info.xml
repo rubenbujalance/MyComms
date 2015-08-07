@@ -5,8 +5,7 @@
               android:layout_height="wrap_content"
               android:layout_width="70dp"
               android:paddingRight="12dp"
-              android:paddingEnd="12dp"
-    >
+              android:paddingEnd="12dp">
 
     <ImageView android:id="@+id/list_item_recent_type_image"
         android:paddingTop="8dp"

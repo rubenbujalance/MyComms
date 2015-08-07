@@ -130,8 +130,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_preferences, container, false);
 
-        vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
-        vactaionTimeArrow = (ImageView) getActivity().findViewById(R.id.about_arrow_right_top);
+        vacationTimeEnds = (TextView) v.findViewById(R.id.settings_preferences_vacation_time_value);
+        vactaionTimeArrow = (ImageView) v.findViewById(R.id.about_arrow_right_top);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {
@@ -159,12 +159,12 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 editor.commit();
 
                 //Remove User from DB
-                if(profileId!=null) {
+                if (profileId != null) {
                     RealmProfileTransactions profileTx = new RealmProfileTransactions();
                     profileTx.removeUserProfile(profileId, null);
                 }
 
-                ((MycommsApp)getActivity().getApplication()).appIsInitialized = false;
+                ((MycommsApp) getActivity().getApplication()).appIsInitialized = false;
 
                 //Go to login page as a new task
                 Intent in = new Intent(getActivity(), LoginSignupActivity.class);
@@ -293,16 +293,27 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                     this.holidayEndDate = endDate.getTime();
 
                     if (holidayEndDate > 0) {
-                        String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
+                        final String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
                         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: setting holidayDate to:" + holidayDateToSet);
-                        vacationTimeEnds.setText(holidayDateToSet);
-                        vacationTimeEnds.setVisibility(View.VISIBLE);
-                        vactaionTimeArrow.setVisibility(View.GONE);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                vacationTimeEnds.setText(holidayDateToSet);
+                                vacationTimeEnds.setVisibility(View.VISIBLE);
+                                vactaionTimeArrow.setVisibility(View.GONE);
+                            }
+                        });
+
                     }
                     else
                     {
-                        vacationTimeEnds.setVisibility(View.GONE);
-                        vactaionTimeArrow.setVisibility(View.VISIBLE);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                vacationTimeEnds.setVisibility(View.GONE);
+                                vactaionTimeArrow.setVisibility(View.VISIBLE);
+                            }
+                        });
                     }
                 }
             }

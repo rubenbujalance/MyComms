@@ -118,6 +118,8 @@ public class DashBoardActivity extends ToolbarActivity
         else
             lay_no_connection.setVisibility(View.VISIBLE);
 
+        loadLocalContacts();
+
     }
 
     private void initALL(){
@@ -335,8 +337,6 @@ public class DashBoardActivity extends ToolbarActivity
             loadUnreadMessages(recentsContainer2);
         }
         loadNews();
-
-        loadLocalContacts();
 
         //Reset notifications inbox
         NotificationMessages.resetInboxMessages();

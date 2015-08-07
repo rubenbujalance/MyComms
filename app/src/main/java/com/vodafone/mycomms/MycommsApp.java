@@ -243,8 +243,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, profileId);
-        downloadLocalContacts.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(MycommsApp.this, profileId);
+        downloadLocalContacts.downloadAndStore();
     }
 
     @Override

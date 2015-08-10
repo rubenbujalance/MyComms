@@ -108,6 +108,8 @@ public class GroupMembersViewAdapter extends RecyclerView.Adapter<GroupHolder>{
         groupHolder.textViewCompany.setText(contact.getCompany());
         groupHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         groupHolder.textViewPosition.setText(contact.getPosition());
+        
+        groupHolder.chatAvailability.setVisibility(View.VISIBLE);
 
         String country = "";
 

@@ -118,9 +118,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     private ImageView sendFileImage, img_sun;
 
-    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
+    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar, contact_availability
+            ,bottom_right_chat_availability, bottom_left_chat_availability, top_right_chat_availability, top_left_chat_availability;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text
-            ,group_names, group_n_components, contact_availability;
+            ,group_names, group_n_components;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
     private LinearLayout lay_phone, lay_add_contact;
@@ -180,6 +181,98 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if(this.isGroupChatMode)
         {
             if(null == _groupChat.getAvatar() || _groupChat.getAvatar().length() == 0)
+            {
+                ArrayList<ImageView> images = new ArrayList<>();
+                images.add(top_left_avatar);
+                images.add(bottom_left_avatar);
+                images.add(bottom_right_avatar);
+
+                final ArrayList<TextView> texts = new ArrayList<>();
+                texts.add(top_left_avatar_text);
+                texts.add(bottom_left_avatar_text);
+                texts.add(bottom_right_avatar_text);
+
+                if (null != contactIds && contactIds.size() > 3)
+                {
+                    lay_right_top_avatar_to_hide.setVisibility(View.VISIBLE);
+                    images.add(top_right_avatar);
+                    texts.add(top_right_avatar_text);
+                }
+
+                int i = 0;
+                boolean profileInside = false;
+                String groupNames = "";
+                String groupNComponents = contactList.size() + " people in group"; //TODO: Hardcode
+                for(Contact contact : contactList)
+                {
+                    if(i>3) break;
+
+                    final ImageView image = images.get(i);
+                    final TextView text = texts.get(i);
+                    text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+                    //Image avatar
+                    String initials = "";
+                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+                    {
+                        if (contact.getContactId().equals(_profile_id))
+                            profileInside = true;
+                        else
+                            groupNames = contact.getFirstName() + ", " + groupNames;
+
+                        initials = contact.getFirstName().substring(0,1);
+
+                        if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                        {
+                            initials = initials + contact.getLastName().substring(0,1);
+                        }
+
+                    }
+
+                    final String finalInitials = initials;
+
+                    image.setImageResource(R.color.grey_middle);
+                    text.setVisibility(View.VISIBLE);
+                    text.setText(finalInitials);
+
+                    if (contact.getAvatar()!=null &&
+                            contact.getAvatar().length()>0)
+                    {
+                        MycommsApp.picasso
+                                .load(contact.getAvatar())
+                                .placeholder(R.color.grey_middle)
+                                .noFade()
+                                .fit().centerCrop()
+                                .into(image, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        text.setVisibility(View.INVISIBLE);
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        image.setImageResource(R.color.grey_middle);
+                                        text.setVisibility(View.VISIBLE);
+                                        text.setText(finalInitials);
+                                    }
+                                });
+                    }
+                    else
+                    {
+                        image.setImageResource(R.color.grey_middle);
+                        text.setText(initials);
+                    }
+                    i++;
+                }
+                groupNames = groupNames.substring(0, groupNames.length()-2);
+                if (profileInside)
+                    groupNames = groupNames + ", you...";
+                group_names.setText(groupNames);
+                group_n_components.setText(groupNComponents);
+            }
+
+            //TODO here we should load avatar passed by group chat but in this case we do the same as above
+            else
             {
                 ArrayList<ImageView> images = new ArrayList<>();
                 images.add(top_left_avatar);
@@ -720,18 +813,30 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
         sendFileImage = (ImageView) findViewById(R.id.send_image);
         lay_phone = (LinearLayout) findViewById(R.id.lay_phone);
-        contact_availability = (TextView) findViewById(R.id.chat_availability);
+        contact_availability = (ImageView) findViewById(R.id.chat_availability);
+        bottom_right_chat_availability = (ImageView) findViewById(R.id.bottom_right_chat_availability);
+        bottom_left_chat_availability = (ImageView) findViewById(R.id.bottom_left_chat_availability);
+        top_right_chat_availability = (ImageView) findViewById(R.id.top_right_chat_availability);
+        top_left_chat_availability = (ImageView) findViewById(R.id.top_left_chat_availability);
 
         if(isGroupChatMode)
         {
             this.lay_phone.setVisibility(View.GONE);
             this.contact_availability.setVisibility(View.GONE);
+            this.bottom_right_chat_availability.setVisibility(View.VISIBLE);
+            this.bottom_left_chat_availability.setVisibility(View.VISIBLE);
+            this.top_right_chat_availability.setVisibility(View.VISIBLE);
+            this.top_left_chat_availability.setVisibility(View.VISIBLE);
         }
 
         else
         {
             this.lay_phone.setVisibility(View.VISIBLE);
             this.contact_availability.setVisibility(View.VISIBLE);
+            this.bottom_right_chat_availability.setVisibility(View.GONE);
+            this.bottom_left_chat_availability.setVisibility(View.GONE);
+            this.top_right_chat_availability.setVisibility(View.GONE);
+            this.top_left_chat_availability.setVisibility(View.GONE);
         }
 
 

@@ -57,7 +57,8 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
 
     private GroupChat _groupChat;
 
-    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
+    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar
+            ,bottom_right_chat_availability, bottom_left_chat_availability, top_right_chat_availability, top_left_chat_availability;
     private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text
             ,group_names, group_n_components;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
@@ -296,6 +297,16 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
         lay_phone = (LinearLayout) findViewById(R.id.lay_phone);
         this.lay_phone.setVisibility(View.GONE);
+
+        bottom_right_chat_availability = (ImageView) findViewById(R.id.bottom_right_chat_availability);
+        bottom_left_chat_availability = (ImageView) findViewById(R.id.bottom_left_chat_availability);
+        top_right_chat_availability = (ImageView) findViewById(R.id.top_right_chat_availability);
+        top_left_chat_availability = (ImageView) findViewById(R.id.top_left_chat_availability);
+
+        bottom_right_chat_availability.setVisibility(View.VISIBLE);
+        bottom_left_chat_availability.setVisibility(View.VISIBLE);
+        top_right_chat_availability.setVisibility(View.VISIBLE);
+        top_left_chat_availability.setVisibility(View.VISIBLE);
 
         group_names = (TextView) findViewById(R.id.group_names);
         group_n_components = (TextView) findViewById(R.id.group_n_components);

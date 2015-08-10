@@ -345,6 +345,8 @@ public class ProfileController extends BaseController {
             passwordConnection.request();
     }
 
+
+
     public void updateTimeZone(HashMap timeZoneHashMap) {
         new GCMGetTokenAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, timeZoneHashMap);
     }

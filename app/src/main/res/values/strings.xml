@@ -283,4 +283,13 @@
     <string name="contact_current_location">Current Location</string>
     <string name="title_activity_contact_details_plus">ContactDetailsPlusActivity</string>
 
+    <!-- Edit profile errors-->
+
+    <string name="error_first_name_not_null">First name must not be empty!</string>
+    <string name="error_last_name_not_null">Last name must not be empty!</string>
+    <string name="error_job_title_not_null">Job title must not be empty!</string>
+    <string name="error_company_not_null">Company must not be empty!</string>
+    <string name="error_home_not_null">Home address must not be empty!</string>
+
+    <string name="error_password_do_not_match">Passwords do not match!</string>
 </resources>

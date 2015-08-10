@@ -16,6 +16,7 @@ public class GroupHolder extends RecyclerView.ViewHolder {
     protected ImageView imageViewDayNight;
     protected ImageView imageAvatar;
     protected ImageView imageCompanyLogo;
+    protected ImageView chatAvailability;
     protected TextView textAvatar;
 
     public GroupHolder(View view) {
@@ -30,6 +31,7 @@ public class GroupHolder extends RecyclerView.ViewHolder {
         textViewCountry = (TextView) view.findViewById(R.id.list_item_status_local_country);
         imageViewDayNight = (ImageView) view.findViewById(R.id.list_item_image_status_daynight);
         imageCompanyLogo = (ImageView) view.findViewById(R.id.list_item_content_companylogo);
+        chatAvailability = (ImageView) view.findViewById(R.id.chat_availability);
     }
 
 

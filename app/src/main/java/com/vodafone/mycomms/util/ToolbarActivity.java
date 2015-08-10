@@ -8,7 +8,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -27,8 +27,9 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
 import io.realm.Realm;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class ToolbarActivity extends ActionBarActivity {
+public class ToolbarActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private Toolbar mFooter;
@@ -259,7 +260,7 @@ public class ToolbarActivity extends ActionBarActivity {
         layoutInbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(foregroundActivity==2) return;
+                if (foregroundActivity == 2) return;
                 editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, true);
                 editor.apply();
                 Log.i(Constants.TAG, "ToolbarActivity.onClick: footerInbox");
@@ -409,5 +410,10 @@ public class ToolbarActivity extends ActionBarActivity {
 
     public void setRealmGroupChatTransactions(RealmGroupChatTransactions realmGroupChatTransactions) {
         this.realmGroupChatTransactions = realmGroupChatTransactions;
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 }

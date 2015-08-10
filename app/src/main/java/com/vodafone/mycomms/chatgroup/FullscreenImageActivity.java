@@ -1,8 +1,9 @@
 package com.vodafone.mycomms.chatgroup;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
@@ -11,7 +12,9 @@ import com.vodafone.mycomms.R;
 
 import java.io.File;
 
-public class FullscreenImageActivity extends ActionBarActivity {
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
+public class FullscreenImageActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,11 @@ public class FullscreenImageActivity extends ActionBarActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
 }

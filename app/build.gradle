@@ -175,6 +175,9 @@ dependencies {
     //GCM
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
 
+    //Custom Font
+    compile 'uk.co.chrisjenx:calligraphy:2.1.0'
+
 }
 
 apply plugin: 'jacoco'

@@ -292,4 +292,5 @@
     <string name="error_home_not_null">Home address must not be empty!</string>
 
     <string name="error_password_do_not_match">Passwords do not match!</string>
+    <string name="font_name_source_sans_pro">fonts/SourceSansPro-Regular.ttf</string>
 </resources>

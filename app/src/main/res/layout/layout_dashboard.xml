@@ -74,12 +74,12 @@
                     android:text="@string/dummyday"
                     android:id="@+id/dateDashboard"
                     android:textColor="@color/white"
-                    android:textSize="22dp"
+                    android:textSize="22sp"
                     android:background="#2affffff"
                     android:paddingLeft="15dp"
                     android:paddingTop="10dp"
                     android:paddingRight="20dp"
-                    android:paddingBottom="10dp" />
+                    android:paddingBottom="10dp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -101,7 +101,7 @@
                         android:id="@+id/titleLatestNews"
                         android:textColor="@color/white"
                         android:padding="15dp"
-                        android:textSize="16dp" />
+                        android:textSize="16sp"/>
 
                     <HorizontalScrollView
                         android:layout_width="fill_parent"

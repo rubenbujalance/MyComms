@@ -77,7 +77,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
 
             viewHolder.lay_top_left_image = (LinearLayout) convertView.findViewById(R.id.lay_top_left_image);
 
-            viewHolder.recent_chat_availability = (ImageView) convertView.findViewById(R.id.recent_chat_availability);
             viewHolder.bottom_right_chat_availability = (ImageView) convertView.findViewById(R.id.bottom_right_chat_availability);
             viewHolder.bottom_left_chat_availability = (ImageView) convertView.findViewById(R.id.bottom_left_chat_availability);
             viewHolder.top_right_chat_availability = (ImageView) convertView.findViewById(R.id.top_right_chat_availability);
@@ -165,6 +164,15 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
 
     private void loadContactView(RecentContact contact, final RecentViewHolder viewHolder)
     {
+        viewHolder.bottom_right_chat_availability.setVisibility(View.GONE);
+        viewHolder.bottom_left_chat_availability.setVisibility(View.GONE);
+        viewHolder.top_right_chat_availability.setVisibility(View.GONE);
+        viewHolder.top_left_chat_availability.setVisibility(View.VISIBLE);
+        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) viewHolder.top_left_chat_availability.getLayoutParams();
+        params.width = 50;
+        params.height = 50;
+        viewHolder.top_left_chat_availability.setLayoutParams(params);
+
         viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
         viewHolder.textViewCompany.setVisibility(View.VISIBLE);
 
@@ -178,8 +186,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                                         , LinearLayout.LayoutParams.MATCH_PARENT
                                 )
                 );
-
-        viewHolder.top_left_chat_availability.setVisibility(View.GONE);
 
         viewHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 
@@ -239,12 +245,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             viewHolder.imageViewRecentType.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_rec_phone_grey));
         }
         viewHolder.textViewTime.setText(Utils.getStringChatTimeDifference(contact.getTimestamp(), mContext));
-
-        viewHolder.bottom_right_chat_availability.setVisibility(View.VISIBLE);
-        viewHolder.bottom_left_chat_availability.setVisibility(View.VISIBLE);
-        viewHolder.top_right_chat_availability.setVisibility(View.VISIBLE);
-        viewHolder.top_left_chat_availability.setVisibility(View.VISIBLE);
-        viewHolder.recent_chat_availability.setVisibility(View.GONE);
     }
 
     private void loadGroupChatView(RecentContact contact,RecentViewHolder viewHolder)
@@ -308,11 +308,10 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         viewHolder.textViewName.setText(composedName);
         viewHolder.textViewOccupation.setText(mContext.getString(R.string.group_chat));
 
-        viewHolder.bottom_right_chat_availability.setVisibility(View.GONE);
-        viewHolder.bottom_left_chat_availability.setVisibility(View.GONE);
-        viewHolder.top_right_chat_availability.setVisibility(View.GONE);
-        viewHolder.top_left_chat_availability.setVisibility(View.GONE);
-        viewHolder.recent_chat_availability.setVisibility(View.VISIBLE);
+        viewHolder.bottom_right_chat_availability.setVisibility(View.VISIBLE);
+        viewHolder.bottom_left_chat_availability.setVisibility(View.VISIBLE);
+        viewHolder.top_right_chat_availability.setVisibility(View.VISIBLE);
+        viewHolder.top_left_chat_availability.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -327,7 +326,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         ImageView imageViewRecentType;
         ImageView imageCompanyLogo;
 
-        ImageView recent_chat_availability;
         ImageView bottom_right_chat_availability;
         ImageView bottom_left_chat_availability;
         ImageView top_right_chat_availability;

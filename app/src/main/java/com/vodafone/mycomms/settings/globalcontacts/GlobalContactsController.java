@@ -78,18 +78,6 @@ public class GlobalContactsController {
         callLDAPDiscover();
     }
 
-//    //Init process from stored data
-//    public void callLDAPAuthProcess(Context context, GlobalContactsCallback cb) {
-//        SharedPreferences sp = context.getSharedPreferences(
-//                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-//        profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-//
-//        GlobalContactsSettings settings =
-//                RealmLDAPSettingsTransactions.getSettings(profileId, realm);
-//
-//        callLDAPAuthProcess(settings.getUser(), settings.getPassword(), context, cb);
-//    }
-
     //Step 1
     private void callLDAPDiscover() {
         Request.Builder builder = new Request.Builder();

@@ -415,6 +415,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
         Log.i(Constants.TAG, "MycommsApp.onAllPendingMessagesReceived: ");
         if(recentChatsHashMap!=null && recentChatsHashMap.size()>0) {
+            if(recentContactController==null)
+                recentContactController = new RecentContactController(this, profile_id);
+
             HashMap<String, Long> recentChatsHashMapClone = new HashMap<>();
             recentContactController.insertPendingChatsRecent(recentChatsHashMap);
             recentChatsHashMap.clear();

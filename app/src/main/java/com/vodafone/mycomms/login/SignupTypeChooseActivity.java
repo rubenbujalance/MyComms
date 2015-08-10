@@ -2,15 +2,15 @@ package com.vodafone.mycomms.login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 
-public class SignupTypeChooseActivity extends ActionBarActivity {
+public class SignupTypeChooseActivity extends MainAppCompatActivity {
 
     Button mSignupEmail;
     Button mSignupSalesforce;

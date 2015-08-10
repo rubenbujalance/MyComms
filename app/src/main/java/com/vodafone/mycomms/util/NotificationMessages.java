@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.util;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -12,6 +11,7 @@ import android.support.v4.app.TaskStackBuilder;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.DashBoardActivity;
+import com.vodafone.mycomms.main.MainActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,7 +19,7 @@ import java.util.Calendar;
 /**
  * Created by str_oan on 24/07/2015.
  */
-public final class NotificationMessages extends Activity
+public final class NotificationMessages extends MainActivity
 {
 
     public static NotificationCompat.Builder mBuilder;

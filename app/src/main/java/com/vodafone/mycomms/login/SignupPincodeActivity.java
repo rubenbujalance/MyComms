@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +18,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
@@ -29,7 +29,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class SignupPincodeActivity extends Activity {
+public class SignupPincodeActivity extends MainActivity {
 
     TextView tvPin1;
     TextView tvPin2;

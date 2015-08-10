@@ -3,18 +3,18 @@ package com.vodafone.mycomms.chatgroup;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 
 import java.io.File;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class FullscreenImageActivity extends AppCompatActivity {
+public class FullscreenImageActivity extends MainAppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -12,10 +11,11 @@ import android.widget.ImageView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.main.MainActivity;
 
 import java.util.regex.Pattern;
 
-public class SignupPassActivity extends Activity {
+public class SignupPassActivity extends MainActivity {
 
     ClearableEditText mPassword;
     ClearableEditText mConfirmPass;

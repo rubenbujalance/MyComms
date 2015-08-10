@@ -42,6 +42,7 @@ import com.google.android.gms.iid.InstanceID;
 import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,7 +66,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by str_rbm on 16/04/2015.
  */
-public final class Utils extends Activity {
+public final class Utils extends MainActivity {
 
     private static HashMap<String, HashMap<String, String>> _countries = null;
     private static String _userAgent = null;

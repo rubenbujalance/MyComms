@@ -293,4 +293,5 @@
 
     <string name="error_password_do_not_match">Passwords do not match!</string>
     <string name="font_name_source_sans_pro">fonts/SourceSansPro-Regular.ttf</string>
+    <string name="title_activity_calligraphy">CalligraphyActivity</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.main;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -45,7 +44,7 @@ import java.util.List;
  * @see SystemUiHider
  */
 @SuppressWarnings("ResourceType")
-public class SplashScreenActivity extends Activity {
+public class SplashScreenActivity extends MainActivity {
 
     Context mContext;
     private boolean isForeground;

@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 
@@ -27,7 +27,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class SignupMailActivity extends Activity {
+public class SignupMailActivity extends MainActivity {
 
     ClearableEditText etEmail;
     Drawable errorIcon;

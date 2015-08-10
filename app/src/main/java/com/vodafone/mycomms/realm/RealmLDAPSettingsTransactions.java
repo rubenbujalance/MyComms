@@ -77,7 +77,8 @@ public class RealmLDAPSettingsTransactions {
             GlobalContactsSettings settings = mRealm.where(GlobalContactsSettings.class)
                     .equalTo(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID, profileId).findFirst();
 
-            if(settings.getToken()!=null && settings.getToken().length()>0) return true;
+            if(settings!=null && settings.getToken()!=null && settings.getToken().length()>0)
+                return true;
             else return false;
         }
         catch(Exception e)

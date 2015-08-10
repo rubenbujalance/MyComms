@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.settings.globalcontacts;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -18,12 +19,11 @@ import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.ToolbarActivity;
 
 import io.realm.Realm;
 import model.GlobalContactsSettings;
 
-public class AddGlobalContactsActivity extends ToolbarActivity {
+public class AddGlobalContactsActivity extends Activity {
 
     Realm realm;
 
@@ -39,7 +39,7 @@ public class AddGlobalContactsActivity extends ToolbarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_global_contacts);
 
-        realm = Realm.getDefaultInstance();
+//        realm = Realm.getDefaultInstance();
 
         layoutErrorBar = (LinearLayout)findViewById(R.id.layoutErrorBar);
         etEmail = (EditText)findViewById(R.id.etEmail);

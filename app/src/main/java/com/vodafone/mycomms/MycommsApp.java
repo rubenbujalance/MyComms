@@ -98,7 +98,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 .build();
 
         Realm.setDefaultConfiguration(realmConfig);
-        this.realm = Realm.getDefaultInstance();
 
         //Shared Preferences
         sp = getSharedPreferences(
@@ -157,7 +156,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onTerminate() {
         super.onTerminate();
         BusProvider.getInstance().unregister(this);
-        this.realm.close();
+        if(realm!=null) realm.close();
         //Network listener
         networkEvents.unregister();
     }
@@ -196,6 +195,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "")==null ||
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "").length()==0){
             profileController.setConnectionCallback(this);
+            if(realm == null) this.realm = Realm.getDefaultInstance();
             profileController.getProfile(this.realm);
 
             return null;
@@ -343,6 +343,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             Crashlytics.setUserIdentifier(profile_id);
 
             try {
+                if(realm == null) realm = Realm.getDefaultInstance();
                 RealmProfileTransactions ptx = new RealmProfileTransactions();
                 UserProfile userProfile = ptx.getUserProfile(profile_id, realm);
                 Crashlytics.setUserName(userProfile.getFirstName()+" "+userProfile.getLastName());

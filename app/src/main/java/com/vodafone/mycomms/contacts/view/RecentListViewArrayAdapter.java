@@ -169,8 +169,10 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         viewHolder.top_right_chat_availability.setVisibility(View.GONE);
         viewHolder.top_left_chat_availability.setVisibility(View.VISIBLE);
         ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) viewHolder.top_left_chat_availability.getLayoutParams();
-        params.width = 50;
-        params.height = 50;
+        params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25,
+                mContext.getResources().getDisplayMetrics());
+        params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25,
+                mContext.getResources().getDisplayMetrics());
         viewHolder.top_left_chat_availability.setLayoutParams(params);
 
         viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
@@ -267,6 +269,13 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                 (
                         new LinearLayout.LayoutParams(width, width)
                 );
+
+        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) viewHolder.top_left_chat_availability.getLayoutParams();
+        params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10,
+                mContext.getResources().getDisplayMetrics());
+        params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10,
+                mContext.getResources().getDisplayMetrics());
+        viewHolder.top_left_chat_availability.setLayoutParams(params);
 
         ArrayList<ImageView> images = new ArrayList<>();
         images.add(viewHolder.top_left_avatar);

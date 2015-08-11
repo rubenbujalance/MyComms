@@ -85,33 +85,79 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testHttpResponseNotExpected() throws Exception {
-        //Discover response !=401
         etUser.setText("testUser");
         etPassword.setText("testPassword");
 
         //OkHttp mocked web server
         webServer = new MockWebServer();
         webServer.useHttps(null, false);
-        webServer.start();
 
+        //Connect OkHttp calls with MockWebServer
         PowerMockito.mockStatic(EndpointWrapper.class);
-        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(
-                webServer.getUrl("/").toString()
-        );
+        webServer.start();
+        String serverUrl = webServer.getUrl("/").toString();
 
+        //Discover response !=2001
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(500));
         btAddAccount.performClick();
-
-        Thread.sleep(5000);
+        Thread.sleep(1000);
+        Robolectric.flushForegroundThreadScheduler();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
 
-        webServer.shutdown();
+        //Discover connection error
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn("hostError:9999");
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody("{incorrectJSON}"));
+        btAddAccount.performClick();
+        Thread.sleep(1000);
+        Robolectric.flushForegroundThreadScheduler();
+
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
+        etUser.setText("testUserChanged");
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
+
+        //Discover incorrect JSON
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody("{incorrectJSON}"));
+        btAddAccount.performClick();
+        Thread.sleep(1000);
+        Robolectric.flushForegroundThreadScheduler();
+
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
+        etUser.setText("testUserChanged");
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
+
         //User URL error
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "{\n" +
+                        "  \"_links\": {\n" +
+                        "    \"self\": {\n" +
+                        "      \"href\": \"https://weblync13-rat.vodafone.com/Autodiscover/AutodiscoverService.svc/root?originalDomain=vodafone.com\"\n" +
+                        "    },\n" +
+                        "    \"user\": {\n" +
+                        "      \"href\": \"https://weblync13-rat.vodafone.com/Autodiscover/AutodiscoverService.svc/root/oauth/user?originalDomain=vodafone.com\"\n" +
+                        "    },\n" +
+                        "    \"xframe\": {\n" +
+                        "      \"href\": \"https://weblync13-rat.vodafone.com/Autodiscover/XFrame/XFrame.html\"\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}"));
+
+        btAddAccount.performClick();
+        Thread.sleep(1000);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
+
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody("{incorrectJSON}"));
 
         //Auth error
+
+
+        webServer.shutdown();
     }
 
 //    @Test

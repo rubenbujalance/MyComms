@@ -94,9 +94,7 @@ public class GlobalContactsController {
                 try {
                     int code = response.code();
 
-                    if (code >= 400 && code < 500) {
-                        cb.onFailure(context.getString(R.string.connection_error), code);
-                    } else if (code >= 500) {
+                    if (code >= 400) {
                         cb.onFailure(context.getString(R.string.error_reading_data_from_server), code);
                     } else if (code == 200) {
                         JSONObject jsonObject = new JSONObject(

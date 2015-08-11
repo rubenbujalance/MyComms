@@ -80,14 +80,11 @@ public class AddGlobalContactsActivity extends Activity {
                             new GlobalContactsController.GlobalContactsCallback() {
                                 @Override
                                 public void onFailure(String error, int resCode) {
-                                    System.err.println("******** onFailure: "+resCode+" ********");
                                     showMessageBarOnUIThread(error);
                                 }
 
                                 @Override
                                 public void onSuccess(GlobalContactsSettings settings) {
-                                    System.err.println("******** onSuccess ********");
-                                    System.err.println("******** token: "+settings.getToken());
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -113,9 +110,8 @@ public class AddGlobalContactsActivity extends Activity {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (layoutErrorBar.getVisibility() == View.VISIBLE &&
-                        tvError.getText().toString()
-                                .compareTo(getString(R.string.credentials_are_incorrect)) == 0)
+
+                if (layoutErrorBar.getVisibility() == View.VISIBLE)
                     layoutErrorBar.setVisibility(View.GONE);
             }
             @Override

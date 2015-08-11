@@ -18,7 +18,8 @@
         android:singleLine="true"
         android:textSize="18sp"
         tools:text="@string/dummyUser"
-        android:textColor="@color/header_background_darken"/>
+        fontPath="fonts/SourceSansPro-Semibold.ttf"
+        android:textColor="@color/contact_soft_black"/>
 
     <!-- Occupation -->
     <TextView

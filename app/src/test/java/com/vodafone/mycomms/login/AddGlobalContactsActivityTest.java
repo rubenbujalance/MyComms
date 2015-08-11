@@ -7,8 +7,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.squareup.okhttp.Response;
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 
@@ -17,7 +19,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -31,9 +32,9 @@ import org.robolectric.annotation.Config;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
-        manifest = "/app/src/main/AndroidManifest.xml")
-@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
-@PrepareForTest(Response.class)
+        manifest = "./src/main/AndroidManifest.xml")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*", "javax.net.ssl.*" })
+@PrepareForTest(EndpointWrapper.class)
 public class AddGlobalContactsActivityTest {
 
     @Rule
@@ -45,6 +46,7 @@ public class AddGlobalContactsActivityTest {
     EditText etPassword;
     LinearLayout layoutErrorBar;
     TextView tvError;
+    MockWebServer webServer;
 
     @Before
     public void setUp() throws Exception {
@@ -87,30 +89,26 @@ public class AddGlobalContactsActivityTest {
         etUser.setText("testUser");
         etPassword.setText("testPassword");
 
-        Response res = PowerMockito.mock(Response.class);
-        Mockito.when(res.code()).thenReturn(500);
+        //OkHttp mocked web server
+        webServer = new MockWebServer();
+        webServer.useHttps(null, false);
+        webServer.start();
 
-//        Response httpResponse = Util.buildResponse(500);
-//        FakeHttp.addPendingHttpResponse(httpResponse);
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(
+                webServer.getUrl("/").toString()
+        );
+
+        webServer.enqueue(new MockResponse().setResponseCode(500));
         btAddAccount.performClick();
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Robolectric.flushForegroundThreadScheduler();
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(5000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
 
+        webServer.shutdown();
         //User URL error
 
         //Auth error

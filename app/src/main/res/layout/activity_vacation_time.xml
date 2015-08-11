@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:weightSum="1"
-    android:filterTouchesWhenObscured="false"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="15dp"
-    android:background="@color/grey_profile_background"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical" android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:weightSum="1"
+              android:filterTouchesWhenObscured="false"
+              android:paddingLeft="10dp"
+              android:paddingRight="10dp"
+              android:paddingTop="15dp"
+              android:background="@color/grey_profile_background"
     >
 
     <TextView
@@ -87,7 +88,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Jun, 10, 2015"
+                tools:text="Jun, 10, 2015"
                 android:id="@+id/vacation_setter_vacation_date_starts_text"
                 android:gravity="right" />
         </LinearLayout>
@@ -118,7 +119,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Jun, 10, 2015"
+                tools:text="Jun, 10, 2015"
                 android:id="@+id/vacation_setter_vacation_date_ends_text"
                 android:gravity="right"
                 />

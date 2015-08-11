@@ -136,6 +136,7 @@
     <string name="profile_edit_mode_done">Done</string>
     <string name="profile_edit_mode_edit">Edit</string>
     <string name="toolbar_group_chat_title_messages">Add to Group</string>
+    <string name="title">Title</string>
 
     <!-- Chat Strings -->
     <string name="chat_me_text">"Me: "</string>
@@ -295,4 +296,5 @@
     <string name="error_password_do_not_match">Passwords do not match!</string>
     <string name="font_name_source_sans_pro">fonts/SourceSansPro-Regular.ttf</string>
     <string name="title_activity_calligraphy">CalligraphyActivity</string>
+    <string name="author">Author</string>
 </resources>

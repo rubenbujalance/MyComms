@@ -56,7 +56,7 @@
             android:paddingLeft="40dp"
             android:paddingRight="40dp"
             android:textColor="#ffffff"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textAlignment="center"
             android:gravity="center_horizontal" />
 
@@ -90,7 +90,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/tvPin1"
-                    android:textSize="50dp"
+                    android:textSize="50sp"
                     android:textColor="#ffffff" />
 
                 <View
@@ -112,7 +112,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/tvPin2"
-                    android:textSize="50dp"
+                    android:textSize="50sp"
                     android:textColor="#ffffff" />
 
                 <View
@@ -134,7 +134,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/tvPin3"
-                    android:textSize="50dp"
+                    android:textSize="50sp"
                     android:textColor="#ffffff" />
 
                 <View
@@ -156,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:id="@+id/tvPin4"
-                    android:textSize="50dp"
+                    android:textSize="50sp"
                     android:textColor="#ffffff" />
 
                 <View
@@ -176,7 +176,7 @@
             android:id="@+id/btResendPin"
             android:background="@drawable/bt_white_elipse_style"
             android:textAllCaps="false"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:layout_marginBottom="30dp"
             android:textColor="#ffffff" />
 
@@ -187,7 +187,7 @@
             android:text="@string/having_trouble"
             android:id="@+id/textView2"
             android:textColor="#ffffff"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
 
     </LinearLayout>
 

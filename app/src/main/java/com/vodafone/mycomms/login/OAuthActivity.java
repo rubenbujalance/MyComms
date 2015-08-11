@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,6 +22,7 @@ import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.DashBoardActivity;
+import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -32,7 +32,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OAuthActivity extends Activity {
+public class OAuthActivity extends MainActivity {
 
     WebView wvOAuth;
     String oauthPrefix;
@@ -239,8 +239,7 @@ public class OAuthActivity extends Activity {
 //                    view.clearCache(true);
 //                    Utils.clearCacheFolder(getApplicationContext().getCacheDir(), 1);
                     return true;
-                }
-                else {
+                } else {
                     view.loadUrl(urlNewString, noCacheHeaders);
                     return true;
                 }
@@ -257,9 +256,8 @@ public class OAuthActivity extends Activity {
             }
 
             @Override
-            public void onPageStarted(WebView view, String url, Bitmap facIcon)
-            {
-                super.onPageStarted(view,url,facIcon);
+            public void onPageStarted(WebView view, String url, Bitmap facIcon) {
+                super.onPageStarted(view, url, facIcon);
                 relativeContainer.setVisibility(View.VISIBLE);
                 wvOAuth.setVisibility(View.INVISIBLE);
 
@@ -272,8 +270,7 @@ public class OAuthActivity extends Activity {
             }
 
             @Override
-            public void onPageFinished(WebView view, String url)
-            {
+            public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 relativeContainer.setVisibility(View.INVISIBLE);
                 wvOAuth.setVisibility(View.VISIBLE);

@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.settings.globalcontacts;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -18,11 +17,12 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.Constants;
 
 import model.GlobalContactsSettings;
 
-public class AddGlobalContactsActivity extends Activity {
+public class AddGlobalContactsActivity extends MainActivity {
 
     //Attributes
     private LinearLayout layoutErrorBar;

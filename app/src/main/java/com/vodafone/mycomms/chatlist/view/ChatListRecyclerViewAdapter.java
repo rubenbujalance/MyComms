@@ -92,9 +92,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                         ||
                         event.getAction() == MotionEvent.ACTION_CANCEL) {
                     if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
+                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simple_border));
                     else
-                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
+                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simple_border));
                     return true;
                 } else return false;
             }

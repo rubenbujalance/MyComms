@@ -127,7 +127,7 @@ public class GroupChatListFragment extends ListFragment implements
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
 
-        mSearchController = new SearchController(getActivity().getApplicationContext(),
+        mSearchController = new SearchController(getActivity(),
                 profileId, realm);
         mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
@@ -309,7 +309,7 @@ public class GroupChatListFragment extends ListFragment implements
      */
     private void reloadAdapter()
     {
-        adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+        adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
         if (contactList!=null) {
             if (listView!=null)
                 state = listView.onSaveInstanceState();
@@ -321,7 +321,7 @@ public class GroupChatListFragment extends ListFragment implements
             }
             else
             {
-                adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+                adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
                 setListAdapter(adapter);
                 if (state!= null)
                     listView.onRestoreInstanceState(state);

@@ -38,8 +38,8 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
-import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
+import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -107,6 +107,7 @@ public class ContactListFragment extends ListFragment {
         args.putInt(ARG_PARAM1, index);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -507,7 +508,7 @@ public class ContactListFragment extends ListFragment {
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
             favouriteContactList = mContactTransactions.getAllFavouriteContacts(realm);
             if (favouriteContactList!=null) {
-                setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
+                setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity(),
                         favouriteContactList, realm));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
@@ -518,7 +519,7 @@ public class ContactListFragment extends ListFragment {
             {
                 recentContactList = filterRecentList(recentContactList);
                 RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter
-                        (getActivity().getApplicationContext(), recentContactList, profileId, realm);
+                        (getActivity(), recentContactList, profileId, realm);
                 if (listView != null) {
                     state = listView.onSaveInstanceState();
                     setListAdapter(recentAdapter);
@@ -562,7 +563,7 @@ public class ContactListFragment extends ListFragment {
     private void reloadAdapter()
     {
         ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(
-                getActivity().getApplicationContext(), contactList);
+                getActivity(), contactList);
         if (contactList!=null) {
             if (listView != null)
                 state = listView.onSaveInstanceState();
@@ -571,7 +572,7 @@ public class ContactListFragment extends ListFragment {
                 if (state != null)
                     listView.onRestoreInstanceState(state);
             } else {
-                adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+                adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
                 setListAdapter(adapter);
                 if (state != null)
                     listView.onRestoreInstanceState(state);

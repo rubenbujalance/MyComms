@@ -44,10 +44,10 @@
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="Title"
+                    android:text="@string/title"
                     android:id="@+id/title"
                     android:textStyle="bold"
-                    android:textSize="25dp"
+                    android:textSize="25sp"
                     android:gravity="center_horizontal"
                     android:textColor="@color/grey_dark"
                     android:padding="10dp"
@@ -76,9 +76,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Author"
+                        android:text="@string/author"
                         android:id="@+id/author"
-                        android:textSize="16dp"
+                        android:textSize="16sp"
                         android:textIsSelectable="false"
                         android:layout_weight="0.99" />
 
@@ -95,9 +95,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2 days ago"
+                        tools:text="2 days ago"
                         android:id="@+id/published"
-                        android:textSize="16dp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <FrameLayout

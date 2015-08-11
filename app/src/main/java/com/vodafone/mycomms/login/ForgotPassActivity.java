@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -17,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 
@@ -24,7 +24,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class ForgotPassActivity extends ActionBarActivity {
+public class ForgotPassActivity extends MainAppCompatActivity {
 
     private static final int FORGOT_PASSWORD_ACTIVITY = 1;
 

@@ -43,14 +43,14 @@ android {
     compileSdkVersion 21
     buildToolsVersion '21.1.2'
 
-       defaultConfig {
-           applicationId "com.vodafone.mycomms"
-           minSdkVersion 15
-           targetSdkVersion 21
-           versionCode version_Code
-           versionName "1.0"
-           signingConfig signingConfigs.release
-       }
+    defaultConfig {
+        applicationId "com.vodafone.mycomms"
+        minSdkVersion 15
+        targetSdkVersion 21
+        versionCode version_Code
+        versionName "1.0"
+        signingConfig signingConfigs.release
+    }
 
     buildTypes {
         release {
@@ -90,6 +90,7 @@ android {
         androidTest {
             setRoot('src/test')
         }
+        main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] }
     }
 
     packagingOptions {
@@ -157,7 +158,7 @@ dependencies {
     }
     compile "org.jxmpp:jxmpp-core:0.4.2-beta1"
     compile "xpp3:xpp3:1.1.4c"
-    compile ("org.igniterealtime.smack:smack-tcp:4.1.1") {
+    compile("org.igniterealtime.smack:smack-tcp:4.1.1") {
         exclude module: 'smack-core'
     }
 
@@ -175,6 +176,9 @@ dependencies {
     //GCM
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
 
+    //Custom Font
+    compile 'uk.co.chrisjenx:calligraphy:2.1.0'
+
 }
 
 apply plugin: 'jacoco'
@@ -187,7 +191,7 @@ def coverageSourceDirs = [
         'src/main/java'
 ]
 
-task jacocoTestReport(type:JacocoReport) {
+task jacocoTestReport(type: JacocoReport) {
     group = "Reporting"
 
     description = "Generate Jacoco coverage reports"

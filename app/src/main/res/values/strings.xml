@@ -136,6 +136,7 @@
     <string name="profile_edit_mode_done">Done</string>
     <string name="profile_edit_mode_edit">Edit</string>
     <string name="toolbar_group_chat_title_messages">Add to Group</string>
+    <string name="title">Title</string>
 
     <!-- Chat Strings -->
     <string name="chat_me_text">"Me: "</string>
@@ -201,6 +202,7 @@
     <string name="editphoto">edit photo</string>
     <string name="image">Image</string>
     <string name="new_meeting">New meeting with</string>
+    <string name="people_in_group">" people in group"</string>
 
     <!--Search bar content -->
 
@@ -292,4 +294,7 @@
     <string name="error_home_not_null">Home address must not be empty!</string>
 
     <string name="error_password_do_not_match">Passwords do not match!</string>
+    <string name="font_name_source_sans_pro">fonts/SourceSansPro-Regular.ttf</string>
+    <string name="title_activity_calligraphy">CalligraphyActivity</string>
+    <string name="author">Author</string>
 </resources>

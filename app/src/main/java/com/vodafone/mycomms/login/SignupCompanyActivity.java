@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -15,6 +14,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;
@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SignupCompanyActivity extends Activity {
+public class SignupCompanyActivity extends MainActivity {
 
     AutoCompleteTVSelectOnly mCompany;
     ClearableEditText mPosition;
@@ -162,8 +162,8 @@ public class SignupCompanyActivity extends Activity {
 
         Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
         errorIcon.setBounds(new Rect(0, 0,
-                (int)(errorIcon.getIntrinsicWidth()*0.5),
-                (int)(errorIcon.getIntrinsicHeight()*0.5)));
+                (int) (errorIcon.getIntrinsicWidth() * 0.5),
+                (int) (errorIcon.getIntrinsicHeight() * 0.5)));
 
         if(mCompany.getText().toString().trim().length() <= 0)
         {

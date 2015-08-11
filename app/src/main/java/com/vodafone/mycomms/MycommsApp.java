@@ -53,6 +53,7 @@ import model.ChatMessage;
 import model.GroupChat;
 import model.News;
 import model.UserProfile;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -134,6 +135,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 //        picasso = new Picasso.Builder(getApplicationContext()).downloader(new OkHttpDownloader(picassoClient)).build();
 
         //**********************
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath(getResources().getString(R.string.font_name_source_sans_pro))
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
 
         mNewsController = new NewsController(getApplicationContext());
 

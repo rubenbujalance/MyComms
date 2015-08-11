@@ -4,8 +4,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="?android:attr/activatedBackgroundIndicator"
-             android:id="@+id/chat_list_item_container"
-    >
+             android:id="@+id/chat_list_item_container">
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,7 +14,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/simpleborder"
-        android:paddingLeft="5dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="10dp"
+        android:paddingRight="10dp"
+        android:paddingEnd="10dp"
+        android:paddingLeft="10dp"
+        android:paddingStart="10dp">
         <include android:id="@+id/layout_list_item_image"
                  layout="@layout/layout_multi_chat_avatar_60"
                  android:layout_width="60dp"
@@ -28,14 +32,17 @@
             android:layout_height="25dp"
             android:layout_marginTop="45dp"
             android:layout_marginLeft="38dp"
-            android:background="@drawable/ic_not_available"
-            />
+            android:layout_marginStart="38dp"
+            android:background="@drawable/ic_not_available"/>
+
         <include android:id="@+id/layout_chatlist_item_content"
                  layout="@layout/layout_chatlist_item_content"
                  android:layout_width="match_parent"
                  android:layout_toRightOf="@id/layout_list_item_image"
+                 android:layout_toEndOf="@id/layout_list_item_image"
                  android:layout_height="70dp"
-                 android:layout_marginLeft="5dp"
+                 android:layout_marginLeft="14dp"
+                 android:layout_marginStart="14dp"
                  android:layout_toLeftOf="@+id/layout_chatlist_item_status"
                  android:layout_toStartOf="@+id/layout_chatlist_item_status"/>
         <include android:id="@+id/layout_chatlist_item_status"
@@ -44,7 +51,6 @@
                  android:layout_height = "70dp"
                  android:layout_alignParentRight="true"
                  android:layout_alignParentEnd="true"
-                 android:layout_gravity="end"
-            />
+                 android:layout_gravity="end"/>
     </RelativeLayout>
 </FrameLayout>

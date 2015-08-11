@@ -31,7 +31,7 @@
             android:background="@color/white">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -139,25 +139,11 @@
                     <!-- First name-->
                     <LinearLayout
                         android:id="@+id/lay_first_name_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:gravity="center"
+                        style="@style/ProfileInfoLayout"
                         >
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
+                            style="@style/ProfileInfoEditLayout"
                             android:layout_weight="7"
-                            android:layout_gravity="center"
-                            android:gravity="center"
                             >
                             <TextView
                                 android:id="@+id/tv_first_name_indicator"
@@ -171,32 +157,11 @@
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="5"
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            style="@style/ProfileInfoEditLayout"
                             >
                             <EditText
                                 android:id="@+id/et_first_name_content"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/white"
-                                android:enabled="false"
-                                android:textSize="15sp"
-                                android:maxLines="1"
-                                android:singleLine="true"
-                                android:lines="1"
-                                android:inputType="text"
-                                android:ellipsize="end"
-                                android:scrollHorizontally="true"
-                                android:textColor="@color/ac_subtitle"
+                                style="@style/ProfileInfoEditText"
                                 android:text="@string/first_name"
                                 />
                         </LinearLayout>
@@ -213,64 +178,25 @@
                     <!-- Last name-->
                     <LinearLayout
                         android:id="@+id/lay_last_name_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:gravity="center"
+                        style="@style/ProfileInfoLayout"
                         >
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
+                            style="@style/ProfileInfoEditLayout"
                             android:layout_weight="7"
-                            android:layout_gravity="center"
-                            android:gravity="center"
                             >
                             <TextView
                                 android:id="@+id/tv_last_name_indicator"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:textColor="@color/contact_soft_grey"
+                                style="@style/ProfileInfoTextView"
                                 android:text="@string/last_name"
-                                android:gravity="start"
                                 />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="5"
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            style="@style/ProfileInfoEditLayout"
                             >
                             <EditText
                                 android:id="@+id/et_last_name_content"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/white"
-                                android:enabled="false"
-                                android:textSize="15sp"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:singleLine="true"
-                                android:lines="1"
-                                android:inputType="text"
-                                android:scrollHorizontally="true"
-                                android:textColor="@color/ac_subtitle"
+                                style="@style/ProfileInfoEditText"
                                 android:text="@string/last_name"
                                 />
                         </LinearLayout>
@@ -287,64 +213,25 @@
                     <!-- Job Title-->
                     <LinearLayout
                         android:id="@+id/lay_job_title_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:gravity="center"
+                        style="@style/ProfileInfoLayout"
                         >
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
+                            style="@style/ProfileInfoEditLayout"
                             android:layout_weight="7"
-                            android:layout_gravity="center"
-                            android:gravity="center"
                             >
                             <TextView
                                 android:id="@+id/tv_job_title_indicator"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:textColor="@color/contact_soft_grey"
+                                style="@style/ProfileInfoTextView"
                                 android:text="@string/job_title"
-                                android:gravity="start"
                                 />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="5"
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            style="@style/ProfileInfoEditLayout"
                             >
                             <EditText
                                 android:id="@+id/et_job_title_content"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/white"
-                                android:inputType="text"
-                                android:enabled="false"
-                                android:textSize="15sp"
-                                android:singleLine="true"
-                                android:ellipsize="end"
-                                android:scrollHorizontally="true"
-                                android:maxLines="1"
-                                android:lines="1"
-                                android:textColor="@color/ac_subtitle"
+                                style="@style/ProfileInfoEditText"
                                 android:text="@string/job_title"
                                 />
                         </LinearLayout>
@@ -361,64 +248,25 @@
                     <!-- Company -->
                     <LinearLayout
                         android:id="@+id/lay_company_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:gravity="center"
+                        style="@style/ProfileInfoLayout"
                         >
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
+                            style="@style/ProfileInfoEditLayout"
                             android:layout_weight="7"
-                            android:layout_gravity="center"
-                            android:gravity="center"
                             >
                             <TextView
                                 android:id="@+id/tv_company_indicator"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:textColor="@color/contact_soft_grey"
+                                style="@style/ProfileInfoTextView"
                                 android:text="@string/company"
-                                android:gravity="start"
                                 />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="5"
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            style="@style/ProfileInfoEditLayout"
                             >
                             <EditText
                                 android:id="@+id/et_company_content"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/white"
-                                android:enabled="false"
-                                android:textSize="15sp"
-                                android:maxLines="1"
-                                android:singleLine="true"
-                                android:lines="1"
-                                android:inputType="text"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:textColor="@color/ac_subtitle"
+                                style="@style/ProfileInfoEditText"
                                 android:text="@string/company"
                                 />
                         </LinearLayout>
@@ -436,64 +284,25 @@
                     <!-- Home -->
                     <LinearLayout
                         android:id="@+id/lay_home_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:gravity="center"
+                        style="@style/ProfileInfoLayout"
                         >
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
+                            style="@style/ProfileInfoEditLayout"
                             android:layout_weight="7"
-                            android:layout_gravity="center"
-                            android:gravity="center"
                             >
                             <TextView
                                 android:id="@+id/tv_home_indicator"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:textColor="@color/contact_soft_grey"
+                                style="@style/ProfileInfoTextView"
                                 android:text="@string/home"
-                                android:gravity="start"
                                 />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:layout_weight="5"
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            style="@style/ProfileInfoEditLayout"
                             >
                             <EditText
                                 android:id="@+id/et_home_content"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/white"
-                                android:enabled="false"
-                                android:textSize="15sp"
-                                android:maxLines="1"
-                                android:singleLine="true"
-                                android:lines="1"
-                                android:inputType="text"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:textColor="@color/ac_subtitle"
+                                style="@style/ProfileInfoEditText"
                                 android:text="@string/home"
                                 />
                         </LinearLayout>
@@ -561,61 +370,26 @@
                     <!-- Password -->
                     <LinearLayout
                         android:id="@+id/lay_password_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:gravity="center"
+                        style="@style/ProfileInfoLayout"
                         >
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
+                            style="@style/ProfileInfoEditLayout"
                             android:layout_weight="7"
-                            android:layout_gravity="center"
-                            android:gravity="center"
                             >
                             <TextView
                                 android:id="@+id/tv_password_indicator"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:textColor="@color/contact_soft_grey"
+                                style="@style/ProfileInfoTextView"
                                 android:text="@string/password"
-                                android:gravity="start"
                                 />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
-                            android:layout_weight="5"
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            style="@style/ProfileInfoEditLayout"
                             >
                             <EditText
                                 android:id="@+id/et_password_content"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/white"
+                                style="@style/ProfileInfoEditText"
                                 android:inputType="textPassword"
-                                android:enabled="false"
-                                android:textSize="15sp"
-                                android:scrollHorizontally="true"
-                                android:ellipsize="end"
-                                android:singleLine="true"
-                                android:textColor="@color/ac_subtitle"
                                 android:text="@string/company"
                                 />
                         </LinearLayout>
@@ -632,61 +406,26 @@
                     <!-- Confirm Password -->
                     <LinearLayout
                         android:id="@+id/lay_confirm_password_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_gravity="center"
-                        android:gravity="center"
+                        style="@style/ProfileInfoLayout"
                         >
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
+                            style="@style/ProfileInfoEditLayout"
                             android:layout_weight="7"
-                            android:layout_gravity="center"
-                            android:gravity="center"
                             >
                             <TextView
                                 android:id="@+id/tv_confirm_password_indicator"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textSize="15sp"
-                                android:textColor="@color/contact_soft_grey"
+                                style="@style/ProfileInfoTextView"
                                 android:text="@string/confirm_password"
-                                android:gravity="start"
                                 />
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="30dp"
-                            android:layout_marginLeft="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginRight="15dp"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginBottom="10dp"
-                            android:textSize="15sp"
-                            android:layout_weight="5"
-                            android:layout_gravity="center"
-                            android:gravity="center"
+                            style="@style/ProfileInfoEditLayout"
                             >
                             <EditText
                                 android:id="@+id/et_confirm_password_content"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@color/white"
+                                style="@style/ProfileInfoEditText"
                                 android:inputType="textPassword"
-                                android:enabled="false"
-                                android:textSize="15sp"
-                                android:ellipsize="end"
-                                android:scrollHorizontally="true"
-                                android:singleLine="true"
-                                android:textColor="@color/ac_subtitle"
                                 android:text="@string/company"
                                 />
                         </LinearLayout>

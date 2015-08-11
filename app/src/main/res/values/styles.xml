@@ -96,13 +96,17 @@
         <item name="android:background">@color/background_platform</item>
     </style>
 
-    <!-- COntact Detail // Profile Styles -->
+    <!-- Contact Detail // Profile Styles -->
     <style name="ContactDetailInfoTextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
         <item name="android:gravity">center</item>
+    </style>
+
+    <style name="ContactLocationDetailInfoTextView" parent="ContactDetailInfoTextView">
+        <item name="android:layout_marginBottom">2dp</item>
     </style>
 
     <style name="ContactDetailPlusLinear">
@@ -132,7 +136,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">17sp</item>
     </style>
 
     <style name="ContactDetailPlusIcon">

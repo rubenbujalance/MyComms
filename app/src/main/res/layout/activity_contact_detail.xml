@@ -126,6 +126,7 @@
                     android:id="@+id/contact_contact_name"
                     android:textSize="24sp"
                     tools:text="James Bond"
+                    fontPath="fonts/SourceSansPro-Semibold.ttf"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"/>
                 <ImageView
@@ -170,19 +171,20 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/border_white_transparent"
                 android:orientation="vertical"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginEnd="2dp"
                 android:layout_weight="1">
                 <TextView
-                    style="@style/ContactDetailInfoTextView"
+                    style="@style/ContactLocationDetailInfoTextView"
                     android:textSize="12sp"
                     android:text="@string/contact_current_location"/>
                 <TextView
-                    style="@style/ContactDetailInfoTextView"
+                    style="@style/ContactLocationDetailInfoTextView"
                     android:id="@+id/contact_country"
                     android:textSize="15sp"
+                    fontPath="fonts/SourceSansPro-Semibold.ttf"
                     tools:text="Macau"/>
             </LinearLayout>
             <LinearLayout
@@ -190,27 +192,28 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:background="@drawable/border_white_transparent"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginEnd="2dp"
                 android:layout_weight="1">
                 <TextView
-                    style="@style/ContactDetailInfoTextView"
+                    style="@style/ContactLocationDetailInfoTextView"
                     android:textSize="12sp"
                     android:text="@string/contact_last_seen"/>
                 <TextView
-                    style="@style/ContactDetailInfoTextView"
+                    style="@style/ContactLocationDetailInfoTextView"
                     android:textSize="15sp"
                     android:id="@+id/contact_last_seen"
+                    fontPath="fonts/SourceSansPro-Semibold.ttf"
                     tools:text="21h ago"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/border_white_transparent"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
                 android:orientation="vertical"
                 android:layout_weight="1">
                 <RelativeLayout
@@ -226,7 +229,7 @@
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentStart="true"/>
                     <TextView
-                        style="@style/ContactDetailInfoTextView"
+                        style="@style/ContactLocationDetailInfoTextView"
                         android:layout_width="wrap_content"
                         android:textSize="12sp"
                         android:text="@string/contact_current_time"
@@ -235,11 +238,12 @@
                         android:layout_toEndOf="@+id/ivStatus"
                         />
                     <TextView
-                        style="@style/ContactDetailInfoTextView"
+                        style="@style/ContactLocationDetailInfoTextView"
                         android:layout_width="wrap_content"
                         android:textSize="15sp"
                         tools:text="01:50"
                         android:maxLines="1"
+                        fontPath="fonts/SourceSansPro-Semibold.ttf"
                         android:id="@+id/contact_local_time"
                         android:layout_below="@+id/textView18"
                         android:layout_alignLeft="@+id/textView18"

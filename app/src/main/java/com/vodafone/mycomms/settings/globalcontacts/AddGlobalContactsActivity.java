@@ -20,12 +20,9 @@ import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 
-import io.realm.Realm;
 import model.GlobalContactsSettings;
 
 public class AddGlobalContactsActivity extends Activity {
-
-    Realm realm;
 
     //Attributes
     private LinearLayout layoutErrorBar;
@@ -83,11 +80,14 @@ public class AddGlobalContactsActivity extends Activity {
                             new GlobalContactsController.GlobalContactsCallback() {
                                 @Override
                                 public void onFailure(String error, int resCode) {
+                                    System.err.println("******** onFailure: "+resCode+" ********");
                                     showMessageBarOnUIThread(error);
                                 }
 
                                 @Override
                                 public void onSuccess(GlobalContactsSettings settings) {
+                                    System.err.println("******** onSuccess ********");
+                                    System.err.println("******** token: "+settings.getToken());
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {

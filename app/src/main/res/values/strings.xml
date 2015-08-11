@@ -201,6 +201,7 @@
     <string name="editphoto">edit photo</string>
     <string name="image">Image</string>
     <string name="new_meeting">New meeting with</string>
+    <string name="people_in_group">" people in group"</string>
 
     <!--Search bar content -->
 

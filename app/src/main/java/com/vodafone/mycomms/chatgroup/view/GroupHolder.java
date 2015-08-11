@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.chatgroup;
+package com.vodafone.mycomms.chatgroup.view;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

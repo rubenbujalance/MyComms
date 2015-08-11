@@ -2,7 +2,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mycomms="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="?actionBarSize" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="?actionBarSize"
+    xmlns:tools="http://schemas.android.com/tools"
     mycomms:theme="@style/ActionBarThemeOverlay"
     mycomms:contentInsetEnd="0dp"
     mycomms:contentInsetStart="0dp"
@@ -19,32 +20,31 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
 
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:orientation="horizontal"
-                      android:layout_weight="5"
-                      android:layout_gravity="center"
-                      android:gravity="start|center"
-            >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="5"
+            android:layout_gravity="center"
+            android:gravity="start|center">
 
             <ImageButton
                 android:id="@+id/back_button"
                 android:layout_width="22dp"
                 android:layout_height="34dp"
                 android:adjustViewBounds="true"
-                android:background="@drawable/ic_go_back"
-                android:layout_centerVertical="true" />
+                android:background="@drawable/ic_go_back"/>
 
         </LinearLayout>
 
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:orientation="horizontal"
-                      android:layout_weight="3"
-                      android:layout_gravity="center"
-                      android:gravity="start|center"
-                      android:id="@+id/group_info_container"
-            >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="3"
+            android:layout_gravity="center"
+            android:gravity="start|center"
+            android:id="@+id/group_info_container">
 
             <LinearLayout android:layout_width="50dp"
                           android:layout_height="50dp"
@@ -64,6 +64,7 @@
                         android:layout_height="15dp"
                         android:layout_marginTop="35dp"
                         android:layout_marginLeft="35dp"
+                        android:layout_marginStart="35dp"
                         android:visibility="gone"
                         android:background="@drawable/ic_not_available"
                         />
@@ -82,13 +83,14 @@
                               android:orientation="horizontal"
                               android:layout_gravity="center"
                               android:gravity="start|center"
-                              android:paddingLeft="2dp"
+                              android:layout_marginLeft="4dp"
+                              android:layout_marginStart="4dp"
                     >
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         tools:text="Albert, Ruben, Alex, Vader"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:ellipsize="end"
@@ -96,6 +98,7 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                         android:id="@+id/group_names"
+                        fontPath="fonts/SourceSansPro-Semibold.ttf"
                         />
                 </LinearLayout>
 
@@ -114,13 +117,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="2dp"
+                        android:layout_marginStart="2dp"
                         android:gravity="center"
                         android:singleLine="true"
                         android:layout_gravity="center"
                         tools:text="7 people ini group"
                         android:textSize="12sp"
                         android:ellipsize="end"
-                        android:textColor="@color/white"
+                        android:textColor="@color/white_alpha80"
                         android:id="@+id/group_n_components"
                         />
                 </LinearLayout>
@@ -139,9 +143,9 @@
             >
             <ImageView
                 android:id="@+id/img_phone"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
-                android:background="@drawable/ic_phone"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/btn_phone_white"
 
                 />
         </LinearLayout>
@@ -157,8 +161,8 @@
             >
             <ImageView
                 android:id="@+id/img_modify_group_chat"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
+                android:layout_width="28dp"
+                android:layout_height="30dp"
                 android:background="@drawable/btn_add_member"
                 />
         </LinearLayout>

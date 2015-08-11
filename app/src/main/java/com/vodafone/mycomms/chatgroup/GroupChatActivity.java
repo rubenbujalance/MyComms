@@ -40,7 +40,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.chat.ChatRecyclerViewAdapter;
+import com.vodafone.mycomms.chatgroup.view.ChatRecyclerViewAdapter;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
@@ -77,15 +77,11 @@ import model.ChatMessage;
 import model.Contact;
 import model.GroupChat;
 
-/**
- * Created by str_oan on 29/06/2015.
- */
 public class GroupChatActivity extends ToolbarActivity implements Serializable
 {
 
     private String LOG_TAG = GroupChatActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
-    private ChatRecyclerViewAdapter mChatRecyclerViewAdapter;
     private EditText etChatTextBox;
     private TextView tvSendChat;
 
@@ -101,7 +97,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private ArrayList<String> groupChatOwnerIds;
     private ArrayList<Contact> contactList;
     private RealmGroupChatTransactions mGroupChatTransactions;
-    private SharedPreferences sp;
     private String previousActivity;
 
     private boolean isGroupChatMode;
@@ -113,10 +108,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private String photoPath = null;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_GALLERY = 2;
-    private File multiPartFile;
     private FilePushToServerController filePushToServerController;
-
-    private ImageView sendFileImage, img_sun;
 
     private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar, contact_availability
             ,bottom_right_chat_availability, bottom_left_chat_availability, top_right_chat_availability, top_left_chat_availability;
@@ -124,7 +116,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             ,group_names, group_n_components;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
-    private LinearLayout lay_phone, lay_add_contact;
+    private LinearLayout lay_add_contact;
 
 
     private Realm realm;
@@ -147,7 +139,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         else
             lay_no_connection.setVisibility(View.VISIBLE);
 
-        sp = getSharedPreferences(
+        SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
@@ -202,7 +194,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 int i = 0;
                 boolean profileInside = false;
                 String groupNames = "";
-                String groupNComponents = contactList.size() + " people in group"; //TODO: Hardcode
+                String groupNComponents = contactList.size() + getResources().getString(R.string.people_in_group);
                 for(Contact contact : contactList)
                 {
                     if(i>3) break;
@@ -294,7 +286,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 int i = 0;
                 boolean profileInside = false;
                 String groupNames = "";
-                String groupNComponents = contactList.size() + " people in group"; //TODO: Hardcode
+                String groupNComponents = contactList.size() + getResources().getString(R.string.people_in_group);
                 for(Contact contact : contactList)
                 {
                     if(i>3) break;
@@ -703,9 +695,9 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     private void refreshAdapter()
     {
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
+        ChatRecyclerViewAdapter chatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
                 _profile, isGroupChatMode, realm);
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+        mRecyclerView.setAdapter(chatRecyclerViewAdapter);
     }
 
     private void setSendEnabled(boolean enable)
@@ -768,7 +760,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     private void loadTheRestOfTheComponents()
     {
-        img_sun = (ImageView) findViewById(R.id.img_sun);
+        ImageView img_sun = (ImageView) findViewById(R.id.img_sun);
         if(isGroupChatMode)
             img_sun.setVisibility(View.GONE);
         else
@@ -811,8 +803,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         lay_bottom_to_hide = (LinearLayout) findViewById(R.id.lay_bottom_both_image_hide);
         lay_bottom_to_hide.setVisibility(View.VISIBLE);
         lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
-        sendFileImage = (ImageView) findViewById(R.id.send_image);
-        lay_phone = (LinearLayout) findViewById(R.id.lay_phone);
+        ImageView sendFileImage = (ImageView) findViewById(R.id.send_image);
+        LinearLayout lay_phone = (LinearLayout) findViewById(R.id.lay_phone);
         contact_availability = (ImageView) findViewById(R.id.chat_availability);
         bottom_right_chat_availability = (ImageView) findViewById(R.id.bottom_right_chat_availability);
         bottom_left_chat_availability = (ImageView) findViewById(R.id.bottom_left_chat_availability);
@@ -821,7 +813,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         if(isGroupChatMode)
         {
-            this.lay_phone.setVisibility(View.GONE);
+            lay_phone.setVisibility(View.GONE);
             this.contact_availability.setVisibility(View.GONE);
             this.bottom_right_chat_availability.setVisibility(View.VISIBLE);
             this.bottom_left_chat_availability.setVisibility(View.VISIBLE);
@@ -831,7 +823,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         else
         {
-            this.lay_phone.setVisibility(View.VISIBLE);
+            lay_phone.setVisibility(View.VISIBLE);
             this.contact_availability.setVisibility(View.VISIBLE);
             this.bottom_right_chat_availability.setVisibility(View.GONE);
             this.bottom_left_chat_availability.setVisibility(View.GONE);
@@ -899,27 +891,23 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         sendFileImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
             }
         });
 
         lay_phone.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 try {
                     Contact contact = contactList.get(0);
                     String strPhones = contact.getPhones();
 
-                    if (strPhones != null)
-                    {
+                    if (strPhones != null) {
                         String phone = strPhones;
-                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
-                        {
+                        if (!contact.getPlatform().equals(Constants.PLATFORM_LOCAL)) {
                             JSONArray jPhones = new JSONArray(strPhones);
-                            phone = (String)((JSONObject)jPhones.get(0)).get(Constants
+                            phone = (String) ((JSONObject) jPhones.get(0)).get(Constants
                                     .CONTACT_PHONE);
                         }
 
@@ -1105,7 +1093,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             {
                 bitmap = Utils.decodeFile(photoPath);
                 filePushToServerController =  new FilePushToServerController(GroupChatActivity.this);
-                multiPartFile = filePushToServerController.prepareFileToSend
+                File multiPartFile = filePushToServerController.prepareFileToSend
                         (
                                 bitmap,
                                 Constants.MULTIPART_FILE,
@@ -1119,9 +1107,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                                 Constants.MEDIA_TYPE_JPG
                         );
 
-                String response = filePushToServerController.executeRequest();
-
-                return response;
+                return filePushToServerController.executeRequest();
             }
             catch (Exception e)
             {

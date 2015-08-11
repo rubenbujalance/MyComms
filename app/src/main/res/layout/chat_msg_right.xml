@@ -10,9 +10,9 @@
         <TextView
             android:id="@+id/sent_time"
             style="@style/ChatSent"
-            android:text="Tue 10:56"
+            tools:text="Tue 10:56"
             android:layout_gravity="center_horizontal"
-            android:textSize="12dp" />
+            android:textSize="12sp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,6 +33,7 @@
                 tools:text="I'm so tired...
                 I haven't slept today
                 I'm sooo tired"
+                android:textSize="16sp"
                 android:gravity="right"
                 android:background="@drawable/chat_bubble_blue_tail"
                 android:textColor="@android:color/white"
@@ -40,8 +41,8 @@
                 android:layout_toStartOf="@+id/layout_list_item_image"/>
 
             <include android:id="@+id/layout_list_item_image" layout="@layout/layout_list_item_image_little"
-                android:layout_width="35dp"
-                android:layout_height = "35dp"
+                     android:layout_width="35dp"
+                     android:layout_height = "35dp"
                      android:layout_gravity="bottom"
                      android:layout_alignBottom="@+id/chat_text"
                      android:layout_alignParentRight="true"
@@ -51,9 +52,10 @@
             android:id="@+id/sent_text"
             style="@style/ChatSent"
             android:visibility="visible"
-            android:text="Delivered"
+            tools:text="Delivered"
             android:paddingTop="0dp"
             android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_gravity="right"/>
     </LinearLayout>
 

@@ -1,4 +1,4 @@
-package com.vodafone.mycomms.chat;
+package com.vodafone.mycomms.chatgroup.view;
 
 import android.content.Context;
 import android.content.Intent;

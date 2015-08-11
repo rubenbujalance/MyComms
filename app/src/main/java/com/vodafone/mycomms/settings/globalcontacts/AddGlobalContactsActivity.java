@@ -110,7 +110,6 @@ public class AddGlobalContactsActivity extends Activity {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 if (layoutErrorBar.getVisibility() == View.VISIBLE)
                     layoutErrorBar.setVisibility(View.GONE);
             }

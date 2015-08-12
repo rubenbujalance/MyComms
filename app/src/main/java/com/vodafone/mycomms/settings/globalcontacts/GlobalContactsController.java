@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.MediaType;
@@ -83,10 +82,12 @@ public class GlobalContactsController {
         Request.Builder builder = new Request.Builder();
         Request request = builder.url(EndpointWrapper.getLDAPDiscover()).build();
 
+        System.err.println("- Discover call: " + request.urlString());
+
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                System.err.println("- GC Controller (Discover): onFailure ********");
+                System.err.println("- Discover onFailure");
                 cb.onFailure(context.getString(R.string.connection_error), 0);
             }
 
@@ -94,8 +95,7 @@ public class GlobalContactsController {
             public void onResponse(Response response) {
                 try {
                     int code = response.code();
-                    System.err.println("- GC Controller (Discover): " +
-                            "onResponse ("+code+") ********");
+                    System.err.println("- Discover onResponse (" + code + ")");
 
                     if (code != 200) {
                         cb.onFailure(context.getString(R.string.error_reading_data_from_server), code);
@@ -110,8 +110,7 @@ public class GlobalContactsController {
                         callLDAPUser(href);
                     }
                 } catch (Exception ex) {
-                    System.err.println("- GC Controller (Discover): " +
-                            "onResponse Exception ("+ex.getMessage()+") ********");
+                    System.err.println("- Discover onResponse Exception (" + ex.getMessage() + ")");
                     Log.e(Constants.TAG,
                             "GlobalContactsController.callLDAPDiscover: ", ex);
                     cb.onFailure(context.getString(R.string.error_reading_data_from_server), 0);
@@ -125,10 +124,12 @@ public class GlobalContactsController {
         Request.Builder builder = new Request.Builder();
         Request request = builder.url(url).build();
 
+        System.err.println("- User call: " + request.urlString());
+
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                System.err.println("- GC Controller (User): onFailure ********");
+                System.err.println("- User onFailure");
                 cb.onFailure(context.getString(R.string.connection_error), 0);
             }
 
@@ -136,8 +137,7 @@ public class GlobalContactsController {
             public void onResponse(Response response) {
                 try {
                     int code = response.code();
-                    System.err.println("- GC Controller (User): " +
-                            "onResponse ("+code+") ********");
+                    System.err.println("- User onResponse ("+code+")");
 
                     if (code >= 400 && code < 500) {
                         Headers headers = response.headers();
@@ -151,7 +151,8 @@ public class GlobalContactsController {
 
                             for (int i = 0; i < authHeader.length; i++) {
                                 if (authHeader[i].trim().startsWith(LDAP_AUTH_URL_KEY)) {
-                                    hrefHeader = authHeader[0].trim();
+                                    hrefHeader = authHeader[i].trim();
+                                    break;
                                 }
                             }
 
@@ -170,8 +171,7 @@ public class GlobalContactsController {
                                 context.getString(R.string.error_reading_data_from_server));
                     }
                 } catch (Exception ex) {
-                    System.err.println("- GC Controller (User): " +
-                            "onResponse Exception ("+ex.getMessage()+") ********");
+                    System.err.println("- User onResponse Exception (" + ex.getMessage() + ")");
                     Log.e(Constants.TAG, "GlobalContactsController.callLDAPUser: ", ex);
                     cb.onFailure(context.getString(R.string.error_reading_data_from_server), 0);
                 }
@@ -204,10 +204,12 @@ public class GlobalContactsController {
                 .post(body)
                 .build();
 
+        System.err.println("- Auth call: " + request.urlString());
+
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
-                System.err.println("- GC Controller (Auth): onFailure ********");
+                System.err.println("- Auth onFailure");
                 cb.onFailure(context.getString(R.string.connection_error), 0);
             }
 
@@ -215,8 +217,7 @@ public class GlobalContactsController {
             public void onResponse(Response response) {
                 try {
                     int code = response.code();
-                    System.err.println("- GC Controller (Auth): " +
-                            "onResponse ("+code+") ********");
+                    System.err.println("- Auth onResponse ("+code+")");
 
                     if (code >= 400 && code < 500) {
                         cb.onFailure(context.getString(R.string.credentials_are_incorrect), code);
@@ -253,10 +254,8 @@ public class GlobalContactsController {
                         cb.onFailure(context.getString(R.string.error_reading_data_from_server), code);
                     }
                 } catch (Exception ex) {
-                    System.err.println("- GC Controller (Auth): " +
-                            "onResponse Exception ("+ex.getMessage()+") ********");
+                    System.err.println("- Auth onResponse Exception (" + ex.getMessage() + ")");
                     Log.e(Constants.TAG, "GlobalContactsController.callLDAPAuth: ", ex);
-                    Crashlytics.logException(ex);
                     cb.onFailure(context.getString(R.string.error_reading_data_from_server), 0);
                 }
             }

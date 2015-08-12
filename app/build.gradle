@@ -185,15 +185,11 @@ jacoco {
     toolVersion = "0.7.1.201405082137"
 }
 
-def coverageSourceDirs = [
-        'src/main/java'
-]
+def coverageSourceDirs = ['src/main/java']
 
 task jacocoTestReport(type: JacocoReport) {
     group = "Reporting"
-
     description = "Generate Jacoco coverage reports"
-
     classDirectories = fileTree(
             dir: 'build/intermediates/classes/i/release',
             excludes: ['**/R.class',
@@ -202,7 +198,6 @@ task jacocoTestReport(type: JacocoReport) {
                        '**/BuildConfig.*',
                        '**/Manifest*.*']
     )
-
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)
     executionData = files('build/jacoco/testIRelease.exec')
@@ -211,5 +206,26 @@ task jacocoTestReport(type: JacocoReport) {
         xml.enabled = true
         html.enabled = true
     }
-
 }
+
+task jacocoTestReportDebug(type: JacocoReport) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for Debug"
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/i/debug',
+            excludes: ['**/R.class',
+                       '**/R$*.class',
+                       '**/*$ViewInjector*.*',
+                       '**/BuildConfig.*',
+                       '**/Manifest*.*']
+    )
+    additionalSourceDirs = files(coverageSourceDirs)
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files('build/jacoco/testIDebug.exec')
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+

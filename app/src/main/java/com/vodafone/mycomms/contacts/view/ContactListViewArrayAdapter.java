@@ -116,7 +116,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         viewHolder.textViewCompany.setText(contact.getCompany());
         viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName() );
         viewHolder.textViewPosition.setText(contact.getPosition());
-
+Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: PLATFORM " + contact.getPlatform());
+Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: PLATFORM " + contact.getLongField1());
         String country = "";
 
         try {

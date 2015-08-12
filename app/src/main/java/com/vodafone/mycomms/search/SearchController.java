@@ -252,8 +252,10 @@ public class SearchController extends BaseController
                 contact.setId(profileId + "_" + jsonObject.getString(Constants.CONTACT_ID));
                 Log.w(Constants.TAG,"SearchController -> mapContact() has value: "+profileId);
             }
-            if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
+            if (!jsonObject.isNull(Constants.CONTACT_PLATFORM)) {
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
+                contact.setLongField1(Utils.setPlatformOrder(jsonObject.getString(Constants.CONTACT_PLATFORM)));
+            }
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))
                 contact.setFirstName(jsonObject.getString(Constants.CONTACT_FNAME));
             if (!jsonObject.isNull(Constants.CONTACT_LNAME))
@@ -290,7 +292,8 @@ public class SearchController extends BaseController
 
             contact.setSortHelper
                     ((
-                                    Utils.normalizeStringNFD(contact.getFirstName()) + " " +
+                                    contact.getLongField1() + " " +
+                                            Utils.normalizeStringNFD(contact.getFirstName()) + " " +
                                             Utils.normalizeStringNFD(contact.getLastName()) + " " +
                                             Utils.normalizeStringNFD(contact.getCompany())).trim()
                     );

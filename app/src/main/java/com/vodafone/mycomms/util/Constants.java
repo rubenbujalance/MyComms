@@ -282,4 +282,10 @@ public class Constants {
     public static final String LDAP_SETTINGS_FIELD_URL = "url";
     public static final String LDAP_API_CALL_PLATFORM = "ly";
 
+    //Platform Search Order
+    public static final long ORDER_MYCOMMS = 0;
+    public static final long ORDER_GLOBAL_CONTACTS = 1;
+    public static final long ORDER_SALES_FORCE = 2;
+    public static final long ORDER_LOCAL = 3;
+
 }

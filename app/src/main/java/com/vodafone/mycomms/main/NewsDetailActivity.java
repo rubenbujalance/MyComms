@@ -51,7 +51,12 @@ public class NewsDetailActivity  extends ToolbarActivity {
         published.setText(intent.getExtras().getString(Constants.NEWS_PUBLISHED_AT));
 
         WebView html = (WebView) findViewById(R.id.newstext);
-        html.loadData(intent.getExtras().getString(Constants.NEWS_HTML), "text/html; charset=utf-8", "UTF-8");
+//        html.loadData(intent.getExtras().getString(Constants.NEWS_HTML), "text/html; charset=utf-8", "UTF-8");
+//        html.loadUrl("file:///android_asset/demo.html");
+        String pish = "<html><head><style type=\"text/css\">@font-face {font-family: SourceSansPro-Regular;src: url(\"file:///android_asset/fonts/SourceSansPro-Regular.ttf\")}body {font-family: SourceSansPro-Regular;font-size: medium;text-align: justify;}</style></head><body>";
+        String pas = "</body></html>";
+        String myHtmlString = pish + intent.getExtras().getString(Constants.NEWS_HTML) + pas;
+        html.loadDataWithBaseURL(null, myHtmlString, "text/html", "UTF-8", null);
 
         ImageView ivBtBack = (ImageView)findViewById(R.id.btn_back);
         ivBtBack.setOnClickListener(new View.OnClickListener() {

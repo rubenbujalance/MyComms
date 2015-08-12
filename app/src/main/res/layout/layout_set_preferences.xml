@@ -4,8 +4,6 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -70,6 +68,7 @@
                         android:gravity="start"
                         android:layout_weight="1"
                         android:textSize="15sp"
+                        fontPath="fonts/SourceSansPro-Semibold.ttf"
                         android:layout_gravity="center"
                         android:textColor="@color/text_dark_color"
                         />
@@ -103,7 +102,6 @@
                         android:src="@mipmap/icon_right_grey" />
                 </LinearLayout>
 
-
             </LinearLayout>
         </LinearLayout>
 
@@ -125,13 +123,9 @@
                 android:layout_height="30dp"
                 android:checked="false"
                 android:enabled="true"
-                android:layout_marginLeft="15dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginRight="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="15dp"
+                android:layout_margin="15dp"
                 android:textSize="15sp"
+                fontPath="fonts/SourceSansPro-Semibold.ttf"
                 android:textColor="@color/text_dark_color"
                 android:text="@string/DoNotDisturb" />
         </LinearLayout>
@@ -189,13 +183,9 @@
                 android:layout_height="30dp"
                 android:checked="true"
                 android:enabled="true"
-                android:layout_marginLeft="15dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginRight="15dp"
-                android:layout_marginEnd="15dp"
-                android:layout_marginBottom="15dp"
+                android:layout_margin="15dp"
                 android:textSize="15sp"
+                fontPath="fonts/SourceSansPro-Semibold.ttf"
                 android:textColor="@color/text_dark_color"
                 android:text="@string/sharecurrenttime" />
         </LinearLayout>
@@ -270,6 +260,7 @@
                         android:gravity="start"
                         android:layout_gravity="center"
                         android:textSize="15sp"
+                        fontPath="fonts/SourceSansPro-Semibold.ttf"
                         android:textColor="@color/text_dark_color"
                         android:text="@string/about_my_comms" />
                 </LinearLayout>
@@ -325,6 +316,7 @@
             android:singleLine="true"
             android:textAllCaps="false"
             android:text="@string/Logout"
+            fontPath="fonts/SourceSansPro-Semibold.ttf"
             android:textColor="#ffffff" />
     </RelativeLayout>
 </LinearLayout>

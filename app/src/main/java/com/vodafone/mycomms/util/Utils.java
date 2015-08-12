@@ -992,4 +992,27 @@ public final class Utils extends MainActivity {
 
         return platformOrder;
     }
+
+    public static String getPlaformName(String platform, Context context) {
+        String platformName;
+
+        switch (platform) {
+            case Constants.PLATFORM_MY_COMMS:
+                platformName = context.getResources().getString(R.string.mycomms);
+                break;
+            case Constants.PLATFORM_SALES_FORCE:
+                platformName = context.getResources().getString(R.string.set_salesforce);
+                break;
+            case Constants.PLATFORM_GLOBAL_CONTACTS:
+                platformName = context.getResources().getString(R.string.set_vodafone_global_list);
+                break;
+            case Constants.PLATFORM_LOCAL:
+                platformName = context.getResources().getString(R.string.set_local_contacts);
+                break;
+            default:
+                platformName = "";
+        }
+
+        return platformName;
+    }
 }

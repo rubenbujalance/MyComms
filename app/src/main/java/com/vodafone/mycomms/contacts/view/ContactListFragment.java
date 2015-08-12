@@ -584,6 +584,34 @@ public class ContactListFragment extends ListFragment {
         }
     }
 
+    /**
+     * Reloads list adapter when on search
+     * @author ---
+     */
+    private void reloadSearchAdapter()
+    {
+        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(
+                getActivity(), contactList);
+        if (contactList!=null) {
+            if (listView != null)
+                state = listView.onSaveInstanceState();
+            if (adapter != null) {
+                setListAdapter(adapter);
+                if (state != null)
+                    listView.onRestoreInstanceState(state);
+            } else {
+                adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
+                setListAdapter(adapter);
+                if (state != null)
+                    listView.onRestoreInstanceState(state);
+            }
+            if (contactList.size()!=0) {
+                if (emptyText!=null)
+                    emptyText.setText(getResources().getString(R.string.no_search_records));
+            }
+        }
+    }
+
 
     /**
      * Gets all contacts from Realm DB by given key word
@@ -624,7 +652,7 @@ public class ContactListFragment extends ListFragment {
     public void reloadAdapterEvent(ReloadAdapterEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.reloadAdapterEvent: ");
         this.contactList = mSearchBarController.getContactList();
-        reloadAdapter();
+        reloadSearchAdapter();
     }
 
     private void showProgressDialog() {

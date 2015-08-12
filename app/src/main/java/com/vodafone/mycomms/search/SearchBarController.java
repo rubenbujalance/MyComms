@@ -179,7 +179,6 @@ public class SearchBarController {
             public void onClick(View v) {
                 hideSearchBarContent();
                 hideKeyboard();
-
             }
         });
 

@@ -3,7 +3,6 @@ package com.vodafone.mycomms.settings.globalcontacts;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -392,9 +391,6 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testConnectivityChanged() throws Exception {
-        Context context = RuntimeEnvironment.application.getApplicationContext();
-        ConnectivityManager connMgr =
-                (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         resetScreen();
 
         System.err.println("******** Test: Connectivity Offline received ********");

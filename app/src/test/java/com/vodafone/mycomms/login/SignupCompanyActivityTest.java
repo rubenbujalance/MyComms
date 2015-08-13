@@ -41,13 +41,13 @@ public class SignupCompanyActivityTest {
         mOfficeLoc = activity.mOfficeLoc;
     }
 
-    @Test
+    //    @Test
     public void testForwardEmptyCompany() {
         ivBtFwd.performClick();
         Assert.assertTrue(mCompany.getError().equals(activity.getString(R.string.select_your_company_to_continue)));
     }
 
-    @Test
+    //    @Test
     public void testForward() {
         String companyName = "Stratesys";
         String companyCode = "001";
@@ -67,7 +67,7 @@ public class SignupCompanyActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    @Test
+    //    @Test
     public void testBack() throws Exception {
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();

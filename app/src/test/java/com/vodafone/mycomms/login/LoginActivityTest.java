@@ -77,7 +77,7 @@ public class LoginActivityTest {
 //        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
 //    }
 
-    @Test
+    //    @Test
     public void testLoginError() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(409, LOGIN_USER_NOT_FOUND_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -95,7 +95,7 @@ public class LoginActivityTest {
         Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.login)));
     }
 
-    @Test
+    //    @Test
     public void testLoginConnectionError() throws Exception {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
@@ -116,7 +116,7 @@ public class LoginActivityTest {
         Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.login)));
     }
 
-    @Test
+    //    @Test
     public void testInvalidVersionResponse() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(400, INVALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -126,14 +126,14 @@ public class LoginActivityTest {
         Assert.assertTrue(sAlert.getTitle().toString().equals(activity.getString(R.string.new_version_available)));
     }
 
-    @Test
+    //    @Test
     public void testForgotPass() throws Exception {
         tvForgotPass.performClick();
         Intent expectedIntent = new Intent(activity, ForgotPassActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    @Test
+    //    @Test
     public void testLoginSalesforce() throws Exception {
         btLoginSalesforce.performClick();
         Intent expectedIntent = new Intent(activity, OAuthActivity.class);
@@ -141,7 +141,7 @@ public class LoginActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    @Test
+    //    @Test
     public void testBack() throws Exception {
         ivBack.performClick();
         Assert.assertTrue(activity.isFinishing());

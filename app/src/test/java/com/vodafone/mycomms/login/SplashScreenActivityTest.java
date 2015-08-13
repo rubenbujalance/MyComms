@@ -76,7 +76,7 @@ public class SplashScreenActivityTest {
 //        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
 //    }
 
-    @Test
+    //    @Test
     public void testCheckVersionNoNetworkConnectionUserLoggedOk() throws Exception {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr =
@@ -101,7 +101,7 @@ public class SplashScreenActivityTest {
                 Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    @Test
+    //    @Test
     public void testCheckVersionNoNetworkConnectionUserNotLogged() throws Exception {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         UserSecurity.resetTokens(context);
@@ -128,7 +128,7 @@ public class SplashScreenActivityTest {
 //        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
 //    }
 
-    @Test
+    //    @Test
     public void testCheckVersionUserLoggedRenewTokenToLoginSignup() throws Exception {
         UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 0, RuntimeEnvironment.application);
         HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
@@ -141,7 +141,7 @@ public class SplashScreenActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    @Test
+    //    @Test
     public void testInvalidVersionResponse() throws Exception {
         RobolectricPackageManager rpm = (RobolectricPackageManager)Shadows.shadowOf(RuntimeEnvironment.application).getPackageManager();
         Intent intent = new Intent(Intent.ACTION_MAIN);

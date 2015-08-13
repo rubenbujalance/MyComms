@@ -279,9 +279,8 @@ public class SearchBarController {
             {
                 contactList = mSearchController.getContactsByKeyWord(keyWord);
             }
+            validateNoPlatformRecords(contactList);
         }
-
-        validateNoPlatformRecords(contactList);
 
     }
 
@@ -612,7 +611,6 @@ public class SearchBarController {
         contact.setContactId(platform);
         contact.setId(profileId + "_" + platform);
         contact.setFirstName(mActivity.getResources().getString(R.string.no_search_records));
-        contact.setLastName("");
 
         return contact;
     }

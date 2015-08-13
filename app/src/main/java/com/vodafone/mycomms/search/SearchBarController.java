@@ -281,6 +281,8 @@ public class SearchBarController {
             }
         }
 
+        validateNoPlatformRecords(contactList);
+
     }
 
     private void loadAllContactsFromDB()
@@ -378,7 +380,7 @@ public class SearchBarController {
             @Override
             public void onFailure(Response response, IOException e) {
                 Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP - Failure: " +
-                        "KeyWord>"+keyWord+"; Retrying>"+retrying);
+                        "KeyWord>" + keyWord + "; Retrying>" + retrying);
 
                 //If have received an Unauthorized response, renew LDAP credentials and retry
                 //If already have retried, show LDAP Warning Bar
@@ -472,9 +474,8 @@ public class SearchBarController {
         String basicCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
         String content = sp.getString(Constants.PLATFORMS_SHARED_PREF, "mc");
         content = content.replace("[","").replace("]","").replace("\"","");
-        String apiCall = basicCall+content+"&t="+keyWord;
 
-        return apiCall;
+        return basicCall+content+"&t="+keyWord;
     }
 
     /**
@@ -529,17 +530,6 @@ public class SearchBarController {
         searchView.setText("");
     }
 
-
-//    @Override
-//    public void onSearchContactsResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging) {
-//
-//    }
-//
-//    @Override
-//    public void onConnectionNotAvailable() {
-//
-//    }
-
     public ArrayList<Contact> getContactList()
     {
         return this.contactList;
@@ -559,5 +549,69 @@ public class SearchBarController {
                 return name1.compareTo(name2);
             }
         });
+    }
+
+    private void validateNoPlatformRecords(ArrayList<Contact> contactList) {
+        boolean isMyComms = false;
+        boolean isSalesForce = false;
+        boolean isGlobal = false;
+        boolean isLocal = false;
+        int salesForcePosition = 0;
+        int globalPosition = 0;
+        int localPosition = 0;
+        String platform;
+
+        for (int i=0;i<contactList.size();i++){
+            platform = contactList.get(i).getPlatform();
+
+            if (!isMyComms && platform.equals(Constants.PLATFORM_MY_COMMS)) {
+                isMyComms = true;
+            } else if (!isSalesForce && platform.equals(Constants.PLATFORM_SALES_FORCE)){
+                isSalesForce = true;
+                salesForcePosition = i;
+            } else if (!isGlobal && platform.equals(Constants.PLATFORM_GLOBAL_CONTACTS)){
+                isGlobal = true;
+                globalPosition = i;
+            } else if (!isLocal && platform.equals(Constants.PLATFORM_LOCAL)) {
+                isLocal = true;
+                localPosition = i;
+            }
+        }
+
+        int size =  contactList.size();
+        if (!isLocal){
+            contactList.add(size, createNoRecordsContact(Constants.PLATFORM_LOCAL));
+        }
+        if (!isGlobal){
+            if (localPosition == 0){
+                localPosition = salesForcePosition;
+                if (localPosition == 0){
+                    localPosition = size;
+                }
+            }
+            contactList.add(localPosition, createNoRecordsContact(Constants.PLATFORM_GLOBAL_CONTACTS));
+        }
+        if (!isSalesForce){
+            if (globalPosition == 0){
+                globalPosition = localPosition;
+                if (globalPosition == 0){
+                    globalPosition = size;
+                }
+            }
+            contactList.add(globalPosition, createNoRecordsContact(Constants.PLATFORM_SALES_FORCE));
+        }
+        if (!isMyComms) {
+            contactList.add(0, createNoRecordsContact(Constants.PLATFORM_MY_COMMS));
+        }
+    }
+
+    private Contact createNoRecordsContact(String platform) {
+        Contact contact = new Contact();
+        contact.setProfileId(profileId);
+        contact.setPlatform(platform);
+        contact.setContactId(platform);
+        contact.setId(profileId + "_" + platform);
+
+        return contact;
     }
 }

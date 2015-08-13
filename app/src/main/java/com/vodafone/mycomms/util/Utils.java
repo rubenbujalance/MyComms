@@ -969,4 +969,50 @@ public final class Utils extends MainActivity {
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         return sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
     }
+
+    public static long setPlatformOrder(String platform) {
+        long platformOrder;
+
+        switch (platform) {
+            case Constants.PLATFORM_MY_COMMS:
+                platformOrder = Constants.ORDER_MYCOMMS;
+                break;
+            case Constants.PLATFORM_SALES_FORCE:
+                platformOrder = Constants.ORDER_SALES_FORCE;
+                break;
+            case Constants.PLATFORM_GLOBAL_CONTACTS:
+                platformOrder = Constants.ORDER_GLOBAL_CONTACTS;
+                break;
+            case Constants.PLATFORM_LOCAL:
+                platformOrder = Constants.ORDER_LOCAL;
+                break;
+            default:
+                platformOrder = 0;
+        }
+
+        return platformOrder;
+    }
+
+    public static String getPlaformName(String platform, Context context) {
+        String platformName;
+
+        switch (platform) {
+            case Constants.PLATFORM_MY_COMMS:
+                platformName = context.getResources().getString(R.string.mycomms);
+                break;
+            case Constants.PLATFORM_SALES_FORCE:
+                platformName = context.getResources().getString(R.string.set_salesforce);
+                break;
+            case Constants.PLATFORM_GLOBAL_CONTACTS:
+                platformName = context.getResources().getString(R.string.set_vodafone_global_list);
+                break;
+            case Constants.PLATFORM_LOCAL:
+                platformName = context.getResources().getString(R.string.set_local_contacts);
+                break;
+            default:
+                platformName = "";
+        }
+
+        return platformName;
+    }
 }

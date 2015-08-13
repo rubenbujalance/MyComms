@@ -40,7 +40,7 @@ public class Contact extends RealmObject{
     private String stringField7;
     private String stringField8;
     private String stringField9;
-    private long longField1;
+    private long longField1; //Platform Order
     private long longField2;
     private long longField3;
     private long longField4;

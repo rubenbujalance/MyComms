@@ -611,6 +611,8 @@ public class SearchBarController {
         contact.setPlatform(platform);
         contact.setContactId(platform);
         contact.setId(profileId + "_" + platform);
+        contact.setFirstName(mActivity.getResources().getString(R.string.no_search_records));
+        contact.setLastName("");
 
         return contact;
     }

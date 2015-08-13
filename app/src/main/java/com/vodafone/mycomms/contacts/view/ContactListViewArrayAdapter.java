@@ -3,6 +3,8 @@ package com.vodafone.mycomms.contacts.view;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
@@ -58,6 +61,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
             viewHolder.imageCompanyLogo = (ImageView) convertView.findViewById(R.id.list_item_content_companylogo);
             viewHolder.platformLabel = (TextView) convertView.findViewById(R.id.platform_label);
+            viewHolder.chatAvailability = (ImageView) convertView.findViewById(R.id.chat_availability);
             
             convertView.setTag(viewHolder);
         } else {
@@ -67,59 +71,15 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
         // update the item view
         Contact contact = getItem(position);
+        String noRecordFound = mContext.getResources().getString(R.string.no_search_records);
 
-        viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
-        if(null != contact.getPlatform()
-                && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
-        {
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
-        }
-        else if (null != contact.getPlatform()
-                && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
-        {
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
-        }
-        else if (null != contact.getPlatform()
-                && Constants.PLATFORM_LOCAL.equals(contact.getPlatform()))
-        {
-            viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
-        }else if (null != contact.getPlatform()
-                && Constants.PLATFORM_GLOBAL_CONTACTS.equals(contact.getPlatform()))
-        {
-            viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_add_vodafone);
-        }
-
-        if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
-        {
-            AvatarSFController avatarSFController = new AvatarSFController
-                    (
-                           mContext, contact.getContactId(), profileId
-                    );
-            avatarSFController.getSFAvatar(contact.getAvatar());
-        }
-
-        Utils.loadContactAvatar
-                (
-                        contact.getFirstName()
-                        , contact.getLastName()
-                        , viewHolder.imageAvatar
-                        , viewHolder.textAvatar
-                        , Utils.getAvatarURL
-                                (
-                                        contact.getPlatform()
-                                        , contact.getStringField1()
-                                        , contact.getAvatar()
-                                )
-                );
-
+        //validate if separator is needed
         boolean showSeparator;
-        if(null != contact.getPlatform()) {
+        if (null != contact.getPlatform()) {
             if (position == 0)
                 showSeparator = true;
             else {
-                if (!contact.getPlatform().equals(getItem(position-1).getPlatform()))
+                if (!contact.getPlatform().equals(getItem(position - 1).getPlatform()))
                     showSeparator = true;
                 else
                     showSeparator = false;
@@ -132,78 +92,137 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             }
         }
 
-        viewHolder.textViewCompany.setText(contact.getCompany());
-        viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName());
-        viewHolder.textViewPosition.setText(contact.getPosition());
-        String country = "";
+        //validate if it's a no resuld found record from the search
+        if(null != contact.getPlatform()
+                && contact.getFirstName().equals(noRecordFound))
+        {
+            MycommsApp.picasso
+                    .load(R.drawable.ic_no_results)
+                    .noFade()
+                    .fit().centerCrop()
+                    .into(viewHolder.imageAvatar);
+            viewHolder.textViewPosition.setText(contact.getFirstName());
+            viewHolder.textViewPosition.setGravity(Gravity.CENTER);
+            viewHolder.textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+            viewHolder.textViewPosition.setTextColor(mContext.getResources().getColor(R.color.contact_very_soft_grey));
+            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
+            viewHolder.chatAvailability.setVisibility(View.GONE);
+        }
+        else
+        {
+            viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
+            if (null != contact.getPlatform()
+                    && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform())) {
+                viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
+            } else if (null != contact.getPlatform()
+                    && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform())) {
+                viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
+            } else if (null != contact.getPlatform()
+                    && Constants.PLATFORM_LOCAL.equals(contact.getPlatform())) {
+                viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
+                viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
+            } else if (null != contact.getPlatform()
+                    && Constants.PLATFORM_GLOBAL_CONTACTS.equals(contact.getPlatform())) {
+                viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
+                viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_add_vodafone);
+            }
 
-        try {
-            if (contact.getCountry() != null && contact.getCountry().length() > 0) {
-                if (Utils.getCountry(contact.getCountry(), mContext).get("is_special") != null) {
-                    if (Utils.getCountry(contact.getCountry(), mContext).get("is_special").equals("Yes")) {
-                        country = Utils.getCountry(contact.getCountry(), mContext).get("FIPS");
+            if (null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform())) {
+                AvatarSFController avatarSFController = new AvatarSFController
+                        (
+                                mContext, contact.getContactId(), profileId
+                        );
+                avatarSFController.getSFAvatar(contact.getAvatar());
+            }
+
+            Utils.loadContactAvatar
+                    (
+                            contact.getFirstName()
+                            , contact.getLastName()
+                            , viewHolder.imageAvatar
+                            , viewHolder.textAvatar
+                            , Utils.getAvatarURL
+                                    (
+                                            contact.getPlatform()
+                                            , contact.getStringField1()
+                                            , contact.getAvatar()
+                                    )
+                    );
+
+
+
+            viewHolder.textViewCompany.setText(contact.getCompany());
+            viewHolder.textViewName.setText(contact.getFirstName() + " " + contact.getLastName());
+            viewHolder.textViewPosition.setText(contact.getPosition());
+            String country = "";
+
+            try {
+                if (contact.getCountry() != null && contact.getCountry().length() > 0) {
+                    if (Utils.getCountry(contact.getCountry(), mContext).get("is_special") != null) {
+                        if (Utils.getCountry(contact.getCountry(), mContext).get("is_special").equals("Yes")) {
+                            country = Utils.getCountry(contact.getCountry(), mContext).get("FIPS");
+                        } else {
+                            country = Utils.getCountry(contact.getCountry(), mContext).get("name");
+                        }
                     } else {
                         country = Utils.getCountry(contact.getCountry(), mContext).get("name");
                     }
+                }
+            } catch (NullPointerException e) {
+                Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: NullPointerException " + e);
+            }
+
+            viewHolder.textViewCountry.setText(country);
+
+            //Icon
+            String icon = "";
+            try {
+                if (null != contact.getPresence() && contact.getPresence().length() > 0) {
+                    JSONObject jsonObject = new JSONObject(contact.getPresence());
+                    if (!jsonObject.isNull("icon")) {
+                        icon = new JSONObject(contact.getPresence()).getString("icon");
+                    }
+                }
+            } catch (JSONException e) {
+                Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: ", e);
+            }
+
+            if (icon.compareTo("dnd") == 0)
+                viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_notdisturb);
+            else if (icon.compareTo("vacation") == 0)
+                viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_vacation);
+            else if (icon.compareTo("moon") == 0)
+                viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_moon);
+            else if (icon.compareTo("sun") == 0)
+                viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
+            else viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
+
+            //Local time
+            String presenceDetail = "";
+            viewHolder.textViewTime.setVisibility(View.VISIBLE);
+
+            try {
+                presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
+                if (presenceDetail.equals("#LOCAL_TIME#")) {
+                    if (null != contact.getTimezone()) {
+                        TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+                        Calendar c = Calendar.getInstance(tz);
+                        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                        format.setTimeZone(c.getTimeZone());
+                        Date parsed = format.parse(c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE));
+                        String result = format.format(parsed);
+                        viewHolder.textViewTime.setText(result);
+                    } else {
+                        viewHolder.textViewTime.setText(" ");
+                    }
+
                 } else {
-                    country = Utils.getCountry(contact.getCountry(), mContext).get("name");
+                    viewHolder.textViewTime.setText(presenceDetail);
                 }
+            } catch (Exception e) {
+                Log.i(Constants.TAG, "ContactListViewArrayAdapter.getView: No presence found");
+                viewHolder.textViewTime.setVisibility(View.INVISIBLE);
             }
-        } catch (NullPointerException e){
-            Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: NullPointerException " + e);
-        }
-
-        viewHolder.textViewCountry.setText(country);
-
-        //Icon
-        String icon = "";
-        try
-        {
-            if(null != contact.getPresence() && contact.getPresence().length()>0)
-            {
-                JSONObject jsonObject =  new JSONObject(contact.getPresence());
-                if(!jsonObject.isNull("icon"))
-                {
-                    icon = new JSONObject(contact.getPresence()).getString("icon");
-                }
-            }
-        } catch (JSONException e) {}
-
-        if(icon.compareTo("dnd")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_notdisturb);
-        else if(icon.compareTo("vacation")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_vacation);
-        else if(icon.compareTo("moon")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_moon);
-        else if(icon.compareTo("sun")==0) viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
-        else viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
-
-        //Local time
-        String presenceDetail = "";
-        viewHolder.textViewTime.setVisibility(View.VISIBLE);
-
-        try {
-            presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
-            if (presenceDetail.equals("#LOCAL_TIME#"))
-            {
-                if(null != contact.getTimezone())
-                {
-                    TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
-                    Calendar c = Calendar.getInstance(tz);
-                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-                    format.setTimeZone(c.getTimeZone());
-                    Date parsed = format.parse(c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE));
-                    String result = format.format(parsed);
-                    viewHolder.textViewTime.setText(result);
-                }
-                else
-                {
-                    viewHolder.textViewTime.setText(" ");
-                }
-
-            } else {
-                viewHolder.textViewTime.setText(presenceDetail);
-            }
-        } catch (Exception e) {
-            Log.i(Constants.TAG, "ContactListViewArrayAdapter.getView: No presence found");
-            viewHolder.textViewTime.setVisibility(View.INVISIBLE);
         }
 
         return convertView;
@@ -223,5 +242,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         ImageView imageCompanyLogo;
         TextView textAvatar;
         TextView platformLabel;
+        ImageView chatAvailability;
     }
 }

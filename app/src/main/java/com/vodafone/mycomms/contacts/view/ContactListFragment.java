@@ -590,7 +590,7 @@ public class ContactListFragment extends ListFragment {
      */
     private void reloadSearchAdapter()
     {
-        ContactSearchListViewArrayAdapter adapter = new ContactSearchListViewArrayAdapter(
+        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(
                 getActivity(), contactList);
         if (contactList!=null) {
             if (listView != null)
@@ -600,7 +600,7 @@ public class ContactListFragment extends ListFragment {
                 if (state != null)
                     listView.onRestoreInstanceState(state);
             } else {
-                adapter = new ContactSearchListViewArrayAdapter(getActivity(), contactList);
+                adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
                 setListAdapter(adapter);
                 if (state != null)
                     listView.onRestoreInstanceState(state);

@@ -10,10 +10,6 @@ import model.Contact;
 
 public class ContactSearchListViewArrayAdapter extends ContactListViewArrayAdapter {
 
-    private boolean localContacts = false;
-    private boolean salesForceContacts = false;
-    private boolean globalContacts = false;
-
     public ContactSearchListViewArrayAdapter(Context context, List<Contact> items) {
         super(context, items);
 

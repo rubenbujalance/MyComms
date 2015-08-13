@@ -17,6 +17,7 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.Constants;
 
@@ -36,7 +37,7 @@ public class AddGlobalContactsActivity extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_global_contacts);
 
-//        realm = Realm.getDefaultInstance();
+        BusProvider.getInstance().register(this);
 
         layoutErrorBar = (LinearLayout)findViewById(R.id.layoutErrorBar);
         etEmail = (EditText)findViewById(R.id.etEmail);
@@ -64,9 +65,7 @@ public class AddGlobalContactsActivity extends MainActivity {
             @Override
             public void onClick(View v) {
                 //Hide error bar if shown
-                if (layoutErrorBar.getVisibility() == View.VISIBLE &&
-                        tvError.getText().toString()
-                                .compareTo(getString(R.string.credentials_are_incorrect)) == 0)
+                if (layoutErrorBar.getVisibility() == View.VISIBLE)
                     layoutErrorBar.setVisibility(View.GONE);
 
                 //Start the process
@@ -80,14 +79,11 @@ public class AddGlobalContactsActivity extends MainActivity {
                             new GlobalContactsController.GlobalContactsCallback() {
                                 @Override
                                 public void onFailure(String error, int resCode) {
-                                    System.err.println("******** onFailure: "+resCode+" ********");
                                     showMessageBarOnUIThread(error);
                                 }
 
                                 @Override
                                 public void onSuccess(GlobalContactsSettings settings) {
-                                    System.err.println("******** onSuccess ********");
-                                    System.err.println("******** token: "+settings.getToken());
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -113,9 +109,7 @@ public class AddGlobalContactsActivity extends MainActivity {
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (layoutErrorBar.getVisibility() == View.VISIBLE &&
-                        tvError.getText().toString()
-                                .compareTo(getString(R.string.credentials_are_incorrect)) == 0)
+                if (layoutErrorBar.getVisibility() == View.VISIBLE)
                     layoutErrorBar.setVisibility(View.GONE);
             }
             @Override
@@ -127,20 +121,19 @@ public class AddGlobalContactsActivity extends MainActivity {
     }
 
     @Subscribe
-     public void onConnectivityChanged(ConnectivityChanged event) {
+    public void onConnectivityChanged(ConnectivityChanged event) {
 
         Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
                 + event.getConnectivityStatus().toString());
         if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
-                event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
-            if(layoutErrorBar.getVisibility()!=View.VISIBLE) {
-                tvError.setText(R.string.no_internet_connection_is_available);
-                layoutErrorBar.setVisibility(View.VISIBLE);
-            }
-            else if (tvError.getText().toString()
-                    .compareTo(getString(R.string.no_internet_connection_is_available))==0){
-                layoutErrorBar.setVisibility(View.GONE);
-            }
+                event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET) {
+            tvError.setText(R.string.no_internet_connection_is_available);
+            layoutErrorBar.setVisibility(View.VISIBLE);
+        }
+        else if (tvError.getText().toString()
+                .compareTo(getString(R.string.no_internet_connection_is_available))==0){
+            layoutErrorBar.setVisibility(View.GONE);
+        }
     }
 
     private boolean checkData() {

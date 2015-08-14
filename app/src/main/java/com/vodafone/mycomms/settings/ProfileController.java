@@ -15,7 +15,6 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.connection.BaseController;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
@@ -485,7 +484,7 @@ public class ProfileController extends BaseController {
 
             //Remove User from DB
             if(profileId!=null) {
-                RealmProfileTransactions profileTx = new RealmProfileTransactions(getActivity());
+                RealmProfileTransactions profileTx = new RealmProfileTransactions();
                 profileTx.removeUserProfile(profileId, null);
             }
 

@@ -1,9 +1,7 @@
 package com.vodafone.mycomms.settings;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,11 +18,8 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.login.LoginSignupActivity;
-import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;

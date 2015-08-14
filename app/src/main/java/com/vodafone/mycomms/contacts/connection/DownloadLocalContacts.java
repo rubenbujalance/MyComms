@@ -130,7 +130,7 @@ public class DownloadLocalContacts
             Realm realm = Realm.getDefaultInstance();
             try
             {
-                RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
+                RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId,mContext);
                 realmContactTransactions.insertContactList(contacts[0], realm);
                 showInsertedIds(contacts[0]);
                 return Integer.toString(contacts[0].size());

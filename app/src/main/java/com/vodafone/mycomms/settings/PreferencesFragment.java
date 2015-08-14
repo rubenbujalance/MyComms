@@ -108,18 +108,12 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         }
         this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
-        profileController = new ProfileController(getActivity());
-        profileController.setConnectionCallback(this);
-
     }
 
     @Override
     public void onResume(){
         super.onResume();
         Log.d(Constants.TAG, "PreferencesFragment.onResume: ");
-//        TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-//        editProfile.setVisibility(View.INVISIBLE);
-
         profileController.setConnectionCallback(this);
         profileController.getProfile(this.realm);
 
@@ -139,38 +133,11 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             public void onClick(View v) {
                 Log.i(Constants.TAG, "PreferencesFragment.onClick: Logout");
 
-                SharedPreferences sp = getActivity().getSharedPreferences(
-                        Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-                String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
                 //Logout on server
                 profileController.logoutToAPI();
+                ((MycommsApp)getActivity().getApplication()).appIsInitialized = false;
 
-                //Remove cookies if Sales Force login
-                Utils.removeCookies();
 
-                //Reset user security data
-                UserSecurity.resetTokens(getActivity());
-
-                //Reset profile data
-                SharedPreferences.Editor editor = sp.edit();
-                editor.remove(Constants.ACCESS_TOKEN_SHARED_PREF);
-                editor.remove(Constants.PROFILE_ID_SHARED_PREF);
-                editor.commit();
-
-                //Remove User from DB
-                if (profileId != null) {
-                    RealmProfileTransactions profileTx = new RealmProfileTransactions();
-                    profileTx.removeUserProfile(profileId, null);
-                }
-
-                ((MycommsApp) getActivity().getApplication()).appIsInitialized = false;
-
-                //Go to login page as a new task
-                Intent in = new Intent(getActivity(), LoginSignupActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
-                        Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(in);
             }
         });
 
@@ -209,6 +176,10 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 startActivity(intent);
             }
         });
+
+        profileController = new ProfileController(getActivity());
+        profileController.setConnectionCallback(this);
+
         return v;
     }
 

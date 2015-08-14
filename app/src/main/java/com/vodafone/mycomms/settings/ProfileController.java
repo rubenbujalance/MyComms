@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.settings;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,7 +15,9 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.connection.BaseController;
+import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.settings.connection.PasswordConnection;
@@ -459,6 +462,39 @@ public class ProfileController extends BaseController {
             return jsonResp;
         }
 
+        @Override
+        protected void onPostExecute(String s)
+        {
+            super.onPostExecute(s);
+
+            SharedPreferences sp = mContext.getSharedPreferences(
+                    Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+            //Remove cookies if Sales Force login
+            Utils.removeCookies();
+
+            //Reset user security data
+            UserSecurity.resetTokens(getActivity());
+
+            //Reset profile data
+            SharedPreferences.Editor editor = sp.edit();
+            editor.remove(Constants.ACCESS_TOKEN_SHARED_PREF);
+            editor.remove(Constants.PROFILE_ID_SHARED_PREF);
+            editor.apply();
+
+            //Remove User from DB
+            if(profileId!=null) {
+                RealmProfileTransactions profileTx = new RealmProfileTransactions(getActivity());
+                profileTx.removeUserProfile(profileId, null);
+            }
+
+            //Go to login page as a new task
+            Intent in = new Intent(mContext, LoginSignupActivity.class);
+            in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK |
+                    Intent.FLAG_ACTIVITY_NEW_TASK);
+            mContext.startActivity(in);
+        }
     }
 
     private class GCMGetTokenAsyncTask extends AsyncTask<Object, Void, Object> {

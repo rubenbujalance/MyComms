@@ -48,6 +48,7 @@ public class OKHttpWrapper {
         client.setConnectTimeout(10, TimeUnit.SECONDS);
         client.setReadTimeout(30, TimeUnit.SECONDS);
         client.setRetryOnConnectionFailure(false);
+        client.setConnectionPool(new com.squareup.okhttp.ConnectionPool(10, (3 * 60 * 1000)));
 
         String finalUrl;
 

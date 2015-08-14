@@ -36,7 +36,7 @@ import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 /**
  * Created by str_evc on 18/05/2015.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+//@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupMailActivityTest {
 
@@ -46,7 +46,7 @@ public class SignupMailActivityTest {
     ImageView ivBtFwd;
     ImageView ivBtBack;
 
-    @Before
+//    @Before
     public void setUp() {
         activity = Robolectric.setupActivity(SignupMailActivity.class);
         etEmail = (ClearableEditText)activity.findViewById(R.id.etSignupEmail);
@@ -54,7 +54,7 @@ public class SignupMailActivityTest {
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
     }
 
-    //    @Test
+//    @Test
     public void testForwardEmptyEmail() {
         etEmail.setText("");
         ivBtFwd.performClick();
@@ -62,7 +62,7 @@ public class SignupMailActivityTest {
         Assert.assertTrue(innerEtEmail.getError().equals(activity.getString(R.string.enter_your_email_to_continue)));
     }
 
-    //    @Test
+//    @Test
     public void testForwardIncorrectFormatEmail() {
         etEmail.setText(INVALID_EMAIL);
         ivBtFwd.performClick();
@@ -70,7 +70,7 @@ public class SignupMailActivityTest {
         Assert.assertTrue(innerEtEmail.getError().equals(activity.getString(R.string.incorrect_format)));
     }
 
-    //    @Test
+//    @Test
     public void testForwardToSignupName() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(204);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -80,7 +80,7 @@ public class SignupMailActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    //    @Test
+//    @Test
     public void testForwardUserAlreadyExists() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(403, USER_ALREADY_EXISTS_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -99,7 +99,7 @@ public class SignupMailActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    //    @Test
+//    @Test
     public void testForwardUserDomainNotAlowed() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(400, USER_DOMAIN_NOT_ALLOWED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -114,7 +114,7 @@ public class SignupMailActivityTest {
         okButton.performClick();
     }
 
-    //    @Test
+//    @Test
     public void testForwardInvalidVersion() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(400, INVALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);

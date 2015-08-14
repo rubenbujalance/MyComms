@@ -20,7 +20,7 @@ import org.robolectric.annotation.Config;
 /**
  * Created by str_evc on 18/05/2015.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+//@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupTypeChooseActivityTest {
 
@@ -29,7 +29,7 @@ public class SignupTypeChooseActivityTest {
     Button mSignupSalesforce;
     ImageView mBack;
 
-    @Before
+//    @Before
     public void setUp() throws Exception {
         activity = Robolectric.setupActivity(SignupTypeChooseActivity.class);
         mSignupEmail = (Button)activity.findViewById(R.id.btSignupMail);
@@ -37,14 +37,14 @@ public class SignupTypeChooseActivityTest {
         mBack = (ImageView)activity.findViewById(R.id.btBack);
     }
 
-    //    @Test
+//    @Test
     public void testSignupTypeChooseToSignupMail() throws Exception {
         mSignupEmail.performClick();
         Intent expectedIntent = new Intent(activity, SignupMailActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    //    @Test
+//    @Test
     public void testSignupTypeChooseToSignupOAuth() throws Exception {
         mSignupSalesforce.performClick();
         Intent expectedIntent = new Intent(activity, OAuthActivity.class);
@@ -52,7 +52,7 @@ public class SignupTypeChooseActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    //    @Test
+//    @Test
     public void testBack() throws Exception {
         mBack.performClick();
         Assert.assertTrue(activity.isFinishing());

@@ -19,15 +19,11 @@ import com.vodafone.mycomms.util.UserSecurity;
 
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
@@ -46,7 +42,7 @@ import static com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE;
 /**
  * Created by str_evc on 18/05/2015.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+//@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
         manifest = "/app/src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
@@ -58,7 +54,7 @@ public class SplashScreenActivityTest {
 
     Activity activity;
 
-    @Before
+//    @Before
     public void setUp() throws Exception {
 //        PowerMockito.mockStatic(Realm.class);
 //        Mockito.when(Realm.getDefaultInstance()).thenReturn(Realm.getDefaultInstance());
@@ -76,7 +72,7 @@ public class SplashScreenActivityTest {
 //        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
 //    }
 
-    //    @Test
+//    @Test
     public void testCheckVersionNoNetworkConnectionUserLoggedOk() throws Exception {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr =
@@ -101,7 +97,7 @@ public class SplashScreenActivityTest {
                 Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    //    @Test
+//    @Test
     public void testCheckVersionNoNetworkConnectionUserNotLogged() throws Exception {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         UserSecurity.resetTokens(context);
@@ -128,7 +124,7 @@ public class SplashScreenActivityTest {
 //        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
 //    }
 
-    //    @Test
+//    @Test
     public void testCheckVersionUserLoggedRenewTokenToLoginSignup() throws Exception {
         UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 0, RuntimeEnvironment.application);
         HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
@@ -141,7 +137,7 @@ public class SplashScreenActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    //    @Test
+//    @Test
     public void testInvalidVersionResponse() throws Exception {
         RobolectricPackageManager rpm = (RobolectricPackageManager)Shadows.shadowOf(RuntimeEnvironment.application).getPackageManager();
         Intent intent = new Intent(Intent.ACTION_MAIN);

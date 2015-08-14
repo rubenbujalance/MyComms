@@ -10,10 +10,7 @@ import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
@@ -23,7 +20,7 @@ import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 /**
  * Created by str_evc on 18/05/2015.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+//@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class ForgotPassActivityTest {
 
@@ -31,14 +28,14 @@ public class ForgotPassActivityTest {
     Button btSend;
     EditText etEmail;
 
-    @Before
+//    @Before
     public void setUp() throws Exception {
         activity = Robolectric.setupActivity(ForgotPassActivity.class);
         etEmail = (EditText) activity.findViewById(R.id.etEmail);
         btSend = (Button) activity.findViewById(R.id.btSend);
     }
 
-    //    @Test
+//    @Test
     public void testSend() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(204);
         FakeHttp.addPendingHttpResponse(httpResponse);
@@ -56,7 +53,7 @@ public class ForgotPassActivityTest {
         Assert.assertTrue(activity.isFinishing());
     }
 
-    //    @Test
+//    @Test
     public void testNoHeadersResponse() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(500);
         FakeHttp.addPendingHttpResponse(httpResponse);

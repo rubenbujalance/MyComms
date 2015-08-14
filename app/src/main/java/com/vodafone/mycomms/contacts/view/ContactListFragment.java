@@ -214,8 +214,8 @@ public class ContactListFragment extends ListFragment {
 
         BusProvider.getInstance().register(this);
 
-        this.realm = Realm.getDefaultInstance();
-        this.realm.setAutoRefresh(true);
+        realm = Realm.getDefaultInstance();
+        if(realm!=null) realm.setAutoRefresh(true);
 
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
@@ -298,7 +298,7 @@ public class ContactListFragment extends ListFragment {
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-        this.realm.close();
+        if(realm!=null) this.realm.close();
     }
 
     @Override

@@ -24,7 +24,7 @@ import static com.vodafone.mycomms.constants.Constants.PASSWORD;
 /**
  * Created by str_evc on 18/05/2015.
  */
-@RunWith(RobolectricGradleTestRunner.class)
+//@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
 public class SignupPassActivityTest {
 
@@ -34,7 +34,7 @@ public class SignupPassActivityTest {
     ImageView ivBtFwd;
     ImageView ivBtBack;
 
-    @Before
+//    @Before
     public void setUp() {
         activity = Robolectric.setupActivity(SignupPassActivity.class);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
@@ -43,14 +43,14 @@ public class SignupPassActivityTest {
         mConfirmPass = activity.mConfirmPass;
     }
 
-    //    @Test
+//    @Test
     public void testForwardBadPassword() {
         ivBtFwd.performClick();
         EditText innerPassword = (EditText)mPassword.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPassword.getError().equals(activity.getString(R.string.incorrect_format)));
     }
 
-    //    @Test
+//    @Test
     public void testForwardPasswordAndPasswordConfirmNoMatching() {
         mPassword.setText(PASSWORD);
         mConfirmPass.setText(ANOTHER_PASSWORD);
@@ -59,7 +59,7 @@ public class SignupPassActivityTest {
         Assert.assertTrue(innerConfirmPass.getError().equals(activity.getString(R.string.passwords_do_not_match)));
     }
 
-    //    @Test
+//    @Test
     public void testForward() {
         mPassword.setText(PASSWORD);
         mConfirmPass.setText(PASSWORD);
@@ -69,7 +69,7 @@ public class SignupPassActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-    //    @Test
+//    @Test
     public void testBack() throws Exception {
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();

@@ -501,8 +501,7 @@ public class ContactListFragment extends ListFragment {
         searchView.setText("");
     }
 
-    public void setListAdapterTabs()
-    {
+    public void setListAdapterTabs() {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);;
 
         if(mIndex == Constants.CONTACTS_FAVOURITE) {

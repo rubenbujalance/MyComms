@@ -21,6 +21,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
+import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,15 +29,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.internal.configuration.GlobalConfiguration;
-import org.mockito.internal.progress.ThreadSafeMockingProgress;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.api.support.ClassLoaderUtil;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
-import org.powermock.reflect.Whitebox;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
@@ -79,7 +76,7 @@ public class AddGlobalContactsActivityTest {
         layoutErrorBar = (LinearLayout)activity.findViewById(R.id.layoutErrorBar);
         tvError = (TextView)activity.findViewById(R.id.tvError);
 
-        MockRepository.addAfterMethodRunner(new MockitoStateCleaner());
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
     }
 
     @Test
@@ -425,26 +422,5 @@ public class AddGlobalContactsActivityTest {
         etUser.setText("testUser");
         etPassword.setText("testPassword");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
-    }
-
-    private static class MockitoStateCleaner implements Runnable {
-        public void run() {
-            clearMockProgress();
-            clearConfiguration();
-        }
-
-        private void clearMockProgress() {
-            clearThreadLocalIn(ThreadSafeMockingProgress.class);
-        }
-
-        private void clearConfiguration() {
-            clearThreadLocalIn(GlobalConfiguration.class);
-        }
-
-        private void clearThreadLocalIn(Class<?> cls) {
-            Whitebox.getInternalState(cls, ThreadLocal.class).set(null);
-            final Class<?> clazz = ClassLoaderUtil.loadClass(cls, ClassLoader.getSystemClassLoader());
-            Whitebox.getInternalState(clazz, ThreadLocal.class).set(null);
-        }
     }
 }

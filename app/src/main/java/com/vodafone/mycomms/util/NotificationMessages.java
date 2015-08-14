@@ -78,6 +78,7 @@ public final class NotificationMessages extends MainActivity
     }
 
     private static void addMessageToInbox(String message) {
+        if(inboxMessages==null) inboxMessages = new ArrayList<>();
         inboxMessages.add(0, message);
 //        if(inboxMessages.size() > INBOX_LENGTH)
 //            inboxMessages.remove(inboxMessages.size() - 1);

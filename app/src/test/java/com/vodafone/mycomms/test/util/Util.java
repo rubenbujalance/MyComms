@@ -6,6 +6,10 @@ import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
+import org.mockito.internal.configuration.GlobalConfiguration;
+import org.mockito.internal.progress.ThreadSafeMockingProgress;
+import org.powermock.api.support.ClassLoaderUtil;
+import org.powermock.reflect.Whitebox;
 
 /**
  * Created by str_evc on 21/05/2015.
@@ -32,6 +36,27 @@ public class Util {
             httpResponse.setEntity(entity);
         }
         return httpResponse;
+    }
+
+    public static class MockitoStateCleaner implements Runnable {
+        public void run() {
+            clearMockProgress();
+            clearConfiguration();
+        }
+
+        private void clearMockProgress() {
+            clearThreadLocalIn(ThreadSafeMockingProgress.class);
+        }
+
+        private void clearConfiguration() {
+            clearThreadLocalIn(GlobalConfiguration.class);
+        }
+
+        private void clearThreadLocalIn(Class<?> cls) {
+            Whitebox.getInternalState(cls, ThreadLocal.class).set(null);
+            final Class<?> clazz = ClassLoaderUtil.loadClass(cls, ClassLoader.getSystemClassLoader());
+            Whitebox.getInternalState(clazz, ThreadLocal.class).set(null);
+        }
     }
 
 }

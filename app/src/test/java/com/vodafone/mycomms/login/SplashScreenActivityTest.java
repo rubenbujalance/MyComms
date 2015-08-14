@@ -9,6 +9,7 @@ import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
 import android.widget.Button;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.DashBoardActivity;
@@ -20,6 +21,7 @@ import com.vodafone.mycomms.util.UserSecurity;
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Rule;
+import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
@@ -38,15 +40,18 @@ import static com.vodafone.mycomms.constants.Constants.EXPIRES_IN;
 import static com.vodafone.mycomms.constants.Constants.INVALID_VERSION_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.REFRESH_TOKEN;
 import static com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
 //@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
-        manifest = "/app/src/main/AndroidManifest.xml")
-@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*" })
-@PrepareForTest(Realm.class)
+        manifest = "./src/main/AndroidManifest.xml")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
+        "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
+@PrepareForTest({Realm.class, Crashlytics.class})
 public class SplashScreenActivityTest {
 
     @Rule
@@ -56,8 +61,11 @@ public class SplashScreenActivityTest {
 
 //    @Before
     public void setUp() throws Exception {
-//        PowerMockito.mockStatic(Realm.class);
-//        Mockito.when(Realm.getDefaultInstance()).thenReturn(Realm.getDefaultInstance());
+        mockStatic(Realm.class);
+        when(Realm.getDefaultInstance()).thenReturn(null);
+        mockStatic(Crashlytics.class);
+
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
     }
 

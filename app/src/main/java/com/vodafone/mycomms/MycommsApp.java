@@ -91,6 +91,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //Realm config
 
+        //TODO WARNING - Change version when Realm DB schema changes
         RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext())
                 .name("mycomms.realm")
 //                .encryptionKey()

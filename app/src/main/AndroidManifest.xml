@@ -227,6 +227,10 @@
             android:name=".main.MainActivity"
             android:label="@string/title_activity_calligraphy" >
         </activity>
+        <activity
+            android:name=".util.CustomFragmentActivity" >
+        </activity>
+
     </application>
 
 </manifest>

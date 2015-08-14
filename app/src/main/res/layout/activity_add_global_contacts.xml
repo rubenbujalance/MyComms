@@ -13,7 +13,7 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="60dp"
             android:src="@drawable/header_berlin_blur"
             android:focusable="false"
             android:tint="@color/header_background_darken"
@@ -21,14 +21,16 @@
             android:scaleType="centerCrop"/>
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
+            android:layout_width="22dp"
+            android:layout_height="34dp"
             android:id="@+id/ivBtBack"
             android:src="@drawable/icon_left_white"
             android:focusable="false"
+            android:adjustViewBounds="true"
             android:layout_marginTop="14dp"
             android:layout_marginLeft="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:layout_centerVertical="true"/>
 
     </RelativeLayout>
 
@@ -108,12 +110,12 @@
                     android:layout_marginTop="0dp"
                     android:hint="@string/enter_email_address"
                     android:textColorHint="@color/grey_light"
-                    android:text="luis.mesas@vodafone.com"
                     android:inputType="textEmailAddress"
                     android:background="@color/white"
                     android:textSize="14sp"
                     android:layout_gravity="center_vertical"
                     android:lines="1"/>
+                <!--android:text="luis.mesas@vodafone.com"-->
             </LinearLayout>
 
             <View
@@ -145,7 +147,6 @@
                     android:layout_marginTop="0dp"
                     android:hint="@string/enter_password"
                     android:textColorHint="@color/grey_light"
-                    android:text="Intelygenz02"
                     android:inputType="textPassword"
                     android:background="@color/white"
                     android:textSize="14sp"
@@ -154,6 +155,7 @@
                     android:layout_marginEnd="14dp"
                     android:lines="1"
                     />
+                <!--android:text="Intelygenz02"-->
             </LinearLayout>
 
             <View

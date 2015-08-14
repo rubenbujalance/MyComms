@@ -1,6 +1,7 @@
 package com.vodafone.mycomms.settings;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,8 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.util.Constants;
 
 /**
@@ -71,6 +74,15 @@ public class AccountsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_accounts, container, false);
+
+        TextView btAddGlobalContacts = (TextView)v.findViewById(R.id.btn_add_vodafone_global);
+        btAddGlobalContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(getActivity(), AddGlobalContactsActivity.class);
+                startActivity(in);
+            }
+        });
 
         return v;
     }

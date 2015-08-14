@@ -3,20 +3,18 @@ package com.vodafone.mycomms.login;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 
 import java.util.HashMap;
 
-public class MailSentActivity extends ActionBarActivity {
+public class MailSentActivity extends MainAppCompatActivity {
 
     TextView mTVHavingTrouble;
     TextView mWeSent;
@@ -34,7 +32,7 @@ public class MailSentActivity extends ActionBarActivity {
 
         HashMap<String, Object> userProfile =
                 UserProfile.getHashMap();
-        mWeSent.setText(getString(R.string.we_sent_an_email_to)+"\n"+userProfile.get("email"));
+        mWeSent.setText(getString(R.string.we_sent_an_email_to) + "\n" + userProfile.get("email"));
 
         if(this.getIntent().getExtras()!=null &&
                 this.getIntent().getExtras().get("pin")!=null)
@@ -46,28 +44,6 @@ public class MailSentActivity extends ActionBarActivity {
                 callPhoneCheck(pin);
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_mail_sent, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -87,7 +63,7 @@ public class MailSentActivity extends ActionBarActivity {
         HashMap<String, Object> body =
                 UserProfile.getHashMap();
 
-        new CheckPhoneApi().execute(body,header);
+        new CheckPhoneApi().execute(body, header);
     }
 
     private class CheckPhoneApi extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {

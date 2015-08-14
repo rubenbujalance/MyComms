@@ -36,11 +36,13 @@
                     android:text="@string/dummyHour"
                     android:id="@+id/timeDashboard"
                     android:textColor="#ffffffff"
-                    android:textSize="38dp"
+                    android:textSize="38sp"
                     android:paddingTop="5dp"
                     android:paddingBottom="5dp"
                     android:paddingLeft="15dp"
+                    android:paddingStart="15dp"
                     android:paddingRight="20dp"
+                    android:paddingEnd="20dp"
                     android:background="#2affffff" />
 
                 <Space
@@ -56,8 +58,10 @@
                     android:layout_weight="0.10"
                     android:background="#2affffff"
                     android:paddingLeft="15dp"
+                    android:paddingStart="15dp"
                     android:paddingTop="5dp"
                     android:paddingRight="10dp"
+                    android:paddingEnd="10dp"
                     android:paddingBottom="5dp"
                     android:clickable="true" />
 
@@ -76,11 +80,13 @@
                     android:format24Hour="EEEE, d MMMM"
                     android:id="@+id/dateDashboard"
                     android:textColor="@color/white"
-                    android:textSize="22dp"
+                    android:textSize="22sp"
                     android:background="#2affffff"
                     android:paddingLeft="15dp"
+                    android:paddingStart="15dp"
                     android:paddingTop="10dp"
                     android:paddingRight="20dp"
+                    android:paddingEnd="20dp"
                     android:paddingBottom="10dp" />
             </LinearLayout>
 
@@ -102,8 +108,11 @@
                         android:text="@string/latestNews"
                         android:id="@+id/titleLatestNews"
                         android:textColor="@color/white"
-                        android:padding="15dp"
-                        android:textSize="16dp" />
+                        android:paddingBottom="10dp"
+                        android:paddingTop="10dp"
+                        android:paddingStart="10dp"
+                        android:paddingLeft="15dp"
+                        android:textSize="17sp" />
 
                     <HorizontalScrollView
                         android:layout_width="fill_parent"
@@ -136,9 +145,11 @@
                     android:text="@string/Recents"
                     android:id="@+id/titleRecents"
                     android:textColor="@color/white"
-                    android:padding="15dp"
-                    android:textSize="16dp"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingLeft="15dp"
+                    android:textSize="16sp"/>
 
                 <Space
                     android:layout_width="150dp"
@@ -154,20 +165,19 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/Favourites"
+                        android:text="@string/Favorites"
                         android:id="@+id/btFavourite"
                         android:textColor="@color/white"
-                        android:textSize="16dp"
-                        android:paddingLeft="15dp"
-                        android:paddingTop="15dp"
-                        android:paddingBottom="5dp" />
+                        android:paddingBottom="10dp"
+                        android:paddingTop="10dp"
+                        android:textSize="16sp"/>
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:id="@+id/imageView13"
                         android:src="@mipmap/icon_right_white"
-                        android:padding="15dp" />
+                        android:padding="10dp" />
                 </LinearLayout>
 
             </LinearLayout>

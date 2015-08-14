@@ -55,7 +55,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         groupChatTransactions = new RealmGroupChatTransactions(mContext, profileId);
-        mContactTransactions = new RealmContactTransactions(profileId, mContext);
+        mContactTransactions = new RealmContactTransactions(profileId);
     }
 
     @Override
@@ -92,9 +92,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                         ||
                         event.getAction() == MotionEvent.ACTION_CANCEL) {
                     if (sdk < Build.VERSION_CODES.JELLY_BEAN)
-                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
+                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simple_border));
                     else
-                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simpleborder));
+                        v.setBackground(mContext.getResources().getDrawable(R.drawable.simple_border));
                     return true;
                 } else return false;
             }
@@ -129,6 +129,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         String timeDifference = Utils.getStringChatTimeDifference(composedChat.get(i)
                 .getChat().getLastMessageTime(), mContext);
         chatListHolder.textViewTime.setText(timeDifference);
+
+        //Show visibility to availability
+        chatListHolder.chat_availability.setVisibility(View.VISIBLE);
 
         long amountUnreadMessages = _chatTx.getChatPendingMessagesCount(getComposedChat(i)
                 .getChat().getContact_id(), realm);
@@ -178,7 +181,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     {
         ArrayList<Contact> contacts = new ArrayList<>();
         RealmContactTransactions realmContactTransactions =
-                new RealmContactTransactions(profileId, mContext);
+                new RealmContactTransactions(profileId);
         UserProfile userProfile = realmContactTransactions.getUserProfile(realm);
         Contact contact = new Contact();
         contact.setAvatar(userProfile.getAvatar());
@@ -210,6 +213,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                 .bottom_right_avatar_text);
 
 
+        //Show visibility to availability
+        chatListHolder.chat_availability.setVisibility(View.GONE);
+
         //Loads avatar visibility for group chat mode
         ArrayList<ImageView> images = new ArrayList<>();
         images.add(chatListHolder.top_left_avatar);
@@ -233,6 +239,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
             chatListHolder.lay_top_right_image_hide.setVisibility(View.VISIBLE);
             images.add(chatListHolder.top_right_avatar);
         }
+
+        chatListHolder.bottom_left_chat_availability.setVisibility(View.VISIBLE);
+        chatListHolder.bottom_right_chat_availability.setVisibility(View.VISIBLE);
+        chatListHolder.top_left_chat_availability.setVisibility(View.VISIBLE);
+        chatListHolder.top_right_chat_availability.setVisibility(View.VISIBLE);
 
         ArrayList<String> contactIds = new ArrayList<>();
         Collections.addAll(contactIds, membersArray);

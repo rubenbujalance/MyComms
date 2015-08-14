@@ -31,7 +31,7 @@ public class ContactDetailController extends BaseController {
         super(activity);
         this.mContext = activity;
         this.profileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(profileId, mContext);
+        realmContactTransactions = new RealmContactTransactions(profileId);
     }
 
     void getContactDetail(String id){

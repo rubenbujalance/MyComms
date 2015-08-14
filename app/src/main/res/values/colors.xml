@@ -1,6 +1,10 @@
 <resources>
 
+    <color name="opaque_black">#80000000</color>
+    <color name="opaque_maroon">#A0603000</color>
     <color name="black_overlay">#66000000</color>
+
+    <color name="text_dark_color">#2e332f</color>
 
     <!-- Contacts colors-->
     <color name="grey_toolbar">#f2f2f2</color>
@@ -8,12 +12,21 @@
     <color name="transparent">#00000000</color>
     <color name="contact_soft_blue_text">#abc5ce</color>
     <color name="contact_strong_blue_text">#587786</color>
+    <color name="background_add_global_contacts">#fdb827</color>
+    <color name="background_platform">#e9e9e9</color>
+    <color name="contact_soft_grey">#7b808c</color>
+    <color name="contact_very_soft_grey">#a2a6ae</color>
+    <color name="contact_soft_black">#051838</color>
+    <color name="white_transparent">#20ffffff</color>
+    <color name="white_alpha80">#80ffffff</color>
+    <color name="white_alpha10">#10ffffff</color>
 
     <!-- Chat colors-->
     <color name="white">#ffffff</color>
     <color name="grey_chat">#f8f8f8</color>
     <color name="grey_sent">#aaaaaa</color>
     <color name="grey_chat_name">#a1a1a1</color>
+    <color name="grey_chat_sent_top_line">#CCCED2</color>
 
     <!--Profile colors-->
     <color name="grey_profile_background">#f2f2f2</color>
@@ -21,6 +34,7 @@
     <!-- MyComms Assets description colors-->
     <color name="grey_dark">#252525</color>
     <color name="grey_middle">#9d9d9d</color>
+    <color name="profile_lay_separator">#d9d9d9</color>
     <color name="grey_mycomms">#b0b0b0</color>
     <color name="grey_light">#eeeeee</color>
     <color name="dark_blue_action">#688391</color>
@@ -29,5 +43,37 @@
     <color name="blue_light">#00a0dd</color>
     <color name="red_action">#ff452b</color>
     <color name="gold">#f7c25f</color>
+
+    <!--Settings Colors -->
+    <!-- Accounts Fragment -->
+    <color name="ac_subtitle">#171616</color>
+    <color name="ac_label">#777</color>
+
+    <!-- ****************** -->
+    <!-- New Designs Colors -->
+    <!-- ****************** -->
+
+    <!--Core Colors-->
+    <color name="lagoon">#009dcd</color>
+    <color name="overboard">#0071ff</color>
+    <color name="strawberry">#f84545</color>
+    <color name="first_blood">#cc0000</color>
+    <color name="sunny">#fad46b</color>
+    <color name="old_banana">#f3bc65</color>
+    <color name="bruise">#a88cd5</color>
+    <color name="tudors">#9175bd</color>
+    <color name="mow">#3eb5ac</color>
+    <color name="cricket">#28948c</color>
+    <color name="burning">#f58410</color>
+    <color name="burnt_amber">#e96300</color>
+
+    <!--Shade colors -->
+    <color name="the_back_flag">#364347</color>
+    <color name="gunpowder">#5e696d</color>
+    <color name="coastal_surf">#e1eef3</color>
+    <color name="deep_blue">#061939</color>
+
+    <!--Other colors -->
+    <color name="header_background_darken">#b2051838</color>
 
 </resources>

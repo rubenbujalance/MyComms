@@ -3,70 +3,171 @@
     xmlns:mycomms="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="?actionBarSize"
+    xmlns:tools="http://schemas.android.com/tools"
     mycomms:theme="@style/ActionBarThemeOverlay"
     mycomms:contentInsetEnd="0dp"
     mycomms:contentInsetStart="0dp"
     android:gravity="top"
-    android:background="@color/toolbar_selected_item"
+    android:background="@drawable/toolbar_bg"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
 
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/btn_back_white"
-            android:layout_centerVertical="true" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="5"
+            android:layout_gravity="center"
+            android:gravity="start|center">
 
-        <include android:id="@+id/layout_list_item_image" layout="@layout/layout_multi_chat_avatar_50"
-                 android:layout_width="50dp"
-                 android:layout_height = "50dp"
-                 android:layout_centerInParent="true" />
+            <ImageButton
+                android:id="@+id/back_button"
+                android:layout_width="22dp"
+                android:layout_height="34dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/ic_go_back"/>
 
-        <ImageView
-            android:id="@+id/img_modify_group_chat"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:clickable="true"
-            android:background="@drawable/icon_tabbar_contacts_selected"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true" />
+        </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/layout_list_item_image"
-            android:layout_toEndOf="@+id/layout_list_item_image"
-            android:visibility="gone">
-            <TextView
-                android:id="@+id/usr_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dummyUser2"
-                android:visibility="gone"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="@color/white"/>
-            <TextView
-                android:id="@+id/usr_last_login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="@string/dummylastseen2"
-                android:textSize="12sp"
-                android:textColor="@color/white"/>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="3"
+            android:layout_gravity="center"
+            android:gravity="start|center"
+            android:id="@+id/group_info_container">
+
+            <LinearLayout android:layout_width="50dp"
+                          android:layout_height="50dp"
+                >
+                <RelativeLayout android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                    >
+                    <include android:id="@+id/layout_list_item_image"
+                             layout="@layout/layout_multi_chat_avatar_50"
+                             android:layout_width="50dp"
+                             android:layout_height="50dp"
+                        />
+
+                    <ImageView
+                        android:id="@+id/chat_availability"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginTop="35dp"
+                        android:layout_marginLeft="35dp"
+                        android:layout_marginStart="35dp"
+                        android:visibility="gone"
+                        android:background="@drawable/ic_not_available"
+                        />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent"
+                          android:layout_height="match_parent"
+                          android:orientation="vertical"
+                          android:layout_gravity="center"
+                          android:gravity="start|center"
+                >
+
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="25dp"
+                              android:orientation="horizontal"
+                              android:layout_gravity="center"
+                              android:gravity="start|center"
+                              android:layout_marginLeft="4dp"
+                              android:layout_marginStart="4dp"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        tools:text="Albert, Ruben, Alex, Vader"
+                        android:textSize="16sp"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:id="@+id/group_names"
+                        fontPath="fonts/SourceSansPro-Semibold.ttf"
+                        />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent"
+                              android:layout_height="25dp"
+                              android:orientation="horizontal"
+                              android:layout_gravity="center"
+                              android:gravity="center"
+                    >
+                    <ImageView android:layout_width="25dp"
+                               android:layout_height="25dp"
+                               android:src="@drawable/ic_sun"
+                               android:id="@+id/img_sun"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="2dp"
+                        android:layout_marginStart="2dp"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:layout_gravity="center"
+                        tools:text="7 people ini group"
+                        android:textSize="12sp"
+                        android:ellipsize="end"
+                        android:textColor="@color/white_alpha80"
+                        android:id="@+id/group_n_components"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+
         </LinearLayout>
-    </RelativeLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="horizontal"
+                      android:layout_weight="5"
+                      android:layout_gravity="center"
+                      android:gravity="center|end"
+                      android:id="@+id/lay_phone"
+                      android:clickable="true"
+            >
+            <ImageView
+                android:id="@+id/img_phone"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/btn_phone_white"
+
+                />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="horizontal"
+                      android:layout_weight="5"
+                      android:layout_gravity="center"
+                      android:gravity="center|end"
+                      android:id="@+id/lay_add_member"
+                      android:clickable="true"
+            >
+            <ImageView
+                android:id="@+id/img_modify_group_chat"
+                android:layout_width="28dp"
+                android:layout_height="30dp"
+                android:background="@drawable/btn_add_member"
+                />
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </android.support.v7.widget.Toolbar>

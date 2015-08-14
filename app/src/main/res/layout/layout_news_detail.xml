@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/container"
-    android:background="#ffffffff">
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical" android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:id="@+id/container"
+              android:background="#ffffffff">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -28,7 +29,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/picture"
-                        android:src="@drawable/sample_3"
                         android:scaleType="centerCrop" />
 
                     <ImageView
@@ -44,10 +44,10 @@
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="Title"
+                    android:text="@string/title"
                     android:id="@+id/title"
                     android:textStyle="bold"
-                    android:textSize="25dp"
+                    android:textSize="25sp"
                     android:gravity="center_horizontal"
                     android:textColor="@color/grey_dark"
                     android:padding="10dp"
@@ -67,7 +67,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:id="@+id/avatar"
-                        android:src="@drawable/cartoon_round_contact_image_example"
+                        tools:src="@drawable/profile_mock_avatar"
                         android:paddingLeft="5dp"
                         android:paddingTop="10dp"
                         android:paddingRight="10dp"
@@ -76,9 +76,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Author"
+                        android:text="@string/author"
                         android:id="@+id/author"
-                        android:textSize="16dp"
+                        android:textSize="16sp"
                         android:textIsSelectable="false"
                         android:layout_weight="0.99" />
 
@@ -95,9 +95,9 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2 days ago"
+                        tools:text="2 days ago"
                         android:id="@+id/published"
-                        android:textSize="16dp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <FrameLayout

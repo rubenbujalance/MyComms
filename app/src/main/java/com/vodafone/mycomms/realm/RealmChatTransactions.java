@@ -33,7 +33,7 @@ public class RealmChatTransactions
         if(sp==null) return;
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        contactTx = new RealmContactTransactions(_profile_id, mContext);
+        contactTx = new RealmContactTransactions(_profile_id);
     }
 
     /*

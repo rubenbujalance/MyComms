@@ -43,14 +43,14 @@ android {
     compileSdkVersion 21
     buildToolsVersion '21.1.2'
 
-       defaultConfig {
-           applicationId "com.vodafone.mycomms"
-           minSdkVersion 15
-           targetSdkVersion 21
-           versionCode version_Code
-           versionName "1.0"
-           signingConfig signingConfigs.release
-       }
+    defaultConfig {
+        applicationId "com.vodafone.mycomms"
+        minSdkVersion 15
+        targetSdkVersion 21
+        versionCode version_Code
+        versionName "1.0"
+        signingConfig signingConfigs.release
+    }
 
     buildTypes {
         release {
@@ -90,6 +90,7 @@ android {
         androidTest {
             setRoot('src/test')
         }
+        main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] }
     }
 
     packagingOptions {
@@ -121,11 +122,16 @@ dependencies {
 //    compile fileTree(include: ['*.jar'], dir: 'libs')
     //Unit testing
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.17'
-    testCompile 'org.robolectric:robolectric:3.0-SNAPSHOT'
-    testCompile 'org.robolectric:shadows-core:3.0-SNAPSHOT'
-    testCompile 'org.robolectric:shadows-httpclient:3.0-SNAPSHOT'
-    testCompile 'org.robolectric:shadows-support-v4:3.0-SNAPSHOT'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.powermock:powermock-module-junit4:1.6.2'
+    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.2'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.2'
+    testCompile 'org.powermock:powermock-classloading-xstream:1.6.2'
+    testCompile 'com.squareup.okhttp:mockwebserver:2.4.0'
+    testCompile 'org.robolectric:robolectric:3.0'
+    testCompile 'org.robolectric:shadows-core:3.0'
+    testCompile 'org.robolectric:shadows-httpclient:3.0'
+    testCompile 'org.robolectric:shadows-support-v4:3.0'
     testCompile 'org.apache.maven:maven-ant-tasks:2.1.3'
     testCompile 'org.apache.httpcomponents:httpclient:4.3.5'
     testCompile 'org.apache.httpcomponents:httpmime:4.3.5'
@@ -133,11 +139,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.android.support:recyclerview-v7:21.0.+'
-    compile 'me.villani.lorenzo.android:android-cropimage:1.1.0'
     compile 'io.realm:realm-android:0.81.1'
     compile 'com.squareup:otto:1.3.5'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile files('lib/gson-2.3.1.jar')
     compile files('lib/android-viewbadger.jar')
     compile files('lib/android-framework-library.jar')
 
@@ -152,7 +156,7 @@ dependencies {
     }
     compile "org.jxmpp:jxmpp-core:0.4.2-beta1"
     compile "xpp3:xpp3:1.1.4c"
-    compile ("org.igniterealtime.smack:smack-tcp:4.1.1") {
+    compile("org.igniterealtime.smack:smack-tcp:4.1.1") {
         exclude module: 'smack-core'
     }
 
@@ -169,6 +173,10 @@ dependencies {
 
     //GCM
     compile 'com.google.android.gms:play-services-gcm:7.5.0'
+
+    //Custom Font
+    compile 'uk.co.chrisjenx:calligraphy:2.1.0'
+
 }
 
 apply plugin: 'jacoco'
@@ -177,15 +185,11 @@ jacoco {
     toolVersion = "0.7.1.201405082137"
 }
 
-def coverageSourceDirs = [
-        'src/main/java'
-]
+def coverageSourceDirs = ['src/main/java']
 
-task jacocoTestReport(type:JacocoReport) {
+task jacocoTestReport(type: JacocoReport) {
     group = "Reporting"
-
     description = "Generate Jacoco coverage reports"
-
     classDirectories = fileTree(
             dir: 'build/intermediates/classes/i/release',
             excludes: ['**/R.class',
@@ -194,7 +198,6 @@ task jacocoTestReport(type:JacocoReport) {
                        '**/BuildConfig.*',
                        '**/Manifest*.*']
     )
-
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)
     executionData = files('build/jacoco/testIRelease.exec')
@@ -203,5 +206,26 @@ task jacocoTestReport(type:JacocoReport) {
         xml.enabled = true
         html.enabled = true
     }
-
 }
+
+task jacocoTestReportDebug(type: JacocoReport) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for Debug"
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/i/debug',
+            excludes: ['**/R.class',
+                       '**/R$*.class',
+                       '**/*$ViewInjector*.*',
+                       '**/BuildConfig.*',
+                       '**/Manifest*.*']
+    )
+    additionalSourceDirs = files(coverageSourceDirs)
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files('build/jacoco/testIDebug.exec')
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+

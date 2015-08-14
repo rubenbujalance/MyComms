@@ -1,14 +1,11 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -25,6 +22,7 @@ import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.DashBoardActivity;
+import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -34,7 +32,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OAuthActivity extends Activity {
+public class OAuthActivity extends MainActivity {
 
     WebView wvOAuth;
     String oauthPrefix;
@@ -72,28 +70,6 @@ public class OAuthActivity extends Activity {
         //Launch OAuth corresponding URL
         wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix,
                 noCacheHeaders);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_oauth_web, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void callOAuthCallback(String url)
@@ -263,8 +239,7 @@ public class OAuthActivity extends Activity {
 //                    view.clearCache(true);
 //                    Utils.clearCacheFolder(getApplicationContext().getCacheDir(), 1);
                     return true;
-                }
-                else {
+                } else {
                     view.loadUrl(urlNewString, noCacheHeaders);
                     return true;
                 }
@@ -281,9 +256,8 @@ public class OAuthActivity extends Activity {
             }
 
             @Override
-            public void onPageStarted(WebView view, String url, Bitmap facIcon)
-            {
-                super.onPageStarted(view,url,facIcon);
+            public void onPageStarted(WebView view, String url, Bitmap facIcon) {
+                super.onPageStarted(view, url, facIcon);
                 relativeContainer.setVisibility(View.VISIBLE);
                 wvOAuth.setVisibility(View.INVISIBLE);
 
@@ -296,8 +270,7 @@ public class OAuthActivity extends Activity {
             }
 
             @Override
-            public void onPageFinished(WebView view, String url)
-            {
+            public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 relativeContainer.setVisibility(View.INVISIBLE);
                 wvOAuth.setVisibility(View.VISIBLE);

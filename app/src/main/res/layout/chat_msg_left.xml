@@ -12,7 +12,7 @@
             style="@style/ChatSent"
             android:visibility="gone"
             android:layout_gravity="center_horizontal"
-            android:textSize="12dp"/>
+            android:textSize="12sp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -27,13 +27,15 @@
                 android:layout_height="wrap_content"
                 android:autoLink="web|email|map|phone"
                 android:clickable="true"
+                android:textSize="16sp"
                 style="@style/ChatText"
                 tools:text="You say goodbye
                 and I say hello.
                 Hello Hello!"
                 android:gravity="left"
                 android:background="@drawable/chat_bubble_grey_tail"
-                android:layout_toRightOf="@+id/layout_list_item_image"/>
+                android:layout_toRightOf="@+id/layout_list_item_image"
+                android:layout_toEndOf="@+id/layout_list_item_image"/>
 
             <include android:id="@+id/layout_list_item_image"
                 layout="@layout/layout_list_item_image_little"
@@ -48,10 +50,11 @@
             android:id="@+id/sent_text"
             style="@style/ChatSent"
             android:visibility="gone"
-            android:text="Delivered"
+            tools:text="Delivered"
             android:paddingTop="0dp"
             android:layout_gravity="left"
-            android:layout_marginLeft="5dp" />
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp" />
     </LinearLayout>
 
 </RelativeLayout>

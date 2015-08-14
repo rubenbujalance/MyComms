@@ -4,9 +4,12 @@
     <string name="login">Login</string>
     <string name="signup">Signup</string>
     <string name="email">Email</string>
+    <string name="email_lower">email</string>
+    <string name="enter_email_address">Enter email address*</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="password">Password</string>
+    <string name="enter_password">Enter password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="country">Country</string>
     <string name="phone_number">Phone Number</string>
@@ -27,6 +30,7 @@
     <string name="we_need_your_picture">We Need Your Picture!</string>
     <string name="please_share_your_smile">Please share your smile with your colleagues</string>
     <string name="cancel">Cancel</string>
+    <string name="home">Home</string>
     <string name="incorrect_format">Incorrect format</string>
     <string name="add_a_photo_to_continue">Add a photo to continue</string>
     <string name="resend_code">Resend Code</string>
@@ -51,7 +55,6 @@
     <string name="new_version_available">New Version Available</string>
     <string name="must_update_to_last_application_version">Must update to last application version</string>
     <string name="update">Update!</string>
-    <string name="office_location">Office Location</string>
     <string name="title_activity_main">MainActivity</string>
 
 
@@ -60,7 +63,7 @@
     <string name="title_section3">Section 3</string>
 
     <!-- Section contact list tab bar titles-->
-    <string name="contact_list_tab_favourites">Favourites</string>
+    <string name="contact_list_tab_favorites">Favorites</string>
     <string name="contact_list_tab_recents">Recents</string>
     <string name="contact_list_tab_contacts">Contacts</string>
     <string name="title_activity_toolbar">ToolbarActivity</string>
@@ -95,7 +98,7 @@
     <!-- Section profile list tab bar titles-->
     <string name="profile_list_tab_preferences">Preferences</string>
     <string name="profile_list_tab_accounts">Accounts</string>
-    <string name="profile_list_tab_my_profile">My Profile</string>
+    <string name="profile_list_tab_my_profile">Profile</string>
     <string name="title_activity_profile">Profile</string>
     <string name="no_internet_connection_is_available">No Internet connection is available</string>
     <string name="error_reading_data_from_server">Error reading data from server</string>
@@ -121,29 +124,30 @@
     </string-array>
     <string name="title_activity_oauth_web">OAuthWebActivity</string>
 
-    <string name="no_favourite_records">Store a list of your favourite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favourite contacts.</string>
+    <string name="no_favorite_records">Store a list of your favorite contacts.\nGet started by adding to this list.\n\nSwipe right on a contact in order to add it to your favorite contacts.</string>
     <string name="no_recent_records">You have no recent interactions with other users</string>
     <string name="no_group_chat_records">Select the people you want to chat with</string>
     <string name="no_search_records">No results found</string>
 
     <!--Toolbar titles-->
     <string name="toolbar_title_messages">Messages</string>
-    <string name="toolbar_title_contact_list">My Contacts</string>
+    <string name="toolbar_title_contact_list">Contacts</string>
     <string name="toolbar_title_contacts">Contacts</string>
     <string name="profile_edit_mode_done">Done</string>
     <string name="profile_edit_mode_edit">Edit</string>
     <string name="toolbar_group_chat_title_messages">Add to Group</string>
+    <string name="title">Title</string>
 
     <!-- Chat Strings -->
     <string name="chat_me_text">"Me: "</string>
     <string name="DummyTime">Thursday 18:40 a.m</string>
-    <string name="Availability">AVAILABILITY</string>
-    <string name="dummyCountry">United States</string>
+    <string name="availability">Availability</string>
+    <string name="dummyCountry">USA</string>
     <string name="badge">badge</string>
     <string name="dummyUser">Captain Planet</string>
     <string name="Contacts">Contacts</string>
     <string name="Recents">Recents</string>
-    <string name="Favourites">Favourites</string>
+    <string name="Favorites">Favorites</string>
     <string name="dummyShortDay">Tue</string>
     <string name="VacationTime">Vacation Time</string>
     <string name="DoNotDisturb">Do Not Disturb</string>
@@ -155,9 +159,9 @@
     <string name="Edit">Edit</string>
     <string name="Sent">Sent</string>
     <string name="dummyAddress">742, Evergreen Terrace</string>
-    <string name="officelocation">Office Location</string>
+    <string name="office_location">Office Location</string>
+    <string name="address">Address</string>
     <string name="dummyEmail">ruben_bujalance@stratesys-ts.com</string>
-    <string name="PhoneNumber">Phone Number</string>
     <string name="repeatPassword">Repeat Password</string>
     <string name="additional">Additional</string>
     <string name="additionalinformation">Additional Information</string>
@@ -172,8 +176,10 @@
     <string name="dummyPosition">Senior Enterprise Manager</string>
     <string name="dummyUserfull">Smith Doe, John</string>
     <string name="dummylastseen">Seen 2d ago</string>
+    <string name="job_title">Job Title</string>
     <string name="mobile">mobile</string>
-    <string name="Phone">Phone</string>
+    <string name="phone">Phone</string>
+    <string name="phone_lower">phone</string>
     <string name="latestNews">Latest News</string>
     <string name="Logout">Logout</string>
     <string name="Chat">"Chat   "</string>
@@ -182,27 +188,30 @@
     <string name="about_my_comms">About MyComms</string>
     <string name="name">Name</string>
     <string name="dummyday">Tuesday 28th April</string>
-    <string name="ABOUT">ABOUT</string>
+    <string name="about">About</string>
+    <string name="personal_info">Personal Info</string>
     <string name="emailbutton">Email Button</string>
     <string name="Send">Send</string>
     <string name="sharecurrenttime">Share current time</string>
     <string name="dummyCompany2">Planet Earth Company</string>
     <string name="typemessage">Type a message...</string>
     <string name="dummylastseen2">Seen long time ago</string>
-    <string name="SharingSettings">SHARING SETTINGS</string>
+    <string name="sharing_settings">Sharing Settings</string>
     <string name="ButtonChat">Button Chat</string>
     <string name="Delivered">Delivered</string>
     <string name="editphoto">edit photo</string>
     <string name="image">Image</string>
+    <string name="new_meeting">New meeting with</string>
+    <string name="people_in_group">" people in group"</string>
 
     <!--Search bar content -->
 
-    <string name="search_bar_text">Search (name, company, email)</string>
+    <string name="search_bar_text">Search</string>
     <string name="search_bar_cancel_button">Cancel</string>
     <string name="Settings">Settings</string>
     <string name="toolbar_preferences">Preferences</string>
     <string name="Profile">Profile</string>
-    <string name="toolbar_my_profile">My Profile</string>
+    <string name="toolbar_my_profile">Profile</string>
 
     <!-- Settings and Profile-->
     <string name="settings_vacation_time_activity_title">"Vacation Time"</string>
@@ -213,7 +222,30 @@
     <string name="settings_label_vacation_time_not_set">Not Set</string>
     <string name="about_version">"version "</string>
     <string name="about_build">"build "</string>
-    <string name="Mycomms">MyComms</string>
+    <string name="mycomms">MyComms</string>
+    <string name="add_accounts">Add Accounts</string>
+    <string name="set_salesforce">Salesforce</string>
+    <string name="set_local_contacts">Local Contacts</string>
+    <string name="set_vodafone_global_list">Vodafone Global List</string>
+    <string name="add">Add</string>
+    <string name="credentials_are_incorrect">Credentials are incorrect - check settings</string>
+    <string name="provide_your_corporate_credentials">
+        <![CDATA[
+        <p>Provide your Corporate credentials to access the <b>Global Contacts list</b></p>]]>
+    </string>
+    <string name="ldap_need_help_with_your_username">
+        <![CDATA[<p><font color=\"#0071ff\">* Need help with your username?</font></p>
+        <p>For most users, their <b>corporate email</b> is their <b>Windows Username</b></p>
+        <p>If you find this doesn\'t work please try the following <b>alternative</b> on your computer:</p>
+        <p>1. Press <b>CTRL-ALT-DEL</b></p>
+        <p>2. Select <b>\"Lock this computer\"</b></p>
+        <p>3. Identify your user in the screen as <b>\"Your name\" (VF-ROOT\User)</b></p>
+        <p>4. Enter VF-ROOT\User as your Windows user</p>
+        <p>If this still doesn\'t work, <b>check with your IT team</b> as your account may have a special configuration</p>
+        ]]>
+    </string>
+    <string name="windows_username">Windows Username</string>
+    <string name="windows_password">Windows Password</string>
 
     <!--Progress dialog-->
 
@@ -222,9 +254,6 @@
         .</string>
     <string name="unread_messages_more_than_99">99+</string>
     <string name="title_activity_group_chat">GroupChatActivity</string>
-
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- Group chat -->
 
@@ -239,4 +268,30 @@
     <!--Push notifications-->
     <string name="new_unread_messages">New unread messages</string>
 
+    <!-- Add global contacts -->
+    <string name="add_global_contacts">Add Vodafone Global Address Contacts</string>
+    <string name="global_contacts_settings_added">
+        Global Contacts Address settings added successfully</string>
+
+    <string name="title_activity_add_global_contacts">AddGlobalContactsActivity</string>
+
+    <!--Contact Detail -->
+    <string name="contact_details">Details</string>
+    <string name="contact_current_time">Current Time</string>
+    <string name="contact_last_seen">Last seen</string>
+    <string name="contact_current_location">Current Location</string>
+    <string name="title_activity_contact_details_plus">ContactDetailsPlusActivity</string>
+
+    <!-- Edit profile errors-->
+
+    <string name="error_first_name_not_null">First name must not be empty!</string>
+    <string name="error_last_name_not_null">Last name must not be empty!</string>
+    <string name="error_job_title_not_null">Job title must not be empty!</string>
+    <string name="error_company_not_null">Company must not be empty!</string>
+    <string name="error_home_not_null">Home address must not be empty!</string>
+
+    <string name="error_password_do_not_match">Passwords do not match!</string>
+    <string name="font_name_source_sans_pro">fonts/SourceSansPro-Regular.ttf</string>
+    <string name="title_activity_calligraphy">CalligraphyActivity</string>
+    <string name="author">Author</string>
 </resources>

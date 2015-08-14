@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.realm;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -13,10 +12,8 @@ import model.UserProfile;
 
 public class RealmProfileTransactions
 {
-    private Context mContext;
-    public RealmProfileTransactions(Context mContext)
+    public RealmProfileTransactions()
     {
-        this.mContext = mContext;
     }
 
     public void insertUserProfile(UserProfile userProfile, Realm realm)

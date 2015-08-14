@@ -55,6 +55,7 @@ public class InternalContactSearch
             contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
+            contact.setLongField1(Utils.setPlatformOrder(Constants.PLATFORM_LOCAL));
             contact.setProfileId(profileId);
             contact = setContactsCompanyDataByContactsIds(id, contact);
             contact = setContactsBasicDataByContactsIds(id, contact);
@@ -70,6 +71,7 @@ public class InternalContactSearch
 
             contact.setSortHelper
                     ((
+                        contact.getLongField1() + " " +
                             Utils.normalizeStringNFD(contact.getFirstName()) + " " +
                             Utils.normalizeStringNFD(contact.getLastName()) + " " +
                             Utils.normalizeStringNFD(contact.getCompany())).trim()
@@ -97,6 +99,7 @@ public class InternalContactSearch
             contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
             contact.setPlatform(Constants.PLATFORM_LOCAL);
+            contact.setLongField1(Utils.setPlatformOrder(Constants.PLATFORM_LOCAL));
             contact.setProfileId(profileId);
             contact = setContactsCompanyDataByContactsIds(id, contact);
             contact = setContactsBasicDataByContactsIds(id, contact);
@@ -112,6 +115,7 @@ public class InternalContactSearch
 
             contact.setSortHelper
                     ((
+                                contact.getLongField1() + " " +
                                     Utils.normalizeStringNFD(contact.getFirstName()) + " " +
                                     Utils.normalizeStringNFD(contact.getLastName()) + " " +
                                     Utils.normalizeStringNFD(contact.getCompany())).trim()

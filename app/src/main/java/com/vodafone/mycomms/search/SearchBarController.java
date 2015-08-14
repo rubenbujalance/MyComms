@@ -14,15 +14,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.connection.ISearchConnectionCallback;
+import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
+import com.vodafone.mycomms.settings.globalcontacts.GlobalContactsController;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,19 +39,18 @@ import java.util.List;
 
 import io.realm.Realm;
 import model.Contact;
+import model.GlobalContactsSettings;
 
 /**
  * Created by str_oan on 26/06/2015.
  */
-public class SearchBarController implements ISearchConnectionCallback
-{
+public class SearchBarController {
     private EditText searchView;
     private Activity mActivity;
     private Button cancelButton;
     private LinearLayout layCancel;
     private SearchController mSearchController;
     private ArrayList<Contact> contactList;
-    private String apiCall;
     private SharedPreferences sp;
     private LinearLayout laySearchBar;
     private ContactListViewArrayAdapter mAdapter;
@@ -50,12 +58,13 @@ public class SearchBarController implements ISearchConnectionCallback
     private ListView mListView;
     private boolean isGroupChatSearch;
     private RealmContactTransactions mContactTransactions;
+    private ContactListFragment contactListFragment;
+    private String profileId;
 
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
 
     private Realm realm;
-
 
     public SearchBarController
             (
@@ -68,6 +77,7 @@ public class SearchBarController implements ISearchConnectionCallback
                     , ListView listView
                     , boolean isGroupChatSearch
                     , Realm realm
+                    , ContactListFragment contactListFragment
             )
     {
         this.mActivity = activity;
@@ -79,9 +89,12 @@ public class SearchBarController implements ISearchConnectionCallback
         this.mListView = listView;
         this.isGroupChatSearch = isGroupChatSearch;
         this.realm = realm;
+        this.contactListFragment = contactListFragment;
 
         sp = mActivity.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
     }
 
@@ -143,7 +156,6 @@ public class SearchBarController implements ISearchConnectionCallback
                 }
 
                 searchAllContacts(searchView.getText().toString());
-                BusProvider.getInstance().post(new ReloadAdapterEvent());
             }
 
             @Override
@@ -167,7 +179,6 @@ public class SearchBarController implements ISearchConnectionCallback
             public void onClick(View v) {
                 hideSearchBarContent();
                 hideKeyboard();
-
             }
         });
 
@@ -230,22 +241,17 @@ public class SearchBarController implements ISearchConnectionCallback
      */
     private void searchAllContacts(String keyWord)
     {
-        if(keyWord.length() == 0)
-        {
-            loadAllContactsFromDB();
-        }
-        else if(keyWord.length() > 0 && keyWord.length() < 3)
-        {
-            loadAllContactsFromDB(keyWord);
-        }
-        else if(keyWord.length() >= 3)
-        {
-            loadAllContactsFromServer(keyWord);
-            if(!isGroupChatSearch)
-            {
-                //loadLocalContacts(keyWord);
+        if(keyWord!=null) {
+            if (keyWord.length() == 0) {
+                loadAllContactsFromDB();
+            } else if (keyWord.length() > 0 && keyWord.length() < 3) {
+                loadAllContactsFromDB(keyWord);
+            } else if (keyWord.length() >= 3) {
+                loadAllContactsFromServer(keyWord);
+                loadAllContactsFromDB(keyWord);
             }
-            loadAllContactsFromDB(keyWord);
+
+            BusProvider.getInstance().post(new ReloadAdapterEvent());
         }
     }
 
@@ -256,6 +262,8 @@ public class SearchBarController implements ISearchConnectionCallback
      */
     private void loadAllContactsFromDB(String keyWord)
     {
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>" + keyWord);
+
         if(null == keyWord)
         {
             contactList = mContactTransactions.getAllContacts(realm);
@@ -264,18 +272,21 @@ public class SearchBarController implements ISearchConnectionCallback
         {
             if(isGroupChatSearch)
             {
-                contactList = mSearchController.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
+                contactList = mSearchController
+                        .getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
             }
             else
             {
                 contactList = mSearchController.getContactsByKeyWord(keyWord);
             }
+            validateNoPlatformRecords(contactList);
         }
 
     }
 
     private void loadAllContactsFromDB()
     {
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: <No Filter>");
         loadAllContactsFromDB(null);
     }
 
@@ -286,9 +297,170 @@ public class SearchBarController implements ISearchConnectionCallback
      */
     private void loadAllContactsFromServer(String keyWord)
     {
-        buildRequestForSearchContacts(keyWord);
-        mSearchController.getContactList(apiCall);
-        mSearchController.setConnectionCallback(this);
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Keyword>" + keyWord);
+
+        //Other platforms: SalesForce, ...
+        loadAllContactsFromPlatforms(keyWord);
+
+        //Global Contacts
+        if(RealmLDAPSettingsTransactions.haveSettings(profileId, realm)) {
+            GlobalContactsSettings settings =
+                    RealmLDAPSettingsTransactions.getSettings(profileId, realm);
+
+            String user = settings.getUser();
+            String password = settings.getPassword();
+
+            String apiCall = buildRequestForSearchLDAPContacts(keyWord, realm, null);
+
+            loadAllContactsFromLDAP(apiCall, keyWord, false, user, password);
+        }
+    }
+
+    private void loadAllContactsFromPlatforms(final String keyWord) {
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromPlatforms: Keyword>"+keyWord);
+
+        String apiCall = buildRequestForSearchContacts(keyWord);
+//        mSearchController.getContactList(apiCall);
+//        mSearchController.setConnectionCallback(this);
+
+
+        OKHttpWrapper.get(apiCall, mActivity, new OKHttpWrapper.HttpCallback() {
+            @Override
+            public void onFailure(Response response, IOException e) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(Constants.TAG, "SearchBarController.run: ", new Exception(
+                                mActivity.getString(R.string.error_reading_data_from_server)));
+                        Toast.makeText(mActivity,
+                                R.string.error_reading_data_from_server, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onSuccess(Response response) {
+                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromPlatforms: Success - " +
+                        response.request().urlString());
+
+                try {
+                    String result = response.body().string();
+
+                    if (result != null && result.trim().length() > 0) {
+
+                        JSONObject jsonResponse = new JSONObject(result);
+
+                        ArrayList<Contact> realmContactList =
+                                mSearchController.insertContactListInRealm(jsonResponse);
+
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadAllContactsFromDB(keyWord);
+                                BusProvider.getInstance().post(new ReloadAdapterEvent());
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromPlatforms: ", e);
+                }
+            }
+        });
+    }
+
+    private void loadAllContactsFromLDAP(final String apiCall, final String keyWord,
+                                         final boolean retrying, final String user,
+                                         final String password)
+    {
+        Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: " +
+                "KeyWord>"+keyWord+"; Retrying>"+retrying);
+
+        OKHttpWrapper.get(apiCall, mActivity, new OKHttpWrapper.HttpCallback() {
+            @Override
+            public void onFailure(Response response, IOException e) {
+                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP - Failure: " +
+                        "KeyWord>" + keyWord + "; Retrying>" + retrying);
+
+                //If have received an Unauthorized response, renew LDAP credentials and retry
+                //If already have retried, show LDAP Warning Bar
+                if(response!=null && response.code()==401 && !retrying) {
+
+                    //In case of Unauthorized, do a renew LDAP credentials
+                    GlobalContactsController gcController = new GlobalContactsController();
+
+                    gcController.callLDAPAuthProcess(user, password, mActivity,
+                        new GlobalContactsController.GlobalContactsCallback() {
+                            @Override
+                            public void onFailure(final String error, final int errorCode) {
+                                //If renew failure, delete local token and show bar
+                                Log.i(Constants.TAG,
+                                        "SearchBarController.loadAllContactsFromLDAP: RENEW");
+
+                                if(errorCode>=400 && errorCode<500) {
+                                    RealmLDAPSettingsTransactions.deleteTokenData(profileId, null);
+                                    contactListFragment.showLDAPSettingsBar(true);
+                                }
+                                else {
+                                    mActivity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Log.e(Constants.TAG, "SearchBarController." +
+                                                    "loadAllContactsFromLDAP: (" + errorCode + ") ",
+                                                    new Exception(error));
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onSuccess(GlobalContactsSettings settings) {
+                                //If renew success, retry search
+                                String apiCall =
+                                        buildRequestForSearchLDAPContacts(keyWord, null, settings);
+                                loadAllContactsFromLDAP(apiCall, keyWord, true, user, password);
+                            }
+                        });
+                }
+                else {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: ", new Exception(
+                                    mActivity.getString(R.string.error_reading_data_from_server)));
+                            Toast.makeText(mActivity, R.string.error_reading_data_from_server,
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onSuccess(Response response) {
+                Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: Success - " +
+                        response.request().urlString());
+                try
+                {
+                    String result = response.body().string();
+
+                    if (result != null && result.trim().length()>0)
+                    {
+                        JSONObject jsonResponse = new JSONObject(result);
+                        ArrayList<Contact> realmContactList =
+                                mSearchController.insertContactListInRealm(jsonResponse);
+
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadAllContactsFromDB(keyWord);
+                                BusProvider.getInstance().post(new ReloadAdapterEvent());
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromLDAP: ", e);
+                }
+            }
+        });
     }
 
     /**
@@ -296,12 +468,44 @@ public class SearchBarController implements ISearchConnectionCallback
      * @author str_oan
      * @param keyWord (String) -> key word for make search;
      */
-    private void buildRequestForSearchContacts(String keyWord)
+    private String buildRequestForSearchContacts(String keyWord)
     {
         String basicCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
         String content = sp.getString(Constants.PLATFORMS_SHARED_PREF, "mc");
         content = content.replace("[","").replace("]","").replace("\"","");
-        apiCall = basicCall+content+"&t="+keyWord;
+
+        return basicCall+content+"&t="+keyWord;
+    }
+
+    /**
+     * Builds request string for search the contacts in LDAP
+     * @author str_rbm
+     * @param keyWord (String) -> key word for make search;
+     */
+    private String buildRequestForSearchLDAPContacts(String keyWord, Realm realm,
+                                                     GlobalContactsSettings ldapSettings)
+    {
+
+        if(ldapSettings==null) {
+            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
+            ldapSettings =
+                    RealmLDAPSettingsTransactions.getSettings(profileId, realm);
+        }
+
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode(ldapSettings.getToken(), "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode(ldapSettings.getTokenType(), "utf-8");
+            apiCall += "&url=" + URLEncoder.encode(ldapSettings.getUrl(), "utf-8");
+            apiCall += "&t=" + URLEncoder.encode(keyWord, "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.buildRequestForSearchLDAPContacts: ", e);
+        }
+
+        return apiCall;
     }
 
     /**
@@ -325,17 +529,6 @@ public class SearchBarController implements ISearchConnectionCallback
         searchView.setText("");
     }
 
-
-    @Override
-    public void onSearchContactsResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging) {
-
-    }
-
-    @Override
-    public void onConnectionNotAvailable() {
-
-    }
-
     public ArrayList<Contact> getContactList()
     {
         return this.contactList;
@@ -355,5 +548,70 @@ public class SearchBarController implements ISearchConnectionCallback
                 return name1.compareTo(name2);
             }
         });
+    }
+
+    private void validateNoPlatformRecords(ArrayList<Contact> contactList) {
+        boolean isMyComms = false;
+        boolean isSalesForce = false;
+        boolean isGlobal = false;
+        boolean isLocal = false;
+        int salesForcePosition = 0;
+        int globalPosition = 0;
+        int localPosition = 0;
+        String platform;
+
+        for (int i=0;i<contactList.size();i++){
+            platform = contactList.get(i).getPlatform();
+
+            if (!isMyComms && platform.equals(Constants.PLATFORM_MY_COMMS)) {
+                isMyComms = true;
+            } else if (!isSalesForce && platform.equals(Constants.PLATFORM_SALES_FORCE)){
+                isSalesForce = true;
+                salesForcePosition = i;
+            } else if (!isGlobal && platform.equals(Constants.PLATFORM_GLOBAL_CONTACTS)){
+                isGlobal = true;
+                globalPosition = i;
+            } else if (!isLocal && platform.equals(Constants.PLATFORM_LOCAL)) {
+                isLocal = true;
+                localPosition = i;
+            }
+        }
+
+        int size =  contactList.size();
+        if (!isLocal){
+            contactList.add(size, createNoRecordsContact(Constants.PLATFORM_LOCAL));
+        }
+        if (!isGlobal){
+            if (localPosition == 0){
+                localPosition = salesForcePosition;
+                if (localPosition == 0){
+                    localPosition = size;
+                }
+            }
+            contactList.add(localPosition, createNoRecordsContact(Constants.PLATFORM_GLOBAL_CONTACTS));
+        }
+        if (!isSalesForce){
+            if (globalPosition == 0){
+                globalPosition = localPosition;
+                if (globalPosition == 0){
+                    globalPosition = size;
+                }
+            }
+            contactList.add(globalPosition, createNoRecordsContact(Constants.PLATFORM_SALES_FORCE));
+        }
+        if (!isMyComms) {
+            contactList.add(0, createNoRecordsContact(Constants.PLATFORM_MY_COMMS));
+        }
+    }
+
+    private Contact createNoRecordsContact(String platform) {
+        Contact contact = new Contact();
+        contact.setProfileId(profileId);
+        contact.setPlatform(platform);
+        contact.setContactId(platform);
+        contact.setId(profileId + "_" + platform);
+        contact.setFirstName(mActivity.getResources().getString(R.string.no_search_records));
+
+        return contact;
     }
 }

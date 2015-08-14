@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.realm;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -19,10 +18,8 @@ import model.ContactAvatar;
 public final class RealmAvatarTransactions
 {
 
-    private Context mContext;
-    public RealmAvatarTransactions(Context context)
+    public RealmAvatarTransactions()
     {
-        this.mContext = context;
     }
 
     public void insertAvatar (ContactAvatar newAvatar, Realm realm)

@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
@@ -103,8 +104,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         mTitleOffset = (int) (TITLE_OFFSET_DIPS * getResources().getDisplayMetrics().density);
 
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, getResources().getDisplayMetrics());
         mTabStrip = new SlidingTabStrip(context);
-        addView(mTabStrip, LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        addView(mTabStrip, LayoutParams.MATCH_PARENT, height);
     }
 
     /**
@@ -165,8 +167,9 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         mViewPager = viewPager;
         if (viewPager != null) {
-            viewPager.setOnPageChangeListener(new InternalViewPagerListener());
             populateTabStrip();
+            viewPager.setOnPageChangeListener(new InternalViewPagerListener());
+            changeSlideBarStateColor(Constants.CONTACTS_ALL);
         }
     }
 
@@ -223,33 +226,22 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
         if (auxactivity[0].equals("com.vodafone.mycomms.ContactListMainActivity")) {
 
-            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_favourites, mTabStrip, false);
+            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_con_favorites, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 3;
 
-            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_recents, mTabStrip, false);
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_con_recents, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 3;
 
-            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_contacts, mTabStrip, false);
+            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_con_contacts, mTabStrip, false);
             tabView.setOnClickListener(tabClickListener);
             mTabStrip.addView(tabView);
             tabView.getLayoutParams().width = width / 3;
 
-        } else if (auxactivity[0].equals("com.vodafone.mycomms.settings.SettingsMainActivity")) {
-            View tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_profile, mTabStrip, false);
-            tabView.setOnClickListener(tabClickListener);
-            mTabStrip.addView(tabView);
-            tabView.getLayoutParams().width = width / 2;
-
-            tabView = LayoutInflater.from(getContext()).inflate(R.layout.tab_settings, mTabStrip, false);
-            tabView.setOnClickListener(tabClickListener);
-            mTabStrip.addView(tabView);
-            tabView.getLayoutParams().width = width / 2;
         }
-
     }
 
     @Override
@@ -283,6 +275,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
     private class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
         private int mScrollState;
 
+
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             int tabStripChildCount = mTabStrip.getChildCount();
@@ -314,7 +307,10 @@ public class SlidingTabLayout extends HorizontalScrollView {
         }
 
         @Override
-        public void onPageSelected(int position) {
+        public void onPageSelected(int position)
+        {
+            changeSlideBarStateColor(position);
+
             if (mScrollState == ViewPager.SCROLL_STATE_IDLE) {
                 mTabStrip.onViewPagerPageChanged(position, 0f);
                 scrollToTab(position, 0);
@@ -326,6 +322,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
             Log.i(Constants.TAG, "SlidingTabLayout.onPageSelected: ");
             BusProvider.getInstance().post(new SetContactListAdapterEvent());
         }
+
+
 
     }
 
@@ -339,6 +337,98 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 }
             }
         }
+    }
+
+    private void changeSlideBarStateColor(int position)
+    {
+        View v;
+        ImageView img;
+        TextView tv;
+        mTabStrip.setSelectedIndicatorColors(getResources().getColor(R.color.transparent));
+        switch (position)
+        {
+            case Constants.CONTACTS_ALL:
+                //all
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_ALL));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.imageView8);
+                img.setImageResource(R.drawable.btnuser_on);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.tv_all_contacts);
+                tv.setTextColor(getResources().getColor(R.color.white));
+                v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
+
+                //recents
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_RECENT));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.imageView5);
+                img.setImageResource(R.drawable.ic_recent_not_pressed);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.tv_recent_contacts);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                //favorits
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.imageView9);
+                img.setImageResource(R.drawable.ic_favourites_not_pressed);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.tv_favourites_contacts);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                break;
+
+            case Constants.CONTACTS_RECENT:
+                //all
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_ALL));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.imageView8);
+                img.setImageResource(R.drawable.btnuser);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.tv_all_contacts);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                //recents
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_RECENT));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.imageView5);
+                img.setImageResource(R.drawable.btn_recents);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.tv_recent_contacts);
+                tv.setTextColor(getResources().getColor(R.color.white));
+                v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
+
+                //favorits
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.imageView9);
+                img.setImageResource(R.drawable.ic_favourites_not_pressed);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.tv_favourites_contacts);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                break;
+
+            case Constants.CONTACTS_FAVOURITE:
+                //all
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_ALL));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.imageView8);
+                img.setImageResource(R.drawable.btnuser);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_ALL)).findViewById(R.id.tv_all_contacts);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                //recents
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_RECENT));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.imageView5);
+                img.setImageResource(R.drawable.ic_recent_not_pressed);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_RECENT)).findViewById(R.id.tv_recent_contacts);
+                tv.setTextColor(getResources().getColor(R.color.grey_middle));
+                v.setBackgroundColor(getResources().getColor(R.color.transparent));
+
+                //favorits
+                v = (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE));
+                img = (ImageView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.imageView9);
+                img.setImageResource(R.drawable.btn_favorites);
+                tv = (TextView) (mTabStrip.getChildAt(Constants.CONTACTS_FAVOURITE)).findViewById(R.id.tv_favourites_contacts);
+                tv.setTextColor(getResources().getColor(R.color.white));
+                v.setBackgroundColor(getResources().getColor(R.color.opaque_black));
+
+                break;
+        }
+
     }
 
 }

@@ -127,10 +127,10 @@ public class GroupChatListFragment extends ListFragment implements
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
 
-        mSearchController = new SearchController(getActivity().getApplicationContext(),
+        mSearchController = new SearchController(getActivity(),
                 profileId, realm);
         mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
-        mContactTransactions = new RealmContactTransactions(profileId, getActivity());
+        mContactTransactions = new RealmContactTransactions(profileId);
         mGroupChatController = new GroupChatController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
         mRecentContactController = new RecentContactController(getActivity(),profileId);
@@ -252,7 +252,7 @@ public class GroupChatListFragment extends ListFragment implements
         Intent in = getActivity().getIntent();
         if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatListActivity.class.getSimpleName()))
             isNewGroupChat = true;
-        else if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatActivity.class.getSimpleName()))
+        else //if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatActivity.class.getSimpleName()))
         {
             this.isNewGroupChat = false;
             this.groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants
@@ -293,7 +293,8 @@ public class GroupChatListFragment extends ListFragment implements
         }
         else
         {
-            contactList = mSearchController.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
+            contactList = mSearchController
+                    .getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
         }
     }
 
@@ -308,7 +309,7 @@ public class GroupChatListFragment extends ListFragment implements
      */
     private void reloadAdapter()
     {
-        adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+        adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
         if (contactList!=null) {
             if (listView!=null)
                 state = listView.onSaveInstanceState();
@@ -320,7 +321,7 @@ public class GroupChatListFragment extends ListFragment implements
             }
             else
             {
-                adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+                adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
                 setListAdapter(adapter);
                 if (state!= null)
                     listView.onRestoreInstanceState(state);
@@ -348,6 +349,7 @@ public class GroupChatListFragment extends ListFragment implements
                         , listView
                         , true
                         , realm
+                        , null
                 );
 
         mSearchBarController.initiateComponentsForSearchView(v);
@@ -709,6 +711,11 @@ public class GroupChatListFragment extends ListFragment implements
         mGroupChatController.setChatMembers(this.selectedContacts);
         mGroupChatController.setChatCreator(this.profileId);
         mGroupChatController.setChatOwners(this.ownersIds);
+        //Added new fields here
+        mGroupChatController.setChatName("TestName");
+        mGroupChatController.setChatAbout("TestAbout");
+        mGroupChatController.setChatAvatar("http://www.google.com");
+
         if(mGroupChatController.isCreatedJSONBodyForCreateGroupChat())
         {
             mGroupChatController.createRequest(mGroupChatController.URL_CREATE_GROUP_CHAT,"post");
@@ -725,9 +732,9 @@ public class GroupChatListFragment extends ListFragment implements
                                     , this.profileId
                                     , this.selectedContacts
                                     , this.ownersIds
-                                    , ""
-                                    , ""
-                                    , ""
+                                    , "TestName"
+                                    , "TestAbout"
+                                    , "http://www.google.com"
                             );
                 }
                 else

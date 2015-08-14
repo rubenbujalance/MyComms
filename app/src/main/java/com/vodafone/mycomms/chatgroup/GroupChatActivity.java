@@ -25,8 +25,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -42,7 +40,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.chat.ChatRecyclerViewAdapter;
+import com.vodafone.mycomms.chatgroup.view.ChatRecyclerViewAdapter;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
@@ -59,15 +57,19 @@ import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.TimeZone;
 
 import io.realm.Realm;
 import model.Chat;
@@ -75,18 +77,13 @@ import model.ChatMessage;
 import model.Contact;
 import model.GroupChat;
 
-/**
- * Created by str_oan on 29/06/2015.
- */
 public class GroupChatActivity extends ToolbarActivity implements Serializable
 {
 
     private String LOG_TAG = GroupChatActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
-    private ChatRecyclerViewAdapter mChatRecyclerViewAdapter;
     private EditText etChatTextBox;
     private TextView tvSendChat;
-    private ImageView imgModifyGroupChat;
 
     private ArrayList<ChatMessage> _chatList = new ArrayList<>();
     private model.UserProfile _profile;
@@ -100,7 +97,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private ArrayList<String> groupChatOwnerIds;
     private ArrayList<Contact> contactList;
     private RealmGroupChatTransactions mGroupChatTransactions;
-    private SharedPreferences sp;
     private String previousActivity;
 
     private boolean isGroupChatMode;
@@ -112,15 +108,16 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     private String photoPath = null;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_GALLERY = 2;
-    private File multiPartFile;
     private FilePushToServerController filePushToServerController;
 
-    private ImageView sendFileImage;
-
-    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar;
-    private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text;
+    private ImageView top_left_avatar, top_right_avatar, bottom_left_avatar, bottom_right_avatar, contact_availability
+            ,bottom_right_chat_availability, bottom_left_chat_availability, top_right_chat_availability, top_left_chat_availability;
+    private TextView top_left_avatar_text, top_right_avatar_text, bottom_left_avatar_text, bottom_right_avatar_text
+            ,group_names, group_n_components;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
+    private LinearLayout lay_add_contact;
+
 
     private Realm realm;
 
@@ -142,12 +139,12 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         else
             lay_no_connection.setVisibility(View.VISIBLE);
 
-        sp = getSharedPreferences(
+        SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
 
-        contactTransactions = new RealmContactTransactions(_profile_id, GroupChatActivity.this);
+        contactTransactions = new RealmContactTransactions(_profile_id);
         chatTransactions = new RealmChatTransactions(this);
         mGroupChatTransactions = new RealmGroupChatTransactions(this, _profile_id);
         _profile = contactTransactions.getUserProfile(realm);
@@ -165,44 +162,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         //Load all messages
         loadMessagesArray();
-
         refreshAdapter();
 
         //Sent chat in grey by default
         setSendEnabled(false);
-
-        etChatTextBox.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-                if (cs != null && cs.length() > 0) setSendEnabled(true);
-                else setSendEnabled(false);
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable arg0) {
-            }
-        });
-
-        tvSendChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());
-                sendText();
-            }
-        });
-
-        sendFileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
-            }
-        });
-
     }
 
     public void setHeaderAvatar()
@@ -229,6 +192,9 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 }
 
                 int i = 0;
+                boolean profileInside = false;
+                String groupNames = "";
+                String groupNComponents = contactList.size() + getResources().getString(R.string.people_in_group);
                 for(Contact contact : contactList)
                 {
                     if(i>3) break;
@@ -241,6 +207,11 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     String initials = "";
                     if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
                     {
+                        if (contact.getContactId().equals(_profile_id))
+                            profileInside = true;
+                        else
+                            groupNames = contact.getFirstName() + ", " + groupNames;
+
                         initials = contact.getFirstName().substring(0,1);
 
                         if(null != contact.getLastName() && contact.getLastName().length() > 0)
@@ -285,6 +256,103 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     }
                     i++;
                 }
+                groupNames = groupNames.substring(0, groupNames.length()-2);
+                if (profileInside)
+                    groupNames = groupNames + ", you...";
+                group_names.setText(groupNames);
+                group_n_components.setText(groupNComponents);
+            }
+
+            //TODO here we should load avatar passed by group chat but in this case we do the same as above
+            else
+            {
+                ArrayList<ImageView> images = new ArrayList<>();
+                images.add(top_left_avatar);
+                images.add(bottom_left_avatar);
+                images.add(bottom_right_avatar);
+
+                final ArrayList<TextView> texts = new ArrayList<>();
+                texts.add(top_left_avatar_text);
+                texts.add(bottom_left_avatar_text);
+                texts.add(bottom_right_avatar_text);
+
+                if (null != contactIds && contactIds.size() > 3)
+                {
+                    lay_right_top_avatar_to_hide.setVisibility(View.VISIBLE);
+                    images.add(top_right_avatar);
+                    texts.add(top_right_avatar_text);
+                }
+
+                int i = 0;
+                boolean profileInside = false;
+                String groupNames = "";
+                String groupNComponents = contactList.size() + getResources().getString(R.string.people_in_group);
+                for(Contact contact : contactList)
+                {
+                    if(i>3) break;
+
+                    final ImageView image = images.get(i);
+                    final TextView text = texts.get(i);
+                    text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+                    //Image avatar
+                    String initials = "";
+                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+                    {
+                        if (contact.getContactId().equals(_profile_id))
+                            profileInside = true;
+                        else
+                            groupNames = contact.getFirstName() + ", " + groupNames;
+
+                        initials = contact.getFirstName().substring(0,1);
+
+                        if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                        {
+                            initials = initials + contact.getLastName().substring(0,1);
+                        }
+
+                    }
+
+                    final String finalInitials = initials;
+
+                    image.setImageResource(R.color.grey_middle);
+                    text.setVisibility(View.VISIBLE);
+                    text.setText(finalInitials);
+
+                    if (contact.getAvatar()!=null &&
+                            contact.getAvatar().length()>0)
+                    {
+                        MycommsApp.picasso
+                                .load(contact.getAvatar())
+                                .placeholder(R.color.grey_middle)
+                                .noFade()
+                                .fit().centerCrop()
+                                .into(image, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+                                        text.setVisibility(View.INVISIBLE);
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        image.setImageResource(R.color.grey_middle);
+                                        text.setVisibility(View.VISIBLE);
+                                        text.setText(finalInitials);
+                                    }
+                                });
+                    }
+                    else
+                    {
+                        image.setImageResource(R.color.grey_middle);
+                        text.setText(initials);
+                    }
+                    i++;
+                }
+                groupNames = groupNames.substring(0, groupNames.length()-2);
+                if (profileInside)
+                    groupNames = groupNames + ", you...";
+                group_names.setText(groupNames);
+                group_n_components.setText(groupNComponents);
             }
             //TODO here we should load avatar passed by group chat but in this case we do the same as above
             else
@@ -369,7 +437,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         {
             lay_right_top_avatar_to_hide.setVisibility(View.GONE);
             lay_bottom_to_hide.setVisibility(View.GONE);
-            imgModifyGroupChat.setVisibility(View.GONE);
+            lay_add_contact.setVisibility(View.GONE);
             lay_top_left_avatar.setLayoutParams
                 (
                         new LinearLayout.LayoutParams
@@ -380,6 +448,51 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 );
 
             Contact contact = contactList.get(0);
+
+            //Contact name
+
+            String name = "";
+            try
+            {
+                if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+                    name = contact.getFirstName();
+                if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                    name = name + " " + contact.getLastName();
+
+                this.group_names.setText(name);
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "setHeaderAvatar ",e);
+                Crashlytics.logException(e);
+            }
+
+            //Contact hour and country
+            try
+            {
+                String hour = "", country = "";
+                if(null != contact.getTimezone())
+                {
+                    TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
+                    Calendar c = Calendar.getInstance(tz);
+                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+                    format.setTimeZone(c.getTimeZone());
+                    Date parsed = format.parse(c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE));
+                    hour = format.format(parsed);
+                }
+                if(contact.getCountry() != null && contact.getCountry().length()>0)
+                    country = Utils.getCountry(contact.getCountry(), this).get("name");
+
+                this.group_n_components.setText(hour + " " +country);
+
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "setHeaderAvatar ",e);
+                Crashlytics.logException(e);
+            }
+
+
             //Image avatar
             String initials = "";
             if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
@@ -392,6 +505,9 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 }
 
             }
+
+
+
 
             final String finalInitials = initials;
 
@@ -657,9 +773,9 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     private void refreshAdapter()
     {
-        mChatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
+        ChatRecyclerViewAdapter chatRecyclerViewAdapter = new ChatRecyclerViewAdapter(GroupChatActivity.this, _chatList,
                 _profile, isGroupChatMode, realm);
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+        mRecyclerView.setAdapter(chatRecyclerViewAdapter);
     }
 
     private void setSendEnabled(boolean enable)
@@ -672,28 +788,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             tvSendChat.setEnabled(true);
             tvSendChat.setTextColor(Color.parseColor("#02B1FF"));
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_chat_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -744,17 +838,33 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
     private void loadTheRestOfTheComponents()
     {
-        imgModifyGroupChat = (ImageView) findViewById(R.id.img_modify_group_chat);
+        ImageView img_sun = (ImageView) findViewById(R.id.img_sun);
+        if(isGroupChatMode)
+            img_sun.setVisibility(View.GONE);
+        else
+            img_sun.setVisibility(View.VISIBLE);
 
+        lay_add_contact = (LinearLayout) findViewById(R.id.lay_add_member);
         if(isGroupChatMode)
         {
             if(groupChatOwnerIds.contains(_profile_id))
-                imgModifyGroupChat.setVisibility(View.VISIBLE);
+                lay_add_contact.setVisibility(View.VISIBLE);
             else
-                imgModifyGroupChat.setVisibility(View.GONE);
+                lay_add_contact.setVisibility(View.INVISIBLE);
+
+            LinearLayout groupInfoContainer = (LinearLayout) findViewById(R.id.group_info_container);
+            groupInfoContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent in = new Intent(GroupChatActivity.this, GroupDetailActivity.class);
+                    in.putExtra(Constants.GROUP_CHAT_ID, _groupId);
+//                    in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(in);
+                }
+            });
         }
         else
-            imgModifyGroupChat.setVisibility(View.GONE);
+            lay_add_contact.setVisibility(View.INVISIBLE);
 
         etChatTextBox = (EditText) findViewById(R.id.chat_text_box);
         tvSendChat = (TextView) findViewById(R.id.chat_send);
@@ -771,8 +881,37 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         lay_bottom_to_hide = (LinearLayout) findViewById(R.id.lay_bottom_both_image_hide);
         lay_bottom_to_hide.setVisibility(View.VISIBLE);
         lay_top_left_avatar = (LinearLayout) findViewById(R.id.lay_top_left_image);
+        ImageView sendFileImage = (ImageView) findViewById(R.id.send_image);
+        LinearLayout lay_phone = (LinearLayout) findViewById(R.id.lay_phone);
+        contact_availability = (ImageView) findViewById(R.id.chat_availability);
+        bottom_right_chat_availability = (ImageView) findViewById(R.id.bottom_right_chat_availability);
+        bottom_left_chat_availability = (ImageView) findViewById(R.id.bottom_left_chat_availability);
+        top_right_chat_availability = (ImageView) findViewById(R.id.top_right_chat_availability);
+        top_left_chat_availability = (ImageView) findViewById(R.id.top_left_chat_availability);
 
-        sendFileImage = (ImageView) findViewById(R.id.send_image);
+        if(isGroupChatMode)
+        {
+            lay_phone.setVisibility(View.GONE);
+            this.contact_availability.setVisibility(View.GONE);
+            this.bottom_right_chat_availability.setVisibility(View.VISIBLE);
+            this.bottom_left_chat_availability.setVisibility(View.VISIBLE);
+            this.top_right_chat_availability.setVisibility(View.VISIBLE);
+            this.top_left_chat_availability.setVisibility(View.VISIBLE);
+        }
+
+        else
+        {
+            lay_phone.setVisibility(View.VISIBLE);
+            this.contact_availability.setVisibility(View.VISIBLE);
+            this.bottom_right_chat_availability.setVisibility(View.GONE);
+            this.bottom_left_chat_availability.setVisibility(View.GONE);
+            this.top_right_chat_availability.setVisibility(View.GONE);
+            this.top_left_chat_availability.setVisibility(View.GONE);
+        }
+
+
+        group_names = (TextView) findViewById(R.id.group_names);
+        group_n_components = (TextView) findViewById(R.id.group_n_components);
 
         if(contactIds==null || contactIds.size()==0) {
             Crashlytics.logException(new Exception("GroupChatActivity.java > " +
@@ -797,11 +936,68 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         //Set avatar
         setHeaderAvatar();
 
-        imgModifyGroupChat.setOnClickListener(new View.OnClickListener() {
+        lay_add_contact.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 startGroupChatListActivity();
+            }
+        });
+
+        etChatTextBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                if (cs != null && cs.length() > 0) setSendEnabled(true);
+                else setSendEnabled(false);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+            }
+        });
+
+        tvSendChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(LOG_TAG, "Sending text " + etChatTextBox.getText().toString());
+                sendText();
+            }
+        });
+
+        sendFileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent(getString(R.string.how_would_you_like_to_add_a_photo), null);
+            }
+        });
+
+        lay_phone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Contact contact = contactList.get(0);
+                    String strPhones = contact.getPhones();
+
+                    if (strPhones != null) {
+                        String phone = strPhones;
+                        if (!contact.getPlatform().equals(Constants.PLATFORM_LOCAL)) {
+                            JSONArray jPhones = new JSONArray(strPhones);
+                            phone = (String) ((JSONObject) jPhones.get(0)).get(Constants
+                                    .CONTACT_PHONE);
+                        }
+
+                        Utils.launchCall(phone, GroupChatActivity.this);
+                        String action = Constants.CONTACTS_ACTION_CALL;
+                        mRecentContactController.insertRecent(contact.getContactId(), action);
+                    }
+                } catch (Exception ex) {
+                    Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
+                    Crashlytics.logException(ex);
+                }
+
             }
         });
     }
@@ -975,7 +1171,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             {
                 bitmap = Utils.decodeFile(photoPath);
                 filePushToServerController =  new FilePushToServerController(GroupChatActivity.this);
-                multiPartFile = filePushToServerController.prepareFileToSend
+                File multiPartFile = filePushToServerController.prepareFileToSend
                         (
                                 bitmap,
                                 Constants.MULTIPART_FILE,
@@ -989,9 +1185,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                                 Constants.MEDIA_TYPE_JPG
                         );
 
-                String response = filePushToServerController.executeRequest();
-
-                return response;
+                return filePushToServerController.executeRequest();
             }
             catch (Exception e)
             {

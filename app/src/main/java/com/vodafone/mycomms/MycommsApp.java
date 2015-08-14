@@ -31,6 +31,8 @@ import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
+import com.vodafone.mycomms.realm.RealmDBMigration;
+import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
@@ -44,12 +46,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TimeZone;
 
+import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import model.ChatMessage;
 import model.GroupChat;
 import model.News;
 import model.UserProfile;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -82,19 +86,31 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         super.onCreate();
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
 
+        //Initialize Crashlytics
+        Fabric.with(getApplicationContext(), new Crashlytics());
 
         //Realm config
+
+        //TODO WARNING - Change version when Realm DB schema changes
         RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext())
                 .name("mycomms.realm")
 //                .encryptionKey()
-//                .schemaVersion(1)
-//                .migration(new RealmDBMigration())
+                .schemaVersion(1)
+                .migration(new RealmDBMigration())
                 .build();
 
         Realm.setDefaultConfiguration(realmConfig);
 
+        //Shared Preferences
+        sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+
+        //Profile id
+        if (sp.contains(Constants.PROFILE_ID_SHARED_PREF))
+            profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+
         //Picasso configuration
-        Downloader downloader   = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
+        Downloader downloader = new OkHttpDownloader(getApplicationContext(), Long.MAX_VALUE);
         Picasso.Builder builder = new Picasso.Builder(getApplicationContext());
         builder.downloader(downloader);
 
@@ -121,7 +137,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //**********************
 
-        this.realm = Realm.getDefaultInstance();
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                        .setDefaultFontPath(getResources().getString(R.string.font_name_source_sans_pro))
+                        .setFontAttrId(R.attr.fontPath)
+                        .build()
+        );
+
         mNewsController = new NewsController(getApplicationContext());
 
         //Initializations
@@ -137,17 +158,13 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             Log.e(Constants.TAG, "MycommsApp.onCreate: ",ex);
             Crashlytics.logException(ex);
         }
-
-        //Shared Preferences
-        sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
     }
 
     @Override
     public void onTerminate() {
         super.onTerminate();
         BusProvider.getInstance().unregister(this);
-        this.realm.close();
+        if(realm!=null) realm.close();
         //Network listener
         networkEvents.unregister();
     }
@@ -186,6 +203,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "")==null ||
                 sp.getString(Constants.PROFILE_ID_SHARED_PREF, "").length()==0){
             profileController.setConnectionCallback(this);
+            if(realm == null) this.realm = Realm.getDefaultInstance();
             profileController.getProfile(this.realm);
 
             return null;
@@ -233,7 +251,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(this, profileId);
+        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(MycommsApp.this, profileId);
         downloadLocalContacts.downloadAndStore();
     }
 
@@ -327,6 +345,21 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             if(profile_id!=null)
                 new sendAvatar().execute(profile_id);
         }
+
+        if(profile_id!=null) {
+            //Set crashlytics user info
+            Crashlytics.setUserIdentifier(profile_id);
+
+            try {
+                if(realm == null) realm = Realm.getDefaultInstance();
+                RealmProfileTransactions ptx = new RealmProfileTransactions();
+                UserProfile userProfile = ptx.getUserProfile(profile_id, realm);
+                Crashlytics.setUserName(userProfile.getFirstName()+" "+userProfile.getLastName());
+                Crashlytics.setUserEmail(userProfile.getEmails().split(";")[0]);
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "MycommsApp.onApplicationAndProfileInitialized: ");
+            }
+        }
     }
 
     @Subscribe
@@ -390,6 +423,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onAllPendingMessagesReceived(AllPendingMessagesReceivedEvent event){
         Log.i(Constants.TAG, "MycommsApp.onAllPendingMessagesReceived: ");
         if(recentChatsHashMap!=null && recentChatsHashMap.size()>0) {
+            if(recentContactController==null)
+                recentContactController = new RecentContactController(this, profile_id);
+
             HashMap<String, Long> recentChatsHashMapClone = new HashMap<>();
             recentContactController.insertPendingChatsRecent(recentChatsHashMap);
             recentChatsHashMap.clear();

@@ -1,14 +1,11 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
@@ -17,6 +14,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;
@@ -28,7 +26,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class SignupCompanyActivity extends Activity {
+public class SignupCompanyActivity extends MainActivity {
 
     AutoCompleteTVSelectOnly mCompany;
     ClearableEditText mPosition;
@@ -105,29 +103,6 @@ public class SignupCompanyActivity extends Activity {
         if(UserProfile.getOfficeLocation() != null) mOfficeLoc.setText(UserProfile.getOfficeLocation());
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_signup_phone, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     private void loadCompaniesArray()
     {
         /*
@@ -187,8 +162,8 @@ public class SignupCompanyActivity extends Activity {
 
         Drawable errorIcon = getResources().getDrawable(R.drawable.ic_error_tooltip);
         errorIcon.setBounds(new Rect(0, 0,
-                (int)(errorIcon.getIntrinsicWidth()*0.5),
-                (int)(errorIcon.getIntrinsicHeight()*0.5)));
+                (int) (errorIcon.getIntrinsicWidth() * 0.5),
+                (int) (errorIcon.getIntrinsicHeight() * 0.5)));
 
         if(mCompany.getText().toString().trim().length() <= 0)
         {

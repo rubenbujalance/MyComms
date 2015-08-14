@@ -25,12 +25,13 @@ public class Constants {
     public static final int RIGHT_CHAT = 1;
     public static final int LEFT_IMAGE_CHAT = 2;
     public static final int RIGHT_IMAGE_CHAT = 3;
-    public static final float CHAT_UNREAD_REGULAR_SIZE = 9; //9sp
-    public static final float CHAT_UNREAD_MORE_THAN_99_SIZE = 7; //7sp
+    public static final float CHAT_UNREAD_REGULAR_SIZE = 12; //9sp
+    public static final float CHAT_UNREAD_MORE_THAN_99_SIZE = 9; //7sp
 
     //Profile Constants
     public static final int MY_SETTINGS = 0;
     public static final int MY_PROFILE = 1;
+    public static final int MY_ACCOUNTS = 2;
     public static final String PROFILE_ID_SHARED_PREF = "mycomms_profile_id";
     public static final String PROFILE_FULLNAME_SHARED_PREF = "mycomms_profile_fullname";
     public static final String ACCESS_TOKEN_SHARED_PREF = "mycomms_access_token";
@@ -97,6 +98,7 @@ public class Constants {
     public static final String CONTACT_LOCAL_CONTENT= "local_contact";
     public static final String CONTACT_SORT_HELPER= "sortHelper";
     public static final String CONTACT_SEARCH_HELPER= "searchHelper";
+    public static final String CONTACT_DETAIL_INFO= "detailInfo";
 
     public static final String CONTACT_PHONE_WORK = "phone_work";
     public static final String CONTACT_PHONE_HOME = "phone_home";
@@ -110,6 +112,7 @@ public class Constants {
     public static final String PLATFORM_SALES_FORCE = "sf";
     public static final String PLATFORM_LOCAL = "local";
     public static final String PLATFORM_MY_COMMS = "mc";
+    public static final String PLATFORM_GLOBAL_CONTACTS = "ly";
 
     public static final String PROFILE_SETTINGS = "settings";
     public static final String PROFILE_PLATFORMS = "platforms";
@@ -270,5 +273,19 @@ public class Constants {
 
     public static final int MAX_AVATAR_WIDTH_OR_HEIGHT = 640;
 
+    //LDAP Settings constants
+    public static final String LDAP_SETTINGS_FIELD_PROFILE_ID = "profileId";
+    public static final String LDAP_SETTINGS_FIELD_USER = "user";
+    public static final String LDAP_SETTINGS_FIELD_PASSWORD = "password";
+    public static final String LDAP_SETTINGS_FIELD_TOKEN = "token";
+    public static final String LDAP_SETTINGS_FIELD_TOKEN_TYPE = "tokenType";
+    public static final String LDAP_SETTINGS_FIELD_URL = "url";
+    public static final String LDAP_API_CALL_PLATFORM = "ly";
+
+    //Platform Search Order
+    public static final long ORDER_MYCOMMS = 0;
+    public static final long ORDER_GLOBAL_CONTACTS = 1;
+    public static final long ORDER_SALES_FORCE = 2;
+    public static final long ORDER_LOCAL = 3;
 
 }

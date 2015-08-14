@@ -29,8 +29,8 @@ public class ContactsController{
     public ContactsController(String profileId, Context mContext) {
         this.mProfileId = profileId;
         this.mContext = mContext;
-        realmContactTransactions = new RealmContactTransactions(mProfileId, mContext);
-        realmAvatarTransactions = new RealmAvatarTransactions(mContext);
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
+        realmAvatarTransactions = new RealmAvatarTransactions();
     }
 
     public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
@@ -67,11 +67,12 @@ public class ContactsController{
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "ContactsController.insertContactListInRealm: " + e.toString());
-            return null;
+            realmContactList = null;
         }
         finally {
             realm.close();
         }
+
         return realmContactList;
     }
 
@@ -165,8 +166,10 @@ public class ContactsController{
                 contact.setContactId(jsonObject.getString(Constants.CONTACT_ID));
                 contact.setId(profileId + "_" + jsonObject.getString(Constants.CONTACT_ID));
             }
-            if (!jsonObject.isNull(Constants.CONTACT_PLATFORM))
+            if (!jsonObject.isNull(Constants.CONTACT_PLATFORM)) {
                 contact.setPlatform(jsonObject.getString(Constants.CONTACT_PLATFORM));
+                contact.setLongField1(Utils.setPlatformOrder(jsonObject.getString(Constants.CONTACT_PLATFORM)));
+            }
             if (!jsonObject.isNull(Constants.CONTACT_FNAME))
                 contact.setFirstName(jsonObject.getString(Constants.CONTACT_FNAME));
             if (!jsonObject.isNull(Constants.CONTACT_LNAME))
@@ -207,6 +210,8 @@ public class ContactsController{
 
             //Sort Helper
             String sortHelper = "";
+            if(contact.getPlatform()!=null && contact.getPlatform().length()>0)
+                sortHelper  += contact.getLongField1() + " ";
             if(contact.getFirstName()!=null && contact.getFirstName().length()>0)
                 sortHelper  += Utils.normalizeStringNFD(contact.getFirstName()) + " ";
             if(contact.getLastName()!=null && contact.getLastName().length()>0)

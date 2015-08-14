@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.main;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -8,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,8 +37,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import io.fabric.sdk.android.Fabric;
-
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -46,7 +44,7 @@ import io.fabric.sdk.android.Fabric;
  * @see SystemUiHider
  */
 @SuppressWarnings("ResourceType")
-public class SplashScreenActivity extends Activity {
+public class SplashScreenActivity extends MainActivity {
 
     Context mContext;
     private boolean isForeground;
@@ -54,9 +52,6 @@ public class SplashScreenActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(SplashScreenActivity.this, new Crashlytics());
-
-
 
         setContentView(R.layout.splash_screen);
         mContext = SplashScreenActivity.this;
@@ -133,13 +128,17 @@ public class SplashScreenActivity extends Activity {
                                     final String data = json.get("data").toString();
                                     runOnUiThread(new Runnable() {
                                         @Override
-                                        public void run() {callBackVersionCheck(data);}
+                                        public void run() {
+                                            callBackVersionCheck(data);
+                                        }
                                     });
                                 }
                             } else {
                                 runOnUiThread(new Runnable() {
                                     @Override
-                                    public void run() {callBackVersionCheck(null);}
+                                    public void run() {
+                                        callBackVersionCheck(null);
+                                    }
                                 });
                             }
                         } catch (Exception ex) {
@@ -320,7 +319,7 @@ public class SplashScreenActivity extends Activity {
             return list.size() > 0;
 
         } catch (Exception e) {
-            Log.e(Constants.TAG, "SplashScreenActivity.isDownloadManagerAvailable: ",e);
+            Log.e(Constants.TAG, "SplashScreenActivity.isDownloadManagerAvailable: ", e);
             Crashlytics.logException(e);
             return false;
         }
@@ -333,12 +332,28 @@ public class SplashScreenActivity extends Activity {
         request.setTitle(getString(R.string.app_name) + " " + getString(R.string.update2));
 
         request.allowScanningByMediaScanner();
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setNotificationVisibility(
+                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "mycomms.apk");
 
         //Get download service and enqueue file
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
+
+//        BroadcastReceiver onComplete = new BroadcastReceiver() {
+//            public void onReceive(Context context, Intent intent) {
+//                if(intent.getPackage().compareTo(getApplicationInfo().packageName)==0) {
+//                    Intent install = new Intent(Intent.ACTION_VIEW);
+//                    install.setDataAndType(Uri.fromFile(
+//                            new File(Environment.getExternalStorageDirectory() + "/" +
+//                                    Environment.DIRECTORY_DOWNLOADS, "mycomms.apk")),
+//                            "application/vnd.android.package-archive");
+//                    startActivity(install);
+//                }
+//            }
+//        };
+//
+//        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
         //Show an alert to indicate the file download
         AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
@@ -355,6 +370,30 @@ public class SplashScreenActivity extends Activity {
 
         builder.create();
         builder.show();
+    }
+
+    private String getFilename(DownloadManager dm, Intent in) {
+        String title = null;
+
+        try {
+            Bundle extras = in.getExtras();
+            DownloadManager.Query q = new DownloadManager.Query();
+            q.setFilterById(extras.getLong(DownloadManager.EXTRA_DOWNLOAD_ID));
+            Cursor c = dm.query(q);
+
+            if (c.moveToFirst()) {
+                int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                    // process download
+                    title = c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE));
+                    // get other required data by changing the constant passed to getColumnIndex
+                }
+            }
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SplashScreenActivity.getFilename: ",e);
+        }
+
+        return title;
     }
 
     //Async Tasks

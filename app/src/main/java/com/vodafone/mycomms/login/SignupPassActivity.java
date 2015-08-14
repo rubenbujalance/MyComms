@@ -1,23 +1,21 @@
 package com.vodafone.mycomms.login;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.main.MainActivity;
 
 import java.util.regex.Pattern;
 
-public class SignupPassActivity extends Activity {
+public class SignupPassActivity extends MainActivity {
 
     ClearableEditText mPassword;
     ClearableEditText mConfirmPass;
@@ -62,29 +60,6 @@ public class SignupPassActivity extends Activity {
                 finish();
             }
         });
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_singup_pass, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private boolean checkData()

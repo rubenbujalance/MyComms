@@ -35,7 +35,7 @@ public class FavouriteController  extends BaseController {
         super(context);
         this.mContext = context;
         this.mProfileId = profileId;
-        realmContactTransactions = new RealmContactTransactions(mProfileId, mContext);
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
         contactsController = new ContactsController(mProfileId, mContext);
         contactController = new ContactController(mContext, mProfileId);
     }
@@ -148,6 +148,8 @@ public class FavouriteController  extends BaseController {
         super.onConnectionComplete(response);
         Log.i(Constants.TAG, "FavouriteController.onConnectionComplete: method " + method);
         String result = response.getData().toString();
+        String conection = response.getConnection().toString();
+        String URL = response.getUrl();
         if (method == HttpConnection.POST || method == HttpConnection.DELETE) {
             BusProvider.getInstance().post(new RefreshFavouritesEvent());
         } else if (method == HttpConnection.GET){

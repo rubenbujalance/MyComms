@@ -1,20 +1,14 @@
 package com.vodafone.mycomms.contacts.detail;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
@@ -64,8 +58,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private TextView tvContactName;
     private TextView tvCompany;
     private TextView tvPosition;
-    private TextView tvPhoneNumber;
-    private TextView tvEmail;
     private TextView tvOfficeLocation;
     private CircleImageView ivAvatar;
     private int imageStarOn;
@@ -73,20 +65,16 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private TextView textAvatar;
 
     //Buttons
-    private ImageView btSms;
-    private ImageView btEmail;
-    private ImageView btChat;
-    private ImageView btCall;
-    private ImageView btEmailBar;
-    private ImageView btChatBar;
-    private ImageView btCallBar;
+    private ImageView btnChat;
+    private ImageView btnEmail;
+    private ImageView btnPhone;
+    private ImageView btnCalendar;
     private ImageView btFavourite;
 
     private boolean contactIsFavorite;
     private FavouriteController favouriteController;
 
-    private LinearLayout lay_no_connection, lay_office_location;
-    private RelativeLayout lay_phone_number, lay_email;
+    private LinearLayout lay_no_connection;
     private String SF_URL;
 
     private Realm realm;
@@ -96,13 +84,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        setContentView(R.layout.contact_detail);
+        setContentView(R.layout.activity_contact_detail);
         this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
         this.SF_URL = null;
 
-        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(APIWrapper.isConnected(ContactDetailMainActivity.this))
             lay_no_connection.setVisibility(View.GONE);
@@ -111,13 +98,10 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         BusProvider.getInstance().register(this);
 
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        mProfileId = Utils.getProfileId(this);
 
         mRecentContactController = new RecentContactController(this, mProfileId);
-        realmContactTransactions = new RealmContactTransactions(mProfileId,
-                ContactDetailMainActivity.this);
+        realmContactTransactions = new RealmContactTransactions(mProfileId);
 
         Intent intent = getIntent();
         contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
@@ -133,28 +117,38 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvContactName = (TextView) findViewById(R.id.contact_contact_name);
         tvCompany = (TextView) findViewById(R.id.contact_company);
         tvPosition = (TextView) findViewById(R.id.contact_position);
-        tvPhoneNumber = (TextView) findViewById(R.id.contact_phone_number);
-        tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
         ivAvatar = (CircleImageView)findViewById(R.id.avatar);
         imageStarOn = R.mipmap.icon_favorite_colour;
         imageStarOff = R.mipmap.icon_favorite_grey;
         textAvatar = (TextView)findViewById(R.id.avatarText);
 
-        lay_email = (RelativeLayout) findViewById(R.id.lay_email);
-        lay_office_location = (LinearLayout) findViewById(R.id.office_location_layout);
-        lay_phone_number = (RelativeLayout) findViewById(R.id.lay_phone_number);
-
         //Buttons
-        btSms = (ImageView)findViewById(R.id.bt_sms);
-        btEmail = (ImageView)findViewById(R.id.bt_email);
-        btCall = (ImageView)findViewById(R.id.bt_call);
-        btChatBar = (ImageView)findViewById(R.id.btchat);
-        btEmailBar = (ImageView)findViewById(R.id.btemail);
-        btCallBar = (ImageView)findViewById(R.id.btcall);
+        btnChat = (ImageView)findViewById(R.id.btn_prof_chat);
+        btnEmail = (ImageView)findViewById(R.id.btn_prof_email);
+        btnPhone = (ImageView)findViewById(R.id.btn_prof_phone);
+        btnCalendar = (ImageView)findViewById(R.id.btn_prof_calendar);
         btFavourite = (ImageView)findViewById(R.id.btFavourite);
 
-        btCall.setOnClickListener(new View.OnClickListener() {
+        LinearLayout detailsContainer = (LinearLayout) findViewById(R.id.details_container);
+
+        detailsContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    Intent in = new Intent(ContactDetailMainActivity.this, ContactDetailsPlusActivity.class);
+//                    in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    String contactDetail[] = loadContactExtra();
+
+                    in.putExtra(Constants.CONTACT_DETAIL_INFO, contactDetail);
+                    startActivity(in);
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", e);
+                }
+            }
+        });
+
+        btnPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -176,40 +170,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
-                    return;
                 }
             }
         });
 
-        btCallBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    String strPhones = contact.getPhones();
-
-                    if (strPhones != null)
-                    {
-                        String phone = strPhones;
-                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
-                        {
-                            JSONArray jPhones = new JSONArray(strPhones);
-                            phone = (String)((JSONObject)jPhones.get(0)).get(Constants.CONTACT_PHONE);
-                        }
-
-
-                        Utils.launchCall(phone, ContactDetailMainActivity.this);
-
-                        action = Constants.CONTACTS_ACTION_CALL;
-                        mRecentContactController.insertRecent(contactId, action);
-                    }
-                } catch (Exception ex) {
-                    Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
-                    return;
-                }
-            }
-        });
-
-        btEmail.setOnClickListener(new View.OnClickListener() {
+        btnEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -231,39 +196,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
-                    return;
                 }
             }
         });
 
-        btEmailBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    String strEmails = contact.getEmails();
-
-                    if (strEmails != null)
-                    {
-                        String email = strEmails;
-                        if(!contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
-                        {
-                            JSONArray jPhones = new JSONArray(strEmails);
-                            email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
-                        }
-
-                        Utils.launchEmail(email, ContactDetailMainActivity.this);
-
-                        action = Constants.CONTACTS_ACTION_EMAIL;
-                        mRecentContactController.insertRecent(contactId, action);
-                    }
-                } catch (Exception ex) {
-                    Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
-                    return;
-                }
-            }
-        });
-
-        btSms.setOnClickListener(new View.OnClickListener() {
+        btnChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -295,18 +232,21 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     }
                 } catch (Exception ex) {
                     Log.e(Constants.TAG, "ContactDetailMainActivity.onClick: ", ex);
-                    return;
                 }
             }
         });
 
-        btChatBar.setOnClickListener(new View.OnClickListener() {
+        btnCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(ContactDetailMainActivity.this, GroupChatActivity.class);
-                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
-                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
-                startActivity(in);
+               try
+               {
+                   Utils.launchCalendar(contact.getFirstName(), ContactDetailMainActivity.this);
+               }
+               catch (Exception e)
+               {
+                   Log.e(Constants.TAG, "ContactDetailMainActivity.btnCalendaronClick: ",e);
+               }
             }
         });
 
@@ -352,8 +292,27 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         });
 
         loadContactDetail();
-
         setButtonsVisibility();
+    }
+
+    private String[] loadContactExtra() {
+
+        String contactDetail[] = new String[10];
+
+        contactDetail[0] = contact.getFirstName();
+        contactDetail[1] = contact.getLastName();
+
+        contactDetail[2] = contact.getPhones();
+        contactDetail[3] = contact.getEmails();
+
+        contactDetail[4] = contact.getOfficeLocation();
+        contactDetail[5] = contact.getPosition();
+        contactDetail[6] = contact.getAvatar();
+        contactDetail[7] = contact.getPlatform();
+        contactDetail[8] = contact.getContactId();
+        contactDetail[9] = contact.getStringField1(); //SFAvatar
+
+        return contactDetail;
     }
 
     private void setButtonsVisibility()
@@ -368,88 +327,39 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             Drawable imageStar = getResources().getDrawable(imageStarOff);
             btFavourite.setImageDrawable(imageStar);
         }
-        if(null != contact.getPlatform() )
+
+        if(null != contact.getPlatform() && contact.getPlatform().equals(Constants.PLATFORM_LOCAL) )
         {
-            if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL) || contact
-                    .getPlatform().equals(Constants.PLATFORM_SALES_FORCE))
-            {
-                btChatBar.setVisibility(View.GONE);
-            }
-            else
-            {
-                btChatBar.setVisibility(View.VISIBLE);
-            }
-
-            if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
-            {
-
-                if(null == contact.getPhones() || contact.getPhones().length() <= 0)
-                {
-                    btCall.setVisibility(View.GONE);
-                    btCallBar.setVisibility(View.GONE);
-                    btSms.setVisibility(View.GONE);
-                    tvPhoneNumber.setVisibility(View.GONE);
-                }
-                else
-                {
-                    btCall.setVisibility(View.VISIBLE);
-                    btCallBar.setVisibility(View.VISIBLE);
-                    btSms.setVisibility(View.VISIBLE);
-                    tvPhoneNumber.setVisibility(View.VISIBLE);
-                }
-
-                if(null == contact.getEmails() || contact.getEmails().length() <= 0)
-                {
-                    btEmail.setVisibility(View.GONE);
-                    btEmailBar.setVisibility(View.GONE);
-                    tvEmail.setVisibility(View.GONE);
-                }
-                else
-                {
-                    btEmail.setVisibility(View.VISIBLE);
-                    btEmailBar.setVisibility(View.VISIBLE);
-                    tvEmail.setVisibility(View.VISIBLE);
-                }
-
-                if(null == contact.getOfficeLocation() || contact.getOfficeLocation().length() <= 0)
-                {
-                    tvOfficeLocation.setVisibility(View.GONE);
-                }
-                else
-                    tvOfficeLocation.setVisibility(View.VISIBLE);
-
-                tvLocalTime.setVisibility(View.GONE);
-                tvCountry.setVisibility(View.GONE);
-                tvLastSeen.setVisibility(View.GONE);
-            }
-            else
-            {
-                if(null == contact.getPhones() || contact.getPhones().length() <= 0)
-                {
-                    lay_phone_number.setVisibility(View.GONE);
-                    btCallBar.setVisibility(View.GONE);
-                }
-                else
-                {
-                    lay_phone_number.setVisibility(View.VISIBLE);
-                    btCallBar.setVisibility(View.VISIBLE);
-                }
-                if(null == contact.getOfficeLocation() || contact.getOfficeLocation().length() <= 0)
-                    lay_office_location.setVisibility(View.GONE);
-                else
-                    lay_office_location.setVisibility(View.VISIBLE);
-                if(null == contact.getEmails() || contact.getEmails().length() <= 0)
-                {
-                    lay_email.setVisibility(View.GONE);
-                    btEmailBar.setVisibility(View.GONE);
-                }
-                else
-                {
-                    lay_email.setVisibility(View.VISIBLE);
-                    btEmailBar.setVisibility(View.VISIBLE);
-                }
-            }
+            TableRow infoRow = (TableRow) findViewById(R.id.contact_info_row);
+            infoRow.setVisibility(View.GONE);
         }
+
+        if(null == contact.getPhones() || contact.getPhones().length() <= 0)
+        {
+            btnPhone.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_phone_off));
+            btnChat.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_chat_off));
+            btnPhone.setOnClickListener(null);
+            btnChat.setOnClickListener(null);
+        }
+        else
+        {
+            btnPhone.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_phone));
+            btnChat.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_chat));
+        }
+
+        if(null == contact.getEmails() || contact.getEmails().length() <= 0){
+            btnEmail.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_email_off));
+            btnEmail.setOnClickListener(null);
+        }
+        else
+            btnEmail.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_email));
+
+        if(null == contact.getOfficeLocation() || contact.getOfficeLocation().length() <= 0)
+        {
+            tvOfficeLocation.setVisibility(View.GONE);
+        }
+        else
+            tvOfficeLocation.setVisibility(View.VISIBLE);
     }
 
     private void loadContactStatusInfo()
@@ -467,11 +377,13 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     icon = jsonObject.getString("icon");
                 }
             }
+
             if(icon.compareTo("dnd")==0) ivIconStatus.setImageResource(R.mipmap.ico_notdisturb_white);
             else if(icon.compareTo("vacation")==0) ivIconStatus.setImageResource(R.mipmap.ico_vacation_white);
             else if(icon.compareTo("moon")==0) ivIconStatus.setImageResource(R.mipmap.ico_moon_white);
             else if(icon.compareTo("sun")==0) ivIconStatus.setImageResource(R.mipmap.ico_sun_white);
-            else ivIconStatus.setVisibility(View.GONE);
+            else ivIconStatus.setVisibility(View.INVISIBLE);
+
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
         }
@@ -537,7 +449,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 if(days >= 1) lastSeenStr = days + "d";
                 else if(hours >=1) lastSeenStr = hours + "h";
                 else if(minutes >=1) lastSeenStr = minutes + "m";
-                else if(minutes < 1) lastSeenStr = "less then a minute";
+                else if(minutes < 1) lastSeenStr = "seconds";
 
                 if(null == lastSeenStr)
                 {
@@ -545,56 +457,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 }
                 else
                 {
-                    tvLastSeen.setText("Seen " + lastSeenStr + " ago");
+                    tvLastSeen.setText(lastSeenStr + " ago");
                 }
             }
         } catch (Exception ex) {
             Log.e(Constants.TAG, "ContactDetailMainActivity.loadContactStatusInfo: ", ex);
         }
-    }
-
-    private String getElementFromJsonArrayString(String jsonArrayString, String key){
-        Log.d(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonArrayString: " + jsonArrayString + ", key=" + key);
-        JSONObject jsonObject = null;
-        String result = null;
-        try {
-            JSONArray jsonArray = new JSONArray(jsonArrayString);
-            for(int i = 0; i < jsonArray.length() ; i++) {
-                jsonObject = jsonArray.getJSONObject(i);
-                if (!jsonObject.isNull(key)) {
-                    result = jsonObject.getString(key);
-                }
-            }
-            Log.d(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonArrayString: " + jsonObject != null ? jsonObject.toString() : "null" );
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonArrayString: " ,e);
-        }
-        return result;
-    }
-
-    private String getElementFromJsonObjectString(String json, String key){
-        JSONObject jsonObject;
-        String result = "";
-        try {
-            jsonObject = new JSONObject(json);
-            if (key.equals(Constants.CONTACT_PHONE)){
-                //TODO: Pending show all telephone numbers of Contact
-                if (!jsonObject.isNull(Constants.CONTACT_PHONE_WORK)){
-                    result = jsonObject.getString(Constants.CONTACT_PHONE_WORK);
-                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE_HOME)){
-                    result = jsonObject.getString(Constants.CONTACT_PHONE_HOME);
-                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE_MOBILE)){
-                    result = jsonObject.getString(Constants.CONTACT_PHONE_MOBILE);
-                } else if (!jsonObject.isNull(Constants.CONTACT_PHONE)){
-                    result = jsonObject.getString(Constants.CONTACT_PHONE);
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " , e);
-        }
-        return result;
     }
 
     private void loadContactAvatar()
@@ -608,12 +476,19 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             avatarSFController.getSFAvatar(contact.getAvatar());
         }
 
-        Utils.loadContactAvatar
+        String test1 = contact.getFirstName();
+        String test2 = contact.getLastName();
+        CircleImageView test3 = ivAvatar;
+        TextView test4 = textAvatar;
+        String test5 = contact.getAvatar();
+        String test6 = SF_URL;
+
+        Utils.loadContactAvatarDetail
                 (
                         contact.getFirstName()
                         , contact.getLastName()
-                        , ivAvatar
-                        , textAvatar
+                        , this.ivAvatar
+                        , this.textAvatar
                         , Utils.getAvatarURL
                                 (
                                         contact.getPlatform()
@@ -622,45 +497,44 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                                 )
                 );
 
-        ivAvatar.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                LayoutInflater layoutInflater
-                        = (LayoutInflater) getBaseContext()
-                        .getSystemService(LAYOUT_INFLATER_SERVICE);
-                final View popupView = layoutInflater.inflate(R.layout.layout_contact_detail_zoom, null);
-                final PopupWindow popupWindow = new PopupWindow(
-                        popupView,
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT);
-                final ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
-                final TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
-
-                Utils.loadContactAvatar
-                        (
-                                contact.getFirstName()
-                                , contact.getLastName()
-                                , fullAvatar
-                                , textAvatar
-                                , Utils.getAvatarURL
-                                        (
-                                                contact.getPlatform()
-                                                , contact.getStringField1()
-                                                , contact.getAvatar()
-                                        )
-                        );
-
-                popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
-                popupView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View arg0) {
-                        popupWindow.dismiss();
-                    }
-                });
-            }
-        });
-
+//        ivAvatar.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View arg0) {
+//                LayoutInflater layoutInflater
+//                        = (LayoutInflater) getBaseContext()
+//                        .getSystemService(LAYOUT_INFLATER_SERVICE);
+//                final View popupView = layoutInflater.inflate(R.layout.layout_contact_detail_zoom, null);
+//                final PopupWindow popupWindow = new PopupWindow(
+//                        popupView,
+//                        LayoutParams.MATCH_PARENT,
+//                        LayoutParams.MATCH_PARENT);
+//                final ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
+//                final TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
+//
+//                Utils.loadContactAvatar
+//                        (
+//                                contact.getFirstName()
+//                                , contact.getLastName()
+//                                , fullAvatar
+//                                , textAvatar
+//                                , Utils.getAvatarURL
+//                                        (
+//                                                contact.getPlatform()
+//                                                , contact.getStringField1()
+//                                                , contact.getAvatar()
+//                                        )
+//                        );
+//
+//                popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
+//                popupView.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View arg0) {
+//                        popupWindow.dismiss();
+//                    }
+//                });
+//            }
+//        });
     }
 
     private void loadContactDetail()
@@ -698,42 +572,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         if(!contact.getPlatform().equals("local"))
         {
-            if(null != contact.getPhones() && contact.getPhones().length() > 0)
-            {
-                if(null != getElementFromJsonArrayString(contact.getPhones(), Constants.CONTACT_PHONE))
-                    tvPhoneNumber.setText(getElementFromJsonArrayString(contact.getPhones(), Constants.CONTACT_PHONE));
-                else
-                    tvPhoneNumber.setText("");
-            }
-            else
-                tvPhoneNumber.setText("");
 
-            if(null != contact.getEmails() && contact.getEmails().length() > 0)
-            {
-                if(null != getElementFromJsonArrayString(contact.getEmails(), Constants.CONTACT_EMAIL))
-                    tvEmail.setText(getElementFromJsonArrayString(contact.getEmails(), Constants.CONTACT_EMAIL));
-                else
-                    tvEmail.setText("");
-            }
-            else
-                tvEmail.setText("");
         }
         else
         {
-            if(null != contact.getPhones() && contact.getPhones().length() > 0)
-            {
-                if(null != getElementFromJsonObjectString(contact.getPhones(), Constants.CONTACT_PHONE))
-                    tvPhoneNumber.setText(getElementFromJsonObjectString(contact.getPhones(), Constants.CONTACT_PHONE));
-                else
-                    tvPhoneNumber.setText("");
-            }
-            else
-                tvPhoneNumber.setText("");
 
-            if(null != contact.getEmails() && contact.getEmails().length() > 0)
-                tvEmail.setText(contact.getEmails());
-            else
-                tvEmail.setText("");
         }
 
         if(null != contact.getOfficeLocation())
@@ -783,8 +626,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     @Subscribe
     public void onConnectivityChanged(ConnectivityChanged event)
     {
-
-        Log.e(Constants.TAG, "DashBoardActivity.onConnectivityChanged: "
+        Log.e(Constants.TAG, "ContactDetailMainActivity.onConnectivityChanged: "
                 + event.getConnectivityStatus().toString());
         if(event.getConnectivityStatus()!= ConnectivityStatus.MOBILE_CONNECTED &&
                 event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)

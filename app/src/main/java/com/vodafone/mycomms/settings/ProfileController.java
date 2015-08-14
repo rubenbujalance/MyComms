@@ -53,7 +53,7 @@ public class ProfileController extends BaseController {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sharedPreferences.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
-        mRealmProfileTransactions = new RealmProfileTransactions(context);
+        mRealmProfileTransactions = new RealmProfileTransactions();
     }
 
     /**
@@ -347,6 +347,8 @@ public class ProfileController extends BaseController {
             passwordConnection.setPayLoad(json.toString());
             passwordConnection.request();
     }
+
+
 
     public void updateTimeZone(HashMap timeZoneHashMap) {
         new GCMGetTokenAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, timeZoneHashMap);

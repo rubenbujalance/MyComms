@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.realm;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -18,12 +17,10 @@ import model.UserProfile;
 
 public class RealmContactTransactions {
     private String mProfileId;
-    private Context mContext;
 
-    public RealmContactTransactions(String profileId, Context mContext)
+    public RealmContactTransactions(String profileId)
     {
         mProfileId = profileId;
-        this.mContext = mContext;
     }
 
     public void insertContactList (ArrayList<Contact> contactArrayList, Realm realm){
@@ -159,7 +156,7 @@ public class RealmContactTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && mRealm!=null)
                 mRealm.close();
         }
     }

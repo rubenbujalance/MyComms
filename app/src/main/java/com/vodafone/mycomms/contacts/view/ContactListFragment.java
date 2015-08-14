@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
@@ -34,9 +35,11 @@ import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
+import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
+import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -68,6 +71,8 @@ public class ContactListFragment extends ListFragment {
     protected Handler handler = new Handler();
     private RealmContactTransactions mContactTransactions;
     private ContactListViewArrayAdapter adapter;
+    private RelativeLayout addGlobalContactsContainer;
+    private TextView myCommsTextView;
 
     private ListView listView;
     private Parcelable state;
@@ -102,6 +107,7 @@ public class ContactListFragment extends ListFragment {
         args.putInt(ARG_PARAM1, index);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -113,6 +119,18 @@ public class ContactListFragment extends ListFragment {
         searchView = (EditText) v.findViewById(R.id.et_search);
         cancelButton = (Button) v.findViewById(R.id.btn_cancel);
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
+
+        addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
+        myCommsTextView = (TextView) v.findViewById(R.id.platform_label);
+
+        //TODO: Null Object error, commented
+        addGlobalContactsContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(getActivity(), AddGlobalContactsActivity.class);
+                startActivity(in);
+            }
+        });
 
         loadSearchBarEventsAndControllers(v);
 
@@ -145,9 +163,16 @@ public class ContactListFragment extends ListFragment {
                 }, 500);
                 Constants.isDashboardOrigin = false;
             }
+
+            if (null != myCommsTextView){
+                myCommsTextView.setVisibility(View.VISIBLE);
+            }
         }
         else{
             hideKeyboard();
+            if (null != myCommsTextView){
+                myCommsTextView.setVisibility(View.GONE);
+            }
         }
 
         if(isProgressDialogNeeded())showProgressDialog();
@@ -168,6 +193,7 @@ public class ContactListFragment extends ListFragment {
                         , listView
                         , false
                         , realm
+                        , this
                 );
 
         mSearchBarController.initiateComponentsForSearchView(v);
@@ -188,8 +214,8 @@ public class ContactListFragment extends ListFragment {
 
         BusProvider.getInstance().register(this);
 
-        this.realm = Realm.getDefaultInstance();
-        this.realm.setAutoRefresh(true);
+        realm = Realm.getDefaultInstance();
+        if(realm!=null) realm.setAutoRefresh(true);
 
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
@@ -206,13 +232,28 @@ public class ContactListFragment extends ListFragment {
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
-        mContactTransactions = new RealmContactTransactions(profileId, getActivity());
+        mContactTransactions = new RealmContactTransactions(profileId);
         mSearchController = new SearchController(getActivity().getApplicationContext(),
                 profileId, realm);
         recentController = new RecentContactController(getActivity(), profileId);
         contactListController = new ContactListController(getActivity(), profileId);
 
         setListAdapterTabs();
+    }
+
+    @Override
+    public void onResume() {
+        if (!RealmLDAPSettingsTransactions.haveSettings(profileId, realm) &&
+                mIndex == Constants.CONTACTS_ALL)
+            showLDAPSettingsBar(true);
+        else showLDAPSettingsBar(false);
+
+        super.onResume();
+    }
+
+    public void showLDAPSettingsBar(boolean show) {
+        if(show) addGlobalContactsContainer.setVisibility(View.VISIBLE);
+        else addGlobalContactsContainer.setVisibility(View.GONE);
     }
 
 //    private void refreshContent(){
@@ -257,7 +298,7 @@ public class ContactListFragment extends ListFragment {
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-        this.realm.close();
+        if(realm!=null) this.realm.close();
     }
 
     @Override
@@ -460,14 +501,13 @@ public class ContactListFragment extends ListFragment {
         searchView.setText("");
     }
 
-    public void setListAdapterTabs()
-    {
-        Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
-        if(mIndex == Constants.CONTACTS_FAVOURITE) {
+    public void setListAdapterTabs() {
+        Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);;
 
+        if(mIndex == Constants.CONTACTS_FAVOURITE) {
             favouriteContactList = mContactTransactions.getAllFavouriteContacts(realm);
             if (favouriteContactList!=null) {
-                setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity().getApplicationContext(),
+                setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity(),
                         favouriteContactList, realm));
             }
         }else if(mIndex == Constants.CONTACTS_RECENT){
@@ -478,7 +518,7 @@ public class ContactListFragment extends ListFragment {
             {
                 recentContactList = filterRecentList(recentContactList);
                 RecentListViewArrayAdapter recentAdapter = new RecentListViewArrayAdapter
-                        (getActivity().getApplicationContext(), recentContactList, profileId, realm);
+                        (getActivity(), recentContactList, profileId, realm);
                 if (listView != null) {
                     state = listView.onSaveInstanceState();
                     setListAdapter(recentAdapter);
@@ -521,7 +561,8 @@ public class ContactListFragment extends ListFragment {
      */
     private void reloadAdapter()
     {
-        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(
+                getActivity(), contactList);
         if (contactList!=null) {
             if (listView != null)
                 state = listView.onSaveInstanceState();
@@ -530,13 +571,40 @@ public class ContactListFragment extends ListFragment {
                 if (state != null)
                     listView.onRestoreInstanceState(state);
             } else {
-                adapter = new ContactListViewArrayAdapter(getActivity().getApplicationContext(), contactList);
+                adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
                 setListAdapter(adapter);
                 if (state != null)
                     listView.onRestoreInstanceState(state);
             }
             if (contactList.size()!=0) {
-                Log.i(Constants.TAG, "ContactListFragment.reloadAdapter: No results from Search");
+                if (emptyText!=null)
+                    emptyText.setText(getResources().getString(R.string.no_search_records));
+            }
+        }
+    }
+
+    /**
+     * Reloads list adapter when on search
+     * @author ---
+     */
+    private void reloadSearchAdapter()
+    {
+        ContactListViewArrayAdapter adapter = new ContactListViewArrayAdapter(
+                getActivity(), contactList);
+        if (contactList!=null) {
+            if (listView != null)
+                state = listView.onSaveInstanceState();
+            if (adapter != null) {
+                setListAdapter(adapter);
+                if (state != null)
+                    listView.onRestoreInstanceState(state);
+            } else {
+                adapter = new ContactListViewArrayAdapter(getActivity(), contactList);
+                setListAdapter(adapter);
+                if (state != null)
+                    listView.onRestoreInstanceState(state);
+            }
+            if (contactList.size()!=0) {
                 if (emptyText!=null)
                     emptyText.setText(getResources().getString(R.string.no_search_records));
             }
@@ -556,8 +624,7 @@ public class ContactListFragment extends ListFragment {
         ArrayList<Contact> contactArrayList;
         if(null == keyWord)
         {
-            RealmContactTransactions mContactTransactions = new RealmContactTransactions
-                    (profileId, getActivity());
+            RealmContactTransactions mContactTransactions = new RealmContactTransactions(profileId);
             contactArrayList = mContactTransactions.getAllContacts(realm);
         }
         else
@@ -584,7 +651,7 @@ public class ContactListFragment extends ListFragment {
     public void reloadAdapterEvent(ReloadAdapterEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.reloadAdapterEvent: ");
         this.contactList = mSearchBarController.getContactList();
-        reloadAdapter();
+        reloadSearchAdapter();
     }
 
     private void showProgressDialog() {
@@ -610,7 +677,6 @@ public class ContactListFragment extends ListFragment {
      */
     public void hideKeyboard()
     {
-        Log.i(Constants.TAG, "ContactListFragment.hideKeyboard: ");
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
                 ().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
@@ -619,7 +685,6 @@ public class ContactListFragment extends ListFragment {
     private void hideProgressDialog()
     {
         if(mSwipeRefreshLayout.isRefreshing())mSwipeRefreshLayout.setRefreshing(false);
-        Log.i(Constants.TAG, "ContactListFragment.hideKeyboard: ");
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
           ().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);

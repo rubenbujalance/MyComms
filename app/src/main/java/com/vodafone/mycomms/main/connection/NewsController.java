@@ -27,7 +27,7 @@ public class NewsController{
     public NewsController(Context context) {
         mContext = context;
         newsList = new ArrayList<>();
-        realmNewsTransactions = new RealmNewsTransactions(mContext);
+        realmNewsTransactions = new RealmNewsTransactions();
     }
 
     public void getNewsList(String api) {

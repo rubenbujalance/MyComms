@@ -27,6 +27,7 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
 import io.realm.Realm;
+import model.Contact;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class ToolbarActivity extends AppCompatActivity {
@@ -87,7 +88,8 @@ public class ToolbarActivity extends AppCompatActivity {
         return mToolbar;
     }
 
-    public Toolbar activateChatListToolbar() {
+    public Toolbar activateChatListToolbar(final Context context)
+    {
         mToolbar = (Toolbar) findViewById(R.id.app_inbox);
         Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_bar);
         Toolbar goneToolbar2 = (Toolbar) findViewById(R.id.app_group_chat);
@@ -98,6 +100,7 @@ public class ToolbarActivity extends AppCompatActivity {
             goneToolbar.setVisibility(View.GONE);
             goneToolbar2.setVisibility(View.GONE);
         }
+        setUserProfileListener(context);
         return mToolbar;
     }
 
@@ -289,6 +292,17 @@ public class ToolbarActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //Intent in = new Intent(context, GroupChatActivity.class);
                 //startActivity(in);
+            }
+        });
+    }
+
+    private void setUserProfileListener(final Context context) {
+        LinearLayout contactsProfile = (LinearLayout) findViewById(R.id.lay_user_profile);
+        contactsProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent in = new Intent(context, SettingsMainActivity.class);
+                startActivity(in);
             }
         });
     }

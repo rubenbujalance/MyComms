@@ -248,6 +248,7 @@ public class ContactListFragment extends ListFragment {
             showLDAPSettingsBar(true);
         else showLDAPSettingsBar(false);
 
+        setListAdapterTabs();
         super.onResume();
     }
 
@@ -502,7 +503,7 @@ public class ContactListFragment extends ListFragment {
     }
 
     public void setListAdapterTabs() {
-        Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);;
+        Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
 
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
             favouriteContactList = mContactTransactions.getAllFavouriteContacts(realm);

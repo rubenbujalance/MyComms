@@ -26,6 +26,10 @@ public class OKHttpWrapper {
         call("GET", url, null, cb, EndpointWrapper.getBaseURL(), context);
     }
 
+    public static void delete(String url, Context context, HttpCallback cb) {
+        call("DELETE", url, null, cb, EndpointWrapper.getBaseURL(), context);
+    }
+
     public static void getNews(String url, Context context, HttpCallback cb) {
         call("GET", url, null, cb, EndpointWrapper.getBaseNewsURL(), context);
     }
@@ -74,6 +78,9 @@ public class OKHttpWrapper {
                     MediaType.parse(Utils.getHttpHeaderContentType()), jsonStr);
             builder.post(body);
         }
+
+        if(method.compareTo("DELETE")==0)
+            builder.delete();
 
         Request request = builder.build();
 

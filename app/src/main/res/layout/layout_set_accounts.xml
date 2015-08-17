@@ -28,6 +28,8 @@
         </LinearLayout>
 
         <RelativeLayout
+            android:id="@+id/lay_sales_force"
+            android:visibility="gone"
             style="@style/RelativeLayoutAccounts">
 
             <ImageView

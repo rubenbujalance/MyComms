@@ -105,6 +105,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.textViewCompany.setText("");
             viewHolder.textViewCountry.setText("");
             viewHolder.textViewTime.setText("");
+            viewHolder.textAvatar.setText("");
             viewHolder.imageCompanyLogo.setVisibility(View.GONE);
             viewHolder.imageViewDayNight.setVisibility(View.GONE);
             viewHolder.textViewPosition.setText(contact.getFirstName());

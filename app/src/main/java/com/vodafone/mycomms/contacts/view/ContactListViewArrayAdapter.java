@@ -101,6 +101,13 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                     .noFade()
                     .fit().centerCrop()
                     .into(viewHolder.imageAvatar);
+            viewHolder.textViewName.setText("");
+            viewHolder.textViewCompany.setText("");
+            viewHolder.textViewCountry.setText("");
+            viewHolder.textViewTime.setText("");
+            viewHolder.textAvatar.setText("");
+            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
+            viewHolder.imageViewDayNight.setVisibility(View.GONE);
             viewHolder.textViewPosition.setText(contact.getFirstName());
             viewHolder.textViewPosition.setGravity(Gravity.CENTER);
             viewHolder.textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);

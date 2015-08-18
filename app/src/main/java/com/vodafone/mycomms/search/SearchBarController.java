@@ -281,7 +281,6 @@ public class SearchBarController {
             }
             validateNoPlatformRecords(contactList);
         }
-
     }
 
     private void loadAllContactsFromDB()
@@ -601,6 +600,14 @@ public class SearchBarController {
         }
         if (!isMyComms) {
             contactList.add(0, createNoRecordsContact(Constants.PLATFORM_MY_COMMS));
+        }
+
+        for (int i=0;i<contactList.size();i++){
+            platform = contactList.get(i).getPlatform();
+
+            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromDB: position " + i);
+            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromDB: platform " + platform);
+            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromDB: first name " + contactList.get(i).getFirstName());
         }
     }
 

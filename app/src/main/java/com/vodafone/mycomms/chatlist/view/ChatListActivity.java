@@ -41,7 +41,7 @@ public class ChatListActivity extends ToolbarActivity{
             lay_no_connection.setVisibility(View.VISIBLE);
 
         enableToolbarIsClicked(false);
-        activateChatListToolbar();
+        activateChatListToolbar(ChatListActivity.this);
         activateFooter();
 
         setFooterListeners(this);

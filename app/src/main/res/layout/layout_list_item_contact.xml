@@ -48,6 +48,21 @@
                 android:layout_toRightOf="@+id/layout_list_item_image"
                 android:layout_toEndOf="@+id/layout_list_item_image"
                 />
+            <RelativeLayout
+                android:layout_width="60dp"
+                android:layout_height="68dp"
+                android:layout_alignTop="@+id/layout_list_item_content"
+                android:layout_toRightOf="@+id/layout_list_item_content"
+                android:layout_toEndOf="@+id/layout_list_item_content"
+                >
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    />
+
+            </RelativeLayout>
             <include
                 android:id="@+id/layout_list_item_status"
                 layout="@layout/layout_list_item_status"

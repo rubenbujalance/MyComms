@@ -71,7 +71,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private ImageView btnCalendar;
     private ImageView btFavourite;
 
-    private boolean contactIsFavorite;
     private FavouriteController favouriteController;
 
     private LinearLayout lay_no_connection;
@@ -280,9 +279,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             }
         });
 
-        Bundle bundle = getIntent().getExtras();
-        contactIsFavorite = bundle.getBoolean(Constants.CONTACT_IS_FAVORITE);
-
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -317,17 +313,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void setButtonsVisibility()
     {
-        if(contactIsFavorite)
-        {
-            Drawable imageStar = getResources().getDrawable(imageStarOn);
-            btFavourite.setImageDrawable(imageStar);
-        }
-        else
-        {
-            Drawable imageStar = getResources().getDrawable(imageStarOff);
-            btFavourite.setImageDrawable(imageStar);
-        }
-
         if(null != contact.getPlatform() && contact.getPlatform().equals(Constants.PLATFORM_LOCAL) )
         {
             TableRow infoRow = (TableRow) findViewById(R.id.contact_info_row);

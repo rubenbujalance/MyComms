@@ -147,6 +147,7 @@ public class Constants {
     public static final String CONTACT_API_DEL_FAVOURITE = "/api/me/favourites/";
     public static final String CONTACT_API_POST_AVATAR = "/api/me/avatar";
     public static final String CONTACT_API_POST_FILE = "/api/uploadFile";
+    public static final String CONTACT_SEND_INVITATION = "/api/me/invite";
 
     public static final String API_VERSION = "/version";
 

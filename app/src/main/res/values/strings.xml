@@ -30,6 +30,8 @@
     <string name="we_need_your_picture">We Need Your Picture!</string>
     <string name="please_share_your_smile">Please share your smile with your colleagues</string>
     <string name="cancel">Cancel</string>
+    <string name="invite">Invite</string>
+    <string name="accept">Accept</string>
     <string name="home">Home</string>
     <string name="incorrect_format">Incorrect format</string>
     <string name="add_a_photo_to_continue">Add a photo to continue</string>
@@ -294,4 +296,11 @@
     <string name="font_name_source_sans_pro">fonts/SourceSansPro-Regular.ttf</string>
     <string name="title_activity_calligraphy">CalligraphyActivity</string>
     <string name="author">Author</string>
+
+    <!-- Invite contact-->
+    <string name="invite_contact_confirmation_1">Are you sure you would like to invite</string>
+    <string name="invite_contact_confirmation_2">to myComms using</string>
+    <string name="invite_to_mycomms">Invite to MyComms</string>
+    <string name="invitation_correctly_sent">Invitation sent</string>
+    <string name="invitation_badly_sent">Oops! Your invitation has not been delivered, please try again later.</string>
 </resources>

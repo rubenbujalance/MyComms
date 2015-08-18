@@ -125,6 +125,7 @@ public class RealmContactTransactions {
 
     public ArrayList<Contact> getAllContacts(Realm realm)
     {
+        Log.e(Constants.TAG, "RealmContactTransactions.getAllContacts: SearchBarController");
         ArrayList<Contact> contactArrayList = new ArrayList<>();
 
         Realm mRealm;

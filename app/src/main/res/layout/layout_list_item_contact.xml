@@ -48,21 +48,6 @@
                 android:layout_toRightOf="@+id/layout_list_item_image"
                 android:layout_toEndOf="@+id/layout_list_item_image"
                 />
-            <RelativeLayout
-                android:layout_width="60dp"
-                android:layout_height="68dp"
-                android:layout_alignTop="@+id/layout_list_item_content"
-                android:layout_toRightOf="@+id/layout_list_item_content"
-                android:layout_toEndOf="@+id/layout_list_item_content"
-                >
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    />
-
-            </RelativeLayout>
             <include
                 android:id="@+id/layout_list_item_status"
                 layout="@layout/layout_list_item_status"
@@ -72,6 +57,28 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"/>
+
+            <LinearLayout
+                android:id="@+id/lay_invite_mycomms"
+                android:layout_width="60dp"
+                android:layout_height="68dp"
+                android:orientation="horizontal"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:visibility="gone"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_invite_to_mycomms"
+                    />
+
+            </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
 </FrameLayout >

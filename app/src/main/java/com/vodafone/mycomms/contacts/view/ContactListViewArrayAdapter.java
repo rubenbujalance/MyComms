@@ -2,6 +2,7 @@ package com.vodafone.mycomms.contacts.view;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.LinearGradient;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -10,10 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -32,6 +36,7 @@ import model.Contact;
 public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
     private Context mContext;
     private String profileId;
+    private ContactsController mContactsController;
 
     public ContactListViewArrayAdapter(Context context, List<Contact> items) {
         super(context, R.layout.layout_list_item_contact, items);
@@ -39,6 +44,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        mContactsController = new ContactsController(profileId, mContext);
 
     }
 
@@ -62,7 +68,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.imageCompanyLogo = (ImageView) convertView.findViewById(R.id.list_item_content_companylogo);
             viewHolder.platformLabel = (TextView) convertView.findViewById(R.id.platform_label);
             viewHolder.chatAvailability = (ImageView) convertView.findViewById(R.id.chat_availability);
-            
+            viewHolder.layInviteMyComms = (LinearLayout) convertView.findViewById(R.id.lay_invite_mycomms);
+
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
@@ -70,8 +77,22 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         }
 
         // update the item view
-        Contact contact = getItem(position);
+        final Contact contact = getItem(position);
         String noRecordFound = mContext.getResources().getString(R.string.no_search_records);
+
+        //Check if contact can be invited to MyComms
+        if(mContactsController.isContactCanBeInvited(contact))
+            viewHolder.layInviteMyComms.setVisibility(View.VISIBLE);
+        else
+            viewHolder.layInviteMyComms.setVisibility(View.GONE);
+
+        viewHolder.layInviteMyComms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                mContactsController.createInviteAlertWithEvents(contact);
+            }
+        });
 
         //validate if separator is needed
         boolean showSeparator;
@@ -250,5 +271,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         TextView textAvatar;
         TextView platformLabel;
         ImageView chatAvailability;
+        LinearLayout layInviteMyComms;
     }
 }

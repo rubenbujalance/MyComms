@@ -1,18 +1,39 @@
 package com.vodafone.mycomms.contacts.connection;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.squareup.okhttp.Response;
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.zip.Inflater;
 
 import io.realm.Realm;
 import model.Contact;
@@ -280,5 +301,188 @@ public class ContactsController{
             Log.e(Constants.TAG, "ContactsController.mapContactToRecent: " ,e);
         }
         return recentContact;
+    }
+
+    /**
+     * Try to send invitation to the contact for join MyComms App
+     * @author str_oan
+     * @param contact (Contact) -> contact which will be invited
+     * @return (boolean) -> true if contact has successfully received the invitation, false otherwise
+     */
+    public boolean isContactCanBeInvited(Contact contact)
+    {
+        String[] domains = new String[]
+                {
+                        "vodafone.com",
+                        "vodafone.com.au",
+                        "ono.es",
+                        "quickcomm.com",
+                        "bluefishplc.com",
+                        "vodacom.co.za",
+                        "jjuan.net",
+                        "my-comms.com",
+                        "igzinc.com",
+                        "intelygenz.com",
+                        "comediadesign.com"
+                };
+        String emails = contact.getEmails();
+        String platform = contact.getPlatform();
+        if(null != emails && emails.length() > 0 && null != platform && platform.length() > 0)
+        {
+            for (String str : domains)
+            {
+                if(platform.equals("mc"))
+                    return false;
+                else
+                {
+                    if(emails.contains(str))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Creates alert dialog where you should confirm if invitation shall be sent
+     * @author str_oan
+     * @param contact (Contact) -> contact which will be invited
+     */
+    public void createInviteAlertWithEvents(Contact contact)
+    {
+        String emails = contact.getEmails();
+        String firstName = contact.getFirstName();
+        View view = getCustomAlertTitleView();
+        TextView textView = (TextView) view.findViewById(R.id.tv_invite_title);
+
+        if(null != emails && emails.length() > 0 && null != firstName)
+        {
+            final String email = Utils.getElementFromJsonArrayString(emails, "email");
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+
+            String title =
+                    mContext.getResources().getString(R.string.invite_contact_confirmation_1)
+                    + " " + firstName
+                    + " " + mContext.getResources().getString(R.string.invite_contact_confirmation_2)
+                    + " " + email + "?";
+
+            textView.setText(title);
+            builder.setCustomTitle(view);
+
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            builder.setPositiveButton(R.string.invite, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id)
+                {
+                    sendInvitation(email);
+                    dialog.dismiss();
+                }
+            });
+
+            builder.create();
+            builder.show();
+        }
+    }
+
+    /**
+     * Sends invitation for join MyComms App via OKHTTP wrapper
+     * @author str_oan
+     * @param email (String) -> email address where invitation will be sent
+     */
+    private void sendInvitation(final String email)
+    {
+        //String testEmail = "alex_anishchenko@stratesys-ts.com";
+        HashMap<String, String> body = new HashMap<>();
+        body.put("email", email);
+        final JSONObject json = new JSONObject(body);
+        final Handler mHandler = new Handler(Looper.getMainLooper());
+        try
+        {
+            OKHttpWrapper.post(Constants.CONTACT_SEND_INVITATION, mContext, new OKHttpWrapper.HttpCallback()
+            {
+                @Override
+                public void onFailure(Response response, IOException e)
+                {
+                    Log.e(Constants.TAG, "sendInvitation.onFailure: ", e);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            showSuccessOrErrorResponse(false);
+                        }
+                    });
+                }
+                @Override
+                public void onSuccess(Response response)
+                {
+                    Log.i(Constants.TAG, "sendInvitation.onSuccess: invitation sent to "+email);
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            showSuccessOrErrorResponse(true);
+                        }
+                    });
+                }
+            }, json);
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "sendInvitation: ", e);
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    showSuccessOrErrorResponse(false);
+                }
+            });
+        }
+    }
+
+    /**
+     * Shows confirmation dialog which indicates if invitation has been correctly sent
+     * @author str_oan
+     * @param isCorrectlyDelivered (boolean) -> if is true then shows affirmative message, otherwise
+     *                             will show error message
+     */
+    private void showSuccessOrErrorResponse(boolean isCorrectlyDelivered)
+    {
+        View view = getCustomAlertTitleView();
+        TextView textView = (TextView) view.findViewById(R.id.tv_invite_title);
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        if(isCorrectlyDelivered)
+        {
+            textView.setText(mContext.getResources().getString(R.string.invitation_correctly_sent));
+            builder.setCustomTitle(view);
+        }
+        else
+        {
+            textView.setText(mContext.getResources().getString(R.string.invitation_badly_sent));
+            builder.setCustomTitle(view);
+            builder.setIcon(mContext.getResources().getDrawable(R.drawable.ic_no_results));
+        }
+
+        builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create();
+        builder.show();
+    }
+
+    /**
+     * Gets custom alert dialog title view
+     * @author str_oan
+     * @return (LinearLayout) -> custom title
+     */
+    private View getCustomAlertTitleView()
+    {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        return inflater.inflate(R.layout.layout_invite_contact, null);
     }
 }

@@ -48,10 +48,9 @@ import io.realm.Realm;
 import model.Contact;
 import model.GroupChat;
 
-public class GroupChatListFragment extends ListFragment implements
-        SwipeRefreshLayout.OnRefreshListener, IContactsRefreshConnectionCallback {
+public class GroupChatListFragment extends ListFragment
+{
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     protected Handler handler = new Handler();
 
     private ListView listView;
@@ -141,10 +140,10 @@ public class GroupChatListFragment extends ListFragment implements
         super.onResume();
     }
 
-    @Override
-    public void onRefresh() {
-        handler.postDelayed(testIsGood, 5000);
-    }
+//    @Override
+//    public void onRefresh() {
+//        handler.postDelayed(testIsGood, 5000);
+//    }
 
     @Override
     public void onDestroy() {
@@ -166,45 +165,47 @@ public class GroupChatListFragment extends ListFragment implements
     @Subscribe
     public void reloadAdapterEvent(ReloadAdapterEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.reloadAdapterEvent: ");
-        this.contactList = mSearchBarController.getContactList();
-        reloadAdapter();
+        ArrayList<Contact> compareList = mSearchBarController.getContactList();
+        if(!compareList.equals(contactList))
+        {
+            contactList = compareList;
+            reloadAdapter();
+        }
     }
 
 
-    public Runnable testIsGood = new Runnable() {
-        @Override
-        public void run() {
-            mSwipeRefreshLayout.setRefreshing(false);
-            Log.wtf(Constants.TAG, "ChatListFragment.run: TEEEEESTINGGGG");
-        }
-    };
+//    public Runnable testIsGood = new Runnable() {
+//        @Override
+//        public void run() {
+//            mSwipeRefreshLayout.setRefreshing(false);
+//            Log.wtf(Constants.TAG, "ChatListFragment.run: TEEEEESTINGGGG");
+//        }
+//    };
 
     private View loadViews(LayoutInflater inflater, ViewGroup container)
     {
         View v = inflater.inflate(R.layout.layout_fragment_group_chat_list, container, false);
         listView = (ListView) v.findViewById(android.R.id.list);
-        chatContactsContainer = (LinearLayout) v.findViewById(R.id
-                .list_group_chat_contacts);
+        chatContactsContainer = (LinearLayout) v.findViewById(R.id.list_group_chat_contacts);
 
-        layGroupChatHeader = (LinearLayout) v.findViewById(R.id
-                .group_chat_header);
+        layGroupChatHeader = (LinearLayout) v.findViewById(R.id.group_chat_header);
 
         layGroupChatHeader.setVisibility(View.GONE);
         txtNumberParticipants = (TextView) v.findViewById(R.id.txt_participants);
         txtWrite = (TextView) v.findViewById(R.id.txt_write);
         selectedContacts = new ArrayList<>();
-        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.contacts_swipe_refresh_layout);
+//        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.contacts_swipe_refresh_layout);
         return v;
     }
 
     private void addListeners()
     {
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshContent();
-            }
-        });
+//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                refreshContent();
+//            }
+//        });
 
         txtWrite.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -330,11 +331,11 @@ public class GroupChatListFragment extends ListFragment implements
     }
 
 
-    private void refreshContent()
-    {
-        contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
-        contactListController.setConnectionCallback(this);
-    }
+//    private void refreshContent()
+//    {
+//        contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
+//        contactListController.setConnectionCallback(this);
+//    }
 
     private void loadSearchBarEventsAndControllers(View v)
     {
@@ -521,40 +522,6 @@ public class GroupChatListFragment extends ListFragment implements
 
         if(selectedContacts.size()<=1)
             txtWrite.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public void onContactsRefreshResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging)
-    {
-        if (morePages){
-            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: ");
-            apiCall = Constants.CONTACT_API_GET_CONTACTS;
-
-            contactListController.getContactList(apiCall + "&o=" + offsetPaging);
-            contactListController.setConnectionCallback(this);
-        } else {
-            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: FINISH");
-            mSwipeRefreshLayout.setRefreshing(false);
-            BusProvider.getInstance().post(new SetContactListAdapterEvent());
-        }
-    }
-
-    @Override
-    public void onFavouritesRefreshResponse()
-    {
-
-    }
-
-    @Override
-    public void onRecentsRefreshResponse()
-    {
-
-    }
-
-    @Override
-    public void onConnectionNotAvailable()
-    {
-        Log.d(Constants.TAG, "GroupChatListFragment.onConnectionNotAvailable: ");
     }
 
     private class CreateGroupChatTask extends AsyncTask<Void, Void, String>

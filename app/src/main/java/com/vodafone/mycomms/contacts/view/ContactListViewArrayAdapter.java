@@ -138,6 +138,9 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         }
         else
         {
+            viewHolder.textViewPosition.setGravity(Gravity.START);
+            viewHolder.textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            viewHolder.textViewPosition.setTextColor(mContext.getResources().getColor(R.color.contact_soft_grey));
             viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
             if (null != contact.getPlatform()
                     && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform())) {

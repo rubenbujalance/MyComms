@@ -59,6 +59,7 @@ public class SearchBarController {
     private RealmContactTransactions mContactTransactions;
     private ContactListFragment contactListFragment;
     private String profileId;
+    private String currentKeyWord;
 
     private final int drLeft = android.R.drawable.ic_menu_search;
     private final int drRight = R.drawable.ic_action_remove;
@@ -92,7 +93,6 @@ public class SearchBarController {
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-
     }
 
     /**
@@ -152,6 +152,7 @@ public class SearchBarController {
                     searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
                 }
 
+                currentKeyWord = searchView.getText().toString();
                 searchAllContacts(searchView.getText().toString());
             }
 
@@ -244,8 +245,8 @@ public class SearchBarController {
             } else if (keyWord.length() > 0 && keyWord.length() < 3) {
                 loadAllContactsFromDB(keyWord);
             } else if (keyWord.length() >= 3) {
-                loadAllContactsFromServer(keyWord);
                 loadAllContactsFromDB(keyWord);
+                loadAllContactsFromServer(keyWord);
             }
         }
     }
@@ -258,26 +259,18 @@ public class SearchBarController {
     private void loadAllContactsFromDB(String keyWord)
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>" + keyWord);
-
+        String kw = keyWord;
         if(null == keyWord)
-        {
             contactList = mContactTransactions.getAllContacts(realm);
-        }
         else
         {
             if(isGroupChatSearch)
-            {
-                contactList = mSearchController
-                        .getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
-            }
+                contactList = mSearchController.getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord);
             else
-            {
                 contactList = mSearchController.getContactsByKeyWord(keyWord);
-            }
             if(!isGroupChatSearch)
                 validateNoPlatformRecords(contactList);
         }
-
         BusProvider.getInstance().post(new ReloadAdapterEvent());
     }
 
@@ -309,7 +302,8 @@ public class SearchBarController {
 
             String apiCall = buildRequestForSearchLDAPContacts(keyWord, realm, null);
 
-            loadAllContactsFromLDAP(apiCall, keyWord, false, user, password);
+            if(!isGroupChatSearch)
+                loadAllContactsFromLDAP(apiCall, keyWord, false, user, password);
         }
     }
 
@@ -347,14 +341,14 @@ public class SearchBarController {
 
                         JSONObject jsonResponse = new JSONObject(result);
 
-                        ArrayList<Contact> realmContactList =
+                        final ArrayList<Contact> realmContactList =
                                 mSearchController.insertContactListInRealm(jsonResponse);
 
                         mActivity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                loadAllContactsFromDB(keyWord);
-                                BusProvider.getInstance().post(new ReloadAdapterEvent());
+                                if(null!= realmContactList && realmContactList.size() > 0 && currentKeyWord.equals(keyWord))
+                                    loadAllContactsFromDB(keyWord);
                             }
                         });
                     }
@@ -442,14 +436,14 @@ public class SearchBarController {
                     if (result != null && result.trim().length()>0)
                     {
                         JSONObject jsonResponse = new JSONObject(result);
-                        ArrayList<Contact> realmContactList =
+                        final ArrayList<Contact> realmContactList =
                                 mSearchController.insertContactListInRealm(jsonResponse);
 
                         mActivity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                loadAllContactsFromDB(keyWord);
-                                BusProvider.getInstance().post(new ReloadAdapterEvent());
+                                if(null!= realmContactList && realmContactList.size() > 0 && currentKeyWord.equals(keyWord))
+                                    loadAllContactsFromDB(keyWord);
                             }
                         });
                     }

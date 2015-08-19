@@ -116,7 +116,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             ,group_names, group_n_components;
     private LinearLayout lay_right_top_avatar_to_hide, lay_bottom_to_hide, lay_top_left_avatar;
     private LinearLayout lay_no_connection;
-    private LinearLayout lay_add_contact;
+    private LinearLayout lay_add_contact, lay_chat_header_description;
 
 
     private Realm realm;
@@ -475,6 +475,16 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     startActivity(in);
                 }
             });
+
+            lay_chat_header_description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent in = new Intent(GroupChatActivity.this, ContactDetailMainActivity.class);
+                    in.putExtra(Constants.CONTACT_CONTACT_ID, _contactId);
+                    in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(in);
+                }
+            });
         }
     }
 
@@ -810,6 +820,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         bottom_left_chat_availability = (ImageView) findViewById(R.id.bottom_left_chat_availability);
         top_right_chat_availability = (ImageView) findViewById(R.id.top_right_chat_availability);
         top_left_chat_availability = (ImageView) findViewById(R.id.top_left_chat_availability);
+        lay_chat_header_description = (LinearLayout) findViewById(R.id.lay_chat_header_description);
 
         if(isGroupChatMode)
         {

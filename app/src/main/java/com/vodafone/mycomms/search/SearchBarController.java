@@ -53,7 +53,6 @@ public class SearchBarController {
     private ArrayList<Contact> contactList;
     private SharedPreferences sp;
     private LinearLayout laySearchBar;
-    private ContactListViewArrayAdapter mAdapter;
     private int mIndex;
     private ListView mListView;
     private boolean isGroupChatSearch;
@@ -72,7 +71,6 @@ public class SearchBarController {
                     , RealmContactTransactions contactTransactions
                     , ArrayList<Contact> contactList
                     , SearchController searchController
-                    , ContactListViewArrayAdapter adapter
                     , int index
                     , ListView listView
                     , boolean isGroupChatSearch
@@ -84,7 +82,6 @@ public class SearchBarController {
         this.mContactTransactions = contactTransactions;
         this.contactList = contactList;
         this.mSearchController = searchController;
-        this.mAdapter = adapter;
         this.mIndex = index;
         this.mListView = listView;
         this.isGroupChatSearch = isGroupChatSearch;

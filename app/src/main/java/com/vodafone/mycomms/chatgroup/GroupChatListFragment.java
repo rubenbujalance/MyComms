@@ -344,7 +344,6 @@ public class GroupChatListFragment extends ListFragment implements
                         , mContactTransactions
                         , contactList
                         , mSearchController
-                        , adapter
                         , Constants.CONTACTS_ALL
                         , listView
                         , true

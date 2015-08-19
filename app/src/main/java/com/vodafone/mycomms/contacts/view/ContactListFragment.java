@@ -9,16 +9,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -27,12 +23,10 @@ import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
-import com.vodafone.mycomms.contacts.connection.ContactListController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
-import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
@@ -62,15 +56,12 @@ import model.RecentContact;
  */
 public class ContactListFragment extends ListFragment {
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     private SearchController mSearchController;
     private SearchBarController mSearchBarController;
     private ArrayList<Contact> contactList;
     private ArrayList<FavouriteContact> favouriteContactList;
     private ArrayList<RecentContact> recentContactList;
-    protected Handler handler = new Handler();
     private RealmContactTransactions mContactTransactions;
-    private ContactListViewArrayAdapter adapter;
     private RelativeLayout addGlobalContactsContainer;
     private TextView myCommsTextView;
 
@@ -78,10 +69,6 @@ public class ContactListFragment extends ListFragment {
     private Parcelable state;
     private TextView emptyText;
     private EditText searchView;
-    private Button cancelButton;
-    private LinearLayout layCancel;
-    private String apiCall;
-    private ContactListController contactListController;
     private RecentContactController recentController;
 
     private String profileId;
@@ -90,15 +77,8 @@ public class ContactListFragment extends ListFragment {
     private static final String ARG_PARAM2 = "param2";
 
     private int mIndex;
-    private String mParam2;
-
     private OnFragmentInteractionListener mListener;
-
     private SharedPreferences sp;
-
-    private final int drLeft = android.R.drawable.ic_menu_search;
-    private final int drRight = R.drawable.ic_action_remove;
-
     private Realm realm;
 
     public static ContactListFragment newInstance(int index, String param2) {
@@ -117,8 +97,6 @@ public class ContactListFragment extends ListFragment {
         listView = (ListView) v.findViewById(android.R.id.list);
         emptyText = (TextView) v.findViewById(android.R.id.empty);
         searchView = (EditText) v.findViewById(R.id.et_search);
-        cancelButton = (Button) v.findViewById(R.id.btn_cancel);
-        layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
 
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
         myCommsTextView = (TextView) v.findViewById(R.id.platform_label);
@@ -134,21 +112,6 @@ public class ContactListFragment extends ListFragment {
 
         loadSearchBarEventsAndControllers(v);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.contacts_swipe_refresh_layout);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-//                refreshContent();
-                //Spinner is always finished after 10 seconds
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        finishSpinner();
-                    }
-//                }, 10000);
-                }, 10);
-            }
-        });
         if (mIndex == Constants.CONTACTS_ALL) {
             //This shows the keyboard and focus on searchView when called from the Dashboard search
             //The Manifest defines that the keybord won't show every time you enter the view (windowSoftInputMode="adjustPan")
@@ -175,8 +138,6 @@ public class ContactListFragment extends ListFragment {
             }
         }
 
-        if(isProgressDialogNeeded())showProgressDialog();
-
         return v;
     }
 
@@ -188,7 +149,6 @@ public class ContactListFragment extends ListFragment {
                         , mContactTransactions
                         , contactList
                         , mSearchController
-                        , adapter
                         , mIndex
                         , listView
                         , false
@@ -219,7 +179,6 @@ public class ContactListFragment extends ListFragment {
 
         if (getArguments() != null) {
             mIndex = getArguments().getInt(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
         sp = getActivity().getSharedPreferences(
@@ -236,8 +195,6 @@ public class ContactListFragment extends ListFragment {
         mSearchController = new SearchController(getActivity().getApplicationContext(),
                 profileId, realm);
         recentController = new RecentContactController(getActivity(), profileId);
-        contactListController = new ContactListController(getActivity(), profileId);
-
         setListAdapterTabs();
     }
 
@@ -270,13 +227,6 @@ public class ContactListFragment extends ListFragment {
 //            contactListController.setConnectionCallback(this);
 //        }
 //    }
-
-    private void finishSpinner(){
-        Log.i(Constants.TAG, "ContactListFragment.finishSpinner: ");
-        if (mSwipeRefreshLayout!=null){
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -424,36 +374,6 @@ public class ContactListFragment extends ListFragment {
         }
     }
 
-//    @Override
-//    public void onContactsRefreshResponse(ArrayList<Contact> contactList, boolean morePages, int offsetPaging) {
-//
-//        if (morePages){
-//            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: ");
-//            apiCall = Constants.CONTACT_API_GET_CONTACTS;
-//
-//            contactListController.getContactList(apiCall + "&o=" + offsetPaging);
-//            contactListController.setConnectionCallback(this);
-//        } else {
-//            Log.i(Constants.TAG, "ContactListFragment.onContactsRefreshResponse: FINISH");
-//            mSwipeRefreshLayout.setRefreshing(false);
-//            BusProvider.getInstance().post(new SetContactListAdapterEvent());
-//        }
-//    }
-
-//    @Override
-//    public void onFavouritesRefreshResponse() {
-//        Log.i(Constants.TAG, "ContactListFragment.onFavouritesRefreshResponse: ");
-//        mSwipeRefreshLayout.setRefreshing(false);
-//        BusProvider.getInstance().post(new SetContactListAdapterEvent());
-//    }
-//
-//    @Override
-//    public void onRecentsRefreshResponse() {
-//        Log.i(Constants.TAG, "ContactListFragment.onRecentsRefreshResponse: ");
-//        mSwipeRefreshLayout.setRefreshing(false);
-//        BusProvider.getInstance().post(new SetContactListAdapterEvent());
-//    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -466,40 +386,6 @@ public class ContactListFragment extends ListFragment {
      */
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(String id);
-    }
-
-    /**
-     * Initiate each component what belong to Search View
-     * @author str_oan
-     */
-    private void initiateComponentsForSearchView(View v)
-    {
-        searchView = (EditText) v.findViewById(R.id.et_search);
-        cancelButton = (Button) v.findViewById(R.id.btn_cancel);
-        layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
-
-        LinearLayout laySearchBar = (LinearLayout) v.findViewById(R.id.lay_search_bar_container);
-
-        if(mIndex != Constants.CONTACTS_ALL)
-        {
-            laySearchBar.setVisibility(View.GONE);
-            hideSearchBarContent();
-        }
-
-        layCancel.setVisibility(View.GONE);
-
-        if(mIndex == Constants.CONTACTS_ALL && Constants.isSearchBarFocusRequested)
-        {
-            showKeyboard();
-            //Constants.isSearchBarFocusRequested = false;
-        }
-    }
-
-    public void hideSearchBarContent()
-    {
-        layCancel.setVisibility(View.GONE);
-        searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-        searchView.setText("");
     }
 
     public void setListAdapterTabs() {
@@ -641,24 +527,11 @@ public class ContactListFragment extends ListFragment {
         return loadAllContactsFromDB(null);
     }
 
-
-    @Subscribe
-    public void setListAdapterEvent(SetContactListAdapterEvent event){
-        Log.i(Constants.TAG, "ContactListPagerFragment.setListAdapterEvent: ");
-        if(!isProgressDialogNeeded())hideProgressDialog();
-    }
-
     @Subscribe
     public void reloadAdapterEvent(ReloadAdapterEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.reloadAdapterEvent: ");
         this.contactList = mSearchBarController.getContactList();
         reloadSearchAdapter();
-    }
-
-    private void showProgressDialog() {
-        mSwipeRefreshLayout.setProgressViewOffset(false, 0,
-                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics()));
-        mSwipeRefreshLayout.setRefreshing(true);
     }
 
     /**
@@ -681,26 +554,6 @@ public class ContactListFragment extends ListFragment {
         InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
                 ().INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-    }
-
-    private void hideProgressDialog()
-    {
-        if(mSwipeRefreshLayout.isRefreshing())mSwipeRefreshLayout.setRefreshing(false);
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
-          ().INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-    }
-
-    private boolean isProgressDialogNeeded()
-    {
-        if(mIndex == Constants.CONTACTS_ALL && contactList.size() <= 0)
-            return true;
-        else if(mIndex == Constants.CONTACTS_RECENT && recentContactList.size() <= 0)
-            return true;
-        else if(mIndex == Constants.CONTACTS_FAVOURITE && favouriteContactList.size() <= 0)
-            return true;
-        else
-            return false;
     }
 
     public SearchBarController getSearchBarController()

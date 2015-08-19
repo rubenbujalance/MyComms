@@ -85,76 +85,97 @@ public class FavouriteController  extends BaseController {
         }
     }
 
-    private void addFavorite(String api, final String contactId)
+    private void addFavorite(final String api, final String contactId, final boolean isRetryNeeded)
     {
-        Log.i(FavouriteController.class.getSimpleName(), "addFavorite -> "+ api);
-        apiCall = api;
-        body.put("id", contactId);
-        final JSONObject json = new JSONObject(body);
-        try{
-            OKHttpWrapper.post(apiCall, mContext, new OKHttpWrapper.HttpCallback() {
-                @Override
-                public void onFailure(Response response, IOException e) {
-                    Log.e(Constants.TAG, "addFavorite.onFailure: ", e);
-                }
+        Log.i(FavouriteController.class.getSimpleName(), "addFavorite -> " + api);
 
-                @Override
-                public void onSuccess(Response response) {
-                    Realm realm = Realm.getDefaultInstance();
-                    try {
-                        Contact contact = realmContactTransactions.getContactById(contactId, realm);
-                        FavouriteContact favouriteContact = contactsController.mapContactToFavourite(contact);
-                        ArrayList<FavouriteContact> favoriteList = new ArrayList<>();
-                        favoriteList.add(favouriteContact);
-                        realmContactTransactions.insertFavouriteContactList(favoriteList, realm);
-                    } catch (Exception e) {
-                        Log.e(Constants.TAG, "addFavorite.onSuccess ", e);
-                    } finally {
-                        realm.close();
-                    }
-                }
-            }, json);
-        }
-        catch (Exception e)
+        Realm realm = Realm.getDefaultInstance();
+        try
         {
-            Log.e(Constants.TAG, "addFavorite: ", e);
+            Contact contact = realmContactTransactions.getContactById(contactId, realm);
+            FavouriteContact favouriteContact = contactsController.mapContactToFavourite(contact);
+            ArrayList<FavouriteContact> favoriteList = new ArrayList<>();
+            favoriteList.add(favouriteContact);
+            realmContactTransactions.insertFavouriteContactList(favoriteList, realm);
+
+            apiCall = api;
+            body.put("id", contactId);
+            final JSONObject json = new JSONObject(body);
+
+            try
+            {
+                OKHttpWrapper.post(apiCall, mContext, new OKHttpWrapper.HttpCallback() {
+                    @Override
+                    public void onFailure(Response response, IOException e)
+                    {
+                        Log.e(Constants.TAG, "addFavorite.onFailure: ", e);
+                        if(isRetryNeeded)
+                        {
+                            Log.e(Constants.TAG, "addFavorite.onFailure: trying to perform the second add intent...");
+                            addFavorite(api, contactId, false);
+                        }
+                        else
+                            Log.e(Constants.TAG, "addFavorite.onFailure: NO MORE intents, favorite has not been added...");
+                    }
+
+                    @Override
+                    public void onSuccess(Response response)
+                    {
+                        Log.i(Constants.TAG, "addFavorite.onSuccess -> Favorite has been added, id: "+contactId);
+                    }
+                }, json);
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "addFavorite: ", e);
+            }
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "addFavorite.onSuccess ", e);
+        } finally {
+            realm.close();
         }
     }
 
-    private void deleteFavorite(String api, final String contactId)
+    private void deleteFavorite(final String api, final String contactId, final boolean isRetryNeeded)
     {
         Log.i(FavouriteController.class.getSimpleName(), "addFavorite -> "+ api);
         apiCall = api;
-        try{
-            OKHttpWrapper.delete(apiCall, mContext, new OKHttpWrapper.HttpCallback() {
-                @Override
-                public void onFailure(Response response, IOException e)
-                {
-                    Log.e(Constants.TAG, "deleteFavorite.onFailure: ", e);
-                }
 
-                @Override
-                public void onSuccess(Response response)
-                {
-                    Realm realm = Realm.getDefaultInstance();
-                    try
+        try
+        {
+            realmContactTransactions.deleteFavouriteContact(contactId, null);
+            try
+            {
+                OKHttpWrapper.delete(apiCall, mContext, new OKHttpWrapper.HttpCallback() {
+                    @Override
+                    public void onFailure(Response response, IOException e)
                     {
-                        realmContactTransactions.deleteFavouriteContact(contactId, null);
+                        Log.e(Constants.TAG, "deleteFavorite.onFailure: ", e);
+                        if(isRetryNeeded)
+                        {
+                            Log.e(Constants.TAG, "deleteFavorite.onFailure: trying to perform the second delete intent...");
+                            deleteFavorite(api, contactId, false);
+                        }
+                        else
+                            Log.e(Constants.TAG, "deleteFavorite.onFailure: NO MORE intents, favorite has not been deleted...");
                     }
-                    catch (Exception e)
+
+                    @Override
+                    public void onSuccess(Response response)
                     {
-                        Log.e(Constants.TAG, "deleteFavorite.onSuccess ",e);
+                        Log.i(Constants.TAG, "deleteFavorite.onSuccess -> Favorite has been deleted, id: " + contactId);
                     }
-                    finally
-                    {
-                        realm.close();
-                    }
-                }
-            });
+                });
+            }
+            catch (Exception e)
+            {
+                Log.e(Constants.TAG, "deleteFavorite: ", e);
+            }
         }
         catch (Exception e)
         {
-            Log.e(Constants.TAG, "deleteFavorite: ", e);
+            Log.e(Constants.TAG, "deleteFavorite ",e);
         }
     }
 
@@ -166,9 +187,9 @@ public class FavouriteController  extends BaseController {
             mFavouriteConnection.cancel();
         }
         if (realmContactTransactions.favouriteContactIsInRealm(contactId, null))
-            deleteFavorite((Constants.CONTACT_API_DEL_FAVOURITE + contactId), contactId);
+            deleteFavorite((Constants.CONTACT_API_DEL_FAVOURITE + contactId), contactId, true);
         else
-            addFavorite(Constants.CONTACT_API_POST_FAVOURITE, contactId);
+            addFavorite(Constants.CONTACT_API_POST_FAVOURITE, contactId, true);
 
         BusProvider.getInstance().post(new SetContactListAdapterEvent());
     }

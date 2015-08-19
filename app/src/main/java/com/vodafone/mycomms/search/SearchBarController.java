@@ -53,7 +53,6 @@ public class SearchBarController {
     private ArrayList<Contact> contactList;
     private SharedPreferences sp;
     private LinearLayout laySearchBar;
-    private ContactListViewArrayAdapter mAdapter;
     private int mIndex;
     private ListView mListView;
     private boolean isGroupChatSearch;
@@ -72,7 +71,6 @@ public class SearchBarController {
                     , RealmContactTransactions contactTransactions
                     , ArrayList<Contact> contactList
                     , SearchController searchController
-                    , ContactListViewArrayAdapter adapter
                     , int index
                     , ListView listView
                     , boolean isGroupChatSearch
@@ -84,7 +82,6 @@ public class SearchBarController {
         this.mContactTransactions = contactTransactions;
         this.contactList = contactList;
         this.mSearchController = searchController;
-        this.mAdapter = adapter;
         this.mIndex = index;
         this.mListView = listView;
         this.isGroupChatSearch = isGroupChatSearch;
@@ -250,8 +247,6 @@ public class SearchBarController {
                 loadAllContactsFromServer(keyWord);
                 loadAllContactsFromDB(keyWord);
             }
-
-            BusProvider.getInstance().post(new ReloadAdapterEvent());
         }
     }
 
@@ -279,8 +274,11 @@ public class SearchBarController {
             {
                 contactList = mSearchController.getContactsByKeyWord(keyWord);
             }
-            validateNoPlatformRecords(contactList);
+            if(!isGroupChatSearch)
+                validateNoPlatformRecords(contactList);
         }
+
+        BusProvider.getInstance().post(new ReloadAdapterEvent());
     }
 
     private void loadAllContactsFromDB()
@@ -600,14 +598,6 @@ public class SearchBarController {
         }
         if (!isMyComms) {
             contactList.add(0, createNoRecordsContact(Constants.PLATFORM_MY_COMMS));
-        }
-
-        for (int i=0;i<contactList.size();i++){
-            platform = contactList.get(i).getPlatform();
-
-            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromDB: position " + i);
-            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromDB: platform " + platform);
-            Log.e(Constants.TAG, "SearchBarController.loadAllContactsFromDB: first name " + contactList.get(i).getFirstName());
         }
     }
 

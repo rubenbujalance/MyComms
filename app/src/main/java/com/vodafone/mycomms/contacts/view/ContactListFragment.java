@@ -257,120 +257,105 @@ public class ContactListFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         Log.i(Constants.TAG, "ContactListFragment.onListItemClick: Listclicking");
         if (mListener != null) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
-            Intent in;
+            if (!contactList.get(position).getFirstName().equals(getResources().getString(R.string.no_search_records))) {
+                // Notify the active callbacks interface (the activity, if the
+                // fragment is attached to one) that an item has been selected.
+                //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
+                Intent in;
 
-            in = new Intent(getActivity(), ContactDetailMainActivity.class);
+                in = new Intent(getActivity(), ContactDetailMainActivity.class);
 
-            if(mIndex == Constants.CONTACTS_FAVOURITE)
-            {
-                in.putExtra(Constants.CONTACT_IS_FAVORITE, true);
-            }
-            else
-            {
-                in.putExtra(Constants.CONTACT_IS_FAVORITE, false);
-            }
+                if (mIndex == Constants.CONTACTS_FAVOURITE) {
+                    in.putExtra(Constants.CONTACT_IS_FAVORITE, true);
+                } else {
+                    in.putExtra(Constants.CONTACT_IS_FAVORITE, false);
+                }
 
-            if(mIndex == Constants.CONTACTS_ALL) {
-                if (contactList.get(position).getContactId()!=null && contactList.get(position).getContactId().equals(profileId))
-                    in = new Intent(getActivity(), SettingsMainActivity.class);
-                ((MycommsApp)getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
-                in.putExtra(Constants.CONTACT_CONTACT_ID,contactList.get(position).getContactId() );
-                startActivity(in);
-            }
-            else if (mIndex == Constants.CONTACTS_RECENT)
-            {
-                try {
-                    String action = recentContactList.get(position).getAction();
-                    ((MycommsApp)getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_RECENT;
-                    if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
-                        String strPhones = recentContactList.get(position).getPhones();
-                        if (strPhones != null)
-                        {
-                            String phone = strPhones;
-                            if(!recentContactList.get(position).getPlatform().equals(Constants
-                                    .PLATFORM_LOCAL))
-                            {
+                if (mIndex == Constants.CONTACTS_ALL) {
+                    if (contactList.get(position).getContactId() != null && contactList.get(position).getContactId().equals(profileId))
+                        in = new Intent(getActivity(), SettingsMainActivity.class);
+                    ((MycommsApp) getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
+                    in.putExtra(Constants.CONTACT_CONTACT_ID, contactList.get(position).getContactId());
+                    startActivity(in);
+                } else if (mIndex == Constants.CONTACTS_RECENT) {
+                    try {
+                        String action = recentContactList.get(position).getAction();
+                        ((MycommsApp) getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_RECENT;
+                        if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
+                            String strPhones = recentContactList.get(position).getPhones();
+                            if (strPhones != null) {
+                                String phone = strPhones;
+                                if (!recentContactList.get(position).getPlatform().equals(Constants
+                                        .PLATFORM_LOCAL)) {
+                                    JSONArray jPhones = new JSONArray(strPhones);
+                                    phone = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                                }
+
+                                Utils.launchCall(phone, getActivity());
+                                recentController.insertRecent(recentContactList.get(position).getContactId(), action);
+                            }
+                        } else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
+                            /*String strPhones = recentContactList.get(position).getPhones();
+                            if (strPhones != null) {
                                 JSONArray jPhones = new JSONArray(strPhones);
-                                phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
+                                String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
+                                Utils.launchSms(phone, getActivity());
+                            }*/
+
+                            // This is LOCAL contact, then in this case the action will be Send SMS
+                            // message
+                            if (null != recentContactList.get(position).getPlatform() && recentContactList.get
+                                    (position).getPlatform().equals(Constants.PLATFORM_LOCAL)) {
+                                String phone = recentContactList.get(position).getPhones();
+                                if (null != phone) {
+                                    Utils.launchSms(phone, getActivity());
+                                    recentController.insertRecent(recentContactList.get(position).getContactId(), action);
+                                }
+                            } else {
+                                if (recentContactList.get(position).getId().startsWith("mg_")) {
+                                    in = new Intent(getActivity(), GroupChatActivity.class);
+                                    in.putExtra(Constants.GROUP_CHAT_ID, recentContactList.get(position).getId());
+                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                    in.putExtra(Constants.IS_GROUP_CHAT, true);
+                                    startActivity(in);
+                                } else {
+                                    in = new Intent(getActivity(), GroupChatActivity.class);
+                                    in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
+                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                    in.putExtra(Constants.IS_GROUP_CHAT, false);
+                                    startActivity(in);
+                                }
                             }
 
-                            Utils.launchCall(phone, getActivity());
-                            recentController.insertRecent(recentContactList.get(position).getContactId(), action);
-                        }
-                    }
-                    else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
-                    {
-                        /*String strPhones = recentContactList.get(position).getPhones();
-                        if (strPhones != null) {
-                            JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
-                            Utils.launchSms(phone, getActivity());
-                        }*/
+                        } else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
+                            String strEmails = recentContactList.get(position).getEmails();
+                            if (strEmails != null) {
+                                String email = strEmails;
+                                if (!recentContactList.get(position).getPlatform().equals(Constants
+                                        .PLATFORM_LOCAL)) {
+                                    JSONArray jPhones = new JSONArray(strEmails);
+                                    email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
+                                }
 
-                        // This is LOCAL contact, then in this case the action will be Send SMS
-                        // message
-                        if(null != recentContactList.get(position).getPlatform() && recentContactList.get
-                            (position).getPlatform().equals(Constants.PLATFORM_LOCAL))
-                        {
-                            String phone = recentContactList.get(position).getPhones();
-                            if(null != phone)
-                            {
-                                Utils.launchSms(phone, getActivity());
+                                Utils.launchEmail(email, getActivity());
                                 recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                             }
                         }
-                        else
-                        {
-                            if(recentContactList.get(position).getId().startsWith("mg_"))
-                            {
-                                in = new Intent(getActivity(), GroupChatActivity.class);
-                                in.putExtra(Constants.GROUP_CHAT_ID, recentContactList.get(position).getId());
-                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
-                                in.putExtra(Constants.IS_GROUP_CHAT, true);
-                                startActivity(in);
-                            }
-                            else
-                            {
-                                in = new Intent(getActivity(), GroupChatActivity.class);
-                                in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
-                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
-                                in.putExtra(Constants.IS_GROUP_CHAT, false);
-                                startActivity(in);
-                            }
-                        }
-
+                        setListAdapterTabs();
+                    } catch (Exception ex) {
+                        Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);
                     }
-                    else if (action.compareTo(Constants.CONTACTS_ACTION_EMAIL) == 0) {
-                        String strEmails = recentContactList.get(position).getEmails();
-                        if (strEmails != null)
-                        {
-                            String email = strEmails;
-                            if(!recentContactList.get(position).getPlatform().equals(Constants
-                                    .PLATFORM_LOCAL))
-                            {
-                                JSONArray jPhones = new JSONArray(strEmails);
-                                email = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
-                            }
-
-                            Utils.launchEmail(email, getActivity());
-                            recentController.insertRecent(recentContactList.get(position).getContactId(), action);
-                        }
+                } else if (mIndex == Constants.CONTACTS_FAVOURITE) {
+                    {
+                        if (favouriteContactList.get(position).getContactId() != null && favouriteContactList.get(position).getContactId().equals(profileId))
+                            in = new Intent(getActivity(), SettingsMainActivity.class);
+                        ((MycommsApp) getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_FAVOURITE;
+                        in.putExtra(Constants.CONTACT_CONTACT_ID, favouriteContactList.get(position).getContactId());
+                        startActivity(in);
                     }
-                    setListAdapterTabs();
-                } catch (Exception ex) {
-                    Log.e(Constants.TAG, "ContactListFragment.onListItemClick: ", ex);
                 }
-            } else if (mIndex == Constants.CONTACTS_FAVOURITE) { {
-                if (favouriteContactList.get(position).getContactId()!=null && favouriteContactList.get(position).getContactId().equals(profileId))
-                    in = new Intent(getActivity(), SettingsMainActivity.class);
-                ((MycommsApp)getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_FAVOURITE;
-                in.putExtra(Constants.CONTACT_CONTACT_ID,favouriteContactList.get(position).getContactId() );
-                startActivity(in);
-            }}
 
+            }
         }
     }
 

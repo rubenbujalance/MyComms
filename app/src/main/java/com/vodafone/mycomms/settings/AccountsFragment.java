@@ -1,7 +1,9 @@
 package com.vodafone.mycomms.settings;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,10 +11,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.util.Constants;
 
@@ -27,6 +32,9 @@ import com.vodafone.mycomms.util.Constants;
 public class AccountsFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private TextView tvAddLocalContacts, tvAddGlobalContacts;
+    private ImageView imgCheckLocalContacts, imgCheckGlobalContacts;
+    private SharedPreferences sp;
 
     private OnFragmentInteractionListener mListener;
     /**
@@ -68,6 +76,7 @@ public class AccountsFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
+        checkAccountButtonVisibility();
         Log.d(Constants.TAG, "AccountsFragment.onResume: ");
     }
 
@@ -75,18 +84,61 @@ public class AccountsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_accounts, container, false);
+        sp = getActivity().getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        setViewsAndEvents(v);
+        return v;
+    }
 
-        TextView btAddGlobalContacts = (TextView)v.findViewById(R.id.btn_add_vodafone_global);
-        btAddGlobalContacts.setOnClickListener(new View.OnClickListener() {
+
+    private void setViewsAndEvents(View v)
+    {
+        tvAddLocalContacts = (TextView) v.findViewById(R.id.btn_add_local_contacts);
+        tvAddGlobalContacts = (TextView) v.findViewById(R.id.btn_add_vodafone_global);
+        imgCheckLocalContacts = (ImageView) v.findViewById(R.id.acc_check_local_contacts);
+        imgCheckGlobalContacts = (ImageView) v.findViewById(R.id.acc_check_vodafone_global);
+        checkAccountButtonVisibility();
+        tvAddGlobalContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent in = new Intent(getActivity(), AddGlobalContactsActivity.class);
                 startActivity(in);
             }
         });
+        tvAddLocalContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sp.edit().putBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, true).apply();
+                checkAccountButtonVisibility();
+                String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+                DownloadLocalContacts downloadLocalContacts =
+                        new DownloadLocalContacts(getActivity(), profileId, true);
+                downloadLocalContacts.downloadAndStore();
+            }
+        });
+    }
 
-
-        return v;
+    private void checkAccountButtonVisibility()
+    {
+        if(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED,false))
+        {
+            tvAddLocalContacts.setVisibility(View.GONE);
+            imgCheckLocalContacts.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            tvAddLocalContacts.setVisibility(View.VISIBLE);
+            imgCheckLocalContacts.setVisibility(View.GONE);
+        }
+        if(sp.getBoolean(Constants.IS_GLOBAL_CONTACTS_LOADING_ENABLED,false))
+        {
+            tvAddGlobalContacts.setVisibility(View.GONE);
+            imgCheckGlobalContacts.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            tvAddGlobalContacts.setVisibility(View.VISIBLE);
+            imgCheckGlobalContacts.setVisibility(View.GONE);
+        }
     }
 
     @Override

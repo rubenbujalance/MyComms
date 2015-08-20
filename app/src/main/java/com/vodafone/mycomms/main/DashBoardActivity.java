@@ -84,6 +84,8 @@ public class DashBoardActivity extends ToolbarActivity
 
     private Realm realm;
 
+    private boolean isLocalContactsLoadingNeeded = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +93,7 @@ public class DashBoardActivity extends ToolbarActivity
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
+        isLocalContactsLoadingNeeded = sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false);
         this.realm = Realm.getDefaultInstance();
         this.realm.setAutoRefresh(true);
 
@@ -118,8 +120,8 @@ public class DashBoardActivity extends ToolbarActivity
         else
             lay_no_connection.setVisibility(View.VISIBLE);
 
-        loadLocalContacts();
-
+        if(isLocalContactsLoadingNeeded)
+            loadLocalContacts();
     }
 
     private void initALL(){

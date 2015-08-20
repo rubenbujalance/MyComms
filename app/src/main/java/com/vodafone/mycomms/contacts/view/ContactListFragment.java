@@ -198,8 +198,9 @@ public class ContactListFragment extends ListFragment {
     }
 
     @Override
-    public void onResume() {
-        if (!RealmLDAPSettingsTransactions.haveSettings(profileId, realm) &&
+    public void onResume()
+    {
+        if (!sp.getBoolean(Constants.IS_GLOBAL_CONTACTS_LOADING_ENABLED, false) &&
                 mIndex == Constants.CONTACTS_ALL)
             showLDAPSettingsBar(true);
         else showLDAPSettingsBar(false);

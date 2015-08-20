@@ -233,6 +233,8 @@ public class Constants {
     public static boolean isSearchBarFocusRequested = false;
     public static boolean isDashboardOrigin = false;
     public static boolean isConnectionAvailable = true;
+    public static final String IS_LOCAL_CONTACTS_LOADING_ENABLED = "is_local_contacts_loading_enabled";
+    public static final String IS_GLOBAL_CONTACTS_LOADING_ENABLED = "is_global_contacts_loading_enabled";
 
     public static final MediaType MEDIA_TYPE_JPG = MediaType.parse("image/jpg");
     public static final MediaType MEDIA_TYPE_FILE = MediaType.parse("file");

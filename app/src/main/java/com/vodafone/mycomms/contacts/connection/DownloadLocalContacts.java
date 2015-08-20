@@ -1,10 +1,12 @@
 package com.vodafone.mycomms.contacts.connection;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.util.Constants;
@@ -20,10 +22,14 @@ public class DownloadLocalContacts
     private String mProfileId;
     private ArrayList<Contact> contactArrayList;
     private final int PROPORTION_AMOUNT = 100;
+    private ProgressDialog mProgressDialog;
+    private boolean isProgressDialogNeeded;
 
-    public DownloadLocalContacts(Context context, String profileId){
+    public DownloadLocalContacts(Context context, String profileId, boolean isProgressDialogNeeded){
         this.mContext = context;
         this.mProfileId = profileId;
+        this.mProgressDialog = new ProgressDialog(context);
+        this.isProgressDialogNeeded = isProgressDialogNeeded;
     }
 
     /**
@@ -44,8 +50,16 @@ public class DownloadLocalContacts
     private class LoadLocalContacts extends AsyncTask<Void, Void, String>
     {
         @Override
-        protected void onPreExecute() {
+        protected void onPreExecute()
+        {
             super.onPreExecute();
+            if(isProgressDialogNeeded)
+            {
+                mProgressDialog.setMessage(mContext.getResources().getString(R.string.uploading_local_contacts));
+                mProgressDialog.setTitle(mContext.getResources().getString(R.string.attention));
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.show();
+            }
         }
 
         @Override
@@ -60,6 +74,12 @@ public class DownloadLocalContacts
         @Override
         protected void onPostExecute(String amount) {
             super.onPostExecute(amount);
+            if(isProgressDialogNeeded)
+            {
+                if(mProgressDialog.isShowing())
+                    mProgressDialog.dismiss();
+            }
+
             Log.i("LoadLocalContacts", "onPostExecute: amount of find contacts is " + amount);
             storeContacts();
         }

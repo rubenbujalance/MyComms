@@ -303,4 +303,8 @@
     <string name="invite_to_mycomms">Invite to MyComms</string>
     <string name="invitation_correctly_sent">Invitation sent</string>
     <string name="invitation_badly_sent">Oops! Your invitation has not been delivered, please try again later.</string>
+
+    <!-- Uploading contacts-->
+    <string name="uploading_local_contacts">Uploading contacts, please wait...</string>
+    <string name="attention">Attention</string>
 </resources>

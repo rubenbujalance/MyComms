@@ -104,7 +104,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         //Shared Preferences
         sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
+        //Store if local contacts loading is needed
+        if(!sp.contains(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED))
+            sp.edit().putBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false).apply();
+        //Store if global contacts loading is needed
+        if(!sp.contains(Constants.IS_GLOBAL_CONTACTS_LOADING_ENABLED))
+            sp.edit().putBoolean(Constants.IS_GLOBAL_CONTACTS_LOADING_ENABLED, false).apply();
         //Profile id
         if (sp.contains(Constants.PROFILE_ID_SHARED_PREF))
             profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
@@ -238,7 +243,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(Constants.DEVICE_ID_SHARED_PREF, deviceId);
-        editor.commit();
+        editor.apply();
 
         //SessionController sessionController = new SessionController(mContext);
         //sessionController.setDeviceId(deviceId);
@@ -251,7 +256,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        DownloadLocalContacts downloadLocalContacts = new DownloadLocalContacts(MycommsApp.this, profileId);
+        DownloadLocalContacts downloadLocalContacts =
+                new DownloadLocalContacts(MycommsApp.this, profileId, false);
         downloadLocalContacts.downloadAndStore();
     }
 

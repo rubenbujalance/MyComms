@@ -13,12 +13,16 @@ import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
 
+import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
@@ -31,7 +35,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 /**
  * Created by str_evc on 18/05/2015.
  */
-//@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
@@ -47,7 +51,7 @@ public class SearchGlobalContactsTest {
     RelativeLayout addGCBar;
     CustomFragmentActivity customFragmentActivity;
 
-//    @Before
+    @Before
     public void setUp() throws Exception {
         mockStatic(Realm.class);
         when(Realm.getDefaultInstance()).thenReturn(null);
@@ -56,7 +60,7 @@ public class SearchGlobalContactsTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
     }
 
-//    @Test
+    @Test
     public void testShowAddGlobalContactsBarInContacts() throws Exception {
 //        RealmContactTransactions realmContactTransactions =
 //                Mockito.mock(RealmContactTransactions.class);

@@ -11,7 +11,6 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.util.Constants;
@@ -80,7 +79,9 @@ public class GlobalContactsController {
     //Step 1
     private void callLDAPDiscover() {
         Request.Builder builder = new Request.Builder();
-        Request request = builder.url(EndpointWrapper.getLDAPDiscover()).build();
+        //TODO: Check why this crashes on MASTER
+//        Request request = builder.url(EndpointWrapper.getLDAPDiscover()).build();
+        Request request = builder.url(Constants.LDAPDISCOVER).build();
 
         System.err.println("- Discover call: " + request.urlString());
 

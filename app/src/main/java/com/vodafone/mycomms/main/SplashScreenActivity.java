@@ -30,6 +30,7 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.SystemUiHider;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
@@ -206,10 +207,23 @@ public class SplashScreenActivity extends MainActivity {
                 builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Launch download and install
-                        if(isDownloadManagerAvailable())
+                        if (isDownloadManagerAvailable())
                             downloadNewVersion(result);
 
                         dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton(R.string.support_button_text, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Launch download and install
+                        Utils.launchSupportEmail(SplashScreenActivity.this);
+                        if (isDownloadManagerAvailable())
+                            downloadNewVersion(result);
+
+                        dialog.dismiss();
+//                        Intent i = new Intent(Intent.ACTION_VIEW);
+//                        i.setData(Uri.parse(result));
+//                        startActivity(i);
                     }
                 });
 

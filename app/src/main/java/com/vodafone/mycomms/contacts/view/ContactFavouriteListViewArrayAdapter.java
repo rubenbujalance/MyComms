@@ -176,6 +176,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             assert null != presenceDetail;
             if (null != presenceDetail && presenceDetail.equals("#LOCAL_TIME#"))
             {
+                viewHolder.textViewCountry.setVisibility(View.VISIBLE);
                 if(null != contact.getTimezone())
                 {
                     TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
@@ -191,7 +192,9 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
                     viewHolder.textViewTime.setText(" ");
                 }
             }
-            else {
+            else
+            {
+                viewHolder.textViewCountry.setVisibility(View.GONE);
                 viewHolder.textViewTime.setText(presenceDetail);
             }
         } catch (Exception e) {

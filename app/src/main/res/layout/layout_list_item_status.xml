@@ -21,6 +21,7 @@
         android:layout_width="wrap_content"
         android:textSize="12sp"
         android:layout_gravity="center"
+        android:gravity="center"
         android:layout_marginBottom="1dp"
         android:orientation="vertical"
         tools:text="@string/dummyHour"
@@ -32,6 +33,7 @@
         android:layout_width="wrap_content"
         android:textSize="12sp"
         android:layout_gravity="center"
+        android:gravity="center"
         android:orientation="vertical"
         tools:text="@string/dummyCountry"
         android:textColor="@color/contact_soft_blue_text"/>

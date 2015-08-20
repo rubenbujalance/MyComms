@@ -1,5 +1,7 @@
 package com.vodafone.mycomms.settings.globalcontacts;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -31,6 +33,7 @@ public class AddGlobalContactsActivity extends MainActivity {
     private EditText etEmail;
     private EditText etPassword;
     private Button btAddAccount;
+    private SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class AddGlobalContactsActivity extends MainActivity {
         setContentView(R.layout.activity_add_global_contacts);
 
         BusProvider.getInstance().register(this);
+        sp = this.getSharedPreferences(Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         layoutErrorBar = (LinearLayout)findViewById(R.id.layoutErrorBar);
         etEmail = (EditText)findViewById(R.id.etEmail);
@@ -83,10 +87,12 @@ public class AddGlobalContactsActivity extends MainActivity {
                                 }
 
                                 @Override
-                                public void onSuccess(GlobalContactsSettings settings) {
+                                public void onSuccess(GlobalContactsSettings settings)
+                                {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
+                                            sp.edit().putBoolean(Constants.IS_GLOBAL_CONTACTS_LOADING_ENABLED, true).apply();
                                             Toast.makeText(AddGlobalContactsActivity.this,
                                                     R.string.global_contacts_settings_added,
                                                     Toast.LENGTH_LONG).show();

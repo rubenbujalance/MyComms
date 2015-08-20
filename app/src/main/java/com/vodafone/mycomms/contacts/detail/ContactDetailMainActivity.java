@@ -208,14 +208,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     if (strPhones != null)
                     {
 
-                        if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL))
+                        if(
+                                contact.getPlatform().equals(Constants.PLATFORM_LOCAL)
+                                || contact.getPlatform().equals(Constants.PLATFORM_GLOBAL_CONTACTS)
+                          )
                         {
-                            String sms;
-                            //TODO: Implement multiple phone choice
-//                            JSONArray jPhones = new JSONArray(strPhones);
-                            JSONObject jPhones = new JSONObject(strPhones);
-                            sms = (String)jPhones.get(Constants
-                                    .CONTACT_PHONE);
+                            String sms = getPhoneFromJSONForLunchSMS(strPhones);
                             Utils.launchSms(sms, ContactDetailMainActivity.this);
                         }
                         else
@@ -289,6 +287,32 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         loadContactDetail();
         setButtonsVisibility();
+    }
+
+    private String getPhoneFromJSONForLunchSMS(String strPhones)
+    {
+        try
+        {
+            JSONObject jsonObject;
+            JSONArray jsonArray;
+            if(strPhones.startsWith("[") && strPhones.endsWith("]"))
+            {
+                jsonArray = new JSONArray(strPhones);
+                jsonObject = jsonArray.getJSONObject(0);
+                return  (String)jsonObject.get(Constants.CONTACT_PHONE);
+            }
+            else
+            {
+                jsonObject = new JSONObject(strPhones);
+                return  (String)jsonObject.get(Constants.CONTACT_PHONE);
+            }
+        }
+
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "getPhoneFromJSONForLunchSMS ",e);
+            return null;
+        }
     }
 
     private String[] loadContactExtra() {

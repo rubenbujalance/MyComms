@@ -11,6 +11,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.main.SplashScreenActivity;
@@ -38,10 +39,10 @@ public class OKHttpWrapper {
         call("POST", url, jsonObject, cb, EndpointWrapper.getBaseURL(), context);
     }
 
-    public static void postNews(String url, Context context,
-                                HttpCallback cb, JSONObject jsonObject) {
-        call("POST", url, jsonObject, cb, EndpointWrapper.getBaseNewsURL(), context);
-    }
+//    public static void postNews(String url, Context context,
+//                                HttpCallback cb, JSONObject jsonObject) {
+//        call("POST", url, jsonObject, cb, EndpointWrapper.getBaseNewsURL(), context);
+//    }
 
     private static void call(String method, final String url, JSONObject jsonObject,
                              final HttpCallback cb, final String endPointWrapper,
@@ -91,7 +92,7 @@ public class OKHttpWrapper {
                 Log.e(Constants.TAG, "OKHttpWrapper.onFailure: error " , e);
 
                 OKHttpErrorReceivedEvent errorEvent = new OKHttpErrorReceivedEvent();
-                errorEvent.setErrorMessage("Connection Error");//TODO: Hardcoded Strings
+                errorEvent.setErrorMessage(context.getString(R.string.wrapper_connection_error));
                 BusProvider.getInstance().post(errorEvent);
 
                 cb.onFailure(null, e);
@@ -107,8 +108,6 @@ public class OKHttpWrapper {
                 int code = response.code();
                 Log.i(Constants.TAG, "OKHttpWrapper.onResponse: " + url + " ("+code+")");
 
-                Response test = response;
-
                 if (!response.isSuccessful()) {
                     //Si es la llamada para el API version, devolver la respuesta y salir
                     if(code==400 && url.compareTo(Constants.API_VERSION)==0) {
@@ -122,26 +121,27 @@ public class OKHttpWrapper {
                     if (code >= 500){
                         //Backend Error
                         Log.e(Constants.TAG, "OKHttpWrapper.onResponse: error code " + code);
-                        errorEvent.setErrorMessage("Error code " + code);//TODO: Hardcoded Strings
+                        errorEvent.setErrorMessage(context.getString(R.string.wrapper_error_code) + code);
 
                     } else if (code >=400 && code < 500){
                         if (code == 400){
                             //New version
-                            errorEvent.setErrorMessage("Download new MyComms Version. Error code " + code);//TODO: Hardcoded Strings
+                            errorEvent.setErrorMessage(context.getString(R.string.wrapper_new_version_download) + code);
                             Intent in = new Intent(context, SplashScreenActivity.class);
                             in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             context.startActivity(in);
                         } else if (code == 401){
+                            Log.i(Constants.TAG, "OKHttpWrapper.onResponse: ");
                             //Unauthorized
-//                            errorEvent.setErrorMessage("Unauthorized User. Error code " + code);//TODO: Hardcoded Strings
+//                            errorEvent.setErrorMessage(context.getString(R.string.wrapper_unauthorized_user) + code);
 //                            Intent in = new Intent(context, LoginSignupActivity.class);
 //                            in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                            context.startActivity(in);
                         } else if (code == 403){
                             //Profile is not member of the group
-                            errorEvent.setErrorMessage("Profile is not member of the group " + code);//TODO: Hardcoded Strings
+                            errorEvent.setErrorMessage(context.getString(R.string.wrapper_profile_error) + code);
                         } else {
-                            errorEvent.setErrorMessage("Error code " + code);//TODO: Hardcoded Strings
+                            errorEvent.setErrorMessage(context.getString(R.string.wrapper_error_code) + code);
                         }
                         if (errorEvent!=null)
                             BusProvider.getInstance().post(errorEvent);

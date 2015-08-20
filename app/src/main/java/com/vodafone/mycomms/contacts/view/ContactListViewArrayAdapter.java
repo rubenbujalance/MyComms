@@ -71,9 +71,11 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.layInviteMyComms = (LinearLayout) convertView.findViewById(R.id.lay_invite_mycomms);
 
             convertView.setTag(viewHolder);
-        } else {
+        } else
+        {
             // recycle the already inflated view
-              viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder.imageAvatar.setImageDrawable(null);
         }
 
         // update the item view
@@ -234,7 +236,9 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
 
             try {
                 presenceDetail = new JSONObject(contact.getPresence()).getString("detail");
-                if (presenceDetail.equals("#LOCAL_TIME#")) {
+                if (presenceDetail.equals("#LOCAL_TIME#"))
+                {
+                    viewHolder.textViewCountry.setVisibility(View.VISIBLE);
                     if (null != contact.getTimezone()) {
                         TimeZone tz = TimeZone.getTimeZone(contact.getTimezone());
                         Calendar c = Calendar.getInstance(tz);
@@ -248,6 +252,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                     }
 
                 } else {
+                    viewHolder.textViewCountry.setVisibility(View.GONE);
                     viewHolder.textViewTime.setText(presenceDetail);
                 }
             } catch (Exception e) {

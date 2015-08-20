@@ -209,6 +209,9 @@ public class SplashScreenActivity extends MainActivity {
                         //Launch download and install
                         if (isDownloadManagerAvailable())
                             downloadNewVersion(result);
+                        else {
+                            downloadNewVersionFromURI(result);
+                        }
 
                         dialog.dismiss();
                     }
@@ -221,9 +224,6 @@ public class SplashScreenActivity extends MainActivity {
                             downloadNewVersion(result);
 
                         dialog.dismiss();
-//                        Intent i = new Intent(Intent.ACTION_VIEW);
-//                        i.setData(Uri.parse(result));
-//                        startActivity(i);
                     }
                 });
 
@@ -256,6 +256,34 @@ public class SplashScreenActivity extends MainActivity {
                             .error_reading_data_from_server),
                     Toast.LENGTH_LONG).show();
             finish();
+        }
+    }
+
+    //Alternative method created for users with problem with Downlad Manager
+    private void downloadNewVersionFromURI(String uri) {
+        try{
+            Log.i(Constants.TAG, "SplashScreenActivity.downloadNewVersionFromURI");
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(uri));
+            startActivity(i);
+
+            //Show an alert to indicate the file download
+            AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
+            builder.setTitle(getString(R.string.update2));
+            builder.setMessage(getString(R.string.please_check_the_download_status_in_the_notifications_bar));
+            builder.setCancelable(false);
+
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //Launch download and install
+                    finish();
+                }
+            });
+
+            builder.create();
+            builder.show();
+        } catch (Exception e){
+            Log.e(Constants.TAG, "SplashScreenActivity.downloadNewVersionFromURI: ",e);
         }
     }
 
@@ -341,49 +369,55 @@ public class SplashScreenActivity extends MainActivity {
 
     private void downloadNewVersion(String url)
     {
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.setDescription(getString(R.string.downloading_new_version));
-        request.setTitle(getString(R.string.app_name) + " " + getString(R.string.update2));
+        try {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            request.setDescription(getString(R.string.downloading_new_version));
+            request.setTitle(getString(R.string.app_name) + " " + getString(R.string.update2));
 
-        request.allowScanningByMediaScanner();
-        request.setNotificationVisibility(
-                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "mycomms.apk");
+            request.allowScanningByMediaScanner();
+            request.setNotificationVisibility(
+                    DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "mycomms.apk");
 
-        //Get download service and enqueue file
-        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
+            //Get download service and enqueue file
+            DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+            manager.enqueue(request);
 
-//        BroadcastReceiver onComplete = new BroadcastReceiver() {
-//            public void onReceive(Context context, Intent intent) {
-//                if(intent.getPackage().compareTo(getApplicationInfo().packageName)==0) {
-//                    Intent install = new Intent(Intent.ACTION_VIEW);
-//                    install.setDataAndType(Uri.fromFile(
-//                            new File(Environment.getExternalStorageDirectory() + "/" +
-//                                    Environment.DIRECTORY_DOWNLOADS, "mycomms.apk")),
-//                            "application/vnd.android.package-archive");
-//                    startActivity(install);
-//                }
-//            }
-//        };
-//
-//        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            //        BroadcastReceiver onComplete = new BroadcastReceiver() {
+            //            public void onReceive(Context context, Intent intent) {
+            //                if(intent.getPackage().compareTo(getApplicationInfo().packageName)==0) {
+            //                    Intent install = new Intent(Intent.ACTION_VIEW);
+            //                    install.setDataAndType(Uri.fromFile(
+            //                            new File(Environment.getExternalStorageDirectory() + "/" +
+            //                                    Environment.DIRECTORY_DOWNLOADS, "mycomms.apk")),
+            //                            "application/vnd.android.package-archive");
+            //                    startActivity(install);
+            //                }
+            //            }
+            //        };
+            //
+            //        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
-        //Show an alert to indicate the file download
-        AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
-        builder.setTitle(getString(R.string.update2));
-        builder.setMessage(getString(R.string.please_check_the_download_status_in_the_notifications_bar));
-        builder.setCancelable(false);
+            //Show an alert to indicate the file download
+            AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
+            builder.setTitle(getString(R.string.update2));
+            builder.setMessage(getString(R.string.please_check_the_download_status_in_the_notifications_bar));
+            builder.setCancelable(false);
 
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //Launch download and install
-                finish();
-            }
-        });
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //Launch download and install
+                    finish();
+                }
+            });
 
-        builder.create();
-        builder.show();
+            builder.create();
+            builder.show();
+        } catch (Exception e){
+            Log.e(Constants.TAG, "SplashScreenActivity.downloadNewVersion: ",e);
+            Crashlytics.logException(e);
+            downloadNewVersionFromURI(url);
+        }
     }
 
     private String getFilename(DownloadManager dm, Intent in) {

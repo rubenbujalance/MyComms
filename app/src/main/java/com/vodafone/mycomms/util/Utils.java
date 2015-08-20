@@ -660,11 +660,6 @@ public final class Utils extends MainActivity {
                         }
                     });
         }
-        else
-        {
-            imageAvatar.setImageResource(R.color.grey_middle);
-            textAvatar.setText(initials);
-        }
     }
 
     public static void loadContactAvatarDetail(String firstName, String lastName, final ImageView

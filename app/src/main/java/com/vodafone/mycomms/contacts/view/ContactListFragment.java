@@ -205,7 +205,7 @@ public class ContactListFragment extends ListFragment {
             showLDAPSettingsBar(true);
         else showLDAPSettingsBar(false);
 
-        setListAdapterTabs();
+        //setListAdapterTabs();
         super.onResume();
     }
 

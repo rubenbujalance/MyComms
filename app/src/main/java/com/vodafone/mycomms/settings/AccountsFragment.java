@@ -12,12 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.util.Constants;
 
@@ -119,8 +118,10 @@ public class AccountsFragment extends Fragment {
 
     private void checkAccountButtonVisibility()
     {
-        if(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED,false))
+        if(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED,false)
+                || validateLocalContactsRealm())
         {
+            sp.edit().putBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, true).apply();
             tvAddLocalContacts.setVisibility(View.GONE);
             imgCheckLocalContacts.setVisibility(View.VISIBLE);
         }
@@ -139,6 +140,12 @@ public class AccountsFragment extends Fragment {
             tvAddGlobalContacts.setVisibility(View.VISIBLE);
             imgCheckGlobalContacts.setVisibility(View.GONE);
         }
+    }
+
+    private boolean validateLocalContactsRealm() {
+        String profile = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profile);
+        return realmContactTransactions.validateContactPlatformExists(null, Constants.PLATFORM_LOCAL);
     }
 
     @Override

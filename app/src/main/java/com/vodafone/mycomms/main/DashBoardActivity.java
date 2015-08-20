@@ -142,7 +142,7 @@ public class DashBoardActivity extends ToolbarActivity
                                     String date = df.format(Calendar.getInstance().getTime());
 
                                     TextView dateText = (TextView) findViewById(R.id.dateDashboard);
-                                    dateText.setText(date);
+                                    dateText.setText(Utils.firstLetterToUpperCase(date));
                 }
             });
         }

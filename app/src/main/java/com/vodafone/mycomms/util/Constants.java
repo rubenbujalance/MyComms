@@ -291,4 +291,6 @@ public class Constants {
     public static final long ORDER_SALES_FORCE = 2;
     public static final long ORDER_LOCAL = 3;
 
+    public static final String LDAPDISCOVER = "https://weblync13-rat.vodafone.com/Autodiscover/AutodiscoverService.svc/root?originalDomain=vodafone.com";
+
 }

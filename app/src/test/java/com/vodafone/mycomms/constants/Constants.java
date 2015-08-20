@@ -42,4 +42,5 @@ public class Constants {
     public static final String LDAP_AUTH_RESPONSE_ERROR = "{\n\"ERROR_access_token\": \"cwt=AAEBHAEFAAAAAAAFFQAAAHgunRNCx3RSgoumKIbaUwCBENsx6jq4WrhZu86hmdu8GriCAg9mgyAUTV3bOCa0m37xnUa9tEGpw4QiH3RWvoW43-eGaQMeWoYI24-6Ay6j0ggNEIYYH10smKhXkptZU8OMRKo\",\n\"expires_in\": 28489,\n\"ms_rtc_identityscope\": \"local\",\n\"token_type\": \"Bearer\"\n}";
     public static final String LDAP_AUTH_URL = "https://weblync13-rat.vodafone.com/WebTicket/oauthtoken";
 
+    public static final String LDAPDISCOVER = "https://weblync13-rat.vodafone.com/Autodiscover/AutodiscoverService.svc/root?originalDomain=vodafone.com";
 }

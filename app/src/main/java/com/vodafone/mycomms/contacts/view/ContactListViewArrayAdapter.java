@@ -2,7 +2,6 @@ package com.vodafone.mycomms.contacts.view;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.LinearGradient;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.MycommsApp;
@@ -57,7 +55,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             convertView = inflater.inflate(R.layout.layout_list_item_contact, parent, false);
 
             viewHolder = new ViewHolder();
-            viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.companyLogo);
+            viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.img_companyLogo);
             viewHolder.textAvatar = (TextView) convertView.findViewById(R.id.avatarText);
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);

@@ -660,11 +660,6 @@ public final class Utils extends MainActivity {
                         }
                     });
         }
-        else
-        {
-            imageAvatar.setImageResource(R.color.grey_middle);
-            textAvatar.setText(initials);
-        }
     }
 
     public static void loadContactAvatarDetail(String firstName, String lastName, final ImageView
@@ -1025,5 +1020,12 @@ public final class Utils extends MainActivity {
         }
 
         return platformName;
+    }
+
+    public static String firstLetterToUpperCase(String date) {
+        char[] array = date.toCharArray();
+        array[0] = Character.toUpperCase(array[0]);
+
+        return new String(array);
     }
 }

@@ -770,5 +770,33 @@ public class RealmContactTransactions {
 
     }
 
+    public boolean validateContactPlatformExists(Realm realm, String platform) {
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getDefaultInstance();
+        try
+        {
+            RealmQuery<Contact> query = mRealm.where(Contact.class)
+                    .equalTo(Constants.CONTACT_PLATFORM,platform)
+                    .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
+
+            Contact result = query.findFirst();
+
+            return result != null;
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmContactTransactions.isAnyContactSaved: ", e);
+            Crashlytics.logException(e);
+            return false;
+        }
+        finally
+        {
+            if(null == realm)
+                mRealm.close();
+        }
+    }
 }
 

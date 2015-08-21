@@ -201,6 +201,98 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
             group_names.setText(groupNames);
             group_n_components.setText(groupNComponents);
         }
+        //TODO here we should load avatar provided by URL for whole group
+        //TODO by now we just the same as in previous If case
+        else
+        {
+            ArrayList<ImageView> images = new ArrayList<>();
+            images.add(top_left_avatar);
+            images.add(bottom_left_avatar);
+            images.add(bottom_right_avatar);
+
+            final ArrayList<TextView> texts = new ArrayList<>();
+            texts.add(top_left_avatar_text);
+            texts.add(bottom_left_avatar_text);
+            texts.add(bottom_right_avatar_text);
+
+            if (null != contactIds && contactIds.size() > 3)
+            {
+                lay_right_top_avatar_to_hide.setVisibility(View.VISIBLE);
+                images.add(top_right_avatar);
+                texts.add(top_right_avatar_text);
+            }
+
+            int i = 0;
+            boolean profileInside = false;
+            String groupNames = "";
+            String groupNComponents = contactList.size() + " people in group"; //TODO: Hardcode
+            for(Contact contact : contactList)
+            {
+                if(i>3) break;
+
+                final ImageView image = images.get(i);
+                final TextView text = texts.get(i);
+                text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+                //Image avatar
+                String initials = "";
+                if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
+                {
+                    if (contact.getContactId().equals(_profile_id))
+                        profileInside = true;
+                    else
+                        groupNames = contact.getFirstName() + ", " + groupNames;
+
+                    initials = contact.getFirstName().substring(0,1);
+
+                    if(null != contact.getLastName() && contact.getLastName().length() > 0)
+                    {
+                        initials = initials + contact.getLastName().substring(0,1);
+                    }
+
+                }
+
+                final String finalInitials = initials;
+
+                image.setImageResource(R.color.grey_middle);
+                text.setVisibility(View.VISIBLE);
+                text.setText(finalInitials);
+
+                if (contact.getAvatar()!=null &&
+                        contact.getAvatar().length()>0)
+                {
+                    MycommsApp.picasso
+                            .load(contact.getAvatar())
+                            .placeholder(R.color.grey_middle)
+                            .noFade()
+                            .fit().centerCrop()
+                            .into(image, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    text.setVisibility(View.INVISIBLE);
+                                }
+
+                                @Override
+                                public void onError() {
+                                    image.setImageResource(R.color.grey_middle);
+                                    text.setVisibility(View.VISIBLE);
+                                    text.setText(finalInitials);
+                                }
+                            });
+                }
+                else
+                {
+                    image.setImageResource(R.color.grey_middle);
+                    text.setText(initials);
+                }
+                i++;
+            }
+            groupNames = groupNames.substring(0, groupNames.length()-2);
+            if (profileInside)
+                groupNames = groupNames + ", you...";
+            group_names.setText(groupNames);
+            group_n_components.setText(groupNComponents);
+        }
     }
 
     private void startGroupChatListActivity()

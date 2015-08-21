@@ -5,12 +5,12 @@
              android:layout_height="wrap_content">
 
     <com.vodafone.mycomms.custom.CircleImageView
-        android:id="@+id/img_companyLogo"
+        android:id="@+id/companyLogo"
         android:layout_width="65dp"
         android:layout_height="65dp"
         android:layout_gravity="center"
         android:layout_alignParentLeft="true"
-        tools:src="@drawable/profile_mock_avatar" />
+        android:src="@drawable/profile_mock_avatar" />
 
     <TextView
         android:id="@+id/avatarText"

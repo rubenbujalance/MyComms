@@ -16,12 +16,14 @@ import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
@@ -40,6 +42,7 @@ import java.util.TimeZone;
 
 import io.realm.Realm;
 import model.Contact;
+import model.UserProfile;
 
 public class ContactDetailMainActivity extends ToolbarActivity implements IContactDetailConnectionCallback {
     private Contact contact;
@@ -106,7 +109,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
         controller = new ContactDetailController(this, mProfileId);
         controller.setConnectionCallback(this);
-        contact = getContact(contactId);
+
+        if (contactId.equals(mProfileId)) {
+            UserProfile profile = getProfile(contactId);
+            contact = ContactsController.mapProfileToContact(profile);
+        }else
+            contact = getContact(contactId);
 
         //Views
         ivIconStatus = (ImageView)findViewById(R.id.ivStatus);
@@ -369,6 +377,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         }
         else
             tvOfficeLocation.setVisibility(View.VISIBLE);
+
+        if (contactId.equals(mProfileId)){
+            btnChat.setImageDrawable(getResources().getDrawable(R.drawable.btn_prof_chat_off));
+            btnChat.setOnClickListener(null);
+        }
     }
 
     private void loadContactStatusInfo()
@@ -605,6 +618,12 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
             controller.getContactDetail(contactId);
 
         return contact;
+    }
+
+    private UserProfile getProfile(String profileId){
+        RealmProfileTransactions realmProfileTransactions = new RealmProfileTransactions();
+
+        return realmProfileTransactions.getUserProfile(profileId,null);
     }
 
     private String printContact(Contact contact){

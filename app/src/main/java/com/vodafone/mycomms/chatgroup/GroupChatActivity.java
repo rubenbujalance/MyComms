@@ -204,56 +204,15 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
 
                     //Image avatar
-                    String initials = "";
-                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-                    {
-                        if (contact.getContactId().equals(_profile_id))
-                            profileInside = true;
-                        else
-                            groupNames = contact.getFirstName() + ", " + groupNames;
-
-                        initials = contact.getFirstName().substring(0,1);
-
-                        if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                        {
-                            initials = initials + contact.getLastName().substring(0,1);
-                        }
-
-                    }
-
-                    final String finalInitials = initials;
-
-                    image.setImageResource(R.color.grey_middle);
-                    text.setVisibility(View.VISIBLE);
-                    text.setText(finalInitials);
-
-                    if (contact.getAvatar()!=null &&
-                            contact.getAvatar().length()>0)
-                    {
-                        MycommsApp.picasso
-                                .load(contact.getAvatar())
-                                .placeholder(R.color.grey_middle)
-                                .noFade()
-                                .fit().centerCrop()
-                                .into(image, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        text.setVisibility(View.INVISIBLE);
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                        image.setImageResource(R.color.grey_middle);
-                                        text.setVisibility(View.VISIBLE);
-                                        text.setText(finalInitials);
-                                    }
-                                });
-                    }
-                    else
-                    {
-                        image.setImageResource(R.color.grey_middle);
-                        text.setText(initials);
-                    }
+                    Utils.loadContactAvatar
+                            (
+                                    contact.getFirstName()
+                                    , contact.getLastName()
+                                    , image
+                                    , text
+                                    , contact.getAvatar()
+                                    , 15
+                            );
                     i++;
                 }
                 groupNames = groupNames.substring(0, groupNames.length()-2);
@@ -296,56 +255,22 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
 
                     //Image avatar
-                    String initials = "";
-                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-                    {
+                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0) {
                         if (contact.getContactId().equals(_profile_id))
                             profileInside = true;
                         else
                             groupNames = contact.getFirstName() + ", " + groupNames;
 
-                        initials = contact.getFirstName().substring(0,1);
-
-                        if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                        {
-                            initials = initials + contact.getLastName().substring(0,1);
-                        }
-
                     }
-
-                    final String finalInitials = initials;
-
-                    image.setImageResource(R.color.grey_middle);
-                    text.setVisibility(View.VISIBLE);
-                    text.setText(finalInitials);
-
-                    if (contact.getAvatar()!=null &&
-                            contact.getAvatar().length()>0)
-                    {
-                        MycommsApp.picasso
-                                .load(contact.getAvatar())
-                                .placeholder(R.color.grey_middle)
-                                .noFade()
-                                .fit().centerCrop()
-                                .into(image, new Callback() {
-                                    @Override
-                                    public void onSuccess() {
-                                        text.setVisibility(View.INVISIBLE);
-                                    }
-
-                                    @Override
-                                    public void onError() {
-                                        image.setImageResource(R.color.grey_middle);
-                                        text.setVisibility(View.VISIBLE);
-                                        text.setText(finalInitials);
-                                    }
-                                });
-                    }
-                    else
-                    {
-                        image.setImageResource(R.color.grey_middle);
-                        text.setText(initials);
-                    }
+                    Utils.loadContactAvatar
+                            (
+                                    contact.getFirstName()
+                                    , contact.getLastName()
+                                    , image
+                                    , text
+                                    , contact.getAvatar()
+                                    , 15
+                            );
                     i++;
                 }
                 groupNames = groupNames.substring(0, groupNames.length()-2);
@@ -414,57 +339,16 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                 Crashlytics.logException(e);
             }
 
-
             //Image avatar
-            String initials = "";
-            if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-            {
-                initials = contact.getFirstName().substring(0,1);
-
-                if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                {
-                    initials = initials + contact.getLastName().substring(0,1);
-                }
-
-            }
-
-
-
-
-            final String finalInitials = initials;
-
-            top_left_avatar.setImageResource(R.color.grey_middle);
-            top_left_avatar_text.setVisibility(View.VISIBLE);
-            top_left_avatar_text.setText(finalInitials);
-            top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-
-            if (contact.getAvatar()!=null &&
-                    contact.getAvatar().length()>0)
-            {
-                MycommsApp.picasso
-                        .load(contact.getAvatar())
-                        .placeholder(R.color.grey_middle)
-                        .noFade()
-                        .fit().centerCrop()
-                        .into(top_left_avatar, new Callback() {
-                            @Override
-                            public void onSuccess() {
-                                top_left_avatar_text.setVisibility(View.INVISIBLE);
-                            }
-
-                            @Override
-                            public void onError() {
-                                top_left_avatar.setImageResource(R.color.grey_middle);
-                                top_left_avatar_text.setVisibility(View.VISIBLE);
-                                top_left_avatar_text.setText(finalInitials);
-                            }
-                        });
-            }
-            else
-            {
-                top_left_avatar.setImageResource(R.color.grey_middle);
-                top_left_avatar_text.setText(initials);
-            }
+            Utils.loadContactAvatar
+                    (
+                            contact.getFirstName()
+                            , contact.getLastName()
+                            , top_left_avatar
+                            , top_left_avatar_text
+                            , contact.getAvatar()
+                            , 25
+                    );
 
             top_left_avatar.setOnClickListener(new View.OnClickListener() {
                 @Override

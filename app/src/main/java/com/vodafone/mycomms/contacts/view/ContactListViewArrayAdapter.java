@@ -55,7 +55,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             convertView = inflater.inflate(R.layout.layout_list_item_contact, parent, false);
 
             viewHolder = new ViewHolder();
-            viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.img_companyLogo);
+            viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.companyLogo);
             viewHolder.textAvatar = (TextView) convertView.findViewById(R.id.avatarText);
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);

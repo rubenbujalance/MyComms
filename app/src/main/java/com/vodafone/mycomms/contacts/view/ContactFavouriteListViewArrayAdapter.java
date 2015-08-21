@@ -49,14 +49,12 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ViewHolder viewHolder;
+        ViewHolder viewHolder = new ViewHolder();
 
         if(convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.layout_list_item_contact, parent, false);
-
-            viewHolder = new ViewHolder();
-            viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.img_companyLogo);
+            viewHolder.imageAvatar = (ImageView) convertView.findViewById(R.id.companyLogo);
             viewHolder.textAvatar = (TextView) convertView.findViewById(R.id.avatarText);
             viewHolder.textViewCompany = (TextView) convertView.findViewById(R.id.list_item_content_company);
             viewHolder.textViewName = (TextView) convertView.findViewById(R.id.list_item_content_name);
@@ -73,11 +71,6 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
 
         // update the item view
         FavouriteContact contact = getItem(position);
-        String desc = contact.getFirstName() + " " + contact.getLastName() + " " + contact.getAvatar();
-
-        FavouriteContact contactAtPositionZero = getItem(0);
-        String descContactAtPositionZero = contactAtPositionZero.getFirstName() + " " + contactAtPositionZero.getLastName() + " " + contactAtPositionZero.getAvatar();
-
         viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
         if(null != contact.getPlatform()
                 && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))

@@ -548,8 +548,15 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private void loadProfileImage()
     {
-        Utils.loadContactAvatar(userProfile.getFirstName(), userProfile.getLastName(), this
-                .profilePicture, this.textAvatar, userProfile.getAvatar(), 25);
+        Utils.loadContactAvatar
+                (
+                        userProfile.getFirstName()
+                        , userProfile.getLastName()
+                        , this.profilePicture
+                        , this.textAvatar
+                        , userProfile.getAvatar()
+                        , 50
+                );
     }
 
     /**

@@ -1,22 +1,14 @@
 package com.vodafone.mycomms.contacts.connection;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
@@ -33,12 +25,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.zip.Inflater;
 
 import io.realm.Realm;
 import model.Contact;
 import model.FavouriteContact;
 import model.RecentContact;
+import model.UserProfile;
 
 public class ContactsController{
 
@@ -301,6 +293,29 @@ public class ContactsController{
             Log.e(Constants.TAG, "ContactsController.mapContactToRecent: " ,e);
         }
         return recentContact;
+    }
+
+    public static Contact mapProfileToContact(UserProfile profile){
+        Contact contact = new Contact();
+        contact.setId(profile.getId());
+        contact.setProfileId(profile.getId());
+        contact.setContactId(profile.getId());
+        contact.setPlatform(profile.getPlatform());
+        contact.setFirstName(profile.getFirstName());
+        contact.setLastName(profile.getLastName());
+        contact.setAvatar(profile.getAvatar());
+        contact.setCompany(profile.getCompany());
+        contact.setPosition(profile.getPosition());
+        contact.setLastSeen(profile.getLastSeen());
+        contact.setOfficeLocation(profile.getOfficeLocation());
+        contact.setPhones(profile.getPhones());
+        contact.setOfficeLocation(profile.getOfficeLocation());
+        contact.setEmails(profile.getEmails());
+        contact.setAvailability(profile.getAvailability());
+        contact.setPresence(profile.getPresence());
+        contact.setCountry(profile.getCountry());
+
+        return contact;
     }
 
     /**

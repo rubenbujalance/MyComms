@@ -24,6 +24,7 @@
         android:layout_above="@+id/message_layout"
         android:background="@color/white"
         android:visibility="visible"
+        android:clickable="true"
         android:paddingBottom="5dp" />
 
     <LinearLayout

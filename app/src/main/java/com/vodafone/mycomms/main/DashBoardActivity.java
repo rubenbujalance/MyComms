@@ -493,6 +493,7 @@ public class DashBoardActivity extends ToolbarActivity
                 title.setText(titleStr);
                 TextView date = (TextView) child.findViewById(R.id.notice_date);
                 date.setText(dateStr);
+
                 MycommsApp.picasso
                         .load(imageUrl)
                         .fit().centerCrop()
@@ -713,7 +714,7 @@ public class DashBoardActivity extends ToolbarActivity
                                                                     , contact.getStringField1()
                                                                     , contact.getAvatar()
                                                             )
-                                                    , 0);
+                                                    , 15);
                                 }
                             }
                             catch (Exception e)
@@ -867,7 +868,10 @@ public class DashBoardActivity extends ToolbarActivity
                             } else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
                                 // This is LOCAL contact, then in this case the action will be Send SMS
                                 // message
-                                if (null != platform && platform.compareTo(Constants.PLATFORM_LOCAL) == 0) {
+                                if (null != platform
+                                        && (platform.compareTo(Constants.PLATFORM_LOCAL) == 0
+                                        || platform.compareTo(Constants.PLATFORM_GLOBAL_CONTACTS) == 0))
+                                {
                                     String phone = phones;
                                     if (null != phone) {
                                         Utils.launchSms(phone, DashBoardActivity.this);
@@ -903,8 +907,20 @@ public class DashBoardActivity extends ToolbarActivity
                     }
                 });
                 Contact contact = realmContactTransactions.getContactById(contactId, realm);
-                Utils.loadContactAvatar(firstName, lastName, recentAvatar, avatarText, Utils
-                        .getAvatarURL(platform, contact.getStringField1(), contact.getAvatar()));
+                Utils.loadContactAvatar
+                        (
+                                firstName
+                                , lastName
+                                , recentAvatar
+                                , avatarText
+                                , Utils.getAvatarURL
+                                        (
+                                                platform
+                                                , contact.getStringField1()
+                                                , contact.getAvatar()
+                                        )
+                                , 25
+                        );
 
                 // Badges
                 RealmChatTransactions realmChatTransactions = new RealmChatTransactions(getBaseContext());

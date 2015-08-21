@@ -493,6 +493,7 @@ public class DashBoardActivity extends ToolbarActivity
                 title.setText(titleStr);
                 TextView date = (TextView) child.findViewById(R.id.notice_date);
                 date.setText(dateStr);
+
                 MycommsApp.picasso
                         .load(imageUrl)
                         .fit().centerCrop()

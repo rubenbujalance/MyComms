@@ -29,6 +29,7 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.Serializable;
@@ -143,56 +144,14 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
                 text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
 
                 //Image avatar
-                String initials = "";
-                if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-                {
-                    if (contact.getContactId().equals(_profile_id))
-                        profileInside = true;
-                    else
-                        groupNames = contact.getFirstName() + ", " + groupNames;
-
-                    initials = contact.getFirstName().substring(0,1);
-
-                    if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                    {
-                        initials = initials + contact.getLastName().substring(0,1);
-                    }
-
-                }
-
-                final String finalInitials = initials;
-
-                image.setImageResource(R.color.grey_middle);
-                text.setVisibility(View.VISIBLE);
-                text.setText(finalInitials);
-
-                if (contact.getAvatar()!=null &&
-                        contact.getAvatar().length()>0)
-                {
-                    MycommsApp.picasso
-                            .load(contact.getAvatar())
-                            .placeholder(R.color.grey_middle)
-                            .noFade()
-                            .fit().centerCrop()
-                            .into(image, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    text.setVisibility(View.INVISIBLE);
-                                }
-
-                                @Override
-                                public void onError() {
-                                    image.setImageResource(R.color.grey_middle);
-                                    text.setVisibility(View.VISIBLE);
-                                    text.setText(finalInitials);
-                                }
-                            });
-                }
-                else
-                {
-                    image.setImageResource(R.color.grey_middle);
-                    text.setText(initials);
-                }
+                Utils.loadContactAvatar
+                        (
+                                contact.getFirstName()
+                                , contact.getLastName()
+                                , image
+                                , text
+                                , contact.getAvatar()
+                        );
                 i++;
             }
             groupNames = groupNames.substring(0, groupNames.length()-2);
@@ -235,56 +194,21 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
                 text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
 
                 //Image avatar
-                String initials = "";
-                if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-                {
+                if(null != contact.getFirstName() && contact.getFirstName().length() > 0) {
                     if (contact.getContactId().equals(_profile_id))
                         profileInside = true;
                     else
                         groupNames = contact.getFirstName() + ", " + groupNames;
-
-                    initials = contact.getFirstName().substring(0,1);
-
-                    if(null != contact.getLastName() && contact.getLastName().length() > 0)
-                    {
-                        initials = initials + contact.getLastName().substring(0,1);
-                    }
-
                 }
+                Utils.loadContactAvatar
+                        (
+                                contact.getFirstName()
+                                , contact.getLastName()
+                                , image
+                                , text
+                                , contact.getAvatar()
+                        );
 
-                final String finalInitials = initials;
-
-                image.setImageResource(R.color.grey_middle);
-                text.setVisibility(View.VISIBLE);
-                text.setText(finalInitials);
-
-                if (contact.getAvatar()!=null &&
-                        contact.getAvatar().length()>0)
-                {
-                    MycommsApp.picasso
-                            .load(contact.getAvatar())
-                            .placeholder(R.color.grey_middle)
-                            .noFade()
-                            .fit().centerCrop()
-                            .into(image, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    text.setVisibility(View.INVISIBLE);
-                                }
-
-                                @Override
-                                public void onError() {
-                                    image.setImageResource(R.color.grey_middle);
-                                    text.setVisibility(View.VISIBLE);
-                                    text.setText(finalInitials);
-                                }
-                            });
-                }
-                else
-                {
-                    image.setImageResource(R.color.grey_middle);
-                    text.setText(initials);
-                }
                 i++;
             }
             groupNames = groupNames.substring(0, groupNames.length()-2);

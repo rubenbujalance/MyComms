@@ -618,26 +618,25 @@ public final class Utils extends MainActivity {
             imageAvatar, final TextView textAvatar, final String avatarURL, float textAvatarSize)
     {
         //Image avatar
-        String avatar = avatarURL;
-        String textAvat = textAvatar.getText().toString();
         String initials = "";
         if(null != firstName && firstName.length() > 0)
         {
             initials = firstName.substring(0, 1);
-
             if(null != lastName && lastName.length() > 0)
-            {
                 initials = initials + lastName.substring(0, 1);
-            }
         }
 
         final String finalInitials = initials;
 
+        if(textAvatarSize != 0)
+            textAvatar.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAvatarSize);
+
         imageAvatar.setImageResource(R.color.grey_middle);
         textAvatar.setVisibility(View.VISIBLE);
         textAvatar.setText(finalInitials);
+        MycommsApp.picasso.cancelRequest(imageAvatar);
 
-        if (null != avatarURL && avatarURL.length()>0)
+        if (avatarURL!=null && avatarURL.length()>0)
         {
             MycommsApp.picasso
                     .load(avatarURL)
@@ -647,7 +646,7 @@ public final class Utils extends MainActivity {
                     .into(imageAvatar, new Callback() {
                         @Override
                         public void onSuccess() {
-                            textAvatar.setVisibility(View.INVISIBLE);
+                            textAvatar.setVisibility(View.GONE);
                         }
 
                         @Override
@@ -657,11 +656,6 @@ public final class Utils extends MainActivity {
                             textAvatar.setText(finalInitials);
                         }
                     });
-        }
-        else
-        {
-            imageAvatar.setImageResource(R.color.grey_middle);
-            textAvatar.setText(initials);
         }
     }
 
@@ -684,6 +678,8 @@ public final class Utils extends MainActivity {
         imageAvatar.setImageResource(R.color.grey_middle);
         textAvatar.setVisibility(View.VISIBLE);
         textAvatar.setText(finalInitials);
+
+        MycommsApp.picasso.cancelRequest(imageAvatar);
 
         if (avatarURL!=null && avatarURL.length()>0)
         {

@@ -38,6 +38,7 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
@@ -448,50 +449,14 @@ public class GroupChatListFragment extends ListFragment
 
 
         //Image avatar
-        String initials = "";
-        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-        {
-            initials = contact.getFirstName().substring(0,1);
-
-            if(null != contact.getLastName() && contact.getLastName().length() > 0)
-            {
-                initials = initials + contact.getLastName().substring(0,1);
-            }
-        }
-
-        final String finalInitials = initials;
-
-        contactAvatar.setImageResource(R.color.grey_middle);
-        avatarText.setVisibility(View.VISIBLE);
-        avatarText.setText(finalInitials);
-
-        if (contact.getAvatar()!=null &&
-                contact.getAvatar().length()>0)
-        {
-            MycommsApp.picasso
-                    .load(contact.getAvatar())
-                    .placeholder(R.color.grey_middle)
-                    .noFade()
-                    .fit().centerCrop()
-                    .into(contactAvatar, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            avatarText.setVisibility(View.INVISIBLE);
-                        }
-
-                        @Override
-                        public void onError() {
-                            contactAvatar.setImageResource(R.color.grey_middle);
-                            avatarText.setVisibility(View.VISIBLE);
-                            avatarText.setText(finalInitials);
-                        }
-                    });
-        }
-        else
-        {
-            contactAvatar.setImageResource(R.color.grey_middle);
-            avatarText.setText(initials);
-        }
+        Utils.loadContactAvatar
+                (
+                        contact.getFirstName()
+                        , contact.getLastName()
+                        , contactAvatar
+                        , avatarText
+                        , contact.getAvatar()
+                );
 
         TextView firstName = (TextView) contactChild.findViewById(R.id.group_chat_first_name);
         TextView lastName = (TextView) contactChild.findViewById(R.id.group_chat_last_name);

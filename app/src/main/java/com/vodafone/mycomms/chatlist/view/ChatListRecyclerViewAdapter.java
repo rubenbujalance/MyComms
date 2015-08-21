@@ -312,52 +312,14 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
                     , final TextView text
             )
     {
-        //Image avatar
-        String initials = "";
-        if(null != contact.getFirstName() && contact.getFirstName().length() > 0)
-        {
-            initials = contact.getFirstName().substring(0,1);
-
-            if(null != contact.getLastName() && contact.getLastName().length() > 0)
-            {
-                initials = initials + contact.getLastName().substring(0,1);
-            }
-        }
-
-        final String finalInitials = initials;
-
-        image.setImageResource(R.color.grey_middle);
-        text.setVisibility(View.VISIBLE);
-        text.setText(finalInitials);
-
-        if (null != contact.getAvatar() &&
-                contact.getAvatar().length()>0)
-        {
-
-            MycommsApp.picasso
-                    .load(contact.getAvatar())
-                    .placeholder(R.color.grey_middle)
-                    .noFade()
-                    .fit().centerCrop()
-                    .into(image, new Callback() {
-                        @Override
-                        public void onSuccess() {
-                            text.setVisibility(View.INVISIBLE);
-                        }
-
-                        @Override
-                        public void onError() {
-                            image.setImageResource(R.color.grey_middle);
-                            text.setVisibility(View.VISIBLE);
-                            text.setText(finalInitials);
-                        }
-                    });
-        }
-        else
-        {
-            image.setImageResource(R.color.grey_middle);
-            text.setText(initials);
-        }
+        Utils.loadContactAvatar
+                (
+                        contact.getFirstName()
+                        , contact.getLastName()
+                        , image
+                        , text
+                        , contact.getAvatar()
+                );
     }
 
     public ComposedChat getComposedChat(int position) {

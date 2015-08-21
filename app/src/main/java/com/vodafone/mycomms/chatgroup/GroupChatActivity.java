@@ -211,6 +211,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                                     , image
                                     , text
                                     , contact.getAvatar()
+                                    , 15
                             );
                     i++;
                 }
@@ -268,6 +269,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                                     , image
                                     , text
                                     , contact.getAvatar()
+                                    , 15
                             );
                     i++;
                 }
@@ -345,6 +347,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                             , top_left_avatar
                             , top_left_avatar_text
                             , contact.getAvatar()
+                            , 25
                     );
 
             top_left_avatar.setOnClickListener(new View.OnClickListener() {

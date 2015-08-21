@@ -714,7 +714,7 @@ public class DashBoardActivity extends ToolbarActivity
                                                                     , contact.getStringField1()
                                                                     , contact.getAvatar()
                                                             )
-                                                    , 0);
+                                                    , 15);
                                 }
                             }
                             catch (Exception e)
@@ -904,8 +904,20 @@ public class DashBoardActivity extends ToolbarActivity
                     }
                 });
                 Contact contact = realmContactTransactions.getContactById(contactId, realm);
-                Utils.loadContactAvatar(firstName, lastName, recentAvatar, avatarText, Utils
-                        .getAvatarURL(platform, contact.getStringField1(), contact.getAvatar()));
+                Utils.loadContactAvatar
+                        (
+                                firstName
+                                , lastName
+                                , recentAvatar
+                                , avatarText
+                                , Utils.getAvatarURL
+                                        (
+                                                platform
+                                                , contact.getStringField1()
+                                                , contact.getAvatar()
+                                        )
+                                , 25
+                        );
 
                 // Badges
                 RealmChatTransactions realmChatTransactions = new RealmChatTransactions(getBaseContext());

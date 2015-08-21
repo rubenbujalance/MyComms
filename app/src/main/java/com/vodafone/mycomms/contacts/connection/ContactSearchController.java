@@ -38,7 +38,7 @@ public class ContactSearchController {
             OKHttpWrapper.get(apiCall, mContext, new OKHttpWrapper.HttpCallback() {
                 @Override
                 public void onFailure(Response response, IOException e) {
-                    Log.i(Constants.TAG, "ContactSearchController.onFailure:");
+                    Log.e(Constants.TAG, "ContactSearchController.onFailure:",e);
                 }
 
                 @Override
@@ -70,8 +70,11 @@ public class ContactSearchController {
                     jsonObject = jsonArray.getJSONObject(i);
                     if (jsonObject.getString(Constants.CONTACT_ID) != null
                             && !jsonObject.getString(Constants.CONTACT_ID).equals("")) {
-                        if (i > 0) ids += ",";
-                        ids += jsonObject.getString(Constants.CONTACT_ID);
+                        //TODO: Temporary filter due to GLOBAL CONTACTS error
+                        if (!jsonObject.getString(Constants.CONTACT_ID).startsWith(Constants.PLATFORM_GLOBAL_CONTACTS)){
+                            if (i > 0) ids += ",";
+                            ids += jsonObject.getString(Constants.CONTACT_ID);
+                        }
                     }
                 }
             }

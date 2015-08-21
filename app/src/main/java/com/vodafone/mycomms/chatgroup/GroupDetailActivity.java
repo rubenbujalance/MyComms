@@ -21,7 +21,9 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatgroup.view.GroupDetailRecyclerItemClickListener;
 import com.vodafone.mycomms.chatgroup.view.GroupMembersViewAdapter;
+import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -106,6 +108,17 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         loadExtras();
         loadContactsFromIds();
         loadTheRestOfTheComponents();
+
+        mRecyclerView.addOnItemTouchListener(new GroupDetailRecyclerItemClickListener(GroupDetailActivity.this,
+                mRecyclerView, new GroupDetailRecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Intent in = new Intent(GroupDetailActivity.this, ContactDetailMainActivity.class);
+                ((MycommsApp) getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
+                in.putExtra(Constants.CONTACT_CONTACT_ID, contactList.get(position).getContactId());
+                startActivity(in);
+            }
+        }));
 
         refreshAdapter();
     }

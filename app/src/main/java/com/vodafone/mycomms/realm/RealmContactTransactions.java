@@ -602,7 +602,7 @@ public class RealmContactTransactions {
             query.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
             RealmResults<RecentContact> result1 = query.findAll();
 
-            if (result1!=null){
+            if (result1!=null && result1.size()!=0){
                 result1.sort(Constants.CONTACT_RECENTS_ACTION_TIME); // Sort ascending
                 result1.sort(Constants.CONTACT_RECENTS_ACTION_TIME, RealmResults.SORT_ORDER_DESCENDING);
                 for (RecentContact contactListItem : result1) {

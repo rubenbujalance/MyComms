@@ -615,9 +615,11 @@ public final class Utils extends MainActivity {
     }
 
     public static void loadContactAvatar(String firstName, String lastName, final ImageView
-            imageAvatar, final TextView textAvatar, String avatarURL, float textAvatarSize)
+            imageAvatar, final TextView textAvatar, final String avatarURL, float textAvatarSize)
     {
         //Image avatar
+        String avatar = avatarURL;
+        String textAvat = textAvatar.getText().toString();
         String initials = "";
         if(null != firstName && firstName.length() > 0)
         {
@@ -627,7 +629,6 @@ public final class Utils extends MainActivity {
             {
                 initials = initials + lastName.substring(0, 1);
             }
-
         }
 
         final String finalInitials = initials;
@@ -636,10 +637,7 @@ public final class Utils extends MainActivity {
         textAvatar.setVisibility(View.VISIBLE);
         textAvatar.setText(finalInitials);
 
-        if(textAvatarSize != 0)
-            textAvatar.setTextSize(TypedValue.COMPLEX_UNIT_SP, textAvatarSize);
-
-        if (avatarURL!=null && avatarURL.length()>0)
+        if (null != avatarURL && avatarURL.length()>0)
         {
             MycommsApp.picasso
                     .load(avatarURL)
@@ -659,6 +657,11 @@ public final class Utils extends MainActivity {
                             textAvatar.setText(finalInitials);
                         }
                     });
+        }
+        else
+        {
+            imageAvatar.setImageResource(R.color.grey_middle);
+            textAvatar.setText(initials);
         }
     }
 

@@ -868,7 +868,10 @@ public class DashBoardActivity extends ToolbarActivity
                             } else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
                                 // This is LOCAL contact, then in this case the action will be Send SMS
                                 // message
-                                if (null != platform && platform.compareTo(Constants.PLATFORM_LOCAL) == 0) {
+                                if (null != platform
+                                        && (platform.compareTo(Constants.PLATFORM_LOCAL) == 0
+                                        || platform.compareTo(Constants.PLATFORM_GLOBAL_CONTACTS) == 0))
+                                {
                                     String phone = phones;
                                     if (null != phone) {
                                         Utils.launchSms(phone, DashBoardActivity.this);

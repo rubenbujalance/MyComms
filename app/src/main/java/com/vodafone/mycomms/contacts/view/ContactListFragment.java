@@ -307,8 +307,10 @@ public class ContactListFragment extends ListFragment {
 
                         // This is LOCAL contact, then in this case the action will be Send SMS
                         // message
-                        if (null != recentContactList.get(position).getPlatform() && recentContactList.get
-                                (position).getPlatform().equals(Constants.PLATFORM_LOCAL)) {
+                        if (null != recentContactList.get(position).getPlatform()
+                                && (recentContactList.get(position).getPlatform().equals(Constants.PLATFORM_LOCAL)
+                                    || recentContactList.get(position).getPlatform().equals(Constants.PLATFORM_GLOBAL_CONTACTS)))
+                        {
                             String phone = recentContactList.get(position).getPhones();
                             if (null != phone) {
                                 Utils.launchSms(phone, getActivity());

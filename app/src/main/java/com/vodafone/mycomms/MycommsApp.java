@@ -375,7 +375,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
         recentContactController = new RecentContactController(this, profile_id);
-        recentContactController.getRecentList();
+        recentContactController.getRecentListWithPreviousLDAPAuthentication();
         getNews();
         XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
     }

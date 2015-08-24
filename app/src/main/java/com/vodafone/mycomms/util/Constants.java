@@ -283,7 +283,14 @@ public class Constants {
     public static final String LDAP_SETTINGS_FIELD_TOKEN = "token";
     public static final String LDAP_SETTINGS_FIELD_TOKEN_TYPE = "tokenType";
     public static final String LDAP_SETTINGS_FIELD_URL = "url";
+    public static final String LDAP_SETTINGS_FIELD_TOKEN_TYPE_HEADER = "tt";
+    public static final String LDAP_SETTINGS_FIELD_TOKEN_HEADER = "lt";
     public static final String LDAP_API_CALL_PLATFORM = "ly";
+    public static final String LDAP_URL_HREF = "href";
+    public static final String LDAP_HEADER_AUTHENTICATE = "WWW-Authenticate";
+    public static final String LDAP_HEADER_AUTHENTICATE_REF = "MsRtcOAuth href=";
+    public static final String LDAP_HEADER_AUTHENTICATE_REF_END = "grant_type";
+
 
     //Platform Search Order
     public static final long ORDER_MYCOMMS = 0;
@@ -292,5 +299,9 @@ public class Constants {
     public static final long ORDER_LOCAL = 3;
 
     public static final String LDAPDISCOVER = "https://weblync13-rat.vodafone.com/Autodiscover/AutodiscoverService.svc/root?originalDomain=vodafone.com";
+
+    public static final String LDAP_GET_AVAILABLE_URL = "https://lyncdiscover.vodafone.com";
+
+
 
 }

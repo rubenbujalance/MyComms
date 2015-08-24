@@ -18,8 +18,10 @@ import com.vodafone.mycomms.util.Constants;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import model.Contact;
 import model.GlobalContactsSettings;
 
 /**
@@ -214,6 +216,7 @@ public class GlobalContactsController {
                 cb.onFailure(context.getString(R.string.connection_error), 0);
             }
 
+
             @Override
             public void onResponse(Response response) {
                 try {
@@ -262,6 +265,123 @@ public class GlobalContactsController {
             }
         });
     }
+
+//    public void getAvailableURL(final String userName, final String userPwd)
+//    {
+//        String URL = Constants.LDAP_GET_AVAILABLE_URL;
+//        Request.Builder builder = new Request.Builder();
+//        final Request request = builder
+//                .url(URL)
+//                .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+//                        LDAP_HEADER_CONTENT_TYPE_VALUE)
+//                .get()
+//                .build();
+//
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Request request, IOException e)
+//            {
+//                Log.e(Constants.TAG, "GlobalContactsController.getAvailableURL.onFailure: on request " + request.url().toString(), e);
+//            }
+//
+//            @Override
+//            public void onResponse(Response response) {
+//                try
+//                {
+//                    int code = response.code();
+//                    if(code >= 200 && code < 300)
+//                    {
+//                        JSONObject jsonObject = new JSONObject(response.body().string());
+//                        if(jsonObject.has(Constants.LDAP_SETTINGS_FIELD_USER))
+//                        {
+//                            JSONObject jsonUserHref = jsonObject.getJSONObject(Constants.LDAP_SETTINGS_FIELD_USER);
+//                            if(jsonUserHref.has(Constants.LDAP_URL_HREF))
+//                            {
+//                                String userHrefURL = jsonUserHref.getString(Constants.LDAP_URL_HREF);
+//                                getURLForAuthenticateUsers(userHrefURL);
+//                            }
+//                            else
+//                                Log.e(Constants.TAG, "GlobalContactsController.getAvailableURL.onResponse: " +
+//                                        "response header does not contains "+Constants.LDAP_URL_HREF);
+//                        }
+//                        else
+//                            Log.e(Constants.TAG, "GlobalContactsController.getAvailableURL.onResponse: " +
+//                                    "response header does not contains "+Constants.LDAP_HEADER_AUTHENTICATE_REF_END);
+//
+//                    }
+//                    else
+//                        Log.e(Constants.TAG, "GlobalContactsController.getAvailableURL.onResponse: request was -> "
+//                                +request.url()+"\n"+" and response code was -> "
+//                                +code+" with response description -> "+response.body().toString());
+//                }
+//                catch (Exception e)
+//                {
+//                    Log.e(Constants.TAG, "GlobalContactsController.getAvailableURL.onResponse: ", e);
+//                }
+//            }
+//        });
+//    }
+//
+//    public void getURLForAuthenticateUsers(String URL)
+//    {
+//        Request.Builder builder = new Request.Builder();
+//        Request request = builder
+//                .url(URL)
+//                .addHeader(Constants.API_HTTP_HEADER_CONTENTTYPE,
+//                        LDAP_HEADER_CONTENT_TYPE_VALUE)
+//                .get()
+//                .build();
+//
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Request request, IOException e)
+//            {
+//                Log.e(Constants.TAG, "GlobalContactsController.getAvailableUsersFromURL.onFailure: on request "+request.url().toString(), e);
+//            }
+//
+//            @Override
+//            public void onResponse(Response response) {
+//                try
+//                {
+//                    int code = response.code();
+//                    if(code == 401)
+//                    {
+//                        if(null != response.header(Constants.LDAP_HEADER_AUTHENTICATE))
+//                        {
+//                            String header = response.header(Constants.LDAP_HEADER_AUTHENTICATE);
+//                            int startPosition = header.indexOf(Constants.LDAP_HEADER_AUTHENTICATE_REF);
+//                            if(startPosition != -1)
+//                            {
+//                                int endPosition = header.indexOf(Constants.LDAP_HEADER_AUTHENTICATE_REF_END);
+//                                if(endPosition != -1)
+//                                {
+//                                    endPosition = endPosition-2;
+//                                    String URL = header.substring(startPosition, endPosition);
+//                                    URL = URL.replace(Constants.LDAP_HEADER_AUTHENTICATE_REF,"").replace("\"","");
+//                                }
+//                                else
+//                                    Log.e(Constants.TAG, "GlobalContactsController.getAvailableUsersFromURL.onResponse: " +
+//                                            "response header does not contains "+Constants.LDAP_HEADER_AUTHENTICATE_REF_END);
+//                            }
+//                            else
+//                                Log.e(Constants.TAG, "GlobalContactsController.getAvailableUsersFromURL.onResponse: " +
+//                                        "response header does not contains "+Constants.LDAP_HEADER_AUTHENTICATE_REF);
+//                        }
+//                        else
+//                            Log.e(Constants.TAG, "GlobalContactsController.getAvailableUsersFromURL.onResponse: " +
+//                                    "response header does not contains "+Constants.LDAP_HEADER_AUTHENTICATE);
+//                    }
+//                    else
+//                        Log.e(Constants.TAG, "GlobalContactsController.getAvailableUsersFromURL.onResponse: response code is -> "
+//                                +code+"\n"+" and description is -> "+response.body().toString());
+//                }
+//                catch (Exception e)
+//                {
+//                    Log.e(Constants.TAG, "GlobalContactsController.getAvailableUsersFromURL.onResponse: ", e);
+//                }
+//            }
+//        });
+//    }
 
     public interface GlobalContactsCallback  {
         /**

@@ -5,12 +5,15 @@ import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
+import com.vodafone.mycomms.settings.globalcontacts.GlobalContactsController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.UserSecurity;
@@ -23,7 +26,9 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import io.realm.Realm;
 import model.Contact;
+import model.GlobalContactsSettings;
 
 public class RecentContactController {
 
@@ -42,7 +47,51 @@ public class RecentContactController {
         contactSearchController = new ContactSearchController(mContext,mProfileId);
     }
 
-    public void getRecentList() {
+    public void getRecentListWithPreviousLDAPAuthentication()
+    {
+        Realm realm = Realm.getDefaultInstance();
+        try
+        {
+            GlobalContactsSettings settings = RealmLDAPSettingsTransactions.getSettings(mProfileId, realm);
+            if(null != settings)
+            {
+                String user = settings.getUser();
+                String pwd = settings.getPassword();
+
+                if(null != user && user.length() > 0 && null != pwd && pwd.length() > 0)
+                {
+                    GlobalContactsController globalContactsController = new GlobalContactsController();
+                    globalContactsController.callLDAPAuthProcess(user, pwd, mContext, new GlobalContactsController.GlobalContactsCallback() {
+                        @Override
+                        public void onFailure(String error, int errorCode)
+                        {
+                            Log.e(Constants.TAG, "ContactSearchController.onFailure: "+error+" error code -> "+errorCode);
+                            getRecentList();
+                        }
+
+                        @Override
+                        public void onSuccess(GlobalContactsSettings settings)
+                        {
+                            getRecentList();
+                        }
+                    });
+                }
+            }
+            else
+                getRecentList();
+        }
+        catch (Exception ex)
+        {
+            Log.e(Constants.TAG, "ContactSearchController.getContactById.onFailure(): ", ex);
+            Crashlytics.logException(ex);
+        }
+        finally {
+            realm.close();
+        }
+    }
+
+    public void getRecentList()
+    {
         Log.i(Constants.TAG, "RecentContactController.getRecentList: ");
         try{
             OKHttpWrapper.get(Constants.CONTACT_API_GET_RECENTS, mContext, new OKHttpWrapper.HttpCallback() {
@@ -173,7 +222,7 @@ public class RecentContactController {
         @Override
         protected void onPostExecute(String response)
         {
-            getRecentList();
+            getRecentListWithPreviousLDAPAuthentication();
         }
     }
 

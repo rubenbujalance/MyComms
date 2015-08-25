@@ -209,7 +209,7 @@ public class ContactListFragment extends ListFragment {
     }
 
     public void showLDAPSettingsBar(boolean show) {
-        if(!show) addGlobalContactsContainer.setVisibility(View.VISIBLE);
+        if(show) addGlobalContactsContainer.setVisibility(View.VISIBLE);
         else addGlobalContactsContainer.setVisibility(View.GONE);
     }
 

@@ -99,7 +99,7 @@ public class SearchGlobalContactsTest {
 
         startContactListFragment(1);
         ContactListFragment recentListFragment = (ContactListFragment)customFragmentActivity
-                .getSupportFragmentManager().findFragmentByTag("0");
+                .getSupportFragmentManager().findFragmentByTag("1");
         addGCBar = (RelativeLayout) recentListFragment.getView().findViewById(R.id.add_global_contacts_container);
         Assert.assertTrue(addGCBar.getVisibility() == (View.GONE));
         System.err.println("******** Test: Global Contacts Visibility ON RECENT LIST OK********");
@@ -136,7 +136,7 @@ public class SearchGlobalContactsTest {
 
         startContactListFragment(1);
         ContactListFragment recentListFragment = (ContactListFragment)customFragmentActivity
-                .getSupportFragmentManager().findFragmentByTag("0");
+                .getSupportFragmentManager().findFragmentByTag("1");
         laySearchBar = (LinearLayout) recentListFragment.getView().findViewById(R.id.lay_search_bar_container);
         Assert.assertTrue(laySearchBar.getVisibility() == (View.GONE));
         System.err.println("******** Test: Search Bar Visibility ON RECENT LIST OK********");

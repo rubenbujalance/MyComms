@@ -206,6 +206,11 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         {
             viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
+        else if (null != contact.getPlatform()
+                && Constants.PLATFORM_GLOBAL_CONTACTS.equals(contact.getPlatform()))
+        {
+            viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_add_vodafone);
+        }
 
         RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(_profile_id);
         Contact cont = mRealmContactTransactions.getContactById(contact.getContactId(), realm);

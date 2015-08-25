@@ -46,6 +46,9 @@ public class ContactListMainActivity extends ToolbarActivity
         setContactsListeners(this);
 
         if (savedInstanceState == null) {
+            //Test git
+        }
+        if (savedInstanceState == null) {
             FragmentTransaction transaction;
             transaction = getSupportFragmentManager().beginTransaction();
             ContactListPagerFragment fragment = new ContactListPagerFragment();

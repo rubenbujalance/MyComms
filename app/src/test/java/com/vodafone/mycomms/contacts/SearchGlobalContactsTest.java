@@ -1,7 +1,10 @@
 package com.vodafone.mycomms.contacts;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.crashlytics.android.Crashlytics;
@@ -71,26 +74,35 @@ public class SearchGlobalContactsTest {
 
     @Test
     public void testShowAddGlobalContactsBarInContacts() throws Exception {
-//        RealmContactTransactions realmContactTransactions =
-//                Mockito.mock(RealmContactTransactions.class);
-//        Mockito.when(realmContactTransactions.getAllContacts(null))
-//                .thenReturn(new ArrayList<Contact>());
-//        Mockito.spy(RealmContactTransactions.class);
-
         addGCBar = (RelativeLayout)contactListFragment.getView()
                 .findViewById(R.id.add_global_contacts_container);
         //Save fake Global Contacts loading to false
-//        Context context = RuntimeEnvironment.application.getApplicationContext();
-//        SharedPreferences sp = context.getSharedPreferences(
-//                com.vodafone.mycomms.util.Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-//        sp.edit().putBoolean(
-//                com.vodafone.mycomms.util.Constants.IS_GLOBAL_CONTACTS_LOADING_ENABLED,
-//                true)
-//                .commit();
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        SharedPreferences sp = context.getSharedPreferences(
+                com.vodafone.mycomms.util.Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        sp.edit().putBoolean(
+                com.vodafone.mycomms.util.Constants.IS_GLOBAL_CONTACTS_LOADING_ENABLED,
+                true)
+                .commit();
         System.err.println("******** Test: IS_GLOBAL_CONTACTS_LOADING_ENABLED FALSE ********");
 
         //addGCBar.setVisibility(View.VISIBLE);
         Assert.assertTrue(addGCBar.getVisibility() == (View.VISIBLE));
+        System.err.println("******** Test: Global Contacts Visibility ON CONTACTS LIST OK********");
+
+        startContactListFragment(0);
+        ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("0");
+        addGCBar = (RelativeLayout) favoriteListFragment.getView().findViewById(R.id.add_global_contacts_container);
+        Assert.assertTrue(addGCBar.getVisibility() == (View.GONE));
+        System.err.println("******** Test: Global Contacts Visibility ON FAVORITE LIST OK********");
+
+        startContactListFragment(1);
+        ContactListFragment recentListFragment = (ContactListFragment)customFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("0");
+        addGCBar = (RelativeLayout) recentListFragment.getView().findViewById(R.id.add_global_contacts_container);
+        Assert.assertTrue(addGCBar.getVisibility() == (View.GONE));
+        System.err.println("******** Test: Global Contacts Visibility ON RECENT LIST OK********");
     }
 
     @Test
@@ -106,6 +118,28 @@ public class SearchGlobalContactsTest {
                 .getNextStartedActivity().equals(expectedIntent));
         System.err.println("******** Test: Navigation to AddGlobalContactsActivity ********");
 
+    }
+
+    @Test
+    public void testSearchBarVisibility() throws Exception {
+        System.err.println("******** Test: Test Search Bar Visibility ********");
+        LinearLayout laySearchBar = (LinearLayout) contactListFragment.getView().findViewById(R.id.lay_search_bar_container);
+        Assert.assertTrue(laySearchBar.getVisibility() == (View.VISIBLE));
+        System.err.println("******** Test: Search Bar Visibility ON CONTACT LIST OK********");
+
+        startContactListFragment(0);
+        ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("0");
+        laySearchBar = (LinearLayout) favoriteListFragment.getView().findViewById(R.id.lay_search_bar_container);
+        Assert.assertTrue(laySearchBar.getVisibility() == (View.GONE));
+        System.err.println("******** Test: Search Bar Visibility ON FAVORITE LIST OK********");
+
+        startContactListFragment(1);
+        ContactListFragment recentListFragment = (ContactListFragment)customFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("0");
+        laySearchBar = (LinearLayout) recentListFragment.getView().findViewById(R.id.lay_search_bar_container);
+        Assert.assertTrue(laySearchBar.getVisibility() == (View.GONE));
+        System.err.println("******** Test: Search Bar Visibility ON RECENT LIST OK********");
     }
 
     public void startContactListFragment(int index)

@@ -110,6 +110,7 @@ public class SearchGlobalContactsTest {
 
     public void startContactListFragment(int index)
     {
+        //Test
         Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
                 CustomFragmentActivity.class);
         in.putExtra("index", index);

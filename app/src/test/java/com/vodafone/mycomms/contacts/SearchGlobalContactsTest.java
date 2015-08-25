@@ -107,7 +107,7 @@ public class SearchGlobalContactsTest {
 
     @Test
     public void testClickBarAndGoToAddGlobalContacts() throws Exception {
-
+//test
         addGCBar = (RelativeLayout)contactListFragment.getView()
                 .findViewById(R.id.add_global_contacts_container);
         addGCBar.setVisibility(View.VISIBLE);

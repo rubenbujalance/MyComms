@@ -204,6 +204,13 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
                     text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
 
                     //Image avatar
+                    if(null != contact.getFirstName() && contact.getFirstName().length() > 0) {
+                        if (contact.getContactId().equals(_profile_id))
+                            profileInside = true;
+                        else
+                            groupNames = contact.getFirstName() + ", " + groupNames;
+
+                    }
                     Utils.loadContactAvatar
                             (
                                     contact.getFirstName()

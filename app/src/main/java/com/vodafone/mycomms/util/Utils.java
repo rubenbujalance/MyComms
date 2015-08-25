@@ -391,7 +391,7 @@ public final class Utils extends MainActivity {
             JSONArray jsonArray = new JSONArray(jsonArrayString);
             for(int i = 0; i < jsonArray.length() ; i++) {
                 jsonObject = jsonArray.getJSONObject(i);
-                if (!jsonObject.isNull(key)) {
+                if (jsonObject.has(key)) {
                     result = jsonObject.getString(key);
                 }
             }

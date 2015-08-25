@@ -35,6 +35,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
     private Context mContext;
     private String profileId;
     private ContactsController mContactsController;
+    private String userProfileEmails;
 
     public ContactListViewArrayAdapter(Context context, List<Contact> items) {
         super(context, R.layout.layout_list_item_contact, items);
@@ -43,7 +44,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         mContactsController = new ContactsController(profileId, mContext);
-
+        userProfileEmails = mContactsController.getUserProfileEmails();
     }
 
     @Override
@@ -81,7 +82,8 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         String noRecordFound = mContext.getResources().getString(R.string.no_search_records);
 
         //Check if contact can be invited to MyComms
-        if(mContactsController.isContactCanBeInvited(contact))
+
+        if(mContactsController.isContactCanBeInvited(contact, userProfileEmails))
             viewHolder.layInviteMyComms.setVisibility(View.VISIBLE);
         else
             viewHolder.layInviteMyComms.setVisibility(View.GONE);

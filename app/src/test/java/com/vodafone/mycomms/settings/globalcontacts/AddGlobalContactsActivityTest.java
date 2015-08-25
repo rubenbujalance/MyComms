@@ -113,7 +113,7 @@ public class AddGlobalContactsActivityTest {
         System.err.println("******** Test: Discover Connection Error ********");
 
         resetScreen();
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn("http://localhost:12345");
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn("http://localhost:12345");
         btAddAccount.performClick();
         Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
@@ -124,7 +124,7 @@ public class AddGlobalContactsActivityTest {
 
         //Discover response !=200
         System.err.println("******** Test: Discover Response !=200 ********");
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn(serverUrl);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(500));
         btAddAccount.performClick();
         Thread.sleep(2000);
@@ -136,7 +136,7 @@ public class AddGlobalContactsActivityTest {
 
         //Discover incorrect JSON
         System.err.println("******** Test: Discover Incorrect JSON ********");
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn(serverUrl);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200).setBody("{'incorrectJSON':'0'}"));
         btAddAccount.performClick();
         Thread.sleep(2000);
@@ -153,7 +153,7 @@ public class AddGlobalContactsActivityTest {
     public void testUserError() throws Exception {
         String serverUrl = startWebMockServer();
         PowerMockito.mockStatic(EndpointWrapper.class);
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn(serverUrl);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
 
         String mockedDiscoverResponse =
                 Constants.LDAP_DISCOVER_RESPONSE_OK.replace("mockUrl",serverUrl);
@@ -212,7 +212,7 @@ public class AddGlobalContactsActivityTest {
     public void testAuthErrors() throws Exception {
         String serverUrl = startWebMockServer();
         PowerMockito.mockStatic(EndpointWrapper.class);
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn(serverUrl);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
 
         Request.Builder builder = Mockito.spy(Request.Builder.class);
         Mockito.when(builder.url(Constants.LDAP_AUTH_URL))
@@ -247,7 +247,7 @@ public class AddGlobalContactsActivityTest {
         System.err.println("******** Test: Auth Response >=400 && <500 ********");
 
         resetScreen();
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn(serverUrl);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse()
@@ -269,7 +269,7 @@ public class AddGlobalContactsActivityTest {
         System.err.println("******** Test: Auth response >=500 ********");
 
         resetScreen();
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn(serverUrl);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse()
@@ -291,7 +291,7 @@ public class AddGlobalContactsActivityTest {
         System.err.println("******** Test: Auth response with malformed JSON ********");
 
         resetScreen();
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn(serverUrl);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse()
@@ -338,7 +338,7 @@ public class AddGlobalContactsActivityTest {
         resetScreen();
 
         //Mock web server responses
-        PowerMockito.when(Constants.LDAPDISCOVER).thenReturn(serverUrl);
+        PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200)
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse()

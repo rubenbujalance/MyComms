@@ -94,10 +94,10 @@ public class DashBoardActivity extends ToolbarActivity
         Log.i(Constants.TAG, "DashBoardActivity.onCreate: ");
 
         //Exception handler
-//        Thread.setDefaultUncaughtExceptionHandler
-//                (
-//                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
-//                );
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -193,9 +193,9 @@ public class DashBoardActivity extends ToolbarActivity
         Log.i(Constants.TAG, "DashBoardActivity.loadRecents: ");
         //if(recentsLoading) return;
 
-        String throwException = "";
-        throwException = throwException.substring(0, throwException.length()-2);
-        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: "+throwException);
+//        String throwException = "";
+//        throwException = throwException.substring(0, throwException.length()-2);
+//        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: "+throwException);
 
         //recentsLoading = true;
         try

@@ -84,7 +84,9 @@ public class AddGlobalContactsActivity extends MainActivity {
                             user, password, AddGlobalContactsActivity.this,
                             new GlobalContactsController.GlobalContactsCallback() {
                                 @Override
-                                public void onFailure(String error, int resCode) {
+                                public void onFailure(String error, int resCode)
+                                {
+                                    Log.e(Constants.TAG, "AddGlobalContactsActivity.onFailure: ERROR ->"+error+" with code -> "+resCode);
                                     showMessageBarOnUIThread(error);
                                 }
 

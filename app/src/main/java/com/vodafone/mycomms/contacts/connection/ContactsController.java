@@ -14,6 +14,7 @@ import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.Utils;
@@ -324,7 +325,7 @@ public class ContactsController{
      * @param contact (Contact) -> contact which will be invited
      * @return (boolean) -> true if contact has successfully received the invitation, false otherwise
      */
-    public boolean isContactCanBeInvited(Contact contact)
+    public boolean isContactCanBeInvited(Contact contact, String userProfileEmails)
     {
         String[] domains = new String[]
                 {
@@ -340,6 +341,7 @@ public class ContactsController{
                         "intelygenz.com",
                         "comediadesign.com"
                 };
+
         String emails = contact.getEmails();
         String platform = contact.getPlatform();
         if(null != emails && emails.length() > 0 && null != platform && platform.length() > 0)
@@ -348,16 +350,34 @@ public class ContactsController{
             {
                 if(platform.equals("mc"))
                     return false;
-                else
-                {
-                    if(emails.contains(str))
-                    {
-                        return true;
-                    }
-                }
+                if(null != userProfileEmails && emails.contains(userProfileEmails))
+                    return false;
+                if(emails.contains(str))
+                    return true;
             }
         }
         return false;
+    }
+
+    public String getUserProfileEmails()
+    {
+        RealmProfileTransactions mRealmProfileTransactions = new RealmProfileTransactions();
+        Realm realm = Realm.getDefaultInstance();
+        try
+        {
+            UserProfile userProfile = mRealmProfileTransactions.getUserProfile(mProfileId, realm);
+            String userProfileEmails = userProfile.getEmails();
+            userProfileEmails = Utils.getElementFromJsonArrayString(userProfileEmails, Constants.CONTACT_EMAIL);
+            return userProfileEmails;
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "ContactsController.getUserProfileEmails: ", e);
+            return null;
+        }
+        finally {
+            realm.close();
+        }
     }
 
     /**

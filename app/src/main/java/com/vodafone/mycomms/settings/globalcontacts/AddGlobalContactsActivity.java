@@ -19,7 +19,9 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
 import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.Constants;
 
@@ -89,6 +91,7 @@ public class AddGlobalContactsActivity extends MainActivity {
                                 @Override
                                 public void onSuccess(GlobalContactsSettings settings)
                                 {
+                                    BusProvider.getInstance().post(new GlobalContactsAddedEvent());
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {

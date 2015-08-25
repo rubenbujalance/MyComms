@@ -31,6 +31,7 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
+import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
 import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
@@ -1051,5 +1052,12 @@ public class DashBoardActivity extends ToolbarActivity
             loadRecents(recentsContainer2);
             loadUnreadMessages(recentsContainer2);
         }
+    }
+
+    @Subscribe
+    public void onGlobalContactsAddedEvent(GlobalContactsAddedEvent event)
+    {
+        Log.i(Constants.TAG, "DashBoardActivity.onGlobalContactsAddedEvent: ");
+        recentContactController.getRecentList();
     }
 }

@@ -9,10 +9,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
+import android.os.*;
+import android.os.Process;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -49,6 +50,7 @@ public class SplashScreenActivity extends MainActivity {
 
     Context mContext;
     private boolean isForeground;
+    private boolean isAppCrashed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +61,23 @@ public class SplashScreenActivity extends MainActivity {
 
         //Register Otto Bus
         BusProvider.getInstance().register(SplashScreenActivity.this);
+
+        getExtras();
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
+        if(isAppCrashed)
+            showAlertDialog();
+        else
+            doOnPostCreateTasks();
+    }
+
+
+    private void doOnPostCreateTasks()
+    {
         //Check if it has been called from the email link
         Uri uriData = getIntent().getData();
 
@@ -97,6 +110,45 @@ public class SplashScreenActivity extends MainActivity {
             }
             checkVersion();
         }
+    }
+
+    private void showAlertDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        String title = mContext.getResources().getString(R.string.uncaught_exception_title);
+        View view = Utils.getCustomAlertTitleView(mContext, R.layout.layout_uncaught_exception_alert);
+        TextView textView = (TextView) view.findViewById(R.id.tv_uncaught_exception_alert_title);
+
+        textView.setText(title);
+        builder.setCustomTitle(view);
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                doOnPostCreateTasks();
+            }
+        });
+        builder.setPositiveButton(R.string.uncaught_exception_contact_support, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                sendSupportEmailIfCrashed();
+            }
+        });
+
+        builder.create();
+        builder.show();
+    }
+
+    private void getExtras()
+    {
+        Intent intent = getIntent();
+        isAppCrashed = intent.hasExtra(Constants.IS_APP_CRASHED_EXTRA);
+    }
+
+    private void sendSupportEmailIfCrashed()
+    {
+        Log.i(Constants.TAG, "SplashScreenActivity.sendSupportEmailIfCrashed: Sending Email...");
+        doOnPostCreateTasks();
     }
 
     private void checkVersion() {

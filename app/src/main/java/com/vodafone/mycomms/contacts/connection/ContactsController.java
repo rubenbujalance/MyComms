@@ -389,7 +389,7 @@ public class ContactsController{
     {
         String emails = contact.getEmails();
         String firstName = contact.getFirstName();
-        View view = getCustomAlertTitleView();
+        View view = Utils.getCustomAlertTitleView(mContext, R.layout.layout_invite_contact);
         TextView textView = (TextView) view.findViewById(R.id.tv_invite_title);
 
         if(null != emails && emails.length() > 0 && null != firstName)
@@ -485,7 +485,7 @@ public class ContactsController{
      */
     private void showSuccessOrErrorResponse(boolean isCorrectlyDelivered)
     {
-        View view = getCustomAlertTitleView();
+        View view = Utils.getCustomAlertTitleView(mContext, R.layout.layout_invite_contact);
         TextView textView = (TextView) view.findViewById(R.id.tv_invite_title);
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         if(isCorrectlyDelivered)
@@ -510,14 +510,5 @@ public class ContactsController{
         builder.show();
     }
 
-    /**
-     * Gets custom alert dialog title view
-     * @author str_oan
-     * @return (LinearLayout) -> custom title
-     */
-    private View getCustomAlertTitleView()
-    {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        return inflater.inflate(R.layout.layout_invite_contact, null);
-    }
+
 }

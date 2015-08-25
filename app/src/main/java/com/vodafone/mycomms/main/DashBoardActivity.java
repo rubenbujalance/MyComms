@@ -45,6 +45,7 @@ import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.NotificationMessages;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
@@ -91,6 +92,12 @@ public class DashBoardActivity extends ToolbarActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "DashBoardActivity.onCreate: ");
+
+        //Exception handler
+//        Thread.setDefaultUncaughtExceptionHandler
+//                (
+//                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+//                );
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -185,6 +192,10 @@ public class DashBoardActivity extends ToolbarActivity
     private void loadRecents(LinearLayout currentRecentContainer){
         Log.i(Constants.TAG, "DashBoardActivity.loadRecents: ");
         //if(recentsLoading) return;
+
+        String throwException = "";
+        throwException = throwException.substring(0, throwException.length()-2);
+        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: "+throwException);
 
         //recentsLoading = true;
         try

@@ -316,4 +316,8 @@
     <!-- Uploading contacts-->
     <string name="uploading_local_contacts">Uploading contacts, please wait...</string>
     <string name="attention">Attention</string>
+
+    <!-- uncaughtException -->
+    <string name="uncaught_exception_title">Unexpected error has been produced. Application will be restarted!</string>
+    <string name="uncaught_exception_contact_support">Contact Support</string>
 </resources>

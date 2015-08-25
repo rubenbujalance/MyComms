@@ -1,7 +1,9 @@
 package com.vodafone.mycomms;
 
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
@@ -29,6 +31,7 @@ import com.vodafone.mycomms.events.ContactListReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.realm.RealmDBMigration;
@@ -54,6 +57,7 @@ import model.GroupChat;
 import model.News;
 import model.UserProfile;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import android.os.Process;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -68,17 +72,16 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private SharedPreferences sp;
     public boolean appIsInitialized = false;
-    FavouriteController favouriteController;
+    private FavouriteController favouriteController;
     private RecentContactController recentContactController;
     private NewsController mNewsController;
-    String profile_id;
+    private String profile_id;
     public int contactViewOrigin = Constants.CONTACTS_ALL;
     public static Picasso picasso;
     private HashMap<String, Long> recentChatsHashMap = new HashMap<>();
 
     //Network listener
     private NetworkEvents networkEvents;
-
     private Realm realm;
 
     @Override

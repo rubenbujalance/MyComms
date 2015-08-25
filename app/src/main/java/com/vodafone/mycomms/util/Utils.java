@@ -1027,4 +1027,15 @@ public final class Utils extends MainActivity {
 
         return new String(array);
     }
+
+    /**
+     * Gets custom alert dialog title view
+     * @author str_oan
+     * @return (LinearLayout) -> custom title
+     */
+    public static View getCustomAlertTitleView(Context context, int viewId)
+    {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        return inflater.inflate(viewId, null);
+    }
 }

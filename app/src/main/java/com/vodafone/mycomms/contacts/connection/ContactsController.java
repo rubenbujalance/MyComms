@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
@@ -387,42 +388,73 @@ public class ContactsController{
      */
     public void createInviteAlertWithEvents(Contact contact)
     {
-        String emails = contact.getEmails();
-        String firstName = contact.getFirstName();
-        View view = Utils.getCustomAlertTitleView(mContext, R.layout.layout_invite_contact);
-        TextView textView = (TextView) view.findViewById(R.id.tv_invite_title);
-
-        if(null != emails && emails.length() > 0 && null != firstName)
+        try
         {
-            final String email = Utils.getElementFromJsonArrayString(emails, "email");
+            String emails = contact.getEmails();
+            String firstName = contact.getFirstName();
+            View view = Utils.getCustomAlertTitleView(mContext, R.layout.layout_invite_contact);
+            TextView textView = (TextView) view.findViewById(R.id.tv_invite_title);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            if(null != emails && emails.length() > 0 && null != firstName)
+            {
+                String email = Utils.getElementFromJsonArrayString(emails, "email");
+                if(null == email||email.length()<=0)
+                    email = Utils.getElementFromJsonObjectString(emails, "email");
+                final String finalEmail = email;
 
-            String title =
-                    mContext.getResources().getString(R.string.invite_contact_confirmation_1)
-                    + " " + firstName
-                    + " " + mContext.getResources().getString(R.string.invite_contact_confirmation_2)
-                    + " " + email + "?";
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-            textView.setText(title);
-            builder.setCustomTitle(view);
-
-            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    dialog.dismiss();
-                }
-            });
-            builder.setPositiveButton(R.string.invite, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id)
+                String title;
+                if(null!=finalEmail && finalEmail.length()>0)
                 {
-                    sendInvitation(email);
-                    dialog.dismiss();
-                }
-            });
+                    title =
+                            mContext.getResources().getString(R.string.invite_contact_confirmation_1)
+                                    + " " + firstName
+                                    + " " + mContext.getResources().getString(R.string.invite_contact_confirmation_2)
+                                    + " " + email + "?";
+                    textView.setText(title);
+                    builder.setCustomTitle(view);
 
-            builder.create();
-            builder.show();
+                    builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.setPositiveButton(R.string.invite, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            sendInvitation(finalEmail);
+                            dialog.dismiss();
+                        }
+                    });
+
+                    builder.create();
+                    builder.show();
+                }
+                else
+                {
+                    title = mContext.getResources().getString(R.string.invite_to_mycomms_error_wrong_email);
+                    textView.setText(title);
+                    builder.setCustomTitle(view);
+
+                    builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    builder.create();
+                    builder.show();
+                }
+            }
         }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "ContactsController.createInviteAlertWithEvents: ", e);
+            Crashlytics.logException(e);
+        }
+
     }
 
     /**

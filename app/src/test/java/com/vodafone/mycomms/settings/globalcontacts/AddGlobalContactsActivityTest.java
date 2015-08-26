@@ -80,6 +80,19 @@ public class AddGlobalContactsActivityTest {
     }
 
     @Test
+    public void shouldNotBeNull() throws Exception {
+        System.err.println("******** Test: NOT NULL OBJECTS ********");
+        junit.framework.Assert.assertTrue(activity != null);
+        junit.framework.Assert.assertTrue(etUser != null);
+        junit.framework.Assert.assertTrue(etPassword != null);
+        junit.framework.Assert.assertTrue(btAddAccount != null);
+        junit.framework.Assert.assertTrue(btBack != null);
+        junit.framework.Assert.assertTrue(layoutErrorBar != null);
+        junit.framework.Assert.assertTrue(tvError != null);
+        System.err.println("******** Test: NO NULL OBJECTS OK ********");
+    }
+
+    @Test
     public void testSendFormatErrorAndReset() throws Exception {
         //User empty
         etPassword.setText("12345");

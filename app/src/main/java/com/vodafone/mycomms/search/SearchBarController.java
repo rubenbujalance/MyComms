@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
-import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
@@ -259,7 +258,6 @@ public class SearchBarController {
     private void loadAllContactsFromDB(String keyWord)
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>" + keyWord);
-        String kw = keyWord;
         if(null == keyWord)
             contactList = mContactTransactions.getAllContacts(realm);
         else
@@ -497,20 +495,6 @@ public class SearchBarController {
         }
 
         return apiCall;
-    }
-
-    /**
-     * Gets all contacts from Local Device DB by given key word
-     * @author str_oan
-     * @param keyWord (String) -> key word for make search
-     * @return (ArrayList<Contact>) -> local contacts if any, otherwise returns empty list
-     * @deprecated Now all contacts are saved on Realm at the application start
-     */
-    private ArrayList<Contact> loadLocalContacts(String keyWord)
-    {
-        ArrayList<Contact> contactArrayList = mSearchController.getLocalContactsByKeyWord(keyWord);
-        mSearchController.storeContactsIntoRealm(contactArrayList);
-        return contactArrayList;
     }
 
     public void hideSearchBarContent()

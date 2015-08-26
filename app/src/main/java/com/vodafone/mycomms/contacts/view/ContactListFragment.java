@@ -62,7 +62,6 @@ public class ContactListFragment extends ListFragment {
     private ArrayList<RecentContact> recentContactList;
     private RealmContactTransactions mContactTransactions;
     private RelativeLayout addGlobalContactsContainer;
-    private TextView myCommsTextView;
 
     private ListView listView;
     private Parcelable state;
@@ -98,7 +97,6 @@ public class ContactListFragment extends ListFragment {
         searchView = (EditText) v.findViewById(R.id.et_search);
 
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
-        myCommsTextView = (TextView) v.findViewById(R.id.platform_label);
 
         //TODO: Null Object error, commented
         addGlobalContactsContainer.setOnClickListener(new View.OnClickListener() {
@@ -126,15 +124,9 @@ public class ContactListFragment extends ListFragment {
                 Constants.isDashboardOrigin = false;
             }
 
-            if (null != myCommsTextView){
-                myCommsTextView.setVisibility(View.VISIBLE);
-            }
         }
         else{
             hideKeyboard();
-            if (null != myCommsTextView){
-                myCommsTextView.setVisibility(View.GONE);
-            }
         }
         return v;
     }
@@ -238,7 +230,6 @@ public class ContactListFragment extends ListFragment {
         }
     }
 
-    //Test 5
     @Override
     public void onDetach() {
         super.onDetach();

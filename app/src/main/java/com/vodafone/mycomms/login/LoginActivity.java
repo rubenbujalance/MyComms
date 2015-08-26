@@ -26,9 +26,11 @@ import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.login.connection.ILoginConnectionCallback;
 import com.vodafone.mycomms.main.DashBoardActivity;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
 
 public class LoginActivity extends MainAppCompatActivity implements ILoginConnectionCallback {
@@ -49,6 +51,11 @@ public class LoginActivity extends MainAppCompatActivity implements ILoginConnec
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this,null)
+                );
 
         //Register Otto Bus
         BusProvider.getInstance().register(this);

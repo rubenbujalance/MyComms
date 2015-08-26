@@ -13,9 +13,11 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 /**
@@ -30,7 +32,14 @@ public class ChatListActivity extends ToolbarActivity{
     public void onCreate(Bundle savedInstanceState) {
         Log.i(Constants.TAG, "ChatMainActivity.onCreate: ");
         super.onCreate(savedInstanceState);
+
         BusProvider.getInstance().register(this);
+
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
+
 
         setContentView(R.layout.layout_main_activity);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);

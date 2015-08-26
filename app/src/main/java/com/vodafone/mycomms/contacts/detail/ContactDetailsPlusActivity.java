@@ -16,9 +16,11 @@ import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
@@ -47,6 +49,11 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
         setContentView(R.layout.activity_contact_detail_plus);
 
         BusProvider.getInstance().register(this);

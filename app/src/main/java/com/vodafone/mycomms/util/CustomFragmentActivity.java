@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 
 /**
  * Created by str_rbm on 13/08/2015.
@@ -20,6 +21,10 @@ public class CustomFragmentActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
         Intent in = this.getIntent();
         int index = in.getIntExtra("index", 2);
         FragmentManager fragmentManager = this.getSupportFragmentManager();

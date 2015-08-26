@@ -9,8 +9,10 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 import java.util.HashMap;
 
@@ -24,6 +26,10 @@ public class MailSentActivity extends MainAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, null)
+                );
         setContentView(R.layout.activity_mail_sent);
 
         mTVHavingTrouble = (TextView)findViewById(R.id.tvHavingTrouble);

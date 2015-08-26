@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.settings.globalcontacts;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,7 +24,9 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
 import com.vodafone.mycomms.main.MainActivity;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 import model.GlobalContactsSettings;
 
@@ -36,10 +39,15 @@ public class AddGlobalContactsActivity extends MainActivity {
     private EditText etPassword;
     private Button btAddAccount;
     private SharedPreferences sp;
+    private ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
         setContentView(R.layout.activity_add_global_contacts);
 
         BusProvider.getInstance().register(this);
@@ -50,6 +58,8 @@ public class AddGlobalContactsActivity extends MainActivity {
         etPassword = (EditText)findViewById(R.id.etPassword);
         tvError = (TextView)findViewById(R.id.tvError);
         btAddAccount = (Button)findViewById(R.id.btAddAccount);
+
+        setCredentialsTextColor(false);
 
         TextView tvInitialText = (TextView)findViewById(R.id.tvInitialText);
         tvInitialText.setText(Html.fromHtml(getString(R.string.provide_your_corporate_credentials)));
@@ -69,13 +79,19 @@ public class AddGlobalContactsActivity extends MainActivity {
 
         btAddAccount.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
+                setCredentialsTextColor(false);
                 //Hide error bar if shown
                 if (layoutErrorBar.getVisibility() == View.VISIBLE)
                     layoutErrorBar.setVisibility(View.GONE);
 
                 //Start the process
                 if (checkData()) {
+                    pd = new ProgressDialog(AddGlobalContactsActivity.this);
+                    pd.setCancelable(false);
+                    pd.setTitle(getResources().getString(R.string.progress_dialog_validating_credentials));
+                    pd.show();
                     String user = etEmail.getText().toString();
                     String password = etPassword.getText().toString();
                     GlobalContactsController gcController = new GlobalContactsController();
@@ -86,13 +102,18 @@ public class AddGlobalContactsActivity extends MainActivity {
                                 @Override
                                 public void onFailure(String error, int resCode)
                                 {
-                                    Log.e(Constants.TAG, "AddGlobalContactsActivity.onFailure: ERROR ->"+error+" with code -> "+resCode);
-                                    showMessageBarOnUIThread(error);
+                                    Log.e(Constants.TAG, "AddGlobalContactsActivity.onFailure: ERROR ->" + error + " with code -> " + resCode);
+                                    if(pd.isShowing())
+                                        pd.dismiss();
+                                    showMessageBarOnUIThread(error, resCode);
+
                                 }
 
                                 @Override
                                 public void onSuccess(GlobalContactsSettings settings)
                                 {
+                                    if(pd.isShowing())
+                                        pd.dismiss();
                                     BusProvider.getInstance().post(new GlobalContactsAddedEvent());
                                     runOnUiThread(new Runnable() {
                                         @Override
@@ -108,6 +129,7 @@ public class AddGlobalContactsActivity extends MainActivity {
                             });
 
                 } else {
+                    setCredentialsTextColor(true);
                     tvError.setText(R.string.credentials_are_incorrect);
                     layoutErrorBar.setVisibility(View.VISIBLE);
                 }
@@ -154,13 +176,29 @@ public class AddGlobalContactsActivity extends MainActivity {
         else return false;
     }
 
-    private void showMessageBarOnUIThread(final String message) {
+    private void showMessageBarOnUIThread(final String message, final int code) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 tvError.setText(message);
                 layoutErrorBar.setVisibility(View.VISIBLE);
+                if(code == 400)
+                    setCredentialsTextColor(true);
             }
         });
+    }
+
+    private void setCredentialsTextColor(boolean isWrongCredentials)
+    {
+        if(isWrongCredentials)
+        {
+            etEmail.setTextColor(getResources().getColor(R.color.red_action));
+            etPassword.setTextColor(getResources().getColor(R.color.red_action));
+        }
+        else
+        {
+            etEmail.setTextColor(getResources().getColor(R.color.contact_soft_black));
+            etPassword.setTextColor(getResources().getColor(R.color.contact_soft_black));
+        }
     }
 }

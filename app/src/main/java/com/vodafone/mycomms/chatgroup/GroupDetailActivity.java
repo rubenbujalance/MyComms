@@ -25,12 +25,14 @@ import com.vodafone.mycomms.chatgroup.view.GroupDetailRecyclerItemClickListener;
 import com.vodafone.mycomms.chatgroup.view.GroupMembersViewAdapter;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
@@ -80,6 +82,11 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
 
         //Register Otto bus to listen to events
         BusProvider.getInstance().register(this);
+
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
 
         this.mRealm = Realm.getDefaultInstance();
 

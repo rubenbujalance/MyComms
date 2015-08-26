@@ -238,6 +238,7 @@ public class ContactListFragment extends ListFragment {
         }
     }
 
+    //Test 5
     @Override
     public void onDetach() {
         super.onDetach();

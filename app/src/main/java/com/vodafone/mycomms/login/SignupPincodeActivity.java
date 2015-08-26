@@ -22,6 +22,7 @@ import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -54,6 +55,10 @@ public class SignupPincodeActivity extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, null)
+                );
         setContentView(R.layout.signup_pincode);
 
         tvPin1 = (TextView)findViewById(R.id.tvPin1);

@@ -23,8 +23,10 @@ import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.MainActivity;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
 
 import org.json.JSONObject;
@@ -47,8 +49,11 @@ public class OAuthActivity extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(Constants.TAG, "OAuthActivity.onCreate: ");
-
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, null)
+                );
         setContentView(R.layout.activity_oauth_web);
 
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);

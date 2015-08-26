@@ -22,6 +22,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatListActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.main.DashBoardActivity;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.SettingsMainActivity;

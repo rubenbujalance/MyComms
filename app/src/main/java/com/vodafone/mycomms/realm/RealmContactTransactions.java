@@ -230,7 +230,7 @@ public class RealmContactTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && mRealm != null)
                 mRealm.close();
         }
         return contactArrayList;

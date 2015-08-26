@@ -4,8 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
@@ -57,6 +62,14 @@ public class SearchGlobalContactsTest {
     ContactListFragment contactListFragment;
     RelativeLayout addGCBar;
     CustomFragmentActivity customFragmentActivity;
+    Context context;
+    ListView listView;
+    TextView emptyText;
+    EditText searchView;
+    RelativeLayout addGlobalContactsContainer;
+    Button cancelButton;
+    LinearLayout layCancel;
+    LinearLayout laySearchBar;
 
     @Before
     public void setUp() throws Exception {
@@ -65,19 +78,40 @@ public class SearchGlobalContactsTest {
         mockStatic(Crashlytics.class);
         whenNew(RealmContactTransactions.class).withAnyArguments()
                 .thenReturn(null);
-
+        context = RuntimeEnvironment.application.getApplicationContext();
         startContactListFragment(2);
         contactListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("2");
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+        listView = (ListView) contactListFragment.getView().findViewById(android.R.id.list);
+        emptyText = (TextView) contactListFragment.getView().findViewById(android.R.id.empty);
+        searchView = (EditText) contactListFragment.getView().findViewById(R.id.et_search);
+        addGlobalContactsContainer = (RelativeLayout) contactListFragment.getView().findViewById(R.id.add_global_contacts_container);
+        cancelButton = (Button) contactListFragment.getView().findViewById(R.id.btn_cancel);
+        layCancel = (LinearLayout) contactListFragment.getView().findViewById(R.id.lay_cancel);
+        laySearchBar = (LinearLayout) contactListFragment.getView().findViewById(R.id.lay_search_bar_container);
+        addGCBar = (RelativeLayout)contactListFragment.getView()
+                .findViewById(R.id.add_global_contacts_container);
+    }
+
+    @Test
+    public void shouldNotBeNull() throws Exception {
+        System.err.println("******** Test: NOT NULL OBJECTS ********");
+        Assert.assertTrue(contactListFragment != null);
+        Assert.assertTrue(listView != null);
+        Assert.assertTrue(emptyText != null);
+        Assert.assertTrue(searchView != null);
+        Assert.assertTrue(addGlobalContactsContainer != null);
+        Assert.assertTrue(cancelButton != null);
+        Assert.assertTrue(layCancel != null);
+        Assert.assertTrue(laySearchBar != null);
+        Assert.assertTrue(addGCBar != null);
+        System.err.println("******** Test: NO NULL OBJECTS OK ********");
     }
 
     @Test
     public void testShowAddGlobalContactsBarInContacts() throws Exception {
-        addGCBar = (RelativeLayout)contactListFragment.getView()
-                .findViewById(R.id.add_global_contacts_container);
         //Save fake Global Contacts loading to false
-        Context context = RuntimeEnvironment.application.getApplicationContext();
         SharedPreferences sp = context.getSharedPreferences(
                 com.vodafone.mycomms.util.Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         sp.edit().putBoolean(
@@ -107,23 +141,19 @@ public class SearchGlobalContactsTest {
 
     @Test
     public void testClickBarAndGoToAddGlobalContacts() throws Exception {
-
-        addGCBar = (RelativeLayout)contactListFragment.getView()
-                .findViewById(R.id.add_global_contacts_container);
         addGCBar.setVisibility(View.VISIBLE);
         addGCBar.performClick();
 
         Intent expectedIntent = new Intent(contactListFragment.getActivity(), AddGlobalContactsActivity.class);
         Assert.assertTrue(Shadows.shadowOf(contactListFragment.getActivity())
                 .getNextStartedActivity().equals(expectedIntent));
-        System.err.println("******** Test: Navigation to AddGlobalContactsActivity ********");
+        System.err.println("******** Test: Navigation to AddGlobalContactsActivity OK********");
 
     }
 
     @Test
     public void testSearchBarVisibility() throws Exception {
         System.err.println("******** Test: Test Search Bar Visibility ********");
-        LinearLayout laySearchBar = (LinearLayout) contactListFragment.getView().findViewById(R.id.lay_search_bar_container);
         Assert.assertTrue(laySearchBar.getVisibility() == (View.VISIBLE));
         System.err.println("******** Test: Search Bar Visibility ON CONTACT LIST OK********");
 
@@ -140,6 +170,64 @@ public class SearchGlobalContactsTest {
         laySearchBar = (LinearLayout) recentListFragment.getView().findViewById(R.id.lay_search_bar_container);
         Assert.assertTrue(laySearchBar.getVisibility() == (View.GONE));
         System.err.println("******** Test: Search Bar Visibility ON RECENT LIST OK********");
+    }
+
+    @Test
+    public void testSearchBarInitialContentVisibility() throws Exception {
+        System.err.println("******** Test: Test Search Bar Content Visibility ********");
+        Assert.assertTrue(layCancel.getVisibility() == (View.GONE));
+        System.err.println("******** Test: Search Cancel Layout Visibility ON CONTACT LIST OK********");
+        Assert.assertTrue(searchView.getHint().equals(context.getResources().getString(R.string.search_bar_text)));
+        System.err.println("******** Test: Search Hint not empty ON CONTACT LIST OK********");
+
+        startContactListFragment(0);
+        ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("0");
+        layCancel = (LinearLayout) favoriteListFragment.getView().findViewById(R.id.lay_search_bar_container);
+        Assert.assertTrue(layCancel.getVisibility() == (View.GONE));
+        System.err.println("******** Test: Search Cancel Layout Visibility ON FAVORITE LIST OK********");
+        searchView = (EditText) favoriteListFragment.getView().findViewById(R.id.et_search);
+        Assert.assertTrue(searchView.getText().equals(""));
+        System.err.println("******** Test: Search Text Empty ON FAVORITE LIST OK********");
+
+        startContactListFragment(1);
+        ContactListFragment recentListFragment = (ContactListFragment)customFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("1");
+        layCancel = (LinearLayout) recentListFragment.getView().findViewById(R.id.lay_search_bar_container);
+        Assert.assertTrue(layCancel.getVisibility() == (View.GONE));
+        System.err.println("******** Test: Search Cancel Layout Visibility ON RECENT LIST OK********");
+        searchView = (EditText) recentListFragment.getView().findViewById(R.id.et_search);
+        Assert.assertTrue(searchView.getText().equals(""));
+        System.err.println("******** Test: Search Text Empty ON RECENT LIST OK********");
+    }
+
+    @Test
+    public void testSearchViewTouchEvent() throws Exception {
+        System.err.println("******** Test: Test Search Bar Touch Events ********");
+        searchView.performClick();
+        //Show Keyboard Soft Input
+        InputMethodManager imm = (InputMethodManager) contactListFragment.getActivity().getSystemService(Context
+                .INPUT_METHOD_SERVICE);
+        Assert.assertTrue(imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT) == true);
+        System.err.println("******** Test: Search Keyboard showing ON CONTACT LIST OK********");
+        //Show CancelButton
+        Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
+        System.err.println("******** Test: Cancel Button Visibility ON CONTACT LIST OK********");
+    }
+
+//    @Test
+    public void testSearchViewOnTextChangedEvent() throws Exception {
+        System.err.println("******** Test: Test Search On Text Changed Events ********");
+        //Input 1 letter text
+        searchView.setText("1");
+        //LayCancel Visible
+        Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
+        Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
+        System.err.println("******** Test: Cancel Button and Layout Visibility ON CONTACT LIST OK********");
+        //CompoundDrawables
+
+        //Input more than 1 letter text
+
     }
 
     public void startContactListFragment(int index)

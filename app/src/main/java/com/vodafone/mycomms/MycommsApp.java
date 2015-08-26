@@ -68,17 +68,16 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private SharedPreferences sp;
     public boolean appIsInitialized = false;
-    FavouriteController favouriteController;
+    private FavouriteController favouriteController;
     private RecentContactController recentContactController;
     private NewsController mNewsController;
-    String profile_id;
+    private String profile_id;
     public int contactViewOrigin = Constants.CONTACTS_ALL;
     public static Picasso picasso;
     private HashMap<String, Long> recentChatsHashMap = new HashMap<>();
 
     //Network listener
     private NetworkEvents networkEvents;
-
     private Realm realm;
 
     @Override

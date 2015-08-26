@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 public class SignupTypeChooseActivity extends MainAppCompatActivity {
 
@@ -19,6 +20,10 @@ public class SignupTypeChooseActivity extends MainAppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, null)
+                );
         setContentView(R.layout.signup_type_choose);
 
         mSignupEmail = (Button)findViewById(R.id.btSignupMail);

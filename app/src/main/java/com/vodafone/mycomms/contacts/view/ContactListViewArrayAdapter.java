@@ -40,6 +40,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
     public ContactListViewArrayAdapter(Context context, List<Contact> items) {
         super(context, R.layout.layout_list_item_contact, items);
         this.mContext = context;
+
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");

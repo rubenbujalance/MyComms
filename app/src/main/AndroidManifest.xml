@@ -194,7 +194,7 @@
             android:name=".settings.globalcontacts.AddGlobalContactsActivity"
             android:label="@string/title_activity_add_global_contacts"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan" >
+            android:windowSoftInputMode="adjustResize" >
         </activity>
 
         <!-- Receiver for push notifications -->

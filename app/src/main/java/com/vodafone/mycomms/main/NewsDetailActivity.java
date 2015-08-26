@@ -13,11 +13,16 @@ import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 public class NewsDetailActivity  extends ToolbarActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
         setContentView(R.layout.layout_news_detail);
 
         Log.d(Constants.TAG, "NewsDetailActivity.onCreate: ");

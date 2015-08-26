@@ -33,6 +33,7 @@
     <string name="invite">Invite</string>
     <string name="accept">Accept</string>
     <string name="home">Home</string>
+    <string name="attention">Attention</string>
     <string name="incorrect_format">Incorrect format</string>
     <string name="add_a_photo_to_continue">Add a photo to continue</string>
     <string name="resend_code">Resend Code</string>
@@ -251,9 +252,12 @@
 
     <!--Progress dialog-->
 
-    <string name="progress_dialog_uploading_file">Uploading file. Please wait...</string>
-    <string name="progress_dialog_downloading_contacts">Downloading contacts. Please wait..
-        .</string>
+    <string name="progress_dialog_uploading_file">Uploading file. Please wait…</string>
+    <string name="progress_dialog_downloading_contacts">Downloading contacts. Please wait…</string>
+    <string name="progress_dialog_validating_credentials">Validating credentials. Please wait…</string>
+    <string name="uploading_local_contacts">Uploading contacts, please wait…</string>
+    <string name="progress_dialog_creating_group_chat">Creating group chat. Please wait…</string>
+    <string name="progress_dialog_updating_group_chat">Updating group chat. Please wait…</string>
     <string name="unread_messages_more_than_99">99+</string>
     <string name="title_activity_group_chat">GroupChatActivity</string>
 
@@ -261,8 +265,6 @@
 
     <string name="group_chat_participants">Participants</string>
     <string name="group_chat_write">Write</string>
-    <string name="progress_dialog_creating_group_chat">Creating group chat. Please wait...</string>
-    <string name="progress_dialog_updating_group_chat">Updating group chat. Please wait...</string>
     <string name="group_chat">Group chat</string>
     <string name="today">Today</string>
     <string name="title_activity_fullscreen_image">FullscreenImageActivity</string>
@@ -299,13 +301,17 @@
 
     <!-- Invite contact-->
     <string name="invite_contact_confirmation_1">Are you sure you would like to invite</string>
-    <string name="invite_contact_confirmation_2">to myComms using</string>
+    <string name="invite_contact_confirmation_2">to MyComms using</string>
     <string name="invite_to_mycomms">Invite to MyComms</string>
+    <string name="invite_to_mycomms_error_wrong_email">Unable to invite user. Wrong provided email address.</string>
     <string name="invitation_correctly_sent">Invitation sent</string>
     <string name="invitation_badly_sent">Oops! Your invitation has not been delivered, please try again later.</string>
     <string name="support_email">support@my-comms.com</string>
+    <string name="support_email_test">alex_anishchenko@stratesys-ts.com</string>
     <string name="support_subject">Support Updating New Version</string>
+    <string name="support_subject_crash">Support on unexpected crash</string>
     <string name="support_text">Unable to download new MyComms version</string>
+    <string name="support_text_crash">Unexpected crash has been detected. Please check it ASAP!</string>
     <string name="support_button_text">Contact Support</string>
     <string name="wrapper_connection_error">Connection Error</string>
     <string name="wrapper_error_code">"Error code "</string>
@@ -313,7 +319,7 @@
     <string name="wrapper_profile_error">"Profile is not member of the group "</string>
     <string name="wrapper_unauthorized_user">"Unauthorized User. Error code "</string>
 
-    <!-- Uploading contacts-->
-    <string name="uploading_local_contacts">Uploading contacts, please wait...</string>
-    <string name="attention">Attention</string>
+    <!-- uncaughtException -->
+    <string name="uncaught_exception_title">Unexpected error has been produced. Application will be restarted!</string>
+    <string name="uncaught_exception_contact_support">Contact Support</string>
 </resources>

@@ -8,8 +8,10 @@ import android.widget.TextView;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 public class AboutActivity  extends ToolbarActivity {
@@ -20,6 +22,10 @@ public class AboutActivity  extends ToolbarActivity {
     public void onCreate(Bundle savedInstanceState) {
         Log.d(Constants.TAG, "AboutActivity.onCreate: ");
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
         BusProvider.getInstance().register(this);
         setContentView(R.layout.layout_about);
         ;

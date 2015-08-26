@@ -208,15 +208,15 @@ public final class Utils extends MainActivity {
         context.startActivity(intent);
     }
 
-    public static void launchSupportEmail(Context context)
+    public static void launchSupportEmail(Activity activity, String subject, String text, String emailAddress, int resultCode)
     {
-        String email = context.getString(R.string.support_email);
+        String email = emailAddress;
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc822");
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-        intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.support_subject));
-        intent.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.support_text));
-        context.startActivity(intent);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        activity.startActivityForResult(intent, resultCode);
     }
 
     public static void launchSms(String phone, Context context)
@@ -1026,5 +1026,16 @@ public final class Utils extends MainActivity {
         array[0] = Character.toUpperCase(array[0]);
 
         return new String(array);
+    }
+
+    /**
+     * Gets custom alert dialog title view
+     * @author str_oan
+     * @return (LinearLayout) -> custom title
+     */
+    public static View getCustomAlertTitleView(Context context, int viewId)
+    {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        return inflater.inflate(viewId, null);
     }
 }

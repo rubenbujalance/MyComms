@@ -14,7 +14,9 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.IConnectionCallback;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
 
@@ -37,7 +39,10 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(Constants.TAG, "VacationTimeSetterActivity.onCreate: ");
         super.onCreate(savedInstanceState);
-
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
         setContentView(R.layout.activity_vacation_time);
 
         profileController = new ProfileController(this);

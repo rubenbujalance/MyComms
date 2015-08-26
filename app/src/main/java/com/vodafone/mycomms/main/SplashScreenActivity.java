@@ -9,10 +9,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
+import android.os.*;
+import android.os.Process;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -29,6 +30,7 @@ import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.SystemUiHider;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -49,6 +51,8 @@ public class SplashScreenActivity extends MainActivity {
 
     Context mContext;
     private boolean isForeground;
+    private boolean isAppCrashed;
+    private String errorMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +60,24 @@ public class SplashScreenActivity extends MainActivity {
 
         setContentView(R.layout.splash_screen);
         mContext = SplashScreenActivity.this;
-
         //Register Otto Bus
         BusProvider.getInstance().register(SplashScreenActivity.this);
+        getExtras();
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
+        if(isAppCrashed)
+            showAlertDialog();
+        else
+            doOnPostCreateTasks();
+    }
+
+
+    private void doOnPostCreateTasks()
+    {
         //Check if it has been called from the email link
         Uri uriData = getIntent().getData();
 
@@ -97,6 +110,55 @@ public class SplashScreenActivity extends MainActivity {
             }
             checkVersion();
         }
+    }
+
+    private void showAlertDialog()
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        String title = mContext.getResources().getString(R.string.uncaught_exception_title);
+        View view = Utils.getCustomAlertTitleView(mContext, R.layout.layout_uncaught_exception_alert);
+        TextView textView = (TextView) view.findViewById(R.id.tv_uncaught_exception_alert_title);
+
+        textView.setText(title);
+        builder.setCustomTitle(view);
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                doOnPostCreateTasks();
+            }
+        });
+        builder.setPositiveButton(R.string.uncaught_exception_contact_support, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+                sendSupportEmailIfAppCrashed();
+            }
+        });
+
+        builder.create();
+        builder.show();
+    }
+
+    private void getExtras()
+    {
+        Intent intent = getIntent();
+        isAppCrashed = intent.hasExtra(Constants.IS_APP_CRASHED_EXTRA);
+        if(intent.hasExtra(Constants.APP_CRASH_MESSAGE))
+            errorMessage = intent.getStringExtra(Constants.APP_CRASH_MESSAGE);
+    }
+
+    private void sendSupportEmailIfAppCrashed()
+    {
+        Log.i(Constants.TAG, "SplashScreenActivity.sendSupportEmailIfCrashed: Sending Email for crash with body -> " + errorMessage);
+        Utils.launchSupportEmail
+                (
+                        SplashScreenActivity.this
+                        , getApplicationContext().getResources().getString(R.string.support_subject_crash)
+                        , getApplicationContext().getResources().getString(R.string.support_text_crash)
+                                + "\n\n" + errorMessage
+                        , getApplicationContext().getResources().getString(R.string.support_email)
+                        , Constants.REQUEST_START_ACTIVITY_FOR_APP_CRASH
+                );
     }
 
     private void checkVersion() {
@@ -219,7 +281,14 @@ public class SplashScreenActivity extends MainActivity {
                 builder.setNegativeButton(R.string.support_button_text, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Launch download and install
-                        Utils.launchSupportEmail(SplashScreenActivity.this);
+                        Utils.launchSupportEmail
+                                (
+                                        SplashScreenActivity.this
+                                        , getApplicationContext().getResources().getString(R.string.support_subject)
+                                        , getApplicationContext().getResources().getString(R.string.support_text)
+                                        , getApplicationContext().getResources().getString(R.string.support_email)
+                                        , 0
+                                );
                         if (isDownloadManagerAvailable())
                             downloadNewVersion(result);
 
@@ -477,6 +546,14 @@ public class SplashScreenActivity extends MainActivity {
     protected void onPause() {
         isForeground = false;
         super.onPause();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == Constants.REQUEST_START_ACTIVITY_FOR_APP_CRASH)
+            doOnPostCreateTasks();
     }
 
     @Override

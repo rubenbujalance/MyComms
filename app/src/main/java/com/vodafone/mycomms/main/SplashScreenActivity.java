@@ -146,6 +146,7 @@ public class SplashScreenActivity extends MainActivity {
         builder.show();
     }
 
+    //hola
     private void getExtras()
     {
         Intent intent = getIntent();

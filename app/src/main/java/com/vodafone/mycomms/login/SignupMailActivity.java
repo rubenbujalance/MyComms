@@ -22,6 +22,7 @@ import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 import org.json.JSONObject;
 
@@ -35,6 +36,10 @@ public class SignupMailActivity extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, null)
+                );
         setContentView(R.layout.sign_up_mail);
 
         etEmail = (ClearableEditText)findViewById(R.id.etSignupEmail);

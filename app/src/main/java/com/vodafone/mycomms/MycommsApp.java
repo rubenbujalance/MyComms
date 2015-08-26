@@ -40,6 +40,7 @@ import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -88,7 +89,10 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onCreate() {
         super.onCreate();
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
-
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(null,null)
+                );
         //Initialize Crashlytics
         Fabric.with(getApplicationContext(), new Crashlytics());
 

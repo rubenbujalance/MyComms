@@ -208,14 +208,14 @@ public final class Utils extends MainActivity {
         context.startActivity(intent);
     }
 
-    public static void launchSupportEmail(Context context)
+    public static void launchSupportEmail(Context context, String subject, String text, String emailAddress)
     {
-        String email = context.getString(R.string.support_email);
+        String email = emailAddress;
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc822");
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-        intent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.support_subject));
-        intent.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.support_text));
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
         context.startActivity(intent);
     }
 

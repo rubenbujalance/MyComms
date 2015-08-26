@@ -1,11 +1,16 @@
 package com.vodafone.mycomms.util;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Process;
 import android.util.Log;
+
+import com.crashlytics.android.Crashlytics;
+
+import org.jivesoftware.smack.util.StringUtils;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 
 /**
@@ -28,25 +33,44 @@ public class UncaughtExceptionHandlerController implements java.lang.Thread.Unca
     public void uncaughtException(Thread thread, Throwable ex)
     {
         Log.e(Constants.TAG, "UncaughtExceptionHandlerController.uncaughtException: ", ex);
-        //Crashlytics.logException(ex);
-        if(isCrashedOnLoopActivity())
+        Crashlytics.logException(ex);
+        String errorMessage = getStringFromThrowable(ex);
+        if(null == mClass || null == mActivity)
             androidDefaultUEH.uncaughtException(thread, ex);
         else
-            startRecoverIntent();
+        {
+            if(null != errorMessage)
+                startRecoverIntent("Exception reference: \n"+errorMessage);
+            else
+                startRecoverIntent("Exception reference: \n"+ex.toString());
+        }
     }
 
-    private void startRecoverIntent()
+    private void startRecoverIntent(String errorMessage)
     {
         Intent intent = new Intent(mActivity, mClass);
         intent.putExtra(Constants.IS_APP_CRASHED_EXTRA, true);
+        intent.putExtra(Constants.APP_CRASH_MESSAGE, errorMessage);
         mActivity.startActivity(intent);
         Process.killProcess(Process.myPid());
         System.exit(0);
     }
-    private boolean isCrashedOnLoopActivity()
+
+    private String getStringFromThrowable(Throwable ex)
     {
-        return mActivity.getClass().getSimpleName().equals(Constants.SPLASH_SCREEN_ACTIVITY)
-                || mActivity.getClass().getSimpleName().equals(Constants.DASH_BOARD_ACTIVITY)
-                || mActivity.getClass().getSimpleName().equals(Constants.MY_COMMS_APP);
+        try
+        {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            ex.printStackTrace(pw);
+            return sw.toString(); // stack trace as a string
+        }
+        catch (Exception e)
+        {
+            Log.e(Constants.TAG, "UncaughtExceptionHandlerController.getStringFromThrowable: ", e);
+            Crashlytics.logException(e);
+            return null;
+        }
+
     }
 }

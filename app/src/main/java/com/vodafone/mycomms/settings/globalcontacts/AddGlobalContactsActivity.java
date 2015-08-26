@@ -23,7 +23,9 @@ import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
 import com.vodafone.mycomms.main.MainActivity;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 import model.GlobalContactsSettings;
 
@@ -40,6 +42,10 @@ public class AddGlobalContactsActivity extends MainActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
         setContentView(R.layout.activity_add_global_contacts);
 
         BusProvider.getInstance().register(this);

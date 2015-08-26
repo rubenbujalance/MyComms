@@ -76,8 +76,6 @@ public class DashBoardActivity extends ToolbarActivity
     private RealmNewsTransactions realmNewsTransactions;
     private RecentContactController recentContactController;
     private LinearLayout lay_no_connection;
-
-
     private LinearLayout recentsContainer, recentsContainer2;
     private boolean isCurrentRecentContainerFirst = true;
     private int numberOfRecents = 0;
@@ -96,7 +94,7 @@ public class DashBoardActivity extends ToolbarActivity
         //Exception handler
         Thread.setDefaultUncaughtExceptionHandler
                 (
-                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                        new UncaughtExceptionHandlerController(this, null)
                 );
 
         SharedPreferences sp = getSharedPreferences(

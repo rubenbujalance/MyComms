@@ -301,7 +301,7 @@ public class Constants {
     public static final String LDAP_GET_AVAILABLE_URL = "https://lyncdiscover.vodafone.com";
 
     public static final String IS_APP_CRASHED_EXTRA = "is_app_crashed_extra";
-    public static final String IS_APP_CRASHED_ON_LOOP_ACTIVITY_EXTRA = "is_loop_activity_extra";
+    public static final String APP_CRASH_MESSAGE = "app_crash_message_extra";
     public static final String SPLASH_SCREEN_ACTIVITY = "SplashScreenActivity";
     public static final String DASH_BOARD_ACTIVITY = "DashBoardActivity";
     public static final String MY_COMMS_APP = "MycommsApp";

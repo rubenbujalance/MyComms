@@ -8,7 +8,9 @@ import android.view.View;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 import java.io.File;
 
@@ -20,6 +22,11 @@ public class FullscreenImageActivity extends MainAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen_image);
+
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
 
         SubsamplingScaleImageView ivImage = (SubsamplingScaleImageView)findViewById(R.id.image);
 

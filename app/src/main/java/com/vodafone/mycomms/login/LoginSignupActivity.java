@@ -12,13 +12,19 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.main.MainActivity;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 public class LoginSignupActivity extends MainActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, null)
+                );
         setContentView(R.layout.login_signup_choose);
 
         //Register Otto Bus

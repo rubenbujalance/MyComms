@@ -11,9 +11,11 @@ import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 public class GroupChatListActivity extends ToolbarActivity {
 
@@ -25,6 +27,11 @@ public class GroupChatListActivity extends ToolbarActivity {
         setContentView(R.layout.layout_main_activity);
 
         BusProvider.getInstance().register(this);
+
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
+                );
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);

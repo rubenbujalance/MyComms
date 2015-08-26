@@ -16,9 +16,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 import org.json.JSONObject;
 
@@ -35,6 +37,11 @@ public class ForgotPassActivity extends MainAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_pass);
+
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, null)
+                );
 
         btSend = (Button) findViewById(R.id.btSend);
         etEmail = (EditText) findViewById(R.id.etEmail);

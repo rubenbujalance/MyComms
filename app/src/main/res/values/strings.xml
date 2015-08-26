@@ -299,13 +299,15 @@
 
     <!-- Invite contact-->
     <string name="invite_contact_confirmation_1">Are you sure you would like to invite</string>
-    <string name="invite_contact_confirmation_2">to myComms using</string>
+    <string name="invite_contact_confirmation_2">to MyComms using</string>
     <string name="invite_to_mycomms">Invite to MyComms</string>
     <string name="invitation_correctly_sent">Invitation sent</string>
     <string name="invitation_badly_sent">Oops! Your invitation has not been delivered, please try again later.</string>
     <string name="support_email">support@my-comms.com</string>
     <string name="support_subject">Support Updating New Version</string>
+    <string name="support_subject_crash">Support on unexpected crash</string>
     <string name="support_text">Unable to download new MyComms version</string>
+    <string name="support_text_crash">Unexpected crash has been detected. Please check it ASAP!</string>
     <string name="support_button_text">Contact Support</string>
     <string name="wrapper_connection_error">Connection Error</string>
     <string name="wrapper_error_code">"Error code "</string>

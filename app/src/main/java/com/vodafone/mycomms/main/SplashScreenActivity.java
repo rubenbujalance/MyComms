@@ -30,6 +30,7 @@ import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.SystemUiHider;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -51,6 +52,7 @@ public class SplashScreenActivity extends MainActivity {
     Context mContext;
     private boolean isForeground;
     private boolean isAppCrashed;
+    private String errorMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,11 @@ public class SplashScreenActivity extends MainActivity {
 
         //Register Otto Bus
         BusProvider.getInstance().register(SplashScreenActivity.this);
+
+        Thread.setDefaultUncaughtExceptionHandler
+                (
+                        new UncaughtExceptionHandlerController(this, null)
+                );
 
         getExtras();
     }
@@ -143,11 +150,21 @@ public class SplashScreenActivity extends MainActivity {
     {
         Intent intent = getIntent();
         isAppCrashed = intent.hasExtra(Constants.IS_APP_CRASHED_EXTRA);
+        if(intent.hasExtra(Constants.APP_CRASH_MESSAGE))
+            errorMessage = intent.getStringExtra(Constants.APP_CRASH_MESSAGE);
     }
 
     private void sendSupportEmailIfCrashed()
     {
         Log.i(Constants.TAG, "SplashScreenActivity.sendSupportEmailIfCrashed: Sending Email...");
+        Utils.launchSupportEmail
+                (
+                        SplashScreenActivity.this
+                        , getApplicationContext().getResources().getString(R.string.support_subject_crash)
+                        , getApplicationContext().getResources().getString(R.string.support_text_crash)
+                        + "\n\n" + errorMessage
+                        , getApplicationContext().getResources().getString(R.string.support_email)
+                );
         doOnPostCreateTasks();
     }
 
@@ -271,7 +288,13 @@ public class SplashScreenActivity extends MainActivity {
                 builder.setNegativeButton(R.string.support_button_text, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Launch download and install
-                        Utils.launchSupportEmail(SplashScreenActivity.this);
+                        Utils.launchSupportEmail
+                                (
+                                        SplashScreenActivity.this
+                                        , getApplicationContext().getResources().getString(R.string.support_subject)
+                                        , getApplicationContext().getResources().getString(R.string.support_text)
+                                        , getApplicationContext().getResources().getString(R.string.support_email)
+                                );
                         if (isDownloadManagerAvailable())
                             downloadNewVersion(result);
 

@@ -208,7 +208,7 @@ public final class Utils extends MainActivity {
         context.startActivity(intent);
     }
 
-    public static void launchSupportEmail(Context context, String subject, String text, String emailAddress)
+    public static void launchSupportEmail(Activity activity, String subject, String text, String emailAddress, int resultCode)
     {
         String email = emailAddress;
         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -216,7 +216,7 @@ public final class Utils extends MainActivity {
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
         intent.putExtra(Intent.EXTRA_SUBJECT, subject);
         intent.putExtra(Intent.EXTRA_TEXT, text);
-        context.startActivity(intent);
+        activity.startActivityForResult(intent, resultCode);
     }
 
     public static void launchSms(String phone, Context context)

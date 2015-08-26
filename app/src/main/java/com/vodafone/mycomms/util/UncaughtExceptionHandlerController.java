@@ -4,11 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Process;
 import android.util.Log;
-
 import com.crashlytics.android.Crashlytics;
-
-import org.jivesoftware.smack.util.StringUtils;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -29,9 +25,18 @@ public class UncaughtExceptionHandlerController implements java.lang.Thread.Unca
         androidDefaultUEH = Thread.getDefaultUncaughtExceptionHandler();
     }
 
+    public UncaughtExceptionHandlerController()
+    {
+        mActivity = null;
+        mClass = null;
+        androidDefaultUEH = Thread.getDefaultUncaughtExceptionHandler();
+    }
+
     @Override
     public void uncaughtException(Thread thread, Throwable ex)
     {
+        Thread t = thread;
+        Throwable tr = ex;
         Log.e(Constants.TAG, "UncaughtExceptionHandlerController.uncaughtException: ", ex);
         Crashlytics.logException(ex);
         String errorMessage = getStringFromThrowable(ex);

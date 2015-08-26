@@ -94,7 +94,7 @@ public class DashBoardActivity extends ToolbarActivity
         //Exception handler
         Thread.setDefaultUncaughtExceptionHandler
                 (
-                        new UncaughtExceptionHandlerController(this, null)
+                        new UncaughtExceptionHandlerController()
                 );
 
         SharedPreferences sp = getSharedPreferences(
@@ -194,7 +194,6 @@ public class DashBoardActivity extends ToolbarActivity
 //        String throwException = "";
 //        throwException = throwException.substring(0, throwException.length()-2);
 //        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: "+throwException);
-
         //recentsLoading = true;
         try
         {

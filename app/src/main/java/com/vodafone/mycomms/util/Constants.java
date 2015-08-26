@@ -302,6 +302,7 @@ public class Constants {
 
     public static final String IS_APP_CRASHED_EXTRA = "is_app_crashed_extra";
     public static final String APP_CRASH_MESSAGE = "app_crash_message_extra";
+    public static final int REQUEST_START_ACTIVITY_FOR_APP_CRASH = 1;
     public static final String SPLASH_SCREEN_ACTIVITY = "SplashScreenActivity";
     public static final String DASH_BOARD_ACTIVITY = "DashBoardActivity";
     public static final String MY_COMMS_APP = "MycommsApp";

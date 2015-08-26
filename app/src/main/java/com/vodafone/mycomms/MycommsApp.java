@@ -1,9 +1,7 @@
 package com.vodafone.mycomms;
 
 import android.app.Application;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
@@ -31,7 +29,6 @@ import com.vodafone.mycomms.events.ContactListReceivedEvent;
 import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.NewsImagesReceivedEvent;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
-import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.main.connection.INewsConnectionCallback;
 import com.vodafone.mycomms.main.connection.NewsController;
 import com.vodafone.mycomms.realm.RealmDBMigration;
@@ -40,7 +37,6 @@ import com.vodafone.mycomms.settings.ProfileController;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.settings.connection.IProfileConnectionCallback;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
@@ -58,7 +54,6 @@ import model.GroupChat;
 import model.News;
 import model.UserProfile;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
-import android.os.Process;
 
 /**
  * Created by str_rbm on 02/04/2015.
@@ -89,10 +84,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onCreate() {
         super.onCreate();
         Log.i(Constants.TAG, "MycommsApp.onCreate: ");
-        Thread.setDefaultUncaughtExceptionHandler
-                (
-                        new UncaughtExceptionHandlerController(null,null)
-                );
+
         //Initialize Crashlytics
         Fabric.with(getApplicationContext(), new Crashlytics());
 

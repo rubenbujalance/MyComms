@@ -60,15 +60,8 @@ public class SplashScreenActivity extends MainActivity {
 
         setContentView(R.layout.splash_screen);
         mContext = SplashScreenActivity.this;
-
         //Register Otto Bus
         BusProvider.getInstance().register(SplashScreenActivity.this);
-
-        Thread.setDefaultUncaughtExceptionHandler
-                (
-                        new UncaughtExceptionHandlerController(this, null)
-                );
-
         getExtras();
     }
 
@@ -138,7 +131,7 @@ public class SplashScreenActivity extends MainActivity {
         builder.setPositiveButton(R.string.uncaught_exception_contact_support, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.dismiss();
-                sendSupportEmailIfCrashed();
+                sendSupportEmailIfAppCrashed();
             }
         });
 
@@ -146,7 +139,6 @@ public class SplashScreenActivity extends MainActivity {
         builder.show();
     }
 
-    //hola
     private void getExtras()
     {
         Intent intent = getIntent();
@@ -155,18 +147,18 @@ public class SplashScreenActivity extends MainActivity {
             errorMessage = intent.getStringExtra(Constants.APP_CRASH_MESSAGE);
     }
 
-    private void sendSupportEmailIfCrashed()
+    private void sendSupportEmailIfAppCrashed()
     {
-        Log.i(Constants.TAG, "SplashScreenActivity.sendSupportEmailIfCrashed: Sending Email...");
+        Log.i(Constants.TAG, "SplashScreenActivity.sendSupportEmailIfCrashed: Sending Email for crash with body -> " + errorMessage);
         Utils.launchSupportEmail
                 (
                         SplashScreenActivity.this
                         , getApplicationContext().getResources().getString(R.string.support_subject_crash)
                         , getApplicationContext().getResources().getString(R.string.support_text_crash)
-                        + "\n\n" + errorMessage
+                                + "\n\n" + errorMessage
                         , getApplicationContext().getResources().getString(R.string.support_email)
+                        , Constants.REQUEST_START_ACTIVITY_FOR_APP_CRASH
                 );
-        doOnPostCreateTasks();
     }
 
     private void checkVersion() {
@@ -295,6 +287,7 @@ public class SplashScreenActivity extends MainActivity {
                                         , getApplicationContext().getResources().getString(R.string.support_subject)
                                         , getApplicationContext().getResources().getString(R.string.support_text)
                                         , getApplicationContext().getResources().getString(R.string.support_email)
+                                        , 0
                                 );
                         if (isDownloadManagerAvailable())
                             downloadNewVersion(result);
@@ -553,6 +546,14 @@ public class SplashScreenActivity extends MainActivity {
     protected void onPause() {
         isForeground = false;
         super.onPause();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == Constants.REQUEST_START_ACTIVITY_FOR_APP_CRASH)
+            doOnPostCreateTasks();
     }
 
     @Override

@@ -304,6 +304,7 @@
     <string name="invitation_correctly_sent">Invitation sent</string>
     <string name="invitation_badly_sent">Oops! Your invitation has not been delivered, please try again later.</string>
     <string name="support_email">support@my-comms.com</string>
+    <string name="support_email_test">alex_anishchenko@stratesys-ts.com</string>
     <string name="support_subject">Support Updating New Version</string>
     <string name="support_subject_crash">Support on unexpected crash</string>
     <string name="support_text">Unable to download new MyComms version</string>

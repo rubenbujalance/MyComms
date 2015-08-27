@@ -3,6 +3,8 @@ package com.vodafone.mycomms.contacts;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -18,6 +20,7 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
@@ -28,6 +31,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -40,8 +44,8 @@ import org.robolectric.annotation.Config;
 
 import io.realm.Realm;
 
-import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
@@ -148,7 +152,6 @@ public class SearchGlobalContactsTest {
         Assert.assertTrue(Shadows.shadowOf(contactListFragment.getActivity())
                 .getNextStartedActivity().equals(expectedIntent));
         System.err.println("******** Test: Navigation to AddGlobalContactsActivity OK********");
-
     }
 
     @Test
@@ -204,7 +207,22 @@ public class SearchGlobalContactsTest {
     @Test
     public void testSearchViewTouchEvent() throws Exception {
         System.err.println("******** Test: Test Search Bar Touch Events ********");
-        searchView.performClick();
+        // Obtain MotionEvent object
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime = SystemClock.uptimeMillis() + 100;
+        float x = 0.0f;
+        float y = 0.0f;
+        // List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
+        int metaState = 0;
+        MotionEvent motionEvent = MotionEvent.obtain(
+                downTime,
+                eventTime,
+                MotionEvent.ACTION_UP,
+                x,
+                y,
+                metaState
+        );
+        searchView.dispatchTouchEvent(motionEvent);
         //Show Keyboard Soft Input
         InputMethodManager imm = (InputMethodManager) contactListFragment.getActivity().getSystemService(Context
                 .INPUT_METHOD_SERVICE);
@@ -215,19 +233,33 @@ public class SearchGlobalContactsTest {
         System.err.println("******** Test: Cancel Button Visibility ON CONTACT LIST OK********");
     }
 
-//    @Test
+    @Test
     public void testSearchViewOnTextChangedEvent() throws Exception {
         System.err.println("******** Test: Test Search On Text Changed Events ********");
-        //Input 1 letter text
-        searchView.setText("1");
-        //LayCancel Visible
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
+        SearchBarController spy = Mockito.spy(searchBarController);
+
+        //Input ""
+        Mockito.doNothing().when(spy).loadAllContactsFromDB(null);
+        spy.initiateComponentsForSearchView(contactListFragment.getView());
+        spy.searchContactsOnTextChanged("");
+        Assert.assertTrue(layCancel.getVisibility() == View.GONE);
+        System.err.println("******** Test: Cancel Layout GONE NULL CHAR ON CONTACT LIST OK********");
+
+        //Input 1 char
+        Mockito.doNothing().when(spy).loadAllContactsFromDB("1");
+        spy.searchContactsOnTextChanged("1");
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
-        System.err.println("******** Test: Cancel Button and Layout Visibility ON CONTACT LIST OK********");
-        //CompoundDrawables
+        System.err.println("******** Test: Cancel Button and Layout VISIBLE 1 CHAR ON CONTACT LIST OK********");
 
         //Input more than 1 letter text
-
+        Mockito.doNothing().when(spy).loadAllContactsFromDB("Testing");
+        Mockito.doNothing().when(spy).loadAllContactsFromServer("Testing");
+        spy.searchContactsOnTextChanged("Testing");
+        Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
+        Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
+        System.err.println("******** Test: Cancel Button and Layout VISIBLE 6 CHAR ON CONTACT LIST OK********");
     }
 
     public void startContactListFragment(int index)
@@ -247,8 +279,7 @@ public class SearchGlobalContactsTest {
 
         //Connect OkHttp calls with MockWebServer
         webServer.start();
-        String serverUrl = webServer.getUrl("/").toString();
 
-        return serverUrl;
+        return webServer.getUrl("/").toString();
     }
 }

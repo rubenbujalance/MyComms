@@ -144,15 +144,7 @@ public class SearchBarController {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.i(this.getClass().getSimpleName() + " -> onTextChanged", "Input is: " + searchView.getText().toString());
-                if (searchView.getText().length() == 1) {
-                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, drRight, 0);
-                    layCancel.setVisibility(View.VISIBLE);
-                } else if (searchView.getText().length() == 0) {
-                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-                }
-
-                currentKeyWord = searchView.getText().toString();
-                searchAllContacts(searchView.getText().toString());
+                searchContactsOnTextChanged(s);
             }
 
             @Override
@@ -180,6 +172,18 @@ public class SearchBarController {
         });
 
     }
+
+    public void searchContactsOnTextChanged(CharSequence s) {
+        if (s.length() == 1) {
+            searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, drRight, 0);
+            layCancel.setVisibility(View.VISIBLE);
+        } else if (s.length() == 0) {
+            searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
+        }
+        currentKeyWord = s.toString();
+        searchAllContacts(currentKeyWord);
+    }
+
     /**
      * Initiate each component what belong to Search View
      * @author str_oan
@@ -255,7 +259,7 @@ public class SearchBarController {
      * @author str_oan
      * @param keyWord (String) -> key word for make search
      */
-    private void loadAllContactsFromDB(String keyWord)
+    public void loadAllContactsFromDB(String keyWord)
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>" + keyWord);
         if(null == keyWord)
@@ -283,7 +287,7 @@ public class SearchBarController {
      * @author str_oan
      * @param keyWord -> key word for make search
      */
-    private void loadAllContactsFromServer(String keyWord)
+    public void loadAllContactsFromServer(String keyWord)
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Keyword>" + keyWord);
 

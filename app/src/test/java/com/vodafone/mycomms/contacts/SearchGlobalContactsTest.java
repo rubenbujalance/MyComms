@@ -74,6 +74,7 @@ public class SearchGlobalContactsTest {
     Button cancelButton;
     LinearLayout layCancel;
     LinearLayout laySearchBar;
+    String testString;
 
     @Before
     public void setUp() throws Exception {
@@ -96,6 +97,7 @@ public class SearchGlobalContactsTest {
         laySearchBar = (LinearLayout) contactListFragment.getView().findViewById(R.id.lay_search_bar_container);
         addGCBar = (RelativeLayout)contactListFragment.getView()
                 .findViewById(R.id.add_global_contacts_container);
+        testString = "Testing";
     }
 
     @Test
@@ -222,14 +224,68 @@ public class SearchGlobalContactsTest {
                 y,
                 metaState
         );
+
         searchView.dispatchTouchEvent(motionEvent);
         //Show Keyboard Soft Input
         InputMethodManager imm = (InputMethodManager) contactListFragment.getActivity().getSystemService(Context
                 .INPUT_METHOD_SERVICE);
         Assert.assertTrue(imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT) == true);
+        System.err.println("******** Test: Search Keyboard showing motion event up ON CONTACT LIST OK********");
+
+        motionEvent = MotionEvent.obtain(
+                downTime,
+                eventTime,
+                MotionEvent.ACTION_DOWN,
+                x,
+                y,
+                metaState
+        );
+
+        searchView.dispatchTouchEvent(motionEvent);
+        //Show Keyboard Soft Input
+        Assert.assertTrue(imm.showSoftInput(searchView, InputMethodManager.SHOW_IMPLICIT) == true);
+        System.err.println("******** Test: Search Keyboard showing motion event not up ON CONTACT LIST OK********");
+    }
+
+    @Test
+    public void testSearchViewTouchDeleteEvent() throws Exception {
+        System.err.println("******** Test: Test Search Bar Touch Delete Events ********");
+
+        //Prepare Mock SearchView in order to avoid onTextChange events
+        final int drLeft = android.R.drawable.ic_menu_search;
+        final int drRight = R.drawable.ic_action_remove;
+        EditText spySearchView = Mockito.spy(searchView);
+        Mockito.doNothing().when(spySearchView).setText(testString);
+        spySearchView.setText(testString);
+
+        //Mock X button and Cancel Visibility
+        layCancel.setVisibility(View.VISIBLE);
+        spySearchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, drRight, 0);
+
+        // Obtain MotionEvent object
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime = SystemClock.uptimeMillis() + 100;
+        float x = spySearchView.getRight() - spySearchView.getCompoundDrawables()[2].getBounds().width();
+        float y = 0.0f;
+        // List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
+        int metaState = 0;
+        MotionEvent motionEvent = MotionEvent.obtain(
+                downTime,
+                eventTime,
+                MotionEvent.ACTION_UP,
+                x,
+                y,
+                metaState
+        );
+
+        spySearchView.dispatchTouchEvent(motionEvent);
+        //Show Keyboard Soft Input
+        InputMethodManager imm = (InputMethodManager) contactListFragment.getActivity().getSystemService(Context
+                .INPUT_METHOD_SERVICE);
+        Assert.assertTrue(imm.showSoftInput(spySearchView, InputMethodManager.SHOW_IMPLICIT) == true);
         System.err.println("******** Test: Search Keyboard showing ON CONTACT LIST OK********");
         //Show CancelButton
-        Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
+        Assert.assertTrue(spySearchView.getText().equals(""));
         System.err.println("******** Test: Cancel Button Visibility ON CONTACT LIST OK********");
     }
 
@@ -237,26 +293,26 @@ public class SearchGlobalContactsTest {
     public void testSearchViewOnTextChangedEvent() throws Exception {
         System.err.println("******** Test: Test Search On Text Changed Events ********");
         SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
-        SearchBarController spy = Mockito.spy(searchBarController);
+        SearchBarController spySearchBarController = Mockito.spy(searchBarController);
 
         //Input ""
-        Mockito.doNothing().when(spy).loadAllContactsFromDB(null);
-        spy.initiateComponentsForSearchView(contactListFragment.getView());
-        spy.searchContactsOnTextChanged("");
+        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB(null);
+        spySearchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+        spySearchBarController.searchContactsOnTextChanged("");
         Assert.assertTrue(layCancel.getVisibility() == View.GONE);
         System.err.println("******** Test: Cancel Layout GONE NULL CHAR ON CONTACT LIST OK********");
 
         //Input 1 char
-        Mockito.doNothing().when(spy).loadAllContactsFromDB("1");
-        spy.searchContactsOnTextChanged("1");
+        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB("1");
+        spySearchBarController.searchContactsOnTextChanged("1");
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
         System.err.println("******** Test: Cancel Button and Layout VISIBLE 1 CHAR ON CONTACT LIST OK********");
 
         //Input more than 1 letter text
-        Mockito.doNothing().when(spy).loadAllContactsFromDB("Testing");
-        Mockito.doNothing().when(spy).loadAllContactsFromServer("Testing");
-        spy.searchContactsOnTextChanged("Testing");
+        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB("Testing");
+        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromServer("Testing");
+        spySearchBarController.searchContactsOnTextChanged("Testing");
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
         System.err.println("******** Test: Cancel Button and Layout VISIBLE 6 CHAR ON CONTACT LIST OK********");

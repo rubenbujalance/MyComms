@@ -17,9 +17,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.Response;
+import com.squareup.otto.Bus;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
-import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
@@ -273,7 +273,9 @@ public class SearchBarController {
             if(!isGroupChatSearch)
                 validateNoPlatformRecords(contactList);
         }
-        BusProvider.getInstance().post(new ReloadAdapterEvent());
+        Bus bus = new Bus();
+        bus.post(new ReloadAdapterEvent());
+//        BusProvider.getInstance().post(new ReloadAdapterEvent());
     }
 
     private void loadAllContactsFromDB()

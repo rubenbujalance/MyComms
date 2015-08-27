@@ -14,9 +14,9 @@ import java.io.StringWriter;
  */
 public class UncaughtExceptionHandlerController implements java.lang.Thread.UncaughtExceptionHandler
 {
-    private Activity mActivity;
-    private Class<?> mClass;
-    private Thread.UncaughtExceptionHandler androidDefaultUEH;
+    public Activity mActivity;
+    public Class<?> mClass;
+    public Thread.UncaughtExceptionHandler androidDefaultUEH;
 
     public UncaughtExceptionHandlerController(Activity crashedActivity, Class<?> c)
     {
@@ -78,4 +78,6 @@ public class UncaughtExceptionHandlerController implements java.lang.Thread.Unca
         }
 
     }
+
+
 }

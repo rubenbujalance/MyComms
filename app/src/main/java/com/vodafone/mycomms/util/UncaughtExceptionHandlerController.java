@@ -45,39 +45,41 @@ public class UncaughtExceptionHandlerController implements java.lang.Thread.Unca
         else
         {
             if(null != errorMessage)
-                startRecoverIntent("Exception reference: \n"+errorMessage);
+                startRecoverIntent("Exception reference: \n" + errorMessage);
             else
                 startRecoverIntent("Exception reference: \n"+ex.toString());
+
+            this.mActivity.finish();
+            //killProcess();
         }
     }
 
-    private void startRecoverIntent(String errorMessage)
+    public void startRecoverIntent(String errorMessage)
     {
         Intent intent = new Intent(mActivity, mClass);
         intent.putExtra(Constants.IS_APP_CRASHED_EXTRA, true);
         intent.putExtra(Constants.APP_CRASH_MESSAGE, errorMessage);
         mActivity.startActivity(intent);
-        Process.killProcess(Process.myPid());
-        System.exit(0);
     }
 
-    private String getStringFromThrowable(Throwable ex)
+    public String getStringFromThrowable(Throwable ex)
     {
-        try
+        if(null!=ex)
         {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
             return sw.toString(); // stack trace as a string
         }
-        catch (Exception e)
-        {
-            Log.e(Constants.TAG, "UncaughtExceptionHandlerController.getStringFromThrowable: ", e);
-            Crashlytics.logException(e);
+        else
             return null;
-        }
-
     }
+
+//    private void killProcess()
+//    {
+//        Process.killProcess(Process.myPid());
+//        System.exit(0);
+//    }
 
 
 }

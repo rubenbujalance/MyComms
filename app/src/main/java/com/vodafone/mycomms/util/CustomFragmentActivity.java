@@ -21,10 +21,6 @@ public class CustomFragmentActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler
-                (
-                        new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
-                );
         Intent in = this.getIntent();
         int index = in.getIntExtra("index", 2);
         FragmentManager fragmentManager = this.getSupportFragmentManager();

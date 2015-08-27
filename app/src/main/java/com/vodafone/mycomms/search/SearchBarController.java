@@ -17,9 +17,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.Response;
+import com.squareup.otto.Bus;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
-import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
@@ -144,15 +144,7 @@ public class SearchBarController {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 Log.i(this.getClass().getSimpleName() + " -> onTextChanged", "Input is: " + searchView.getText().toString());
-                if (searchView.getText().length() == 1) {
-                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, drRight, 0);
-                    layCancel.setVisibility(View.VISIBLE);
-                } else if (searchView.getText().length() == 0) {
-                    searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
-                }
-
-                currentKeyWord = searchView.getText().toString();
-                searchAllContacts(searchView.getText().toString());
+                searchContactsOnTextChanged(s);
             }
 
             @Override
@@ -180,6 +172,18 @@ public class SearchBarController {
         });
 
     }
+
+    public void searchContactsOnTextChanged(CharSequence s) {
+        if (s.length() == 1) {
+            searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, drRight, 0);
+            layCancel.setVisibility(View.VISIBLE);
+        } else if (s.length() == 0) {
+            searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
+        }
+        currentKeyWord = s.toString();
+        searchAllContacts(currentKeyWord);
+    }
+
     /**
      * Initiate each component what belong to Search View
      * @author str_oan
@@ -255,7 +259,7 @@ public class SearchBarController {
      * @author str_oan
      * @param keyWord (String) -> key word for make search
      */
-    private void loadAllContactsFromDB(String keyWord)
+    public void loadAllContactsFromDB(String keyWord)
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>" + keyWord);
         if(null == keyWord)
@@ -269,7 +273,9 @@ public class SearchBarController {
             if(!isGroupChatSearch)
                 validateNoPlatformRecords(contactList);
         }
-        BusProvider.getInstance().post(new ReloadAdapterEvent());
+        Bus bus = new Bus();
+        bus.post(new ReloadAdapterEvent());
+//        BusProvider.getInstance().post(new ReloadAdapterEvent());
     }
 
     private void loadAllContactsFromDB()
@@ -283,7 +289,7 @@ public class SearchBarController {
      * @author str_oan
      * @param keyWord -> key word for make search
      */
-    private void loadAllContactsFromServer(String keyWord)
+    public void loadAllContactsFromServer(String keyWord)
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromServer: Keyword>" + keyWord);
 

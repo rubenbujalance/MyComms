@@ -29,7 +29,6 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
-import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
@@ -63,7 +62,6 @@ public class ContactListFragment extends ListFragment {
     private ArrayList<RecentContact> recentContactList;
     private RealmContactTransactions mContactTransactions;
     private RelativeLayout addGlobalContactsContainer;
-    private TextView myCommsTextView;
 
     private ListView listView;
     private Parcelable state;
@@ -99,7 +97,6 @@ public class ContactListFragment extends ListFragment {
         searchView = (EditText) v.findViewById(R.id.et_search);
 
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
-        myCommsTextView = (TextView) v.findViewById(R.id.platform_label);
 
         //TODO: Null Object error, commented
         addGlobalContactsContainer.setOnClickListener(new View.OnClickListener() {
@@ -127,15 +124,9 @@ public class ContactListFragment extends ListFragment {
                 Constants.isDashboardOrigin = false;
             }
 
-            if (null != myCommsTextView){
-                myCommsTextView.setVisibility(View.VISIBLE);
-            }
         }
         else{
             hideKeyboard();
-            if (null != myCommsTextView){
-                myCommsTextView.setVisibility(View.GONE);
-            }
         }
         return v;
     }

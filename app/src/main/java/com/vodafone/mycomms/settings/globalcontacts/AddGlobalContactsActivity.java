@@ -3,6 +3,7 @@ package com.vodafone.mycomms.settings.globalcontacts;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -89,9 +90,12 @@ public class AddGlobalContactsActivity extends MainActivity {
                 //Start the process
                 if (checkData()) {
                     pd = new ProgressDialog(AddGlobalContactsActivity.this);
-                    pd.setCancelable(false);
-                    pd.setTitle(getResources().getString(R.string.progress_dialog_validating_credentials));
                     pd.show();
+                    pd.setCancelable(false);
+                    pd.getWindow().setBackgroundDrawable(getResources().getDrawable(R.color.transparent));
+                    pd.setContentView(R.layout.layout_progress_dialog_without_text);
+                    //pd.setTitle(getResources().getString(R.string.progress_dialog_validating_credentials));
+
                     String user = etEmail.getText().toString();
                     String password = etPassword.getText().toString();
                     GlobalContactsController gcController = new GlobalContactsController();
@@ -106,7 +110,6 @@ public class AddGlobalContactsActivity extends MainActivity {
                                     if(pd.isShowing())
                                         pd.dismiss();
                                     showMessageBarOnUIThread(error, resCode);
-
                                 }
 
                                 @Override
@@ -132,6 +135,28 @@ public class AddGlobalContactsActivity extends MainActivity {
                     setCredentialsTextColor(true);
                     tvError.setText(R.string.credentials_are_incorrect);
                     layoutErrorBar.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        etEmail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus)
+                {
+                    setCredentialsTextColor(false);
+                    layoutErrorBar.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        etPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus)
+                {
+                    setCredentialsTextColor(false);
+                    layoutErrorBar.setVisibility(View.GONE);
                 }
             }
         });

@@ -304,8 +304,10 @@ public class SignupPhoneActivity extends MainActivity {
                     SignupPhoneActivity.this);
         }
         @Override
-        protected void onPostExecute(HashMap<String,Object> result) {
-            callBackPhoneCheck(result);
+        protected void onPostExecute(HashMap<String,Object> result)
+        {
+            if(null != result)
+                callBackPhoneCheck(result);
         }
     }
 }

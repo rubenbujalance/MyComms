@@ -95,7 +95,7 @@ public class SplashScreenActivity extends MainActivity {
                 //No connection, cannot check version nor profile
                 if (UserSecurity.isUserLogged(SplashScreenActivity.this)) {
                     if (!UserSecurity.hasExpired(SplashScreenActivity.this)) {
-                        if(((MycommsApp)getApplication()).isProfileAvailable()) {
+                        if(MycommsApp.isProfileAvailable()) {
                             goToApp(true);
                         }
                     }

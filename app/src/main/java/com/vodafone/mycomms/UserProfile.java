@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Objects;
 
 //import com.google.gson.Gson;
 
@@ -181,9 +182,9 @@ public final class UserProfile implements Serializable{
         return true;
     }
 
-    public static HashMap getHashMap()
+    public static HashMap<String,Object> getHashMap()
     {
-        HashMap<String, String> body = new HashMap<String, String>();
+        HashMap<String, Object> body = new HashMap<>();
         if(_firstName != null) body.put("firstName",_firstName);
         if(_lastName != null) body.put("lastName",_lastName);
         if(_countryISO != null) body.put("country",_countryISO);

@@ -1,7 +1,6 @@
 package com.vodafone.mycomms.login;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.DashBoardActivity;
-import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
@@ -26,11 +24,9 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
-import static com.vodafone.mycomms.constants.Constants.INVALID_VERSION_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_USER_NOT_FOUND_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.PASSWORD;

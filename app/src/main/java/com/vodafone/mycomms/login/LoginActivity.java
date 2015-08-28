@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -32,6 +33,8 @@ import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
+
+import org.jetbrains.annotations.Contract;
 
 public class LoginActivity extends MainAppCompatActivity implements ILoginConnectionCallback {
 
@@ -259,14 +262,22 @@ public class LoginActivity extends MainAppCompatActivity implements ILoginConnec
         if(((MycommsApp)getApplication()).isProfileAvailable()) {
             goToApp();
         }
-        else {
-            Toast.makeText(this,
-                    getString(R.string.no_internet_connection_log_in_needed),
-                    Toast.LENGTH_LONG).show();
+        else
+        {
+            try
+            {
+                Toast.makeText(this,
+                        getString(R.string.no_internet_connection_log_in_needed),
+                        Toast.LENGTH_LONG).show();
+            }
+            catch(NullPointerException e)
+            {
+                Log.e(Constants.TAG, ".: ",e);
+            }
         }
     }
 
-    private void goToApp()
+    public void goToApp()
     {
         //Go to app
         Intent in = new Intent(LoginActivity.this, DashBoardActivity.class);

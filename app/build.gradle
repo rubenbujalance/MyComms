@@ -177,6 +177,9 @@ dependencies {
     //Custom Font
     compile 'uk.co.chrisjenx:calligraphy:2.1.0'
 
+    //Annotations
+    compile 'org.jetbrains:annotations:13.0'
+
 }
 
 apply plugin: 'jacoco'

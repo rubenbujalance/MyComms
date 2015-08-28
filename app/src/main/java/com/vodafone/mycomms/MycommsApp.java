@@ -66,7 +66,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
     private ProfileController profileController;
     private Context mContext;
-    private SharedPreferences sp;
+    private static SharedPreferences sp;
     public boolean appIsInitialized = false;
     private FavouriteController favouriteController;
     private RecentContactController recentContactController;
@@ -219,7 +219,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         }
     }
 
-    public boolean isProfileAvailable()
+    public static boolean isProfileAvailable()
     {
         try {
             if(sp.contains(Constants.PROFILE_ID_SHARED_PREF)) return true;

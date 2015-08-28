@@ -17,9 +17,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.Response;
-import com.squareup.otto.Bus;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
@@ -46,7 +46,7 @@ import model.GlobalContactsSettings;
 public class SearchBarController {
     private EditText searchView;
     private Activity mActivity;
-    private Button cancelButton;
+    public Button mCancelButton;
     private LinearLayout layCancel;
     private SearchController mSearchController;
     private ArrayList<Contact> contactList;
@@ -103,7 +103,6 @@ public class SearchBarController {
 
         searchView.setCompoundDrawablesWithIntrinsicBounds(drLeft, 0, 0, 0);
 
-
         searchView.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
@@ -116,7 +115,7 @@ public class SearchBarController {
 
                 searchView.requestFocus();
                 showKeyboard();
-                cancelButton.setVisibility(View.VISIBLE);
+                mCancelButton.setVisibility(View.VISIBLE);
 
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     // Will hide X button for delete searched text
@@ -163,7 +162,7 @@ public class SearchBarController {
             }
         });
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 hideSearchBarContent();
@@ -191,7 +190,7 @@ public class SearchBarController {
     public void initiateComponentsForSearchView(View v)
     {
         searchView = (EditText) v.findViewById(R.id.et_search);
-        cancelButton = (Button) v.findViewById(R.id.btn_cancel);
+        mCancelButton = (Button) v.findViewById(R.id.btn_cancel);
         layCancel = (LinearLayout) v.findViewById(R.id.lay_cancel);
 
         laySearchBar = (LinearLayout) v.findViewById(R.id.lay_search_bar_container);
@@ -273,12 +272,10 @@ public class SearchBarController {
             if(!isGroupChatSearch)
                 validateNoPlatformRecords(contactList);
         }
-        Bus bus = new Bus();
-        bus.post(new ReloadAdapterEvent());
-//        BusProvider.getInstance().post(new ReloadAdapterEvent());
+        BusProvider.getInstance().post(new ReloadAdapterEvent());
     }
 
-    private void loadAllContactsFromDB()
+    public void loadAllContactsFromDB()
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: <No Filter>");
         loadAllContactsFromDB(null);

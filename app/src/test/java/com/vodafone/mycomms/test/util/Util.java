@@ -1,5 +1,7 @@
 package com.vodafone.mycomms.test.util;
 
+import com.squareup.okhttp.mockwebserver.MockWebServer;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -57,6 +59,18 @@ public class Util {
             final Class<?> clazz = ClassLoaderUtil.loadClass(cls, ClassLoader.getSystemClassLoader());
             Whitebox.getInternalState(clazz, ThreadLocal.class).set(null);
         }
+    }
+
+    public static String startWebMockServer(MockWebServer webServer) throws Exception {
+        //OkHttp mocked web server
+        webServer = new MockWebServer();
+        webServer.useHttps(null, false);
+
+        //Connect OkHttp calls with MockWebServer
+        webServer.start();
+        String serverUrl = webServer.getUrl("/").toString();
+
+        return serverUrl;
     }
 
 }

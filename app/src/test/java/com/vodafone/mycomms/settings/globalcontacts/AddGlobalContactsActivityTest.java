@@ -119,7 +119,7 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testDiscoverErrors() throws Exception {
-        String serverUrl = startWebMockServer();
+        String serverUrl = Util.startWebMockServer(webServer);
         PowerMockito.mockStatic(EndpointWrapper.class);
 
         //Discover connection error
@@ -164,7 +164,7 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testUserError() throws Exception {
-        String serverUrl = startWebMockServer();
+        String serverUrl = Util.startWebMockServer(webServer);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
 
@@ -223,7 +223,7 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testAuthErrors() throws Exception {
-        String serverUrl = startWebMockServer();
+        String serverUrl = Util.startWebMockServer(webServer);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
 
@@ -339,7 +339,7 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testOK() throws Exception {
-        String serverUrl = startWebMockServer();
+        String serverUrl = Util.startWebMockServer(webServer);
         PowerMockito.mockStatic(EndpointWrapper.class);
 
         String mockedDiscoverResponse =
@@ -417,18 +417,6 @@ public class AddGlobalContactsActivityTest {
     public void testGoBack() throws Exception {
         btBack.performClick();
         Assert.assertTrue(activity.isFinishing());
-    }
-
-    private String startWebMockServer() throws Exception {
-        //OkHttp mocked web server
-        webServer = new MockWebServer();
-        webServer.useHttps(null, false);
-
-        //Connect OkHttp calls with MockWebServer
-        webServer.start();
-        String serverUrl = webServer.getUrl("/").toString();
-
-        return serverUrl;
     }
 
     private void resetScreen() {

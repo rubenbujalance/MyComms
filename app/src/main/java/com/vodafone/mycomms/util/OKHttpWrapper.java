@@ -58,7 +58,8 @@ public class OKHttpWrapper {
         String finalUrl;
 
         if(endPointWrapper==null) finalUrl = url;
-        else finalUrl = "https://" + endPointWrapper + url;
+        else if(!endPointWrapper.startsWith("http")) finalUrl = "https://" + endPointWrapper + url;
+        else finalUrl = endPointWrapper + url;
 
         Request.Builder builder = new Request.Builder();
         builder.url(finalUrl)

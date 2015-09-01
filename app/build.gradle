@@ -188,13 +188,13 @@ jacoco {
     toolVersion = "0.7.1.201405082137"
 }
 
-def coverageSourceDirs = ['src/main/java/com']
+def coverageSourceDirs = ['src/main/java/com/vodafone']
 
 task jacocoTestReport(type: JacocoReport) {
     group = "Reporting"
     description = "Generate Jacoco coverage reports"
     classDirectories = fileTree(
-            dir: 'build/intermediates/classes/i/release',
+            dir: 'build/intermediates/classes/i/release/com/vodafone',
             excludes: ['**/R.class',
                        '**/R$*.class',
                        '**/*$ViewInjector*.*',
@@ -215,7 +215,7 @@ task jacocoTestReportDebug(type: JacocoReport) {
     group = "Reporting"
     description = "Generate Jacoco coverage reports for Debug"
     classDirectories = fileTree(
-            dir: 'build/intermediates/classes/i/debug',
+            dir: 'build/intermediates/classes/i/debug/com/vodafone',
             excludes: ['**/R.class',
                        '**/R$*.class',
                        '**/*$ViewInjector*.*',

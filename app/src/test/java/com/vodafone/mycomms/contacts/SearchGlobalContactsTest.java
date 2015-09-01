@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,9 +23,10 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
-import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
+import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
@@ -49,7 +51,12 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowInputMethodManager;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import io.realm.Realm;
+import model.GlobalContactsSettings;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -63,7 +70,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({RealmContactTransactions.class, Realm.class, BusProvider.class, EndpointWrapper.class})
+@PrepareForTest({RealmContactTransactions.class, Realm.class, EndpointWrapper.class, RealmLDAPSettingsTransactions.class})
 public class SearchGlobalContactsTest {
 
     @Rule
@@ -89,9 +96,9 @@ public class SearchGlobalContactsTest {
         mockStatic(Crashlytics.class);
         whenNew(RealmContactTransactions.class).withAnyArguments()
                 .thenReturn(null);
-        mockStatic(BusProvider.class);
-        BusProvider.MainThreadBus bus = new BusProvider.MainThreadBus();
-        when(BusProvider.getInstance()).thenReturn(bus);
+//        mockStatic(BusProvider.class);
+//        BusProvider.MainThreadBus bus = new BusProvider.MainThreadBus();
+//        when(BusProvider.getInstance()).thenReturn(bus);
         context = RuntimeEnvironment.application.getApplicationContext();
         startContactListFragment(2);
         contactListFragment = (ContactListFragment)customFragmentActivity
@@ -149,6 +156,35 @@ public class SearchGlobalContactsTest {
         addGlobalContactsContainer = (RelativeLayout) recentListFragment.getView().findViewById(R.id.add_global_contacts_container);
         Assert.assertTrue(addGlobalContactsContainer.getVisibility() == (View.GONE));
         System.err.println("******** Test: Global Contacts Visibility ON RECENT LIST OK********");
+    }
+
+    @Test
+    public void testInitiateSearchViewComponentsOnFavoriteFragment() throws Exception {
+        System.err.println("******** Test: Initiate SearchView Components ON FAVORITE LIST********");
+        startContactListFragment(0);
+        ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("0");
+
+        SearchBarController searchBarController = new SearchBarController(favoriteListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
+        SearchBarController spySearchBarController = Mockito.spy(searchBarController);
+
+        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB(null);
+        try{
+            spySearchBarController.initiateComponentsForSearchView(favoriteListFragment.getView());
+        } catch (RuntimeException e){
+            System.err.println("******** Test: RunTimeException Handled OK********" + e);
+        }
+        laySearchBar = (LinearLayout) favoriteListFragment.getView().findViewById(R.id.lay_search_bar_container);
+        layCancel = (LinearLayout) favoriteListFragment.getView().findViewById(R.id.lay_cancel);
+        searchView = (EditText) favoriteListFragment.getView().findViewById(R.id.et_search);
+
+        Assert.assertTrue(laySearchBar.getVisibility() == View.GONE);
+        Assert.assertTrue(layCancel.getVisibility() == View.GONE);
+        Assert.assertTrue(searchView.getText().equals(""));
+
+        addGlobalContactsContainer = (RelativeLayout) favoriteListFragment.getView().findViewById(R.id.add_global_contacts_container);
+        Assert.assertTrue(addGlobalContactsContainer.getVisibility() == (View.GONE));
+        System.err.println("******** Test: Initiate SearchView Components ON FAVORITE LIST OK********");
     }
 
     @Test
@@ -342,7 +378,7 @@ public class SearchGlobalContactsTest {
         spySearchBarController.searchContactsOnTextChanged("Testing");
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
-        System.err.println("******** Test: Cancel Button and Layout VISIBLE 6 CHAR ON CONTACT LIST KOKOKOKOKO OK********");
+        System.err.println("******** Test: Cancel Button and Layout VISIBLE 6 CHAR ON CONTACT LIST OK********");
     }
 
     @Test
@@ -406,44 +442,150 @@ public class SearchGlobalContactsTest {
     }
 
     @Test
-    public void testLoadContactsFromServerEvent() throws Exception {
-        System.err.println("******** Test: Load Contacts from Server Events ********");
-        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
-        try {
-            searchBarController.loadAllContactsFromServer("1");
+    public void testLoadContactsFromDBEvent() throws Exception {
+        System.err.println("******** Test: Load Contacts from DB Events ********");
+        SearchController searchController = new SearchController(context, Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+
+        try{
+            searchBarController.searchContactsOnTextChanged("");
+            System.err.println("******** Searching for null ********");
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
+        Robolectric.flushForegroundThreadScheduler();
+
+        try{
+            searchBarController.searchContactsOnTextChanged("1");
+            System.err.println("******** Searching for 1 ********");
+        } catch (RuntimeException e){
+            System.err.println("******** Test: RunTimeException Handled OK********" + e);
+        }
+        Robolectric.flushForegroundThreadScheduler();
+        System.err.println("******** Test: Load Contacts from DB Events OK ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromPlatformSearch() throws Exception {
+        System.err.println("******** Test: Load All Contacts Search from Platform Events ********");
+
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String mockedUserResponseHeader =
+                com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_OK;
+        String json = loadJSON();
+        webServer.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setHeader(com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_KEY,
+                        mockedUserResponseHeader)
+                .setBody(json)
+        );
+        webServer.enqueue(new MockResponse().setResponseCode(401));
+
+        SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+
+        try{
+            searchBarController.searchContactsOnTextChanged("Persona");
+            System.err.println("******** Searching for Persona ********");
+            System.err.println("******** Response Code is 201 ********");
+        } catch (RuntimeException e){
+            System.err.println("******** Test: RunTimeException Handled OK********" + e);
+        }
+        Thread.sleep(5000);
+        Robolectric.flushForegroundThreadScheduler();
+        Robolectric.flushBackgroundThreadScheduler();
+
+        webServer.shutdown();
+
+        System.err.println("******** Test: Load All Contacts from Platforms Events OK ********");
+    }
+
+    @Test
+    public void testLoadContactsFromServer() throws Exception {
+        System.err.println("******** Test: Load Contacts from Server Events ********");
+
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String mockedUserResponseHeader =
+                com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_OK;
+        String json = loadJSON();
+        webServer.enqueue(new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_KEY,
+                                mockedUserResponseHeader)
+                        .setBody(json)
+        );
+        webServer.enqueue(new MockResponse().setResponseCode(401));
+
+        SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+
+        //Test Load Contacts from Server
+        //Mock save settings
+        GlobalContactsSettings settings = new GlobalContactsSettings(
+                com.vodafone.mycomms.constants.Constants.PROFILE_ID,
+                com.vodafone.mycomms.constants.Constants.LDAP_USER,
+                com.vodafone.mycomms.constants.Constants.LDAP_PASSWORD,
+                com.vodafone.mycomms.constants.Constants.LDAP_TOKEN,
+                com.vodafone.mycomms.constants.Constants.LDAP_TOKEN_TYPE,
+                com.vodafone.mycomms.constants.Constants.LDAP_RETURN_URL
+        );
+
+        PowerMockito.mockStatic(RealmLDAPSettingsTransactions.class);
+        PowerMockito.when(RealmLDAPSettingsTransactions
+                .getSettings(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn(settings);
+        PowerMockito.when(RealmLDAPSettingsTransactions
+                .haveSettings(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn(true);
+        try{
+            searchBarController.searchContactsOnTextChanged("Persona");
+            System.err.println("******** Searching for Persona ********");
+            System.err.println("******** Response Code is 201 ********");
+        } catch (RuntimeException e){
+            System.err.println("******** Test: RunTimeException Handled OK********" + e);
+        }
+        Thread.sleep(5000);
+        Robolectric.flushForegroundThreadScheduler();
+        Robolectric.flushBackgroundThreadScheduler();
+
+//        String toast = ShadowToast.getTextOfLatestToast();
+//        Assert.assertTrue(toast.equals("Error reading data from server"));
+
+        webServer.shutdown();
+
         System.err.println("******** Test: Load Contacts from Server Events OK ********");
     }
 
     @Test
-    public void testLoadAllContactsFromPlatforms() throws Exception {
-        System.err.println("******** Test: Load All Contacts from Platform Events ********");
+    public void testLoadAllContactsFromGroupSearch() throws Exception {
+        System.err.println("******** Test: Load All Contacts From Group Search Events ********");
+        SearchController searchController = new SearchController(context, Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,true,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
 
-        String serverUrl = startWebMockServer();
-        PowerMockito.mockStatic(EndpointWrapper.class);
-        String expression = "https://";
-        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl.replaceFirst(expression,""));
-
-        String mockedUserResponseHeader =
-                com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_OK;
-
-        webServer.enqueue(new MockResponse()
-                .setResponseCode(201)
-                .setHeader(com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_KEY,
-                        mockedUserResponseHeader)
-        );
-//        Util.mockGlobalSettings();
-//        Util.saveFakeProfile();
-        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
-        searchBarController.loadAllContactsFromPlatforms("1");
-        Thread.sleep(3000);
+        try{
+            searchBarController.searchContactsOnTextChanged("Persona");
+            System.err.println("******** Searching for Group Persona ********");
+        } catch (RuntimeException e){
+            System.err.println("******** Test: RunTimeException Handled OK********" + e);
+        }
         Robolectric.flushForegroundThreadScheduler();
+        System.err.println("******** Test: Load All Contacts From Group Search Events OK********");
+    }
 
-//        String toast = ShadowToast.getTextOfLatestToast();
-//        Assert.assertTrue(toast.equals("Error reading data from server"));
-        System.err.println("******** Test: Load All Contacts from Platforms Events OK ********");
+    @Test
+    public void testLoadAllWithNoContactsSearch() throws Exception {
+        System.err.println("******** Test: Load All Contacts From Group Search Events ********");
+        System.err.println("******** Test: Load All Contacts From Group Search Events OK********");
     }
 
     public void startContactListFragment(int index)
@@ -465,5 +607,23 @@ public class SearchGlobalContactsTest {
         webServer.start();
 
         return webServer.getUrl("/").toString();
+    }
+
+    private String loadJSON() throws Exception {
+        InputStream inputStream = context.getResources().openRawResource(R.raw.test_contacts);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        int ctr;
+        try {
+            ctr = inputStream.read();
+            while (ctr != -1) {
+                byteArrayOutputStream.write(ctr);
+                ctr = inputStream.read();
+            }
+            inputStream.close();
+        } catch (IOException e) {
+            Log.e(Constants.TAG, "SearchGlobalContactsTest.loadJSON: e ",e);
+        }
+        return byteArrayOutputStream.toString();
     }
 }

@@ -49,10 +49,10 @@ import java.util.List;
 @SuppressWarnings("ResourceType")
 public class SplashScreenActivity extends MainActivity {
 
-    Context mContext;
-    private boolean isForeground;
-    private boolean isAppCrashed;
-    private String errorMessage;
+    public Context mContext;
+    public boolean isForeground;
+    public boolean isAppCrashed;
+    public String errorMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,18 +63,11 @@ public class SplashScreenActivity extends MainActivity {
         //Register Otto Bus
         BusProvider.getInstance().register(SplashScreenActivity.this);
         getExtras();
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
         if(isAppCrashed)
             showAlertDialog();
         else
             doOnPostCreateTasks();
     }
-
 
     private void doOnPostCreateTasks()
     {
@@ -93,14 +86,12 @@ public class SplashScreenActivity extends MainActivity {
             //Normal behaviour
             if (!APIWrapper.isConnected(SplashScreenActivity.this)) {
                 //No connection, cannot check version nor profile
-                if (UserSecurity.isUserLogged(SplashScreenActivity.this)) {
-                    if (!UserSecurity.hasExpired(SplashScreenActivity.this)) {
-                        if(MycommsApp.isProfileAvailable()) {
-                            goToApp(true);
-                        }
-                    }
+                if (UserSecurity.isUserLogged(SplashScreenActivity.this)
+                        && !UserSecurity.hasExpired(SplashScreenActivity.this)
+                        && MycommsApp.isProfileAvailable())
+                {
+                    goToApp(true);
                 }
-
                 //No Internet connection, and user not logged in or accessToken expired
                 Toast.makeText(SplashScreenActivity.this,
                         getString(R.string.no_internet_connection_log_in_needed),
@@ -114,9 +105,9 @@ public class SplashScreenActivity extends MainActivity {
 
     private void showAlertDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        String title = mContext.getResources().getString(R.string.uncaught_exception_title);
-        View view = Utils.getCustomAlertTitleView(mContext, R.layout.layout_uncaught_exception_alert);
+        AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
+        String title = SplashScreenActivity.this.getResources().getString(R.string.uncaught_exception_title);
+        View view = Utils.getCustomAlertTitleView(SplashScreenActivity.this, R.layout.layout_uncaught_exception_alert);
         TextView textView = (TextView) view.findViewById(R.id.tv_uncaught_exception_alert_title);
 
         textView.setText(title);
@@ -161,69 +152,77 @@ public class SplashScreenActivity extends MainActivity {
                 );
     }
 
-    private void checkVersion() {
+    public void checkVersion() {
         OKHttpWrapper.get(Constants.API_VERSION, SplashScreenActivity.this,
                 new OKHttpWrapper.HttpCallback() {
                     @Override
-                    public void onFailure(Response response, IOException e) {
-                        if (response == null) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(SplashScreenActivity.this,
-                                            getString(R.string.error_reading_data_from_server),
-                                            Toast.LENGTH_LONG).show();
-                                    callBackVersionCheck(null);
-                                }
-                            });
-
-                            return;
-                        }
-
-                        try {
-                            if (Integer.toString(response.code()).startsWith("4") &&
-                                    response.body() != null) {
-                                final JSONObject json = new JSONObject(response.body().string());
-
-                                if (json.get("err") != null &&
-                                        json.get("err").toString().
-                                                compareTo("invalid_version") == 0) {
-                                    final String data = json.get("data").toString();
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            callBackVersionCheck(data);
-                                        }
-                                    });
-                                }
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callBackVersionCheck(null);
-                                    }
-                                });
-                            }
-                        } catch (Exception ex) {
-                            Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: ", ex);
-                            Crashlytics.logException(ex);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(SplashScreenActivity.this,
-                                            getString(R.string.error_reading_data_from_server),
-                                            Toast.LENGTH_LONG).show();
-                                    callBackVersionCheck(null);
-                                }
-                            });
-                        }
+                    public void onFailure(Response response, IOException e)
+                    {
+                        doCheckVersionOnFailure(response, e);
                     }
 
                     @Override
-                    public void onSuccess(Response response) {
+                    public void onSuccess(Response response)
+                    {
                         callBackVersionCheck(null);
                     }
                 });
+    }
+
+    public void doCheckVersionOnFailure(Response response, IOException e)
+    {
+        Log.e(Constants.TAG, "SplashScreenActivity.doCheckVersionOnFailure: ", e);
+        if (response == null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(SplashScreenActivity.this,
+                            getString(R.string.error_reading_data_from_server),
+                            Toast.LENGTH_LONG).show();
+                    callBackVersionCheck(null);
+                }
+            });
+
+            return;
+        }
+
+        try {
+            if (Integer.toString(response.code()).startsWith("4") &&
+                    response.body() != null) {
+                final JSONObject json = new JSONObject(response.body().string());
+
+                if (json.get("err") != null &&
+                        json.get("err").toString().
+                                compareTo("invalid_version") == 0) {
+                    final String data = json.get("data").toString();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callBackVersionCheck(data);
+                        }
+                    });
+                }
+            } else {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBackVersionCheck(null);
+                    }
+                });
+            }
+        } catch (Exception ex) {
+            Log.e(Constants.TAG, "CheckVersionApi.onPostExecute: ", ex);
+            Crashlytics.logException(ex);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(SplashScreenActivity.this,
+                            getString(R.string.error_reading_data_from_server),
+                            Toast.LENGTH_LONG).show();
+                    callBackVersionCheck(null);
+                }
+            });
+        }
     }
 
     //Called when user profile has been loaded

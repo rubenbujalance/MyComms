@@ -1,10 +1,9 @@
 package com.vodafone.mycomms.test.util;
 
-import com.squareup.okhttp.mockwebserver.MockWebServer;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 
@@ -73,16 +72,14 @@ public class Util {
         }
     }
 
-    public static String startWebMockServer(MockWebServer webServer) throws Exception {
+    public static MockWebServer newWebMockServer() throws Exception {
         //OkHttp mocked web server
-        webServer = new MockWebServer();
+        MockWebServer webServer = new MockWebServer();
         webServer.useHttps(null, false);
 
         //Connect OkHttp calls with MockWebServer
         webServer.start();
-        String serverUrl = webServer.getUrl("/").toString();
-
-        return serverUrl;
+        return webServer;
     }
 
     public static void mockGlobalSettings(){

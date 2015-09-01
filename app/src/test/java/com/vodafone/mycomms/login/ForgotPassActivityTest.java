@@ -49,7 +49,8 @@ public class ForgotPassActivityTest {
 
     @Test
     public void testSend() throws Exception {
-        String serverUrl = Util.startWebMockServer(webServer);
+        webServer = Util.newWebMockServer();
+        String serverUrl = webServer.getUrl("/").toString();
 
         HttpResponse httpResponse = Util.buildResponse(204);
         FakeHttp.addPendingHttpResponse(httpResponse);

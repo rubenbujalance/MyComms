@@ -119,7 +119,8 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testDiscoverErrors() throws Exception {
-        String serverUrl = Util.startWebMockServer(webServer);
+        webServer = Util.newWebMockServer();
+        String serverUrl = webServer.getUrl("/").toString();
         PowerMockito.mockStatic(EndpointWrapper.class);
 
         //Discover connection error
@@ -164,7 +165,8 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testUserError() throws Exception {
-        String serverUrl = Util.startWebMockServer(webServer);
+        webServer = Util.newWebMockServer();
+        String serverUrl = webServer.getUrl("/").toString();
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
 
@@ -223,7 +225,8 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testAuthErrors() throws Exception {
-        String serverUrl = Util.startWebMockServer(webServer);
+        webServer = Util.newWebMockServer();
+        String serverUrl = webServer.getUrl("/").toString();
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
 
@@ -339,7 +342,8 @@ public class AddGlobalContactsActivityTest {
 
     @Test
     public void testOK() throws Exception {
-        String serverUrl = Util.startWebMockServer(webServer);
+        webServer = Util.newWebMockServer();
+        String serverUrl = webServer.getUrl("/").toString();
         PowerMockito.mockStatic(EndpointWrapper.class);
 
         String mockedDiscoverResponse =

@@ -1024,13 +1024,6 @@ public final class Utils extends MainActivity {
         return platformName;
     }
 
-    public static String firstLetterToUpperCase(String date) {
-        char[] array = date.toCharArray();
-        array[0] = Character.toUpperCase(array[0]);
-
-        return new String(array);
-    }
-
     /**
      * Gets custom alert dialog title view
      * @author str_oan

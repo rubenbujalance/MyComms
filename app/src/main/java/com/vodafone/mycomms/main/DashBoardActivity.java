@@ -40,7 +40,6 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.NotificationMessages;
@@ -58,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 
 import io.realm.Realm;
 import model.Contact;
@@ -133,25 +133,26 @@ public class DashBoardActivity extends ToolbarActivity
     private void initALL(){
         int sdk = Build.VERSION.SDK_INT;
         if (sdk < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                public void run() {
-                    // Set Time line
-                    //                DateFormat tf = new SimpleDateFormat("HH:mm");
-                    //                String time = tf.format(Calendar.getInstance().getTime());
 
-                    //                TextView timeText = (TextView) findViewById(R.id.timeDashboard);
-                    //                timeText.setText(time);
-
-                    // Set Date line
-                                    DateFormat df = new SimpleDateFormat("EEEE, d MMMM");
-                                    String date = df.format(Calendar.getInstance().getTime());
-
-                                    TextView dateText = (TextView) findViewById(R.id.dateDashboard);
-                                    dateText.setText(Utils.firstLetterToUpperCase(date));
-                }
-            });
         }
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            public void run() {
+                // Set Time line
+                //                DateFormat tf = new SimpleDateFormat("HH:mm");
+                //                String time = tf.format(Calendar.getInstance().getTime());
+
+                //                TextView timeText = (TextView) findViewById(R.id.timeDashboard);
+                //                timeText.setText(time);
+
+                // Set Date line
+                DateFormat df = new SimpleDateFormat("EEEE, d MMMM", Locale.US);
+                String date = df.format(Calendar.getInstance().getTime());
+
+                TextView dateText = (TextView) findViewById(R.id.dateDashboard);
+                dateText.setText(date);
+            }
+        });
 
         activateFooter();
 

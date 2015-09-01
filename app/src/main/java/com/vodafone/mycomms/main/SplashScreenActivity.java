@@ -488,30 +488,6 @@ public class SplashScreenActivity extends MainActivity {
         }
     }
 
-    private String getFilename(DownloadManager dm, Intent in) {
-        String title = null;
-
-        try {
-            Bundle extras = in.getExtras();
-            DownloadManager.Query q = new DownloadManager.Query();
-            q.setFilterById(extras.getLong(DownloadManager.EXTRA_DOWNLOAD_ID));
-            Cursor c = dm.query(q);
-
-            if (c.moveToFirst()) {
-                int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-                if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                    // process download
-                    title = c.getString(c.getColumnIndex(DownloadManager.COLUMN_TITLE));
-                    // get other required data by changing the constant passed to getColumnIndex
-                }
-            }
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "SplashScreenActivity.getFilename: ",e);
-        }
-
-        return title;
-    }
-
     //Async Tasks
     private class RenewTokenAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
         @Override

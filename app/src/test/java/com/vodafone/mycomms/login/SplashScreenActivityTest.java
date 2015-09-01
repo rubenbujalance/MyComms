@@ -123,30 +123,12 @@ public class SplashScreenActivityTest{
                 );
     }
 
-//    private void testDoOnPostCreateTasks()
-//    {
-//        Assert.assertNull(activity.getIntent().getData());
-//        if(!APIWrapper.isConnected(activity))
-//        {
-//            //TODO check NO connection
-//        }
-//        else
-//            testCheckVersion();
-//
-//    }
-//
-//    private void testCheckVersion()
-//    {
-//        activity.
-//    }
-
     private void testAlertWithNegativeButton()
     {
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button btnNegative = alert.getButton(AlertDialog.BUTTON_NEGATIVE);
         btnNegative.performClick();
         Assert.assertTrue(!alert.isShowing());
-//        testDoOnPostCreateTasks();
     }
 
     private void testAlertWithPositiveButton()
@@ -164,7 +146,6 @@ public class SplashScreenActivityTest{
         activity = Robolectric.buildActivity(SplashScreenActivity.class).create().get();
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA));
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.APP_CRASH_MESSAGE));
-//        testDoOnPostCreateTasks();
     }
 
 
@@ -238,19 +219,6 @@ public class SplashScreenActivityTest{
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
     }
 
-//    @Test
-//    public void testCheckVersionUserLoggedRenewTokenOk() throws Exception {
-//        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, 0, RuntimeEnvironment.application);
-//        HttpResponse httpResponse = Util.buildResponse(204, VALID_VERSION_RESPONSE);
-//        FakeHttp.addPendingHttpResponse(httpResponse);
-//        HttpResponse httpResponseRenewToken = Util.buildResponse(200, LOGIN_OK_RESPONSE);
-//        FakeHttp.addPendingHttpResponse(httpResponseRenewToken);
-//        activity = Robolectric.setupActivity(SplashScreenActivity.class);
-//        Assert.assertTrue(activity.isFinishing());
-//        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
-//        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
-//    }
-
     @Test
     public void testCheckVersionUserLoggedRenewTokenToLoginSignup() throws Exception
     {
@@ -269,7 +237,7 @@ public class SplashScreenActivityTest{
     }
 
     @Test
-    public void testInvalidVersionResponse() throws Exception
+    public void testInvalidVersionResponseWithUpdateButtonClicked() throws Exception
     {
         String serverUrl = startWebMockServer();
         PowerMockito.mockStatic(EndpointWrapper.class);
@@ -298,6 +266,34 @@ public class SplashScreenActivityTest{
         Button okButton = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         okButton.performClick();
         Assert.assertTrue(activity.isFinishing());
+    }
+
+    @Test
+    public void testInvalidVersionResponseWithSupportButtonClicked() throws Exception
+    {
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(EndpointWrapper.class);
+
+        RobolectricPackageManager rpm = (RobolectricPackageManager)Shadows.shadowOf(RuntimeEnvironment.application).getPackageManager();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setClassName("com.android.providers.downloads.ui", "com.android.providers.downloads.ui.DownloadList");
+        ResolveInfo info = new ResolveInfo();
+        info.isDefault = true;
+        rpm.addResolveInfoForIntent(intent, info);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(400).setBody(Constants.VALID_VERSION_RESPONSE));
+        activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        Robolectric.flushForegroundThreadScheduler();
+        Thread.sleep(5000);
+        Robolectric.flushForegroundThreadScheduler();
+        AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
+        ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
+        Assert.assertTrue(sAlert.getTitle().toString().equals(activity.getString(R.string.new_version_available)));
+
+        Button supportButton = alert.getButton(AlertDialog.BUTTON_NEGATIVE);
+        supportButton.performClick();
+        Assert.assertTrue(!alert.isShowing());
     }
 
     private String startWebMockServer() throws Exception {

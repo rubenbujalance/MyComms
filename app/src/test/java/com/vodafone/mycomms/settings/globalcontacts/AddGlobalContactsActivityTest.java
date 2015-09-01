@@ -169,7 +169,7 @@ public class AddGlobalContactsActivityTest {
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
 
         String mockedDiscoverResponse =
-                Constants.LDAP_DISCOVER_RESPONSE_OK.replace("mockUrl",serverUrl);
+                Constants.LDAP_DISCOVER_RESPONSE_OK.replace("mockUrl", serverUrl);
 
         //User connection error
         System.err.println("******** Test: User Connection Error ********");

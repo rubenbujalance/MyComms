@@ -315,7 +315,6 @@ public class SearchBarController {
 //        mSearchController.getContactList(apiCall);
 //        mSearchController.setConnectionCallback(this);
 
-
         OKHttpWrapper.get(apiCall, mActivity, new OKHttpWrapper.HttpCallback() {
             @Override
             public void onFailure(Response response, IOException e) {

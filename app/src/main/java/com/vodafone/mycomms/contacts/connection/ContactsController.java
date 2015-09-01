@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
@@ -377,7 +376,8 @@ public class ContactsController{
             return null;
         }
         finally {
-            realm.close();
+            if (realm != null)
+                realm.close();
         }
     }
 

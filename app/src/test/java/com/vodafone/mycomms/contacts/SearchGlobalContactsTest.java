@@ -16,10 +16,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
@@ -34,6 +37,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -59,7 +63,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({RealmContactTransactions.class, Realm.class})
+@PrepareForTest({RealmContactTransactions.class, Realm.class, BusProvider.class, EndpointWrapper.class})
 public class SearchGlobalContactsTest {
 
     @Rule
@@ -85,6 +89,9 @@ public class SearchGlobalContactsTest {
         mockStatic(Crashlytics.class);
         whenNew(RealmContactTransactions.class).withAnyArguments()
                 .thenReturn(null);
+        mockStatic(BusProvider.class);
+        BusProvider.MainThreadBus bus = new BusProvider.MainThreadBus();
+        when(BusProvider.getInstance()).thenReturn(bus);
         context = RuntimeEnvironment.application.getApplicationContext();
         startContactListFragment(2);
         contactListFragment = (ContactListFragment)customFragmentActivity
@@ -401,9 +408,42 @@ public class SearchGlobalContactsTest {
     @Test
     public void testLoadContactsFromServerEvent() throws Exception {
         System.err.println("******** Test: Load Contacts from Server Events ********");
-//        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
-//        searchBarController.loadAllContactsFromServer("1");
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
+        try {
+            searchBarController.loadAllContactsFromServer("1");
+        } catch (RuntimeException e){
+            System.err.println("******** Test: RunTimeException Handled OK********" + e);
+        }
         System.err.println("******** Test: Load Contacts from Server Events OK ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromPlatforms() throws Exception {
+        System.err.println("******** Test: Load All Contacts from Platform Events ********");
+
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        String expression = "https://";
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl.replaceFirst(expression,""));
+
+        String mockedUserResponseHeader =
+                com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_OK;
+
+        webServer.enqueue(new MockResponse()
+                .setResponseCode(201)
+                .setHeader(com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_KEY,
+                        mockedUserResponseHeader)
+        );
+//        Util.mockGlobalSettings();
+//        Util.saveFakeProfile();
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
+        searchBarController.loadAllContactsFromPlatforms("1");
+        Thread.sleep(3000);
+        Robolectric.flushForegroundThreadScheduler();
+
+//        String toast = ShadowToast.getTextOfLatestToast();
+//        Assert.assertTrue(toast.equals("Error reading data from server"));
+        System.err.println("******** Test: Load All Contacts from Platforms Events OK ********");
     }
 
     public void startContactListFragment(int index)

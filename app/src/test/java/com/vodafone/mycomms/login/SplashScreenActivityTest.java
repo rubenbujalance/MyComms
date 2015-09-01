@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.widget.Button;
 
 import com.crashlytics.android.Crashlytics;
@@ -19,17 +19,24 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.constants.Constants;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -44,9 +51,11 @@ import org.robolectric.res.builder.RobolectricPackageManager;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowIntent;
 
-import io.realm.Realm;
-import okio.Buffer;
+import java.util.HashMap;
 
+import io.realm.Realm;
+
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -58,7 +67,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, EndpointWrapper.class})
+@PrepareForTest({Realm.class, Crashlytics.class, EndpointWrapper.class, APIWrapper.class})
 public class SplashScreenActivityTest{
 
     @Rule
@@ -74,6 +83,7 @@ public class SplashScreenActivityTest{
         mockStatic(Realm.class);
         when(Realm.getDefaultInstance()).thenReturn(null);
         mockStatic(Crashlytics.class);
+        mockStatic(Util.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
     }
 
@@ -99,6 +109,74 @@ public class SplashScreenActivityTest{
         testAlertWithNegativeButton();
         testAlertWithPositiveButton();
 
+    }
+
+    @Test
+    public void testOnCreateWithExtraDataWithStatus200() throws Exception
+    {
+        HashMap<String, Object> returnMap = new HashMap<>();
+        returnMap.put("status", "200");
+        JSONObject jsonObject = new JSONObject("{\"accessToken\":\"accessToken\",\"expiresIn\":\"20\"}");
+        returnMap.put("json", jsonObject);
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(APIWrapper.class);
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), any(HashMap.class), any(HashMap.class), any(Activity.class))).thenReturn(returnMap);
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(Constants.VALID_VERSION_RESPONSE));
+        Uri uri = Uri.parse("intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\\");
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(uri);
+        activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
+        Robolectric.flushForegroundThreadScheduler();
+        Thread.sleep(5000);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertNotNull(UserSecurity.getAccessToken(activity));
+    }
+
+    @Test
+    public void testOnCreateWithExtraDataWithStatus500() throws Exception
+    {
+        HashMap<String, Object> returnMap = new HashMap<>();
+        returnMap.put("status", "500");
+        JSONObject jsonObject = new JSONObject("{\"accessToken\":\"accessToken\",\"expiresIn\":\"20\"}");
+        returnMap.put("json", jsonObject);
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(APIWrapper.class);
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), any(HashMap.class), any(HashMap.class), any(Activity.class))).thenReturn(returnMap);
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(Constants.VALID_VERSION_RESPONSE));
+        Uri uri = Uri.parse("intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\\");
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(uri);
+        activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
+        Robolectric.flushForegroundThreadScheduler();
+        Thread.sleep(5000);
+        Robolectric.flushForegroundThreadScheduler();
+
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+        Assert.assertTrue(activity.isFinishing());
+    }
+
+    @Test
+    public void testOnCreateWithExtraDataWithExceptionAndFinish() throws Exception
+    {
+        HashMap<String, Object> returnMap = new HashMap<>();
+        returnMap.put("mockForFail", "mockContent");
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(APIWrapper.class);
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), any(HashMap.class), any(HashMap.class), any(Activity.class))).thenReturn(returnMap);
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(Constants.VALID_VERSION_RESPONSE));
+        Uri uri = Uri.parse("intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\\");
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(uri);
+        activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
+        Assert.assertTrue(activity.isFinishing());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -147,8 +225,6 @@ public class SplashScreenActivityTest{
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA));
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.APP_CRASH_MESSAGE));
     }
-
-
 
     @Test
     public void testCheckVersionFailedWithNullResponse() throws Exception
@@ -296,6 +372,35 @@ public class SplashScreenActivityTest{
         Assert.assertTrue(!alert.isShowing());
     }
 
+    @Test
+    public void testDownloadManagerFromURI()throws Exception
+    {
+        String serverUrl = startWebMockServer();
+        String body = "{\"err\":\"invalid_version\",\"data\":\"mockData\"}";
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        UserSecurity.setTokens(Constants.ACCESS_TOKEN, Constants.REFRESH_TOKEN, 0, RuntimeEnvironment.application);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(400).setBody(body));
+        activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        activity.getApplicationContext().getPackageManager().clearPackagePreferredActivities("com.android.providers.downloads.ui");
+        Robolectric.flushForegroundThreadScheduler();
+        Thread.sleep(5000);
+        Robolectric.flushForegroundThreadScheduler();
+
+        AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
+        Button positiveBtn = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveBtn.performClick();
+        Assert.assertTrue(!alert.isShowing());
+        Robolectric.flushForegroundThreadScheduler();
+
+        AlertDialog alert2 = ShadowAlertDialog.getLatestAlertDialog();
+        Button positiveBtn2 = alert2.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveBtn2.performClick();
+        Assert.assertTrue(!alert2.isShowing());
+
+        Assert.assertTrue(activity.isFinishing());
+    }
+
     private String startWebMockServer() throws Exception {
         //OkHttp mocked web server
         webServer = new MockWebServer();
@@ -308,20 +413,60 @@ public class SplashScreenActivityTest{
         return serverUrl;
     }
 
-//    @Test
-//    public void testEmailLink() throws Exception {
-//        //String link = "<a href=\"intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\">Link to MyComms</a>";
-//        Uri uri = Uri.parse("intent://user/refreshToken/RaHZJLVyVc7ZxyDEJsTZcLpXVxmPnUKzHJ3cofn2HYyTYV0B9wQyCVPsNZuVWRKrtTVen_KnG7mTa_vYKFM4TEv4AIMMYeTcJXvCPQnDAPdaui1dqprrPYxVpCYlqVxOwpdbkx_wwPT7BuxYpfvlG9oirrdxhvB0jQGwnZnrseo/#Intent;scheme=mycomms-i;end\\");
-//        Intent incomingIntent = new Intent();
-//        incomingIntent.setData(uri);
-//        activity = Robolectric.buildActivity(OAuthActivity.class).withIntent(incomingIntent).create().get();
-//        UserSecurity.setTokens(ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN, RuntimeEnvironment.application);
-//        HttpResponse httpResponse = Util.buildResponse(200, LOGIN_OK_RESPONSE);
-//        FakeHttp.addPendingHttpResponse(httpResponse);
-//        activity = Robolectric.setupActivity(SplashScreenActivity.class);
-//        Assert.assertTrue(activity.isFinishing());
-//        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
-//        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
-//    }
+    @Test
+    public void testBusProvider_OnApplicationAndProfileInitializedEvent()
+    {
+        activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
 
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+        Assert.assertTrue(activity.isFinishing());
+    }
+
+    @Test
+    public void testBusProvider_OnApplicationAndProfileReadErrorEvent_WithProfileAvailable()
+    {
+        activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        BusProvider.getInstance().post(new ApplicationAndProfileReadError());
+
+        SharedPreferences sp = activity.getSharedPreferences(
+                com.vodafone.mycomms.util.Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        sp.edit().putString(
+                com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF,
+                Constants.PROFILE_ID)
+                .apply();
+
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+        Assert.assertTrue(activity.isFinishing());
+    }
+
+    @Test
+    public void testBusProvider_OnApplicationAndProfileReadErrorEvent_NOProfileAvailable()
+    {
+        activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        BusProvider.getInstance().post(new ApplicationAndProfileReadError());
+
+        Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+        Assert.assertTrue(activity.isFinishing());
+    }
+
+
+
+    @Test
+    public void testBusProvider_OnOKHttpErrorReceived()
+    {
+        String mockMessage = "mockErrorMessage";
+        activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        OKHttpErrorReceivedEvent event = new OKHttpErrorReceivedEvent();
+        event.setErrorMessage(mockMessage);
+        BusProvider.getInstance().post(event);
+
+        Assert.assertEquals(mockMessage, event.getErrorMessage());
+    }
 }

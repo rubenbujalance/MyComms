@@ -41,6 +41,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.squareup.okhttp.Response;
 import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
@@ -1065,5 +1066,37 @@ public final class Utils extends MainActivity {
 
             return false;
         }
+    }
+
+    public static HashMap<String,Object> okHttpResToHash(Response response)
+    {
+        if(response == null) return null;
+        HashMap<String, Object> hash = new HashMap<>();
+        String textEntity = null;
+        try {
+            if(response.body() != null)
+                textEntity = response.body().string();
+
+            String contentType;
+
+            if(textEntity != null && textEntity.length() > 0) {
+                contentType = response.header("Content-Type");
+
+                if (contentType.compareTo("application/json") == 0) {
+                    JSONObject json = new JSONObject(textEntity);
+                    hash.put("json", json);
+                } else {
+                    hash.put("text", textEntity);
+                }
+            }
+
+            hash.put("status", String.valueOf(response.code()));
+
+        } catch(Exception ex) {
+            Log.e(Constants.TAG, "APIWrapper.httpResToHash: \n" + ex.toString());
+            return null;
+        }
+
+        return hash;
     }
 }

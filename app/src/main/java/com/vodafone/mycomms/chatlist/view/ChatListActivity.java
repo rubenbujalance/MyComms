@@ -14,10 +14,10 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.main.SplashScreenActivity;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
+import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 /**
@@ -44,7 +44,7 @@ public class ChatListActivity extends ToolbarActivity{
         setContentView(R.layout.layout_main_activity);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        if(APIWrapper.isConnected(ChatListActivity.this))
+        if(Utils.isConnected(ChatListActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else
             lay_no_connection.setVisibility(View.VISIBLE);

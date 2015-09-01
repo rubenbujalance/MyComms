@@ -16,11 +16,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
@@ -53,7 +53,7 @@ public class ForgotPassActivity extends MainAppCompatActivity {
         btSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(APIWrapper.checkConnectionAndAlert(ForgotPassActivity.this))
+                if(Utils.checkConnectionAndAlert(ForgotPassActivity.this))
                     callSendNewPass();
             }
         });

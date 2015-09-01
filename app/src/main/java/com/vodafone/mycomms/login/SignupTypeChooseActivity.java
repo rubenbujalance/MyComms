@@ -8,8 +8,8 @@ import android.widget.ImageView;
 
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
+import com.vodafone.mycomms.util.Utils;
 
 public class SignupTypeChooseActivity extends MainAppCompatActivity {
 
@@ -33,7 +33,7 @@ public class SignupTypeChooseActivity extends MainAppCompatActivity {
         mSignupEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(APIWrapper.checkConnectionAndAlert(SignupTypeChooseActivity.this)) {
+                if(Utils.checkConnectionAndAlert(SignupTypeChooseActivity.this)) {
                     Intent in = new Intent(SignupTypeChooseActivity.this, SignupMailActivity.class);
                     startActivity(in);
                 }
@@ -43,7 +43,7 @@ public class SignupTypeChooseActivity extends MainAppCompatActivity {
         mSignupSalesforce.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(APIWrapper.checkConnectionAndAlert(SignupTypeChooseActivity.this)) {
+                if(Utils.checkConnectionAndAlert(SignupTypeChooseActivity.this)) {
                     Intent in = new Intent(SignupTypeChooseActivity.this, OAuthActivity.class);
                     in.putExtra("oauth", "sf");
                     startActivity(in);

@@ -14,6 +14,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -1037,5 +1039,31 @@ public final class Utils extends MainActivity {
     {
         LayoutInflater inflater = LayoutInflater.from(context);
         return inflater.inflate(viewId, null);
+    }
+
+    //Check network connection
+    public static boolean isConnected(Context context){
+        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected())
+            return true;
+        else
+            return false;
+    }
+
+    public static boolean checkConnectionAndAlert(Context context){
+        if(isConnected(context))
+        {
+            return true;
+        }
+        else
+        {
+            Utils.showAlert(
+                    context,
+                    context.getString(R.string.no_internet_connection),
+                    context.getString(R.string.no_internet_connection_is_available));
+
+            return false;
+        }
     }
 }

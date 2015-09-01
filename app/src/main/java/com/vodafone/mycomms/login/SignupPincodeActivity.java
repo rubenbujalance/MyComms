@@ -132,7 +132,7 @@ public class SignupPincodeActivity extends MainActivity {
                     tvPin4.setText(text);
                     pin += text;
 
-                    if(APIWrapper.checkConnectionAndAlert(SignupPincodeActivity.this))
+                    if(Utils.checkConnectionAndAlert(SignupPincodeActivity.this))
                         callPhoneCheck(pin);
                 }
 

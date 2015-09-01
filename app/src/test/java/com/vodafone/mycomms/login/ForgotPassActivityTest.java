@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.test.util.Util;
@@ -13,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
@@ -25,12 +27,18 @@ import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+        manifest = "./src/main/AndroidManifest.xml")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
+        "javax.net.ssl.*", "org.json.*"})
+//@PrepareForTest({EndpointWrapper.class, RealmLDAPSettingsTransactions.class})
 public class ForgotPassActivityTest {
 
     Activity activity;
     Button btSend;
     EditText etEmail;
+
+    MockWebServer webServer;
 
     @Before
     public void setUp() throws Exception {
@@ -41,6 +49,8 @@ public class ForgotPassActivityTest {
 
     @Test
     public void testSend() throws Exception {
+        String serverUrl = Util.startWebMockServer(webServer);
+
         HttpResponse httpResponse = Util.buildResponse(204);
         FakeHttp.addPendingHttpResponse(httpResponse);
         //Empty e-mail

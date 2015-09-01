@@ -141,7 +141,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         this.realm.setAutoRefresh(true);
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        if(APIWrapper.isConnected(GroupChatActivity.this))
+        if(Utils.isConnected(GroupChatActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else
             lay_no_connection.setVisibility(View.VISIBLE);

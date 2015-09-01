@@ -442,18 +442,6 @@ public class SearchGlobalContactsTest {
     }
 
     @Test
-    public void testLoadContactsFromServerEvent() throws Exception {
-        System.err.println("******** Test: Load Contacts from Server Events ********");
-        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
-        try {
-            searchBarController.loadAllContactsFromServer("1");
-        } catch (RuntimeException e){
-            System.err.println("******** Test: RunTimeException Handled OK********" + e);
-        }
-        System.err.println("******** Test: Load Contacts from Server Events OK ********");
-    }
-
-    @Test
     public void testLoadContactsFromDBEvent() throws Exception {
         System.err.println("******** Test: Load Contacts from DB Events ********");
         SearchController searchController = new SearchController(context, Constants.PROFILE_ID, null);
@@ -490,11 +478,12 @@ public class SearchGlobalContactsTest {
                 com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_OK;
         String json = loadJSON();
         webServer.enqueue(new MockResponse()
-                .setResponseCode(201)
+                .setResponseCode(200)
                 .setHeader(com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_KEY,
                         mockedUserResponseHeader)
                 .setBody(json)
         );
+        webServer.enqueue(new MockResponse().setResponseCode(401));
 
         SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
         SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
@@ -507,9 +496,37 @@ public class SearchGlobalContactsTest {
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         Robolectric.flushForegroundThreadScheduler();
         Robolectric.flushBackgroundThreadScheduler();
+
+        webServer.shutdown();
+
+        System.err.println("******** Test: Load All Contacts from Platforms Events OK ********");
+    }
+
+    @Test
+    public void testLoadContactsFromServer() throws Exception {
+        System.err.println("******** Test: Load Contacts from Server Events ********");
+
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String mockedUserResponseHeader =
+                com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_OK;
+        String json = loadJSON();
+        webServer.enqueue(new MockResponse()
+                        .setResponseCode(200)
+                        .setHeader(com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_KEY,
+                                mockedUserResponseHeader)
+                        .setBody(json)
+        );
+        webServer.enqueue(new MockResponse().setResponseCode(401));
+
+        SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
 
         //Test Load Contacts from Server
         //Mock save settings
@@ -536,13 +553,16 @@ public class SearchGlobalContactsTest {
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         Robolectric.flushForegroundThreadScheduler();
         Robolectric.flushBackgroundThreadScheduler();
 
 //        String toast = ShadowToast.getTextOfLatestToast();
 //        Assert.assertTrue(toast.equals("Error reading data from server"));
-        System.err.println("******** Test: Load All Contacts from Platforms Events OK ********");
+
+        webServer.shutdown();
+
+        System.err.println("******** Test: Load Contacts from Server Events OK ********");
     }
 
     @Test

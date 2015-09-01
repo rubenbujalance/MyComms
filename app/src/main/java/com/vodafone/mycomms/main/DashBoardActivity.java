@@ -101,7 +101,6 @@ public class DashBoardActivity extends ToolbarActivity
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         isLocalContactsLoadingNeeded = sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false);
         this.realm = Realm.getDefaultInstance();
-        this.realm.setAutoRefresh(true);
 
         _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         realmContactTransactions = new RealmContactTransactions(_profileId);
@@ -166,7 +165,7 @@ public class DashBoardActivity extends ToolbarActivity
                 //Start Contacts activity
                 Constants.isSearchBarFocusRequested = true;
                 Constants.isDashboardOrigin = true;
-                ((MycommsApp) getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
+                MycommsApp.contactViewOrigin = Constants.CONTACTS_ALL;
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
                 //in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
@@ -179,7 +178,7 @@ public class DashBoardActivity extends ToolbarActivity
             public void onClick(View v) {
                 //Start Favourites activity
                 Intent in = new Intent(DashBoardActivity.this, ContactListMainActivity.class);
-                ((MycommsApp)getApplication()).contactViewOrigin = Constants.CONTACTS_FAVOURITE;
+                MycommsApp.contactViewOrigin = Constants.CONTACTS_FAVOURITE;
                 in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(in);
 //                finish();
@@ -189,19 +188,12 @@ public class DashBoardActivity extends ToolbarActivity
 
     private void loadRecents(LinearLayout currentRecentContainer){
         Log.i(Constants.TAG, "DashBoardActivity.loadRecents: ");
-        //if(recentsLoading) return;
-
-//        String throwException = "";
-//        throwException = throwException.substring(0, throwException.length()-2);
-//        Log.i(Constants.TAG, "DashBoardActivity.loadRecents: "+throwException);
-        //recentsLoading = true;
         try
         {
-            ArrayList<RecentContact> recentList = new ArrayList<>();
+            ArrayList<RecentContact> recentList;
             LayoutInflater inflater = LayoutInflater.from(this);
             currentRecentContainer.removeAllViews();
 
-            //realmContactTransactions = new RealmContactTransactions(_profileId);
             recentList = realmContactTransactions.getAllRecentContacts(realm);
 
             this.numberOfRecents = recentList.size();

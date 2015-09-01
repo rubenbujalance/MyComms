@@ -72,7 +72,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private RecentContactController recentContactController;
     private NewsController mNewsController;
     private String profile_id;
-    public int contactViewOrigin = Constants.CONTACTS_ALL;
+    public static int contactViewOrigin = Constants.CONTACTS_ALL;
     public static Picasso picasso;
     private HashMap<String, Long> recentChatsHashMap = new HashMap<>();
 

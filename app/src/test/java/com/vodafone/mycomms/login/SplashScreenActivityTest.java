@@ -83,7 +83,6 @@ public class SplashScreenActivityTest{
         mockStatic(Realm.class);
         when(Realm.getDefaultInstance()).thenReturn(null);
         mockStatic(Crashlytics.class);
-        mockStatic(Util.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
     }
 

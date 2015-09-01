@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.login;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -7,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
+import android.os.Build;
+import android.util.Log;
 import android.widget.Button;
 
 import com.crashlytics.android.Crashlytics;
@@ -20,6 +23,7 @@ import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,6 +45,7 @@ import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowIntent;
 
 import io.realm.Realm;
+import okio.Buffer;
 
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -96,6 +101,28 @@ public class SplashScreenActivityTest{
 
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testAllLifeCycleEvents()
+    {
+        activity = Robolectric.buildActivity(SplashScreenActivity.class).create().start().resume().pause().resume().pause().stop().destroy().get();
+        Assert.assertTrue(activity.isDestroyed());
+    }
+
+    public void testSendSupportEmail()
+    {
+        String mockErrorMessage = "errorMessage";
+        Utils.launchSupportEmail
+                (
+                        activity
+                        , activity.getApplicationContext().getResources().getString(R.string.support_subject_crash)
+                        , activity.getApplicationContext().getResources().getString(R.string.support_text_crash)
+                                + "\n\n" + mockErrorMessage
+                        , activity.getApplicationContext().getResources().getString(R.string.support_email)
+                        , com.vodafone.mycomms.util.Constants.REQUEST_START_ACTIVITY_FOR_APP_CRASH
+                );
+    }
+
 //    private void testDoOnPostCreateTasks()
 //    {
 //        Assert.assertNull(activity.getIntent().getData());
@@ -128,6 +155,7 @@ public class SplashScreenActivityTest{
         Button btnNegative = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         btnNegative.performClick();
         Assert.assertTrue(!alert.isShowing());
+        testSendSupportEmail();
     }
 
     @Test
@@ -148,6 +176,22 @@ public class SplashScreenActivityTest{
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(9999));
+        activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        Thread.sleep(5000);
+        Robolectric.flushForegroundThreadScheduler();
+        Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+
+    }
+
+    @Test
+    public void testCheckVersionFailedWithResponse500() throws Exception
+    {
+        String serverUrl = startWebMockServer();
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(500));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Thread.sleep(5000);
         Robolectric.flushForegroundThreadScheduler();

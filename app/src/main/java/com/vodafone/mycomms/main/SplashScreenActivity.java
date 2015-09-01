@@ -49,10 +49,10 @@ import java.util.List;
 @SuppressWarnings("ResourceType")
 public class SplashScreenActivity extends MainActivity {
 
-    Context mContext;
-    private boolean isForeground;
-    private boolean isAppCrashed;
-    private String errorMessage;
+    public Context mContext;
+    public boolean isForeground;
+    public boolean isAppCrashed;
+    public String errorMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

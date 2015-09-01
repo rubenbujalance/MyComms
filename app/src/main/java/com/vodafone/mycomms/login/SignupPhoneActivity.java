@@ -25,6 +25,7 @@ import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -95,7 +96,7 @@ public class SignupPhoneActivity extends MainActivity {
             public void onClick(View v) {
                 if(checkData()) {
                     saveData();
-                    if(APIWrapper.checkConnectionAndAlert(SignupPhoneActivity.this))
+                    if(Utils.checkConnectionAndAlert(SignupPhoneActivity.this))
                         callProfileCheck();
                 }
             }

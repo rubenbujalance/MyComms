@@ -133,7 +133,7 @@ public class LoginActivity extends MainAppCompatActivity implements ILoginConnec
         btLoginSalesforce.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(APIWrapper.checkConnectionAndAlert(LoginActivity.this)) {
+                if(Utils.checkConnectionAndAlert(LoginActivity.this)) {
                     Intent in = new Intent(LoginActivity.this, OAuthActivity.class);
                     in.putExtra("oauth", "sf");
                     startActivity(in);

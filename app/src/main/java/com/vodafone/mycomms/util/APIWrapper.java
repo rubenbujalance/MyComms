@@ -2,33 +2,27 @@ package com.vodafone.mycomms.util;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.R;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import java.net.URI;
 
 public class APIWrapper {
 
@@ -231,37 +225,11 @@ public class APIWrapper {
             hash.put("status", String.valueOf(response.getStatusLine().getStatusCode()));
 
         } catch(Exception ex) {
-        Log.e(Constants.TAG, "APIWrapper.httpResToHash: \n" + ex.toString());
-            return null;
-    }
+            Log.e(Constants.TAG, "APIWrapper.httpResToHash: \n" + ex.toString());
+                return null;
+        }
 
         return hash;
-    }
-
-    //Check network connection
-    public static boolean isConnected(Context context){
-        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected())
-            return true;
-        else
-            return false;
-    }
-
-    public static boolean checkConnectionAndAlert(Context context){
-        if(isConnected(context))
-        {
-            return true;
-        }
-        else
-        {
-            Utils.showAlert(
-                    context,
-                    context.getString(R.string.no_internet_connection),
-                    context.getString(R.string.no_internet_connection_is_available));
-
-            return false;
-        }
     }
 
     class HttpDeleteWithBody extends HttpEntityEnclosingRequestBase {

@@ -59,7 +59,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
         BusProvider.getInstance().register(this);
 
         layNoConnection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        if(APIWrapper.isConnected(ContactDetailsPlusActivity.this))
+        if(Utils.isConnected(ContactDetailsPlusActivity.this))
             layNoConnection.setVisibility(View.GONE);
         else
             layNoConnection.setVisibility(View.VISIBLE);

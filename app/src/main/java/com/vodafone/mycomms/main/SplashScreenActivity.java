@@ -91,7 +91,7 @@ public class SplashScreenActivity extends MainActivity {
         }
         else {
             //Normal behaviour
-            if (!APIWrapper.isConnected(SplashScreenActivity.this)) {
+            if (!Utils.isConnected(SplashScreenActivity.this)) {
                 //No connection, cannot check version nor profile
                 if (UserSecurity.isUserLogged(SplashScreenActivity.this)) {
                     if (!UserSecurity.hasExpired(SplashScreenActivity.this)) {

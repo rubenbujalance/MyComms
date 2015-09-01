@@ -17,10 +17,10 @@ import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.SplashScreenActivity;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
+import com.vodafone.mycomms.util.Utils;
 
 public class SettingsMainActivity extends ToolbarActivity implements ProfileFragment.OnFragmentInteractionListener, PreferencesFragment.OnFragmentInteractionListener, AccountsFragment.OnFragmentInteractionListener{
 
@@ -52,7 +52,7 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
             }
         });
 
-        if(APIWrapper.isConnected(SettingsMainActivity.this))
+        if(Utils.isConnected(SettingsMainActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else
             lay_no_connection.setVisibility(View.VISIBLE);

@@ -23,6 +23,7 @@ import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
+import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 
@@ -56,7 +57,7 @@ public class SignupMailActivity extends MainActivity {
             @Override
             public void onClick(View v) {
                 if(checkData()) {
-                    if(APIWrapper.checkConnectionAndAlert(SignupMailActivity.this))
+                    if(Utils.checkConnectionAndAlert(SignupMailActivity.this))
                         callEmailCheck();
                 }
             }

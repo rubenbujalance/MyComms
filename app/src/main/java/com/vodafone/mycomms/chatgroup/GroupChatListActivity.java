@@ -12,10 +12,10 @@ import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.SplashScreenActivity;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
+import com.vodafone.mycomms.util.Utils;
 
 public class GroupChatListActivity extends ToolbarActivity {
 
@@ -35,7 +35,7 @@ public class GroupChatListActivity extends ToolbarActivity {
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        if(APIWrapper.isConnected(GroupChatListActivity.this))
+        if(Utils.isConnected(GroupChatListActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else
             lay_no_connection.setVisibility(View.VISIBLE);

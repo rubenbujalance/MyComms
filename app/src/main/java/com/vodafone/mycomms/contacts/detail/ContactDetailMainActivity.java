@@ -101,7 +101,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         this.SF_URL = null;
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        if(APIWrapper.isConnected(ContactDetailMainActivity.this))
+        if(Utils.isConnected(ContactDetailMainActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else
             lay_no_connection.setVisibility(View.VISIBLE);

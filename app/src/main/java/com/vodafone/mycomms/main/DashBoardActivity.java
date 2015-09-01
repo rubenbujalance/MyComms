@@ -121,7 +121,7 @@ public class DashBoardActivity extends ToolbarActivity
         recentsContainer2 = (LinearLayout) findViewById(R.id.list_recents_2);
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        if(APIWrapper.isConnected(DashBoardActivity.this))
+        if(Utils.isConnected(DashBoardActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else
             lay_no_connection.setVisibility(View.VISIBLE);

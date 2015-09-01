@@ -18,7 +18,6 @@ import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Callback;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.view.GroupDetailRecyclerItemClickListener;
@@ -29,7 +28,6 @@ import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
@@ -91,7 +89,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         this.mRealm = Realm.getDefaultInstance();
 
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        if(APIWrapper.isConnected(GroupDetailActivity.this))
+        if(Utils.isConnected(GroupDetailActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else
             lay_no_connection.setVisibility(View.VISIBLE);

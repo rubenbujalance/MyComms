@@ -1,15 +1,27 @@
 package com.vodafone.mycomms.test.util;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.vodafone.mycomms.constants.Constants;
+import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHttpResponse;
+import org.mockito.Mockito;
 import org.mockito.internal.configuration.GlobalConfiguration;
 import org.mockito.internal.progress.ThreadSafeMockingProgress;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.api.support.ClassLoaderUtil;
 import org.powermock.reflect.Whitebox;
+import org.robolectric.RuntimeEnvironment;
+
+import io.realm.Realm;
+import model.GlobalContactsSettings;
 
 /**
  * Created by str_evc on 21/05/2015.
@@ -58,5 +70,37 @@ public class Util {
             Whitebox.getInternalState(clazz, ThreadLocal.class).set(null);
         }
     }
+
+    public static void mockGlobalSettings(){
+        //Mock save settings
+        GlobalContactsSettings settings = new GlobalContactsSettings(
+                Constants.PROFILE_ID,
+                Constants.LDAP_USER,
+                Constants.LDAP_PASSWORD,
+                Constants.LDAP_TOKEN,
+                Constants.LDAP_TOKEN_TYPE,
+                Constants.LDAP_RETURN_URL
+        );
+
+        PowerMockito.mockStatic(RealmLDAPSettingsTransactions.class);
+        PowerMockito.when(RealmLDAPSettingsTransactions
+                .createOrUpdateData(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                        Mockito.any(Realm.class)))
+                .thenReturn(settings);
+    }
+
+    public static void saveFakeProfile(){
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        SharedPreferences sp = context.getSharedPreferences(
+                com.vodafone.mycomms.util.Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        sp.edit().putString(
+                com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF,
+                Constants.PROFILE_ID)
+                .commit();
+    }
+
+
+
 
 }

@@ -41,4 +41,10 @@ public class Constants {
     public static final String LDAP_AUTH_RESPONSE_OK = "{\n\"access_token\": \"cwt=AAEBHAEFAAAAAAAFFQAAAHgunRNCx3RSgoumKIbaUwCBENsx6jq4WrhZu86hmdu8GriCAg9mgyAUTV3bOCa0m37xnUa9tEGpw4QiH3RWvoW43-eGaQMeWoYI24-6Ay6j0ggNEIYYH10smKhXkptZU8OMRKo\",\n\"expires_in\": 28489,\n\"ms_rtc_identityscope\": \"local\",\n\"token_type\": \"Bearer\"\n}";
     public static final String LDAP_AUTH_RESPONSE_ERROR = "{\n\"ERROR_access_token\": \"cwt=AAEBHAEFAAAAAAAFFQAAAHgunRNCx3RSgoumKIbaUwCBENsx6jq4WrhZu86hmdu8GriCAg9mgyAUTV3bOCa0m37xnUa9tEGpw4QiH3RWvoW43-eGaQMeWoYI24-6Ay6j0ggNEIYYH10smKhXkptZU8OMRKo\",\n\"expires_in\": 28489,\n\"ms_rtc_identityscope\": \"local\",\n\"token_type\": \"Bearer\"\n}";
     public static final String LDAP_AUTH_URL = "https://weblync13-rat.vodafone.com/WebTicket/oauthtoken";
+
+    //MYCOMMS BASEURL TESTS
+    public static final String BASEURL_AUTH_URL = "https://int.my-comms.com";
+    public static final String BASEURL_RESPONSE_HEADER_OK = "Access-Control-Allow-Credentials=\"true\", Access-Control-Allow-Headers=\"x-mycomms-version,content-type,Authorization\", Access-Control-Allow-Methods=\"OPTION,GET,PUT,POST,DELETE,HEAD\", Access-Control-Allow-Origin = \"https://int-marketing.my-comms.com\", Connection = \"keep-alive\", Content-Length = \"12851\", Content-Type = \"application/json\", Date = \"Mon, 31 Aug 2015 07:54:33 GMT\", Server = \"nginx/1.4.6 (Ubuntu)\", X-Frame-Options = \"SAMEORIGIN\"";
+    public static final String BASEURL_RESPONSE_HEADER_KEY = "WWW-Authenticate";
+
 }

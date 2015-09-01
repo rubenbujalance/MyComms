@@ -308,7 +308,7 @@ public class SearchBarController {
         }
     }
 
-    private void loadAllContactsFromPlatforms(final String keyWord) {
+    public void loadAllContactsFromPlatforms(final String keyWord) {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromPlatforms: Keyword>"+keyWord);
 
         String apiCall = buildRequestForSearchContacts(keyWord);

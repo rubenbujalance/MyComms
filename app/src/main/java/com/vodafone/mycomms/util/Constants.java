@@ -226,7 +226,7 @@ public class Constants {
     public static final String SIMPLE_FILE_TO_SEND = "simple_file";
 
     public static final String DATE_DISPLAY_FORMAT = "MMM d, yyyy";
-    public static final String API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    public static final String API_DATE_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     public final static SimpleDateFormat SIMPLE_DATE_FORMAT_DISPLAY = new SimpleDateFormat (DATE_DISPLAY_FORMAT);
     public static String toolbar = "toolbar";
 

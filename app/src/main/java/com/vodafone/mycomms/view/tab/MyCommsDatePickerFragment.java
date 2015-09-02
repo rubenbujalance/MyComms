@@ -25,8 +25,11 @@ public class MyCommsDatePickerFragment extends DialogFragment implements DatePic
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
+        DatePickerDialog datePicker = new DatePickerDialog(getActivity(), this, year, month, day);
+        datePicker.getDatePicker().setMinDate(System.currentTimeMillis() + (24*60*60*1000));
+
         // Create a new instance of DatePickerDialog and return it
-        return new DatePickerDialog(getActivity(), this, year, month, day);
+        return datePicker;
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {

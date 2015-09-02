@@ -74,6 +74,45 @@ public class RealmDBMigration implements RealmMigration {
             }
         }
 
+        // Migrate from version 1
+        if(version == 1) {
+            Log.i(Constants.TAG, "RealmDBMigration.execute: Migrating from version 1");
+
+            try {
+                Table ldapSettings = realm.getTable(GlobalContactsSettings.class);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID)==-1) {
+                    long columnIndex = ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
+                    ldapSettings.setPrimaryKey(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
+                    ldapSettings.addSearchIndex(columnIndex);
+                } else if(!ldapSettings.hasPrimaryKey()) {
+                    ldapSettings.setPrimaryKey(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID);
+                    ldapSettings.addSearchIndex(
+                            ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID));
+                }
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_USER)==-1)
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_USER);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_PASSWORD)==-1)
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_PASSWORD);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_TOKEN)==-1)
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_TOKEN);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_TOKEN_TYPE)==-1)
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_TOKEN_TYPE);
+                if(ldapSettings.getColumnIndex(Constants.LDAP_SETTINGS_FIELD_URL)==-1)
+                    ldapSettings.addColumn(
+                            ColumnType.STRING, Constants.LDAP_SETTINGS_FIELD_URL);
+
+                version = 1;
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "RealmDBMigration.execute: ", e);
+                Crashlytics.logException(e);
+            }
+        }
+
 /*        if (version == 0) {
             Table personTable = realm.getTable(Chat.class);
 

@@ -74,7 +74,8 @@ public class ProfileController extends BaseController {
             }
 
             if (this.getConnectionCallback() != null && userProfileFromDB != null) {
-                ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileReceived(userProfileFromDB);
+                ((IProfileConnectionCallback) this.getConnectionCallback())
+                        .onProfileReceived(userProfileFromDB);
             }
         }
 
@@ -156,7 +157,12 @@ public class ProfileController extends BaseController {
             HashMap body = new HashMap<>();
 
             if(privateTimezone) body.put("privateTimeZone",privateTimezone );
-            if(holidayEndDate!=null) body.put("holidayEndDate", holidayEndDate);
+            if(holidayEndDate!=null) {
+                HashMap holiday = new HashMap();
+                if(holidayEndDate.length()>0)
+                    holiday.put(Constants.PROFILE_HOLIDAY_END_DATE, holidayEndDate);
+                body.put(Constants.PROFILE_HOLIDAY, holiday);
+            }
             if(doNotDisturb) body.put("doNotDisturb", doNotDisturb );
             if(privateLocation) body.put("privateLocation",privateLocation);
 
@@ -334,7 +340,8 @@ public class ProfileController extends BaseController {
     public void updateSettingsData(HashMap settingsHashMap) {
         JSONObject json = new JSONObject(settingsHashMap);
         Log.i(Constants.TAG, "ProfileController.updateSettingsData: " + json.toString());
-        UpdateSettingsConnection updateSettingsConnection = new UpdateSettingsConnection(getContext(),this);
+        UpdateSettingsConnection updateSettingsConnection =
+                new UpdateSettingsConnection(getContext(),this);
         updateSettingsConnection.setPayLoad(json.toString());
         updateSettingsConnection.request();
     }
@@ -346,8 +353,6 @@ public class ProfileController extends BaseController {
             passwordConnection.setPayLoad(json.toString());
             passwordConnection.request();
     }
-
-
 
     public void updateTimeZone(HashMap timeZoneHashMap) {
         new GCMGetTokenAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, timeZoneHashMap);

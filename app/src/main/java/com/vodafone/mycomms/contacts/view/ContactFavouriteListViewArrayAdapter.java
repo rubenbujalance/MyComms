@@ -114,17 +114,8 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
 
         String country = "";
         try {
-            if (contact.getCountry() != null && contact.getCountry().length() > 0) {
-                if (Utils.getCountry(contact.getCountry(), mContext).get("is_special") != null) {
-                    if (Utils.getCountry(contact.getCountry(), mContext).get("is_special").equals("Yes")) {
-                        country = Utils.getCountry(contact.getCountry(), mContext).get("FIPS");
-                    } else {
-                        country = Utils.getCountry(contact.getCountry(), mContext).get("name");
-                    }
-                } else {
-                    country = Utils.getCountry(contact.getCountry(), mContext).get("name");
-                }
-            }
+            if (contact.getCountry() != null && contact.getCountry().length() > 0)
+                country = Utils.getCountryValue(contact.getCountry(), mContext);
         } catch (NullPointerException e){
             Log.e(Constants.TAG, "ContactListViewArrayAdapter.getView: NullPointerException " + e);
         }

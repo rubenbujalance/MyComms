@@ -1092,4 +1092,23 @@ public final class Utils extends MainActivity {
 
         return hash;
     }
+
+    public static String getCountryValue(String countryCode, Context context) {
+        String countryValue;
+        String test = countryCode;
+        HashMap countryHashMap = Utils.getCountry(test, context);
+        if (countryHashMap.get("is_special") != null) {
+            if (countryHashMap.get("is_special").equals("Yes") || countryHashMap.get("name").toString().length() > 9) {
+                countryValue = countryHashMap.get("FIPS").toString();
+            } else {
+                countryValue = countryHashMap.get("name").toString();
+            }
+        } else {
+            if (countryHashMap.get("name").toString().length() > 9)
+                countryValue = countryHashMap.get("FIPS").toString();
+            else
+                countryValue = countryHashMap.get("name").toString();
+        }
+        return countryValue;
+    }
 }

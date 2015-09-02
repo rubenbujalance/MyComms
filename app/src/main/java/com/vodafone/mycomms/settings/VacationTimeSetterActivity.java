@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -49,12 +50,10 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
         profileController.setConnectionCallback(this);
 
         Switch vacationTimeSwitch = (Switch) findViewById(R.id.switch_vacation_time);
-        vacationTimeSwitch.setOnClickListener(new View.OnClickListener() {
-
+        vacationTimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                Switch vacationTimeSwitch = (Switch) v;
-                if (vacationTimeSwitch.isChecked()) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
                     Calendar holidayEndDateCalendar = Calendar.getInstance();
 
                     datePickerFragment = new MyCommsDatePickerFragment();

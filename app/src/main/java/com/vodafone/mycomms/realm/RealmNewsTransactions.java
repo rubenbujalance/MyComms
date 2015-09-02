@@ -76,7 +76,7 @@ public class RealmNewsTransactions
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null!=mRealm)
                 mRealm.close();
         }
 

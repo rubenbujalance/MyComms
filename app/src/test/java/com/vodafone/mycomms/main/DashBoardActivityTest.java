@@ -8,24 +8,39 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.opengl.Visibility;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.crashlytics.android.Crashlytics;
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.connection.AsyncTaskQueue;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
+import com.vodafone.mycomms.events.GroupChatCreatedEvent;
+import com.vodafone.mycomms.events.MessageStatusChanged;
+import com.vodafone.mycomms.events.NewsReceivedEvent;
+import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
 
-import org.junit.Assert;
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,9 +61,11 @@ import org.robolectric.shadows.ShadowIntent;
 import java.util.ArrayList;
 
 import io.realm.Realm;
+import model.News;
 import model.RecentContact;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -60,7 +77,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, EndpointWrapper.class, APIWrapper.class})
+@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class})
 public class DashBoardActivityTest
 {
     @Rule
@@ -68,8 +85,6 @@ public class DashBoardActivityTest
 
     public Activity mActivity;
     public SharedPreferences sp;
-    public ArrayList<RecentContact> emptyRecentContactsList;
-    public ArrayList<RecentContact> notEmptyRecentContactsList;
 
     @Before
     public void setUp() throws Exception
@@ -81,44 +96,6 @@ public class DashBoardActivityTest
         Context context = RuntimeEnvironment.application.getApplicationContext();
         sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
-        emptyRecentContactsList = new ArrayList<>();
-        notEmptyRecentContactsList = fillMockRecentContactsList();
-
-    }
-
-    private ArrayList<RecentContact> fillMockRecentContactsList()
-    {
-        ArrayList<RecentContact> recentList = new ArrayList<>();
-        RecentContact mockRecentContact = new RecentContact();
-
-        mockRecentContact.setContactId("mg_55df03a45b04622a4248cc9f");
-        mockRecentContact.setId("mg_55df03a45b04622a4248cc9f");
-        mockRecentContact.setAction("sms");
-        mockRecentContact.setTimestamp(Long.parseLong("1440678843328"));
-        mockRecentContact.setAvailability("available");
-
-        recentList.add(mockRecentContact);
-        mockRecentContact = new RecentContact();
-
-        mockRecentContact.setContactId("mc_55409316799f7e1a109446f4");
-        mockRecentContact.setId("mc_55409316799f7e1a109446f4");
-        mockRecentContact.setAction("sms");
-        mockRecentContact.setTimestamp(Long.parseLong("1440658545874"));
-        mockRecentContact.setAvailability("available");
-
-        recentList.add(mockRecentContact);
-        mockRecentContact = new RecentContact();
-
-        mockRecentContact.setContactId("mg_55dc2a35a297b90a726e4cc2");
-        mockRecentContact.setId("mg_55dc2a35a297b90a726e4cc2");
-        mockRecentContact.setAction("sms");
-        mockRecentContact.setTimestamp(Long.parseLong("1440571515241"));
-        mockRecentContact.setAvailability("available");
-
-        recentList.add(mockRecentContact);
-
-        return recentList;
     }
 
     @Test
@@ -178,9 +155,13 @@ public class DashBoardActivityTest
     @Test
     public void testInitAllBtnFavoriteOnClick() throws Exception
     {
+
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
         Thread.sleep(1000);
         Robolectric.flushForegroundThreadScheduler();
+
+        LinearLayout btFavourite = (LinearLayout) mActivity.findViewById(R.id.LayoutFavourite);
+        btFavourite.performClick();
 
         Assert.assertEquals(MycommsApp.contactViewOrigin, Constants.CONTACTS_FAVOURITE);
 
@@ -190,36 +171,139 @@ public class DashBoardActivityTest
     }
 
     @Test
-    public void testOnResume()
+    public void testLoadLocalContacts() throws Exception
     {
-        RealmContactTransactions realmContactTransactions = Mockito.mock(RealmContactTransactions.class);
-        Mockito.when(realmContactTransactions.getAllRecentContacts(Mockito.any(Realm.class))).thenReturn(notEmptyRecentContactsList);
+        sp.edit().putBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, true).apply();
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
+        Thread.sleep(1000);
+        Robolectric.flushForegroundThreadScheduler();
+
+        org.junit.Assert.assertTrue(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false));
+    }
+
+    @Test
+    public void testActivityLifeCycleUntilOnStop() throws Exception
+    {
+        mock(DashBoardActivityController.class);
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().pause().stop().get();
+        org.junit.Assert.assertTrue(mActivity.isFinishing());
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testActivityFullLifeCycle() throws Exception
+    {
+        mock(DashBoardActivityController.class);
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().pause().stop().destroy().get();
+        org.junit.Assert.assertTrue(mActivity.isDestroyed());
+    }
+
+    @Test
+    public void test_onEventNewsReceived()
+    {
+        News mockNews = new News();
+        ArrayList<News> mockNewsList = new ArrayList<>();
+        mockNewsList.add(mockNews);
+        NewsReceivedEvent event = new NewsReceivedEvent();
+        event.setNews(mockNewsList);
+
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
-        testLoadRecent();
-        testLoadUnreadMessages();
-        testLoadNews();
-        testResetOfNotificationMessages();
-
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertNotNull(event);
     }
 
-    private void testLoadRecent()
+    @Test
+    public void test_onEventChatReceived()
     {
+        ChatsReceivedEvent event = new ChatsReceivedEvent();
+        event.setPendingMessages(0);
 
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(event.getPendingMessages(), 0);
     }
 
-    private void testLoadUnreadMessages()
+    @Test
+    public void test_onEventMessageStatusChanged()
     {
+        MessageStatusChanged event = new MessageStatusChanged();
 
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertNotNull(event);
     }
 
-    private void testLoadNews()
+    @Test
+    public void test_onRecentContactsReceived()
     {
+        RecentContactsReceivedEvent event = new RecentContactsReceivedEvent();
 
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertNotNull(event);
     }
 
-    private void testResetOfNotificationMessages()
+    @Test
+    public void test_onConnectivityChanged_Connected()
     {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
 
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
     }
 
+    @Test
+    public void test_onConnectivityChanged_NotConnected1()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
+
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+    }
+
+    @Test
+    public void test_onConnectivityChanged_NotConnected2()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
+
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+    }
+
+    @Test
+    public void test_onConnectivityChanged_NotConnected3()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
+
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+    }
+
+    @Test
+    public void test_onEventGroupChatCreated()
+    {
+        GroupChatCreatedEvent event = new GroupChatCreatedEvent();
+
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertNotNull(event);
+    }
+
+    @Test
+    public void test_onGlobalContactsAddedEvent()
+    {
+        GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
+
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertNotNull(event);
+    }
 }

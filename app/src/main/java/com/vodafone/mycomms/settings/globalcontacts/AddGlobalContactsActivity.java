@@ -3,7 +3,6 @@ package com.vodafone.mycomms.settings.globalcontacts;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -21,7 +20,6 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
 import com.vodafone.mycomms.main.MainActivity;
@@ -72,6 +70,13 @@ public class AddGlobalContactsActivity extends MainActivity {
 
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        LinearLayout backArea = (LinearLayout) findViewById(R.id.back_area);
+        backArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

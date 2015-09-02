@@ -72,7 +72,6 @@ public class DashBoardActivityControllerTest
     public RecentContactController mRecentContactController;
     public SharedPreferences sp;
     public ArrayList<RecentContact> emptyRecentContactsList;
-    public ArrayList<RecentContact> notEmptyRecentContactsList;
     public int numberOfRecentContacts;
     public LinearLayout mRecentContainer, mRecentContainer2;
     public ArrayList<News> newsArrayList;
@@ -92,7 +91,6 @@ public class DashBoardActivityControllerTest
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
         this.emptyRecentContactsList = new ArrayList<>();
-        this.notEmptyRecentContactsList = fillMockRecentContactsList();
         this.mProfileId = "mc_5570340e7eb7c3512f2f9bf2";
         this.mRealmContactTransactions = new RealmContactTransactions(this.mProfileId);
         this.numberOfRecentContacts = 0;
@@ -121,7 +119,6 @@ public class DashBoardActivityControllerTest
     public void testCorrectlyCreated()
     {
         Assert.assertEquals(this.mDashBoardActivityController.mActivity, this.mActivity);
-        Assert.assertEquals(this.mDashBoardActivityController.mRealmContactTransactions, this.mRealmContactTransactions);
         Assert.assertEquals(this.mDashBoardActivityController.mProfileId, this.mProfileId);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContactController, this.mRecentContactController);
     }
@@ -228,9 +225,17 @@ public class DashBoardActivityControllerTest
     }
 
     @Test
-    public void testLoadRecent_Fail()
+    public void testLoadRecent_Failed_WithControlledException()
     {
+        this.mDashBoardActivityController.mRecentContainer = null;
+        this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
+        Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer == null);
+    }
 
+    @Test
+    public void testLoadRecent_OK()
+    {
+        this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
     }
 
     private void mockParams()
@@ -239,7 +244,7 @@ public class DashBoardActivityControllerTest
         Mockito.when(this.mDashBoardActivityController.mRealmNewsTransactions.getAllNews(any(Realm.class))).thenReturn(getMockNewsArrayList());
 
         this.mDashBoardActivityController.mRealmContactTransactions = Mockito.mock(RealmContactTransactions.class);
-        Mockito.when(this.mDashBoardActivityController.mRealmNewsTransactions.getAllNews(any(Realm.class))).thenReturn(getMockNewsArrayList());
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getAllRecentContacts(any(Realm.class))).thenReturn(getMockRecentContactsList());
     }
 
     private ArrayList<News> getMockNewsArrayList()
@@ -285,7 +290,7 @@ public class DashBoardActivityControllerTest
         return mockNewsArrayList;
     }
 
-    private ArrayList<RecentContact> fillMockRecentContactsList()
+    private ArrayList<RecentContact> getMockRecentContactsList()
     {
         ArrayList<RecentContact> recentList = new ArrayList<>();
         RecentContact mockRecentContact = new RecentContact();

@@ -544,4 +544,9 @@ public class ContactListFragment extends ListFragment {
     {
         return this.mSearchBarController;
     }
+
+    public EditText getSearchView()
+    {
+        return this.searchView;
+    }
 }

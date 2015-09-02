@@ -65,7 +65,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_status_local_time);
             viewHolder.textViewCountry = (TextView) convertView.findViewById(R.id.list_item_status_local_country);
             viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
-            viewHolder.imageCompanyLogo = (ImageView) convertView.findViewById(R.id.list_item_content_companylogo);
             viewHolder.platformLabel = (TextView) convertView.findViewById(R.id.platform_label);
             viewHolder.chatAvailability = (ImageView) convertView.findViewById(R.id.chat_availability);
             viewHolder.layInviteMyComms = (LinearLayout) convertView.findViewById(R.id.lay_invite_mycomms);
@@ -130,13 +129,11 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.textViewCountry.setText("");
             viewHolder.textViewTime.setText("");
             viewHolder.textAvatar.setText("");
-            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
             viewHolder.imageViewDayNight.setVisibility(View.GONE);
             viewHolder.textViewPosition.setText(contact.getFirstName());
             viewHolder.textViewPosition.setGravity(Gravity.CENTER);
             viewHolder.textViewPosition.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
             viewHolder.textViewPosition.setTextColor(mContext.getResources().getColor(R.color.contact_very_soft_grey));
-            viewHolder.imageCompanyLogo.setVisibility(View.GONE);
             viewHolder.chatAvailability.setVisibility(View.GONE);
         }
         else
@@ -146,19 +143,11 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             viewHolder.textViewPosition.setTextColor(mContext.getResources().getColor(R.color.contact_soft_grey));
             viewHolder.imageViewDayNight.setVisibility(View.VISIBLE);
             if (null != contact.getPlatform()
-                    && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform())) {
-                viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
-            } else if (null != contact.getPlatform()
-                    && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform())) {
-                viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
-            } else if (null != contact.getPlatform()
                     && Constants.PLATFORM_LOCAL.equals(contact.getPlatform())) {
                 viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
-                viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
             } else if (null != contact.getPlatform()
                     && Constants.PLATFORM_GLOBAL_CONTACTS.equals(contact.getPlatform())) {
                 viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
-                viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_add_vodafone);
             }
 
             if (null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform())) {
@@ -276,7 +265,6 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
         TextView textViewCountry;
         ImageView imageViewDayNight;
         ImageView imageAvatar;
-        ImageView imageCompanyLogo;
         TextView textAvatar;
         TextView platformLabel;
         ImageView chatAvailability;

@@ -133,9 +133,9 @@ public class ContactListPagerFragment extends Fragment{
     {
         if (contactListFragment!=null)
         {
-            contactListFragment.getSearchBarController().hideSearchBarContent();
-            contactListFragment.getSearchBarController().hideKeyboard();
-            contactListFragment.setListAdapterTabs();
+            if (contactListFragment.getSearchView().getText().equals("")){
+                contactListFragment.setListAdapterTabs();
+            }
         }
 
         if (contactRecentListFragment!=null)

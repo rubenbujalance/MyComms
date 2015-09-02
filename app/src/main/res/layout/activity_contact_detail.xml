@@ -5,15 +5,21 @@
               android:layout_height="match_parent"
               android:background="@drawable/bg_blurred">
 
-    <ImageView
-        android:layout_width="24dp"
-        android:layout_height="34dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
-        android:id="@+id/ivBtBack"
-        android:src="@drawable/icon_left_white"
-        android:focusable="false" />
+    <LinearLayout
+        android:id="@+id/back_area"
+        android:orientation="horizontal"
+        android:layout_width="55dp"
+        android:layout_height="55dp">
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="34dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:id="@+id/ivBtBack"
+            android:src="@drawable/icon_left_white"
+            android:focusable="false" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

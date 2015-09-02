@@ -20,18 +20,23 @@
             android:tintMode="src_over"
             android:scaleType="centerCrop"/>
 
-        <ImageView
-            android:layout_width="22dp"
-            android:layout_height="34dp"
-            android:id="@+id/ivBtBack"
-            android:src="@drawable/icon_left_white"
-            android:focusable="false"
-            android:adjustViewBounds="true"
-            android:layout_marginTop="14dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginBottom="12dp"
-            android:layout_centerVertical="true"/>
-
+        <LinearLayout
+            android:id="@+id/back_area"
+            android:orientation="horizontal"
+            android:layout_width="55dp"
+            android:layout_height="55dp">
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="34dp"
+                android:id="@+id/ivBtBack"
+                android:src="@drawable/icon_left_white"
+                android:focusable="false"
+                android:adjustViewBounds="true"
+                android:layout_marginTop="14dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginBottom="12dp"
+                android:layout_centerVertical="true"/>
+        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout

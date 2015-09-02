@@ -37,8 +37,6 @@ import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Callback;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.view.ChatRecyclerViewAdapter;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
@@ -52,7 +50,6 @@ import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
@@ -758,6 +755,13 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         ImageView backButton = (ImageView) findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        LinearLayout backArea = (LinearLayout) findViewById(R.id.back_area);
+        backArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

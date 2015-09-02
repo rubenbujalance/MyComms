@@ -375,6 +375,13 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
                 finish();
             }
         });
+        LinearLayout backArea = (LinearLayout) findViewById(R.id.back_area);
+        backArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         //Set avatar
         setHeaderAvatar();

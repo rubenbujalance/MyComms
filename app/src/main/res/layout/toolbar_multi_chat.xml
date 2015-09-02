@@ -28,12 +28,19 @@
             android:layout_gravity="center"
             android:gravity="start|center">
 
-            <ImageButton
-                android:id="@+id/back_button"
-                android:layout_width="22dp"
-                android:layout_height="34dp"
-                android:adjustViewBounds="true"
-                android:background="@drawable/ic_go_back"/>
+            <LinearLayout
+                android:id="@+id/back_area"
+                android:orientation="horizontal"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content">
+                <ImageButton
+                    android:id="@+id/back_button"
+                    android:layout_width="22dp"
+                    android:layout_height="34dp"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/ic_go_back"/>
+            </LinearLayout>
+
 
         </LinearLayout>
 

@@ -25,7 +25,6 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -295,6 +294,13 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        LinearLayout backArea = (LinearLayout)findViewById(R.id.back_area);
+        backArea.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();

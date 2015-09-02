@@ -1095,8 +1095,7 @@ public final class Utils extends MainActivity {
 
     public static String getCountryValue(String countryCode, Context context) {
         String countryValue;
-        String test = countryCode;
-        HashMap countryHashMap = Utils.getCountry(test, context);
+        HashMap countryHashMap = Utils.getCountry(countryCode, context);
         if (countryHashMap.get("is_special") != null) {
             if (countryHashMap.get("is_special").equals("Yes") || countryHashMap.get("name").toString().length() > 9) {
                 countryValue = countryHashMap.get("FIPS").toString();

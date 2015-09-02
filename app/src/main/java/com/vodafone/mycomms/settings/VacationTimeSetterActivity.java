@@ -22,6 +22,7 @@ import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ import java.util.HashMap;
 public class VacationTimeSetterActivity extends FragmentActivity implements IConnectionCallback {
     private MyCommsDatePickerFragment datePickerFragment;
     public static final String EXTRA_HOLIDAY_END_DATE = "EXTRA_VACATION_TIME_ID";
-    private long holidayEndDate;
+    private String holidayEndDate = "";
 
     private ProfileController profileController;
 
@@ -58,9 +59,12 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
 
                     datePickerFragment = new MyCommsDatePickerFragment();
 
-                    if(holidayEndDate > 0L) {
+                    if (holidayEndDate != null && holidayEndDate.length()>0) {
+
                         try {
-                            holidayEndDateCalendar.setTime(Constants.SIMPLE_DATE_FORMAT_DISPLAY.parse(Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate)));
+                            SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
+                            Date endDate = sdf.parse(holidayEndDate);
+                            holidayEndDateCalendar.setTime(endDate);
                             datePickerFragment.setCalendar(holidayEndDateCalendar);
                         } catch (ParseException e) {
                             Log.w(Constants.TAG, "VacationTimeSetterActivity.onClick: ", e);
@@ -69,24 +73,24 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
                     datePickerFragment.setOnDateSetListener(onDateSetListener);
                     datePickerFragment.setOnCancelListener(onCancelListener);
                     datePickerFragment.show(VacationTimeSetterActivity.this.getSupportFragmentManager(), "fragment_date_picker");
-
-
                 } else {
                     VacationTimeSetterActivity.this.findViewById(R.id.settings_textview_vacation_time).setVisibility(View.VISIBLE);
                     VacationTimeSetterActivity.this.findViewById(R.id.vacation_time_ends_layout).setVisibility(View.GONE);
-                    holidayEndDate = 0L;
+                    holidayEndDate = "";
                 }
             }
         });
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            this.holidayEndDate = extras.getLong(EXTRA_HOLIDAY_END_DATE);
-            if(this.holidayEndDate > 0L){
+        if (getIntent().getExtras() != null) {
+            holidayEndDate = getIntent().getExtras().getString(EXTRA_HOLIDAY_END_DATE);
+
+            if(holidayEndDate != null && holidayEndDate.length()>0){
                 VacationTimeSetterActivity.this.findViewById(R.id.settings_textview_vacation_time).setVisibility(View.GONE);
                 VacationTimeSetterActivity.this.findViewById(R.id.vacation_time_ends_layout).setVisibility(View.VISIBLE);
                 try {
-                    updateDateText(Constants.SIMPLE_DATE_FORMAT_DISPLAY.parse(Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate)));
+                    SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
+                    Date endDate = sdf.parse(holidayEndDate);
+                    updateDateText(endDate);
                 } catch (ParseException e) {
                     Log.w(Constants.TAG, "VacationTimeSetterActivity.onCreate: exception while parsing date", e);
                 }
@@ -113,45 +117,59 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
         finish();
     }
     
-    private DatePickerDialog.OnDateSetListener onDateSetListener = new DatePickerDialog.OnDateSetListener() {
-        @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            Log.d(Constants.TAG, "VacationTimeSetterActivity.onDateSet: ");
-            Date selectecDate = datePickerFragment.getCalendar().getTime();
-            holidayEndDate = selectecDate.getTime();
-            updateDateText(datePickerFragment.getCalendar().getTime());
-            VacationTimeSetterActivity.this.findViewById(R.id.settings_textview_vacation_time).setVisibility(View.GONE);
-            VacationTimeSetterActivity.this.findViewById(R.id.vacation_time_ends_layout).setVisibility(View.VISIBLE);
-        }
-    };
+    private DatePickerDialog.OnDateSetListener onDateSetListener =
+            new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    Log.d(Constants.TAG, "VacationTimeSetterActivity.onDateSet: ");
+                    datePickerFragment.getCalendar().set(Calendar.HOUR_OF_DAY, 23);
+                    datePickerFragment.getCalendar().set(Calendar.MINUTE, 59);
+                    datePickerFragment.getCalendar().set(Calendar.SECOND, 0);
+                    datePickerFragment.getCalendar().set(Calendar.MILLISECOND, 0);
+                    Date selectedDate = datePickerFragment.getCalendar().getTime();
+                    holidayEndDate = Utils.timestampToFormatedString(
+                            selectedDate.getTime(), Constants.API_DATE_FULL_FORMAT);
+                    updateDateText(selectedDate);
+                    VacationTimeSetterActivity.this.findViewById(
+                            R.id.settings_textview_vacation_time).setVisibility(View.GONE);
+                    VacationTimeSetterActivity.this.findViewById
+                            (R.id.vacation_time_ends_layout).setVisibility(View.VISIBLE);
+                }
+            };
 
     public void updateHolidayData(){
         Log.d(Constants.TAG, "VacationTimeSetterActivity.updateHolidayData: ");
-        HashMap settingsHashMap = new HashMap<>();
-        if(holidayEndDate!=0){
-            //Changes to adapt Android to backend:
-            // - Don't send "true"
-            // - Change dateFormat to yyyy-MM-dd'T'HH:mm:ss.SSSZ
 
-//            settingsHashMap.put(Constants.PROFILE_HOLIDAY, true);
-
-            String dateISO =
-                    Utils.timestampToFormatedString(holidayEndDate, Constants.API_DATE_FORMAT);
-
+        //RBM: Changes to adapt Android to new backend date format:
+        // - Don't send "true"
+        // - Change dateFormat to yyyy-MM-dd'T'HH:mm:ss.SSSZ
+        try {
             HashMap holidayHashMap = new HashMap<>();
-            holidayHashMap.put(Constants.PROFILE_HOLIDAY_END_DATE,  dateISO);
+            HashMap settingsHashMap = new HashMap<>();
+            if (holidayEndDate != null && holidayEndDate.length() > 0) {
+//            settingsHashMap.put(Constants.PROFILE_HOLIDAY, true);
+                String holidayEndDateUTC = Utils.isoDateToUTC(holidayEndDate);
+                holidayEndDateUTC = holidayEndDateUTC.substring(
+                        0, holidayEndDateUTC.length()-5)+"Z";
+                holidayHashMap.put(Constants.PROFILE_HOLIDAY_END_DATE, holidayEndDateUTC);
+            }
+
             settingsHashMap.put(Constants.PROFILE_HOLIDAY, holidayHashMap);
+            profileController.updateSettingsData(settingsHashMap);
+        } catch(Exception e) {
+            Log.e(Constants.TAG, "VacationTimeSetterActivity.updateHolidayData: ");
         }
-        profileController.updateSettingsData(settingsHashMap);
     }
 
-    private DatePickerDialog.OnCancelListener onCancelListener = new DatePickerDialog.OnCancelListener(){
-        @Override
-        public void onCancel(DialogInterface dialog) {
-            Log.d(Constants.TAG, "VacationTimeSetterActivity.onCancel: ");
-            ((Switch)VacationTimeSetterActivity.this.findViewById(R.id.switch_vacation_time)).setChecked(false);
-        }
-    };
+    private DatePickerDialog.OnCancelListener onCancelListener =
+            new DatePickerDialog.OnCancelListener(){
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    Log.d(Constants.TAG, "VacationTimeSetterActivity.onCancel: ");
+                    ((Switch)VacationTimeSetterActivity.this
+                            .findViewById(R.id.switch_vacation_time)).setChecked(false);
+                }
+            };
 
     private void updateDateText(Date date){
         Log.d(Constants.TAG, "VacationTimeSetterActivity.updateDateText: " + date);

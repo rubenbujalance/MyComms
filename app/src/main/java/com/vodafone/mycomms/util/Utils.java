@@ -64,6 +64,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -960,16 +961,75 @@ public final class Utils extends MainActivity {
         if(timestamp==0) return null;
 
         try {
+            //Format in ISO
             Calendar c = Calendar.getInstance();
             c.setTimeInMillis(timestamp);
             SimpleDateFormat sdf = new SimpleDateFormat(format);
             sdf.setTimeZone(c.getTimeZone());
             formatedDate = sdf.format(c.getTime());
+
+
         } catch (Exception e) {
             Log.e(Constants.TAG, "Utils.timestampToFormatedString: ",e);
         }
 
         return formatedDate;
+    }
+
+    public static Date dateToUTC(Date date) {
+        TimeZone tz = TimeZone.getDefault();
+        Date ret = new Date( date.getTime() - tz.getRawOffset() );
+
+        // if we are now in DST, back off by the delta.  Note that we are checking the GMT date, this is the KEY.
+        if ( tz.inDaylightTime( ret )){
+            Date dstDate = new Date( ret.getTime() - tz.getDSTSavings() );
+
+            // check to make sure we have not crossed back into standard time
+            // this happens when we are on the cusp of DST (7pm the day before the change for PDT)
+            if ( tz.inDaylightTime( dstDate )){
+                ret = dstDate;
+            }
+        }
+
+        return ret;
+    }
+
+    public static String isoUTCToTimezone(String date) {
+        String result = "";
+
+        try {
+            SimpleDateFormat sourceFormat = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
+            sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date parsed = sourceFormat.parse(date); // => Date is in UTC now
+
+            SimpleDateFormat destFormat = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
+            destFormat.setTimeZone(TimeZone.getDefault());
+
+            result = destFormat.format(parsed);
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "Utils.utcISOToTimezone: ");
+        }
+
+        return result;
+    }
+
+    public static String isoDateToUTC(String date) {
+        String ret = "";
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
+            Date holidayEndDateTmp = sdf.parse(date);
+            holidayEndDateTmp = Utils.dateToUTC(holidayEndDateTmp);
+            ret = Utils.timestampToFormatedString(
+                    holidayEndDateTmp.getTime(), Constants.API_DATE_FULL_FORMAT);
+
+            ret = ret.substring(0, ret.length()-5)+"+0000";
+
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "Utils.isoDateToUTC: ");
+        }
+
+        return ret;
     }
 
     public static String getProfileId(Context context){

@@ -50,13 +50,14 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private ProfileController profileController;
     private boolean isSourceDB = true;
 
-    private long holidayEndDate = 0L;
+    private String holidayEndDate = "";
     private boolean isFirstLoad = true;
     private boolean doNotDisturb = false;
     private boolean privateTimeZone = false;
+    private int commingFrom;
 
     private TextView vacationTimeEnds;
-    private ImageView vactaionTimeArrow;
+    private ImageView vacationTimeArrow;
 
     private Realm realm;
 
@@ -95,7 +96,10 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
+        vacationTimeEnds = (TextView)getActivity().findViewById(
+                R.id.settings_preferences_vacation_time_value);
+        vacationTimeArrow = (ImageView)getActivity().findViewById(
+                R.id.about_arrow_right_top);
 
         if (getArguments() != null) {
             mParam1 = getArguments().getInt(ARG_PARAM1);
@@ -106,21 +110,12 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
-        Log.d(Constants.TAG, "PreferencesFragment.onResume: ");
-        profileController.setConnectionCallback(this);
-        profileController.getProfile(this.realm);
-
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_preferences, container, false);
 
         vacationTimeEnds = (TextView) v.findViewById(R.id.settings_preferences_vacation_time_value);
-        vactaionTimeArrow = (ImageView) v.findViewById(R.id.about_arrow_right_top);
+        vacationTimeArrow = (ImageView) v.findViewById(R.id.about_arrow_right_top);
 
         Button btLogout = (Button)v.findViewById(R.id.btLogout);
         btLogout.setOnClickListener(new View.OnClickListener() {
@@ -130,7 +125,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
                 //Logout on server
                 profileController.logoutToAPI();
-                ((MycommsApp)getActivity().getApplication()).appIsInitialized = false;
+                ((MycommsApp) getActivity().getApplication()).appIsInitialized = false;
 
 
             }
@@ -179,6 +174,18 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        if(commingFrom!=SettingsMainActivity.VACATION_TIME_SETTER_ID) {
+            profileController.setConnectionCallback(this);
+            profileController.getProfile(this.realm);
+        }
+
+        commingFrom = -1;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         this.realm.close();
@@ -218,6 +225,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -236,11 +244,9 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         super.onStop();
     }
 
-
     @Override
     public void onProfileReceived(UserProfile userProfile) {
         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: settings:" + userProfile.getSettings());
-
 
         JSONObject jsonSettings = null;
         boolean privateTimeZone = false;
@@ -250,26 +256,28 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
                 jsonSettings = new JSONObject(userProfile.getSettings());
 
-                if(jsonSettings.has("holiday")) {
-                    JSONObject jsonHoliday = jsonSettings.getJSONObject("holiday");
+                if(jsonSettings.has(Constants.PROFILE_HOLIDAY)) {
+                    JSONObject jsonHoliday = jsonSettings.getJSONObject(Constants.PROFILE_HOLIDAY);
                     String endDateStr = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
                     endDateStr = endDateStr.replaceAll("Z", "+0000");
-                    SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FORMAT);
-                    Date endDate = sdf.parse(endDateStr);
-                    this.holidayEndDate = endDate.getTime();
 
-                    if (holidayEndDate > 0) {
-                        final String holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
+                    holidayEndDate = Utils.isoUTCToTimezone(endDateStr);
+
+                    if (holidayEndDate != null && holidayEndDate.length()>0) {
+                        SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
+                        Date endDate = sdf.parse(holidayEndDate);
+
+                        final String holidayDateToSet =
+                                Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(endDate.getTime());
                         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: setting holidayDate to:" + holidayDateToSet);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 vacationTimeEnds.setText(holidayDateToSet);
                                 vacationTimeEnds.setVisibility(View.VISIBLE);
-                                vactaionTimeArrow.setVisibility(View.GONE);
+                                vacationTimeArrow.setVisibility(View.GONE);
                             }
                         });
-
                     }
                     else
                     {
@@ -277,7 +285,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                             @Override
                             public void run() {
                                 vacationTimeEnds.setVisibility(View.GONE);
-                                vactaionTimeArrow.setVisibility(View.VISIBLE);
+                                vacationTimeArrow.setVisibility(View.VISIBLE);
                             }
                         });
                     }
@@ -409,19 +417,18 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         super.onPause();
         profileController.setConnectionCallback(null);
         Log.d(Constants.TAG, "PreferencesFragment.onPause: ");
-
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ");
+        commingFrom = requestCode;
         super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
             case (SettingsMainActivity.VACATION_TIME_SETTER_ID) : {
                 if (resultCode == Activity.RESULT_OK) {
                     Log.d(Constants.TAG, "PreferencesFragment.onActivityResult: ACTIVITY_RESULT_OK");
-                    this.holidayEndDate = data.getLongExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, 0L);
+                    this.holidayEndDate = data.getStringExtra(SettingsMainActivity.VACATION_TIME_END_VALUE);
 
                     updateHolidayText(holidayEndDate);
                     updateProfileInDb();
@@ -431,31 +438,33 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         }
     }
 
-    void updateHolidayText(long holidayEndDate){
+    void updateHolidayText(String holidayEndDate){
         Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: " + holidayEndDate);
         this.holidayEndDate = holidayEndDate;
 
-        TextView vacationTimeEnds = (TextView) getActivity().findViewById(R.id.settings_preferences_vacation_time_value);
-        ImageView vactaionTimeArrow = (ImageView) getActivity().findViewById(R.id.about_arrow_right_top);
-
         String holidayDateToSet = null;
-        if(holidayEndDate > 0){
-            holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(holidayEndDate);
-        }else {
-            holidayDateToSet = getString(R.string.settings_label_vacation_time_not_set);
+
+        try {
+            if (holidayEndDate != null && holidayEndDate.length() > 0) {
+                SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
+                Date endDate = sdf.parse(holidayEndDate);
+                holidayDateToSet = Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(endDate.getTime());
+            } else {
+                holidayDateToSet = getString(R.string.settings_label_vacation_time_not_set);
+            }
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "PreferencesFragment.updateHolidayText: ");
         }
 
         Log.d(Constants.TAG, "PreferencesFragment.updateHolidayText: setting holidayDate to:" + holidayDateToSet);
         vacationTimeEnds.setText(holidayDateToSet);
         vacationTimeEnds.setVisibility(View.VISIBLE);
-        vactaionTimeArrow.setVisibility(View.GONE);
+        vacationTimeArrow.setVisibility(View.GONE);
     }
 
     void updateProfileInDb(){
-        String dateISO =
-                Utils.timestampToFormatedString(holidayEndDate, Constants.API_DATE_FORMAT);
         this.profileController.updateUserProfileSettingsInDB(
-                false, this.privateTimeZone, dateISO, this.doNotDisturb);
+                false, this.privateTimeZone, Utils.isoDateToUTC(holidayEndDate), this.doNotDisturb);
     }
 
 }

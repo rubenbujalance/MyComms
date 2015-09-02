@@ -62,7 +62,6 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_status_local_time);
             viewHolder.textViewCountry = (TextView) convertView.findViewById(R.id.list_item_status_local_country);
             viewHolder.imageViewDayNight = (ImageView) convertView.findViewById(R.id.list_item_image_status_daynight);
-            viewHolder.imageCompanyLogo = (ImageView) convertView.findViewById(R.id.list_item_content_companylogo);
             convertView.setTag(viewHolder);
         } else {
             // recycle the already inflated view
@@ -76,18 +75,11 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
                 && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {
             viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
-        }
-        else if (null != contact.getPlatform()
-                && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
-        {
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
         }
         else if (null != contact.getPlatform()
                 && Constants.PLATFORM_LOCAL.equals(contact.getPlatform()))
         {
             viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
         RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(profileId);
@@ -212,7 +204,6 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
         TextView textViewCountry;
         ImageView imageViewDayNight;
         ImageView imageAvatar;
-        ImageView imageCompanyLogo;
         TextView textAvatar;
     }
 }

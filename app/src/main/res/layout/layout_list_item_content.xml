@@ -12,7 +12,7 @@
         android:id="@+id/list_item_content_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="1dip"
+        android:paddingBottom="1dp"
         android:ellipsize="end"
         android:lines="1"
         android:singleLine="true"
@@ -26,7 +26,7 @@
         android:id="@+id/list_item_content_position"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:paddingBottom="2dip"
+        android:paddingBottom="2dp"
         android:ellipsize="end"
         android:lines="1"
         android:singleLine="true"
@@ -40,20 +40,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <ImageView
-            android:id="@+id/list_item_content_companylogo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
-            android:paddingRight="4dp"
-            android:src="@drawable/icon_platform_mycomms"/>
-
         <!-- Occupation -->
         <TextView android:id="@+id/list_item_content_company"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:paddingLeft="0dip"
-            android:paddingStart="0dip"
             android:textSize="14sp"
             android:ellipsize="end"
             android:lines="1"

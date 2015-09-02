@@ -60,7 +60,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             viewHolder.textViewTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
             viewHolder.imageViewRecentType = (ImageView) convertView.findViewById(R.id.list_item_recent_type_image);
             viewHolder.textViewRecentItemTime = (TextView) convertView.findViewById(R.id.list_item_recent_info_time);
-            viewHolder.imageCompanyLogo = (ImageView) convertView.findViewById(R.id.list_item_content_companylogo);
 
             viewHolder.top_left_avatar = (ImageView) convertView.findViewById(R.id.top_left_avatar);
             viewHolder.top_right_avatar = (ImageView) convertView.findViewById(R.id.top_right_avatar);
@@ -175,7 +174,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                 mContext.getResources().getDisplayMetrics());
         viewHolder.top_left_chat_availability.setLayoutParams(params);
 
-        viewHolder.imageCompanyLogo.setVisibility(View.VISIBLE);
         viewHolder.textViewCompany.setVisibility(View.VISIBLE);
 
         viewHolder.lay_top_right_image_hide.setVisibility(View.GONE);
@@ -190,27 +188,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                 );
 
         viewHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
-
-        if(null != contact.getPlatform()
-                && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
-        {
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
-        }
-        else if (null != contact.getPlatform()
-                && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
-        {
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
-        }
-        else if (null != contact.getPlatform()
-                && Constants.PLATFORM_LOCAL.equals(contact.getPlatform()))
-        {
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
-        }
-        else if (null != contact.getPlatform()
-                && Constants.PLATFORM_GLOBAL_CONTACTS.equals(contact.getPlatform()))
-        {
-            viewHolder.imageCompanyLogo.setImageResource(R.drawable.ic_add_vodafone);
-        }
 
         RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(_profile_id);
         Contact cont = mRealmContactTransactions.getContactById(contact.getContactId(), realm);
@@ -266,7 +243,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
             viewHolder.lay_top_right_image_hide.setVisibility(View.GONE);
 
         viewHolder.lay_bottom_both_image_hide.setVisibility(View.VISIBLE);
-        viewHolder.imageCompanyLogo.setVisibility(View.GONE);
         viewHolder.textViewCompany.setVisibility(View.GONE);
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 30,
         mContext.getResources().getDisplayMetrics());
@@ -338,7 +314,6 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         TextView textViewTime;
         TextView textViewRecentItemTime;
         ImageView imageViewRecentType;
-        ImageView imageCompanyLogo;
 
         ImageView bottom_right_chat_availability;
         ImageView bottom_left_chat_availability;

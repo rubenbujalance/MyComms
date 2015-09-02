@@ -65,21 +65,10 @@ public class GroupMembersViewAdapter extends RecyclerView.Adapter<GroupHolder>{
         Contact contact = groupContactList.get(i);
 
         groupHolder.imageViewDayNight.setVisibility(View.VISIBLE);
-        if(null != contact.getPlatform()
-                && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
-        {
-            groupHolder.imageCompanyLogo.setImageResource(R.drawable.btn_sales_force);
-        }
-        else if (null != contact.getPlatform()
-                && Constants.PLATFORM_MY_COMMS.equals(contact.getPlatform()))
-        {
-            groupHolder.imageCompanyLogo.setImageResource(R.drawable.icon_mycomms);
-        }
-        else if (null != contact.getPlatform()
+        if (null != contact.getPlatform()
                 && Constants.PLATFORM_LOCAL.equals(contact.getPlatform()))
         {
             groupHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
-            groupHolder.imageCompanyLogo.setImageResource(R.drawable.icon_local_contacts);
         }
 
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))

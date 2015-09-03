@@ -50,6 +50,7 @@ public class Constants {
     public static final String PROFILE_EMAIL = "email";
     public static final String PROFILE_DEVICE_ID = "deviceId";
     public static final String PROFILE_HOLIDAY_END_DATE = "endDate";
+    public static final String PROFILE_HOLIDAY_START_DATE = "startDate";
     public static final String PROFILE_HOLIDAY = "holiday";
     public static final String PROFILE_ID = "id";
 

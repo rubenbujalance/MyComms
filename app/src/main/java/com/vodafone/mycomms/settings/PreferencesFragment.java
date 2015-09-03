@@ -261,7 +261,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                     String endDateStr = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
                     endDateStr = endDateStr.replaceAll("Z", "+0000");
 
-                    holidayEndDate = Utils.isoUTCToTimezone(endDateStr);
+                    holidayEndDate = Utils.isoDateToTimezone(endDateStr);
 
                     if (holidayEndDate != null && holidayEndDate.length()>0) {
                         SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
@@ -464,7 +464,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
     void updateProfileInDb(){
         this.profileController.updateUserProfileSettingsInDB(
-                false, this.privateTimeZone, Utils.isoDateToUTC(holidayEndDate), this.doNotDisturb);
+                false, this.privateTimeZone, holidayEndDate, this.doNotDisturb);
     }
 
 }

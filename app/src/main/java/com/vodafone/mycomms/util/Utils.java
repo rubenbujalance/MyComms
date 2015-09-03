@@ -994,12 +994,12 @@ public final class Utils extends MainActivity {
         return ret;
     }
 
-    public static String isoUTCToTimezone(String date) {
+    public static String isoDateToTimezone(String date) {
         String result = "";
 
         try {
             SimpleDateFormat sourceFormat = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
-            sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//            sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             Date parsed = sourceFormat.parse(date); // => Date is in UTC now
 
             SimpleDateFormat destFormat = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
@@ -1011,25 +1011,6 @@ public final class Utils extends MainActivity {
         }
 
         return result;
-    }
-
-    public static String isoDateToUTC(String date) {
-        String ret = "";
-
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
-            Date holidayEndDateTmp = sdf.parse(date);
-            holidayEndDateTmp = Utils.dateToUTC(holidayEndDateTmp);
-            ret = Utils.timestampToFormatedString(
-                    holidayEndDateTmp.getTime(), Constants.API_DATE_FULL_FORMAT);
-
-            ret = ret.substring(0, ret.length()-5)+"+0000";
-
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "Utils.isoDateToUTC: ");
-        }
-
-        return ret;
     }
 
     public static String getProfileId(Context context){

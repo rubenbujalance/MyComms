@@ -7,10 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.net.Uri;
-import android.os.*;
-import android.os.Process;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -30,7 +30,6 @@ import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.SystemUiHider;
-import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
@@ -39,6 +38,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+
+import static android.widget.Toast.makeText;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -93,7 +94,7 @@ public class SplashScreenActivity extends MainActivity {
                     goToApp(true);
                 }
                 //No Internet connection, and user not logged in or accessToken expired
-                Toast.makeText(SplashScreenActivity.this,
+                makeText(SplashScreenActivity.this,
                         getString(R.string.no_internet_connection_log_in_needed),
                         Toast.LENGTH_LONG).show();
                 goToLogin();
@@ -156,14 +157,12 @@ public class SplashScreenActivity extends MainActivity {
         OKHttpWrapper.get(Constants.API_VERSION, SplashScreenActivity.this,
                 new OKHttpWrapper.HttpCallback() {
                     @Override
-                    public void onFailure(Response response, IOException e)
-                    {
+                    public void onFailure(Response response, IOException e) {
                         doCheckVersionOnFailure(response, e);
                     }
 
                     @Override
-                    public void onSuccess(Response response)
-                    {
+                    public void onSuccess(Response response) {
                         callBackVersionCheck(null);
                     }
                 });
@@ -176,7 +175,7 @@ public class SplashScreenActivity extends MainActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(SplashScreenActivity.this,
+                    makeText(SplashScreenActivity.this,
                             getString(R.string.error_reading_data_from_server),
                             Toast.LENGTH_LONG).show();
                     callBackVersionCheck(null);
@@ -216,7 +215,7 @@ public class SplashScreenActivity extends MainActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(SplashScreenActivity.this,
+                    makeText(SplashScreenActivity.this,
                             getString(R.string.error_reading_data_from_server),
                             Toast.LENGTH_LONG).show();
                     callBackVersionCheck(null);
@@ -238,14 +237,13 @@ public class SplashScreenActivity extends MainActivity {
         Log.e(Constants.TAG, "SplashScreenActivity.onApplicationAndProfileReadErrorEvent: ");
         if(!isForeground) return;
 
-        if(((MycommsApp)getApplication()).isProfileAvailable()) {
+        if(MycommsApp.isProfileAvailable()) {
             goToApp(false);
         }
         else {
-            Toast.makeText(SplashScreenActivity.this,
-                    getString(R.string.no_internet_connection_log_in_needed),
+            makeText(SplashScreenActivity.this,
+                    getResources().getString(R.string.no_internet_connection_log_in_needed),
                     Toast.LENGTH_LONG).show();
-
             goToLogin();
         }
     }
@@ -268,7 +266,7 @@ public class SplashScreenActivity extends MainActivity {
                 builder.setPositiveButton(R.string.update, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Launch download and install
-                        if (isDownloadManagerAvailable())
+                        if (isDownloadManagerAvailable(SplashScreenActivity.this))
                             downloadNewVersion(result);
                         else {
                             downloadNewVersionFromURI(result);
@@ -288,7 +286,7 @@ public class SplashScreenActivity extends MainActivity {
                                         , getApplicationContext().getResources().getString(R.string.support_email)
                                         , 0
                                 );
-                        if (isDownloadManagerAvailable())
+                        if (isDownloadManagerAvailable(SplashScreenActivity.this))
                             downloadNewVersion(result);
 
                         dialog.dismiss();
@@ -320,7 +318,7 @@ public class SplashScreenActivity extends MainActivity {
         } catch (Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackVersionCheck: \n",ex);
             Crashlytics.logException(ex);
-            Toast.makeText(SplashScreenActivity.this, getString(R.string
+            makeText(SplashScreenActivity.this, getString(R.string
                             .error_reading_data_from_server),
                     Toast.LENGTH_LONG).show();
             finish();
@@ -351,7 +349,7 @@ public class SplashScreenActivity extends MainActivity {
             builder.create();
             builder.show();
         } catch (Exception e){
-            Log.e(Constants.TAG, "SplashScreenActivity.downloadNewVersionFromURI: ",e);
+            Log.e(Constants.TAG, "SplashScreenActivity.downloadNewVersionFromURI: ", e);
         }
     }
 
@@ -399,7 +397,7 @@ public class SplashScreenActivity extends MainActivity {
 
                 //Load profile and go to app
                 ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
-                if(((MycommsApp)getApplication()).isProfileAvailable())
+                if(MycommsApp.isProfileAvailable())
                     goToApp(true);
             }
             else
@@ -410,28 +408,10 @@ public class SplashScreenActivity extends MainActivity {
         } catch(Exception ex) {
             Log.e(Constants.TAG, "SplashScreenActivity.callBackRenewToken: \n",ex);
             Crashlytics.logException(ex);
-            Toast.makeText(SplashScreenActivity.this, getString(R.string
+            makeText(SplashScreenActivity.this, getString(R.string
                             .error_reading_data_from_server),
                     Toast.LENGTH_LONG).show();
             finish();
-        }
-    }
-
-    private boolean isDownloadManagerAvailable() {
-        try {
-            Intent intent = new Intent(Intent.ACTION_MAIN);
-            intent.addCategory(Intent.CATEGORY_LAUNCHER);
-            intent.setClassName("com.android.providers.downloads.ui", "com.android.providers.downloads.ui.DownloadList");
-
-            List<ResolveInfo> list = getPackageManager().queryIntentActivities(intent,
-                                                                PackageManager.MATCH_DEFAULT_ONLY);
-
-            return list.size() > 0;
-
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "SplashScreenActivity.isDownloadManagerAvailable: ", e);
-            Crashlytics.logException(e);
-            return false;
         }
     }
 
@@ -482,25 +462,31 @@ public class SplashScreenActivity extends MainActivity {
             builder.create();
             builder.show();
         } catch (Exception e){
-            Log.e(Constants.TAG, "SplashScreenActivity.downloadNewVersion: ",e);
+            Log.e(Constants.TAG, "SplashScreenActivity.downloadNewVersion: ", e);
             Crashlytics.logException(e);
             downloadNewVersionFromURI(url);
         }
     }
 
-    //Async Tasks
-    private class RenewTokenAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
-        @Override
-        protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
-            return APIWrapper.httpPostAPI("/auth/renew", params[0], params[1], SplashScreenActivity.this);
-        }
-        @Override
-        protected void onPostExecute(HashMap<String,Object> result) {
-            callBackRenewToken(result);
+    public static boolean isDownloadManagerAvailable(Context context)
+    {
+        try {
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+            intent.setClassName("com.android.providers.downloads.ui", "com.android.providers.downloads.ui.DownloadList");
+
+            List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
+                    PackageManager.MATCH_DEFAULT_ONLY);
+
+            return list.size() > 0;
+
+        } catch (Exception e) {
+            return false;
         }
     }
 
-    private class ProfileAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
+    //Async Tasks
+    private class RenewTokenAPI extends AsyncTask<HashMap<String,Object>, Void, HashMap<String,Object>> {
         @Override
         protected HashMap<String,Object> doInBackground(HashMap<String,Object>[] params) {
             return APIWrapper.httpPostAPI("/auth/renew", params[0], params[1], SplashScreenActivity.this);
@@ -541,6 +527,8 @@ public class SplashScreenActivity extends MainActivity {
     public void onOKHttpErrorReceived(OKHttpErrorReceivedEvent event) {
         Log.i(Constants.TAG, "SplashScreenActivity.onOKHttpErrorReceived: ");
         String errorMessage = event.getErrorMessage();
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+        makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
+
+
 }

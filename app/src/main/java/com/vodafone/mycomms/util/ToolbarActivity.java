@@ -56,7 +56,8 @@ public class ToolbarActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.realm.close();
+        if(null != this.realm)
+            this.realm.close();
     }
 
     public void setForegroundActivity(int activity)

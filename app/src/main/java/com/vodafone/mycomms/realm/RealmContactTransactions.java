@@ -413,7 +413,7 @@ public class RealmContactTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
     }

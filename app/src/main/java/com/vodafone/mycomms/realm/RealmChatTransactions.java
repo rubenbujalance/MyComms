@@ -591,7 +591,7 @@ public class RealmChatTransactions
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
 

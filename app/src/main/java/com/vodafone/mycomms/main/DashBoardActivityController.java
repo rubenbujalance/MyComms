@@ -33,6 +33,8 @@ import com.vodafone.mycomms.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -62,6 +64,7 @@ public class DashBoardActivityController
     public RecentContactController mRecentContactController;
     public ArrayList<News> newsArrayList;
     public RealmNewsTransactions mRealmNewsTransactions;
+    public RealmGroupChatTransactions mRealmGroupChatTransactions;
 
     public DashBoardActivityController
             (
@@ -83,6 +86,7 @@ public class DashBoardActivityController
         this.mRecentContainer = (LinearLayout) mActivity.findViewById(R.id.list_recents);
         this.mRecentContainer2 = (LinearLayout) mActivity.findViewById(R.id.list_recents_2);
         this.newsArrayList = new ArrayList<>();
+        this.mRealmGroupChatTransactions = new RealmGroupChatTransactions(mActivity, mProfileId);
     }
 
     public void loadRecents(LinearLayout currentRecentContainer)
@@ -189,9 +193,8 @@ public class DashBoardActivityController
             this.recentId = recentId;
             this.recentContact = recentContact;
             this.groupChatId = groupChatId;
-            RealmGroupChatTransactions realmGroupChatTransactions = new
-                    RealmGroupChatTransactions(mActivity, mProfileId);
-            GroupChat groupChat = realmGroupChatTransactions.getGroupChatById(groupChatId, mRealm);
+
+            GroupChat groupChat = mRealmGroupChatTransactions.getGroupChatById(groupChatId, mRealm);
             if(null != groupChat && null != groupChat.getMembers() && !groupChat.getMembers().isEmpty())
             {
                 this.contactId = groupChat.getMembers();
@@ -347,6 +350,11 @@ public class DashBoardActivityController
                             }
                             catch (Exception e)
                             {
+                                final StringWriter sw = new StringWriter();
+                                final PrintWriter pw = new PrintWriter(sw, true);
+                                e.printStackTrace(pw);
+
+                                System.err.println("******** DrawSingleRecentAsyncTask.onPostExecute ********\n"+sw.getBuffer().toString());
                                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
                                 Crashlytics.logException(e);
                             }
@@ -358,25 +366,31 @@ public class DashBoardActivityController
                         lay_main_container.setVisibility(View.VISIBLE);
                     }
 
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run()
+                        {
+                            LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
+                            btRecents.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View v) {
+                                    try {
+                                        if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
+                                            Intent in = new Intent(mActivity, GroupChatActivity.class);
+                                            in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
+                                            in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                            in.putExtra(Constants.IS_GROUP_CHAT, true);
+                                            mActivity.startActivity(in);
+                                        }
 
-                    LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
-                    btRecents.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            try {
-                                if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
-                                    Intent in = new Intent(mActivity, GroupChatActivity.class);
-                                    in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
-                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
-                                    in.putExtra(Constants.IS_GROUP_CHAT, true);
-                                    mActivity.startActivity(in);
+                                    } catch (Exception e) {
+                                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecentItemClick: ", e);
+                                        Crashlytics.logException(e);
+                                    }
                                 }
-
-                            } catch (Exception e) {
-                                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecentItemClick: ", e);
-                                Crashlytics.logException(e);
-                            }
+                            });
                         }
                     });
+
                 }
                 catch (Exception e)
                 {

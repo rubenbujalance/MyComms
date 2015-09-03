@@ -464,7 +464,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
     void updateProfileInDb(){
         this.profileController.updateUserProfileSettingsInDB(
-                false, this.privateTimeZone, Utils.isoDateToUTC(holidayEndDate), this.doNotDisturb);
+                false, this.privateTimeZone, holidayEndDate, this.doNotDisturb);
     }
 
 }

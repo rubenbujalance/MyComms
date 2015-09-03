@@ -151,7 +151,9 @@ public class ProfileController extends BaseController {
         }
     }
 
-    public void updateUserProfileSettingsInDB(boolean privateLocation, boolean privateTimezone, String holidayEndDate, boolean doNotDisturb) {
+    public void updateUserProfileSettingsInDB(boolean privateLocation, boolean privateTimezone,
+                                              String holidayEndDate,
+                                              boolean doNotDisturb) {
         Log.d(Constants.TAG, "ProfileController.updateUserProfileSettingsInDB: privateLocation= " + privateLocation + ", privateTimezone= " + privateTimezone + ", holidayEndDate=" + holidayEndDate + ", doNotDisturb=" + doNotDisturb);
         if(userProfile != null){
             HashMap body = new HashMap<>();
@@ -159,8 +161,9 @@ public class ProfileController extends BaseController {
             if(privateTimezone) body.put("privateTimeZone",privateTimezone );
             if(holidayEndDate!=null) {
                 HashMap holiday = new HashMap();
-                if(holidayEndDate.length()>0)
+                if(holidayEndDate.length()>0) {
                     holiday.put(Constants.PROFILE_HOLIDAY_END_DATE, holidayEndDate);
+                }
                 body.put(Constants.PROFILE_HOLIDAY, holiday);
             }
             if(doNotDisturb) body.put("doNotDisturb", doNotDisturb );

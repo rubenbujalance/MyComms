@@ -83,7 +83,7 @@ public class DashBoardActivityTest
     @Rule
     public PowerMockRule rule = new PowerMockRule();
 
-    public Activity mActivity;
+    public DashBoardActivity mActivity;
     public SharedPreferences sp;
 
     @Before
@@ -179,14 +179,6 @@ public class DashBoardActivityTest
         Robolectric.flushForegroundThreadScheduler();
 
         org.junit.Assert.assertTrue(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false));
-    }
-
-    @Test
-    public void testActivityLifeCycleUntilOnStop() throws Exception
-    {
-        mock(DashBoardActivityController.class);
-        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().pause().stop().get();
-        org.junit.Assert.assertTrue(mActivity.isFinishing());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

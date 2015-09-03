@@ -45,10 +45,10 @@ import model.News;
 
 public class DashBoardActivity extends ToolbarActivity
 {
-    private RecentContactController recentContactController;
-    private LinearLayout lay_no_connection;
-    private DashBoardActivityController mDashBoardActivityController;
-    private Realm realm;
+    public RecentContactController recentContactController;
+    public LinearLayout lay_no_connection;
+    public DashBoardActivityController mDashBoardActivityController;
+    public Realm realm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -168,7 +168,6 @@ public class DashBoardActivity extends ToolbarActivity
     @Override
     protected void onStop() {
         super.onStop();
-        finish();
     }
 
     @Override

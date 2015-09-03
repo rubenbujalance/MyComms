@@ -7,14 +7,18 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.squareup.picasso.Downloader;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
+import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
@@ -23,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -45,12 +48,16 @@ import io.realm.Realm;
 import model.News;
 import model.RecentContact;
 
-import static java.lang.System.exit;
-import static java.lang.System.in;
-import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.robolectric.Shadows.shadowOf;
+
+import com.vodafone.mycomms.test.util.MockDataForTests;
 
 /**
  * Created by str_oan on 02/09/2015.
@@ -60,23 +67,14 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, RealmNewsTransactions.class})
+@PrepareForTest({Realm.class, Crashlytics.class})
 public class DashBoardActivityControllerTest
 {
     @Rule
     public PowerMockRule rule = new PowerMockRule();
 
-    public Activity mActivity;
-    public String mProfileId;
-    public RealmContactTransactions mRealmContactTransactions;
-    public RecentContactController mRecentContactController;
+    public DashBoardActivity mActivity;
     public SharedPreferences sp;
-    public ArrayList<RecentContact> emptyRecentContactsList;
-    public int numberOfRecentContacts;
-    public LinearLayout mRecentContainer, mRecentContainer2;
-    public ArrayList<News> newsArrayList;
-    public Realm mRealm;
-
     public DashBoardActivityController mDashBoardActivityController;
 
     @Before
@@ -89,72 +87,60 @@ public class DashBoardActivityControllerTest
         Context context = RuntimeEnvironment.application.getApplicationContext();
         this.sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-
-        this.emptyRecentContactsList = new ArrayList<>();
-        this.mProfileId = "mc_5570340e7eb7c3512f2f9bf2";
-        this.mRealmContactTransactions = new RealmContactTransactions(this.mProfileId);
-        this.numberOfRecentContacts = 0;
-        this.mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
+        this.sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
+        this.mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().visible().get();
         Thread.sleep(1000);
-        Robolectric.flushForegroundThreadScheduler();
-        this.mRecentContactController = new RecentContactController(this.mActivity, this.mProfileId);
-        this.mRecentContainer = (LinearLayout) mActivity.findViewById(R.id.list_recents);
-        this.mRecentContainer2 = (LinearLayout) mActivity.findViewById(R.id.list_recents_2);
-        this.newsArrayList = new ArrayList<>();
-        this.mRealm = PowerMockito.mock(Realm.class);
-
-        this.mDashBoardActivityController = new DashBoardActivityController
-                (
-                        this.mActivity
-                        , this.mRealm
-                        , this.mRealmContactTransactions
-                        , this.mProfileId
-                        , this.mRecentContactController
-                );
-
+        this.mDashBoardActivityController = this.mActivity.mDashBoardActivityController;
         mockParams();
     }
 
     @Test
     public void testCorrectlyCreated()
     {
+        Assert.assertNotNull(this.mDashBoardActivityController);
         Assert.assertEquals(this.mDashBoardActivityController.mActivity, this.mActivity);
-        Assert.assertEquals(this.mDashBoardActivityController.mProfileId, this.mProfileId);
-        Assert.assertEquals(this.mDashBoardActivityController.mRecentContactController, this.mRecentContactController);
+        Assert.assertEquals(this.mDashBoardActivityController.mProfileId, "mc_5570340e7eb7c3512f2f9bf2");
+        Assert.assertNotNull(this.mDashBoardActivityController.mRecentContactController);
+        Assert.assertNotNull(this.mDashBoardActivityController.mRealmContactTransactions);
+        Assert.assertNotNull(this.mDashBoardActivityController.mRealmGroupChatTransactions);
     }
 
     @Test
-    public void testLoadNews_OKWithClickOnNew() throws Exception
+    public void testLoadNews_WithClickOnNew_OK() throws Exception
     {
+        this.mDashBoardActivityController.mRealmNewsTransactions = Mockito.mock(RealmNewsTransactions.class);
+        Mockito.when(this.mDashBoardActivityController.mRealmNewsTransactions.getAllNews(any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockNewsArrayList());
+
         this.mDashBoardActivityController.loadNews();
+
         Thread.sleep(5000);
-        Assert.assertNotNull(this.mDashBoardActivityController.newsArrayList);
 
         LinearLayout container = (LinearLayout) mActivity.findViewById(R.id.list_news);
         LayoutInflater inflater = LayoutInflater.from(this.mActivity);
         Assert.assertNotNull(inflater);
-        View mView = inflater.inflate(R.layout.layout_news_dashboard, container, false);
-        LinearLayout btnNews = (LinearLayout) mView.findViewById(R.id.notice_content);
-
+        View v = container.getChildAt(0);
+        LinearLayout btnews = (LinearLayout) v.findViewById(R.id.notice_content);
         int numberOfChild = container.getChildCount();
-        Assert.assertEquals(numberOfChild, getMockNewsArrayList().size());
+        btnews.performClick();
+        ShadowActivity shadowActivity = shadowOf(this.mActivity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = shadowOf(startedIntent);
 
-        btnNews.performClick();
-
-        Intent expectedIntent = new Intent(this.mActivity, NewsDetailActivity.class);
-        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
-        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (NewsDetailActivity.class.getName()));
+        Assert.assertNotNull(this.mDashBoardActivityController.newsArrayList);
+        Assert.assertEquals(numberOfChild, MockDataForTests.getMockNewsArrayList().size());
+        assertThat(shadowIntent.getComponent().getClassName(), equalTo(NewsDetailActivity.class.getName()));
     }
 
     @Test
     public void testDrawNews_OK()
     {
-        this.mDashBoardActivityController.drawNews(getMockNewsArrayList());
+        this.mDashBoardActivityController.drawNews(MockDataForTests.getMockNewsArrayList());
         LinearLayout container = (LinearLayout) mActivity.findViewById(R.id.list_news);
         Assert.assertNotNull(container);
     }
 
-    @Test
+    @Test (expected = NullPointerException.class)
     public void testDrawNews_ControlledException()
     {
         this.mDashBoardActivityController.drawNews(null);
@@ -198,6 +184,9 @@ public class DashBoardActivityControllerTest
     {
         this.mDashBoardActivityController.loadLocalContacts();
         Assert.assertTrue(this.mDashBoardActivityController.mProfileId != null);
+        Assert.assertTrue(this.mDashBoardActivityController.mProfileId.length() > 0);
+        Assert.assertTrue(this.mDashBoardActivityController.mActivity != null);
+
     }
 
     @Test
@@ -227,111 +216,107 @@ public class DashBoardActivityControllerTest
     @Test
     public void testLoadRecent_Failed_WithControlledException()
     {
-        this.mDashBoardActivityController.mRecentContainer = null;
+        this.mDashBoardActivityController.mRealmContactTransactions = Mockito.mock(RealmContactTransactions.class);
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+                .thenReturn(null);
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-        Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer == null);
+        Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
     }
 
     @Test
-    public void testLoadRecent_OK()
+    public void testLoadRecent_OK() throws Exception
     {
+
+        String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
+        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+        this.mDashBoardActivityController.mRealmContactTransactions = Mockito.mock(RealmContactTransactions. class);
+        Mockito.when(this.mDashBoardActivityController.mRealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockGroupChat());
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getUserProfile(any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockUserProfile());
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockContactById(mockContactId_1));
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockContactById(mockContactId_2));
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockRecentContactsList());
+
+
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
+        Thread.sleep(5000);
+
+        View mView = this.mDashBoardActivityController.mRecentContainer.getChildAt(0);
+        LinearLayout lay_main_container = (LinearLayout) mView.findViewById(R.id.recent_content);
+        boolean isClicked = lay_main_container.performClick();
+
+        ShadowActivity shadowActivity = shadowOf(this.mActivity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = shadowOf(startedIntent);
+
+        Assert.assertTrue(isClicked);
+        Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
+        Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts != 0);
+        Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 2);
+        assertThat(shadowIntent.getComponent().getClassName(), equalTo(GroupChatActivity.class.getName()));
+    }
+
+    @Test
+    public void testLoadRecent_FailWithNullData() throws Exception
+    {
+
+        String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
+        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+        this.mDashBoardActivityController.mRealmContactTransactions = Mockito.mock(RealmContactTransactions. class);
+        Mockito.when(this.mDashBoardActivityController.mRealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+                .thenReturn(null);
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getUserProfile(any(Realm.class)))
+                .thenReturn(null);
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+                .thenReturn(null);
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+                .thenReturn(null);
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+                .thenReturn(null);
+
+
+        this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
+        Thread.sleep(5000);
+
+        Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
+    }
+
+    @Test
+    public void testLoadRecent_FailWithWrongNotNullData() throws Exception
+    {
+
+        String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
+        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+        this.mDashBoardActivityController.mRealmContactTransactions = Mockito.mock(RealmContactTransactions. class);
+        Mockito.when(this.mDashBoardActivityController.mRealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockGroupChat_WithWrongData());
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getUserProfile(any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockUserProfile());
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockContactById(mockContactId_1));
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockContactById(mockContactId_2));
+        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockRecentContactsList_WithWrongData());
+
+
+        this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
+        Thread.sleep(5000);
+
+        Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts != 0);
     }
 
     private void mockParams()
     {
-        this.mDashBoardActivityController.mRealmNewsTransactions = Mockito.mock(RealmNewsTransactions.class);
-        Mockito.when(this.mDashBoardActivityController.mRealmNewsTransactions.getAllNews(any(Realm.class))).thenReturn(getMockNewsArrayList());
-
-        this.mDashBoardActivityController.mRealmContactTransactions = Mockito.mock(RealmContactTransactions.class);
-        Mockito.when(this.mDashBoardActivityController.mRealmContactTransactions.getAllRecentContacts(any(Realm.class))).thenReturn(getMockRecentContactsList());
+        Downloader downloader = new OkHttpDownloader(mActivity.getApplicationContext(), Long.MAX_VALUE);
+        Picasso.Builder builder = new Picasso.Builder(mActivity.getApplicationContext());
+        builder.downloader(downloader);
+        MycommsApp.picasso = builder.build();
     }
 
-    private ArrayList<News> getMockNewsArrayList()
-    {
-        News mockNews = new News();
-        ArrayList<News> mockNewsArrayList = new ArrayList<>();
-        mockNews.setAuthor_avatar("mockAvatar");
-        mockNews.setAuthor_name("mockName");
-        mockNews.setCreated_at(Long.parseLong("12345678"));
-        mockNews.setHtml("mockHtml");
-        mockNews.setImage("mockURL");
-        mockNews.setLink("mockLink");
-        mockNews.setTitle("mockTitle");
-        mockNews.setUpdated_at(Long.parseLong("123456789"));
-        mockNews.setUuid("mockUID");
 
-        mockNewsArrayList.add(mockNews);
-        mockNews = new News();
-        mockNews.setAuthor_avatar("mockAvatar2");
-        mockNews.setAuthor_name("mockName2");
-        mockNews.setCreated_at(Long.parseLong("12345678"));
-        mockNews.setHtml("mockHtml2");
-        mockNews.setImage("mockURL2");
-        mockNews.setLink("mockLink2");
-        mockNews.setTitle("mockTitle2");
-        mockNews.setUpdated_at(Long.parseLong("123456789"));
-        mockNews.setUuid("mockUID2");
-
-        mockNewsArrayList.add(mockNews);
-        mockNews = new News();
-        mockNews.setAuthor_avatar("mockAvatar3");
-        mockNews.setAuthor_name("mockName3");
-        mockNews.setCreated_at(Long.parseLong("12345678"));
-        mockNews.setHtml("mockHtml3");
-        mockNews.setImage("mockURL3");
-        mockNews.setLink("mockLink3");
-        mockNews.setTitle("mockTitle3");
-        mockNews.setUpdated_at(Long.parseLong("123456789"));
-        mockNews.setUuid("mockUID3");
-
-        mockNewsArrayList.add(mockNews);
-
-        return mockNewsArrayList;
-    }
-
-    private ArrayList<RecentContact> getMockRecentContactsList()
-    {
-        ArrayList<RecentContact> recentList = new ArrayList<>();
-        RecentContact mockRecentContact = new RecentContact();
-
-        mockRecentContact.setContactId("mc_55409316799f7e1a109446f4");
-        mockRecentContact.setId("mc_55409316799f7e1a109446f4");
-        mockRecentContact.setAction("sms");
-        mockRecentContact.setPlatform("mc");
-        mockRecentContact.setFirstName("Albert");
-        mockRecentContact.setLastName("Mialet");
-        mockRecentContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
-        mockRecentContact.setPhones("{\"phones\": [\n" +
-                "{\n" +
-                "\"country\": \"ES\",\n" +
-                "\"phone\": \"+34659562976\"\n" +
-                "}\n" +
-                "]}");
-        mockRecentContact.setEmails("{\"emails\": [\n" +
-                "{\n" +
-                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
-                "}\n" +
-                "]}");
-        mockRecentContact.setCompany("Stratesys");
-        mockRecentContact.setPosition("Senior Developer Consultant");
-        mockRecentContact.setOfficeLocation("Barcelona");
-        mockRecentContact.setTimezone("Europe/Madrid");
-        mockRecentContact.setAvailability("DADFE1");
-        mockRecentContact.setTimestamp(Long.parseLong("1440658545874"));
-
-        recentList.add(mockRecentContact);
-        mockRecentContact = new RecentContact();
-
-        mockRecentContact.setContactId("mg_55dc2a35a297b90a726e4cc2");
-        mockRecentContact.setId("mg_55dc2a35a297b90a726e4cc2");
-        mockRecentContact.setUniqueId("unique_mg_55dc2a35a297b90a726e4cc2");
-        mockRecentContact.setAction("sms");
-        mockRecentContact.setTimestamp(Long.parseLong("1440571515241"));
-        mockRecentContact.setAvailability("available");
-
-        recentList.add(mockRecentContact);
-
-        return recentList;
-    }
 }

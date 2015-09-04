@@ -8,6 +8,7 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.ClearableEditText;
@@ -102,5 +103,19 @@ public class SignupPassActivity extends MainActivity {
     private void saveData ()
     {
         UserProfile.setPassword(mPassword.getText().toString());
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

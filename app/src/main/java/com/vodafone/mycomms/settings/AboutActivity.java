@@ -6,6 +6,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.SplashScreenActivity;
@@ -63,4 +64,17 @@ public class AboutActivity  extends ToolbarActivity {
         XMPPTransactions.disconnectMsgServerSession();
     }
 
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
+    }
 }

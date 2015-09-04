@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.ContactsController;
@@ -681,5 +682,19 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     {
         if(null!= this.contact.getStringField1())
             this.SF_URL = this.contact.getStringField1();
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

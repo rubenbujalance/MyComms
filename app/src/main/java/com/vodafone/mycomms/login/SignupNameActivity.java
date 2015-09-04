@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
@@ -265,5 +266,18 @@ public class SignupNameActivity extends MainActivity {
         UserProfile.setPhotoPath(photoPath);
     }
 
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
+    }
 
 }

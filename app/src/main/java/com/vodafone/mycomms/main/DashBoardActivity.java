@@ -29,9 +29,6 @@ import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
-import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
-import com.vodafone.mycomms.realm.RealmNewsTransactions;
-import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.NotificationMessages;
 import com.vodafone.mycomms.util.ToolbarActivity;
@@ -42,8 +39,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -180,11 +175,6 @@ public class DashBoardActivity extends ToolbarActivity
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
         Log.i(Constants.TAG, "DashBoardActivity.onPause: ");
@@ -266,5 +256,19 @@ public class DashBoardActivity extends ToolbarActivity
     {
         Log.i(Constants.TAG, "DashBoardActivity.onGlobalContactsAddedEvent: ");
         recentContactController.getRecentList();
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

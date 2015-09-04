@@ -23,7 +23,6 @@ import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.MainActivity;
-import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
@@ -298,5 +297,19 @@ public class OAuthActivity extends MainActivity {
             }
 
         });
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

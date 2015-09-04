@@ -404,4 +404,18 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
             lay_no_connection.setVisibility(View.GONE);
         }
     }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
+    }
 }

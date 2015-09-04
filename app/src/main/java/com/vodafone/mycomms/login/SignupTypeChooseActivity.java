@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.main.connection.MainAppCompatActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
@@ -58,5 +59,19 @@ public class SignupTypeChooseActivity extends MainAppCompatActivity {
                 finish();
             }
         });
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

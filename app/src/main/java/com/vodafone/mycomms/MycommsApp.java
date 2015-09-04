@@ -1,7 +1,10 @@
 package com.vodafone.mycomms;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
@@ -43,6 +46,7 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.TimeZone;
 
@@ -79,6 +83,17 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     //Network listener
     private NetworkEvents networkEvents;
     private Realm realm;
+
+    //Idle listeners
+    private int lastInteractionTime;
+    private Boolean isScreenOff = false;
+
+    //Activity counter
+    private static int stateCounter;
+    private boolean countdownOn = false;
+    private long startTime = 0;
+    private long currentTime = 0;
+
 
     @Override
     public void onCreate() {
@@ -162,6 +177,12 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
             Log.e(Constants.TAG, "MycommsApp.onCreate: ",ex);
             Crashlytics.logException(ex);
         }
+
+        startUserInactivityDetectThread(); // start the thread to detect inactivity
+        new ScreenReceiver();  // creating receive SCREEN_OFF and SCREEN_ON broadcast msgs from the device.
+
+        //Variable that counts how many activities are open
+        stateCounter = 0;
     }
 
     @Override
@@ -541,4 +562,91 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 Log.e(Constants.TAG, "sendAvatar.onPostExecute: ERROR -> response is null");
         }
     }
+
+    public void startUserInactivityDetectThread() {
+        new Thread(new Runnable() {
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(15000); // checks every 15sec for inactivity
+
+                        if (countdownOn && !isScreenOff && !isApplicationOnBackground()) {
+                            Log.e(Constants.TAG, "MycommsApp.onTick: INTERACTION!!!");
+                            countdownOn = false;
+                        }
+                        if (!countdownOn && (isScreenOff || isApplicationOnBackground())) {
+                            Log.e(Constants.TAG, "MycommsApp.run: Starting CountDown");
+                            Log.e(Constants.TAG, "MycommsApp.onTick: NO INTERACTION!!!");
+                            countdownOn = true;
+                            startTime = Calendar.getInstance().getTimeInMillis();
+                        }
+                        if (countdownOn && (isScreenOff || isApplicationOnBackground())) {
+                            currentTime = Calendar.getInstance().getTimeInMillis();
+                            if ((currentTime - startTime)>Constants.IDLE_TIME){
+                                //Time to shut down services
+                                Log.e(Constants.TAG, "MycommsApp.run: TIME OUT!!!");
+                            }
+                        }
+
+                    } catch (InterruptedException e) {
+                        Log.e(Constants.TAG, "MyCommsApp.run: e ", e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public long getLastInteractionTime() {
+        return lastInteractionTime;
+    }
+
+    public void setLastInteractionTime(int lastInteraction) {
+        lastInteractionTime = lastInteraction;
+    }
+
+    private class ScreenReceiver extends BroadcastReceiver {
+
+        protected ScreenReceiver() {
+            // register receiver that handles screen on and screen off logic
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_SCREEN_ON);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
+            registerReceiver(this, filter);
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                Log.e(Constants.TAG, "MyCommsApp ScreenReceiver.onReceive: SCREEN OFF");
+                isScreenOff = true;
+            } else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                Log.e(Constants.TAG, "MyCommsApp ScreenReceiver.onReceive: SCREEN ON");
+                isScreenOff = false;
+            }
+        }
+    }
+
+    /**
+     * @return true if application is on background
+     * */
+    public static boolean isApplicationOnBackground()
+    {
+        return stateCounter == 0;
+    }
+
+    //to be called on each Activity onStart()
+    public static void activityStarted()
+    {
+        stateCounter++;
+        Log.e(Constants.TAG, "MycommsApp.activityStarted: ACTIVITIES OPEN " + stateCounter );
+    }
+
+    //to be called on each Activity onStop()
+    public static void activityStopped()
+    {
+        stateCounter--;
+        Log.e(Constants.TAG, "MycommsApp.activityStopped: ACTIVITES CLOSED " + stateCounter);
+    }
+
+
 }

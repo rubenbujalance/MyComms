@@ -8,11 +8,11 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.main.MainActivity;
-import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
@@ -60,5 +60,19 @@ public class LoginSignupActivity extends MainActivity {
         Log.i(Constants.TAG, "LoginSignupActivity.onOKHttpErrorReceived: ");
         String errorMessage = event.getErrorMessage();
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

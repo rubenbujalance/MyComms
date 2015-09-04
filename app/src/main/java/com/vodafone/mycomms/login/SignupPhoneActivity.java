@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
 import com.crashlytics.android.Crashlytics;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
@@ -237,7 +238,7 @@ public class SignupPhoneActivity extends MainActivity {
         HashMap<String, Object> body =
                 UserProfile.getHashMap();
 
-        new CheckProfileApi().execute(body, new HashMap<String,Object>());
+        new CheckProfileApi().execute(body, new HashMap<String, Object>());
     }
 
     private void callBackPhoneCheck(HashMap<String, Object> result)
@@ -310,5 +311,19 @@ public class SignupPhoneActivity extends MainActivity {
             if(null != result)
                 callBackPhoneCheck(result);
         }
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

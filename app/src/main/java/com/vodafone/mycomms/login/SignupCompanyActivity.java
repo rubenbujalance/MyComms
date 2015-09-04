@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
 
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
@@ -195,5 +196,19 @@ public class SignupCompanyActivity extends MainActivity {
         UserProfile.setCompanyName(mCompany.getText().toString());
         UserProfile.setPosition(mPosition.getText().toString());
         UserProfile.setOfficeLocation(mOfficeLoc.getText().toString());
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

@@ -65,6 +65,10 @@ public class DashBoardActivityController
     public ArrayList<News> newsArrayList;
     public RealmNewsTransactions mRealmNewsTransactions;
     public RealmGroupChatTransactions mRealmGroupChatTransactions;
+    public RealmChatTransactions chatTx;
+
+    public RealmGroupChatTransactions mRealmGroupChatTransactionsRecents;
+    public RealmChatTransactions mRealmChatTransactionsRecents;
 
     public DashBoardActivityController
             (
@@ -87,6 +91,7 @@ public class DashBoardActivityController
         this.mRecentContainer2 = (LinearLayout) mActivity.findViewById(R.id.list_recents_2);
         this.newsArrayList = new ArrayList<>();
         this.mRealmGroupChatTransactions = new RealmGroupChatTransactions(mActivity, mProfileId);
+        this.chatTx = new RealmChatTransactions(mActivity);
     }
 
     public void loadRecents(LinearLayout currentRecentContainer)
@@ -350,11 +355,6 @@ public class DashBoardActivityController
                             }
                             catch (Exception e)
                             {
-                                final StringWriter sw = new StringWriter();
-                                final PrintWriter pw = new PrintWriter(sw, true);
-                                e.printStackTrace(pw);
-
-                                System.err.println("******** DrawSingleRecentAsyncTask.onPostExecute ********\n"+sw.getBuffer().toString());
                                 Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onPostExecute: ",e);
                                 Crashlytics.logException(e);
                             }
@@ -366,28 +366,22 @@ public class DashBoardActivityController
                         lay_main_container.setVisibility(View.VISIBLE);
                     }
 
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run()
-                        {
-                            LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
-                            btRecents.setOnClickListener(new View.OnClickListener() {
-                                public void onClick(View v) {
-                                    try {
-                                        if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
-                                            Intent in = new Intent(mActivity, GroupChatActivity.class);
-                                            in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
-                                            in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
-                                            in.putExtra(Constants.IS_GROUP_CHAT, true);
-                                            mActivity.startActivity(in);
-                                        }
-
-                                    } catch (Exception e) {
-                                        Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecentItemClick: ", e);
-                                        Crashlytics.logException(e);
-                                    }
+                    LinearLayout btRecents = (LinearLayout) childRecents.findViewById(R.id.recent_content);
+                    btRecents.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            try {
+                                if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
+                                    Intent in = new Intent(mActivity, GroupChatActivity.class);
+                                    in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
+                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                    in.putExtra(Constants.IS_GROUP_CHAT, true);
+                                    mActivity.startActivity(in);
                                 }
-                            });
+
+                            } catch (Exception e) {
+                                Log.e(Constants.TAG, "DrawSingleRecentAsyncTask.onRecentItemClick: ", e);
+                                Crashlytics.logException(e);
+                            }
                         }
                     });
 
@@ -495,8 +489,7 @@ public class DashBoardActivityController
                                 String strPhones = phones;
                                 if (strPhones != null) {
                                     String phone = strPhones;
-                                    if (!platform.equals(Constants
-                                            .PLATFORM_LOCAL)) {
+                                    if (!platform.equals(Constants.PLATFORM_LOCAL)) {
                                         JSONArray jPhones = new JSONArray(strPhones);
                                         phone = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONE);
                                     }
@@ -582,14 +575,16 @@ public class DashBoardActivityController
 
     public void loadUnreadMessages(LinearLayout recentsContainer)
     {
-        RealmChatTransactions chatTx = new RealmChatTransactions(mActivity);
-        RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(mActivity, mProfileId);
+
         long pendingMsgsCount;
         String action;
         View view;
         TextView unread_messages;
         ImageView typeRecent;
         RecentContact contact;
+
+        this.mRealmGroupChatTransactionsRecents = new RealmGroupChatTransactions(this.mActivity, this.mProfileId);
+        this.mRealmChatTransactionsRecents = new RealmChatTransactions(this.mActivity);
 
         for(int i = 0; i < recentsContainer.getChildCount(); i++)
         {
@@ -600,12 +595,12 @@ public class DashBoardActivityController
 
             if(contact.getContactId().startsWith("mg_"))
             {
-                pendingMsgsCount = groupChatTx.getGroupChatPendingMessagesCount(contact.getContactId(), mRealm);
+                pendingMsgsCount = mRealmGroupChatTransactionsRecents.getGroupChatPendingMessagesCount(contact.getContactId(), mRealm);
                 action = "sms";
             }
             else
             {
-                pendingMsgsCount = chatTx.getChatPendingMessagesCount(contact.getContactId(), mRealm);
+                pendingMsgsCount = mRealmChatTransactionsRecents.getChatPendingMessagesCount(contact.getContactId(), mRealm);
                 action = contact.getAction();
             }
 

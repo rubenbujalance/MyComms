@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
@@ -212,7 +213,7 @@ public class AddGlobalContactsActivity extends MainActivity {
             public void run() {
                 tvError.setText(message);
                 layoutErrorBar.setVisibility(View.VISIBLE);
-                if(code == 400)
+                if (code == 400)
                     setCredentialsTextColor(true);
             }
         });
@@ -230,5 +231,19 @@ public class AddGlobalContactsActivity extends MainActivity {
             etEmail.setTextColor(getResources().getColor(R.color.contact_soft_black));
             etPassword.setTextColor(getResources().getColor(R.color.contact_soft_black));
         }
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

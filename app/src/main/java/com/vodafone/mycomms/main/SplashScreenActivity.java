@@ -530,5 +530,17 @@ public class SplashScreenActivity extends MainActivity {
         makeText(this, errorMessage, Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
 
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
+    }
 }

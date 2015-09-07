@@ -11,13 +11,13 @@ import android.widget.TextView;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.SplashScreenActivity;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
@@ -234,11 +234,9 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
                 try {
                     String strEmails = contactDetailInfo[3];
 
-                    if (strEmails != null)
-                    {
+                    if (strEmails != null) {
                         String email = strEmails;
-                        if(!platform.equals(Constants.PLATFORM_LOCAL))
-                        {
+                        if (!platform.equals(Constants.PLATFORM_LOCAL)) {
                             JSONArray jPhones = new JSONArray(strEmails);
                             email = (String) ((JSONObject) jPhones.get(0)).get(Constants.CONTACT_EMAIL);
                         }
@@ -258,13 +256,11 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
                 try {
                     String strPhones = contactDetailInfo[2];
 
-                    if (strPhones != null)
-                    {
+                    if (strPhones != null) {
                         String phone = strPhones;
-                        if(!platform.equals(Constants.PLATFORM_LOCAL))
-                        {
+                        if (!platform.equals(Constants.PLATFORM_LOCAL)) {
                             JSONArray jPhones = new JSONArray(strPhones);
-                            phone = (String)((JSONObject)jPhones.get(0)).get(Constants
+                            phone = (String) ((JSONObject) jPhones.get(0)).get(Constants
                                     .CONTACT_PHONE);
                         }
 
@@ -299,5 +295,19 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
             layNoConnection.setVisibility(View.VISIBLE);
         else
             layNoConnection.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

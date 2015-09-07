@@ -6,13 +6,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
-import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 public class AboutActivity  extends ToolbarActivity {
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
@@ -58,9 +58,19 @@ public class AboutActivity  extends ToolbarActivity {
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-
-        // Disconnect from the XMPP server
-        XMPPTransactions.disconnectMsgServerSession();
     }
 
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
+    }
 }

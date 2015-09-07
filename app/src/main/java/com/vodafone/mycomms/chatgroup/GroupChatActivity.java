@@ -37,6 +37,7 @@ import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.otto.Subscribe;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.view.ChatRecyclerViewAdapter;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
@@ -1100,5 +1101,18 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             lay_no_connection.setVisibility(View.GONE);
             setSendEnabled(true);
         }
+    }
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

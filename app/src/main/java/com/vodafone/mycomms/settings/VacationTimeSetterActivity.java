@@ -13,6 +13,7 @@ import android.widget.DatePicker;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.connection.IConnectionCallback;
 import com.vodafone.mycomms.main.SplashScreenActivity;
@@ -198,5 +199,19 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        MycommsApp.activityStarted();
+    }
+
+    @Override
+    public void onStop()
+    {
+        MycommsApp.activityStopped();
+        super.onStop();
     }
 }

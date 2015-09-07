@@ -30,7 +30,6 @@ import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.NotificationMessages;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
@@ -50,6 +49,7 @@ public class DashBoardActivity extends ToolbarActivity
     public LinearLayout lay_no_connection;
     public DashBoardActivityController mDashBoardActivityController;
     public Realm realm;
+    private String _profileId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,11 +64,14 @@ public class DashBoardActivity extends ToolbarActivity
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        boolean isLocalContactsLoadingNeeded = sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false);
+        boolean isLocalContactsLoadingNeeded =
+                sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false);
         this.realm = Realm.getDefaultInstance();
 
-        String _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(_profileId);
+        _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
+        RealmContactTransactions realmContactTransactions =
+                new RealmContactTransactions(_profileId);
         recentContactController = new RecentContactController(this, _profileId);
 
         BusProvider.getInstance().register(this);
@@ -157,8 +160,6 @@ public class DashBoardActivity extends ToolbarActivity
         });
     }
 
-
-
     //Prevent of going from main screen back to login
     @Override
     public void onBackPressed() {
@@ -178,8 +179,6 @@ public class DashBoardActivity extends ToolbarActivity
     protected void onPause() {
         super.onPause();
         Log.i(Constants.TAG, "DashBoardActivity.onPause: ");
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -190,8 +189,14 @@ public class DashBoardActivity extends ToolbarActivity
         checkUnreadChatMessages();
         mDashBoardActivityController.loadRecentContactsAndUnreadMessages();
         mDashBoardActivityController.loadNews();
-        //Reset notifications inbox
-        NotificationMessages.resetInboxMessages();
+
+        //RBM - If splashScreen decided it has to go to chat
+        Intent in = getIntent();
+        Intent chatIntent = in.getParcelableExtra(Constants.GO_TO_CHAT_INTENT_KEY);
+        if(chatIntent!=null) {
+            in.removeExtra(Constants.GO_TO_CHAT_INTENT_KEY);
+            startActivity(chatIntent);
+        }
     }
 
     @Subscribe

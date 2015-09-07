@@ -6,15 +6,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.MainActivity;
+import com.vodafone.mycomms.main.SplashScreenActivity;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by str_oan on 24/07/2015.
@@ -29,7 +29,7 @@ public final class NotificationMessages extends MainActivity
     public static final int INBOX_LENGTH = 5;
     public static ArrayList<String> inboxMessages;
 
-    private static void createNotificationMessagesInstance(Context context)
+    private static void createNotificationMessagesInstance(Context context, Bundle data)
     {
 
         mNotificationManager =
@@ -42,9 +42,10 @@ public final class NotificationMessages extends MainActivity
                                 context.getResources(), R.mipmap.ic_launcher))
                         .setContentTitle(context.getString(R.string.app_name));
 
-        Intent resultIntent = new Intent(context, DashBoardActivity.class);
+        Intent resultIntent = new Intent(context, SplashScreenActivity.class);
+        resultIntent.putExtra(Constants.NOTIFICATION_EXTRA_KEY, data);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(DashBoardActivity.class);
+        stackBuilder.addParentStack(SplashScreenActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         resultPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
@@ -52,13 +53,12 @@ public final class NotificationMessages extends MainActivity
         inboxMessages = new ArrayList<>();
     }
 
-
-    public static void sendMessage(String message, Context context)
+    public static void sendMessage(Bundle data, Context context)
     {
-        if(null == mNotificationManager)
-            createNotificationMessagesInstance(context);
+        String message = data.getString("message");
 
-        long timestamp = Calendar.getInstance().getTimeInMillis();
+        if(null == mNotificationManager)
+            createNotificationMessagesInstance(context, data);
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
         inboxStyle.setBigContentTitle(context.getString(R.string.new_unread_messages));
@@ -91,8 +91,12 @@ public final class NotificationMessages extends MainActivity
         }
     }
 
-    public static void resetInboxMessages() {
-        inboxMessages = new ArrayList<>();
-    }
+    public static void resetInboxMessages(Context context) {
+        if(mNotificationManager != null)
+            mNotificationManager.cancel(notificationId);
 
+        inboxMessages = new ArrayList<>();
+
+        mNotificationManager = null;
+    }
 }

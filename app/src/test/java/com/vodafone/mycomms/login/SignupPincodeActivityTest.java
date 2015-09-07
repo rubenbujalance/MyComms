@@ -1,8 +1,14 @@
 package com.vodafone.mycomms.login;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -10,6 +16,7 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 
@@ -22,12 +29,12 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowInputMethodManager;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
 import static com.vodafone.mycomms.constants.Constants.CHECK_PHONE_OK_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
-import static com.vodafone.mycomms.constants.Constants.USER_PHONE_NOT_VERIFIED_RESPONSE;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -42,12 +49,18 @@ public class SignupPincodeActivityTest {
     Button btResendPin;
     ImageView ivBtFwd;
     ImageView ivBtBack;
+    TextView tvPin1;
+    TextView tvPin2;
+    TextView tvPin3;
+    TextView tvPin4;
+
     View lnPin1;
+    View lnPin2;
+    View lnPin3;
+    View lnPin4;
 
     @Before
     public void setUp() throws Exception {
-        HttpResponse httpResponse = Util.buildResponse(200, USER_PHONE_NOT_VERIFIED_RESPONSE);
-        FakeHttp.addPendingHttpResponse(httpResponse);
         activity = Robolectric.setupActivity(SignupPincodeActivity.class);
         Shadows.shadowOf(activity).getNextStartedActivity();
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
@@ -56,6 +69,14 @@ public class SignupPincodeActivityTest {
         tvPinPhoneNumber = activity.tvPinPhoneNumber;
         btResendPin = activity.btResendPin;
         lnPin1 = activity.lnPin1;
+        lnPin2 = activity.lnPin2;
+        lnPin3 = activity.lnPin3;
+        lnPin4 = activity.lnPin4;
+
+        tvPin1 = activity.tvPin1;
+        tvPin2 = activity.tvPin2;
+        tvPin3 = activity.tvPin3;
+        tvPin4 = activity.tvPin4;
     }
 
     @Test
@@ -99,7 +120,116 @@ public class SignupPincodeActivityTest {
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
-        //Assert.assertTrue(lnPin1.getBackground());
+        Assert.assertTrue(lnPin1.getBackground().equals(activity.getResources().getDrawable(android.R.color.holo_red_dark)));
+    }
+
+    @Test
+    public void testSendPinCodeText() throws Exception {
+        HttpResponse httpResponse = Util.buildResponse(200, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
+        FakeHttp.addPendingHttpResponse(httpResponse);
+
+        etPin.setText("1");
+        Assert.assertTrue(activity.nextPinPos == 2);
+        Assert.assertTrue(tvPin1.getText().equals("1"));
+
+        etPin.setText("12");
+        Assert.assertTrue(activity.nextPinPos == 3);
+        Assert.assertTrue(tvPin1.getText().equals("1"));
+        Assert.assertTrue(tvPin2.getText().equals("2"));
+
+        etPin.setText("123");
+        Assert.assertTrue(activity.nextPinPos == 4);
+        Assert.assertTrue(tvPin1.getText().equals("1"));
+        Assert.assertTrue(tvPin2.getText().equals("2"));
+        Assert.assertTrue(tvPin3.getText().equals("3"));
+
+        etPin.setText("1234");
+        Assert.assertTrue(activity.nextPinPos == 1);
+        Assert.assertTrue(tvPin1.getText().equals("1"));
+        Assert.assertTrue(tvPin2.getText().equals("2"));
+        Assert.assertTrue(tvPin3.getText().equals("3"));
+        Assert.assertTrue(tvPin4.getText().equals("4"));
+
+        //Test of Reset after writing 4 pin code
+        tvPin1.setText("1");
+        tvPin2.setText("2");
+        etPin.setText("9");
+        Assert.assertTrue(tvPin1.getCurrentTextColor() == Color.WHITE);
+        Assert.assertTrue(lnPin1.getBackground().equals(activity.getResources().getDrawable(android.R.color.white)));
+        Assert.assertTrue(activity.nextPinPos == 2);
+        Assert.assertTrue(tvPin1.getText().equals("9"));
+        Assert.assertTrue(tvPin2.getText().equals("  "));
+        Assert.assertTrue(tvPin3.getText().equals("  "));
+        Assert.assertTrue(tvPin4.getText().equals("  "));
+    }
+
+    @Test
+    public void testResendPin() throws Exception {
+        HttpResponse httpResponse = Util.buildResponse(200, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
+        FakeHttp.addPendingHttpResponse(httpResponse);
+        btResendPin.performClick();
+        Intent expectedIntent = new Intent(activity, MailSentActivity.class);
+        expectedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        expectedIntent.putExtra("pin", activity.pin);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (MailSentActivity.class.getName()));
+    }
+
+    @Test
+    public void testShowKeyboard() throws Exception {
+        InputMethodManager inputManager = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        ShadowInputMethodManager shadowInputMethodManager = Shadows.shadowOf(inputManager);
+
+        tvPin1.performClick();
+        Thread.sleep(500);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+        lnPin1.performClick();
+        Thread.sleep(500);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+
+        tvPin2.performClick();
+        Thread.sleep(500);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+        lnPin2.performClick();
+        Thread.sleep(500);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+
+        tvPin3.performClick();
+        Thread.sleep(500);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+        lnPin3.performClick();
+        Thread.sleep(500);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+
+        tvPin4.performClick();
+        Thread.sleep(500);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+        lnPin4.performClick();
+        Thread.sleep(500);
+        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+    }
+
+    @Test
+    public void testSendPincodeOK() throws Exception {
+        HttpResponse httpResponse = Util.buildResponse(201, LOGIN_OK_RESPONSE);
+        FakeHttp.addPendingHttpResponse(httpResponse);
+        etPin.setText("1");
+        etPin.setText("12");
+        etPin.setText("123");
+        etPin.setText("1234");
+        Intent expectedIntent = new Intent(activity, SplashScreenActivity.class);
+        expectedIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SplashScreenActivity.class.getName()));
     }
 
     @Test
@@ -107,6 +237,13 @@ public class SignupPincodeActivityTest {
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
         Assert.assertTrue(activity.isFinishing());
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testFinish() throws Exception {
+        Activity activity = Robolectric.buildActivity(SignupPincodeActivity.class).create().start().resume().pause().stop().destroy().get();
+        Assert.assertTrue(activity.isDestroyed());
     }
 
 }

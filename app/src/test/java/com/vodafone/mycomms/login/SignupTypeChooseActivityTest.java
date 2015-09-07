@@ -1,7 +1,9 @@
 package com.vodafone.mycomms.login;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -56,6 +58,13 @@ public class SignupTypeChooseActivityTest {
     public void testBack() throws Exception {
         mBack.performClick();
         Assert.assertTrue(activity.isFinishing());
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testFinish() throws Exception {
+        Activity activity = Robolectric.buildActivity(SignupTypeChooseActivity.class).create().start().resume().pause().stop().destroy().get();
+        Assert.assertTrue(activity.isDestroyed());
     }
 
 }

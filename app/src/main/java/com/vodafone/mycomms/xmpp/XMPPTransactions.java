@@ -19,6 +19,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
@@ -1046,6 +1047,9 @@ public final class XMPPTransactions {
                                 }
 
                                 groupTx.insertOrUpdateGroupChat(chat, realm);
+
+                                //Notify app about new group chat created
+                                BusProvider.getInstance().post(new GroupChatCreatedEvent());
 
                             } catch (JSONException e) {
                                 Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onConnectionComplete: ", e);

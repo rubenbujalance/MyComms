@@ -320,5 +320,5 @@ public class Constants {
     public static final String DASH_BOARD_ACTIVITY = "DashBoardActivity";
     public static final String MY_COMMS_APP = "MycommsApp";
 
-    public static final int IDLE_TIME = 900000;//90 seconds
+    public static final int IDLE_TIME = 90000;//90 seconds
 }

@@ -338,7 +338,7 @@ public class MockDataForTests
         //Contact 1
         mockContact.setContactId("mc_55d28046bfcac49d64d9d6af");
         mockContact.setId("mc_55d28046bfcac49d64d9d6af");
-        mockContact.setPlatform("mc");
+        mockContact.setPlatform("sf");
         mockContact.setFirstName("Albert");
         mockContact.setLastName("Mialet");
         mockContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
@@ -350,7 +350,7 @@ public class MockDataForTests
                 "]");
         mockContact.setEmails("[\n" +
                 "{\n" +
-                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "\"email\": \"vdf01@vodafone.com\"\n" +
                 "}\n" +
                 "]");
         mockContact.setCompany("Stratesys");
@@ -366,7 +366,7 @@ public class MockDataForTests
         //Contact 2
         mockContact.setContactId("mc_554b20fc80eb511a3c1d1262");
         mockContact.setId("mc_554b20fc80eb511a3c1d1262");
-        mockContact.setPlatform("mc");
+        mockContact.setPlatform("ly");
         mockContact.setFirstName("Albert");
         mockContact.setLastName("Mialet");
         mockContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
@@ -394,7 +394,7 @@ public class MockDataForTests
         //Contact 3
         mockContact.setContactId("mc_55361a9cc729d4430b9722f3");
         mockContact.setId("mc_55361a9cc729d4430b9722f3");
-        mockContact.setPlatform("mc");
+        mockContact.setPlatform("local");
         mockContact.setFirstName("Albert");
         mockContact.setLastName("Mialet");
         mockContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");

@@ -359,7 +359,7 @@ public class SearchBarController {
         });
     }
 
-    private void loadAllContactsFromLDAP(final String apiCall, final String keyWord,
+    public void loadAllContactsFromLDAP(final String apiCall, final String keyWord,
                                          final boolean retrying, final String user,
                                          final String password)
     {
@@ -473,10 +473,9 @@ public class SearchBarController {
      * @author str_rbm
      * @param keyWord (String) -> key word for make search;
      */
-    private String buildRequestForSearchLDAPContacts(String keyWord, Realm realm,
+    public String buildRequestForSearchLDAPContacts(String keyWord, Realm realm,
                                                      GlobalContactsSettings ldapSettings)
     {
-
         if(ldapSettings==null) {
             String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
 
@@ -511,23 +510,7 @@ public class SearchBarController {
         return this.contactList;
     }
 
-    /**
-     * Sorts list of contacts by First Name + Last Name alphabetically
-     * @param contactList (List<Contact>) -> list which will be sorted
-     */
-    private void sortContacts(List<Contact> contactList)
-    {
-        Collections.sort(contactList, new Comparator<Contact>() {
-            @Override
-            public int compare(Contact lhs, Contact rhs) {
-                String name1 = lhs.getFirstName() + lhs.getLastName();
-                String name2 = rhs.getFirstName() + rhs.getLastName();
-                return name1.compareTo(name2);
-            }
-        });
-    }
-
-    private void validateNoPlatformRecords(ArrayList<Contact> contactList) {
+    public void validateNoPlatformRecords(ArrayList<Contact> contactList) {
         boolean isMyComms = false;
         boolean isSalesForce = false;
         boolean isGlobal = false;
@@ -590,5 +573,10 @@ public class SearchBarController {
         contact.setFirstName(mActivity.getResources().getString(R.string.no_search_records));
 
         return contact;
+    }
+
+    public void setCurrentKeyWord(String currentKeyWord)
+    {
+        this.currentKeyWord = currentKeyWord;
     }
 }

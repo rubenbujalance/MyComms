@@ -40,11 +40,16 @@ public class ContactsController{
     private String mProfileId;
     private Context mContext;
 
+
+
+    private RealmProfileTransactions mRealmProfileTransactions;
+
     public ContactsController(String profileId, Context mContext) {
         this.mProfileId = profileId;
         this.mContext = mContext;
         realmContactTransactions = new RealmContactTransactions(mProfileId);
         realmAvatarTransactions = new RealmAvatarTransactions();
+        mRealmProfileTransactions = new RealmProfileTransactions();
     }
 
     public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
@@ -361,7 +366,6 @@ public class ContactsController{
 
     public String getUserProfileEmails()
     {
-        RealmProfileTransactions mRealmProfileTransactions = new RealmProfileTransactions();
         Realm realm = Realm.getDefaultInstance();
         try
         {
@@ -542,5 +546,13 @@ public class ContactsController{
         builder.show();
     }
 
+
+    public RealmProfileTransactions getRealmProfileTransactions() {
+        return mRealmProfileTransactions;
+    }
+
+    public void setRealmProfileTransactions(RealmProfileTransactions realmProfileTransactions) {
+        mRealmProfileTransactions = realmProfileTransactions;
+    }
 
 }

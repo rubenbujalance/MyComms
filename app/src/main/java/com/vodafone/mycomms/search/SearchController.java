@@ -138,11 +138,6 @@ public class SearchController
         return contact;
     }
 
-    public ArrayList<Contact> getLocalContactsByKeyWord(String keyWord) {
-        Log.d(Constants.TAG, "SearchController.getLocalContactsByKeyWord: ");
-        return internalContactSearch.getLocalContactsByKeyWord(keyWord);
-    }
-
     public ArrayList<Contact> getContactsByKeyWord(String keyWord) {
         Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
         return realmContactTransactions.getContactsByKeyWord(keyWord, realm);
@@ -153,12 +148,6 @@ public class SearchController
         Log.d(Constants.TAG, "SearchController.getContactsByKeyWord: ");
         return realmContactTransactions
                 .getContactsByKeyWordWithoutLocalsAndSalesForce(keyWord, realm);
-    }
-
-    public void storeContactsIntoRealm(ArrayList<Contact> contacts)
-    {
-        Log.d(Constants.TAG, "SearchController.storeContactsIntoRealm: ");
-        realmContactTransactions.insertContactList(contacts, null);
     }
 
     public InternalContactSearch getInternalContactSearch()

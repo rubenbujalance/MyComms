@@ -14,6 +14,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
 import com.vodafone.mycomms.events.BusProvider;
@@ -102,14 +103,15 @@ public final class XMPPTransactions {
 //        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() ||
 //                !_xmppConnection.isConnected() || force) {
 
+        if (!MycommsApp.disconnectedProcess) {
             Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: Connecting");
 
             //Save context and reset connection
-            if(_appContext==null)
+            if (_appContext == null)
                 _appContext = appContext;
 
             //Check profile id exists
-            if(_profile_id==null) {
+            if (_profile_id == null) {
                 //Get profile_id
                 SharedPreferences sp = appContext.getSharedPreferences(
                         Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -117,13 +119,13 @@ public final class XMPPTransactions {
             }
 
             //Device ID
-            if(_device_id==null) {
+            if (_device_id == null) {
                 _device_id = Utils.getDeviceId(_appContext.getContentResolver(),
                         (TelephonyManager) _appContext.getSystemService(Service.TELEPHONY_SERVICE));
             }
 
             //Configuration for the connection
-            if(_xmppConfigBuilder==null) {
+            if (_xmppConfigBuilder == null) {
                 loadConnectionConfig();
             }
 
@@ -134,6 +136,7 @@ public final class XMPPTransactions {
             XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
             xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 //        }
+        }
     }
 
     private static void loadConnectionConfig()
@@ -163,7 +166,7 @@ public final class XMPPTransactions {
                 while(!Thread.interrupted()) {
                     try {
                         Thread.sleep(miliseconds);
-                        if(!_isConnecting && !isPinging) {
+                        if(!_isConnecting && !isPinging && !MycommsApp.disconnectedProcess) {
                             isPinging = true;
                             sendPing();
                             Thread.sleep(2000);
@@ -237,7 +240,9 @@ public final class XMPPTransactions {
     public static boolean disconnectMsgServerSession()
     {
         try {
-            _xmppConnection.disconnect();
+            if (_xmppConnection != null) {
+                _xmppConnection.disconnect();
+            }
 
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: ", e);
@@ -246,6 +251,22 @@ public final class XMPPTransactions {
         }
 
         Log.w(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: XMPP Server DISCONNECTED");
+        return true;
+    }
+
+    public static boolean disconnectPingThreadSession()
+    {
+        try {
+            if (pingThread != null)
+                pingThread.interrupt();
+            pingThread = null;
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "XMPPTransactions.disconnectPingThreadSession: ", e);
+            Crashlytics.logException(e);
+            return false;
+        }
+
+        Log.w(Constants.TAG, "XMPPTransactions.disconnectPingThreadSession: Ping Session DISCONNECTED");
         return true;
     }
 

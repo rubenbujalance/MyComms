@@ -91,6 +91,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     //Activity counter
     private static int stateCounter;
     private boolean countdownOn = false;
+    public static boolean disconnectedProcess = false;
     private long startTime = 0;
     private long currentTime = 0;
 
@@ -571,20 +572,26 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                         Thread.sleep(15000); // checks every 15sec for inactivity
 
                         if (countdownOn && !isScreenOff && !isApplicationOnBackground()) {
-                            Log.e(Constants.TAG, "MycommsApp.onTick: INTERACTION!!!");
+                            Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: Interaction!!!");
                             countdownOn = false;
+                            disconnectedProcess = false;
+                            networkEvents.register();
                         }
                         if (!countdownOn && (isScreenOff || isApplicationOnBackground())) {
-                            Log.e(Constants.TAG, "MycommsApp.run: Starting CountDown");
-                            Log.e(Constants.TAG, "MycommsApp.onTick: NO INTERACTION!!!");
+                            Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: Starting CountDown");
+                            Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: No Interaction!!!");
                             countdownOn = true;
                             startTime = Calendar.getInstance().getTimeInMillis();
                         }
-                        if (countdownOn && (isScreenOff || isApplicationOnBackground())) {
+                        if (countdownOn && !disconnectedProcess && (isScreenOff || isApplicationOnBackground())) {
                             currentTime = Calendar.getInstance().getTimeInMillis();
                             if ((currentTime - startTime)>Constants.IDLE_TIME){
                                 //Time to shut down services
-                                Log.e(Constants.TAG, "MycommsApp.run: TIME OUT!!!");
+                                Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: TIME OUT. Shut down services");
+                                XMPPTransactions.disconnectMsgServerSession();
+                                XMPPTransactions.disconnectPingThreadSession();
+                                networkEvents.unregister();
+                                disconnectedProcess = true;
                             }
                         }
 
@@ -594,14 +601,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                 }
             }
         }).start();
-    }
-
-    public long getLastInteractionTime() {
-        return lastInteractionTime;
-    }
-
-    public void setLastInteractionTime(int lastInteraction) {
-        lastInteractionTime = lastInteraction;
     }
 
     private class ScreenReceiver extends BroadcastReceiver {
@@ -629,23 +628,18 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     /**
      * @return true if application is on background
      * */
-    public static boolean isApplicationOnBackground()
-    {
+    public static boolean isApplicationOnBackground() {
         return stateCounter == 0;
     }
 
     //to be called on each Activity onStart()
-    public static void activityStarted()
-    {
+    public static void activityStarted() {
         stateCounter++;
-        Log.e(Constants.TAG, "MycommsApp.activityStarted: ACTIVITIES OPEN " + stateCounter );
     }
 
     //to be called on each Activity onStop()
-    public static void activityStopped()
-    {
+    public static void activityStopped() {
         stateCounter--;
-        Log.e(Constants.TAG, "MycommsApp.activityStopped: ACTIVITES CLOSED " + stateCounter);
     }
 
 

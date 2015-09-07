@@ -984,7 +984,9 @@ public final class XMPPTransactions {
         }
     }
 
-    private static void downloadAndSaveGroupChat(final String chatMessageId, final String groupId){
+    public static void downloadAndSaveGroupChat(final String chatMessageId, final String groupId){
+        Log.i(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat: ");
+
         OKHttpWrapper.get(Constants.SINGLE_GROUP_CHAT_API + "/" + groupId, _appContext, new OKHttpWrapper.HttpCallback() {
             @Override
             public void onFailure(Response response, IOException e) {
@@ -998,6 +1000,7 @@ public final class XMPPTransactions {
 
             @Override
             public void onSuccess(Response response) {
+                Log.i(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onSuccess:");
                 boolean success = false;
                 Realm realm = Realm.getDefaultInstance();
                 try {

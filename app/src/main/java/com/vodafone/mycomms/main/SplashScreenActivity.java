@@ -27,6 +27,7 @@ import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -38,6 +39,7 @@ import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.SystemUiHider;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.json.JSONObject;
 
@@ -65,6 +67,7 @@ public class SplashScreenActivity extends MainActivity {
     public boolean isAppCrashed;
     public String errorMessage;
     private Realm realm;
+    private String _profileId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +79,14 @@ public class SplashScreenActivity extends MainActivity {
         //Instantiate Realm
         realm = Realm.getDefaultInstance();
 
+        //Profile Id
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
         //Register Otto Bus
         BusProvider.getInstance().register(SplashScreenActivity.this);
+
         getExtras();
         if(isAppCrashed)
             showAlertDialog();
@@ -98,9 +107,8 @@ public class SplashScreenActivity extends MainActivity {
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
             String token = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
-            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
 
-            if(token==null || token.length()==0 || profileId==null || profileId.length()==0)
+            if(token==null || token.length()==0 || _profileId==null || _profileId.length()==0)
                 return false;
 
             Intent intent = getIntent();
@@ -146,7 +154,7 @@ public class SplashScreenActivity extends MainActivity {
                         //Check if chat exists and navigate
                         RealmGroupChatTransactions realmGroupChatTransactions =
                                 new RealmGroupChatTransactions(
-                                        SplashScreenActivity.this, profileId);
+                                        SplashScreenActivity.this, _profileId);
                         GroupChat groupChat =
                                 realmGroupChatTransactions.getGroupChatById(from, realm);
 
@@ -597,12 +605,14 @@ public class SplashScreenActivity extends MainActivity {
 
     private class CheckIfGoToConversation extends AsyncTask<Void, Void, Void> {
         boolean goToConversation;
+        boolean waitToGroupChatDownload;
         Intent intentChat;
         Realm realm;
 
         @Override
         protected Void doInBackground(Void... params) {
             goToConversation = false;
+            waitToGroupChatDownload = false;
             intentChat = null;
             realm = Realm.getDefaultInstance();
 
@@ -673,10 +683,10 @@ public class SplashScreenActivity extends MainActivity {
 
                                     goToConversation = true;
                                 } else {
-                                    intentChat = new Intent(SplashScreenActivity.this, ChatListActivity.class);
-                                    intentChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-
-                                    goToConversation = true;
+                                    XMPPTransactions.downloadAndSaveGroupChat(null, from);
+                                    waitToGroupChatDownload = true;
+//                                    intentChat = new Intent(SplashScreenActivity.this, ChatListActivity.class);
+//                                    intentChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                                 }
                             }
                         }
@@ -694,13 +704,19 @@ public class SplashScreenActivity extends MainActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             if(goToConversation) {
+                Log.i(Constants.TAG, "CheckIfGoToConversation.onPostExecute: GoToConversation");
                 Intent intent = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                 intent.putExtra(Constants.GO_TO_CHAT_INTENT_KEY, intentChat);
                 startActivity(intent);
                 finish();
             }
-            else {
+            else if(!waitToGroupChatDownload){
+                Log.i(Constants.TAG, "CheckIfGoToConversation.onPostExecute: doPostCreateTasks");
                 doOnPostCreateTasks();
+            }
+            else {
+                //In any other case, we will wait to group chat creation response
+                Log.i(Constants.TAG, "CheckIfGoToConversation.onPostExecute: waitToGroupChatDownload");
             }
         }
     }
@@ -736,6 +752,48 @@ public class SplashScreenActivity extends MainActivity {
         Log.i(Constants.TAG, "SplashScreenActivity.onOKHttpErrorReceived: ");
         String errorMessage = event.getErrorMessage();
         makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+    }
+
+    @Subscribe
+    public void onGroupChatCreatedEvent(GroupChatCreatedEvent event) {
+        Log.i(Constants.TAG, "SplashScreenActivity.onGroupChatCreatedEvent: " +
+                "Id-"+event.getGroupId()+"; Success-"+event.isSuccess());
+
+        final String groupId = event.getGroupId();
+        final boolean success = event.isSuccess();
+
+        if(!success) {
+            //If failed, go to chat list
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intentChat = new Intent(SplashScreenActivity.this, ChatListActivity.class);
+                    intentChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                    Intent intent = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
+                    intent.putExtra(Constants.GO_TO_CHAT_INTENT_KEY, intentChat);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }
+        else {
+            //If success, go to group chat
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
+                    intentChat.putExtra(Constants.CHAT_FIELD_CONTACT_ID, groupId);
+                    intentChat.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                    intentChat.putExtra(Constants.IS_GROUP_CHAT, false);
+
+                    Intent intent = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
+                    intent.putExtra(Constants.GO_TO_CHAT_INTENT_KEY, intentChat);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }
     }
 
     @Override

@@ -984,16 +984,21 @@ public final class XMPPTransactions {
         }
     }
 
-    private static void downloadAndSaveGroupChat(final String chatId, String groupId){
+    private static void downloadAndSaveGroupChat(final String chatMessageId, final String groupId){
         OKHttpWrapper.get(Constants.SINGLE_GROUP_CHAT_API + "/" + groupId, _appContext, new OKHttpWrapper.HttpCallback() {
             @Override
             public void onFailure(Response response, IOException e) {
                 Log.i(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onFailure:");
+                //Notify app
+                GroupChatCreatedEvent groupChatCreatedEvent = new GroupChatCreatedEvent();
+                groupChatCreatedEvent.setGroupId(groupId);
+                groupChatCreatedEvent.setSuccess(false);
+                BusProvider.getInstance().post(new GroupChatCreatedEvent());
             }
 
             @Override
-            public void onSuccess(Response response)
-            {
+            public void onSuccess(Response response) {
+                boolean success = false;
                 Realm realm = Realm.getDefaultInstance();
                 try {
                     String jsonStr;
@@ -1012,13 +1017,12 @@ public final class XMPPTransactions {
                                 JSONObject member;
                                 String id;
 
-                                for(int i=0; i<members.length(); i++)
-                                {
+                                for (int i = 0; i < members.length(); i++) {
                                     member = members.getJSONObject(i);
                                     id = member.getString("id");
 
                                     membersIds.add(id);
-                                    if(member.has("owner"))
+                                    if (member.has("owner"))
                                         ownersIds.add(id);
                                 }
 
@@ -1029,27 +1033,27 @@ public final class XMPPTransactions {
                                         groupId, _profile_id, membersIds, ownersIds, "", "", "");
 
                                 //Set last message data
-                                ChatMessage newChatMessage = groupTx.getGroupChatMessageById
-                                        (chatId, realm);
-                                if(newChatMessage!=null) {
-                                    chat.setLastMessage_id(newChatMessage.getId());
+                                if (chatMessageId != null) {
+                                    ChatMessage newChatMessage = groupTx.getGroupChatMessageById
+                                            (chatMessageId, realm);
+                                    if (newChatMessage != null) {
+                                        chat.setLastMessage_id(newChatMessage.getId());
 
-                                    String lastText;
-                                    if (newChatMessage.getType() == Constants.CHAT_MESSAGE_TYPE_TEXT)
-                                        lastText = newChatMessage.getText();
-                                    else lastText = _appContext.getString(R.string.image);
+                                        String lastText;
+                                        if (newChatMessage.getType() == Constants.CHAT_MESSAGE_TYPE_TEXT)
+                                            lastText = newChatMessage.getText();
+                                        else lastText = _appContext.getString(R.string.image);
 
-                                    if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
-                                        chat.setLastMessage(_appContext.getResources().getString(R.string.chat_me_text) + lastText);
-                                    else chat.setLastMessage(lastText);
+                                        if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
+                                            chat.setLastMessage(_appContext.getResources().getString(R.string.chat_me_text) + lastText);
+                                        else chat.setLastMessage(lastText);
 
-                                    chat.setLastMessageTime(newChatMessage.getTimestamp());
+                                        chat.setLastMessageTime(newChatMessage.getTimestamp());
+                                    }
                                 }
-
                                 groupTx.insertOrUpdateGroupChat(chat, realm);
 
-                                //Notify app about new group chat created
-                                BusProvider.getInstance().post(new GroupChatCreatedEvent());
+                                success = true;
 
                             } catch (JSONException e) {
                                 Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onConnectionComplete: ", e);
@@ -1060,10 +1064,15 @@ public final class XMPPTransactions {
                     }
                 } catch (IOException e) {
                     Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onSuccess: ", e);
-                }
-                finally {
+                } finally {
                     realm.close();
                 }
+
+                //Notify app
+                GroupChatCreatedEvent groupChatCreatedEvent = new GroupChatCreatedEvent();
+                groupChatCreatedEvent.setGroupId(groupId);
+                groupChatCreatedEvent.setSuccess(success);
+                BusProvider.getInstance().post(new GroupChatCreatedEvent());
             }
         });
     }

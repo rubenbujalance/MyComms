@@ -51,6 +51,7 @@ import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.connection.FilePushToServerController;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.NotificationMessages;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
@@ -620,6 +621,10 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
     @Override
     protected void onResume() {
         super.onResume();
+
+        //Reset notifications
+        NotificationMessages.resetInboxMessages(GroupChatActivity.this);
+
         XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
 
         if(etChatTextBox.getText().toString()!=null &&

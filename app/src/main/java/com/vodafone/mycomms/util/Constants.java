@@ -292,12 +292,24 @@ public class Constants {
     public static final String LDAP_HEADER_AUTHENTICATE_REF = "MsRtcOAuth href=";
     public static final String LDAP_HEADER_AUTHENTICATE_REF_END = "grant_type";
 
-
     //Platform Search Order
     public static final long ORDER_MYCOMMS = 0;
     public static final long ORDER_GLOBAL_CONTACTS = 1;
     public static final long ORDER_SALES_FORCE = 2;
     public static final long ORDER_LOCAL = 3;
+
+    //Notifications
+    public static final String NOTIFICATION_EXTRA_KEY = "notification";
+    public static final String NOTIFICATION_BUNDLE_TAG_KEY = "tag";
+    public static final String NOTIFICATION_BUNDLE_FROM_KEY = "gcm.notification.messageFrom";
+    public static final String NOTIFICATION_BUNDLE_TYPE_KEY = "gcm.notification.type";
+    public static final String NOTIFICATION_BUNDLE_MESSAGE_KEY = "message";
+    public static final String NOTIFICATION_BUNDLE_PACKAGE_KEY = "collapse_key";
+    public static final String NOTIFICATION_BUNDLE_CHAT_TYPE_VALUE = "chat";
+    public static final String NOTIFICATION_BUNDLE_GROUPCHAT_TYPE_VALUE = "groupchat";
+    public static final String GO_TO_CHAT_INTENT_KEY = "goToChat";
+
+    //Others
 
     public static final String LDAP_GET_AVAILABLE_URL = "https://lyncdiscover.vodafone.com";
 

@@ -1,10 +1,8 @@
 package com.vodafone.mycomms.services;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
-import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.NotificationMessages;
 
 public class MyGcmListenerService extends GcmListenerService
@@ -19,9 +17,7 @@ public class MyGcmListenerService extends GcmListenerService
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
         Bundle test = data;
-        Log.i(Constants.TAG, "MyGcmListenerService.onMessageReceived: From-" + from + "; Message-" + message);
-        NotificationMessages.sendMessage(message, this);
+        NotificationMessages.sendMessage(data, this);
     }
 }

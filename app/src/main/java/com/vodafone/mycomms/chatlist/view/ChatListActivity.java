@@ -15,6 +15,7 @@ import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.NotificationMessages;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
@@ -39,7 +40,6 @@ public class ChatListActivity extends ToolbarActivity{
                 (
                         new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
                 );
-
 
         setContentView(R.layout.layout_main_activity);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
@@ -78,6 +78,10 @@ public class ChatListActivity extends ToolbarActivity{
     @Override
     protected void onResume() {
         super.onResume();
+
+        //Reset notifications
+        NotificationMessages.resetInboxMessages(ChatListActivity.this);
+
         setForegroundActivity(2);
         overridePendingTransition(0,0);
         //Update Pending Messages on Toolbar

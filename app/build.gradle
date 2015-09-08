@@ -199,7 +199,8 @@ task jacocoTestReport(type: JacocoReport) {
                        '**/R$*.class',
                        '**/*$ViewInjector*.*',
                        '**/BuildConfig.*',
-                       '**/Manifest*.*']
+                       '**/Manifest*.*',
+                       '**/mycomms/realm/*.*']
     )
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)
@@ -220,7 +221,8 @@ task jacocoTestReportDebug(type: JacocoReport) {
                        '**/R$*.class',
                        '**/*$ViewInjector*.*',
                        '**/BuildConfig.*',
-                       '**/Manifest*.*']
+                       '**/Manifest*.*',
+                       '**/mycomms/realm/*.*']
     )
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)

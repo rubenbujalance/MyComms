@@ -1,10 +1,12 @@
 package com.vodafone.mycomms.login;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
@@ -142,6 +144,13 @@ public class SignupNameActivityTest {
         Shadows.shadowOf(activity).getNextStartedActivity();
         Intent expectedIntent = new Intent(activity, SignupCompanyActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testFinish() throws Exception {
+        Activity activity = Robolectric.buildActivity(SignupNameActivity.class).create().start().resume().pause().stop().destroy().get();
+        Assert.assertTrue(activity.isDestroyed());
     }
 
 }

@@ -1,9 +1,11 @@
 package com.vodafone.mycomms.login;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -127,6 +129,13 @@ public class SignupMailActivityTest {
         Assert.assertTrue(title.equals(activity.getString(R.string.new_version_available)));
         Button okButton = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
         okButton.performClick();
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testFinish() throws Exception {
+        Activity activity = Robolectric.buildActivity(SignupMailActivity.class).create().start().resume().pause().stop().destroy().get();
+        Assert.assertTrue(activity.isDestroyed());
     }
 
 }

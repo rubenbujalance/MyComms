@@ -1,9 +1,11 @@
 package com.vodafone.mycomms.login;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -11,6 +13,9 @@ import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.test.util.Util;
 
@@ -129,9 +134,38 @@ public class LoginActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
+
+    @Test
+    public void testApplicationAndProfileInitializedBusEvent() {
+        BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+    }
+
+    @Test
+    public void testProfileConnectionErrorBusEvent() {
+        BusProvider.getInstance().post(new ApplicationAndProfileReadError());
+        Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
+        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+    }
+
+    @Test
+    public void testPasswordKeyEvent() throws Exception {
+        //Simulate Editor Key Event
+    }
+
     @Test
     public void testBack() throws Exception {
         ivBack.performClick();
         Assert.assertTrue(activity.isFinishing());
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testFinish() throws Exception {
+        Activity activity = Robolectric.buildActivity(LoginActivity.class).create().start().resume().pause().stop().destroy().get();
+        Assert.assertTrue(activity.isDestroyed());
     }
 }

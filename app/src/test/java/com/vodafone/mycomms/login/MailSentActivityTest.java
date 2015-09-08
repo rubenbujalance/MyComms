@@ -1,7 +1,9 @@
 package com.vodafone.mycomms.login;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
-import android.view.KeyEvent;
+import android.os.Build;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -20,7 +22,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowIntent;
+import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
 import static com.vodafone.mycomms.constants.Constants.CHECK_PHONE_OK_RESPONSE;
@@ -65,14 +67,28 @@ public class MailSentActivityTest {
         Assert.assertTrue("/api/profile".equals(latestSentHttpPost.getURI().getPath()));
     }
 
+//    @Test
+//    public void testBack() throws Exception {
+//        KeyEvent keyEvent = new KeyEvent(0,0,KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK, 0, 0);
+//        activity.dispatchKeyEvent(keyEvent);
+//        Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
+//        expectedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
+//        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+//    }
+
     @Test
-    public void testBack() throws Exception {
-        KeyEvent keyEvent = new KeyEvent(0,0,KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK, 0, 0);
-        activity.dispatchKeyEvent(keyEvent);
-        Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
-        expectedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
-        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+    public void shouldCallFinishInOnBackPressed() {
+        activity.onBackPressed();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+        Assert.assertTrue(shadowActivity.isFinishing());
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testFinish() throws Exception {
+        Activity activity = Robolectric.buildActivity(MailSentActivity.class).create().start().resume().pause().stop().destroy().get();
+        Assert.assertTrue(activity.isDestroyed());
+    }
 }

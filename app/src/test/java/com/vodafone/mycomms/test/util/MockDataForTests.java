@@ -1,8 +1,14 @@
 package com.vodafone.mycomms.test.util;
 
+import com.vodafone.mycomms.util.Constants;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import model.Contact;
+import model.FavouriteContact;
 import model.GroupChat;
 import model.News;
 import model.RecentContact;
@@ -586,10 +592,176 @@ public class MockDataForTests
                 "}\n" +
                 "]");
         mockUserProfile.setFirstName("mockMyName");
+        mockUserProfile.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
         mockUserProfile.setLastName("mockMyLastName");
         mockUserProfile.setId("mc_5570340e7eb7c3512f2f9bf2");
+        mockUserProfile.setPlatform("mc");
+        mockUserProfile.setLastSeen(123456);
+        mockUserProfile.setPresence("mockPresence");
+        mockUserProfile.setCountry("ESP");
 
         return mockUserProfile;
+    }
+
+    public static RecentContact getMockRecentContact()
+    {
+        RecentContact mockRecentContact = new RecentContact();
+        mockRecentContact.setAvailability("DADFE1");
+        mockRecentContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
+        mockRecentContact.setCompany("Stratesys");
+        mockRecentContact.setPosition("Senior Developer Consultant");
+        mockRecentContact.setOfficeLocation("Barcelona");
+        mockRecentContact.setEmails("[\n" +
+                "{\n" +
+                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "}\n" +
+                "]");
+        mockRecentContact.setFirstName("mockMyName");
+        mockRecentContact.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
+        mockRecentContact.setLastName("mockMyLastName");
+        mockRecentContact.setId("mc_5570340e7eb7c3512f2f9bf2");
+        mockRecentContact.setPlatform("mc");
+        mockRecentContact.setLastSeen(123456);
+        mockRecentContact.setPresence("mockPresence");
+        mockRecentContact.setCountry("ESP");
+
+        return mockRecentContact;
+    }
+
+    public static Contact getMockContact()
+    {
+        Contact mockContact = new Contact();
+        mockContact.setAvailability("DADFE1");
+        mockContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
+        mockContact.setCompany("Stratesys");
+        mockContact.setPosition("Senior Developer Consultant");
+        mockContact.setOfficeLocation("Barcelona");
+        mockContact.setEmails("[\n" +
+                "{\n" +
+                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "}\n" +
+                "]");
+        mockContact.setFirstName("mockMyName");
+        mockContact.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
+        mockContact.setLastName("mockMyLastName");
+        mockContact.setId("mc_5570340e7eb7c3512f2f9bf2");
+        mockContact.setPlatform("mc");
+        mockContact.setLastSeen(123456);
+        mockContact.setPresence("mockPresence");
+        mockContact.setCountry("ESP");
+        mockContact.setTimezone("mockTimeZone");
+        mockContact.setPosition("mockPosition");
+        mockContact.setContactId("mockContactId");
+        mockContact.setStringField1("mockFiled");
+
+        return mockContact;
+    }
+
+    public static JSONObject getContactJSONObject()
+    {
+        Contact contact = getMockContact();
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put(Constants.CONTACT_ID, contact.getContactId());
+            jsonObject.put(Constants.CONTACT_PLATFORM, contact.getPlatform());
+            jsonObject.put(Constants.CONTACT_FNAME, contact.getFirstName());
+            jsonObject.put(Constants.CONTACT_LNAME, contact.getLastName());
+            jsonObject.put(Constants.CONTACT_AVATAR, contact.getAvatar());
+            jsonObject.put(Constants.CONTACT_COMPANY, contact.getCompany());
+            jsonObject.put(Constants.CONTACT_POSITION, contact.getPosition());
+            jsonObject.put(Constants.CONTACT_TIMEZONE, contact.getTimezone());
+            jsonObject.put(Constants.CONTACT_LASTSEEN, contact.getLastSeen());
+            jsonObject.put(Constants.CONTACT_OFFICE_LOC, contact.getOfficeLocation());
+            jsonObject.put(Constants.CONTACT_PHONES, new JSONArray(contact.getPhones()));
+            jsonObject.put(Constants.CONTACT_EMAILS, new JSONArray(contact.getEmails()));
+            jsonObject.put(Constants.CONTACT_AVAILABILITY, contact.getAvailability());
+            jsonObject.put(Constants.CONTACT_PRESENCE, contact.getPresence());
+            jsonObject.put(Constants.CONTACT_COUNTRY, contact.getCountry());
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** getContactJSONObject JSONObject creation failed ********\n"+e.getMessage());
+        }
+
+        return jsonObject;
+    }
+
+    public static JSONObject getContactDATAFromJSONObjectWithJSONArray()
+    {
+        JSONArray jsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        try
+        {
+            jsonArray.put(0, getContactJSONObject());
+            jsonObject.put(Constants.CONTACT_DATA, jsonArray);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** getContactJSONObjecctWithJSONArray JSONObject creation failed ********\n"+e.getMessage());
+        }
+        return jsonObject;
+    }
+
+    public static JSONObject getContactFavoriteDATAFromJSONObjectWithJSONArray()
+    {
+        JSONArray jsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        try
+        {
+            jsonArray.put(0, getContactJSONObject());
+            jsonObject.put(Constants.CONTACT_FAVOURITES, jsonArray);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** getContactJSONObjecctWithJSONArray JSONObject creation failed ********\n"+e.getMessage());
+        }
+        return jsonObject;
+    }
+
+    public static FavouriteContact getMockFavoriteContact()
+    {
+        FavouriteContact mockContact = new FavouriteContact();
+        mockContact.setAvailability("DADFE1");
+        mockContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
+        mockContact.setCompany("Stratesys");
+        mockContact.setPosition("Senior Developer Consultant");
+        mockContact.setOfficeLocation("Barcelona");
+        mockContact.setEmails("[\n" +
+                "{\n" +
+                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "}\n" +
+                "]");
+        mockContact.setFirstName("mockMyName");
+        mockContact.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
+        mockContact.setLastName("mockMyLastName");
+        mockContact.setId("mc_5570340e7eb7c3512f2f9bf2");
+        mockContact.setPlatform("mc");
+        mockContact.setLastSeen(123456);
+        mockContact.setPresence("mockPresence");
+        mockContact.setCountry("ESP");
+
+        return mockContact;
     }
 
     public static GroupChat getMockGroupChat()

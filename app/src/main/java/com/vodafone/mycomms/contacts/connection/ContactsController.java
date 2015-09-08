@@ -44,12 +44,21 @@ public class ContactsController{
 
     private RealmProfileTransactions mRealmProfileTransactions;
 
+
     public ContactsController(String profileId, Context mContext) {
         this.mProfileId = profileId;
         this.mContext = mContext;
         realmContactTransactions = new RealmContactTransactions(mProfileId);
         realmAvatarTransactions = new RealmAvatarTransactions();
         mRealmProfileTransactions = new RealmProfileTransactions();
+    }
+
+    public RealmContactTransactions getRealmContactTransactions() {
+        return realmContactTransactions;
+    }
+
+    public void setRealmContactTransactions(RealmContactTransactions realmContactTransactions) {
+        ContactsController.realmContactTransactions = realmContactTransactions;
     }
 
     public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
@@ -83,13 +92,13 @@ public class ContactsController{
                     }
                 }
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             Log.e(Constants.TAG, "ContactsController.insertContactListInRealm: " + e.toString());
             realmContactList = null;
         }
         finally {
-            realm.close();
+            if(null != realm)
+                realm.close();
         }
 
         return realmContactList;
@@ -113,12 +122,13 @@ public class ContactsController{
                 realmContactTransactions.deleteAllFavouriteContacts(null);
                 realmContactTransactions.insertFavouriteContactList(contactList, null);
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             Log.e(Constants.TAG, "ContactsController.insertFavouriteContactInRealm : ",e);
         }
-        finally {
-            realm.close();
+        finally
+        {
+            if(null != realm)
+                realm.close();
         }
     }
 
@@ -153,7 +163,6 @@ public class ContactsController{
                 realmContactTransactions.insertRecentContactList(contactList, null);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
             Log.e(Constants.TAG, "ContactsController.insertRecentContactInRealm : ",e);
         }finally {
             realm.close();
@@ -172,7 +181,6 @@ public class ContactsController{
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             Log.e(Constants.TAG, "ContactsController.insertRecentGroupChatIntoRealm : ",e);
         }
     }
@@ -193,13 +201,16 @@ public class ContactsController{
                 contact.setFirstName(jsonObject.getString(Constants.CONTACT_FNAME));
             if (!jsonObject.isNull(Constants.CONTACT_LNAME))
                 contact.setLastName(jsonObject.getString(Constants.CONTACT_LNAME));
-            if (!jsonObject.isNull(Constants.CONTACT_AVATAR)) contact.setAvatar(jsonObject.getString(Constants.CONTACT_AVATAR));
+            if (!jsonObject.isNull(Constants.CONTACT_AVATAR))
+                contact.setAvatar(jsonObject.getString(Constants.CONTACT_AVATAR));
             if (!jsonObject.isNull(Constants.CONTACT_POSITION))
                 contact.setPosition(jsonObject.getString(Constants.CONTACT_POSITION));
-            if (!jsonObject.isNull(Constants.CONTACT_COMPANY)) contact.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
+            if (!jsonObject.isNull(Constants.CONTACT_COMPANY))
+                contact.setCompany(jsonObject.getString(Constants.CONTACT_COMPANY));
             if (!jsonObject.isNull(Constants.CONTACT_TIMEZONE))
                 contact.setTimezone(jsonObject.getString(Constants.CONTACT_TIMEZONE));
-            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN)) contact.setLastSeen(jsonObject.getLong(Constants.CONTACT_LASTSEEN));
+            if (!jsonObject.isNull(Constants.CONTACT_LASTSEEN))
+                contact.setLastSeen(jsonObject.getLong(Constants.CONTACT_LASTSEEN));
             if (!jsonObject.isNull(Constants.CONTACT_OFFICE_LOC))
                 contact.setOfficeLocation(jsonObject.getString(Constants.CONTACT_OFFICE_LOC));
             if (!jsonObject.isNull(Constants.CONTACT_PHONES))
@@ -240,9 +251,8 @@ public class ContactsController{
 
             sortHelper = sortHelper.trim();
             contact.setSortHelper(sortHelper);
-
-        }catch (JSONException e){
-            e.printStackTrace();
+        }
+        catch (Exception e){
             Log.e(Constants.TAG, "ContactDBController.mapContact: ",e);
         }
         return contact;
@@ -313,7 +323,6 @@ public class ContactsController{
         contact.setCompany(profile.getCompany());
         contact.setPosition(profile.getPosition());
         contact.setLastSeen(profile.getLastSeen());
-        contact.setOfficeLocation(profile.getOfficeLocation());
         contact.setPhones(profile.getPhones());
         contact.setOfficeLocation(profile.getOfficeLocation());
         contact.setEmails(profile.getEmails());
@@ -466,9 +475,8 @@ public class ContactsController{
      * @author str_oan
      * @param email (String) -> email address where invitation will be sent
      */
-    private void sendInvitation(final String email)
+    public void sendInvitation(final String email)
     {
-        //String testEmail = "alex_anishchenko@stratesys-ts.com";
         HashMap<String, String> body = new HashMap<>();
         body.put("email", email);
         final JSONObject json = new JSONObject(body);
@@ -519,7 +527,7 @@ public class ContactsController{
      * @param isCorrectlyDelivered (boolean) -> if is true then shows affirmative message, otherwise
      *                             will show error message
      */
-    private void showSuccessOrErrorResponse(boolean isCorrectlyDelivered)
+    public void showSuccessOrErrorResponse(boolean isCorrectlyDelivered)
     {
         View view = Utils.getCustomAlertTitleView(mContext, R.layout.layout_invite_contact);
         TextView textView = (TextView) view.findViewById(R.id.tv_invite_title);
@@ -544,11 +552,6 @@ public class ContactsController{
 
         builder.create();
         builder.show();
-    }
-
-
-    public RealmProfileTransactions getRealmProfileTransactions() {
-        return mRealmProfileTransactions;
     }
 
     public void setRealmProfileTransactions(RealmProfileTransactions realmProfileTransactions) {

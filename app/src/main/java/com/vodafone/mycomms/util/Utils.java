@@ -404,7 +404,6 @@ public final class Utils extends MainActivity {
 
             Log.i(Constants.TAG, "Utils.getElementFromJsonArrayString: " + jsonObject != null ? jsonObject.toString() : "null");
         } catch (JSONException e) {
-            e.printStackTrace();
             Log.e(Constants.TAG, "Utils.getElementFromJsonArrayString: " ,e);
         }
         return result;
@@ -428,7 +427,6 @@ public final class Utils extends MainActivity {
                 }
             }
         } catch (JSONException e) {
-            e.printStackTrace();
             Log.e(Constants.TAG, "ContactDetailMainActivity.getElementFromJsonObjectString: " , e);
         }
         return result;

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.MycommsApp;
@@ -289,9 +290,13 @@ public class SignupPhoneActivity extends MainActivity {
                 startActivity(in);
                 finish();
             }
-            else
+            else if (status.compareTo("403") == 0)
             {
                 goToPincodeActivity();
+            }
+            else
+            {
+                Toast.makeText(SignupPhoneActivity.this, getResources().getString(R.string.error_reading_data_from_server), Toast.LENGTH_LONG).show();
             }
         } catch(Exception ex) {
             Log.e(Constants.TAG, "SignupPhoneActivity.callBackPhoneCheck: ",ex);

@@ -176,7 +176,7 @@ public class SplashScreenActivity extends MainActivity {
                 }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "DashBoardActivity.onResume: ");
+            Log.e(Constants.TAG, "SplashScreenActivity.goToConversation: ",e);
             Crashlytics.logException(e);
             goToConversation = false;
         }
@@ -693,7 +693,7 @@ public class SplashScreenActivity extends MainActivity {
                     }
                 }
             } catch (Exception e) {
-                Log.e(Constants.TAG, "DashBoardActivity.onResume: ");
+                Log.e(Constants.TAG, "CheckIfGoToConversation.doInBackground: ",e);
                 Crashlytics.logException(e);
                 goToConversation = false;
             }

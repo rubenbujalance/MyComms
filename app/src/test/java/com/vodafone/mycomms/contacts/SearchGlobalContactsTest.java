@@ -28,16 +28,19 @@ import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
 
 import junit.framework.Assert;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
@@ -54,6 +57,7 @@ import org.robolectric.shadows.ShadowInputMethodManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 
 import io.realm.Realm;
 import model.GlobalContactsSettings;
@@ -467,16 +471,36 @@ public class SearchGlobalContactsTest {
     }
 
     @Test
-    public void testLoadAllContactsFromPlatformSearch() throws Exception {
+    public void testLoadAllContactsFromPlatformSearch(){
         System.err.println("******** Test: Load All Contacts Search from Platform Events ********");
 
-        String serverUrl = startWebMockServer();
+        String serverUrl = null;
+        try
+        {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
+        }
+
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
 
         String mockedUserResponseHeader =
                 com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_OK;
-        String json = loadJSON();
+
+        String json = null;
+        try
+        {
+            json = loadJSON();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due json = loadJSON()********\n" + e.getMessage());
+        }
         webServer.enqueue(new MockResponse()
                 .setResponseCode(200)
                 .setHeader(com.vodafone.mycomms.constants.Constants.BASEURL_RESPONSE_HEADER_KEY,
@@ -485,7 +509,8 @@ public class SearchGlobalContactsTest {
         );
         webServer.enqueue(new MockResponse().setResponseCode(401));
 
-        SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
+        SearchController searchController = Mockito.mock(SearchController.class);
+        Mockito.when(searchController.insertContactListInRealm(Matchers.any(JSONObject.class))).thenReturn(MockDataForTests.getMockContactsList());
         SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
         searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
 
@@ -496,13 +521,577 @@ public class SearchGlobalContactsTest {
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
-        Thread.sleep(5000);
-        Robolectric.flushForegroundThreadScheduler();
-        Robolectric.flushBackgroundThreadScheduler();
 
-        webServer.shutdown();
+        try
+        {
+            Thread.sleep(2000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(5000)********\n"+e.getMessage());
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
+        try {
+            webServer.shutdown();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
+        }
+        org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
 
         System.err.println("******** Test: Load All Contacts from Platforms Events OK ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromLDAP_onFailure_405()
+    {
+        String serverUrl = null;
+        try
+        {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
+        }
+
+
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String body = "{\"error\":\"error\"}";
+
+        webServer.enqueue(new MockResponse().setResponseCode(405).setBody(body));
+
+        SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+        searchBarController.setCurrentKeyWord("test");
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode("mockToken", "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode("mockTokenType", "utf-8");
+            apiCall += "&url=" + URLEncoder.encode("mockURL", "utf-8");
+            apiCall += "&t=" + URLEncoder.encode("test", "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.testLoadAllContactsFromLDAP_onFailure_405: ", e);
+        }
+        searchBarController.loadAllContactsFromLDAP
+                (
+                        apiCall
+                        , "test"
+                        , false
+                        , "mockUser"
+                        , "mockPwd"
+                );
+
+        try {
+            Thread.sleep(5000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
+        }
+
+        Robolectric.flushForegroundThreadScheduler();
+
+        org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
+
+        try {
+            webServer.shutdown();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
+        }
+
+        System.err.println("******** Passed, onFailure with wrong response code ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromLDAP_onFailure_401_OnFailure_401()
+    {
+        String serverUrl = null;
+        try
+        {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
+        }
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String body = "{\"error\":\"error\"}";
+
+        webServer.enqueue(new MockResponse().setResponseCode(401).setBody(body));
+        webServer.enqueue(new MockResponse().setResponseCode(401).setBody(body));
+
+        SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode("mockToken", "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode("mockTokenType", "utf-8");
+            apiCall += "&url=" + URLEncoder.encode("mockURL", "utf-8");
+            apiCall += "&t=" + URLEncoder.encode("test", "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.testLoadAllContactsFromLDAP_onFailure_401_OnFailure_401: ", e);
+        }
+        searchBarController.loadAllContactsFromLDAP
+                (
+                        apiCall
+                        , "test"
+                        , false
+                        , "mockUser"
+                        , "mockPwd"
+                );
+
+        try {
+            Thread.sleep(2000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(2000)********\n" + e.getMessage());
+        }
+
+        Robolectric.flushForegroundThreadScheduler();
+
+        try {
+            Thread.sleep(2000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
+        }
+
+        Robolectric.flushForegroundThreadScheduler();
+
+        org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
+
+        try {
+            webServer.shutdown();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
+        }
+
+        System.err.println("******** Passed, onFailure + onFailure -> addGlobalContactsContainer is visible ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromLDAP_onFailure_401_OnFailure_500()
+    {
+        String serverUrl = null;
+        try
+        {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
+        }
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String body = "{\"error\":\"error\"}";
+
+        webServer.enqueue(new MockResponse().setResponseCode(401).setBody(body));
+        webServer.enqueue(new MockResponse().setResponseCode(500).setBody(body));
+
+        SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode("mockToken", "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode("mockTokenType", "utf-8");
+            apiCall += "&url=" + URLEncoder.encode("mockURL", "utf-8");
+            apiCall += "&t=" + URLEncoder.encode("test", "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.testLoadAllContactsFromLDAP_onFailure_401_OnFailure_500: ", e);
+        }
+        searchBarController.loadAllContactsFromLDAP
+                (
+                        apiCall
+                        , "test"
+                        , false
+                        , "mockUser"
+                        , "mockPwd"
+                );
+
+        try {
+            Thread.sleep(5000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
+        }
+
+        Robolectric.flushForegroundThreadScheduler();
+        org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
+
+        try {
+            webServer.shutdown();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
+        }
+
+        System.err.println("******** Passed, onFailure + onFailure -> addGlobalContactsContainer is not visible ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromLDAP_onFailure_401_onSuccess_200_onFailure_401()
+    {
+        String serverUrl = null;
+        try
+        {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
+        }
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String bodyOk = "{\"ok\":\"ok\"}";
+        String bodyError = "{\"error\":\"error\"}";
+
+        webServer.enqueue(new MockResponse().setResponseCode(401).setBody(bodyError));
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(bodyOk));
+        webServer.enqueue(new MockResponse().setResponseCode(401).setBody(bodyError));
+
+        SearchController searchController = new SearchController(context, com.vodafone.mycomms.constants.Constants.PROFILE_ID, null);
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode("mockToken", "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode("mockTokenType", "utf-8");
+            apiCall += "&url=" + URLEncoder.encode("mockURL", "utf-8");
+            apiCall += "&t=" + URLEncoder.encode("test", "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.testLoadAllContactsFromLDAP_onFailure_401_onSuccess_200_onFailure_401: ", e);
+        }
+        searchBarController.loadAllContactsFromLDAP
+                (
+                        apiCall
+                        , "test"
+                        , false
+                        , "mockUser"
+                        , "mockPwd"
+                );
+
+        try {
+            Thread.sleep(5000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
+        }
+
+        Robolectric.flushForegroundThreadScheduler();
+        org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
+
+        try {
+            webServer.shutdown();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
+        }
+
+        System.err.println("******** Passed, onFailure + onSuccess + onFailure ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromLDAP_onFailure_401_onSuccess_200_onSuccess_200()
+    {
+        String serverUrl = null;
+        try
+        {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
+        }
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String bodyOk = "{\"ok\":\"ok\"}";
+        String bodyError = "{\"ok\":\"ok\"}";
+
+        webServer.enqueue(new MockResponse().setResponseCode(401).setBody(bodyError));
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(bodyOk));
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(bodyOk));
+
+        SearchController searchController = Mockito.mock(SearchController.class);
+        Mockito.when(searchController.insertContactListInRealm(Matchers.any(JSONObject.class))).thenReturn(MockDataForTests.getMockContactsList());
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode("mockToken", "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode("mockTokenType", "utf-8");
+            apiCall += "&url=" + URLEncoder.encode("mockURL", "utf-8");
+            apiCall += "&t=" + URLEncoder.encode("test", "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.testLoadAllContactsFromLDAP_onFailure_401_onSuccess_200_onSuccess_200: ", e);
+        }
+        searchBarController.loadAllContactsFromLDAP
+                (
+                        apiCall
+                        , "test"
+                        , false
+                        , "mockUser"
+                        , "mockPwd"
+                );
+
+        try {
+            Thread.sleep(5000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
+        }
+
+        Robolectric.flushForegroundThreadScheduler();
+        org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
+
+        try {
+            webServer.shutdown();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
+        }
+
+        org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
+        System.err.println("******** Passed, onFailure + onSuccess + onSuccess ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromLDAP_onSuccess_200_No_Body()
+    {
+        String serverUrl = null;
+        try
+        {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
+        }
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        webServer.enqueue(new MockResponse().setResponseCode(200));
+
+        SearchController searchController = Mockito.mock(SearchController.class);
+        Mockito.when(searchController.insertContactListInRealm(Matchers.any(JSONObject.class))).thenReturn(MockDataForTests.getMockContactsList());
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode("mockToken", "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode("mockTokenType", "utf-8");
+            apiCall += "&url=" + URLEncoder.encode("mockURL", "utf-8");
+            apiCall += "&t=" + URLEncoder.encode("test", "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.testLoadAllContactsFromLDAP_onSuccess_200_No_Body: ", e);
+        }
+        searchBarController.loadAllContactsFromLDAP
+                (
+                        apiCall
+                        , "test"
+                        , false
+                        , "mockUser"
+                        , "mockPwd"
+                );
+
+        try {
+            Thread.sleep(5000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
+        }
+
+        org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
+        try {
+            webServer.shutdown();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
+        }
+        System.err.println("******** Passed, onSuccess ********");
+    }
+
+    @Test
+    public void testLoadAllContactsFromLDAP_onSuccess_200_With_Body()
+    {
+        String serverUrl = null;
+        try
+        {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
+        }
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+
+        String bodyOk = "{\"ok\":\"ok\"}";
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(bodyOk));
+
+        SearchController searchController = Mockito.mock(SearchController.class);
+        Mockito.when(searchController.insertContactListInRealm(Matchers.any(JSONObject.class))).thenReturn(MockDataForTests.getMockContactsList());
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+        searchBarController.setCurrentKeyWord("test");
+
+        String apiCall = Constants.CONTACT_API_GET_CONTACTS_BASIC_CALL;
+
+        try {
+            apiCall += Constants.LDAP_API_CALL_PLATFORM;
+            apiCall += "&lt=" + URLEncoder.encode("mockToken", "utf-8");
+            apiCall += "&tt=" + URLEncoder.encode("mockTokenType", "utf-8");
+            apiCall += "&url=" + URLEncoder.encode("mockURL", "utf-8");
+            apiCall += "&t=" + URLEncoder.encode("test", "utf-8");
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "SearchBarController.testLoadAllContactsFromLDAP_onSuccess_200_With_Body: ", e);
+        }
+        searchBarController.loadAllContactsFromLDAP
+                (
+                        apiCall
+                        , "test"
+                        , false
+                        , "mockUser"
+                        , "mockPwd"
+                );
+
+        try {
+            Thread.sleep(5000);
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due Thread.sleep(2000)********\n" + e.getMessage());
+        }
+
+        Robolectric.flushForegroundThreadScheduler();
+        org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
+
+        try {
+            webServer.shutdown();
+        }
+        catch (Exception e)
+        {
+            org.junit.Assert.fail();
+            System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
+        }
+        System.err.println("******** Passed, onSuccess ********");
+    }
+
+    @Test
+    public void buildRequestForSearchLDAPContacts_Fail()
+    {
+        GlobalContactsSettings mGlobalContactsSettings = new GlobalContactsSettings();
+        mGlobalContactsSettings.setProfileId("mockId");
+        mGlobalContactsSettings.setPassword("mockPWD");
+        mGlobalContactsSettings.setToken(null);
+        mGlobalContactsSettings.setTokenType("mockType");
+        mGlobalContactsSettings.setUrl("mockURL");
+        mGlobalContactsSettings.setUser("mockUser");
+
+        PowerMockito.mockStatic(RealmLDAPSettingsTransactions.class);
+        PowerMockito.when(RealmLDAPSettingsTransactions.getSettings(Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(mGlobalContactsSettings);
+
+        SearchController searchController = Mockito.mock(SearchController.class);
+        Mockito.when(searchController.insertContactListInRealm(Matchers.any(JSONObject.class))).thenReturn(MockDataForTests.getMockContactsList());
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.buildRequestForSearchLDAPContacts("test", null, null);
+        searchBarController.setCurrentKeyWord("test");
+
+        org.junit.Assert.assertNull(mGlobalContactsSettings.getToken());
+
+        System.err.println("******** Passed, buildRequestForSearchLDAPContacts_Fail ********");
+    }
+
+
+    @Test
+    public void validateNoPlatformRecords_OK()
+    {
+        SearchController searchController = Mockito.mock(SearchController.class);
+        Mockito.when(searchController.insertContactListInRealm(Matchers.any(JSONObject.class))).thenReturn(MockDataForTests.getMockContactsList());
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
+        searchBarController.validateNoPlatformRecords(MockDataForTests.getMockContactsList());
+        searchBarController.setCurrentKeyWord("test");
+
+        org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
+        org.junit.Assert.assertTrue(MockDataForTests.getMockContactsList().get(0).getPlatform().equals(Constants.PLATFORM_MY_COMMS));
+        org.junit.Assert.assertTrue(MockDataForTests.getMockContactsList().get(1).getPlatform().equals(Constants.PLATFORM_SALES_FORCE));
+        org.junit.Assert.assertTrue(MockDataForTests.getMockContactsList().get(2).getPlatform().equals(Constants.PLATFORM_GLOBAL_CONTACTS));
+        org.junit.Assert.assertTrue(MockDataForTests.getMockContactsList().get(3).getPlatform().equals(Constants.PLATFORM_LOCAL));
+
+        System.err.println("******** Passed, validateNoPlatformRecords_OK ********");
     }
 
     @Test

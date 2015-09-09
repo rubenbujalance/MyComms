@@ -59,6 +59,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private TextView vacationTimeEnds;
     private ImageView vacationTimeArrow;
 
+    private View view;
+
     private Realm realm;
 
     /**
@@ -106,14 +108,13 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         this.realm = Realm.getDefaultInstance();
-        this.realm.setAutoRefresh(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_preferences, container, false);
-
+        view = inflater.inflate(R.layout.layout_set_preferences, container, false);
         vacationTimeEnds = (TextView) v.findViewById(R.id.settings_preferences_vacation_time_value);
         vacationTimeArrow = (ImageView) v.findViewById(R.id.about_arrow_right_top);
 
@@ -125,7 +126,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
                 //Logout on server
                 profileController.logoutToAPI();
-                ((MycommsApp) getActivity().getApplication()).appIsInitialized = false;
+                MycommsApp.appIsInitialized = false;
 
 
             }
@@ -329,7 +330,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 @Override
                 public void run()
                 {
-                    Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
+                    Switch shareCurrentTimeSwitch = (Switch) view.findViewById(R.id.setting_share_current_time_switch);
                     shareCurrentTimeSwitch.setChecked(false);
                 }
             });
@@ -339,7 +340,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
+                    Switch shareCurrentTimeSwitch = (Switch) view.findViewById(R.id.setting_share_current_time_switch);
                     shareCurrentTimeSwitch.setChecked(true);
                 }
             });
@@ -351,7 +352,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
+                    Switch doNotDisturbSwitch = (Switch) view.findViewById(R.id.settings_do_not_disturb_switch);
                     doNotDisturbSwitch.setChecked(true);
                 }
             });
@@ -361,7 +362,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
+                    Switch doNotDisturbSwitch = (Switch) view.findViewById(R.id.settings_do_not_disturb_switch);
                     doNotDisturbSwitch.setChecked(false);
                 }
             });

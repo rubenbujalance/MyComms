@@ -1,10 +1,7 @@
 package com.vodafone.mycomms.settings;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,12 +13,13 @@ import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.test.util.Util;
-import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.CustomFragmentActivity;
+import com.vodafone.mycomms.util.CustomPreferencesFragmentActivity;
 
 import junit.framework.Assert;
 
@@ -29,6 +27,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -36,13 +35,16 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 import io.realm.Realm;
+import model.UserProfile;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -63,7 +65,7 @@ public class PreferencesFragmentTest {
 
     MockWebServer webServer;
     PreferencesFragment mPreferencesFragment;
-    CustomFragmentActivity customFragmentActivity;
+    CustomPreferencesFragmentActivity customPreferencesFragmentActivity;
     Context context;
     TextView vacationTimeEnds;
     ImageView vacationTimeArrow;
@@ -72,7 +74,6 @@ public class PreferencesFragmentTest {
     Switch shareCurrentTimeSwitch;
     Switch doNotDisturbSwitch;
     TextView aboutButton;
-
 
     @Before
     public void setUp() throws Exception {
@@ -85,7 +86,7 @@ public class PreferencesFragmentTest {
                 .thenReturn(null);
         context = RuntimeEnvironment.application.getApplicationContext();
         startPreferencesFragment(0);
-        mPreferencesFragment = (PreferencesFragment) customFragmentActivity
+        mPreferencesFragment = (PreferencesFragment) customPreferencesFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("0");
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         vacationTimeEnds = (TextView) mPreferencesFragment.getView().findViewById(R.id.settings_preferences_vacation_time_value);
@@ -112,24 +113,155 @@ public class PreferencesFragmentTest {
     }
 
     @Test
-    public void testBack() throws Exception {
-//        mBack.performClick();
-//        Assert.assertTrue(activity.isFinishing());
+    public void testReceivedProfile() throws Exception {
+        System.err.println("******** Test: On Received Profile ********");
+
+        //Private Time Zone
+        UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_TIMEZONE_PRIVATE);
+        mPreferencesFragment.onProfileReceived(userProfile);
+        Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
+
+        //Public Time Zone
+        userProfile = mockUserProfile(Constants.SETTINGS_JSON_TIMEZONE_PUBLIC);
+        mPreferencesFragment.onProfileReceived(userProfile);
+        Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
+
+        System.err.println("******** Test: On Received Profile OK********");
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
-    public void testFinish() throws Exception {
-        Activity activity = Robolectric.buildActivity(SettingsMainActivity.class).create().start().resume().pause().stop().destroy().get();
-        Assert.assertTrue(activity.isDestroyed());
+    public void testLogout() throws Exception {
+        System.err.println("******** Test: LOGOUT ********");
+
+        ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
+        Mockito.doNothing().when(spyProfileController).logoutToAPI();
+
+        btLogout.performClick();
+        Assert.assertFalse(MycommsApp.appIsInitialized);
+
+        System.err.println("******** Test: LOGOUT OK********");
     }
+
+    @Test
+    public void testVacationTimeClick() throws Exception {
+        System.err.println("******** Test: Vacation Time Click ********");
+
+        vacationTimeButton.performClick();
+
+        System.err.println("******** Test: Vacation Time Click OK********");
+    }
+
+    //    @Test
+    public void testVacationTimeActivityResult() throws Exception {
+        System.err.println("******** Test: Vacation Time Click ********");
+
+        //        Shadows.shadowOf(mPreferencesFragment.getActivity()).receiveResult(
+//                new Intent(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class),
+//                Activity.RESULT_OK,
+//                new Intent().putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, Constants.VACATION_END_DATE));
+//
+//        Assert.assertEquals(Constants.VACATION_END_DATE, vacationTimeEnds.getText());
+
+        System.err.println("******** Test: Vacation Time Click OK********");
+    }
+
+    @Test
+    public void testShareCurrentTimeSwitchOn() throws Exception {
+        System.err.println("******** Test: Share Current Time ********");
+
+        UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_TIMEZONE_PUBLIC);
+        ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
+        Mockito.doNothing().when(spyProfileController).updateSettingsData(Mockito.any(HashMap.class));
+
+        shareCurrentTimeSwitch.performClick();
+
+        mPreferencesFragment.onProfileReceived(userProfile);
+
+        Assert.assertFalse(shareCurrentTimeSwitch.isChecked());
+
+        System.err.println("******** Test: Share Current Time OK********");
+    }
+
+    @Test
+    public void testShareCurrentTimeSwitchOff() throws Exception {
+        System.err.println("******** Test: Share Current Time ********");
+
+        shareCurrentTimeSwitch.setChecked(true);
+        shareCurrentTimeSwitch.performClick();
+
+        Assert.assertTrue(!shareCurrentTimeSwitch.isChecked());
+
+        System.err.println("******** Test: Share Current Time OK********");
+    }
+
+    @Test
+    public void testDoNotDisturbSwitch() throws Exception {
+        System.err.println("******** Test: LOGOUT ********");
+
+        UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_DONOTDISTURB);
+        doNotDisturbSwitch.performClick();
+        Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
+
+        mPreferencesFragment.onProfileReceived(userProfile);
+        Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
+
+        System.err.println("******** Test: LOGOUT OK********");
+    }
+
+    @Test
+    public void testAboutNavigation() throws Exception {
+        System.err.println("******** Test: About navigation ********");
+
+        aboutButton.performClick();
+        Intent expectedIntent = new Intent(mPreferencesFragment.getActivity(), AboutActivity.class);
+        Assert.assertTrue(Shadows.shadowOf(mPreferencesFragment.getActivity())
+                .getNextStartedActivity().equals(expectedIntent));
+
+        System.err.println("******** Test: About navigation OK********");
+    }
+
+    //    @Test
+    public void testOnProfileReceived() throws Exception {
+        System.err.println("******** Test: LOGOUT ********");
+
+        System.err.println("******** Test: LOGOUT OK********");
+    }
+
+    //    @Test
+    public void testOnDetachFragment() throws Exception {
+        System.err.println("******** Test: LOGOUT ********");
+
+        System.err.println("******** Test: LOGOUT OK********");
+    }
+
+    //    @Test
+    public void testOnPauseFragment() throws Exception {
+        System.err.println("******** Test: LOGOUT ********");
+
+        System.err.println("******** Test: LOGOUT OK********");
+    }
+
+    //    @Test
+    public void testOnStopFragment() throws Exception {
+        System.err.println("******** Test: LOGOUT ********");
+
+        System.err.println("******** Test: LOGOUT OK********");
+    }
+
+    //    @Test
+    public void testOnDestroyFragment() throws Exception {
+        System.err.println("******** Test: LOGOUT ********");
+
+        System.err.println("******** Test: LOGOUT OK********");
+    }
+
 
     public void startPreferencesFragment(int index)
     {
         Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
-                CustomFragmentActivity.class);
+                CustomPreferencesFragmentActivity.class);
         in.putExtra("index", index);
-        customFragmentActivity = Robolectric.buildActivity(CustomFragmentActivity.class)
+        customPreferencesFragmentActivity = Robolectric.buildActivity(CustomPreferencesFragmentActivity.class)
                 .withIntent(in)
                 .create().start().resume().get();
     }
@@ -158,8 +290,16 @@ public class PreferencesFragmentTest {
             }
             inputStream.close();
         } catch (IOException e) {
-            Log.e(Constants.TAG, "SearchGlobalContactsTest.loadJSON: e ", e);
+            Log.e(com.vodafone.mycomms.util.Constants.TAG, "SearchGlobalContactsTest.loadJSON: e ", e);
         }
         return byteArrayOutputStream.toString();
+    }
+
+    private UserProfile mockUserProfile(String settings){
+        UserProfile userProfile = new UserProfile();
+        userProfile.setId("1234");
+        userProfile.setSettings(settings);
+
+        return userProfile;
     }
 }

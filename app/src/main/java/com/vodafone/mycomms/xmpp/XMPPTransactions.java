@@ -939,7 +939,7 @@ public final class XMPPTransactions {
 
             if(chat==null) {
                 //Get group from API in background, and save to Realm
-                downloadAndSaveGroupChat(id, groupId);
+                downloadAndSaveGroupChat(id, groupId, null);
 
             }
             else {
@@ -984,8 +984,21 @@ public final class XMPPTransactions {
         }
     }
 
-    public static void downloadAndSaveGroupChat(final String chatMessageId, final String groupId){
+    public static void downloadAndSaveGroupChat(String chatMessageId, String groupId){
+        downloadAndSaveGroupChat(chatMessageId, groupId, null);
+    }
+
+    public static void downloadAndSaveGroupChat(final String chatMessageId, final String groupId, Context appContext){
         Log.i(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat: ");
+
+        if(_appContext==null) _appContext = appContext;
+
+        if (_profile_id == null) {
+            //Get profile_id
+            SharedPreferences sp = _appContext.getSharedPreferences(
+                    Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+            _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        }
 
         OKHttpWrapper.get(Constants.SINGLE_GROUP_CHAT_API + "/" + groupId, _appContext, new OKHttpWrapper.HttpCallback() {
             @Override

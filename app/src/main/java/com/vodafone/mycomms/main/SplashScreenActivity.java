@@ -684,7 +684,7 @@ public class SplashScreenActivity extends MainActivity {
                                     goToConversation = true;
                                 } else {
                                     waitToGroupChatDownload = true;
-                                    XMPPTransactions.downloadAndSaveGroupChat(null, from);
+                                    XMPPTransactions.downloadAndSaveGroupChat(null, from, getApplicationContext());
 //                                    intentChat = new Intent(SplashScreenActivity.this, ChatListActivity.class);
 //                                    intentChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                                 }

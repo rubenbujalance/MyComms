@@ -62,12 +62,12 @@ public final class NotificationMessages extends MainActivity
 //            from = from.substring(0, from.indexOf("@"));
 //        else from = null;
 
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+//        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 //        inboxStyle.setBigContentTitle(context.getString(R.string.new_unread_messages));
 //        addMessageToInbox(from, message);
 //        fillInbox(from, inboxStyle);
 //        inboxStyle.setSummaryText(inboxMessages.get(from).size() + " new messages");
-        builder.setStyle(inboxStyle);
+//        builder.setStyle(inboxStyle);
         builder.setWhen(System.currentTimeMillis());
         builder.setContentText(message);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);

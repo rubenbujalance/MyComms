@@ -1008,7 +1008,7 @@ public final class XMPPTransactions {
                 GroupChatCreatedEvent groupChatCreatedEvent = new GroupChatCreatedEvent();
                 groupChatCreatedEvent.setGroupId(groupId);
                 groupChatCreatedEvent.setSuccess(false);
-                BusProvider.getInstance().post(new GroupChatCreatedEvent());
+                BusProvider.getInstance().post(groupChatCreatedEvent);
             }
 
             @Override
@@ -1088,7 +1088,7 @@ public final class XMPPTransactions {
                 GroupChatCreatedEvent groupChatCreatedEvent = new GroupChatCreatedEvent();
                 groupChatCreatedEvent.setGroupId(groupId);
                 groupChatCreatedEvent.setSuccess(success);
-                BusProvider.getInstance().post(new GroupChatCreatedEvent());
+                BusProvider.getInstance().post(groupChatCreatedEvent);
             }
         });
     }

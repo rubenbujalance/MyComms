@@ -8,23 +8,18 @@ import android.widget.Button;
 import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
-import com.thoughtworks.xstream.mapper.Mapper;
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
-import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +36,6 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
-import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowAlertDialog;
 
@@ -421,90 +415,90 @@ public class ContactsControllerTest
         contactsController.mapContact(null, null);
     }
 
-    @Test
-    public void testInsertRecentGroupChatIntoRealm_OK()
-    {
-        Contact contact = MockDataForTests.getMockContact();
-        JSONObject jsonObject = MockDataForTests.getContactJSONObject();
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.insertRecentGroupChatIntoRealm(contact, jsonObject);
-    }
-
-    @Test
-    public void testInsertRecentGroupChatIntoRealm_Null_Data()
-    {
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.insertRecentGroupChatIntoRealm(null, null);
-    }
-
-    @Test
-    public void testInsertContactListInRealmWithNullContactFromGetter()
-    {
-        JSONObject jsonObject = MockDataForTests.getContactDATAFromJSONObjectWithJSONArray();
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(null);
-        contactsController.insertContactListInRealm(jsonObject);
-    }
-
-    @Test
-    public void testInsertContactListInRealmWithNOTNullContactFromGetter()
-    {
-        JSONObject jsonObject = MockDataForTests.getContactDATAFromJSONObjectWithJSONArray();
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
-        contactsController.insertContactListInRealm(jsonObject);
-    }
-
-    @Test
-    public void testInsertContactListInRealmWithControlledException()
-    {
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.insertContactListInRealm(null);
-    }
-
-    @Test
-    public void testInsertFavouriteContactInRealmWithNullContactFromGetter()
-    {
-        JSONObject jsonObject = MockDataForTests.getContactFavoriteDATAFromJSONObjectWithJSONArray();
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(null);
-        contactsController.insertFavouriteContactInRealm(jsonObject);
-    }
-
-    @Test
-    public void testInsertFavouriteContactInRealmWithNOTNullContactFromGetter()
-    {
-        JSONObject jsonObject = MockDataForTests.getContactFavoriteDATAFromJSONObjectWithJSONArray();
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
-        contactsController.insertFavouriteContactInRealm(jsonObject);
-    }
-
-    @Test
-    public void testInsertFavouriteContactInRealmWithControlledException()
-    {
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.insertFavouriteContactInRealm(null);
-    }
-
-    @Test
-    public void testInsertContactListInRealmWithoutJSONArray()
-    {
-        JSONObject jsonObject = MockDataForTests.getContactJSONObject();
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
-        contactsController.insertContactListInRealm(jsonObject);
-    }
+//    @Test
+//    public void testInsertRecentGroupChatIntoRealm_OK()
+//    {
+//        Contact contact = MockDataForTests.getMockContact();
+//        JSONObject jsonObject = MockDataForTests.getContactJSONObject();
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.insertRecentGroupChatIntoRealm(contact, jsonObject);
+//    }
+//
+//    @Test
+//    public void testInsertRecentGroupChatIntoRealm_Null_Data()
+//    {
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.insertRecentGroupChatIntoRealm(null, null);
+//    }
+//
+//    @Test
+//    public void testInsertContactListInRealmWithNullContactFromGetter()
+//    {
+//        JSONObject jsonObject = MockDataForTests.getContactDATAFromJSONObjectWithJSONArray();
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
+//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
+//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(null);
+//        contactsController.insertContactListInRealm(jsonObject);
+//    }
+//
+//    @Test
+//    public void testInsertContactListInRealmWithNOTNullContactFromGetter()
+//    {
+//        JSONObject jsonObject = MockDataForTests.getContactDATAFromJSONObjectWithJSONArray();
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
+//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
+//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
+//        contactsController.insertContactListInRealm(jsonObject);
+//    }
+//
+//    @Test
+//    public void testInsertContactListInRealmWithControlledException()
+//    {
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.insertContactListInRealm(null);
+//    }
+//
+//    @Test
+//    public void testInsertFavouriteContactInRealmWithNullContactFromGetter()
+//    {
+//        JSONObject jsonObject = MockDataForTests.getContactFavoriteDATAFromJSONObjectWithJSONArray();
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
+//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
+//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(null);
+//        contactsController.insertFavouriteContactInRealm(jsonObject);
+//    }
+//
+//    @Test
+//    public void testInsertFavouriteContactInRealmWithNOTNullContactFromGetter()
+//    {
+//        JSONObject jsonObject = MockDataForTests.getContactFavoriteDATAFromJSONObjectWithJSONArray();
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
+//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
+//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
+//        contactsController.insertFavouriteContactInRealm(jsonObject);
+//    }
+//
+//    @Test
+//    public void testInsertFavouriteContactInRealmWithControlledException()
+//    {
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.insertFavouriteContactInRealm(null);
+//    }
+//
+//    @Test
+//    public void testInsertContactListInRealmWithoutJSONArray()
+//    {
+//        JSONObject jsonObject = MockDataForTests.getContactJSONObject();
+//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
+//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
+//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
+//        contactsController.insertContactListInRealm(jsonObject);
+//    }
 
     public void startContactListFragment(int index)
     {

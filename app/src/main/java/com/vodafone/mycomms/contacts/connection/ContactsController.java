@@ -53,14 +53,6 @@ public class ContactsController{
         mRealmProfileTransactions = new RealmProfileTransactions();
     }
 
-    public RealmContactTransactions getRealmContactTransactions() {
-        return realmContactTransactions;
-    }
-
-    public void setRealmContactTransactions(RealmContactTransactions realmContactTransactions) {
-        ContactsController.realmContactTransactions = realmContactTransactions;
-    }
-
     public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
     {
         ArrayList<Contact> realmContactList = new ArrayList<>();

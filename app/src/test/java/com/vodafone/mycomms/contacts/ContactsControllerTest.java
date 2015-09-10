@@ -190,7 +190,6 @@ public class ContactsControllerTest implements IMockitoConfiguration {
             System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
             Assert.fail();
         }
-        Robolectric.flushForegroundThreadScheduler();
 
         ReloadAdapterEvent event = new ReloadAdapterEvent();
         BusProvider.getInstance().post(event);

@@ -36,7 +36,6 @@ import model.UserProfile;
 public class ContactsController{
 
     private static RealmContactTransactions realmContactTransactions;
-    private RealmAvatarTransactions realmAvatarTransactions;
     private String mProfileId;
     private Context mContext;
 
@@ -49,7 +48,6 @@ public class ContactsController{
         this.mProfileId = profileId;
         this.mContext = mContext;
         realmContactTransactions = new RealmContactTransactions(mProfileId);
-        realmAvatarTransactions = new RealmAvatarTransactions();
         mRealmProfileTransactions = new RealmProfileTransactions();
     }
 
@@ -73,10 +71,10 @@ public class ContactsController{
                 jsonObject = jsonArray.getJSONObject(i);
 
                 if(null != jsonObject.getString(Constants.CONTACT_ID)){
-                    contact = realmContactTransactions.getContactById(jsonObject.getString
+                    contact = RealmContactTransactions.getContactById(jsonObject.getString
                             (Constants.CONTACT_ID), realm);
                     if (null != contact){
-                        String SF_URL = realmContactTransactions.getContactById(jsonObject
+                        String SF_URL = RealmContactTransactions.getContactById(jsonObject
                                 .getString(Constants.CONTACT_ID), realm)
                                 .getStringField1();
                         if(null != SF_URL)
@@ -105,7 +103,7 @@ public class ContactsController{
             Log.i(Constants.TAG, "ContactsController.insertFavouriteContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_FAVOURITES);
             for (int i = 0; i < jsonArray.length(); i++) {
-                contact = realmContactTransactions.getContactById(jsonArray.getString(i), realm);
+                contact = RealmContactTransactions.getContactById(jsonArray.getString(i), realm);
                 if (contact != null) {
                     contactList.add(mapContactToFavourite(contact));
                 }
@@ -135,7 +133,7 @@ public class ContactsController{
         try {
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
-                contact = realmContactTransactions.getContactById(
+                contact = RealmContactTransactions.getContactById(
                         jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID), realm);
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));

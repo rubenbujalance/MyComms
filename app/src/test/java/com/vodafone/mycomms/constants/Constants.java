@@ -52,5 +52,9 @@ public class Constants {
     public static final String SETTINGS_JSON_TIMEZONE_PRIVATE = "\"{\\\"privateTimeZone\\\":true,\\\"holiday\\\":{\\\"startDate\\\":\\\"2015-09-08T22:00:00.000Z\\\",\\\"endDate\\\":\\\"2015-09-10T21:59:59.999Z\\\"}}\"";
     public static final String SETTINGS_JSON_TIMEZONE_PUBLIC = "\"{\\\"holiday\\\":{\\\"startDate\\\":\\\"2015-09-08T22:00:00.000Z\\\",\\\"endDate\\\":\\\"2015-09-10T21:59:59.999Z\\\"}}\"";
     public static final String SETTINGS_JSON_DONOTDISTURB = "\"{\\\"doNotDisturb\\\":true,\\\"holiday\\\":{\\\"startDate\\\":\\\"2015-09-08T22:00:00.000Z\\\",\\\"endDate\\\":\\\"2015-09-10T21:59:59.999Z\\\"}}\"";
+    public static final String SETTINGS_JSON_FULL = "{\"privateTimeZone\":true,\"doNotDisturb\":true,\"holiday\":{\"startDate\":\"2015-09-09T22:00:00.000Z\",\"endDate\":\"2015-10-19T21:59:59.999Z\"}}";
+    public static final String SETTINGS_JSON_NO_HOLIDAY = "{\"privateTimeZone\":true,\"doNotDisturb\":true}";
+    public static final String SETTINGS_JSON_NO_DONOTDISTURB = "{\"privateTimeZone\":true}";
+    public static final String SETTINGS_JSON_NO_TIMEZONE = "{\"doNotDisturb\":true}";
 
 }

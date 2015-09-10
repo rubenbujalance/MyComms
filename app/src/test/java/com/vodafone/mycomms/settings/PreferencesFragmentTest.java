@@ -3,6 +3,7 @@ package com.vodafone.mycomms.settings;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,9 +21,12 @@ import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomPreferencesFragmentActivity;
+import com.vodafone.mycomms.util.Utils;
 
 import junit.framework.Assert;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,10 +41,11 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowActivity;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 import io.realm.Realm;
@@ -143,30 +148,7 @@ public class PreferencesFragmentTest {
     }
 
     @Test
-    public void testVacationTimeClick() throws Exception {
-        System.err.println("******** Test: Vacation Time Click ********");
-
-        vacationTimeButton.performClick();
-
-        System.err.println("******** Test: Vacation Time Click OK********");
-    }
-
-    //    @Test
-    public void testVacationTimeActivityResult() throws Exception {
-        System.err.println("******** Test: Vacation Time Click ********");
-
-        //        Shadows.shadowOf(mPreferencesFragment.getActivity()).receiveResult(
-//                new Intent(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class),
-//                Activity.RESULT_OK,
-//                new Intent().putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, Constants.VACATION_END_DATE));
-//
-//        Assert.assertEquals(Constants.VACATION_END_DATE, vacationTimeEnds.getText());
-
-        System.err.println("******** Test: Vacation Time Click OK********");
-    }
-
-    @Test
-    public void testShareCurrentTimeSwitchOn() throws Exception {
+    public void testShareCurrentTimeSwitch() throws Exception {
         System.err.println("******** Test: Share Current Time ********");
 
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_TIMEZONE_PUBLIC);
@@ -188,15 +170,25 @@ public class PreferencesFragmentTest {
 
         shareCurrentTimeSwitch.setChecked(true);
         shareCurrentTimeSwitch.performClick();
-
         Assert.assertTrue(!shareCurrentTimeSwitch.isChecked());
 
         System.err.println("******** Test: Share Current Time OK********");
     }
 
     @Test
+    public void testShareCurrentTimeSwitchOn() throws Exception {
+        System.err.println("******** Test: Share Current Time ********");
+
+        shareCurrentTimeSwitch.setChecked(false);
+        shareCurrentTimeSwitch.performClick();
+        Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
+
+        System.err.println("******** Test: Share Current Time OK********");
+    }
+
+    @Test
     public void testDoNotDisturbSwitch() throws Exception {
-        System.err.println("******** Test: LOGOUT ********");
+        System.err.println("******** Test: Do not disturb ********");
 
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_DONOTDISTURB);
         doNotDisturbSwitch.performClick();
@@ -205,7 +197,29 @@ public class PreferencesFragmentTest {
         mPreferencesFragment.onProfileReceived(userProfile);
         Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
 
-        System.err.println("******** Test: LOGOUT OK********");
+        System.err.println("******** Test: Do not disturb OK********");
+    }
+
+    @Test
+    public void testDoNotDisturbSwitchOn() throws Exception {
+        System.err.println("******** Test: Do not disturb ********");
+
+        doNotDisturbSwitch.setChecked(false);
+        doNotDisturbSwitch.performClick();
+        Assert.assertTrue(doNotDisturbSwitch.isChecked());
+
+        System.err.println("******** Test: Do not disturb OK********");
+    }
+
+    @Test
+    public void testDoNotDisturbSwitchOff() throws Exception {
+        System.err.println("******** Test: Do not disturb ********");
+
+        doNotDisturbSwitch.setChecked(true);
+        doNotDisturbSwitch.performClick();
+        Assert.assertTrue(!doNotDisturbSwitch.isChecked());
+
+        System.err.println("******** Test: Do not disturb OK********");
     }
 
     @Test
@@ -220,41 +234,65 @@ public class PreferencesFragmentTest {
         System.err.println("******** Test: About navigation OK********");
     }
 
-    //    @Test
-    public void testOnProfileReceived() throws Exception {
-        System.err.println("******** Test: LOGOUT ********");
+    @Test
+    public void testOnProfileReceivedWithVacation() throws Exception {
+        System.err.println("******** Test: On Profile Received ********");
 
-        System.err.println("******** Test: LOGOUT OK********");
+        UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_FULL);
+        ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
+        Mockito.doNothing().when(spyProfileController).updateSettingsData(Mockito.any(HashMap.class));
+        mPreferencesFragment.onProfileReceived(userProfile);
+        String date = getHolidayDateToSet(Constants.SETTINGS_JSON_FULL);
+
+        Assert.assertTrue(vacationTimeEnds.getText().equals(date));
+        Assert.assertTrue(vacationTimeEnds.getVisibility() == View.VISIBLE);
+        Assert.assertTrue(vacationTimeArrow.getVisibility() == View.GONE);
+
+        System.err.println("******** Test: On Profile Received OK********");
     }
 
-    //    @Test
-    public void testOnDetachFragment() throws Exception {
-        System.err.println("******** Test: LOGOUT ********");
+    @Test
+    public void testOnProfileReceivedWithNoHoliday() throws Exception {
+        System.err.println("******** Test: On Profile Received ********");
 
-        System.err.println("******** Test: LOGOUT OK********");
+        UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_HOLIDAY);
+        ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
+        Mockito.doNothing().when(spyProfileController).updateSettingsData(Mockito.any(HashMap.class));
+        mPreferencesFragment.profileController = spyProfileController;
+        mPreferencesFragment.onProfileReceived(userProfile);
+
+        Assert.assertTrue(vacationTimeEnds.getVisibility() == View.GONE);
+        Assert.assertTrue(vacationTimeArrow.getVisibility() == View.VISIBLE);
+
+        System.err.println("******** Test: On Profile Received OK********");
     }
 
-    //    @Test
-    public void testOnPauseFragment() throws Exception {
-        System.err.println("******** Test: LOGOUT ********");
+    @Test
+    public void testOnProfileReceivedWithPublicTimeZone() throws Exception {
+        System.err.println("******** Test: On Profile Received ********");
 
-        System.err.println("******** Test: LOGOUT OK********");
+        UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_TIMEZONE);
+        ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
+        Mockito.doNothing().when(spyProfileController).updateSettingsData(Mockito.any(HashMap.class));
+        mPreferencesFragment.profileController = spyProfileController;
+        mPreferencesFragment.onProfileReceived(userProfile);
+
+        Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
+
+        System.err.println("******** Test: On Profile Received OK********");
     }
 
-    //    @Test
-    public void testOnStopFragment() throws Exception {
-        System.err.println("******** Test: LOGOUT ********");
+    @Test
+    public void testOnProfileReceivedWithNoDoNotDisturb() throws Exception {
+        System.err.println("******** Test: On Profile Received ********");
 
-        System.err.println("******** Test: LOGOUT OK********");
+        UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_DONOTDISTURB);
+        mPreferencesFragment.onProfileReceived(userProfile);
+
+        Assert.assertTrue(!doNotDisturbSwitch.isChecked());
+
+        System.err.println("******** Test: On Profile Received OK********");
     }
-
-    //    @Test
-    public void testOnDestroyFragment() throws Exception {
-        System.err.println("******** Test: LOGOUT ********");
-
-        System.err.println("******** Test: LOGOUT OK********");
-    }
-
 
     public void startPreferencesFragment(int index)
     {
@@ -266,33 +304,62 @@ public class PreferencesFragmentTest {
                 .create().start().resume().get();
     }
 
-    private String startWebMockServer() throws Exception {
-        //OkHttp mocked web server
-        webServer = new MockWebServer();
-        webServer.useHttps(null, false);
+    @Test
+    public void testVacationTimeClick() throws Exception {
+        System.err.println("******** Test: Vacation Time Click ********");
 
-        //Connect OkHttp calls with MockWebServer
-        webServer.start();
+        vacationTimeButton.performClick();
+//        Intent expectedIntent = new Intent(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
+//        Assert.assertTrue(Shadows.shadowOf(mPreferencesFragment.getActivity())
+//                .getNextStartedActivityForResult().equals(expectedIntent));
 
-        return webServer.getUrl("/").toString();
+        System.err.println("******** Test: Vacation Time Click OK********");
     }
 
-    private String loadJSON() throws Exception {
-        InputStream inputStream = context.getResources().openRawResource(R.raw.test_contacts);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    @Test
+    public void shouldSupportStartActivityForResult() throws Exception {
+        ShadowActivity shadowActivity = Shadows.shadowOf(mPreferencesFragment.getActivity());
+        Intent intent = new Intent().setClass(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
+        Assert.assertTrue(shadowActivity.getNextStartedActivity() == null);
+        mPreferencesFragment.getActivity().startActivityForResult(intent, 142);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        Assert.assertTrue(startedIntent != null);
+        Assert.assertTrue(startedIntent.equals(intent));
+    }
 
-        int ctr;
-        try {
-            ctr = inputStream.read();
-            while (ctr != -1) {
-                byteArrayOutputStream.write(ctr);
-                ctr = inputStream.read();
-            }
-            inputStream.close();
-        } catch (IOException e) {
-            Log.e(com.vodafone.mycomms.util.Constants.TAG, "SearchGlobalContactsTest.loadJSON: e ", e);
-        }
-        return byteArrayOutputStream.toString();
+    @Test
+    public void shouldSupportGetStartedActivitiesForResult() throws Exception {
+        ShadowActivity shadowActivity = Shadows.shadowOf(mPreferencesFragment.getActivity());
+        Intent intent = new Intent().setClass(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
+        mPreferencesFragment.getActivity().startActivityForResult(intent, 142);
+        ShadowActivity.IntentForResult intentForResult = shadowActivity.getNextStartedActivityForResult();
+        Assert.assertTrue(intentForResult!=null);
+        Assert.assertTrue(shadowActivity.getNextStartedActivityForResult()==null);
+        Assert.assertTrue(intentForResult.intent!=null);
+        Assert.assertTrue(intentForResult.intent==intent);
+        Assert.assertTrue(intentForResult.requestCode == 142);
+    }
+
+//    @Test
+    public void testVacationTimeActivityResult() throws Exception {
+        System.err.println("******** Test: Vacation Time Click ********");
+
+        vacationTimeButton.performClick();
+
+//        ShadowActivity sActivity = Shadows.shadowOf(mPreferencesFragment.getActivity());
+//        Intent requestIntent = new Intent(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
+//        requestIntent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, "Fake Date");
+//        Intent responseIntent = new Intent().putExtra("vacationTimeEndValue","Fake Date");
+//        sActivity.receiveResult(requestIntent, Activity.RESULT_OK, responseIntent);
+//        Assert.assertNotNull(vacationTimeEnds.getText());
+        //        Shadows.shadowOf(mPreferencesFragment.getActivity()).receiveResult(
+//                new Intent(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class),
+//                Activity.RESULT_OK,
+//                new Intent().putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, Constants.VACATION_END_DATE));
+//
+//        Assert.assertEquals(Constants.VACATION_END_DATE, vacationTimeEnds.getText());
+
+        System.err.println("******** Test: Vacation Time Click OK********");
     }
 
     private UserProfile mockUserProfile(String settings){
@@ -301,5 +368,28 @@ public class PreferencesFragmentTest {
         userProfile.setSettings(settings);
 
         return userProfile;
+    }
+
+    private String getHolidayDateToSet(String json){
+        String endDateStr = "";
+        try {
+            JSONObject jsonSettings = new JSONObject(json);
+            JSONObject jsonHoliday = jsonSettings.getJSONObject(com.vodafone.mycomms.util.Constants.PROFILE_HOLIDAY);
+            endDateStr = jsonHoliday.getString(com.vodafone.mycomms.util.Constants.PROFILE_HOLIDAY_END_DATE);
+        } catch (JSONException e){
+            Log.e(com.vodafone.mycomms.util.Constants.TAG, "PreferencesFragmentTest.getHolidayDateToSet: e ",e);
+        }
+        endDateStr = endDateStr.replaceAll("Z", "+0000");
+        String holidayEndDate = Utils.isoDateToTimezone(endDateStr);
+        SimpleDateFormat sdf = new SimpleDateFormat(com.vodafone.mycomms.util.Constants.API_DATE_FULL_FORMAT);
+        Date endDate = null;
+        try {
+            endDate = sdf.parse(holidayEndDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        final String holidayDateToSet =
+                com.vodafone.mycomms.util.Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(endDate.getTime());
+        return holidayDateToSet;
     }
 }

@@ -47,7 +47,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private ProfileController profileController;
+    public ProfileController profileController;
     private boolean isSourceDB = true;
 
     private String holidayEndDate = "";
@@ -241,10 +241,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         mListener = null;
     }
 
-    public void onStop(){
-        super.onStop();
-    }
-
     @Override
     public void onProfileReceived(UserProfile userProfile) {
         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: settings:" + userProfile.getSettings());
@@ -255,14 +251,16 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
         try{
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
+                String test = userProfile.getSettings();
                 jsonSettings = new JSONObject(userProfile.getSettings());
 
                 if(jsonSettings.has(Constants.PROFILE_HOLIDAY)) {
                     JSONObject jsonHoliday = jsonSettings.getJSONObject(Constants.PROFILE_HOLIDAY);
-                    String endDateStr = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
-                    endDateStr = endDateStr.replaceAll("Z", "+0000");
-
-                    holidayEndDate = Utils.isoDateToTimezone(endDateStr);
+                    if (jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE)!=null) {
+                        String endDateStr = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
+                        endDateStr = endDateStr.replaceAll("Z", "+0000");
+                        holidayEndDate = Utils.isoDateToTimezone(endDateStr);
+                    }
 
                     if (holidayEndDate != null && holidayEndDate.length()>0) {
                         SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
@@ -277,16 +275,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                                 vacationTimeEnds.setText(holidayDateToSet);
                                 vacationTimeEnds.setVisibility(View.VISIBLE);
                                 vacationTimeArrow.setVisibility(View.GONE);
-                            }
-                        });
-                    }
-                    else
-                    {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                vacationTimeEnds.setVisibility(View.GONE);
-                                vacationTimeArrow.setVisibility(View.VISIBLE);
                             }
                         });
                     }

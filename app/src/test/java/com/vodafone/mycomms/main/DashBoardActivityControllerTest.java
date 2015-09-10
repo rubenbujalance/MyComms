@@ -25,6 +25,7 @@ import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,11 +49,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.realm.Realm;
-import model.RecentContact;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -71,7 +70,8 @@ import static org.robolectric.Shadows.shadowOf;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, RealmContactTransactions.class, RealmGroupChatTransactions.class})
+@PrepareForTest({Realm.class, Crashlytics.class, RealmContactTransactions.class, RealmGroupChatTransactions.class,
+                    XMPPTransactions.class})
 public class DashBoardActivityControllerTest implements IMockitoConfiguration
 {
     @Rule
@@ -86,6 +86,7 @@ public class DashBoardActivityControllerTest implements IMockitoConfiguration
     {
         mockStatic(Realm.class);
         when(Realm.getDefaultInstance()).thenReturn(null);
+        mockStatic(XMPPTransactions.class);
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         Context context = RuntimeEnvironment.application.getApplicationContext();

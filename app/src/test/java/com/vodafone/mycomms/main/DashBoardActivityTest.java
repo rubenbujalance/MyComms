@@ -1,14 +1,10 @@
 package com.vodafone.mycomms.main;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.opengl.Visibility;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,11 +15,8 @@ import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.ContactListMainActivity;
-import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.connection.AsyncTaskQueue;
-import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
@@ -31,13 +24,10 @@ import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
-import com.vodafone.mycomms.realm.RealmContactTransactions;
-import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.test.util.Util;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import junit.framework.Assert;
 
@@ -45,8 +35,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -62,9 +50,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import model.News;
-import model.RecentContact;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -77,7 +63,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class})
+@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class, XMPPTransactions.class})
 public class DashBoardActivityTest
 {
     @Rule
@@ -91,6 +77,7 @@ public class DashBoardActivityTest
     {
         mockStatic(Realm.class);
         when(Realm.getDefaultInstance()).thenReturn(null);
+        mockStatic(XMPPTransactions.class);
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         Context context = RuntimeEnvironment.application.getApplicationContext();

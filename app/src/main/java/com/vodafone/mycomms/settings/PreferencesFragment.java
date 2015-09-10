@@ -47,7 +47,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-    private ProfileController profileController;
+    public ProfileController profileController;
     private boolean isSourceDB = true;
 
     private String holidayEndDate = "";
@@ -58,6 +58,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
     private TextView vacationTimeEnds;
     private ImageView vacationTimeArrow;
+
+    private View view;
 
     private Realm realm;
 
@@ -106,14 +108,13 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         this.realm = Realm.getDefaultInstance();
-        this.realm.setAutoRefresh(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_set_preferences, container, false);
-
+        view = inflater.inflate(R.layout.layout_set_preferences, container, false);
         vacationTimeEnds = (TextView) v.findViewById(R.id.settings_preferences_vacation_time_value);
         vacationTimeArrow = (ImageView) v.findViewById(R.id.about_arrow_right_top);
 
@@ -125,7 +126,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
                 //Logout on server
                 profileController.logoutToAPI();
-                ((MycommsApp) getActivity().getApplication()).appIsInitialized = false;
+                MycommsApp.appIsInitialized = false;
 
 
             }
@@ -240,10 +241,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         mListener = null;
     }
 
-    public void onStop(){
-        super.onStop();
-    }
-
     @Override
     public void onProfileReceived(UserProfile userProfile) {
         Log.d(Constants.TAG, "PreferencesFragment.onProfileReceived: settings:" + userProfile.getSettings());
@@ -254,14 +251,16 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
         try{
             if(userProfile.getSettings() != null && userProfile.getSettings().length() > 0) {
+                String test = userProfile.getSettings();
                 jsonSettings = new JSONObject(userProfile.getSettings());
 
                 if(jsonSettings.has(Constants.PROFILE_HOLIDAY)) {
                     JSONObject jsonHoliday = jsonSettings.getJSONObject(Constants.PROFILE_HOLIDAY);
-                    String endDateStr = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
-                    endDateStr = endDateStr.replaceAll("Z", "+0000");
-
-                    holidayEndDate = Utils.isoDateToTimezone(endDateStr);
+                    if (jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE)!=null) {
+                        String endDateStr = jsonHoliday.getString(Constants.PROFILE_HOLIDAY_END_DATE);
+                        endDateStr = endDateStr.replaceAll("Z", "+0000");
+                        holidayEndDate = Utils.isoDateToTimezone(endDateStr);
+                    }
 
                     if (holidayEndDate != null && holidayEndDate.length()>0) {
                         SimpleDateFormat sdf = new SimpleDateFormat(Constants.API_DATE_FULL_FORMAT);
@@ -276,16 +275,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                                 vacationTimeEnds.setText(holidayDateToSet);
                                 vacationTimeEnds.setVisibility(View.VISIBLE);
                                 vacationTimeArrow.setVisibility(View.GONE);
-                            }
-                        });
-                    }
-                    else
-                    {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                vacationTimeEnds.setVisibility(View.GONE);
-                                vacationTimeArrow.setVisibility(View.VISIBLE);
                             }
                         });
                     }
@@ -329,7 +318,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
                 @Override
                 public void run()
                 {
-                    Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
+                    Switch shareCurrentTimeSwitch = (Switch) view.findViewById(R.id.setting_share_current_time_switch);
                     shareCurrentTimeSwitch.setChecked(false);
                 }
             });
@@ -339,7 +328,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Switch shareCurrentTimeSwitch = (Switch) getActivity().findViewById(R.id.setting_share_current_time_switch);
+                    Switch shareCurrentTimeSwitch = (Switch) view.findViewById(R.id.setting_share_current_time_switch);
                     shareCurrentTimeSwitch.setChecked(true);
                 }
             });
@@ -351,7 +340,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
+                    Switch doNotDisturbSwitch = (Switch) view.findViewById(R.id.settings_do_not_disturb_switch);
                     doNotDisturbSwitch.setChecked(true);
                 }
             });
@@ -361,7 +350,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Switch doNotDisturbSwitch = (Switch) getActivity().findViewById(R.id.settings_do_not_disturb_switch);
+                    Switch doNotDisturbSwitch = (Switch) view.findViewById(R.id.settings_do_not_disturb_switch);
                     doNotDisturbSwitch.setChecked(false);
                 }
             });

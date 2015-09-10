@@ -47,4 +47,14 @@ public class Constants {
     public static final String BASEURL_RESPONSE_HEADER_OK = "Access-Control-Allow-Credentials=\"true\", Access-Control-Allow-Headers=\"x-mycomms-version,content-type,Authorization\", Access-Control-Allow-Methods=\"OPTION,GET,PUT,POST,DELETE,HEAD\", Access-Control-Allow-Origin = \"https://int-marketing.my-comms.com\", Connection = \"keep-alive\", Content-Length = \"12851\", Content-Type = \"application/json\", Date = \"Mon, 31 Aug 2015 07:54:33 GMT\", Server = \"nginx/1.4.6 (Ubuntu)\", X-Frame-Options = \"SAMEORIGIN\"";
     public static final String BASEURL_RESPONSE_HEADER_KEY = "WWW-Authenticate";
 
+    //SETTINGS TESTS
+    public static final String VACATION_END_DATE = "2015-09-10T00:00:00.000+0200";
+    public static final String SETTINGS_JSON_TIMEZONE_PRIVATE = "\"{\\\"privateTimeZone\\\":true,\\\"holiday\\\":{\\\"startDate\\\":\\\"2015-09-08T22:00:00.000Z\\\",\\\"endDate\\\":\\\"2015-09-10T21:59:59.999Z\\\"}}\"";
+    public static final String SETTINGS_JSON_TIMEZONE_PUBLIC = "\"{\\\"holiday\\\":{\\\"startDate\\\":\\\"2015-09-08T22:00:00.000Z\\\",\\\"endDate\\\":\\\"2015-09-10T21:59:59.999Z\\\"}}\"";
+    public static final String SETTINGS_JSON_DONOTDISTURB = "\"{\\\"doNotDisturb\\\":true,\\\"holiday\\\":{\\\"startDate\\\":\\\"2015-09-08T22:00:00.000Z\\\",\\\"endDate\\\":\\\"2015-09-10T21:59:59.999Z\\\"}}\"";
+    public static final String SETTINGS_JSON_FULL = "{\"privateTimeZone\":true,\"doNotDisturb\":true,\"holiday\":{\"startDate\":\"2015-09-09T22:00:00.000Z\",\"endDate\":\"2015-10-19T21:59:59.999Z\"}}";
+    public static final String SETTINGS_JSON_NO_HOLIDAY = "{\"privateTimeZone\":true,\"doNotDisturb\":true}";
+    public static final String SETTINGS_JSON_NO_DONOTDISTURB = "{\"privateTimeZone\":true}";
+    public static final String SETTINGS_JSON_NO_TIMEZONE = "{\"doNotDisturb\":true}";
+
 }

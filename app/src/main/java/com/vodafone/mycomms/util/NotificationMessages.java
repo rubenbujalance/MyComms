@@ -54,8 +54,10 @@ public final class NotificationMessages extends MainActivity
         if(null == mNotificationManager)
             mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        String message = data.getString("message");
+        //Avoid duplicated notifications
+        if(notificationIds.containsKey(data.toString())) return;
 
+        String message = data.getString("message");
         NotificationCompat.Builder builder = createNotificationMessagesInstance(context, data);
 //        String from = data.getString(Constants.NOTIFICATION_BUNDLE_FROM_KEY);
 //        if (from != null && from.contains("@"))
@@ -84,7 +86,8 @@ public final class NotificationMessages extends MainActivity
 //
 //            mNotificationManager.notify(id, notification);
 //        }
-
+        int id = (int)System.currentTimeMillis();
+        notificationIds.put(data.toString(), id);
         mNotificationManager.notify((int)System.currentTimeMillis(), notification);
     }
 

@@ -805,7 +805,7 @@ public class SplashScreenActivity extends MainActivity {
                 @Override
                 public void run() {
                     Intent intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
-                    intentChat.putExtra(Constants.CHAT_FIELD_CONTACT_ID, groupId);
+                    intentChat.putExtra(Constants.GROUP_CHAT_ID, groupId);
                     intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                     intentChat.putExtra(Constants.IS_GROUP_CHAT, true);
 

@@ -74,17 +74,17 @@ public class MockDataForTests
         mockRecentContact.setFirstName("Albert");
         mockRecentContact.setLastName("Mialet");
         mockRecentContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
-        mockRecentContact.setPhones("[{\"phones\": [\n" +
+        mockRecentContact.setPhones("[\n" +
                 "{\n" +
                 "\"country\": \"ES\",\n" +
                 "\"phone\": \"+34659562976\"\n" +
                 "}\n" +
-                "]}]");
-        mockRecentContact.setEmails("[{\"emails\": [\n" +
+                "]");
+        mockRecentContact.setEmails("[\n" +
                 "{\n" +
                 "\"email\": \"vdf01@stratesys-ts.com\"\n" +
                 "}\n" +
-                "]}]");
+                "]");
         mockRecentContact.setCompany("Stratesys");
         mockRecentContact.setPosition("Senior Developer Consultant");
         mockRecentContact.setOfficeLocation("Barcelona");
@@ -103,8 +103,167 @@ public class MockDataForTests
         mockRecentContact.setAvailability("available");
 
         recentList.add(mockRecentContact);
+        mockRecentContact = new RecentContact();
+
+        mockRecentContact.setContactId("mc_55409316799f7e1a109446f4");
+        mockRecentContact.setId("mc_55409316799f7e1a109446f4");
+        mockRecentContact.setAction("call");
+        mockRecentContact.setPlatform("mc");
+        mockRecentContact.setFirstName("Albert");
+        mockRecentContact.setLastName("Mialet");
+        mockRecentContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
+        mockRecentContact.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
+        mockRecentContact.setEmails("[\n" +
+                "{\n" +
+                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "}\n" +
+                "]");
+        mockRecentContact.setCompany("Stratesys");
+        mockRecentContact.setPosition("Senior Developer Consultant");
+        mockRecentContact.setOfficeLocation("Barcelona");
+        mockRecentContact.setTimezone("Europe/Madrid");
+        mockRecentContact.setAvailability("DADFE1");
+        mockRecentContact.setTimestamp(Long.parseLong("1440658545874"));
+
+        recentList.add(mockRecentContact);
+        mockRecentContact = new RecentContact();
+
+        mockRecentContact.setContactId("mc_55409316799f7e1a109446f4");
+        mockRecentContact.setId("mc_55409316799f7e1a109446f4");
+        mockRecentContact.setAction("email");
+        mockRecentContact.setPlatform("mc");
+        mockRecentContact.setFirstName("Albert");
+        mockRecentContact.setLastName("Mialet");
+        mockRecentContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
+        mockRecentContact.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
+        mockRecentContact.setEmails("[\n" +
+                "{\n" +
+                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "}\n" +
+                "]");
+        mockRecentContact.setCompany("Stratesys");
+        mockRecentContact.setPosition("Senior Developer Consultant");
+        mockRecentContact.setOfficeLocation("Barcelona");
+        mockRecentContact.setTimezone("Europe/Madrid");
+        mockRecentContact.setAvailability("DADFE1");
+        mockRecentContact.setTimestamp(Long.parseLong("1440658545874"));
+
+        recentList.add(mockRecentContact);
 
         return recentList;
+    }
+
+    public static ArrayList<FavouriteContact> getMockFavouriteContactsList()
+    {
+        ArrayList<FavouriteContact> list = new ArrayList<>();
+        FavouriteContact mockFavouriteContact = new FavouriteContact();
+
+        mockFavouriteContact.setContactId("mc_55409316799f7e1a109446f4");
+        mockFavouriteContact.setId("mc_55409316799f7e1a109446f4");
+        mockFavouriteContact.setPlatform("mc");
+        mockFavouriteContact.setFirstName("Albert");
+        mockFavouriteContact.setLastName("Mialet");
+        mockFavouriteContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
+        mockFavouriteContact.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
+        mockFavouriteContact.setEmails("[\n" +
+                "{\n" +
+                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "}\n" +
+                "]");
+        mockFavouriteContact.setPresence(
+                "{\n" +
+                        "\"icon\": \"mockIcon\"\n," +
+                        "\"detail\": \"#LOCAL_TIME#\"\n" +
+                        "}");
+        mockFavouriteContact.setCompany("Stratesys");
+        mockFavouriteContact.setPosition("Senior Developer Consultant");
+        mockFavouriteContact.setOfficeLocation("Barcelona");
+        mockFavouriteContact.setTimezone("Europe/Madrid");
+        mockFavouriteContact.setAvailability("DADFE1");
+        mockFavouriteContact.setCountry("Spain");
+
+        list.add(mockFavouriteContact);
+        mockFavouriteContact = new FavouriteContact();
+
+        mockFavouriteContact.setContactId("mc_55409316799f7e1a109446f4");
+        mockFavouriteContact.setId("mc_55409316799f7e1a109446f4");
+        mockFavouriteContact.setPlatform("sf");
+        mockFavouriteContact.setFirstName("Albert");
+        mockFavouriteContact.setLastName("Mialet");
+        mockFavouriteContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
+        mockFavouriteContact.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
+        mockFavouriteContact.setEmails("[\n" +
+                "{\n" +
+                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "}\n" +
+                "]");
+        mockFavouriteContact.setCompany("Stratesys");
+        mockFavouriteContact.setPresence(
+                "{\n" +
+                        "\"icon\": \"mockIcon\"\n," +
+                        "\"detail\": \"#LOCAL_TIME#\"\n" +
+                        "}");
+        mockFavouriteContact.setPosition("Senior Developer Consultant");
+        mockFavouriteContact.setOfficeLocation("Barcelona");
+        mockFavouriteContact.setTimezone("Europe/Madrid");
+        mockFavouriteContact.setAvailability("DADFE1");
+        mockFavouriteContact.setCountry("Spain");
+
+        list.add(mockFavouriteContact);
+        mockFavouriteContact = new FavouriteContact();
+
+        mockFavouriteContact.setContactId("mc_55409316799f7e1a109446f4");
+        mockFavouriteContact.setId("mc_55409316799f7e1a109446f4");
+        mockFavouriteContact.setPlatform("local");
+        mockFavouriteContact.setFirstName("Albert");
+        mockFavouriteContact.setLastName("Mialet");
+        mockFavouriteContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
+        mockFavouriteContact.setPhones("[\n" +
+                "{\n" +
+                "\"country\": \"ES\",\n" +
+                "\"phone\": \"+34659562976\"\n" +
+                "}\n" +
+                "]");
+        mockFavouriteContact.setEmails("[\n" +
+                "{\n" +
+                "\"email\": \"vdf01@stratesys-ts.com\"\n" +
+                "}\n" +
+                "]");
+        mockFavouriteContact.setCompany("Stratesys");
+        mockFavouriteContact.setPresence(
+                "{\n" +
+                "\"icon\": \"mockIcon\"\n," +
+                "\"detail\": \"#LOCAL_TIME#\"\n" +
+                "}");
+        mockFavouriteContact.setPosition("Senior Developer Consultant");
+        mockFavouriteContact.setOfficeLocation("Barcelona");
+        mockFavouriteContact.setTimezone("Europe/Madrid");
+        mockFavouriteContact.setAvailability("DADFE1");
+        mockFavouriteContact.setCountry("Spain");
+
+        list.add(mockFavouriteContact);
+
+        return list;
     }
 
     public static ArrayList<RecentContact> getMockRecentContactsList_OnlyOneGroupChat()
@@ -415,6 +574,10 @@ public class MockDataForTests
                 "\"email\": \"vdf01@stratesys-ts.com\"\n" +
                 "}\n" +
                 "]");
+        mockContact.setPresence(
+                "{\n" +
+                "\"detail\": \"#LOCAL_TIME#\"\n" +
+                "}");
         mockContact.setCompany("Stratesys");
         mockContact.setPosition("Senior Developer Consultant");
         mockContact.setOfficeLocation("Barcelona");
@@ -532,6 +695,11 @@ public class MockDataForTests
         mockContact.setOfficeLocation("Barcelona");
         mockContact.setTimezone("Europe/Madrid");
         mockContact.setAvailability("DADFE1");
+        mockContact.setCountry("Spain");
+        mockContact.setPresence(
+                "{\n" +
+                        "\"icon\": \"mockIcon\"\n" +
+                "}");
         mockContact.setProfileId("mc_5570340e7eb7c3512f2f9bf2");
 
         contactList.add(mockContact);
@@ -541,7 +709,7 @@ public class MockDataForTests
         mockContact.setContactId("mc_5535b2ac13be4b7975c51600");
         mockContact.setId("mc_5535b2ac13be4b7975c51600");
         mockContact.setPlatform("mc");
-        mockContact.setFirstName("Albert");
+        mockContact.setFirstName("No results found");
         mockContact.setLastName("Mialet");
         mockContact.setAvatar("https://mycomms-avatars.s3-us-west-2.amazonaws.com/55409316799f7e1a109446f4_1437066718958d");
         mockContact.setPhones("[\n" +

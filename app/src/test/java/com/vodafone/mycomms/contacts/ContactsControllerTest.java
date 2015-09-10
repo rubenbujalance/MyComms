@@ -1,20 +1,39 @@
 package com.vodafone.mycomms.contacts;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
+import com.squareup.picasso.Downloader;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.MycommsApp;
+import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.contacts.connection.ContactsController;
+import com.vodafone.mycomms.contacts.connection.RecentContactController;
+import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
+import com.vodafone.mycomms.search.SearchBarController;
+import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.APIWrapper;
@@ -28,6 +47,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.ReturnValues;
+import org.mockito.configuration.AnnotationEngine;
+import org.mockito.configuration.IMockitoConfiguration;
+import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -36,8 +59,12 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.ShadowIntent;
+import org.robolectric.shadows.ShadowListView;
 
 import io.realm.Realm;
 import model.Contact;
@@ -47,7 +74,6 @@ import model.UserProfile;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 /**
  * Created by str_oan on 07/09/2015.
@@ -58,15 +84,16 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({RealmContactTransactions.class, Realm.class, EndpointWrapper.class})
-public class ContactsControllerTest
-{
+@PrepareForTest({Realm.class, EndpointWrapper.class
+        , SearchController.class, SearchBarController.class, RecentContactController.class
+        , RealmContactTransactions.class})
+
+public class ContactsControllerTest implements IMockitoConfiguration {
     @Rule
     public PowerMockRule rule = new PowerMockRule();
 
     public MockWebServer webServer;
     public Context mContext;
-    public ContactsController mContactsController;
     public String mProfileId = "mc_5570340e7eb7c3512f2f9bf2";
     public CustomFragmentActivity mCustomFragmentActivity;
     public ContactListFragment mContactListFragment;
@@ -77,23 +104,204 @@ public class ContactsControllerTest
         mockStatic(Realm.class);
         when(Realm.getDefaultInstance()).thenReturn(null);
         mockStatic(Crashlytics.class);
+        mContext = RuntimeEnvironment.application.getApplicationContext();
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testContactListFragmentLifecycle()
+    {
+        Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
+                CustomFragmentActivity.class);
+        in.putExtra("index", 2);
+        mCustomFragmentActivity = Robolectric.buildActivity(CustomFragmentActivity.class)
+                .withIntent(in)
+                .create().start().resume().pause().stop().destroy().get();
+        Assert.assertTrue(mCustomFragmentActivity.isDestroyed());
+    }
+
+    @Test
+    public void testContactListFragment_LoadContactsFromDB_NullKeyWord()
+    {
         try
         {
-            whenNew(RealmContactTransactions.class).withAnyArguments()
-                    .thenReturn(null);
+            com.vodafone.mycomms.util.Constants.isDashboardOrigin = true;
+            PowerMockito.mockStatic(RealmContactTransactions.class);
+            PowerMockito.when(RealmContactTransactions.getAllContacts(Matchers.any(Realm.class), Matchers.anyString()))
+                    .thenReturn(MockDataForTests.getMockContactsList());
         }
         catch (Exception e)
         {
+            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
             Assert.fail();
-            System.err.println("******** Test: ContactsControllerTest********"+e.getMessage());
         }
 
-        mContext = RuntimeEnvironment.application.getApplicationContext();
         startContactListFragment(2);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("2");
-        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+        try
+        {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
 
+        Assert.assertTrue(!mContactListFragment.getContactList().isEmpty());
+        Assert.assertTrue(mContactListFragment.getContactList().size() == 9);
+        Assert.assertFalse(com.vodafone.mycomms.util.Constants.isDashboardOrigin);
+
+        checkOnItemClick();
+
+    }
+
+    @Test
+    public void testReloadAdapterEvent()
+    {
+        try
+        {
+            PowerMockito.mockStatic(RealmContactTransactions.class);
+            PowerMockito.when(RealmContactTransactions.getAllContacts(Matchers.any(Realm.class), Matchers.anyString()))
+                    .thenReturn(MockDataForTests.getMockContactsList());
+
+            PowerMockito.mockStatic(SearchBarController.class);
+            PowerMockito.when(SearchBarController.getContactList())
+                    .thenReturn(MockDataForTests.getMockContactsList());
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        startContactListFragment(2);
+        mContactListFragment = (ContactListFragment)mCustomFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("2");
+        try
+        {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
+        ReloadAdapterEvent event = new ReloadAdapterEvent();
+        BusProvider.getInstance().post(event);
+
+        Assert.assertTrue(!mContactListFragment.getContactList().isEmpty());
+        Assert.assertTrue(mContactListFragment.getContactList().size() == 9);
+    }
+
+    private void checkOnItemClick()
+    {
+        ListView listView = mContactListFragment.getListView();
+        View view = mContactListFragment.getView();
+        int position = 0;
+        long id = listView.getItemIdAtPosition(position);
+
+        listView.performItemClick(view, position, id);
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
+    }
+
+    @Test
+    public void testContactListFragment_LoadListViewElements_Click()
+    {
+        try
+        {
+            PowerMockito.mockStatic(RealmContactTransactions.class);
+            PowerMockito.when(RealmContactTransactions.getAllContacts(Matchers.any(Realm.class), Matchers.anyString()))
+                    .thenReturn(MockDataForTests.getMockContactsList());
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        startContactListFragment(2);
+        mContactListFragment = (ContactListFragment)mCustomFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("2");
+        mockParams();
+        try
+        {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
+        Assert.assertTrue(!mContactListFragment.getContactList().isEmpty());
+        Assert.assertTrue(mContactListFragment.getContactList().size() == 9);
+
+        ShadowListView shadowListView = Shadows.shadowOf(mContactListFragment.getListView());
+        shadowListView.populateItems();
+        Assert.assertTrue(shadowListView.performItemClick(0));
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
+    }
+
+
+    @Test
+    public void testContactListFragment_InviteOption_Click()
+    {
+        try
+        {
+            PowerMockito.mockStatic(RealmContactTransactions.class);
+            PowerMockito.when(RealmContactTransactions.getAllContacts(Matchers.any(Realm.class), Matchers.anyString()))
+                    .thenReturn(MockDataForTests.getMockContactsList());
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        startContactListFragment(2);
+        mContactListFragment = (ContactListFragment)mCustomFragmentActivity
+                .getSupportFragmentManager().findFragmentByTag("2");
+        mockParams();
+        try
+        {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
+        Assert.assertTrue(!mContactListFragment.getContactList().isEmpty());
+        Assert.assertTrue(mContactListFragment.getContactList().size() == 9);
+
+        ShadowListView shadowListView = Shadows.shadowOf(mContactListFragment.getListView());
+        shadowListView.populateItems();
+        ListView listView = mContactListFragment.getListView();
+        View view = listView.getChildAt(0);
+        LinearLayout layInviteMyComms = (LinearLayout) view.findViewById(R.id.lay_invite_mycomms);
+        layInviteMyComms.performClick();
+
+        AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
+        Button acceptButton = alert.getButton(AlertDialog.BUTTON_POSITIVE);
+        acceptButton.performClick();
+        Assert.assertTrue(!alert.isShowing());
     }
 
     @Test
@@ -415,91 +623,6 @@ public class ContactsControllerTest
         contactsController.mapContact(null, null);
     }
 
-//    @Test
-//    public void testInsertRecentGroupChatIntoRealm_OK()
-//    {
-//        Contact contact = MockDataForTests.getMockContact();
-//        JSONObject jsonObject = MockDataForTests.getContactJSONObject();
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.insertRecentGroupChatIntoRealm(contact, jsonObject);
-//    }
-//
-//    @Test
-//    public void testInsertRecentGroupChatIntoRealm_Null_Data()
-//    {
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.insertRecentGroupChatIntoRealm(null, null);
-//    }
-//
-//    @Test
-//    public void testInsertContactListInRealmWithNullContactFromGetter()
-//    {
-//        JSONObject jsonObject = MockDataForTests.getContactDATAFromJSONObjectWithJSONArray();
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(null);
-//        contactsController.insertContactListInRealm(jsonObject);
-//    }
-//
-//    @Test
-//    public void testInsertContactListInRealmWithNOTNullContactFromGetter()
-//    {
-//        JSONObject jsonObject = MockDataForTests.getContactDATAFromJSONObjectWithJSONArray();
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
-//        contactsController.insertContactListInRealm(jsonObject);
-//    }
-//
-//    @Test
-//    public void testInsertContactListInRealmWithControlledException()
-//    {
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.insertContactListInRealm(null);
-//    }
-//
-//    @Test
-//    public void testInsertFavouriteContactInRealmWithNullContactFromGetter()
-//    {
-//        JSONObject jsonObject = MockDataForTests.getContactFavoriteDATAFromJSONObjectWithJSONArray();
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(null);
-//        contactsController.insertFavouriteContactInRealm(jsonObject);
-//    }
-//
-//    @Test
-//    public void testInsertFavouriteContactInRealmWithNOTNullContactFromGetter()
-//    {
-//        JSONObject jsonObject = MockDataForTests.getContactFavoriteDATAFromJSONObjectWithJSONArray();
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
-//        contactsController.insertFavouriteContactInRealm(jsonObject);
-//    }
-//
-//    @Test
-//    public void testInsertFavouriteContactInRealmWithControlledException()
-//    {
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.insertFavouriteContactInRealm(null);
-//    }
-//
-//    @Test
-//    public void testInsertContactListInRealmWithoutJSONArray()
-//    {
-//        JSONObject jsonObject = MockDataForTests.getContactJSONObject();
-//        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-//        contactsController.setRealmContactTransactions(Mockito.mock(RealmContactTransactions.class));
-//        Mockito.when(contactsController.getRealmContactTransactions().getContactById
-//                (Matchers.anyString(), Matchers.any(Realm.class))).thenReturn(MockDataForTests.getMockContact());
-//        contactsController.insertContactListInRealm(jsonObject);
-//    }
-
     public void startContactListFragment(int index)
     {
         Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
@@ -507,7 +630,7 @@ public class ContactsControllerTest
         in.putExtra("index", index);
         mCustomFragmentActivity = Robolectric.buildActivity(CustomFragmentActivity.class)
                 .withIntent(in)
-                .create().start().resume().get();
+                .create().start().resume().visible().get();
     }
 
     private String startWebMockServer() throws Exception {
@@ -520,5 +643,52 @@ public class ContactsControllerTest
         String serverUrl = webServer.getUrl("").toString();
 
         return serverUrl;
+    }
+
+    private void startContactListFragment()
+    {
+        ContactListMainActivity activity = Robolectric.buildActivity( ContactListMainActivity.class )
+                .create()
+                .start()
+                .resume()
+                .get();
+
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add( this.mContactListFragment, null );
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public ReturnValues getReturnValues() {
+        return null;
+    }
+
+    @Override
+    public Answer<Object> getDefaultAnswer() {
+        return null;
+    }
+
+    @Override
+    public AnnotationEngine getAnnotationEngine() {
+        return null;
+    }
+
+    @Override
+    public boolean cleansStackTrace() {
+        return false;
+    }
+
+    @Override
+    public boolean enableClassCache() {
+        return false;
+    }
+
+    private void mockParams()
+    {
+        Downloader downloader = new OkHttpDownloader(mContactListFragment.getActivity().getApplicationContext(), Long.MAX_VALUE);
+        Picasso.Builder builder = new Picasso.Builder(mContactListFragment.getActivity().getApplicationContext());
+        builder.downloader(downloader);
+        MycommsApp.picasso = builder.build();
     }
 }

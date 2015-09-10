@@ -41,6 +41,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
@@ -170,11 +171,8 @@ public class SearchGlobalContactsTest {
                 .getSupportFragmentManager().findFragmentByTag("0");
 
         SearchBarController searchBarController = new SearchBarController(favoriteListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
-        SearchBarController spySearchBarController = Mockito.spy(searchBarController);
-
-        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB(null);
         try{
-            spySearchBarController.initiateComponentsForSearchView(favoriteListFragment.getView());
+            searchBarController.initiateComponentsForSearchView(favoriteListFragment.getView());
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
@@ -359,27 +357,23 @@ public class SearchGlobalContactsTest {
     @Test
     public void testSearchViewOnTextChangedEvent() throws Exception {
         System.err.println("******** Test: Search On Text Changed Events ********");
-        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
-        SearchBarController spySearchBarController = Mockito.spy(searchBarController);
+        SearchController mSearchController = Mockito.mock(SearchController.class);
+        Mockito.when(mSearchController.getContactsByKeyWord(Matchers.anyString())).thenReturn(MockDataForTests.getMockContactsList());
 
-        //Input ""
-        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB(null);
-        spySearchBarController.initiateComponentsForSearchView(contactListFragment.getView());
-        spySearchBarController.searchContactsOnTextChanged("");
+        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,mSearchController,2,null,false,null,contactListFragment);
+        searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
+        searchBarController.searchContactsOnTextChanged("");
         Assert.assertTrue(layCancel.getVisibility() == View.GONE);
         System.err.println("******** Test: Cancel Layout GONE NULL CHAR ON CONTACT LIST OK********");
 
         //Input 1 char
-        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB("1");
-        spySearchBarController.searchContactsOnTextChanged("1");
+        searchBarController.searchContactsOnTextChanged("1");
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
         System.err.println("******** Test: Cancel Button and Layout VISIBLE 1 CHAR ON CONTACT LIST OK********");
 
         //Input more than 1 letter text
-        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB("Testing");
-        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromServer("Testing");
-        spySearchBarController.searchContactsOnTextChanged("Testing");
+        searchBarController.searchContactsOnTextChanged("Testing");
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
         System.err.println("******** Test: Cancel Button and Layout VISIBLE 6 CHAR ON CONTACT LIST OK********");

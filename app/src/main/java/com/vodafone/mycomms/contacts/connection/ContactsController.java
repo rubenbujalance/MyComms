@@ -75,7 +75,7 @@ public class ContactsController{
                 contact = mapContact(jsonObject, mProfileId);
                 realmContactList.add(contact);
             }
-            realmContactTransactions.insertContactList(realmContactList, null);
+            RealmContactTransactions.insertContactList(realmContactList, null, mProfileId);
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 jsonObject = jsonArray.getJSONObject(i);

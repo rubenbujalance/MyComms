@@ -16,14 +16,14 @@ import model.RecentContact;
 import model.UserProfile;
 
 public class RealmContactTransactions {
-    private String mProfileId;
+    private static String mProfileId;
 
     public RealmContactTransactions(String profileId)
     {
         mProfileId = profileId;
     }
 
-    public void insertContactList (ArrayList<Contact> contactArrayList, Realm realm){
+    public static void insertContactList (ArrayList<Contact> contactArrayList, Realm realm, String mProfileId){
         int size = contactArrayList.size();
 
         Realm mRealm;
@@ -123,7 +123,7 @@ public class RealmContactTransactions {
         }
     }
 
-    public ArrayList<Contact> getAllContacts(Realm realm)
+    public static ArrayList<Contact> getAllContacts(Realm realm, String mProfileId)
     {
         Log.e(Constants.TAG, "RealmContactTransactions.getAllContacts: SearchBarController");
         ArrayList<Contact> contactArrayList = new ArrayList<>();
@@ -162,7 +162,7 @@ public class RealmContactTransactions {
         }
     }
 
-    public ArrayList<Contact> sortContacts(ArrayList<Contact> contactsArrayList){
+    public static ArrayList<Contact> sortContacts(ArrayList<Contact> contactsArrayList){
         int size = contactsArrayList.size();
         int notLettersStart = 0;
         ArrayList<Contact> noLettersContactsArrayList = new ArrayList<>();
@@ -321,7 +321,7 @@ public class RealmContactTransactions {
         return contactArrayList;
     }
 
-    public Contact getContactById(String contactId, Realm realm)
+    public static Contact getContactById(String contactId, Realm realm)
     {
         Realm mRealm;
         if(null != realm)
@@ -385,7 +385,7 @@ public class RealmContactTransactions {
         }
     }
 
-    public UserProfile getUserProfile(Realm realm)
+    public static UserProfile getUserProfile(Realm realm, String mProfileId)
     {
         Realm mRealm;
         if(null != realm)
@@ -493,7 +493,7 @@ public class RealmContactTransactions {
         }
     }
 
-    public ArrayList<FavouriteContact> getAllFavouriteContacts(Realm realm)
+    public static ArrayList<FavouriteContact> getAllFavouriteContacts(Realm realm)
     {
         Realm mRealm;
         if(null != realm)
@@ -560,7 +560,7 @@ public class RealmContactTransactions {
         }
     }
 
-    public ArrayList<FavouriteContact> sortFavouriteContacts(ArrayList<FavouriteContact> favouriteContactsArrayList){
+    public static ArrayList<FavouriteContact> sortFavouriteContacts(ArrayList<FavouriteContact> favouriteContactsArrayList){
         int size = favouriteContactsArrayList.size();
         int notLettersStart = 0;
         ArrayList<FavouriteContact> noLettersFavouriteContactsArrayList = new ArrayList<>();
@@ -588,7 +588,7 @@ public class RealmContactTransactions {
 
     }
 
-    public ArrayList<RecentContact> getAllRecentContacts(Realm realm)
+    public static ArrayList<RecentContact> getAllRecentContacts(Realm realm)
     {
         Realm mRealm;
         if(null != realm)

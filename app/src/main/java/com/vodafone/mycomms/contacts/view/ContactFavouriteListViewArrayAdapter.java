@@ -82,8 +82,8 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             viewHolder.imageViewDayNight.setVisibility(View.INVISIBLE);
         }
 
-        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(profileId);
-        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId(), realm);
+        new RealmContactTransactions(profileId);
+        Contact cont = RealmContactTransactions.getContactById(contact.getContactId(), realm);
 
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {

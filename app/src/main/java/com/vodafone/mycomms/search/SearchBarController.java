@@ -49,7 +49,7 @@ public class SearchBarController {
     public Button mCancelButton;
     private LinearLayout layCancel;
     private SearchController mSearchController;
-    private ArrayList<Contact> contactList;
+    private static ArrayList<Contact> contactList;
     private SharedPreferences sp;
     private LinearLayout laySearchBar;
     private int mIndex;
@@ -262,7 +262,7 @@ public class SearchBarController {
     {
         Log.i(Constants.TAG, "SearchBarController.loadAllContactsFromDB: Keyword>" + keyWord);
         if(null == keyWord)
-            contactList = mContactTransactions.getAllContacts(realm);
+            contactList = RealmContactTransactions.getAllContacts(realm, profileId);
         else
         {
             if(isGroupChatSearch)
@@ -505,9 +505,9 @@ public class SearchBarController {
         searchView.setText("");
     }
 
-    public ArrayList<Contact> getContactList()
+    public static ArrayList<Contact> getContactList()
     {
-        return this.contactList;
+        return contactList;
     }
 
     public void validateNoPlatformRecords(ArrayList<Contact> contactList) {

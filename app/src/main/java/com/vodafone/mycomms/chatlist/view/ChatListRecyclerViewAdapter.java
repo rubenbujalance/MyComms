@@ -182,7 +182,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         ArrayList<Contact> contacts = new ArrayList<>();
         RealmContactTransactions realmContactTransactions =
                 new RealmContactTransactions(profileId);
-        UserProfile userProfile = realmContactTransactions.getUserProfile(realm);
+        UserProfile userProfile = RealmContactTransactions.getUserProfile(realm, profileId);
         Contact contact = new Contact();
         contact.setAvatar(userProfile.getAvatar());
         contact.setFirstName(userProfile.getFirstName());

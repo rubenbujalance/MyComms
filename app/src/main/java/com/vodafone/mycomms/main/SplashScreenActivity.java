@@ -91,10 +91,13 @@ public class SplashScreenActivity extends MainActivity {
          * RBM - For testing purpose only, remove before upload code
          */
 
-        Bundle data = new Bundle();
-        data.putString("message", "test message");
-        data.putString(Constants.NOTIFICATION_BUNDLE_TYPE_KEY, Constants.NOTIFICATION_BUNDLE_GROUPCHAT_TYPE_VALUE);
-        data.putString(Constants.NOTIFICATION_BUNDLE_FROM_KEY, "");
+//        Bundle data = new Bundle();
+//        data.putString("message", "test message");
+//        data.putString(Constants.NOTIFICATION_BUNDLE_TYPE_KEY, Constants.NOTIFICATION_BUNDLE_GROUPCHAT_TYPE_VALUE);
+//        String from = "@my-comms.com/359300054255790";
+//        data.putString(Constants.NOTIFICATION_BUNDLE_FROM_KEY, from);
+//
+//        getIntent().putExtra(Constants.NOTIFICATION_EXTRA_KEY, data);
 
         /*
          * *********************************************************
@@ -152,7 +155,7 @@ public class SplashScreenActivity extends MainActivity {
                         if(chat!=null) {
                             intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
                             intentChat.putExtra(Constants.CHAT_FIELD_CONTACT_ID, from);
-                            intentChat.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                            intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                             intentChat.putExtra(Constants.IS_GROUP_CHAT, false);
 
                             goToConversation = true;
@@ -174,7 +177,7 @@ public class SplashScreenActivity extends MainActivity {
                         if(groupChat!=null) {
                             intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
                             intentChat.putExtra(Constants.GROUP_CHAT_ID, from);
-                            intentChat.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                            intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                             intentChat.putExtra(Constants.IS_GROUP_CHAT, true);
 
                             goToConversation = true;
@@ -676,7 +679,7 @@ public class SplashScreenActivity extends MainActivity {
                                 if (chat != null) {
                                     intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
                                     intentChat.putExtra(Constants.CHAT_FIELD_CONTACT_ID, from);
-                                    intentChat.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                    intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                                     intentChat.putExtra(Constants.IS_GROUP_CHAT, false);
 
                                     goToConversation = true;
@@ -697,7 +700,7 @@ public class SplashScreenActivity extends MainActivity {
                                 if (groupChat != null) {
                                     intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
                                     intentChat.putExtra(Constants.GROUP_CHAT_ID, from);
-                                    intentChat.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                    intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                                     intentChat.putExtra(Constants.IS_GROUP_CHAT, true);
 
                                     goToConversation = true;
@@ -803,8 +806,8 @@ public class SplashScreenActivity extends MainActivity {
                 public void run() {
                     Intent intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
                     intentChat.putExtra(Constants.CHAT_FIELD_CONTACT_ID, groupId);
-                    intentChat.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
-                    intentChat.putExtra(Constants.IS_GROUP_CHAT, false);
+                    intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
+                    intentChat.putExtra(Constants.IS_GROUP_CHAT, true);
 
                     Intent intent = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
                     intent.putExtra(Constants.GO_TO_CHAT_INTENT_KEY, intentChat);

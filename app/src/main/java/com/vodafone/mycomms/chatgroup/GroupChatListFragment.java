@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -23,16 +22,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Callback;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.contacts.connection.ContactListController;
-import com.vodafone.mycomms.contacts.connection.IContactsRefreshConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ReloadAdapterEvent;
-import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.search.SearchBarController;
@@ -231,7 +226,7 @@ public class GroupChatListFragment extends ListFragment
     {
         Intent in = new Intent(getActivity(), GroupChatActivity.class);
         in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
-        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.GROUP_CHAT_LIST_ACTIVITY);
+        in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.GROUP_CHAT_LIST_ACTIVITY);
         in.putExtra(Constants.IS_GROUP_CHAT, true);
         startActivity(in);
 
@@ -242,7 +237,7 @@ public class GroupChatListFragment extends ListFragment
     {
         Intent in = new Intent(getActivity(), GroupChatActivity.class);
         in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, selectedContacts.get(0));
-        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.GROUP_CHAT_LIST_ACTIVITY);
+        in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.GROUP_CHAT_LIST_ACTIVITY);
         in.putExtra(Constants.IS_GROUP_CHAT, false);
         startActivity(in);
 

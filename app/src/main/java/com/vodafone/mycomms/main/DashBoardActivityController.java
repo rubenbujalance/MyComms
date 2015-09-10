@@ -1,9 +1,7 @@
 package com.vodafone.mycomms.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
@@ -33,8 +31,6 @@ import com.vodafone.mycomms.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -373,7 +369,7 @@ public class DashBoardActivityController
                                 if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
                                     Intent in = new Intent(mActivity, GroupChatActivity.class);
                                     in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
-                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                    in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                                     in.putExtra(Constants.IS_GROUP_CHAT, true);
                                     mActivity.startActivity(in);
                                 }
@@ -512,7 +508,7 @@ public class DashBoardActivityController
                                 } else {
                                     Intent in = new Intent(mActivity, GroupChatActivity.class);
                                     in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
-                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                    in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                                     in.putExtra(Constants.IS_GROUP_CHAT, false);
                                     mActivity.startActivity(in);
                                 }

@@ -217,7 +217,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
                         {
                             Intent in = new Intent(ContactDetailsPlusActivity.this, GroupChatActivity.class);
                             in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactDetailInfo[8]);
-                            in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
+                            in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.CHAT_VIEW_CONTACT_DETAIL);
                             startActivity(in);
                         }
                         recentContactController.insertRecent(contactId, Constants.CONTACTS_ACTION_SMS);

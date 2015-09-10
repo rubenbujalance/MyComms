@@ -114,7 +114,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         RealmContactTransactions contactTransactions =
                 new RealmContactTransactions(_profile_id);
 
-        UserProfile userProfile = contactTransactions.getUserProfile(realm);
+        UserProfile userProfile = RealmContactTransactions.getUserProfile(realm, _profile_id);
         Contact contact = new Contact();
         contact.setAvatar(userProfile.getAvatar());
         contact.setFirstName(userProfile.getFirstName());
@@ -189,8 +189,8 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
 
         viewHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 
-        RealmContactTransactions mRealmContactTransactions = new RealmContactTransactions(_profile_id);
-        Contact cont = mRealmContactTransactions.getContactById(contact.getContactId(), realm);
+        new RealmContactTransactions(_profile_id);
+        Contact cont = RealmContactTransactions.getContactById(contact.getContactId(), realm);
 
         if(null != contact.getPlatform() && Constants.PLATFORM_SALES_FORCE.equals(contact.getPlatform()))
         {

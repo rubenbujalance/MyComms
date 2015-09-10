@@ -49,7 +49,7 @@ public class SearchController
 
                 realmContactList.add(contact);
             }
-            realmContactTransactions.insertContactList(realmContactList, realm);
+            RealmContactTransactions.insertContactList(realmContactList, realm, mProfileId);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "SearchController.insertContactListInRealm: " + e.toString());

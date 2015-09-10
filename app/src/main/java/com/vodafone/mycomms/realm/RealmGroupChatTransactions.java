@@ -224,7 +224,7 @@ public class RealmGroupChatTransactions
         }
     }
 
-    public GroupChat getGroupChatById(String id, Realm realm)
+    public static GroupChat getGroupChatById(String id, Realm realm)
     {
         Realm mRealm;
         if(null != realm)
@@ -246,7 +246,7 @@ public class RealmGroupChatTransactions
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
     }

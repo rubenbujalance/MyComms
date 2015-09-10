@@ -291,7 +291,7 @@ public class GroupChatListFragment extends ListFragment
     {
         if(null == keyWord)
         {
-            contactList = mContactTransactions.getAllContacts(realm);
+            contactList = RealmContactTransactions.getAllContacts(realm, profileId);
         }
         else
         {

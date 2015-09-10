@@ -214,7 +214,7 @@ public class DashBoardActivityController
 
         private void loadContactsFromIds(ArrayList<String> ids)
         {
-            UserProfile userProfile = mRealmContactTransactions.getUserProfile(mRealm);
+            UserProfile userProfile = RealmContactTransactions.getUserProfile(mRealm, mProfileId);
             Contact contact = new Contact();
             contact.setAvatar(userProfile.getAvatar());
             contact.setFirstName(userProfile.getFirstName());

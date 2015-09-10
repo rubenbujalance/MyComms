@@ -96,6 +96,8 @@ public class ContactListFragment extends ListFragment {
         emptyText = (TextView) v.findViewById(android.R.id.empty);
         searchView = (EditText) v.findViewById(R.id.et_search);
 
+
+
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
 
         //TODO: Null Object error, commented
@@ -107,9 +109,11 @@ public class ContactListFragment extends ListFragment {
             }
         });
 
+        setListAdapterTabs();
         loadSearchBarEventsAndControllers(v);
 
-        if (mIndex == Constants.CONTACTS_ALL) {
+        if (mIndex == Constants.CONTACTS_ALL)
+        {
             //This shows the keyboard and focus on searchView when called from the Dashboard search
             //The Manifest defines that the keybord won't show every time you enter the view (windowSoftInputMode="adjustPan")
             //So it needs a delayed handler in order to show the keyboard after the activity is created (half a second seems to be enough)
@@ -136,7 +140,7 @@ public class ContactListFragment extends ListFragment {
         mSearchBarController = new SearchBarController
                 (
                         getActivity()
-                        , mContactTransactions
+                        , getContactTransactions()
                         , contactList
                         , mSearchController
                         , mIndex
@@ -181,11 +185,17 @@ public class ContactListFragment extends ListFragment {
             profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
         }
         Log.i(Constants.TAG, "ContactListFragment.onCreate: profileId " + profileId);
-        mContactTransactions = new RealmContactTransactions(profileId);
         mSearchController = new SearchController(getActivity().getApplicationContext(),
                 profileId, realm);
         recentController = new RecentContactController(getActivity(), profileId);
-        setListAdapterTabs();
+
+    }
+
+    public RealmContactTransactions getContactTransactions() {
+        if(null == mContactTransactions)
+            mContactTransactions = new RealmContactTransactions(profileId);
+
+        return  mContactTransactions;
     }
 
     @Override
@@ -204,20 +214,6 @@ public class ContactListFragment extends ListFragment {
         if(show) addGlobalContactsContainer.setVisibility(View.VISIBLE);
         else addGlobalContactsContainer.setVisibility(View.GONE);
     }
-
-//    private void refreshContent(){
-//
-//        if (mIndex==Constants.CONTACTS_ALL) {
-//            contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
-//            contactListController.setConnectionCallback(this);
-//        } else if (mIndex==Constants.CONTACTS_FAVOURITE) {
-//            contactListController.getContactList(Constants.CONTACT_API_GET_FAVOURITES);
-//            contactListController.setConnectionCallback(this);
-//        } else if (mIndex==Constants.CONTACTS_RECENT) {
-//            contactListController.getContactList(Constants.CONTACT_API_GET_RECENTS);
-//            contactListController.setConnectionCallback(this);
-//        }
-//    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -249,9 +245,6 @@ public class ContactListFragment extends ListFragment {
         Log.i(Constants.TAG, "ContactListFragment.onListItemClick: Listclicking");
         if (mListener != null)
         {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).getId());
             Intent in;
 
             in = new Intent(getActivity(), ContactDetailMainActivity.class);
@@ -266,7 +259,7 @@ public class ContactListFragment extends ListFragment {
             {
                 if(null != contactList && !contactList.get(position).getFirstName().equals(getResources().getString(R.string.no_search_records)))
                 {
-                    ((MycommsApp) getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
+                    MycommsApp.contactViewOrigin = Constants.CONTACTS_ALL;
                     in.putExtra(Constants.CONTACT_CONTACT_ID, contactList.get(position).getContactId());
                     startActivity(in);
                 }
@@ -274,7 +267,7 @@ public class ContactListFragment extends ListFragment {
             } else if (mIndex == Constants.CONTACTS_RECENT) {
                 try {
                     String action = recentContactList.get(position).getAction();
-                    ((MycommsApp) getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_RECENT;
+                    MycommsApp.contactViewOrigin = Constants.CONTACTS_RECENT;
                     if (action.compareTo(Constants.CONTACTS_ACTION_CALL) == 0) {
                         String strPhones = recentContactList.get(position).getPhones();
                         if (strPhones != null) {
@@ -345,7 +338,7 @@ public class ContactListFragment extends ListFragment {
                 {
                     if (favouriteContactList.get(position).getContactId() != null && favouriteContactList.get(position).getContactId().equals(profileId))
                         in = new Intent(getActivity(), SettingsMainActivity.class);
-                    ((MycommsApp) getActivity().getApplication()).contactViewOrigin = Constants.CONTACTS_FAVOURITE;
+                    MycommsApp.contactViewOrigin = Constants.CONTACTS_FAVOURITE;
                     in.putExtra(Constants.CONTACT_CONTACT_ID, favouriteContactList.get(position).getContactId());
                     startActivity(in);
                 }
@@ -373,7 +366,7 @@ public class ContactListFragment extends ListFragment {
         Log.i(Constants.TAG, "ContactListFragment.setListAdapterTabs: index " + mIndex);
 
         if(mIndex == Constants.CONTACTS_FAVOURITE) {
-            favouriteContactList = mContactTransactions.getAllFavouriteContacts(realm);
+            favouriteContactList = getContactTransactions().getAllFavouriteContacts(realm);
             if (favouriteContactList!=null) {
                 setListAdapter(new ContactFavouriteListViewArrayAdapter(getActivity(),
                         favouriteContactList, realm));
@@ -381,7 +374,7 @@ public class ContactListFragment extends ListFragment {
         }else if(mIndex == Constants.CONTACTS_RECENT){
             if (emptyText!=null)
                 emptyText.setText("");
-            recentContactList = mContactTransactions.getAllRecentContacts(realm);
+            recentContactList = getContactTransactions().getAllRecentContacts(realm);
             if (recentContactList!=null)
             {
                 recentContactList = filterRecentList(recentContactList);
@@ -492,8 +485,7 @@ public class ContactListFragment extends ListFragment {
         ArrayList<Contact> contactArrayList;
         if(null == keyWord)
         {
-            RealmContactTransactions mContactTransactions = new RealmContactTransactions(profileId);
-            contactArrayList = mContactTransactions.getAllContacts(realm);
+            contactArrayList = RealmContactTransactions.getAllContacts(realm, profileId);
         }
         else
         {
@@ -535,18 +527,27 @@ public class ContactListFragment extends ListFragment {
      */
     public void hideKeyboard()
     {
-        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(getActivity
-                ().INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-    }
-
-    public SearchBarController getSearchBarController()
-    {
-        return this.mSearchBarController;
     }
 
     public EditText getSearchView()
     {
         return this.searchView;
+    }
+
+    public ArrayList<Contact> getContactList()
+    {
+        return this.contactList;
+    }
+
+    public ArrayList<RecentContact> getRecentContactList()
+    {
+        return this.recentContactList;
+    }
+
+    public ArrayList<FavouriteContact> getFavouriteContactList()
+    {
+        return this.favouriteContactList;
     }
 }

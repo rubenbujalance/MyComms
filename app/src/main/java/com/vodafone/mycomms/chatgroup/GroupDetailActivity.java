@@ -102,7 +102,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         contactTransactions = new RealmContactTransactions(_profile_id);
         chatTransactions = new RealmChatTransactions(this);
         mGroupChatTransactions = new RealmGroupChatTransactions(this, _profile_id);
-        _profile = contactTransactions.getUserProfile(this.mRealm);
+        _profile = RealmContactTransactions.getUserProfile(this.mRealm, _profile_id);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);

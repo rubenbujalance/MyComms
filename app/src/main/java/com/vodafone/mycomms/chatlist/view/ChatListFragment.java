@@ -87,7 +87,7 @@ public class ChatListFragment extends Fragment{
         Intent in = new Intent(getActivity(), GroupChatActivity.class);
         in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, chat.getContact_id());
         in.putExtra(Constants.IS_GROUP_CHAT, false);
-        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_LIST_ACTIVITY);
+        in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.CHAT_LIST_ACTIVITY);
         startActivity(in);
     }
 
@@ -96,7 +96,7 @@ public class ChatListFragment extends Fragment{
         Intent in = new Intent(getActivity(), GroupChatActivity.class);
         in.putExtra(Constants.GROUP_CHAT_ID, chat.getId());
         in.putExtra(Constants.IS_GROUP_CHAT, true);
-        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_LIST_ACTIVITY);
+        in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.CHAT_LIST_ACTIVITY);
         startActivity(in);
     }
 

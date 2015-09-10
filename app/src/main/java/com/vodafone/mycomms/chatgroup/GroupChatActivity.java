@@ -652,7 +652,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         Log.i(Constants.TAG, "GroupChatActivity.onEventChatsReceived: ");
         ChatMessage chatMsg = event.getMessage();
         if((isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().compareTo(_groupId)==0)
-                || (!isGroupChatMode && chatMsg!=null && chatMsg.getContact_id().compareTo(_contactId)==0))
+                || (!isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().length()==0 &&
+                chatMsg.getContact_id().compareTo(_contactId)==0))
         {
             if(_chatList.size()==0 ||
                     (_chatList.get(_chatList.size()-1).getId().compareTo(chatMsg.getId())!=0)) {

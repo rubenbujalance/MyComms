@@ -33,6 +33,7 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -185,7 +186,10 @@ public class DashBoardActivity extends ToolbarActivity
     protected void onResume() {
         super.onResume();
         setForegroundActivity(1);
-        overridePendingTransition(0,0);
+        overridePendingTransition(0, 0);
+
+        XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
+
         checkUnreadChatMessages();
         mDashBoardActivityController.loadRecentContactsAndUnreadMessages();
         mDashBoardActivityController.loadNews();

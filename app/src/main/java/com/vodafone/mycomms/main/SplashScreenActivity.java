@@ -87,6 +87,19 @@ public class SplashScreenActivity extends MainActivity {
         //Register Otto Bus
         BusProvider.getInstance().register(SplashScreenActivity.this);
 
+        /*
+         * RBM - For testing purpose only, remove before upload code
+         */
+
+        Bundle data = new Bundle();
+        data.putString("message", "test message");
+        data.putString(Constants.NOTIFICATION_BUNDLE_TYPE_KEY, Constants.NOTIFICATION_BUNDLE_GROUPCHAT_TYPE_VALUE);
+        data.putString(Constants.NOTIFICATION_BUNDLE_FROM_KEY, "");
+
+        /*
+         * *********************************************************
+         */
+
         getExtras();
         if(isAppCrashed)
             showAlertDialog();
@@ -611,6 +624,7 @@ public class SplashScreenActivity extends MainActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
+            Log.i(Constants.TAG, "CheckIfGoToConversation.doInBackground: ");
             goToConversation = false;
             waitToGroupChatDownload = false;
             intentChat = null;
@@ -634,8 +648,9 @@ public class SplashScreenActivity extends MainActivity {
                     intent.removeExtra(Constants.NOTIFICATION_EXTRA_KEY);
                     String type = null;
 
-                    if (notificationData != null)
+                    if (notificationData != null) {
                         type = notificationData.getString(Constants.NOTIFICATION_BUNDLE_TYPE_KEY);
+                    }
 
                     //Check if it comes from a chat notification
                     if (type != null &&
@@ -645,6 +660,10 @@ public class SplashScreenActivity extends MainActivity {
 
                         if (from != null && from.contains("@")) {
                             from = from.substring(0, from.indexOf("@"));
+
+                            Log.i(Constants.TAG, "CheckIfGoToConversation.doInBackground: Notification received " +
+                                    "[Type-"+type+"; From-"+from);
+
                             boolean isGroupChat =
                                     (type.compareTo(Constants.NOTIFICATION_BUNDLE_GROUPCHAT_TYPE_VALUE) == 0);
 

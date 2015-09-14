@@ -130,13 +130,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
         if(null != contactDetailInfo[3] && contactDetailInfo[3].length() > 0) //Emails
         {
             if (platform.equals(Constants.PLATFORM_LOCAL))
-            {
                 tvEmail.setText(contactDetailInfo[3]);
-//                if (null != Utils.getElementFromJsonObjectString(contactDetailInfo[3], Constants.CONTACT_EMAIL))
-//                    tvEmail.setText(Utils.getElementFromJsonObjectString(contactDetailInfo[3], Constants.CONTACT_EMAIL));
-//                else
-//                    tvEmail.setText("");
-            }
             else
             {
                 if (null != Utils.getElementFromJsonArrayString(contactDetailInfo[3], Constants.CONTACT_EMAIL))

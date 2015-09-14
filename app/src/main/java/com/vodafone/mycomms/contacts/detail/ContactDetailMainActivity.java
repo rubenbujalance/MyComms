@@ -53,7 +53,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private String action;
     private String mProfileId;
     private RecentContactController mRecentContactController;
-    private RealmContactTransactions realmContactTransactions;
 
     //Views
     private ImageView ivIconStatus;
@@ -96,7 +95,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.activity_contact_detail);
         this.realm = Realm.getDefaultInstance();
-        this.realm.setAutoRefresh(true);
 
         this.SF_URL = null;
 
@@ -111,14 +109,14 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         mProfileId = Utils.getProfileId(this);
 
         mRecentContactController = new RecentContactController(this, mProfileId);
-        realmContactTransactions = new RealmContactTransactions(mProfileId);
 
         Intent intent = getIntent();
-        contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
+        if(null != intent && intent.hasExtra(Constants.CONTACT_CONTACT_ID))
+            contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
         controller = new ContactDetailController(this, mProfileId);
         controller.setConnectionCallback(this);
 
-        if (contactId.equals(mProfileId)) {
+        if (null != contactId && contactId.equals(mProfileId)) {
             UserProfile profile = getProfile(contactId);
             contact = ContactsController.mapProfileToContact(profile);
         }else
@@ -133,7 +131,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvCompany = (TextView) findViewById(R.id.contact_company);
         tvPosition = (TextView) findViewById(R.id.contact_position);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
-        ivAvatar = (CircleImageView)findViewById(R.id.avatar);
+        ivAvatar = (CircleImageView) findViewById(R.id.avatar);
         imageStarOn = R.mipmap.icon_favorite_colour;
         imageStarOff = R.mipmap.icon_favorite_grey;
         textAvatar = (TextView)findViewById(R.id.avatarText);
@@ -401,8 +399,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private void loadContactStatusInfo()
     {
-        Calendar currentCal = Calendar.getInstance();
-
         try {
             //Icon
             String icon = "";
@@ -533,45 +529,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                                         , contact.getAvatar()
                                 )
                 );
-
-//        ivAvatar.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View arg0) {
-//                LayoutInflater layoutInflater
-//                        = (LayoutInflater) getBaseContext()
-//                        .getSystemService(LAYOUT_INFLATER_SERVICE);
-//                final View popupView = layoutInflater.inflate(R.layout.layout_contact_detail_zoom, null);
-//                final PopupWindow popupWindow = new PopupWindow(
-//                        popupView,
-//                        LayoutParams.MATCH_PARENT,
-//                        LayoutParams.MATCH_PARENT);
-//                final ImageView fullAvatar = (ImageView) popupView.findViewById(R.id.avatar_large);
-//                final TextView textAvatar = (TextView) popupView.findViewById(R.id.avatarText);
-//
-//                Utils.loadContactAvatar
-//                        (
-//                                contact.getFirstName()
-//                                , contact.getLastName()
-//                                , fullAvatar
-//                                , textAvatar
-//                                , Utils.getAvatarURL
-//                                        (
-//                                                contact.getPlatform()
-//                                                , contact.getStringField1()
-//                                                , contact.getAvatar()
-//                                        )
-//                        );
-//
-//                popupWindow.showAtLocation(ivAvatar, Gravity.TOP, 0, 0);
-//                popupView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View arg0) {
-//                        popupWindow.dismiss();
-//                    }
-//                });
-//            }
-//        });
     }
 
     private void loadContactDetail()
@@ -607,15 +564,6 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         else
             tvPosition.setText("");
 
-        if(!contact.getPlatform().equals("local"))
-        {
-
-        }
-        else
-        {
-
-        }
-
         if(null != contact.getOfficeLocation())
             tvOfficeLocation.setText(contact.getOfficeLocation());
         else
@@ -623,7 +571,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     }
 
     private Contact getContact(String contactId){
-        List<Contact> contactList = realmContactTransactions.getFilteredContacts(Constants
+        List<Contact> contactList = RealmContactTransactions.getFilteredContacts(Constants
                 .CONTACT_CONTACT_ID, contactId, realm);
 
         Contact contact = contactList.get(0);

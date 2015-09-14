@@ -12,6 +12,9 @@ import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ContactListReceivedEvent;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
@@ -38,6 +41,7 @@ public class ContactsController{
     private static RealmContactTransactions realmContactTransactions;
     private String mProfileId;
     private Context mContext;
+    private int offsetPaging = 0;
 
 
 
@@ -546,6 +550,54 @@ public class ContactsController{
 
     public void setRealmProfileTransactions(RealmProfileTransactions realmProfileTransactions) {
         mRealmProfileTransactions = realmProfileTransactions;
+    }
+
+
+    public void getContactList(String api){
+        Log.i(Constants.TAG, "ContactsController.getContactList: " + api);
+
+        try{
+            OKHttpWrapper.get(api, mContext, new OKHttpWrapper.HttpCallback() {
+                @Override
+                public void onFailure(Response response, IOException e) {
+                    Log.i(Constants.TAG, "ContactsController.onFailure:");
+                }
+
+                @Override
+                public void onSuccess(Response response) {
+                    try {
+                        String json;
+                        if (response.isSuccessful()) {
+                            json = response.body().string();
+                            if (json != null && json.trim().length() > 0) {
+                                JSONObject jsonResponse = new JSONObject(json);
+
+                                insertContactListInRealm(jsonResponse);
+                                //Update Contact List View on every pagination
+                                BusProvider.getInstance().post(new SetContactListAdapterEvent());
+
+                                JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
+                                if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
+                                    int pageSize = jsonPagination.getInt(Constants.CONTACT_PAGINATION_PAGESIZE);
+                                    offsetPaging = offsetPaging + pageSize;
+                                    getContactList(Constants.CONTACT_API_GET_CONTACTS + "&o=" + offsetPaging);
+                                } else {
+                                    offsetPaging = 0;
+                                    //Bus Event Post when contacts have been received
+                                    BusProvider.getInstance().post(new ContactListReceivedEvent());
+                                }
+                            }
+                        } else {
+                            Log.e(Constants.TAG, "ContactsController.isNOTSuccessful");
+                        }
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "ContactsController.onSuccess: ", e);
+                    }
+                }
+            });
+        } catch (Exception e){
+            Log.e(Constants.TAG, "ContactsController.getContactList: ", e);
+        }
     }
 
 }

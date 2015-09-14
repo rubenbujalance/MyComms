@@ -102,17 +102,15 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
     private ArrayList<Contact> getGroupChatContacts(String groupChatId)
     {
         ArrayList<Contact> contacts = new ArrayList<>();
-        RealmGroupChatTransactions groupChatTransactions =
-                new RealmGroupChatTransactions(mContext, _profile_id);
+        new RealmGroupChatTransactions(mContext, _profile_id);
 
-        GroupChat groupChat = groupChatTransactions.getGroupChatById(groupChatId, realm);
+        GroupChat groupChat = RealmGroupChatTransactions.getGroupChatById(groupChatId, realm);
         //TODO: ERROR 'java.lang.String model.GroupChat.getMembers()' on a null object reference
         if(groupChat==null) return null;
 
         String[] ids = groupChat.getMembers().split("@");
 
-        RealmContactTransactions contactTransactions =
-                new RealmContactTransactions(_profile_id);
+        new RealmContactTransactions(_profile_id);
 
         UserProfile userProfile = RealmContactTransactions.getUserProfile(realm, _profile_id);
         Contact contact = new Contact();
@@ -127,7 +125,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         {
             if(!id.equals(_profile_id))
             {
-                contact = contactTransactions.getContactById(id,realm);
+                contact = RealmContactTransactions.getContactById(id, realm);
                 contacts.add(contact);
             }
         }

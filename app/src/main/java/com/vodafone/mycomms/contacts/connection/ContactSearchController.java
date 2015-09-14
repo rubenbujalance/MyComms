@@ -8,7 +8,6 @@ import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
-import com.vodafone.mycomms.settings.globalcontacts.GlobalContactsController;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 
@@ -19,7 +18,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import io.realm.Realm;
-import model.Contact;
 import model.GlobalContactsSettings;
 
 public class ContactSearchController {

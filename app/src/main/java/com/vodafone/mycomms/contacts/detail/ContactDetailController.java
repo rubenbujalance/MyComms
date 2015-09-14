@@ -21,15 +21,11 @@ import model.Contact;
  */
 public class ContactDetailController extends BaseController {
 
-    private ContactDetailConnection contactDetailConnection;
-    private IContactDetailConnectionCallback contactDetailConnectionCallback;
-    private Context mContext;
     private RealmContactTransactions realmContactTransactions;
     private String profileId;
 
     public ContactDetailController(Activity activity, String profileId) {
         super(activity);
-        this.mContext = activity;
         this.profileId = profileId;
         realmContactTransactions = new RealmContactTransactions(profileId);
     }

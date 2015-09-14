@@ -19,7 +19,7 @@ import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.chatgroup.GroupChatController;
-import com.vodafone.mycomms.contacts.connection.ContactController;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
@@ -72,7 +72,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Context mContext;
     private static SharedPreferences sp;
     public boolean appIsInitialized = false;
-    private FavouriteController favouriteController;
     private RecentContactController recentContactController;
     private NewsController mNewsController;
     private String profile_id;
@@ -405,8 +404,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onEventNewsReceived(NewsReceivedEvent event) {
         Log.i(Constants.TAG, "MyCommsApp.onEventNewsReceived: ");
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        ContactController contactController = new ContactController(mContext, profile_id);
-        contactController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
+        ContactsController contactsController = new ContactsController(profile_id, mContext);
+        contactsController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
         FavouriteController favouriteController = new FavouriteController(mContext, profile_id);
         favouriteController.getFavouritesList(Constants.CONTACT_API_GET_FAVOURITES);
     }

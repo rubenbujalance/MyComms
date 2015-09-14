@@ -25,7 +25,6 @@ import com.vodafone.mycomms.realm.RealmNewsTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,6 +44,7 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
@@ -58,9 +58,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.robolectric.Shadows.shadowOf;
 
 /**
  * Created by str_oan on 02/09/2015.
@@ -70,8 +67,7 @@ import static org.robolectric.Shadows.shadowOf;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, RealmContactTransactions.class, RealmGroupChatTransactions.class,
-                    XMPPTransactions.class})
+@PrepareForTest({Realm.class, Crashlytics.class, RealmContactTransactions.class, RealmGroupChatTransactions.class})
 public class DashBoardActivityControllerTest implements IMockitoConfiguration
 {
     @Rule
@@ -84,10 +80,9 @@ public class DashBoardActivityControllerTest implements IMockitoConfiguration
     @Before
     public void setUp() throws Exception
     {
-        mockStatic(Realm.class);
-        when(Realm.getDefaultInstance()).thenReturn(null);
-        mockStatic(XMPPTransactions.class);
-        mockStatic(Crashlytics.class);
+        PowerMockito.mockStatic(Realm.class);
+        PowerMockito.when(Realm.getDefaultInstance()).thenReturn(null);
+        PowerMockito.mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         Context context = RuntimeEnvironment.application.getApplicationContext();
         this.sp = context.getSharedPreferences(
@@ -128,9 +123,9 @@ public class DashBoardActivityControllerTest implements IMockitoConfiguration
         LinearLayout btnews = (LinearLayout) v.findViewById(R.id.notice_content);
         int numberOfChild = container.getChildCount();
         btnews.performClick();
-        ShadowActivity shadowActivity = shadowOf(this.mActivity);
+        ShadowActivity shadowActivity = Shadows.shadowOf(this.mActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
-        ShadowIntent shadowIntent = shadowOf(startedIntent);
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
 
         Assert.assertNotNull(this.mDashBoardActivityController.newsArrayList);
         Assert.assertEquals(numberOfChild, MockDataForTests.getMockNewsArrayList().size());
@@ -265,9 +260,9 @@ public class DashBoardActivityControllerTest implements IMockitoConfiguration
         LinearLayout lay_main_container = (LinearLayout) mView.findViewById(R.id.recent_content);
         boolean isClicked = lay_main_container.performClick();
 
-        ShadowActivity shadowActivity = shadowOf(this.mActivity);
+        ShadowActivity shadowActivity = Shadows.shadowOf(this.mActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
-        ShadowIntent shadowIntent = shadowOf(startedIntent);
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
 
         Assert.assertTrue(isClicked);
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);

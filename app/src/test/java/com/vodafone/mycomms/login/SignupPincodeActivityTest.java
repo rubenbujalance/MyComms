@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.constants.Constants;
@@ -25,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
@@ -33,8 +35,12 @@ import org.robolectric.shadows.ShadowInputMethodManager;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import io.realm.Realm;
+
 import static com.vodafone.mycomms.constants.Constants.CHECK_PHONE_OK_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -60,7 +66,11 @@ public class SignupPincodeActivityTest {
     View lnPin4;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+
         activity = Robolectric.setupActivity(SignupPincodeActivity.class);
         Shadows.shadowOf(activity).getNextStartedActivity();
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);

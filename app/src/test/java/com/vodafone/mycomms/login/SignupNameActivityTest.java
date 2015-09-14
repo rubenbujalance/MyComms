@@ -14,16 +14,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
@@ -36,6 +39,7 @@ import java.util.Date;
 
 import static com.vodafone.mycomms.constants.Constants.FIRSTNAME;
 import static com.vodafone.mycomms.constants.Constants.LASTNAME;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -53,7 +57,11 @@ public class SignupNameActivityTest {
     ImageView ivBtFwd;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+
         activity = Robolectric.setupActivity(SignupNameActivity.class);
         mFirstName = activity.mFirstName;
         mLastName = activity.mLastName;

@@ -458,7 +458,7 @@ public class RealmContactTransactions {
         }
     }
 
-    public boolean favouriteContactIsInRealm(String contactId, Realm realm)
+    public static boolean favouriteContactIsInRealm(String contactId, Realm realm)
     {
         Realm mRealm;
         if(null != realm)
@@ -488,7 +488,7 @@ public class RealmContactTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null!= mRealm)
                 mRealm.close();
         }
     }

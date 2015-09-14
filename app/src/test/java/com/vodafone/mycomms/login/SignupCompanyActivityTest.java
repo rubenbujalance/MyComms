@@ -6,20 +6,31 @@ import android.content.Intent;
 import android.os.Build;
 import android.widget.ImageView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.contacts.detail.ContactDetailsPlusActivity;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowActivity;
+import org.robolectric.shadows.ShadowIntent;
+
+import io.realm.Realm;
+
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -36,7 +47,10 @@ public class SignupCompanyActivityTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         activity = Robolectric.setupActivity(SignupCompanyActivity.class);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         mCompany = activity.mCompany;
@@ -66,8 +80,11 @@ public class SignupCompanyActivityTest {
         Shadows.shadowOf(mCompany).checkedPerformClick();*/
         ivBtFwd.performClick();
         Assert.assertTrue(companyName.equals(UserProfile.getCompanyName()));
-        Intent expectedIntent = new Intent(activity, SignupPassActivity.class);
-        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(SignupPassActivity.class.getName()));
     }
 
     @Test

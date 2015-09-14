@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
@@ -24,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
@@ -32,10 +34,14 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import io.realm.Realm;
+
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_USER_NOT_FOUND_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.PASSWORD;
 import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -53,7 +59,11 @@ public class LoginActivityTest {
     ImageView ivBack;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+
         activity = Robolectric.setupActivity(LoginActivity.class);
         btLogin = (Button) activity.findViewById(R.id.btLogin);
         btLoginSalesforce = (Button) activity.findViewById(R.id.btLoginSalesforce);

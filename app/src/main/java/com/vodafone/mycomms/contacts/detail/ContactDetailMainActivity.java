@@ -13,21 +13,21 @@ import android.widget.TextView;
 
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
+import com.squareup.okhttp.Response;
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
-import com.vodafone.mycomms.contacts.connection.IContactDetailConnectionCallback;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
-import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
 import com.vodafone.mycomms.util.AvatarSFController;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -46,9 +47,8 @@ import io.realm.Realm;
 import model.Contact;
 import model.UserProfile;
 
-public class ContactDetailMainActivity extends ToolbarActivity implements IContactDetailConnectionCallback {
+public class ContactDetailMainActivity extends ToolbarActivity{
     private Contact contact;
-    private ContactDetailController controller;
     private String contactId;
     private String action;
     private String mProfileId;
@@ -63,7 +63,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     private TextView tvCompany;
     private TextView tvPosition;
     private TextView tvOfficeLocation;
-    private CircleImageView ivAvatar;
+    private ImageView ivAvatar;
     private int imageStarOn;
     private int imageStarOff;
     private TextView textAvatar;
@@ -79,6 +79,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
     private LinearLayout lay_no_connection;
     private String SF_URL;
+
+
 
     private Realm realm;
 
@@ -109,12 +111,11 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         mProfileId = Utils.getProfileId(this);
 
         mRecentContactController = new RecentContactController(this, mProfileId);
+        new ContactsController(mProfileId, ContactDetailMainActivity.this);
 
         Intent intent = getIntent();
         if(null != intent && intent.hasExtra(Constants.CONTACT_CONTACT_ID))
             contactId = intent.getExtras().getString(Constants.CONTACT_CONTACT_ID);
-        controller = new ContactDetailController(this, mProfileId);
-        controller.setConnectionCallback(this);
 
         if (null != contactId && contactId.equals(mProfileId)) {
             UserProfile profile = getProfile(contactId);
@@ -131,7 +132,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         tvCompany = (TextView) findViewById(R.id.contact_company);
         tvPosition = (TextView) findViewById(R.id.contact_position);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
-        ivAvatar = (CircleImageView) findViewById(R.id.avatar);
+        ivAvatar = (ImageView) findViewById(R.id.avatar);
         imageStarOn = R.mipmap.icon_favorite_colour;
         imageStarOff = R.mipmap.icon_favorite_grey;
         textAvatar = (TextView)findViewById(R.id.avatarText);
@@ -222,10 +223,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
                     if (strPhones != null)
                     {
 
-                        if(
-                                contact.getPlatform().equals(Constants.PLATFORM_LOCAL)
-                                || contact.getPlatform().equals(Constants.PLATFORM_GLOBAL_CONTACTS)
-                          )
+                        if(contact.getPlatform().equals(Constants.PLATFORM_LOCAL)
+                                || contact.getPlatform().equals(Constants.PLATFORM_GLOBAL_CONTACTS))
                         {
                             String sms = getPhoneFromJSONForLunchSMS(strPhones);
                             Utils.launchSms(sms, ContactDetailMainActivity.this);
@@ -511,7 +510,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
 
         String test1 = contact.getFirstName();
         String test2 = contact.getLastName();
-        CircleImageView test3 = ivAvatar;
+        ImageView test3 = ivAvatar;
         TextView test4 = textAvatar;
         String test5 = contact.getAvatar();
         String test6 = SF_URL;
@@ -542,7 +541,8 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.realm.close();
+        if(null != realm)
+            this.realm.close();
     }
 
     public void loadContactInfo()
@@ -578,7 +578,7 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         Log.d(Constants.TAG, "ContactDetailMainActivity.getContact: " + printContact(contact));
 
         if(null != contact.getPlatform() && !contact.getPlatform().equals("local"))
-            controller.getContactDetail(contactId);
+            getContactFromServerById(contactId);
 
         return contact;
     }
@@ -601,18 +601,18 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
         return buf.toString();
     }
 
-    @Override
-    public void onContactDetailReceived(Contact contact) {
-        Log.d(Constants.TAG, "ContactDetailMainActivity.onContactDetailReceived: " + printContact(contact));
-        this.contact = contact;
-        loadContactDetail();
-        setButtonsVisibility();
-    }
+//    @Override
+//    public void onContactDetailReceived(Contact contact) {
+//        Log.d(Constants.TAG, "ContactDetailMainActivity.onContactDetailReceived: " + printContact(contact));
+//        this.contact = contact;
+//        loadContactDetail();
+//        setButtonsVisibility();
+//    }
 
-    @Override
-    public void onConnectionNotAvailable() {
-        Log.d(Constants.TAG, "ContactDetailMainActivity.onConnectionNotAvailable: ");
-    }
+//    @Override
+//    public void onConnectionNotAvailable() {
+//        Log.d(Constants.TAG, "ContactDetailMainActivity.onConnectionNotAvailable: ");
+//    }
 
     @Subscribe
     public void onConnectivityChanged(ConnectivityChanged event)
@@ -644,5 +644,58 @@ public class ContactDetailMainActivity extends ToolbarActivity implements IConta
     {
         MycommsApp.activityStopped();
         super.onStop();
+    }
+
+
+    public void getContactFromServerById(String contactId)
+    {
+        Log.i(Constants.TAG, "ContactDetailMainActivity.getContactFromServerById: " + contactId);
+        String URL = "/api/me/contact/?id="+contactId;
+        try
+        {
+            OKHttpWrapper.get(URL, ContactDetailMainActivity.this, new OKHttpWrapper.HttpCallback()
+            {
+                @Override
+                public void onFailure(Response response, IOException e) {
+                    Log.i(Constants.TAG, "getContactFromServerById.onFailure:");
+                }
+
+                @Override
+                public void onSuccess(Response response)
+                {
+                    try
+                    {
+                        String result = response.body().string();
+                        Log.i(Constants.TAG, "ContactDetailMainActivity.onSuccess: Body content is ->" + result);
+                        JSONObject jsonResponse;
+
+                        try {
+
+                            RealmContactTransactions realmContactTransactions = new RealmContactTransactions(mProfileId);
+                            jsonResponse = new JSONObject(result);
+                            String data = jsonResponse.getString(Constants.CONTACT_DATA);
+                            jsonResponse = new JSONObject(data.substring(1, data.length()-1 )); //Removing squared bracelets.
+                            contact = ContactsController.mapContact(jsonResponse, mProfileId);
+                            realmContactTransactions.updateContact(contact, null);
+
+                            ContactDetailMainActivity.this.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    loadContactDetail();
+                                    setButtonsVisibility();
+                                }
+                            });
+                        } catch (Exception e){
+                            Log.e(Constants.TAG, "ContactsController.onConnectionComplete: " + e.toString());
+                        }
+
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "getContactFromServerById.onSuccess: ", e);
+                    }
+                }
+            });
+        } catch (Exception e){
+            Log.e(Constants.TAG, "ContactDetailMainActivity.getContactFromServerById: ", e);
+        }
     }
 }

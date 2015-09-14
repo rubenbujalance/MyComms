@@ -6,20 +6,28 @@ import android.content.Intent;
 import android.os.Build;
 import android.widget.Button;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
+import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowToast;
+
+import io.realm.Realm;
+
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -33,7 +41,11 @@ public class LoginSignupActivityTest {
     Button btLogin;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+
         activity = Robolectric.setupActivity(LoginSignupActivity.class);
         btSignup = (Button)activity.findViewById(R.id.btSignup);
         btLogin = (Button)activity.findViewById(R.id.btLogin);

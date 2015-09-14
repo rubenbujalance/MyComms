@@ -6,6 +6,7 @@ import android.os.Build;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
@@ -16,14 +17,19 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import io.realm.Realm;
+
 import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
 import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -43,7 +49,10 @@ public class ForgotPassActivityTest {
     MockWebServer webServer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         activity = Robolectric.setupActivity(ForgotPassActivity.class);
         etEmail = (EditText) activity.findViewById(R.id.etEmail);
         btSend = (Button) activity.findViewById(R.id.btSend);

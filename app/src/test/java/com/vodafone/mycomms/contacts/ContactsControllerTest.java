@@ -5,8 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -19,7 +17,6 @@ import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
@@ -642,20 +639,6 @@ public class ContactsControllerTest implements IMockitoConfiguration {
         String serverUrl = webServer.getUrl("").toString();
 
         return serverUrl;
-    }
-
-    private void startContactListFragment()
-    {
-        ContactListMainActivity activity = Robolectric.buildActivity( ContactListMainActivity.class )
-                .create()
-                .start()
-                .resume()
-                .get();
-
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add( this.mContactListFragment, null );
-        fragmentTransaction.commit();
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.webkit.WebView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
@@ -16,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.Robolectric;
@@ -25,7 +27,11 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowWebView;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import io.realm.Realm;
+
 import static com.vodafone.mycomms.constants.Constants.OAUTH_RESPONSE;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -43,7 +49,10 @@ public class OAuthActivityTest {
     WebView wvOAuth;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         incomingIntent = new Intent();
         incomingIntent.putExtra("oauth", "sf");
         activity = Robolectric.buildActivity(OAuthActivity.class).withIntent(incomingIntent).create().get();

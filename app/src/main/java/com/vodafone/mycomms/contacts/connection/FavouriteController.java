@@ -126,7 +126,8 @@ public class FavouriteController  extends BaseController {
         } catch (Exception e) {
             Log.e(Constants.TAG, "addFavorite.onSuccess ", e);
         } finally {
-            realm.close();
+            if(null != realm)
+                realm.close();
         }
     }
 
@@ -176,7 +177,7 @@ public class FavouriteController  extends BaseController {
         Log.i(Constants.TAG, "FavouriteController.manageFavourite: ");
         body = new HashMap<>();
 
-        if (realmContactTransactions.favouriteContactIsInRealm(contactId, null))
+        if (RealmContactTransactions.favouriteContactIsInRealm(contactId, null))
             deleteFavorite((Constants.CONTACT_API_DEL_FAVOURITE + contactId), contactId, true);
         else
             addFavorite(Constants.CONTACT_API_POST_FAVOURITE, contactId, true);
@@ -186,6 +187,6 @@ public class FavouriteController  extends BaseController {
 
     public boolean contactIsFavourite(String contactId)
     {
-        return realmContactTransactions.favouriteContactIsInRealm(contactId, null);
+        return RealmContactTransactions.favouriteContactIsInRealm(contactId, null);
     }
 }

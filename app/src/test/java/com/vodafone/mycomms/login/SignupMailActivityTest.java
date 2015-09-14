@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.custom.ClearableEditText;
@@ -22,11 +23,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
 import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
@@ -34,6 +38,7 @@ import static com.vodafone.mycomms.constants.Constants.INVALID_VERSION_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.USER_ALREADY_EXISTS_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.USER_DOMAIN_NOT_ALLOWED_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -49,7 +54,11 @@ public class SignupMailActivityTest {
     ImageView ivBtBack;
 
     @Before
-    public void setUp() {
+    public void setUp()
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+
         activity = Robolectric.setupActivity(SignupMailActivity.class);
         etEmail = (ClearableEditText)activity.findViewById(R.id.etSignupEmail);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
@@ -78,8 +87,11 @@ public class SignupMailActivityTest {
         FakeHttp.addPendingHttpResponse(httpResponse);
         etEmail.setText(VALID_EMAIL);
         ivBtFwd.performClick();
-        Intent expectedIntent = new Intent(activity, SignupNameActivity.class);
-        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+
+       ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+       Intent startedIntent = shadowActivity.getNextStartedActivity();
+       ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+       Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(SignupNameActivity.class.getName()));
     }
 
     @Test
@@ -95,10 +107,10 @@ public class SignupMailActivityTest {
         Assert.assertTrue(title.equals(activity.getString(R.string.user_already_exists)));
         Button okButton = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
         okButton.performClick();
-        Intent expectedIntent = new Intent(activity, LoginActivity.class);
-        expectedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        expectedIntent.putExtra("email", etEmail.getText().toString());
-        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(LoginActivity.class.getName()));
     }
 
     @Test

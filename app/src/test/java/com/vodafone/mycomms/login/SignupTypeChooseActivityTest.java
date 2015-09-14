@@ -7,17 +7,25 @@ import android.os.Build;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+
+import io.realm.Realm;
+
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -32,7 +40,11 @@ public class SignupTypeChooseActivityTest {
     ImageView mBack;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+
         activity = Robolectric.setupActivity(SignupTypeChooseActivity.class);
         mSignupEmail = (Button)activity.findViewById(R.id.btSignupMail);
         mSignupSalesforce = (Button)activity.findViewById(R.id.btSignupSalesforce);

@@ -229,7 +229,7 @@ public class PreferencesFragmentTest {
         aboutButton.performClick();
         Intent expectedIntent = new Intent(mPreferencesFragment.getActivity(), AboutActivity.class);
         Assert.assertTrue(Shadows.shadowOf(mPreferencesFragment.getActivity())
-                .getNextStartedActivity().equals(expectedIntent));
+                .getNextStartedActivity().getComponent().getClassName().compareTo(AboutActivity.class.getName())==0);
 
         System.err.println("******** Test: About navigation OK********");
     }
@@ -324,7 +324,7 @@ public class PreferencesFragmentTest {
         mPreferencesFragment.getActivity().startActivityForResult(intent, 142);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         Assert.assertTrue(startedIntent != null);
-        Assert.assertTrue(startedIntent.equals(intent));
+        Assert.assertTrue(startedIntent.getComponent().getClassName().compareTo(VacationTimeSetterActivity.class.getName())==0);
     }
 
     @Test

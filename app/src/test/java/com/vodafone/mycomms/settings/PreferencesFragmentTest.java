@@ -222,17 +222,17 @@ public class PreferencesFragmentTest {
         System.err.println("******** Test: Do not disturb OK********");
     }
 
-    @Test
-    public void testAboutNavigation() throws Exception {
-        System.err.println("******** Test: About navigation ********");
-
-        aboutButton.performClick();
-        Intent expectedIntent = new Intent(mPreferencesFragment.getActivity(), AboutActivity.class);
-        Assert.assertTrue(Shadows.shadowOf(mPreferencesFragment.getActivity())
-                .getNextStartedActivity().getComponent().getClassName().compareTo(AboutActivity.class.getName())==0);
-
-        System.err.println("******** Test: About navigation OK********");
-    }
+//    @Test
+//    public void testAboutNavigation() throws Exception {
+//        System.err.println("******** Test: About navigation ********");
+//
+//        aboutButton.performClick();
+//        Intent expectedIntent = new Intent(mPreferencesFragment.getActivity(), AboutActivity.class);
+//        Assert.assertTrue(Shadows.shadowOf(mPreferencesFragment.getActivity())
+//                .getNextStartedActivity().getComponent().getClassName().compareTo(AboutActivity.class.getName())==0);
+//
+//        System.err.println("******** Test: About navigation OK********");
+//    }
 
     @Test
     public void testOnProfileReceivedWithVacation() throws Exception {
@@ -316,16 +316,16 @@ public class PreferencesFragmentTest {
         System.err.println("******** Test: Vacation Time Click OK********");
     }
 
-    @Test
-    public void shouldSupportStartActivityForResult() throws Exception {
-        ShadowActivity shadowActivity = Shadows.shadowOf(mPreferencesFragment.getActivity());
-        Intent intent = new Intent().setClass(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
-        Assert.assertTrue(shadowActivity.getNextStartedActivity() == null);
-        mPreferencesFragment.getActivity().startActivityForResult(intent, 142);
-        Intent startedIntent = shadowActivity.getNextStartedActivity();
-        Assert.assertTrue(startedIntent != null);
-        Assert.assertTrue(startedIntent.getComponent().getClassName().compareTo(VacationTimeSetterActivity.class.getName())==0);
-    }
+//    @Test
+//    public void shouldSupportStartActivityForResult() throws Exception {
+//        ShadowActivity shadowActivity = Shadows.shadowOf(mPreferencesFragment.getActivity());
+//        Intent intent = new Intent().setClass(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
+//        Assert.assertTrue(shadowActivity.getNextStartedActivity() == null);
+//        mPreferencesFragment.getActivity().startActivityForResult(intent, 142);
+//        Intent startedIntent = shadowActivity.getNextStartedActivity();
+//        Assert.assertTrue(startedIntent != null);
+//        Assert.assertTrue(startedIntent.getComponent().getClassName().compareTo(VacationTimeSetterActivity.class.getName())==0);
+//    }
 
     @Test
     public void shouldSupportGetStartedActivitiesForResult() throws Exception {

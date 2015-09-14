@@ -71,7 +71,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private ProfileController profileController;
     private Context mContext;
     private static SharedPreferences sp;
-    public boolean appIsInitialized = false;
+    public static boolean appIsInitialized = false;
     private FavouriteController favouriteController;
     private RecentContactController recentContactController;
     private NewsController mNewsController;

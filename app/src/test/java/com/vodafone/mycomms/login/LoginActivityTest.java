@@ -134,7 +134,6 @@ public class LoginActivityTest {
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
-
     @Test
     public void testApplicationAndProfileInitializedBusEvent() {
         BusProvider.getInstance().post(new ApplicationAndProfileInitialized());

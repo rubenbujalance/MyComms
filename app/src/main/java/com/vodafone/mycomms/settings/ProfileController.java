@@ -401,7 +401,8 @@ public class ProfileController extends BaseController {
             Crashlytics.logException(e);
         }
         finally {
-            realm.close();
+            if (realm != null)
+               realm.close();
         }
     }
 

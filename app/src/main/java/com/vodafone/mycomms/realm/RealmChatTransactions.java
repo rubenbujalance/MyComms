@@ -291,6 +291,7 @@ public class RealmChatTransactions
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, id);
             chatMessage = query.findFirst();
         }

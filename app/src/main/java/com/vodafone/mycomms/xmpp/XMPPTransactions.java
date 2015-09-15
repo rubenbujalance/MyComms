@@ -118,6 +118,9 @@ public final class XMPPTransactions {
                         Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
                 _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
             }
+            else {
+                Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: PROFILE ID IS NOT NULL" + _profile_id);
+            }
 
             //Device ID
             if (_device_id == null) {
@@ -128,6 +131,14 @@ public final class XMPPTransactions {
             //Configuration for the connection
             if (_xmppConfigBuilder == null) {
                 loadConnectionConfig();
+            }
+            else if (_xmppConfigBuilder.build().getUsername()==null) {
+                _xmppConfigBuilder = null;
+                loadConnectionConfig();
+                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: CONFIG BUILDER (CLEAN) AND NULL");
+            }
+            else {
+                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: CONFIG BUILDER NOT NULL");
             }
 
             //Set a timer to check connection every 5 seconds
@@ -251,6 +262,10 @@ public final class XMPPTransactions {
             return false;
         }
 
+        _xmppConfigBuilder = null;
+        _xmppConnection = null;
+        _profile_id = null;
+
         Log.w(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: XMPP Server DISCONNECTED");
         return true;
     }
@@ -273,7 +288,7 @@ public final class XMPPTransactions {
 
     public static void checkAndReconnectXMPP(final Context context)
     {
-        Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP");
+        Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP _xmppConnection-" + _xmppConnection);
 
         if(_isConnecting &&
                 Calendar.getInstance().getTimeInMillis() > _isConnectingTime+10000)
@@ -362,7 +377,8 @@ public final class XMPPTransactions {
             };
 
             pingWaitingID = id;
-            _xmppConnection.sendStanza(st);
+            if (_xmppConnection!=null)
+                _xmppConnection.sendStanza(st);
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendPing: Error sending message", e);

@@ -281,6 +281,10 @@ public class RealmChatTransactions
     }
 
     public ChatMessage getChatMessageById(String id, Realm realm){
+        return getChatMessageById(id, false, realm);
+    }
+
+    public ChatMessage getChatMessageById(String id, boolean useProfile, Realm realm){
         ChatMessage chatMessage = null;
 
         Realm mRealm;
@@ -291,7 +295,8 @@ public class RealmChatTransactions
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id);
+            if(useProfile)
+                query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id);
             query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, id);
             chatMessage = query.findFirst();
         }

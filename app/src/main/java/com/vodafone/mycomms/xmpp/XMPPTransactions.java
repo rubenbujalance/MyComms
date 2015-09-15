@@ -98,7 +98,7 @@ public final class XMPPTransactions {
 
     public static void initializeMsgServerSession(Context appContext)
     {
-        if(_isConnecting) return;
+        if(_isConnecting || MycommsApp.disconnectedProcess) return;
 
         //Start connection
 //        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() ||
@@ -121,6 +121,9 @@ public final class XMPPTransactions {
             else {
                 Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: PROFILE ID IS NOT NULL" + _profile_id);
             }
+
+            //If at this point it is no profile loaded, it indicates there is no user profile logged
+            if(_profile_id==null || _profile_id.length()==0) return;
 
             //Device ID
             if (_device_id == null) {
@@ -690,7 +693,7 @@ public final class XMPPTransactions {
             boolean changeStatus = false;
 
             //Check if chat message has already been received
-            ChatMessage tempMsg = chatTx.getChatMessageById(id, realm);
+            ChatMessage tempMsg = chatTx.getChatMessageById(id, true, realm);
             if(tempMsg!=null) {
                 if(getXMPPStatusOrder(status) <= getXMPPStatusOrder(tempMsg.getStatus()))
                     return false;
@@ -793,7 +796,7 @@ public final class XMPPTransactions {
             chatTx = new RealmChatTransactions(_appContext);
 
             //Check if chat message has already been received
-            ChatMessage tempMsg = chatTx.getChatMessageById(id, realm);
+            ChatMessage tempMsg = chatTx.getChatMessageById(id, true, realm);
             if(tempMsg!=null) {
                 if(getXMPPStatusOrder(status) <= getXMPPStatusOrder(tempMsg.getStatus()))
                     return false;
@@ -1415,14 +1418,12 @@ public final class XMPPTransactions {
                 _isConnecting = true;
                 _isConnectingTime = Calendar.getInstance().getTimeInMillis();
 
-                if(_xmppConnection!=null) {
+                if(_xmppConnection!=null && _xmppConnection.isConnected())
                     _xmppConnection.disconnect();
-                }
-                else {
-                    _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
-                    _xmppConnection.addConnectionListener(getConnectionListener());
-                    connectionCreated = true;
-                }
+
+                _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
+                _xmppConnection.addConnectionListener(getConnectionListener());
+                connectionCreated = true;
 
                 // Connect to the server
                 _xmppConnection.connect();

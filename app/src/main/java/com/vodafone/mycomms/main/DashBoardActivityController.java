@@ -211,37 +211,30 @@ public class DashBoardActivityController
         private void loadContactsFromIds(ArrayList<String> ids)
         {
             UserProfile userProfile = RealmContactTransactions.getUserProfile(mRealm, mProfileId);
-            Contact contact = new Contact();
-            contact.setAvatar(userProfile.getAvatar());
-            contact.setFirstName(userProfile.getFirstName());
-            contact.setLastName(userProfile.getLastName());
-            contact.setContactId(userProfile.getId());
-            contact.setPlatform(userProfile.getPlatform());
-            contacts.add(contact);
+            Contact userContact = new Contact();
+            userContact.setAvatar(userProfile.getAvatar());
+            userContact.setFirstName(userProfile.getFirstName());
+            userContact.setLastName(userProfile.getLastName());
+            userContact.setContactId(userProfile.getId());
+            userContact.setPlatform(userProfile.getPlatform());
 
-            int i = 0;
-            mapAvatarImageAndContact.put(images.get(i), contact);
-            i++;
+            Contact contact;
+            String id;
 
-            for(String id : ids)
+            for(int imageIndex=0; (imageIndex<ids.size() && imageIndex<=3); imageIndex++)
             {
-                if(!id.equals(userProfile.getId()))
-                {
+                id = ids.get(imageIndex);
+                if(id.compareTo(userProfile.getId())!=0)
                     contact = mRealmContactTransactions.getContactById(id, mRealm);
+                else
+                    contact = userContact;
 
-                    if(null != contact)
-                    {
-                        contacts.add(contact);
-                        if(i <= 3)
-                        {
-                            mapAvatarImageAndContact.put(images.get(i), contact);
-                            i++;
-                        }
-                    }
+                if(null != contact) {
+                    contacts.add(contact);
+                    mapAvatarImageAndContact.put(images.get(imageIndex), contact);
                 }
             }
         }
-
 
         @Override
         protected void onPreExecute()

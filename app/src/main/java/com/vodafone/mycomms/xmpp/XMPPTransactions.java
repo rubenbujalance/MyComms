@@ -98,7 +98,7 @@ public final class XMPPTransactions {
 
     public static void initializeMsgServerSession(Context appContext)
     {
-        if(_isConnecting) return;
+        if(_isConnecting || MycommsApp.disconnectedProcess) return;
 
         //Start connection
 //        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() ||
@@ -118,6 +118,12 @@ public final class XMPPTransactions {
                         Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
                 _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
             }
+            else {
+                Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: PROFILE ID IS NOT NULL" + _profile_id);
+            }
+
+            //If at this point it is no profile loaded, it indicates there is no user profile logged
+            if(_profile_id==null || _profile_id.length()==0) return;
 
             //Device ID
             if (_device_id == null) {
@@ -128,6 +134,14 @@ public final class XMPPTransactions {
             //Configuration for the connection
             if (_xmppConfigBuilder == null) {
                 loadConnectionConfig();
+            }
+            else if (_xmppConfigBuilder.build().getUsername()==null) {
+                _xmppConfigBuilder = null;
+                loadConnectionConfig();
+                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: CONFIG BUILDER (CLEAN) AND NULL");
+            }
+            else {
+                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: CONFIG BUILDER NOT NULL");
             }
 
             //Set a timer to check connection every 5 seconds
@@ -251,6 +265,10 @@ public final class XMPPTransactions {
             return false;
         }
 
+        _xmppConfigBuilder = null;
+        _xmppConnection = null;
+        _profile_id = null;
+
         Log.w(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: XMPP Server DISCONNECTED");
         return true;
     }
@@ -273,7 +291,7 @@ public final class XMPPTransactions {
 
     public static void checkAndReconnectXMPP(final Context context)
     {
-        Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP");
+        Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP _xmppConnection-" + _xmppConnection);
 
         if(_isConnecting &&
                 Calendar.getInstance().getTimeInMillis() > _isConnectingTime+10000)
@@ -362,7 +380,8 @@ public final class XMPPTransactions {
             };
 
             pingWaitingID = id;
-            _xmppConnection.sendStanza(st);
+            if (_xmppConnection!=null)
+                _xmppConnection.sendStanza(st);
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendPing: Error sending message", e);
@@ -674,7 +693,7 @@ public final class XMPPTransactions {
             boolean changeStatus = false;
 
             //Check if chat message has already been received
-            ChatMessage tempMsg = chatTx.getChatMessageById(id, realm);
+            ChatMessage tempMsg = chatTx.getChatMessageById(id, true, realm);
             if(tempMsg!=null) {
                 if(getXMPPStatusOrder(status) <= getXMPPStatusOrder(tempMsg.getStatus()))
                     return false;
@@ -777,7 +796,7 @@ public final class XMPPTransactions {
             chatTx = new RealmChatTransactions(_appContext);
 
             //Check if chat message has already been received
-            ChatMessage tempMsg = chatTx.getChatMessageById(id, realm);
+            ChatMessage tempMsg = chatTx.getChatMessageById(id, true, realm);
             if(tempMsg!=null) {
                 if(getXMPPStatusOrder(status) <= getXMPPStatusOrder(tempMsg.getStatus()))
                     return false;
@@ -1399,14 +1418,12 @@ public final class XMPPTransactions {
                 _isConnecting = true;
                 _isConnectingTime = Calendar.getInstance().getTimeInMillis();
 
-                if(_xmppConnection!=null) {
+                if(_xmppConnection!=null && _xmppConnection.isConnected())
                     _xmppConnection.disconnect();
-                }
-                else {
-                    _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
-                    _xmppConnection.addConnectionListener(getConnectionListener());
-                    connectionCreated = true;
-                }
+
+                _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
+                _xmppConnection.addConnectionListener(getConnectionListener());
+                connectionCreated = true;
 
                 // Connect to the server
                 _xmppConnection.connect();

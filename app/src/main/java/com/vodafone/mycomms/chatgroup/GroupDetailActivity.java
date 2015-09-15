@@ -281,20 +281,23 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
     private void loadContactsFromIds()
     {
         contactList = new ArrayList<>();
-        Contact contact = new Contact();
-        contact.setAvatar(_profile.getAvatar());
-        contact.setFirstName(_profile.getFirstName());
-        contact.setLastName(_profile.getLastName());
-        contact.setContactId(_profile.getId());
-        contactList.add(contact);
+
+        Contact userContact = new Contact();
+        userContact.setAvatar(_profile.getAvatar());
+        userContact.setFirstName(_profile.getFirstName());
+        userContact.setLastName(_profile.getLastName());
+        userContact.setContactId(_profile.getId());
+
+        Contact contact;
+
         for(String id : contactIds)
         {
-            if(!id.equals(_profile_id))
-            {
+            if(id.compareTo(_profile_id)!=0)
                 contact = contactTransactions.getContactById(id, mRealm);
-                if(contact != null)
-                    contactList.add(contact);
-            }
+            else contact = userContact;
+
+            if(contact != null)
+                contactList.add(contact);
         }
     }
 

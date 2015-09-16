@@ -19,6 +19,7 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
 import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
@@ -60,7 +61,7 @@ import model.News;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class})
+@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class, BusProvider.class})
 public class DashBoardActivityTest
 {
     @Rule
@@ -75,6 +76,14 @@ public class DashBoardActivityTest
         PowerMockito.mockStatic(Realm.class);
         PowerMockito.when(Realm.getDefaultInstance()).thenReturn(null);
         PowerMockito.mockStatic(Crashlytics.class);
+
+        //Mock BusProvider to avoid post "onDashBoardCreatedEvent"
+        BusProvider.MainThreadBus bus = BusProvider.getInstance();
+        BusProvider.MainThreadBus busSpy = Mockito.spy(bus);
+        PowerMockito.doNothing().when(busSpy).post(Mockito.any(DashboardCreatedEvent.class));
+        PowerMockito.mockStatic(BusProvider.class);
+        PowerMockito.when(BusProvider.getInstance()).thenReturn(bus);
+
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         Context context = RuntimeEnvironment.application.getApplicationContext();
         sp = context.getSharedPreferences(
@@ -232,6 +241,9 @@ public class DashBoardActivityTest
     @Test
     public void test_onConnectivityChanged_NotConnected1()
     {
+//        PowerMockito.mockStatic(BusProvider.class);
+//        PowerMockito.when(BusProvider.getInstance()).thenReturn(BusProvider.getInstance());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -243,6 +255,9 @@ public class DashBoardActivityTest
     @Test
     public void test_onConnectivityChanged_NotConnected2()
     {
+//        PowerMockito.mockStatic(BusProvider.class);
+//        PowerMockito.when(BusProvider.getInstance()).thenReturn(BusProvider.getInstance());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -254,6 +269,9 @@ public class DashBoardActivityTest
     @Test
     public void test_onConnectivityChanged_NotConnected3()
     {
+//        PowerMockito.mockStatic(BusProvider.class);
+//        PowerMockito.when(BusProvider.getInstance()).thenReturn(BusProvider.getInstance());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();

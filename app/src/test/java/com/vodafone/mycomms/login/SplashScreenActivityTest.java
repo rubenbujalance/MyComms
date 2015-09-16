@@ -31,6 +31,7 @@ import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -84,6 +85,15 @@ public class SplashScreenActivityTest{
         when(Realm.getDefaultInstance()).thenReturn(null);
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            if (webServer != null) webServer.shutdown();
+        } catch (Exception e) {}
     }
 
     @Test

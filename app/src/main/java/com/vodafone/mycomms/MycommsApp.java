@@ -398,6 +398,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         recentContactController = new RecentContactController(this, profile_id);
         recentContactController.getRecentListWithPreviousLDAPAuthentication();
         getNews();
+
+        XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
     }
 
     @Subscribe

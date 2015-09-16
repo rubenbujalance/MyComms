@@ -695,8 +695,8 @@ public class DashBoardActivityController
         protected void onPreExecute() {
             child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
             container.addView(child);
-            if(pos==0) child.setPadding(0, 20, 5, 20);
-            else child.setPadding(5, 20, 5, 20);
+            if(pos==0) child.setPadding(0, 0, 5, 0);
+            else child.setPadding(5, 0, 5, 0);
         }
 
         @Override

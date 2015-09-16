@@ -61,7 +61,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
 @PrepareForTest({RealmContactTransactions.class, Realm.class, EndpointWrapper.class,
-        RealmProfileTransactions.class})
+        RealmProfileTransactions.class, Crashlytics.class})
 
 public class PreferencesFragmentTest {
 

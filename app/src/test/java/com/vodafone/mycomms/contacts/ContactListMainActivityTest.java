@@ -2,7 +2,6 @@ package com.vodafone.mycomms.contacts;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.view.View;
@@ -14,20 +13,14 @@ import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.realm.RealmContactTransactions;
-import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
-import com.vodafone.mycomms.util.Constants;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;

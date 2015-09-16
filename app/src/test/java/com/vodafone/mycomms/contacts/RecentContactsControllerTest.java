@@ -64,6 +64,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
 @PrepareForTest({Realm.class, EndpointWrapper.class
+        , Crashlytics.class
         , SearchController.class, SearchBarController.class, RecentContactController.class
         , RealmGroupChatTransactions.class, RealmContactTransactions.class})
 public class RecentContactsControllerTest

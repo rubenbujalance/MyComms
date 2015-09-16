@@ -137,7 +137,6 @@ public class SplashScreenActivityTest{
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(uri);
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
-        Robolectric.flushForegroundThreadScheduler();
         Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         Assert.assertNotNull(UserSecurity.getAccessToken(activity));
@@ -160,7 +159,6 @@ public class SplashScreenActivityTest{
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(uri);
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
-        Robolectric.flushForegroundThreadScheduler();
         Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
@@ -340,7 +338,6 @@ public class SplashScreenActivityTest{
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(400).setBody(Constants.VALID_VERSION_RESPONSE));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Robolectric.flushForegroundThreadScheduler();
         Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
@@ -372,7 +369,6 @@ public class SplashScreenActivityTest{
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(400).setBody(Constants.VALID_VERSION_RESPONSE));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Robolectric.flushForegroundThreadScheduler();
         Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();

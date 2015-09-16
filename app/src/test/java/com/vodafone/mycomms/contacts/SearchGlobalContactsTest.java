@@ -75,7 +75,11 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({RealmContactTransactions.class, Realm.class, EndpointWrapper.class, RealmLDAPSettingsTransactions.class})
+@PrepareForTest({RealmContactTransactions.class
+        , Realm.class
+        , Crashlytics.class
+        , EndpointWrapper.class
+        , RealmLDAPSettingsTransactions.class})
 public class SearchGlobalContactsTest {
 
     @Rule

@@ -2,7 +2,6 @@ package com.vodafone.mycomms.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageView;
@@ -25,11 +24,7 @@ public class NewsDetailActivity  extends ToolbarActivity {
                         new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
                 );
         setContentView(R.layout.layout_news_detail);
-
-        Log.d(Constants.TAG, "NewsDetailActivity.onCreate: ");
-
         Intent intent = getIntent();
-
         ImageView picture = (ImageView) findViewById(R.id.picture);
         Picasso.with(this)
                 .load("https://"+ EndpointWrapper.getBaseNewsURL()+intent.getExtras().getString(Constants.NEWS_IMAGE))
@@ -57,8 +52,6 @@ public class NewsDetailActivity  extends ToolbarActivity {
         published.setText(intent.getExtras().getString(Constants.NEWS_PUBLISHED_AT));
 
         WebView html = (WebView) findViewById(R.id.newstext);
-//        html.loadData(intent.getExtras().getString(Constants.NEWS_HTML), "text/html; charset=utf-8", "UTF-8");
-//        html.loadUrl("file:///android_asset/demo.html");
         String pish = "<html><head><style type=\"text/css\">@font-face {font-family: SourceSansPro-Regular;src: url(\"file:///android_asset/fonts/SourceSansPro-Regular.ttf\")}body {font-family: SourceSansPro-Regular;font-size: medium;text-align: justify;}</style></head><body>";
         String pas = "</body></html>";
         String myHtmlString = pish + intent.getExtras().getString(Constants.NEWS_HTML) + pas;
@@ -68,7 +61,6 @@ public class NewsDetailActivity  extends ToolbarActivity {
         ivBtBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Start Contacts activity
                 backAction();
             }
         });
@@ -80,9 +72,6 @@ public class NewsDetailActivity  extends ToolbarActivity {
     }
 
     private void backAction() {
-//        Intent in = new Intent(NewsDetailActivity.this, DashBoardActivity.class);
-//        in.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-//        startActivity(in);
         finish();
     }
 

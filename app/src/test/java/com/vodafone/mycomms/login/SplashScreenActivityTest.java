@@ -185,6 +185,8 @@ public class SplashScreenActivityTest{
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(uri);
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
+        Robolectric.flushForegroundThreadScheduler();
+        Thread.sleep(2000);
         Assert.assertTrue(activity.isFinishing());
     }
 
@@ -298,6 +300,7 @@ public class SplashScreenActivityTest{
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        Thread.sleep(1000);
         Assert.assertTrue(activity.isFinishing());
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -392,7 +395,6 @@ public class SplashScreenActivityTest{
         webServer.enqueue(new MockResponse().setResponseCode(400).setBody(body));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         activity.getApplicationContext().getPackageManager().clearPackagePreferredActivities("com.android.providers.downloads.ui");
-        Robolectric.flushForegroundThreadScheduler();
         Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 

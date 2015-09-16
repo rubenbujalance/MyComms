@@ -247,7 +247,6 @@ public class ContactDetailMainActivityTest
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         Assert.assertTrue(null != startedIntent);
         Assert.assertTrue(startedIntent.hasExtra(Constants.CHAT_FIELD_CONTACT_ID));
-        Assert.assertTrue(startedIntent.hasExtra(Constants.CHAT_PREVIOUS_VIEW));
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
     }

@@ -205,8 +205,6 @@ public final class Utils extends MainActivity {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc822");
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-//                        intent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
-//                        intent.putExtra(Intent.EXTRA_TEXT, "I'm email body.");
 
         context.startActivity(intent);
     }

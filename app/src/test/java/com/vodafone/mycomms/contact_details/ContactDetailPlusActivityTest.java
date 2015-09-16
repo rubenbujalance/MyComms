@@ -57,13 +57,12 @@ import static org.powermock.api.mockito.PowerMockito.when;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class})
+@PrepareForTest({Realm.class, Crashlytics.class})
 public class ContactDetailPlusActivityTest
 {
     @Rule
     public PowerMockRule rule = new PowerMockRule();
     public ContactDetailsPlusActivity mActivity;
-    public Context mContext;
 
     @Before
     public void setUp()
@@ -72,7 +71,6 @@ public class ContactDetailPlusActivityTest
         when(Realm.getDefaultInstance()).thenReturn(null);
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
-        mContext = RuntimeEnvironment.application.getApplicationContext();
         mockPicasso();
     }
 
@@ -111,9 +109,10 @@ public class ContactDetailPlusActivityTest
     public void testConnectionAvailable()
     {
         ConnectivityManager connMgr =
-                (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            (ConnectivityManager)(RuntimeEnvironment.application.getApplicationContext()).getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
         setUpActivity();
+
         try {
             Thread.sleep(1000);
         }
@@ -131,7 +130,7 @@ public class ContactDetailPlusActivityTest
     public void testConnectionNotAvailable()
     {
         ConnectivityManager connMgr =
-                (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager)(RuntimeEnvironment.application.getApplicationContext()).getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         setUpActivity();
         try {
@@ -199,7 +198,6 @@ public class ContactDetailPlusActivityTest
 
         mActivity = Robolectric.buildActivity(ContactDetailsPlusActivity.class)
                 .withIntent(intent).create().start().resume().get();
-
         try {
             Thread.sleep(1000);
         }
@@ -246,7 +244,6 @@ public class ContactDetailPlusActivityTest
 
         mActivity = Robolectric.buildActivity(ContactDetailsPlusActivity.class)
                 .withIntent(intent).create().start().resume().get();
-
         try {
             Thread.sleep(1000);
         }
@@ -302,7 +299,6 @@ public class ContactDetailPlusActivityTest
 
         mActivity = Robolectric.buildActivity(ContactDetailsPlusActivity.class)
                 .withIntent(intent).create().start().resume().get();
-
         try {
             Thread.sleep(1000);
         }
@@ -376,7 +372,6 @@ public class ContactDetailPlusActivityTest
 
         mActivity = Robolectric.buildActivity(ContactDetailsPlusActivity.class)
                 .withIntent(intent).create().start().resume().get();
-
         try {
             Thread.sleep(1000);
         }
@@ -447,7 +442,6 @@ public class ContactDetailPlusActivityTest
 
         mActivity = Robolectric.buildActivity(ContactDetailsPlusActivity.class)
                 .withIntent(intent).create().start().resume().get();
-
         try {
             Thread.sleep(1000);
         }
@@ -647,8 +641,8 @@ public class ContactDetailPlusActivityTest
 
     private void mockPicasso()
     {
-        Downloader downloader = new OkHttpDownloader(mContext, Long.MAX_VALUE);
-        Picasso.Builder builder = new Picasso.Builder(mContext);
+        Downloader downloader = new OkHttpDownloader(RuntimeEnvironment.application.getApplicationContext(), Long.MAX_VALUE);
+        Picasso.Builder builder = new Picasso.Builder(RuntimeEnvironment.application.getApplicationContext());
         builder.downloader(downloader);
         MycommsApp.picasso = builder.build();
     }

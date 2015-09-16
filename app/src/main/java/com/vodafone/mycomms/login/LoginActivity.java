@@ -254,7 +254,7 @@ public class LoginActivity extends MainAppCompatActivity implements ILoginConnec
         Log.e(Constants.TAG, "LoginActivity.onApplicationAndProfileReadErrorEvent: ");
         if(!isForeground) return;
 
-        if(((MycommsApp)getApplication()).isProfileAvailable()) {
+        if(MycommsApp.isProfileAvailable()) {
             goToApp();
         }
         else

@@ -23,14 +23,19 @@ import com.vodafone.mycomms.test.util.Util;
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
@@ -48,6 +53,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
+        "javax.net.ssl.*", "org.json.*"})
+@PrepareForTest({Crashlytics.class})
 public class LoginActivityTest {
 
     Activity activity;
@@ -59,12 +67,19 @@ public class LoginActivityTest {
     ImageView ivBack;
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
-        activity = Robolectric.setupActivity(LoginActivity.class);
+        activity = Robolectric.buildActivity(LoginActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
         btLogin = (Button) activity.findViewById(R.id.btLogin);
         btLoginSalesforce = (Button) activity.findViewById(R.id.btLoginSalesforce);
         tvForgotPass = (TextView) activity.findViewById(R.id.tvForgotPass);
@@ -74,9 +89,17 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testLoginOk() throws Exception {
-        HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
-        FakeHttp.addPendingHttpResponse(httpResponse);
+    public void testLoginOk()
+    {
+        try {
+            HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
+            FakeHttp.addPendingHttpResponse(httpResponse);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+
         etEmail.setText(VALID_EMAIL);
         etPassword.setText(PASSWORD);
         btLogin.performClick();
@@ -92,9 +115,16 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testLoginError() throws Exception {
-        HttpResponse httpResponse = Util.buildResponse(409, LOGIN_USER_NOT_FOUND_RESPONSE);
-        FakeHttp.addPendingHttpResponse(httpResponse);
+    public void testLoginError()
+    {
+        try {
+            HttpResponse httpResponse = Util.buildResponse(409, LOGIN_USER_NOT_FOUND_RESPONSE);
+            FakeHttp.addPendingHttpResponse(httpResponse);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
         etEmail.setText(VALID_EMAIL);
         etPassword.setText(PASSWORD);
         btLogin.performClick();
@@ -109,12 +139,18 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testLoginConnectionError() throws Exception {
+    public void testLoginConnectionError(){
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
-        HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
-        FakeHttp.addPendingHttpResponse(httpResponse);
+        try {
+            HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
+            FakeHttp.addPendingHttpResponse(httpResponse);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
         etEmail.setText(VALID_EMAIL);
         etPassword.setText(PASSWORD);
         btLogin.performClick();
@@ -130,20 +166,22 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testForgotPass() throws Exception {
+    public void testForgotPass(){
         tvForgotPass.performClick();
-        Intent expectedIntent = new Intent(activity, ForgotPassActivity.class);
-        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ForgotPassActivity.class.getName()));
     }
 
     @Test
-    public void testLoginSalesforce() throws Exception {
+    public void testLoginSalesforce(){
         btLoginSalesforce.performClick();
-        Intent expectedIntent = new Intent(activity, OAuthActivity.class);
-        expectedIntent.putExtra("oauth", "sf");
-        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(OAuthActivity.class.getName()));
     }
-
 
     @Test
     public void testApplicationAndProfileInitializedBusEvent() {
@@ -162,19 +200,14 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testPasswordKeyEvent() throws Exception {
-        //Simulate Editor Key Event
-    }
-
-    @Test
-    public void testBack() throws Exception {
+    public void testBack(){
         ivBack.performClick();
         Assert.assertTrue(activity.isFinishing());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
-    public void testFinish() throws Exception {
+    public void testFinish(){
         Activity activity = Robolectric.buildActivity(LoginActivity.class).create().start().resume().pause().stop().destroy().get();
         Assert.assertTrue(activity.isDestroyed());
     }

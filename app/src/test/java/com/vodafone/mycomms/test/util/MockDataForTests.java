@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import model.Contact;
 import model.FavouriteContact;
@@ -252,9 +253,9 @@ public class MockDataForTests
         mockFavouriteContact.setCompany("Stratesys");
         mockFavouriteContact.setPresence(
                 "{\n" +
-                "\"icon\": \"mockIcon\"\n," +
-                "\"detail\": \"#LOCAL_TIME#\"\n" +
-                "}");
+                        "\"icon\": \"mockIcon\"\n," +
+                        "\"detail\": \"#LOCAL_TIME#\"\n" +
+                        "}");
         mockFavouriteContact.setPosition("Senior Developer Consultant");
         mockFavouriteContact.setOfficeLocation("Barcelona");
         mockFavouriteContact.setTimezone("Europe/Madrid");
@@ -865,6 +866,22 @@ public class MockDataForTests
         catch (Exception e)
         {
             System.err.println("******** getContactJSONObject JSONObject creation failed ********\n"+e.getMessage());
+        }
+
+        return jsonObject;
+    }
+
+    public static JSONObject getContactJSONObjectWithDataTagAsJSONArray()
+    {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        try {
+            jsonArray.put(getContactJSONObject());
+            jsonObject.put(Constants.CONTACT_DATA, jsonArray);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** getContactJSONObjectWithDataTag JSONObject creation failed ********\n"+e.getMessage());
         }
 
         return jsonObject;

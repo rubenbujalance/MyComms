@@ -17,9 +17,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
@@ -39,6 +43,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
+        "javax.net.ssl.*", "org.json.*"})
+@PrepareForTest({Crashlytics.class})
 public class MailSentActivityTest {
 
     MailSentActivity activity;
@@ -54,8 +61,16 @@ public class MailSentActivityTest {
 
         Intent intent = new Intent();
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("pin",PIN);
-        activity = Robolectric.buildActivity(MailSentActivity.class).withIntent(intent).create().get();
+        intent.putExtra("pin", PIN);
+        activity = Robolectric.buildActivity(MailSentActivity.class).withIntent(intent).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
         mWeSent = activity.mWeSent;
         mResendEmail = activity.mResendEmail;
     }
@@ -76,16 +91,6 @@ public class MailSentActivityTest {
         Assert.assertTrue(header.getValue().equals(PIN));
         Assert.assertTrue("/api/profile".equals(latestSentHttpPost.getURI().getPath()));
     }
-
-//    @Test
-//    public void testBack() throws Exception {
-//        KeyEvent keyEvent = new KeyEvent(0,0,KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK, 0, 0);
-//        activity.dispatchKeyEvent(keyEvent);
-//        Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
-//        expectedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
-//        Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
-//    }
 
     @Test
     public void shouldCallFinishInOnBackPressed() {

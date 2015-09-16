@@ -24,9 +24,13 @@ import com.vodafone.mycomms.test.util.Util;
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
@@ -47,6 +51,9 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
+        "javax.net.ssl.*", "org.json.*"})
+@PrepareForTest({Crashlytics.class})
 public class SignupPincodeActivityTest {
 
     SignupPincodeActivity activity;
@@ -71,7 +78,15 @@ public class SignupPincodeActivityTest {
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
-        activity = Robolectric.setupActivity(SignupPincodeActivity.class);
+        activity = Robolectric.buildActivity(SignupPincodeActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
         Shadows.shadowOf(activity).getNextStartedActivity();
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);

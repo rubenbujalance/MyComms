@@ -110,7 +110,7 @@ public class SignupNameActivity extends MainActivity {
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean(Constants.FIRST_TIME_AVATAR_DELIVERY, false) ;
-        editor.commit();
+        editor.apply();
     }
 
     private void dispatchTakePictureIntent(String title, String subtitle) {

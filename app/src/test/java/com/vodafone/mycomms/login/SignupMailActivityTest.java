@@ -21,9 +21,13 @@ import com.vodafone.mycomms.test.util.Util;
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
@@ -45,6 +49,9 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
+        "javax.net.ssl.*", "org.json.*"})
+@PrepareForTest({Crashlytics.class})
 public class SignupMailActivityTest {
 
     Activity activity;
@@ -59,7 +66,16 @@ public class SignupMailActivityTest {
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
-        activity = Robolectric.setupActivity(SignupMailActivity.class);
+        activity = Robolectric.buildActivity(SignupMailActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
         etEmail = (ClearableEditText)activity.findViewById(R.id.etSignupEmail);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
@@ -82,7 +98,8 @@ public class SignupMailActivityTest {
     }
 
    @Test
-    public void testForwardToSignupName() throws Exception {
+    public void testForwardToSignupName() throws Exception
+   {
         HttpResponse httpResponse = Util.buildResponse(204);
         FakeHttp.addPendingHttpResponse(httpResponse);
         etEmail.setText(VALID_EMAIL);

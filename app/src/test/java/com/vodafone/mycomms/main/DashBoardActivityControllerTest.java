@@ -32,10 +32,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.ReturnValues;
-import org.mockito.configuration.AnnotationEngine;
-import org.mockito.configuration.IMockitoConfiguration;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -48,11 +44,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.realm.Realm;
-import model.RecentContact;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -72,7 +66,7 @@ import static org.robolectric.Shadows.shadowOf;
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
 @PrepareForTest({Realm.class, Crashlytics.class, RealmContactTransactions.class, RealmGroupChatTransactions.class})
-public class DashBoardActivityControllerTest implements IMockitoConfiguration
+public class DashBoardActivityControllerTest
 {
     @Rule
     public PowerMockRule rule = new PowerMockRule();
@@ -543,31 +537,5 @@ public class DashBoardActivityControllerTest implements IMockitoConfiguration
         Picasso.Builder builder = new Picasso.Builder(mActivity.getApplicationContext());
         builder.downloader(downloader);
         MycommsApp.picasso = builder.build();
-    }
-
-
-    @Override
-    public ReturnValues getReturnValues() {
-        return null;
-    }
-
-    @Override
-    public Answer<Object> getDefaultAnswer() {
-        return null;
-    }
-
-    @Override
-    public AnnotationEngine getAnnotationEngine() {
-        return null;
-    }
-
-    @Override
-    public boolean cleansStackTrace() {
-        return false;
-    }
-
-    @Override
-    public boolean enableClassCache() {
-        return false;
     }
 }

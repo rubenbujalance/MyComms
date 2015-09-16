@@ -156,7 +156,6 @@ public class ForgotPassActivity extends MainAppCompatActivity {
             }
         } catch(Exception ex) {
             Log.e(Constants.TAG, "ForgotPassActivity.callBackSendNewPass: \n" + ex.toString());
-            return;
         }
     }
 

@@ -11,8 +11,13 @@ import android.provider.CalendarContract;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
@@ -23,6 +28,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.contacts.detail.ContactDetailsPlusActivity;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
@@ -47,7 +53,10 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
+import java.util.ArrayList;
+
 import io.realm.Realm;
+import model.Contact;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -69,6 +78,7 @@ public class ContactDetailMainActivityTest
     public PowerMockRule rule = new PowerMockRule();
     public ContactDetailMainActivity mActivity;
     public Context mContext;
+    public MockWebServer webServer;
 
     @Before
     public void setUp()
@@ -79,8 +89,6 @@ public class ContactDetailMainActivityTest
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         mContext = RuntimeEnvironment.application.getApplicationContext();
         mockParams();
-
-        setUpParams();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -109,6 +117,7 @@ public class ContactDetailMainActivityTest
         ConnectivityManager connMgr =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
+        setUpParams();
         setUpActivity();
         try {
             Thread.sleep(1000);
@@ -129,6 +138,7 @@ public class ContactDetailMainActivityTest
         ConnectivityManager connMgr =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
+        setUpParams();
         setUpActivity();
         try {
             Thread.sleep(1000);
@@ -146,6 +156,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testDetailsPlusActivity_Visible()
     {
+        setUpParams();
         setUpActivity();
         try {
             Thread.sleep(1000);
@@ -172,6 +183,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testButtonPhone_Clicked()
     {
+        setUpParams();
         setUpActivity();
         try {
             Thread.sleep(1000);
@@ -196,6 +208,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testButtonEmail_Clicked()
     {
+        setUpParams();
         setUpActivity();
         try {
             Thread.sleep(1000);
@@ -219,6 +232,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testButtonChat_Clicked()
     {
+        setUpParams();
         setUpActivity();
         try {
             Thread.sleep(1000);
@@ -243,8 +257,90 @@ public class ContactDetailMainActivityTest
     }
 
     @Test
+    public void testButtonChatLocal_Clicked()
+    {
+        SharedPreferences sp = mContext.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
+        PowerMockito.mockStatic(RealmContactTransactions.class);
+        ArrayList<Contact> mockContactList = MockDataForTests.getMockContactsList();
+        mockContactList.get(0).setPlatform(Constants.PLATFORM_LOCAL);
+        PowerMockito.when(RealmContactTransactions.getFilteredContacts(Matchers.anyString(), Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(mockContactList);
+
+        setUpActivity();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testButtonEmail_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
+        ImageView btnChat = (ImageView) mActivity.findViewById(R.id.btn_prof_chat);
+        btnChat.performClick();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_VIEW));
+    }
+
+    @Test
+    public void testContactWithoutPhone_NoEmail_NoOfficeLocation_WithPresence_WitLastSeen()
+    {
+        SharedPreferences sp = mContext.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
+        PowerMockito.mockStatic(RealmContactTransactions.class);
+        ArrayList<Contact> mockContactList = MockDataForTests.getMockContactsList();
+        mockContactList.get(0).setPhones(null);
+        mockContactList.get(0).setEmails(null);
+        mockContactList.get(0).setOfficeLocation(null);
+        mockContactList.get(0).setPresence(
+                "{\n" +
+                        "\"icon\": \"mockIcon\"\n," +
+                        "\"detail\": \"#LOCAL_TIME#\"\n" +
+                        "}");
+        mockContactList.get(0).setLastSeen(Long.parseLong("123456"));
+        PowerMockito.when(RealmContactTransactions.getFilteredContacts(Matchers.anyString(), Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(mockContactList);
+
+        setUpActivity();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testButtonEmail_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        int phoneDrawable = R.drawable.btn_prof_phone_off;
+        int chatDrawable = R.drawable.btn_prof_chat_off;
+        Drawable imageButton = mActivity.getResources().getDrawable(phoneDrawable);
+        Drawable imageChat = mActivity.getResources().getDrawable(chatDrawable);
+        ImageView btnPhone = (ImageView)mActivity.findViewById(R.id.btn_prof_phone);
+        ImageView btnChat = (ImageView)mActivity.findViewById(R.id.btn_prof_chat);
+        Assert.assertTrue(btnPhone.getDrawable().equals(imageButton));
+        Assert.assertTrue(btnChat.getDrawable().equals(imageChat));
+
+        int emailDrawable = R.drawable.btn_prof_email_off;
+        Drawable emailButton = mActivity.getResources().getDrawable(emailDrawable);
+        ImageView btnEmail = (ImageView)mActivity.findViewById(R.id.btn_prof_email);
+        Assert.assertTrue(btnEmail.getDrawable().equals(emailButton));
+
+        TextView tvOfficeLocation = (TextView)mActivity.findViewById(R.id.contact_office_location);
+        Assert.assertTrue(tvOfficeLocation.getVisibility() == View.GONE);
+    }
+
+
+    @Test
     public void testButtonCalendar_Clicked()
     {
+        setUpParams();
         setUpActivity();
         try {
             Thread.sleep(1000);
@@ -274,6 +370,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testContactIsFavorite_StarVisibility()
     {
+        setUpParams();
         PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
                 .thenReturn(true);
         setUpActivity();
@@ -299,6 +396,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testContactIsNOTFavorite_StarVisibility()
     {
+        setUpParams();
         PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
                 .thenReturn(false);
         setUpActivity();
@@ -324,6 +422,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testFavoriteStarOn_Clicked()
     {
+        setUpParams();
         PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
                 .thenReturn(true);
         setUpActivity();
@@ -348,6 +447,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testFavoriteStarOff_Clicked()
     {
+        setUpParams();
         PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
                 .thenReturn(false);
         setUpActivity();
@@ -372,6 +472,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testBackButton_Clicked()
     {
+        setUpParams();
         PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
                 .thenReturn(true);
         setUpActivity();
@@ -393,6 +494,7 @@ public class ContactDetailMainActivityTest
     @Test
     public void testBackLayout_Clicked()
     {
+        setUpParams();
         PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
                 .thenReturn(true);
         setUpActivity();
@@ -409,6 +511,223 @@ public class ContactDetailMainActivityTest
         backArea.performClick();
 
         Assert.assertTrue(mActivity.isFinishing());
+    }
+
+    @Test
+    public void testServerWithErrorResponse()
+    {
+        String serverUrl = null;
+        try {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testServerWithErrorResponse Failed due to: startWebMockServer()********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(400).setBody(com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE));
+
+        setUpParams();
+        setUpActivity();
+        Contact contact = mActivity.getContact();
+        try {
+            Thread.sleep(3000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Contact contact2 = mActivity.getContact();
+
+        Assert.assertTrue(contact.equals(contact2));
+
+    }
+
+    @Test
+    public void testServerWithCorrectResponse()
+    {
+        String serverUrl = null;
+        try {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testServerWithErrorResponse Failed due to: startWebMockServer()********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(200).setBody(MockDataForTests.getContactJSONObjectWithDataTagAsJSONArray().toString()));
+
+        setUpParams();
+        setUpActivity();
+        try {
+            Thread.sleep(3000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+        Contact contact = mActivity.getContact();
+
+        Assert.assertTrue(contact.getFirstName().equals(MockDataForTests.getMockContact().getFirstName()));
+
+    }
+
+    @Test
+    public void testOnConnectivityChanged_HasInternet_Event()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
+        setUpParams();
+        PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(true);
+        setUpActivity();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
+    }
+
+    @Test
+    public void testOnConnectivityChanged_Unknown_Event()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
+        setUpParams();
+        PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(true);
+        setUpActivity();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+    }
+
+    @Test
+    public void testOnConnectivityChanged_Offline_Event()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
+        setUpParams();
+        PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(true);
+        setUpActivity();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+    }
+
+    @Test
+    public void testOnConnectivityChanged_ConnectedNoInternet_Event()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
+        setUpParams();
+        PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(true);
+        setUpActivity();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+    }
+
+    @Test
+    public void testOnConnectivityChanged_WifiConnected_Event()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED);
+        setUpParams();
+        PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(true);
+        setUpActivity();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+    }
+
+    @Test
+    public void testOnConnectivityChanged_MobileConnected_Event()
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.MOBILE_CONNECTED);
+        setUpParams();
+        PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(true);
+        setUpActivity();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
+            Assert.fail();
+        }
+
+        LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
+        BusProvider.getInstance().post(event);
+        org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
     }
 
     private void setUpParams()
@@ -435,5 +754,17 @@ public class ContactDetailMainActivityTest
         Picasso.Builder builder = new Picasso.Builder(mContext);
         builder.downloader(downloader);
         MycommsApp.picasso = builder.build();
+    }
+
+    private String startWebMockServer() throws Exception {
+        //OkHttp mocked web server
+        webServer = new MockWebServer();
+        webServer.useHttps(null, false);
+
+        //Connect OkHttp calls with MockWebServer
+        webServer.start();
+        String serverUrl = webServer.getUrl("").toString();
+
+        return serverUrl;
     }
 }

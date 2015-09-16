@@ -44,10 +44,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.mockito.ReturnValues;
-import org.mockito.configuration.AnnotationEngine;
-import org.mockito.configuration.IMockitoConfiguration;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -85,7 +81,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
         , SearchController.class, SearchBarController.class, RecentContactController.class
         , RealmContactTransactions.class})
 
-public class ContactsControllerTest implements IMockitoConfiguration {
+public class ContactsControllerTest{
     @Rule
     public PowerMockRule rule = new PowerMockRule();
 
@@ -305,7 +301,7 @@ public class ContactsControllerTest implements IMockitoConfiguration {
     {
         String mockEmail = "mock_email@mockdomain.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(0),mockEmail);
+        boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(0), mockEmail);
 
         Assert.assertFalse(canBeInvited);
     }
@@ -315,7 +311,7 @@ public class ContactsControllerTest implements IMockitoConfiguration {
     {
         String mockEmail = "mock_email@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(0),mockEmail);
+        boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(0), mockEmail);
 
         Assert.assertFalse(canBeInvited);
     }
@@ -325,7 +321,7 @@ public class ContactsControllerTest implements IMockitoConfiguration {
     {
         String mockEmail = "vdf01@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(1),mockEmail);
+        boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(1), mockEmail);
 
         Assert.assertFalse(canBeInvited);
     }
@@ -335,7 +331,7 @@ public class ContactsControllerTest implements IMockitoConfiguration {
     {
         String mockEmail = "vdf01@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(2),mockEmail);
+        boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(2), mockEmail);
 
         Assert.assertFalse(canBeInvited);
     }
@@ -639,31 +635,6 @@ public class ContactsControllerTest implements IMockitoConfiguration {
         String serverUrl = webServer.getUrl("").toString();
 
         return serverUrl;
-    }
-
-    @Override
-    public ReturnValues getReturnValues() {
-        return null;
-    }
-
-    @Override
-    public Answer<Object> getDefaultAnswer() {
-        return null;
-    }
-
-    @Override
-    public AnnotationEngine getAnnotationEngine() {
-        return null;
-    }
-
-    @Override
-    public boolean cleansStackTrace() {
-        return false;
-    }
-
-    @Override
-    public boolean enableClassCache() {
-        return false;
     }
 
     private void mockParams()

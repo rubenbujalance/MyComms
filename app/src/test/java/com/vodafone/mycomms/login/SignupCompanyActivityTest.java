@@ -17,9 +17,12 @@ import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
@@ -37,6 +40,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
+        "javax.net.ssl.*", "org.json.*"})
 public class SignupCompanyActivityTest {
 
     SignupCompanyActivity activity;
@@ -51,7 +56,15 @@ public class SignupCompanyActivityTest {
     {
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
-        activity = Robolectric.setupActivity(SignupCompanyActivity.class);
+        activity = Robolectric.buildActivity(SignupCompanyActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         mCompany = activity.mCompany;
         mPosition = activity.mPosition;
@@ -71,13 +84,6 @@ public class SignupCompanyActivityTest {
         mCompany.setText(companyName);
         mCompany.setCodeSelected(companyCode);
         mCompany.callOnClick();
-        /*mCompany.setListSelection(0);
-        mCompany.setSelection(0);
-        mCompany.isPopupShowing();
-        mCompany.callOnClick();
-        mCompany.getAdapter();
-        Shadows.shadowOf(mCompany.getDropDownBackground());
-        Shadows.shadowOf(mCompany).checkedPerformClick();*/
         ivBtFwd.performClick();
         Assert.assertTrue(companyName.equals(UserProfile.getCompanyName()));
 

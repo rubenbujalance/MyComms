@@ -430,7 +430,6 @@ public class ContactDetailMainActivity extends ToolbarActivity{
             }
 
             try {
-                assert null != presenceDetail;
                 if (null != presenceDetail && presenceDetail.equals("#LOCAL_TIME#"))
                 {
                     if(null != contact.getTimezone())
@@ -601,19 +600,6 @@ public class ContactDetailMainActivity extends ToolbarActivity{
         return buf.toString();
     }
 
-//    @Override
-//    public void onContactDetailReceived(Contact contact) {
-//        Log.d(Constants.TAG, "ContactDetailMainActivity.onContactDetailReceived: " + printContact(contact));
-//        this.contact = contact;
-//        loadContactDetail();
-//        setButtonsVisibility();
-//    }
-
-//    @Override
-//    public void onConnectionNotAvailable() {
-//        Log.d(Constants.TAG, "ContactDetailMainActivity.onConnectionNotAvailable: ");
-//    }
-
     @Subscribe
     public void onConnectivityChanged(ConnectivityChanged event)
     {
@@ -697,5 +683,10 @@ public class ContactDetailMainActivity extends ToolbarActivity{
         } catch (Exception e){
             Log.e(Constants.TAG, "ContactDetailMainActivity.getContactFromServerById: ", e);
         }
+    }
+
+    public Contact getContact()
+    {
+        return this.contact;
     }
 }

@@ -162,7 +162,6 @@ public class SignupMailActivity extends MainActivity {
                 }
             } catch(Exception ex) {
                 Log.e(Constants.TAG, "SignupMailActivity.callBackEmailCheck: \n" + ex.toString());
-                return;
             }
         }
     }

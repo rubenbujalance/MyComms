@@ -15,10 +15,14 @@ import com.vodafone.mycomms.test.util.Util;
 import org.apache.http.HttpResponse;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
@@ -39,7 +43,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
-//@PrepareForTest({EndpointWrapper.class, RealmLDAPSettingsTransactions.class})
+@PrepareForTest({Crashlytics.class})
 public class ForgotPassActivityTest {
 
     Activity activity;
@@ -53,7 +57,15 @@ public class ForgotPassActivityTest {
     {
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
-        activity = Robolectric.setupActivity(ForgotPassActivity.class);
+        activity = Robolectric.buildActivity(ForgotPassActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
         etEmail = (EditText) activity.findViewById(R.id.etEmail);
         btSend = (Button) activity.findViewById(R.id.btSend);
     }

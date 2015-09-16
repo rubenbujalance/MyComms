@@ -22,6 +22,7 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
+import com.vodafone.mycomms.events.DashboardCreatedEvent;
 import com.vodafone.mycomms.events.GlobalContactsAddedEvent;
 import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
@@ -38,6 +39,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -55,10 +57,6 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import model.News;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-
 /**
  * Created by str_oan on 01/09/2015.
  */
@@ -67,8 +65,8 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class
-        , APIWrapper.class, EndpointWrapper.class})
+@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class, BusProvider.class
+,APIWrapper.class, EndpointWrapper.class})
 public class DashBoardActivityTest
 {
     @Rule
@@ -81,9 +79,17 @@ public class DashBoardActivityTest
     @Before
     public void setUp() throws Exception
     {
-        mockStatic(Realm.class);
-        when(Realm.getDefaultInstance()).thenReturn(null);
-        mockStatic(Crashlytics.class);
+        PowerMockito.mockStatic(Realm.class);
+        PowerMockito.when(Realm.getDefaultInstance()).thenReturn(null);
+        PowerMockito.mockStatic(Crashlytics.class);
+
+        //Mock BusProvider to avoid post "onDashBoardCreatedEvent"
+        BusProvider.MainThreadBus bus = BusProvider.getInstance();
+        BusProvider.MainThreadBus busSpy = Mockito.spy(bus);
+        PowerMockito.doNothing().when(busSpy).post(Mockito.any(DashboardCreatedEvent.class));
+        PowerMockito.mockStatic(BusProvider.class);
+        PowerMockito.when(BusProvider.getInstance()).thenReturn(bus);
+
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         Context context = RuntimeEnvironment.application.getApplicationContext();
         sp = context.getSharedPreferences(
@@ -177,7 +183,7 @@ public class DashBoardActivityTest
     @Test
     public void testActivityFullLifeCycle() throws Exception
     {
-        mock(DashBoardActivityController.class);
+        Mockito.mock(DashBoardActivityController.class);
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().pause().stop().destroy().get();
         org.junit.Assert.assertTrue(mActivity.isDestroyed());
     }

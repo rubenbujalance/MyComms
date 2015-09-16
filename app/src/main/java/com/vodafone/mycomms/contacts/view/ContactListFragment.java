@@ -293,13 +293,13 @@ public class ContactListFragment extends ListFragment {
                             if (recentContactList.get(position).getId().startsWith("mg_")) {
                                 in = new Intent(getActivity(), GroupChatActivity.class);
                                 in.putExtra(Constants.GROUP_CHAT_ID, recentContactList.get(position).getId());
-                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.CHAT_VIEW_CONTACT_LIST);
                                 in.putExtra(Constants.IS_GROUP_CHAT, true);
                                 startActivity(in);
                             } else {
                                 in = new Intent(getActivity(), GroupChatActivity.class);
                                 in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, recentContactList.get(position).getContactId());
-                                in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_LIST);
+                                in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.CHAT_VIEW_CONTACT_LIST);
                                 in.putExtra(Constants.IS_GROUP_CHAT, false);
                                 startActivity(in);
                             }

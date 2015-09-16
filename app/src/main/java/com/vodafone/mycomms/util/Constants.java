@@ -244,6 +244,7 @@ public class Constants {
     public static final String GROUP_CHAT_PREVIOUS_ACTIVITY = "previous_activity";
     public static final String GROUP_CHAT_LIST_ACTIVITY = "GroupChatListActivity";
     public static final String CHAT_LIST_ACTIVITY = "ChatListActivity";
+    public static final String DASHBOARD_ACTIVITY = "DashBoardActivity";
     public static final String GROUP_CHAT_MEMBERS = "group_chat_members";
     public static final String GROUP_CHAT_NAME = "group_chat_name";
     public static final String GROUP_CHAT_ABOUT = "group_chat_about";
@@ -317,7 +318,6 @@ public class Constants {
     public static final String APP_CRASH_MESSAGE = "app_crash_message_extra";
     public static final int REQUEST_START_ACTIVITY_FOR_APP_CRASH = 1;
     public static final String SPLASH_SCREEN_ACTIVITY = "SplashScreenActivity";
-    public static final String DASH_BOARD_ACTIVITY = "DashBoardActivity";
     public static final String MY_COMMS_APP = "MycommsApp";
 
     public static final int IDLE_TIME = 90000;//90 seconds

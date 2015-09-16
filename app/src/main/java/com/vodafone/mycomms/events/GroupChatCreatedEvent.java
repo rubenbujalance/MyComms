@@ -1,19 +1,25 @@
 package com.vodafone.mycomms.events;
 
-import model.GroupChat;
-
 /**
  * Created by str_rbm on 04/06/2015.
  */
 public class GroupChatCreatedEvent {
-    private GroupChat chat;
+    private String groupId;
+    private boolean success;
 
-    public GroupChat getGroupChat() {
-        return chat;
+    public String getGroupId() {
+        return groupId;
+    }
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
-    public void setGroupChat(GroupChat chat) {
-        this.chat = chat;
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }
 

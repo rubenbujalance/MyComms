@@ -212,6 +212,28 @@ task jacocoTestReport(type: JacocoReport) {
     }
 }
 
+task jacocoTestReportQA(type: JacocoReport) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports"
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/q/release/com/vodafone',
+            excludes: ['**/R.class',
+                       '**/R$*.class',
+                       '**/*$ViewInjector*.*',
+                       '**/BuildConfig.*',
+                       '**/Manifest*.*',
+                       '**/mycomms/realm/*.*']
+    )
+    additionalSourceDirs = files(coverageSourceDirs)
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files('build/jacoco/testQRelease.exec')
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
 task jacocoTestReportDebug(type: JacocoReport) {
     group = "Reporting"
     description = "Generate Jacoco coverage reports for Debug"

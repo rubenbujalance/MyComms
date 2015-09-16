@@ -209,7 +209,7 @@ public class GroupChatListFragment extends ListFragment
     {
         Intent in = new Intent(getActivity(), GroupChatActivity.class);
         in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
-        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.GROUP_CHAT_LIST_ACTIVITY);
+        in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.GROUP_CHAT_LIST_ACTIVITY);
         in.putExtra(Constants.IS_GROUP_CHAT, true);
         startActivity(in);
 
@@ -220,7 +220,7 @@ public class GroupChatListFragment extends ListFragment
     {
         Intent in = new Intent(getActivity(), GroupChatActivity.class);
         in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, selectedContacts.get(0));
-        in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.GROUP_CHAT_LIST_ACTIVITY);
+        in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.GROUP_CHAT_LIST_ACTIVITY);
         in.putExtra(Constants.IS_GROUP_CHAT, false);
         startActivity(in);
 

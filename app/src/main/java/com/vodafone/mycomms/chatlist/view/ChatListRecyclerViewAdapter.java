@@ -15,8 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.picasso.Callback;
-import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.ComposedChat;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -174,31 +172,32 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     }
 
 
-    private ArrayList<Contact> loadContactsFromIds
-            (
-                    ArrayList<String> ids
-            )
+    private ArrayList<Contact> loadContactsFromIds(ArrayList<String> ids)
     {
         ArrayList<Contact> contacts = new ArrayList<>();
         RealmContactTransactions realmContactTransactions =
                 new RealmContactTransactions(profileId);
+
         UserProfile userProfile = RealmContactTransactions.getUserProfile(realm, profileId);
-        Contact contact = new Contact();
-        contact.setAvatar(userProfile.getAvatar());
-        contact.setFirstName(userProfile.getFirstName());
-        contact.setLastName(userProfile.getLastName());
-        contact.setContactId(userProfile.getId());
-        contact.setPlatform(userProfile.getPlatform());
-        contacts.add(contact);
+        Contact userContact = new Contact();
+        userContact.setAvatar(userProfile.getAvatar());
+        userContact.setFirstName(userProfile.getFirstName());
+        userContact.setLastName(userProfile.getLastName());
+        userContact.setContactId(userProfile.getId());
+        userContact.setPlatform(userProfile.getPlatform());
+
+        Contact contact;
+
         for(String id : ids)
         {
-            if(!id.equals(userProfile.getId()))
-            {
+            if(id.compareTo(userProfile.getId())!=0)
                 contact = realmContactTransactions.getContactById(id,realm);
-                if(null != contact)
-                    contacts.add(contact);
-            }
+            else contact = userContact;
+
+            if(null != contact)
+                contacts.add(contact);
         }
+
         return contacts;
     }
 

@@ -27,6 +27,7 @@ import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.login.LoginSignupActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
@@ -38,6 +39,7 @@ import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.SystemUiHider;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.json.JSONObject;
 
@@ -65,6 +67,7 @@ public class SplashScreenActivity extends MainActivity {
     public boolean isAppCrashed;
     public String errorMessage;
     private Realm realm;
+    private String _profileId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,14 +79,35 @@ public class SplashScreenActivity extends MainActivity {
         //Instantiate Realm
         realm = Realm.getDefaultInstance();
 
+        //Profile Id
+        SharedPreferences sp = getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        _profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
         //Register Otto Bus
         BusProvider.getInstance().register(SplashScreenActivity.this);
+
+        /*
+         * RBM - For testing purpose only, remove before upload code
+         */
+
+//        Bundle data = new Bundle();
+//        data.putString("message", "test message");
+//        data.putString(Constants.NOTIFICATION_BUNDLE_TYPE_KEY, Constants.NOTIFICATION_BUNDLE_GROUPCHAT_TYPE_VALUE);
+//        String from = "@my-comms.com/359300054255790";
+//        data.putString(Constants.NOTIFICATION_BUNDLE_FROM_KEY, from);
+//
+//        getIntent().putExtra(Constants.NOTIFICATION_EXTRA_KEY, data);
+
+        /*
+         * *********************************************************
+         */
+
         getExtras();
         if(isAppCrashed)
             showAlertDialog();
-        else if(!goToConversation())
-            doOnPostCreateTasks();
-
+        else
+            new CheckIfGoToConversation().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private boolean goToConversation() {
@@ -99,9 +123,8 @@ public class SplashScreenActivity extends MainActivity {
             SharedPreferences sp = getSharedPreferences(
                     Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
             String token = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
-            String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
 
-            if(token==null || token.length()==0 || profileId==null || profileId.length()==0)
+            if(token==null || token.length()==0 || _profileId==null || _profileId.length()==0)
                 return false;
 
             Intent intent = getIntent();
@@ -132,7 +155,7 @@ public class SplashScreenActivity extends MainActivity {
                         if(chat!=null) {
                             intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
                             intentChat.putExtra(Constants.CHAT_FIELD_CONTACT_ID, from);
-                            intentChat.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                            intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                             intentChat.putExtra(Constants.IS_GROUP_CHAT, false);
 
                             goToConversation = true;
@@ -147,14 +170,14 @@ public class SplashScreenActivity extends MainActivity {
                         //Check if chat exists and navigate
                         RealmGroupChatTransactions realmGroupChatTransactions =
                                 new RealmGroupChatTransactions(
-                                        SplashScreenActivity.this, profileId);
+                                        SplashScreenActivity.this, _profileId);
                         GroupChat groupChat =
                                 realmGroupChatTransactions.getGroupChatById(from, realm);
 
                         if(groupChat!=null) {
                             intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
                             intentChat.putExtra(Constants.GROUP_CHAT_ID, from);
-                            intentChat.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                            intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                             intentChat.putExtra(Constants.IS_GROUP_CHAT, true);
 
                             goToConversation = true;
@@ -169,7 +192,7 @@ public class SplashScreenActivity extends MainActivity {
                 }
             }
         } catch (Exception e) {
-            Log.e(Constants.TAG, "DashBoardActivity.onResume: ");
+            Log.e(Constants.TAG, "SplashScreenActivity.goToConversation: ",e);
             Crashlytics.logException(e);
             goToConversation = false;
         }
@@ -545,21 +568,6 @@ public class SplashScreenActivity extends MainActivity {
             DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
             manager.enqueue(request);
 
-            //        BroadcastReceiver onComplete = new BroadcastReceiver() {
-            //            public void onReceive(Context context, Intent intent) {
-            //                if(intent.getPackage().compareTo(getApplicationInfo().packageName)==0) {
-            //                    Intent install = new Intent(Intent.ACTION_VIEW);
-            //                    install.setDataAndType(Uri.fromFile(
-            //                            new File(Environment.getExternalStorageDirectory() + "/" +
-            //                                    Environment.DIRECTORY_DOWNLOADS, "mycomms.apk")),
-            //                            "application/vnd.android.package-archive");
-            //                    startActivity(install);
-            //                }
-            //            }
-            //        };
-            //
-            //        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
             //Show an alert to indicate the file download
             AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenActivity.this);
             builder.setTitle(getString(R.string.update2));
@@ -611,6 +619,130 @@ public class SplashScreenActivity extends MainActivity {
         }
     }
 
+    private class CheckIfGoToConversation extends AsyncTask<Void, Void, Void> {
+        boolean goToConversation;
+        boolean waitToGroupChatDownload;
+        Intent intentChat;
+        Realm realm;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Log.i(Constants.TAG, "CheckIfGoToConversation.doInBackground: ");
+            goToConversation = false;
+            waitToGroupChatDownload = false;
+            intentChat = null;
+            realm = Realm.getDefaultInstance();
+
+            //Reset notifications
+            NotificationMessages.resetInboxMessages(SplashScreenActivity.this);
+
+            //If we come from a notification, navigate if necessary
+            try {
+                //Check if it comes from a notification with a logged out user
+                SharedPreferences sp = getSharedPreferences(
+                        Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+                String token = sp.getString(Constants.ACCESS_TOKEN_SHARED_PREF, "");
+                String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+
+                if(token!=null && token.length()>0 && profileId!=null && profileId.length()>0) {
+
+                    Intent intent = getIntent();
+                    Bundle notificationData = intent.getBundleExtra(Constants.NOTIFICATION_EXTRA_KEY);
+                    intent.removeExtra(Constants.NOTIFICATION_EXTRA_KEY);
+                    String type = null;
+
+                    if (notificationData != null) {
+                        type = notificationData.getString(Constants.NOTIFICATION_BUNDLE_TYPE_KEY);
+                    }
+
+                    //Check if it comes from a chat notification
+                    if (type != null &&
+                            (type.compareTo(Constants.NOTIFICATION_BUNDLE_CHAT_TYPE_VALUE) == 0 ||
+                                    type.compareTo(Constants.NOTIFICATION_BUNDLE_GROUPCHAT_TYPE_VALUE) == 0)) {
+                        String from = notificationData.getString(Constants.NOTIFICATION_BUNDLE_FROM_KEY);
+
+                        if (from != null && from.contains("@")) {
+                            from = from.substring(0, from.indexOf("@"));
+
+                            Log.i(Constants.TAG, "CheckIfGoToConversation.doInBackground: Notification received " +
+                                    "[Type-"+type+"; From-"+from);
+
+                            boolean isGroupChat =
+                                    (type.compareTo(Constants.NOTIFICATION_BUNDLE_GROUPCHAT_TYPE_VALUE) == 0);
+
+                            if (!isGroupChat) {
+                                //Check if chat exists and navigate
+                                RealmChatTransactions realmChatTransactions =
+                                        new RealmChatTransactions(SplashScreenActivity.this);
+                                Chat chat = realmChatTransactions.getChatByContactId(from, realm);
+
+                                if (chat != null) {
+                                    intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
+                                    intentChat.putExtra(Constants.CHAT_FIELD_CONTACT_ID, from);
+                                    intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
+                                    intentChat.putExtra(Constants.IS_GROUP_CHAT, false);
+
+                                    goToConversation = true;
+                                } else {
+                                    intentChat = new Intent(SplashScreenActivity.this, ChatListActivity.class);
+                                    intentChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                                    goToConversation = true;
+                                }
+                            } else {
+                                //Check if chat exists and navigate
+                                RealmGroupChatTransactions realmGroupChatTransactions =
+                                        new RealmGroupChatTransactions(
+                                                SplashScreenActivity.this, profileId);
+                                GroupChat groupChat =
+                                        realmGroupChatTransactions.getGroupChatById(from, realm);
+
+                                if (groupChat != null) {
+                                    intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
+                                    intentChat.putExtra(Constants.GROUP_CHAT_ID, from);
+                                    intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
+                                    intentChat.putExtra(Constants.IS_GROUP_CHAT, true);
+
+                                    goToConversation = true;
+                                } else {
+                                    waitToGroupChatDownload = true;
+                                    XMPPTransactions.downloadAndSaveGroupChat(null, from, getApplicationContext());
+//                                    intentChat = new Intent(SplashScreenActivity.this, ChatListActivity.class);
+//                                    intentChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(Constants.TAG, "CheckIfGoToConversation.doInBackground: ",e);
+                Crashlytics.logException(e);
+                goToConversation = false;
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if(goToConversation) {
+                Log.i(Constants.TAG, "CheckIfGoToConversation.onPostExecute: GoToConversation");
+                Intent intent = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
+                intent.putExtra(Constants.GO_TO_CHAT_INTENT_KEY, intentChat);
+                startActivity(intent);
+                finish();
+            }
+            else if(!waitToGroupChatDownload){
+                Log.i(Constants.TAG, "CheckIfGoToConversation.onPostExecute: doPostCreateTasks");
+                doOnPostCreateTasks();
+            }
+            else {
+                //In any other case, we will wait to group chat creation response
+                Log.i(Constants.TAG, "CheckIfGoToConversation.onPostExecute: waitToGroupChatDownload");
+            }
+        }
+    }
+
     @Override
     protected void onResume() {
         isForeground = true;
@@ -642,6 +774,48 @@ public class SplashScreenActivity extends MainActivity {
         Log.i(Constants.TAG, "SplashScreenActivity.onOKHttpErrorReceived: ");
         String errorMessage = event.getErrorMessage();
         makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+    }
+
+    @Subscribe
+    public void onGroupChatCreatedEvent(GroupChatCreatedEvent event) {
+        Log.i(Constants.TAG, "SplashScreenActivity.onGroupChatCreatedEvent: " +
+                "Id-"+event.getGroupId()+"; Success-"+event.isSuccess());
+
+        final String groupId = event.getGroupId();
+        final boolean success = event.isSuccess();
+
+        if(!success) {
+            //If failed, go to chat list
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intentChat = new Intent(SplashScreenActivity.this, ChatListActivity.class);
+                    intentChat.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+
+                    Intent intent = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
+                    intent.putExtra(Constants.GO_TO_CHAT_INTENT_KEY, intentChat);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }
+        else {
+            //If success, go to group chat
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);
+                    intentChat.putExtra(Constants.GROUP_CHAT_ID, groupId);
+                    intentChat.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
+                    intentChat.putExtra(Constants.IS_GROUP_CHAT, true);
+
+                    Intent intent = new Intent(SplashScreenActivity.this, DashBoardActivity.class);
+                    intent.putExtra(Constants.GO_TO_CHAT_INTENT_KEY, intentChat);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }
     }
 
     @Override

@@ -185,7 +185,10 @@ public class DashBoardActivity extends ToolbarActivity
     protected void onResume() {
         super.onResume();
         setForegroundActivity(1);
-        overridePendingTransition(0,0);
+        overridePendingTransition(0, 0);
+
+//        XMPPTransactions.checkAndReconnectXMPP(getApplicationConte    xt());
+
         checkUnreadChatMessages();
         mDashBoardActivityController.loadRecentContactsAndUnreadMessages();
         mDashBoardActivityController.loadNews();

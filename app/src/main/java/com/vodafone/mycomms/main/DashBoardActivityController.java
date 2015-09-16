@@ -1,9 +1,7 @@
 package com.vodafone.mycomms.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
@@ -33,8 +31,6 @@ import com.vodafone.mycomms.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -215,37 +211,30 @@ public class DashBoardActivityController
         private void loadContactsFromIds(ArrayList<String> ids)
         {
             UserProfile userProfile = RealmContactTransactions.getUserProfile(mRealm, mProfileId);
-            Contact contact = new Contact();
-            contact.setAvatar(userProfile.getAvatar());
-            contact.setFirstName(userProfile.getFirstName());
-            contact.setLastName(userProfile.getLastName());
-            contact.setContactId(userProfile.getId());
-            contact.setPlatform(userProfile.getPlatform());
-            contacts.add(contact);
+            Contact userContact = new Contact();
+            userContact.setAvatar(userProfile.getAvatar());
+            userContact.setFirstName(userProfile.getFirstName());
+            userContact.setLastName(userProfile.getLastName());
+            userContact.setContactId(userProfile.getId());
+            userContact.setPlatform(userProfile.getPlatform());
 
-            int i = 0;
-            mapAvatarImageAndContact.put(images.get(i), contact);
-            i++;
+            Contact contact;
+            String id;
 
-            for(String id : ids)
+            for(int imageIndex=0; (imageIndex<ids.size() && imageIndex<=3); imageIndex++)
             {
-                if(!id.equals(userProfile.getId()))
-                {
+                id = ids.get(imageIndex);
+                if(id.compareTo(userProfile.getId())!=0)
                     contact = mRealmContactTransactions.getContactById(id, mRealm);
+                else
+                    contact = userContact;
 
-                    if(null != contact)
-                    {
-                        contacts.add(contact);
-                        if(i <= 3)
-                        {
-                            mapAvatarImageAndContact.put(images.get(i), contact);
-                            i++;
-                        }
-                    }
+                if(null != contact) {
+                    contacts.add(contact);
+                    mapAvatarImageAndContact.put(images.get(imageIndex), contact);
                 }
             }
         }
-
 
         @Override
         protected void onPreExecute()
@@ -373,7 +362,7 @@ public class DashBoardActivityController
                                 if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
                                     Intent in = new Intent(mActivity, GroupChatActivity.class);
                                     in.putExtra(Constants.GROUP_CHAT_ID, groupChatId);
-                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                    in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                                     in.putExtra(Constants.IS_GROUP_CHAT, true);
                                     mActivity.startActivity(in);
                                 }
@@ -512,7 +501,7 @@ public class DashBoardActivityController
                                 } else {
                                     Intent in = new Intent(mActivity, GroupChatActivity.class);
                                     in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
-                                    in.putExtra(Constants.CHAT_PREVIOUS_VIEW, "DashBoardActivity");
+                                    in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.DASHBOARD_ACTIVITY);
                                     in.putExtra(Constants.IS_GROUP_CHAT, false);
                                     mActivity.startActivity(in);
                                 }

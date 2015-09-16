@@ -440,20 +440,22 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         contactList = new ArrayList<>();
         if(isGroupChatMode)
         {
-            Contact contact = new Contact();
-            contact.setAvatar(_profile.getAvatar());
-            contact.setFirstName(_profile.getFirstName());
-            contact.setLastName(_profile.getLastName());
-            contact.setContactId(_profile.getId());
-            contactList.add(contact);
+            Contact userContact = new Contact();
+            userContact.setAvatar(_profile.getAvatar());
+            userContact.setFirstName(_profile.getFirstName());
+            userContact.setLastName(_profile.getLastName());
+            userContact.setContactId(_profile.getId());
+
+            Contact contact;
+
             for(String id : contactIds)
             {
                 if(!id.equals(_profile_id))
-                {
                     contact = contactTransactions.getContactById(id, realm);
-                    if(contact != null)
-                        contactList.add(contact);
-                }
+                else contact = userContact;
+
+                if(contact != null)
+                    contactList.add(contact);
             }
         }
         else
@@ -652,7 +654,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         Log.i(Constants.TAG, "GroupChatActivity.onEventChatsReceived: ");
         ChatMessage chatMsg = event.getMessage();
         if((isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().compareTo(_groupId)==0)
-                || (!isGroupChatMode && chatMsg!=null && chatMsg.getContact_id().compareTo(_contactId)==0))
+                || (!isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().length()==0 &&
+                chatMsg.getContact_id().compareTo(_contactId)==0))
         {
             if(_chatList.size()==0 ||
                     (_chatList.get(_chatList.size()-1).getId().compareTo(chatMsg.getId())!=0)) {

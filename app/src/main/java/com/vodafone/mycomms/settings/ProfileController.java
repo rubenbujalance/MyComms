@@ -28,6 +28,7 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -401,7 +402,8 @@ public class ProfileController extends BaseController {
             Crashlytics.logException(e);
         }
         finally {
-            realm.close();
+            if (realm != null)
+               realm.close();
         }
     }
 
@@ -495,6 +497,8 @@ public class ProfileController extends BaseController {
                 RealmProfileTransactions profileTx = new RealmProfileTransactions();
                 profileTx.removeUserProfile(profileId, null);
             }
+
+            XMPPTransactions.disconnectMsgServerSession();
 
             //Go to login page as a new task
             Intent in = new Intent(mContext, LoginSignupActivity.class);

@@ -15,6 +15,7 @@ import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by str_oan on 24/07/2015.
@@ -22,20 +23,15 @@ import java.util.ArrayList;
 public final class NotificationMessages extends MainActivity
 {
 
-    public static NotificationCompat.Builder mBuilder;
     public static NotificationManager mNotificationManager = null;
     public static PendingIntent resultPendingIntent;
-    public static int notificationId = 1;
     public static final int INBOX_LENGTH = 5;
-    public static ArrayList<String> inboxMessages;
+    public static HashMap<String,ArrayList<String>> inboxMessages = new HashMap<>();
+    public static HashMap<String,Integer> notificationIds = new HashMap<>();
 
-    private static void createNotificationMessagesInstance(Context context, Bundle data)
+    private static NotificationCompat.Builder createNotificationMessagesInstance(Context context, Bundle data)
     {
-
-        mNotificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        mBuilder =
+        NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_notif_white)
                         .setLargeIcon(BitmapFactory.decodeResource(
@@ -50,53 +46,77 @@ public final class NotificationMessages extends MainActivity
         resultPendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
 
-        inboxMessages = new ArrayList<>();
+        return mBuilder;
     }
 
     public static void sendMessage(Bundle data, Context context)
     {
-        String message = data.getString("message");
-
         if(null == mNotificationManager)
-            createNotificationMessagesInstance(context, data);
+            mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-        inboxStyle.setBigContentTitle(context.getString(R.string.new_unread_messages));
-        //RBM: We can't know how many messages unread we have. They are not being saved in DB
-        //when a notification arrives, until user opens the app
-        addMessageToInbox(message);
-        fillInbox(inboxStyle);
-        inboxStyle.setSummaryText(inboxMessages.size() + " new messages");
-        mBuilder.setStyle(inboxStyle);
-        mBuilder.setWhen(System.currentTimeMillis());
-        mBuilder.setContentText(context.getString(R.string.new_unread_messages));
-        mBuilder.setTicker(context.getString(R.string.new_unread_messages));
-        mBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
-        mBuilder.setAutoCancel(true);
-        Notification notification = mBuilder.build();
-        mNotificationManager.notify(notificationId, notification);
+        //Avoid duplicated notifications
+        if(notificationIds.containsKey(data.toString())) return;
+
+        String message = data.getString("message");
+        NotificationCompat.Builder builder = createNotificationMessagesInstance(context, data);
+//        String from = data.getString(Constants.NOTIFICATION_BUNDLE_FROM_KEY);
+//        if (from != null && from.contains("@"))
+//            from = from.substring(0, from.indexOf("@"));
+//        else from = null;
+
+//        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+//        inboxStyle.setBigContentTitle(context.getString(R.string.new_unread_messages));
+//        addMessageToInbox(from, message);
+//        fillInbox(from, inboxStyle);
+//        inboxStyle.setSummaryText(inboxMessages.get(from).size() + " new messages");
+//        builder.setStyle(inboxStyle);
+        builder.setWhen(System.currentTimeMillis());
+        builder.setContentText(message);
+        builder.setPriority(NotificationCompat.PRIORITY_MAX);
+        builder.setAutoCancel(true);
+        Notification notification = builder.build();
+
+//        if(from!=null) {
+//            int id;
+//            if(notificationIds.containsKey(from)) {id = notificationIds.get(from);}
+//            else {
+//                id = (int)System.currentTimeMillis();
+//                notificationIds.put(from,id);
+//            }
+//
+//            mNotificationManager.notify(id, notification);
+//        }
+        int id = (int)System.currentTimeMillis();
+        notificationIds.put(data.toString(), id);
+        mNotificationManager.notify((int)System.currentTimeMillis(), notification);
     }
 
-    private static void addMessageToInbox(String message) {
-        if(inboxMessages==null) inboxMessages = new ArrayList<>();
-        inboxMessages.add(0, message);
+    private static void addMessageToInbox(String from, String message) {
+        if(inboxMessages.containsKey(from))
+        {inboxMessages.get(from).add(0,message);}
+        else {
+            ArrayList<String> messages = new ArrayList<>();
+            messages.add(0,message);
+            inboxMessages.put(from, messages);
+        }
 //        if(inboxMessages.size() > INBOX_LENGTH)
 //            inboxMessages.remove(inboxMessages.size() - 1);
     }
 
-    private static void fillInbox(NotificationCompat.InboxStyle inboxStyle) {
+    private static void fillInbox(String from, NotificationCompat.InboxStyle inboxStyle) {
+        ArrayList<String> messages = inboxMessages.get(from);
+
         for(int i=0; i<INBOX_LENGTH; i++) {
-            if(i >= inboxMessages.size()) break;
-            inboxStyle.addLine(inboxMessages.get(i));
+            if(i >= messages.size()) break;
+            inboxStyle.addLine(messages.get(i));
         }
     }
 
     public static void resetInboxMessages(Context context) {
         if(mNotificationManager != null)
-            mNotificationManager.cancel(notificationId);
+            mNotificationManager.cancelAll();
 
-        inboxMessages = new ArrayList<>();
-
-        mNotificationManager = null;
+        inboxMessages = new HashMap<>();
+        notificationIds = new HashMap<>();
     }
 }

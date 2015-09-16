@@ -381,7 +381,7 @@ public class RealmGroupChatTransactions
         }
     }
 
-    public ChatMessage getGroupChatMessageById(String groupId, Realm realm){
+    public ChatMessage getGroupChatMessageById(String chatMessageId, Realm realm){
         ChatMessage chatMessage = null;
 
         Realm mRealm;
@@ -392,7 +392,7 @@ public class RealmGroupChatTransactions
         try
         {
             RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, groupId);
+            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, chatMessageId);
             chatMessage = query.findFirst();
             return chatMessage;
         }

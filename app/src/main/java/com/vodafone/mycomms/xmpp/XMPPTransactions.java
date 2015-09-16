@@ -98,7 +98,7 @@ public final class XMPPTransactions {
 
     public static void initializeMsgServerSession(Context appContext)
     {
-        if(_isConnecting) return;
+        if(_isConnecting || MycommsApp.disconnectedProcess) return;
 
         //Start connection
 //        if(_xmppConnection == null || _xmppConnection.isDisconnectedButSmResumptionPossible() ||
@@ -118,6 +118,12 @@ public final class XMPPTransactions {
                         Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
                 _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
             }
+            else {
+                Log.i(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: PROFILE ID IS NOT NULL" + _profile_id);
+            }
+
+            //If at this point it is no profile loaded, it indicates there is no user profile logged
+            if(_profile_id==null || _profile_id.length()==0) return;
 
             //Device ID
             if (_device_id == null) {
@@ -128,6 +134,14 @@ public final class XMPPTransactions {
             //Configuration for the connection
             if (_xmppConfigBuilder == null) {
                 loadConnectionConfig();
+            }
+            else if (_xmppConfigBuilder.build().getUsername()==null) {
+                _xmppConfigBuilder = null;
+                loadConnectionConfig();
+                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: CONFIG BUILDER (CLEAN) AND NULL");
+            }
+            else {
+                Log.e(Constants.TAG, "XMPPTransactions.initializeMsgServerSession: CONFIG BUILDER NOT NULL");
             }
 
             //Set a timer to check connection every 5 seconds
@@ -251,6 +265,10 @@ public final class XMPPTransactions {
             return false;
         }
 
+        _xmppConfigBuilder = null;
+        _xmppConnection = null;
+        _profile_id = null;
+
         Log.w(Constants.TAG, "XMPPTransactions.disconnectMsgServerSession: XMPP Server DISCONNECTED");
         return true;
     }
@@ -273,7 +291,7 @@ public final class XMPPTransactions {
 
     public static void checkAndReconnectXMPP(final Context context)
     {
-        Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP");
+        Log.i(Constants.TAG, "XMPPTransactions.checkAndReconnectXMPP _xmppConnection-" + _xmppConnection);
 
         if(_isConnecting &&
                 Calendar.getInstance().getTimeInMillis() > _isConnectingTime+10000)
@@ -362,7 +380,8 @@ public final class XMPPTransactions {
             };
 
             pingWaitingID = id;
-            _xmppConnection.sendStanza(st);
+            if (_xmppConnection!=null)
+                _xmppConnection.sendStanza(st);
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendPing: Error sending message", e);
@@ -674,7 +693,7 @@ public final class XMPPTransactions {
             boolean changeStatus = false;
 
             //Check if chat message has already been received
-            ChatMessage tempMsg = chatTx.getChatMessageById(id, realm);
+            ChatMessage tempMsg = chatTx.getChatMessageById(id, true, realm);
             if(tempMsg!=null) {
                 if(getXMPPStatusOrder(status) <= getXMPPStatusOrder(tempMsg.getStatus()))
                     return false;
@@ -777,7 +796,7 @@ public final class XMPPTransactions {
             chatTx = new RealmChatTransactions(_appContext);
 
             //Check if chat message has already been received
-            ChatMessage tempMsg = chatTx.getChatMessageById(id, realm);
+            ChatMessage tempMsg = chatTx.getChatMessageById(id, true, realm);
             if(tempMsg!=null) {
                 if(getXMPPStatusOrder(status) <= getXMPPStatusOrder(tempMsg.getStatus()))
                     return false;
@@ -939,7 +958,7 @@ public final class XMPPTransactions {
 
             if(chat==null) {
                 //Get group from API in background, and save to Realm
-                downloadAndSaveGroupChat(id, groupId);
+                downloadAndSaveGroupChat(id, groupId, null);
 
             }
             else {
@@ -984,16 +1003,37 @@ public final class XMPPTransactions {
         }
     }
 
-    private static void downloadAndSaveGroupChat(final String chatId, String groupId){
+    public static void downloadAndSaveGroupChat(String chatMessageId, String groupId){
+        downloadAndSaveGroupChat(chatMessageId, groupId, null);
+    }
+
+    public static void downloadAndSaveGroupChat(final String chatMessageId, final String groupId, Context appContext){
+        Log.i(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat: ");
+
+        if(_appContext==null) _appContext = appContext;
+
+        if (_profile_id == null) {
+            //Get profile_id
+            SharedPreferences sp = _appContext.getSharedPreferences(
+                    Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+            _profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
+        }
+
         OKHttpWrapper.get(Constants.SINGLE_GROUP_CHAT_API + "/" + groupId, _appContext, new OKHttpWrapper.HttpCallback() {
             @Override
             public void onFailure(Response response, IOException e) {
                 Log.i(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onFailure:");
+                //Notify app
+                GroupChatCreatedEvent groupChatCreatedEvent = new GroupChatCreatedEvent();
+                groupChatCreatedEvent.setGroupId(groupId);
+                groupChatCreatedEvent.setSuccess(false);
+                BusProvider.getInstance().post(groupChatCreatedEvent);
             }
 
             @Override
-            public void onSuccess(Response response)
-            {
+            public void onSuccess(Response response) {
+                Log.i(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onSuccess:");
+                boolean success = false;
                 Realm realm = Realm.getDefaultInstance();
                 try {
                     String jsonStr;
@@ -1012,13 +1052,12 @@ public final class XMPPTransactions {
                                 JSONObject member;
                                 String id;
 
-                                for(int i=0; i<members.length(); i++)
-                                {
+                                for (int i = 0; i < members.length(); i++) {
                                     member = members.getJSONObject(i);
                                     id = member.getString("id");
 
                                     membersIds.add(id);
-                                    if(member.has("owner"))
+                                    if (member.has("owner"))
                                         ownersIds.add(id);
                                 }
 
@@ -1029,27 +1068,27 @@ public final class XMPPTransactions {
                                         groupId, _profile_id, membersIds, ownersIds, "", "", "");
 
                                 //Set last message data
-                                ChatMessage newChatMessage = groupTx.getGroupChatMessageById
-                                        (chatId, realm);
-                                if(newChatMessage!=null) {
-                                    chat.setLastMessage_id(newChatMessage.getId());
+                                if (chatMessageId != null) {
+                                    ChatMessage newChatMessage = groupTx.getGroupChatMessageById
+                                            (chatMessageId, realm);
+                                    if (newChatMessage != null) {
+                                        chat.setLastMessage_id(newChatMessage.getId());
 
-                                    String lastText;
-                                    if (newChatMessage.getType() == Constants.CHAT_MESSAGE_TYPE_TEXT)
-                                        lastText = newChatMessage.getText();
-                                    else lastText = _appContext.getString(R.string.image);
+                                        String lastText;
+                                        if (newChatMessage.getType() == Constants.CHAT_MESSAGE_TYPE_TEXT)
+                                            lastText = newChatMessage.getText();
+                                        else lastText = _appContext.getString(R.string.image);
 
-                                    if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
-                                        chat.setLastMessage(_appContext.getResources().getString(R.string.chat_me_text) + lastText);
-                                    else chat.setLastMessage(lastText);
+                                        if (newChatMessage.getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_SENT))
+                                            chat.setLastMessage(_appContext.getResources().getString(R.string.chat_me_text) + lastText);
+                                        else chat.setLastMessage(lastText);
 
-                                    chat.setLastMessageTime(newChatMessage.getTimestamp());
+                                        chat.setLastMessageTime(newChatMessage.getTimestamp());
+                                    }
                                 }
-
                                 groupTx.insertOrUpdateGroupChat(chat, realm);
 
-                                //Notify app about new group chat created
-                                BusProvider.getInstance().post(new GroupChatCreatedEvent());
+                                success = true;
 
                             } catch (JSONException e) {
                                 Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onConnectionComplete: ", e);
@@ -1060,10 +1099,15 @@ public final class XMPPTransactions {
                     }
                 } catch (IOException e) {
                     Log.e(Constants.TAG, "XMPPTransactions.downloadAndSaveGroupChat.onSuccess: ", e);
-                }
-                finally {
+                } finally {
                     realm.close();
                 }
+
+                //Notify app
+                GroupChatCreatedEvent groupChatCreatedEvent = new GroupChatCreatedEvent();
+                groupChatCreatedEvent.setGroupId(groupId);
+                groupChatCreatedEvent.setSuccess(success);
+                BusProvider.getInstance().post(groupChatCreatedEvent);
             }
         });
     }
@@ -1374,14 +1418,12 @@ public final class XMPPTransactions {
                 _isConnecting = true;
                 _isConnectingTime = Calendar.getInstance().getTimeInMillis();
 
-                if(_xmppConnection!=null) {
+                if(_xmppConnection!=null && _xmppConnection.isConnected())
                     _xmppConnection.disconnect();
-                }
-                else {
-                    _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
-                    _xmppConnection.addConnectionListener(getConnectionListener());
-                    connectionCreated = true;
-                }
+
+                _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
+                _xmppConnection.addConnectionListener(getConnectionListener());
+                connectionCreated = true;
 
                 // Connect to the server
                 _xmppConnection.connect();

@@ -233,7 +233,7 @@ public class ContactDetailMainActivity extends ToolbarActivity{
                         {
                             Intent in = new Intent(ContactDetailMainActivity.this, GroupChatActivity.class);
                             in.putExtra(Constants.CHAT_FIELD_CONTACT_ID, contactId);
-                            in.putExtra(Constants.CHAT_PREVIOUS_VIEW, Constants.CHAT_VIEW_CONTACT_DETAIL);
+                            in.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, Constants.CHAT_VIEW_CONTACT_DETAIL);
                             startActivity(in);
                         }
 

@@ -162,6 +162,12 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
                 text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
 
                 //Image avatar
+                if(null != contact.getFirstName() && contact.getFirstName().length() > 0) {
+                    if (contact.getContactId().equals(_profile_id))
+                        profileInside = true;
+                    else
+                        groupNames = contact.getFirstName() + ", " + groupNames;
+                }
                 Utils.loadContactAvatar
                         (
                                 contact.getFirstName()
@@ -170,6 +176,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
                                 , text
                                 , contact.getAvatar()
                         );
+
                 i++;
             }
             groupNames = groupNames.substring(0, groupNames.length()-2);
@@ -178,8 +185,8 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
             group_names.setText(groupNames);
             group_n_components.setText(groupNComponents);
         }
-        //TODO here we should load avatar provided by URL for whole group
-        //TODO by now we just the same as in previous If case
+        //Here we should load avatar provided by URL for whole group
+        //by now we just the same as in previous If case
         else
         {
             ArrayList<ImageView> images = new ArrayList<>();
@@ -274,20 +281,23 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
     private void loadContactsFromIds()
     {
         contactList = new ArrayList<>();
-        Contact contact = new Contact();
-        contact.setAvatar(_profile.getAvatar());
-        contact.setFirstName(_profile.getFirstName());
-        contact.setLastName(_profile.getLastName());
-        contact.setContactId(_profile.getId());
-        contactList.add(contact);
+
+        Contact userContact = new Contact();
+        userContact.setAvatar(_profile.getAvatar());
+        userContact.setFirstName(_profile.getFirstName());
+        userContact.setLastName(_profile.getLastName());
+        userContact.setContactId(_profile.getId());
+
+        Contact contact;
+
         for(String id : contactIds)
         {
-            if(!id.equals(_profile_id))
-            {
+            if(id.compareTo(_profile_id)!=0)
                 contact = contactTransactions.getContactById(id, mRealm);
-                if(contact != null)
-                    contactList.add(contact);
-            }
+            else contact = userContact;
+
+            if(contact != null)
+                contactList.add(contact);
         }
     }
 

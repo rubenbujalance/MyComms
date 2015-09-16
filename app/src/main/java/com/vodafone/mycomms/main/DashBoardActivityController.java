@@ -245,7 +245,7 @@ public class DashBoardActivityController
                 recentsContainer.addView(childRecents);
                 hashMapRecentIdView.put(childRecents, this.recentContact);
 
-                childRecents.setPadding(10, 20, 10, 20);
+                childRecents.setPadding(10, 0, 10, 0);
 
                 top_left_avatar = (ImageView) childRecents.findViewById(R.id.top_left_avatar);
                 top_right_avatar = (ImageView) childRecents.findViewById(R.id.top_right_avatar);
@@ -435,7 +435,7 @@ public class DashBoardActivityController
             recentsContainer.addView(childRecents);
             hashMapRecentIdView.put(childRecents,this.recentContact);
 
-            childRecents.setPadding(10, 20, 10, 20);
+            childRecents.setPadding(10, 0, 10, 0);
             recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
 
             //Avatar

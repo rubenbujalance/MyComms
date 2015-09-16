@@ -137,11 +137,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
             else viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
         }
         else
-        {
             viewHolder.imageViewDayNight.setImageResource(R.mipmap.ico_sun);
-        }
-
-        //viewHolder.textViewTime.setText(Utils.getTimeFromMillis(contact.getLastSeen()));
 
         //Local time
         String presenceDetail = null;
@@ -168,9 +164,7 @@ public class ContactFavouriteListViewArrayAdapter extends ArrayAdapter<Favourite
                     viewHolder.textViewTime.setText(result);
                 }
                 else
-                {
                     viewHolder.textViewTime.setText(" ");
-                }
             }
             else
             {

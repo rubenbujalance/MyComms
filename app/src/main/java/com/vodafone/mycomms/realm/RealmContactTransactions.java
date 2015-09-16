@@ -285,7 +285,7 @@ public class RealmContactTransactions {
         return contactArrayList;
     }
 
-    public ArrayList<Contact> getFilteredContacts(String field, String filter, Realm realm)
+    public static ArrayList<Contact> getFilteredContacts(String field, String filter, Realm realm)
     {
         ArrayList<Contact> contactArrayList = new ArrayList<>();
 
@@ -314,7 +314,7 @@ public class RealmContactTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
 
@@ -458,7 +458,7 @@ public class RealmContactTransactions {
         }
     }
 
-    public boolean favouriteContactIsInRealm(String contactId, Realm realm)
+    public static boolean favouriteContactIsInRealm(String contactId, Realm realm)
     {
         Realm mRealm;
         if(null != realm)
@@ -488,7 +488,7 @@ public class RealmContactTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null!= mRealm)
                 mRealm.close();
         }
     }
@@ -707,7 +707,7 @@ public class RealmContactTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null!= mRealm)
                 mRealm.close();
         }
     }

@@ -13,8 +13,11 @@ import android.widget.LinearLayout;
 import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.ContactListMainActivity;
+import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
@@ -26,6 +29,7 @@ import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.test.util.Util;
+import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -61,7 +65,8 @@ import model.News;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class, BusProvider.class})
+@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class, BusProvider.class
+,APIWrapper.class, EndpointWrapper.class})
 public class DashBoardActivityTest
 {
     @Rule
@@ -69,6 +74,7 @@ public class DashBoardActivityTest
 
     public DashBoardActivity mActivity;
     public SharedPreferences sp;
+    public MockWebServer webServer;
 
     @Before
     public void setUp() throws Exception
@@ -241,9 +247,6 @@ public class DashBoardActivityTest
     @Test
     public void test_onConnectivityChanged_NotConnected1()
     {
-//        PowerMockito.mockStatic(BusProvider.class);
-//        PowerMockito.when(BusProvider.getInstance()).thenReturn(BusProvider.getInstance());
-
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -255,9 +258,6 @@ public class DashBoardActivityTest
     @Test
     public void test_onConnectivityChanged_NotConnected2()
     {
-//        PowerMockito.mockStatic(BusProvider.class);
-//        PowerMockito.when(BusProvider.getInstance()).thenReturn(BusProvider.getInstance());
-
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -269,9 +269,6 @@ public class DashBoardActivityTest
     @Test
     public void test_onConnectivityChanged_NotConnected3()
     {
-//        PowerMockito.mockStatic(BusProvider.class);
-//        PowerMockito.when(BusProvider.getInstance()).thenReturn(BusProvider.getInstance());
-
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -291,12 +288,194 @@ public class DashBoardActivityTest
     }
 
     @Test
-    public void test_onGlobalContactsAddedEvent()
+    public void test_onGlobalContactsAddedEvent_OK()
     {
         GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
+        String serverUrl = null;
+        try {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+
+        PowerMockito.mockStatic(APIWrapper.class);
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody(com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE));
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+
         BusProvider.getInstance().post(event);
+
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
         org.junit.Assert.assertNotNull(event);
+    }
+
+    @Test
+    public void test_onGlobalContactsAddedEvent_OK_WrongJSON()
+    {
+        GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
+        String serverUrl = null;
+        try {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+
+        PowerMockito.mockStatic(APIWrapper.class);
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody("mockBody"));
+
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+
+        BusProvider.getInstance().post(event);
+
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
+        org.junit.Assert.assertNotNull(event);
+    }
+
+    @Test
+    public void test_onGlobalContactsAddedEvent_OK_NoResponse()
+    {
+        GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
+        String serverUrl = null;
+        try {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+
+        PowerMockito.mockStatic(APIWrapper.class);
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(200));
+
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+
+        BusProvider.getInstance().post(event);
+
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
+        org.junit.Assert.assertNotNull(event);
+    }
+
+    @Test
+    public void test_onGlobalContactsAddedEvent_Fail()
+    {
+        GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
+        String serverUrl = null;
+        try {
+            serverUrl = startWebMockServer();
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+
+        PowerMockito.mockStatic(APIWrapper.class);
+        PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        webServer.enqueue(new MockResponse().setResponseCode(400)
+                .setBody(com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE));
+
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+
+        BusProvider.getInstance().post(event);
+
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
+            org.junit.Assert.fail();
+        }
+        Robolectric.flushForegroundThreadScheduler();
+
+        org.junit.Assert.assertNotNull(event);
+    }
+
+    private String startWebMockServer() throws Exception
+    {
+        //OkHttp mocked web server
+        webServer = new MockWebServer();
+        webServer.useHttps(null, false);
+
+        //Connect OkHttp calls with MockWebServer
+        webServer.start();
+        String serverUrl = webServer.getUrl("").toString();
+
+        return serverUrl;
     }
 }

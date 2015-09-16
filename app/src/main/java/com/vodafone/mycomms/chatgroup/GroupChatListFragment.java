@@ -23,7 +23,6 @@ import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.connection.ContactListController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.view.ContactListViewArrayAdapter;
 import com.vodafone.mycomms.events.BusProvider;
@@ -54,6 +53,9 @@ public class GroupChatListFragment extends ListFragment
     private SharedPreferences sp;
     private ArrayList<Contact> contactList;
     private String profileId;
+    private String name = "";
+    private String about = "";
+    private String avatarURL = "";
     private ContactListViewArrayAdapter adapter;
     private Parcelable state;
     private SearchBarController mSearchBarController;
@@ -74,7 +76,6 @@ public class GroupChatListFragment extends ListFragment
 
     private ArrayList<String> selectedContacts;
     private ArrayList<String> ownersIds;
-    private ContactListController contactListController;
 
     private final String LOG_TAG = GroupChatListActivity.class.getSimpleName();
 
@@ -127,7 +128,6 @@ public class GroupChatListFragment extends ListFragment
         mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
         mGroupChatController = new GroupChatController(getActivity(), profileId);
-        contactListController = new ContactListController(getActivity(), profileId);
         mRecentContactController = new RecentContactController(getActivity(),profileId);
     }
 
@@ -169,15 +169,6 @@ public class GroupChatListFragment extends ListFragment
         }
     }
 
-
-//    public Runnable testIsGood = new Runnable() {
-//        @Override
-//        public void run() {
-//            mSwipeRefreshLayout.setRefreshing(false);
-//            Log.wtf(Constants.TAG, "ChatListFragment.run: TEEEEESTINGGGG");
-//        }
-//    };
-
     private View loadViews(LayoutInflater inflater, ViewGroup container)
     {
         View v = inflater.inflate(R.layout.layout_fragment_group_chat_list, container, false);
@@ -190,19 +181,11 @@ public class GroupChatListFragment extends ListFragment
         txtNumberParticipants = (TextView) v.findViewById(R.id.txt_participants);
         txtWrite = (TextView) v.findViewById(R.id.txt_write);
         selectedContacts = new ArrayList<>();
-//        mSwipeRefreshLayout = (SwipeRefreshLayout) v.findViewById(R.id.contacts_swipe_refresh_layout);
         return v;
     }
 
     private void addListeners()
     {
-//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//            @Override
-//            public void onRefresh() {
-//                refreshContent();
-//            }
-//        });
-
         txtWrite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -270,7 +253,7 @@ public class GroupChatListFragment extends ListFragment
         {
             if(!id.equals(profileId))
             {
-                Contact contact = mContactTransactions.getContactById(id, realm);
+                Contact contact = RealmContactTransactions.getContactById(id, realm);
                 addContactToChat(contact);
             }
         }
@@ -325,13 +308,6 @@ public class GroupChatListFragment extends ListFragment
             }
         }
     }
-
-
-//    private void refreshContent()
-//    {
-//        contactListController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
-//        contactListController.setConnectionCallback(this);
-//    }
 
     private void loadSearchBarEventsAndControllers(View v)
     {
@@ -579,7 +555,7 @@ public class GroupChatListFragment extends ListFragment
                 }
                 else
                 {
-                    GroupChat groupChat = mGroupChatTransactions.getGroupChatById(groupChatId, realm);
+                    GroupChat groupChat = RealmGroupChatTransactions.getGroupChatById(groupChatId, realm);
                     if(null != groupChat)
                     {
                         mGroupChatTransactions.updateGroupChatInstance
@@ -644,7 +620,7 @@ public class GroupChatListFragment extends ListFragment
 
         if(mGroupChatController.isCreatedJSONBodyForCreateGroupChat())
         {
-            mGroupChatController.createRequest(mGroupChatController.URL_CREATE_GROUP_CHAT,"post");
+            mGroupChatController.createRequest(GroupChatController.URL_CREATE_GROUP_CHAT,"post");
             response = mGroupChatController.executeRequest();
             if(null != response && mGroupChatController.getResponseCode().startsWith("2"))
             {
@@ -658,9 +634,9 @@ public class GroupChatListFragment extends ListFragment
                                     , this.profileId
                                     , this.selectedContacts
                                     , this.ownersIds
-                                    , "TestName"
-                                    , "TestAbout"
-                                    , "http://www.google.com"
+                                    , this.name
+                                    , this.about
+                                    , this.avatarURL
                             );
                 }
                 else
@@ -678,7 +654,7 @@ public class GroupChatListFragment extends ListFragment
         mGroupChatController.setChatOwners(this.ownersIds);
         if(mGroupChatController.isCreatedJSONBodyForUpdateGroupChat())
         {
-            mGroupChatController.createRequest(mGroupChatController.URL_UPDATE_GROUP_CHAT, "put", groupChatId);
+            mGroupChatController.createRequest(GroupChatController.URL_UPDATE_GROUP_CHAT, "put", groupChatId);
             return mGroupChatController.executeRequest();
         }
         else

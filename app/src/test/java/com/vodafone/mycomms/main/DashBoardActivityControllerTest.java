@@ -33,10 +33,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.ReturnValues;
-import org.mockito.configuration.AnnotationEngine;
-import org.mockito.configuration.IMockitoConfiguration;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -542,31 +538,5 @@ public class DashBoardActivityControllerTest implements IMockitoConfiguration
         Picasso.Builder builder = new Picasso.Builder(mActivity.getApplicationContext());
         builder.downloader(downloader);
         MycommsApp.picasso = builder.build();
-    }
-
-
-    @Override
-    public ReturnValues getReturnValues() {
-        return null;
-    }
-
-    @Override
-    public Answer<Object> getDefaultAnswer() {
-        return null;
-    }
-
-    @Override
-    public AnnotationEngine getAnnotationEngine() {
-        return null;
-    }
-
-    @Override
-    public boolean cleansStackTrace() {
-        return false;
-    }
-
-    @Override
-    public boolean enableClassCache() {
-        return false;
     }
 }

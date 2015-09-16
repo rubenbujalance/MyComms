@@ -35,7 +35,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
     private TextView tvOfficeLocation;
     private TextView tvPosition;
     private TextView txtAvatar;
-    private CircleImageView ivAvatar;
+    private ImageView ivAvatar;
 
     //Buttons
     private ImageView btnChat;
@@ -75,7 +75,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
         tvPhoneNumber = (TextView) findViewById(R.id.contact_phone_number);
         tvEmail = (TextView) findViewById(R.id.contact_email);
         tvOfficeLocation = (TextView)findViewById(R.id.contact_office_location);
-        ivAvatar = (CircleImageView)findViewById(R.id.avatar);
+        ivAvatar = (ImageView)findViewById(R.id.avatar);
         tvPosition = (TextView) findViewById(R.id.contact_position);
         txtAvatar = (TextView) findViewById(R.id.avatarText);
 
@@ -130,13 +130,7 @@ public class ContactDetailsPlusActivity extends ToolbarActivity {
         if(null != contactDetailInfo[3] && contactDetailInfo[3].length() > 0) //Emails
         {
             if (platform.equals(Constants.PLATFORM_LOCAL))
-            {
                 tvEmail.setText(contactDetailInfo[3]);
-//                if (null != Utils.getElementFromJsonObjectString(contactDetailInfo[3], Constants.CONTACT_EMAIL))
-//                    tvEmail.setText(Utils.getElementFromJsonObjectString(contactDetailInfo[3], Constants.CONTACT_EMAIL));
-//                else
-//                    tvEmail.setText("");
-            }
             else
             {
                 if (null != Utils.getElementFromJsonArrayString(contactDetailInfo[3], Constants.CONTACT_EMAIL))

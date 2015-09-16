@@ -114,9 +114,6 @@ public class ContactListFragment extends ListFragment {
 
         if (mIndex == Constants.CONTACTS_ALL)
         {
-            //This shows the keyboard and focus on searchView when called from the Dashboard search
-            //The Manifest defines that the keybord won't show every time you enter the view (windowSoftInputMode="adjustPan")
-            //So it needs a delayed handler in order to show the keyboard after the activity is created (half a second seems to be enough)
             if (Constants.isDashboardOrigin) {
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(new Runnable() {
@@ -281,16 +278,8 @@ public class ContactListFragment extends ListFragment {
                             Utils.launchCall(phone, getActivity());
                             recentController.insertRecent(recentContactList.get(position).getContactId(), action);
                         }
-                    } else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0) {
-                        /*String strPhones = recentContactList.get(position).getPhones();
-                        if (strPhones != null) {
-                            JSONArray jPhones = new JSONArray(strPhones);
-                            String phone = (String)((JSONObject) jPhones.get(0)).get(Constants.CONTACT_PHONES);
-                            Utils.launchSms(phone, getActivity());
-                        }*/
-
-                        // This is LOCAL contact, then in this case the action will be Send SMS
-                        // message
+                    } else if (action.compareTo(Constants.CONTACTS_ACTION_SMS) == 0)
+                    {
                         if (null != recentContactList.get(position).getPlatform()
                                 && (recentContactList.get(position).getPlatform().equals(Constants.PLATFORM_LOCAL)
                                     || recentContactList.get(position).getPlatform().equals(Constants.PLATFORM_GLOBAL_CONTACTS)))
@@ -400,13 +389,12 @@ public class ContactListFragment extends ListFragment {
     private ArrayList<RecentContact> filterRecentList(ArrayList<RecentContact> items)
     {
         ArrayList<RecentContact> finalList = new ArrayList<>();
-        RealmGroupChatTransactions realmGroupChatTransactions = new
-                RealmGroupChatTransactions(getActivity(), profileId);
+        new RealmGroupChatTransactions(getActivity(), profileId);
         for(RecentContact contact : items)
         {
             if(null != contact && null != contact.getId() && contact.getId().startsWith("mg_"))
             {
-                if(null != realmGroupChatTransactions.getGroupChatById(contact.getId(), realm))
+                if(null != RealmGroupChatTransactions.getGroupChatById(contact.getId(), realm))
                     finalList.add(contact);
             }
 
@@ -484,13 +472,9 @@ public class ContactListFragment extends ListFragment {
     {
         ArrayList<Contact> contactArrayList;
         if(null == keyWord)
-        {
             contactArrayList = RealmContactTransactions.getAllContacts(realm, profileId);
-        }
         else
-        {
             contactArrayList = mSearchController.getContactsByKeyWord(keyWord);
-        }
 
         return contactArrayList;
     }
@@ -505,7 +489,7 @@ public class ContactListFragment extends ListFragment {
         Log.i(Constants.TAG, "ContactListPagerFragment.reloadAdapterEvent: ");
         if(mIndex == Constants.CONTACTS_ALL)
         {
-            contactList = mSearchBarController.getContactList();
+            contactList = SearchBarController.getContactList();
             reloadSearchAdapter();
         }
     }

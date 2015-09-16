@@ -26,11 +26,9 @@ public class ContactListPagerFragment extends Fragment{
     private SlidingTabLayout mSlidingTabLayout;
     private ViewPager mViewPager;
     private boolean mBusRegistered = false;
-    private ContactsController mContactsController;
     private ContactListFragment contactListFragment;
     private ContactListFragment contactRecentListFragment;
     private ContactListFragment contactFavouritesListFragment;
-    private String mProfileId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -40,12 +38,7 @@ public class ContactListPagerFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sp = getActivity().getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        mProfileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        mContactsController = new ContactsController(mProfileId, getActivity());
         BusProvider.getInstance().register(this);
-
     }
 
     @Override
@@ -70,11 +63,11 @@ public class ContactListPagerFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        if (((MycommsApp)getActivity().getApplication()).contactViewOrigin == Constants.CONTACTS_ALL){
+        if (MycommsApp.contactViewOrigin == Constants.CONTACTS_ALL){
             mViewPager.setCurrentItem(Constants.CONTACTS_ALL);
-        } else if (((MycommsApp)getActivity().getApplication()).contactViewOrigin == Constants.CONTACTS_FAVOURITE){
+        } else if (MycommsApp.contactViewOrigin == Constants.CONTACTS_FAVOURITE){
             mViewPager.setCurrentItem(Constants.CONTACTS_FAVOURITE);
-        } else if (((MycommsApp)getActivity().getApplication()).contactViewOrigin == Constants.CONTACTS_RECENT){
+        } else if (MycommsApp.contactViewOrigin == Constants.CONTACTS_RECENT){
             mViewPager.setCurrentItem(Constants.CONTACTS_RECENT);
         }
     }

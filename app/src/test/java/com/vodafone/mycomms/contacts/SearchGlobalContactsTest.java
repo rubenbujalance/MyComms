@@ -101,6 +101,7 @@ public class SearchGlobalContactsTest {
         mockStatic(Crashlytics.class);
         whenNew(RealmContactTransactions.class).withAnyArguments()
                 .thenReturn(null);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 //        mockStatic(BusProvider.class);
 //        BusProvider.MainThreadBus bus = new BusProvider.MainThreadBus();
 //        when(BusProvider.getInstance()).thenReturn(bus);
@@ -108,7 +109,7 @@ public class SearchGlobalContactsTest {
         startContactListFragment(2);
         contactListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("2");
-        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+
         listView = (ListView) contactListFragment.getView().findViewById(android.R.id.list);
         emptyText = (TextView) contactListFragment.getView().findViewById(android.R.id.empty);
         searchView = (EditText) contactListFragment.getView().findViewById(R.id.et_search);

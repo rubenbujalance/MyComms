@@ -138,7 +138,7 @@ public class SplashScreenActivityTest{
         intent.setData(uri);
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
         Robolectric.flushForegroundThreadScheduler();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         Assert.assertNotNull(UserSecurity.getAccessToken(activity));
     }
@@ -161,7 +161,7 @@ public class SplashScreenActivityTest{
         intent.setData(uri);
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
         Robolectric.flushForegroundThreadScheduler();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
@@ -243,7 +243,7 @@ public class SplashScreenActivityTest{
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(9999));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -259,7 +259,7 @@ public class SplashScreenActivityTest{
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(500));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -281,7 +281,7 @@ public class SplashScreenActivityTest{
         SharedPreferences sp = context.getSharedPreferences(
                 com.vodafone.mycomms.util.Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         sp.edit().putString(
-                com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF, "mc_555a0792121ef1695cc7c1c3").commit();
+                com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF, "mc_555a0792121ef1695cc7c1c3").apply();
 
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Realm.getDefaultInstance();
@@ -314,7 +314,7 @@ public class SplashScreenActivityTest{
         webServer.enqueue(new MockResponse().setResponseCode(200).setBody(Constants.VALID_VERSION_RESPONSE));
         webServer.enqueue(new MockResponse().setResponseCode(500).setBody(Constants.VALID_VERSION_RESPONSE));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -338,7 +338,7 @@ public class SplashScreenActivityTest{
         webServer.enqueue(new MockResponse().setResponseCode(400).setBody(Constants.VALID_VERSION_RESPONSE));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Robolectric.flushForegroundThreadScheduler();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
@@ -370,7 +370,7 @@ public class SplashScreenActivityTest{
         webServer.enqueue(new MockResponse().setResponseCode(400).setBody(Constants.VALID_VERSION_RESPONSE));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Robolectric.flushForegroundThreadScheduler();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
@@ -393,7 +393,7 @@ public class SplashScreenActivityTest{
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         activity.getApplicationContext().getPackageManager().clearPackagePreferredActivities("com.android.providers.downloads.ui");
         Robolectric.flushForegroundThreadScheduler();
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();

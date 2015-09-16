@@ -19,7 +19,7 @@ import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.chatgroup.GroupChatController;
-import com.vodafone.mycomms.contacts.connection.ContactController;
+import com.vodafone.mycomms.contacts.connection.ContactsController;
 import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
@@ -71,8 +71,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private ProfileController profileController;
     private Context mContext;
     private static SharedPreferences sp;
-    public static boolean appIsInitialized = false;
-    private FavouriteController favouriteController;
+    public boolean appIsInitialized = false;
     private RecentContactController recentContactController;
     private NewsController mNewsController;
     private String profile_id;
@@ -406,8 +405,8 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public void onEventNewsReceived(NewsReceivedEvent event) {
         Log.i(Constants.TAG, "MyCommsApp.onEventNewsReceived: ");
         String profile_id = sp.getString(Constants.PROFILE_ID_SHARED_PREF, null);
-        ContactController contactController = new ContactController(mContext, profile_id);
-        contactController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
+        ContactsController contactsController = new ContactsController(profile_id, mContext);
+        contactsController.getContactList(Constants.CONTACT_API_GET_CONTACTS);
         FavouriteController favouriteController = new FavouriteController(mContext, profile_id);
         favouriteController.getFavouritesList(Constants.CONTACT_API_GET_FAVOURITES);
     }
@@ -460,40 +459,40 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         }
     }
 
-    public class loadGroupChats extends AsyncTask<String, Void, String>
-    {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try
-            {
-                GroupChatController groupChatController = new GroupChatController(mContext, profile_id);
-                ArrayList<GroupChat> chats = groupChatController.getAllGroupChatsFromAPI();
-                return groupChatController.insertGroupChatsIntoRealmIfNotExist(chats);
-            }
-            catch (Exception e)
-            {
-                Log.e(Constants.TAG, "MyCommsApp.loadGroupChats -> doInBackground: ERROR "
-                        + e.toString());
-                Crashlytics.logException(e);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            super.onPostExecute(result);
-            if(null == result) result = "0";
-            Log.d(Constants.TAG, "MyCommsApp.onPostExecute: Inserted group chat ids (if any): " +
-                    result);
-        }
-    }
+//    public class loadGroupChats extends AsyncTask<String, Void, String>
+//    {
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//        }
+//
+//        @Override
+//        protected String doInBackground(String... params) {
+//            try
+//            {
+//                GroupChatController groupChatController = new GroupChatController(mContext, profile_id);
+//                ArrayList<GroupChat> chats = groupChatController.getAllGroupChatsFromAPI();
+//                return groupChatController.insertGroupChatsIntoRealmIfNotExist(chats);
+//            }
+//            catch (Exception e)
+//            {
+//                Log.e(Constants.TAG, "MyCommsApp.loadGroupChats -> doInBackground: ERROR "
+//                        + e.toString());
+//                Crashlytics.logException(e);
+//                return null;
+//            }
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result)
+//        {
+//            super.onPostExecute(result);
+//            if(null == result) result = "0";
+//            Log.d(Constants.TAG, "MyCommsApp.onPostExecute: Inserted group chat ids (if any): " +
+//                    result);
+//        }
+//    }
 
     public void getNews() {
         Log.i(Constants.TAG, "MycommsApp.getNews: ");

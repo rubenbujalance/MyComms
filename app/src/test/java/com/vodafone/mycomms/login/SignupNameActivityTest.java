@@ -14,34 +14,48 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
+import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.test.util.Util;
+import com.vodafone.mycomms.util.Constants;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.MockRepository;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.ShadowIntent;
 
 import java.io.File;
 import java.util.Date;
 
 import static com.vodafone.mycomms.constants.Constants.FIRSTNAME;
 import static com.vodafone.mycomms.constants.Constants.LASTNAME;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
+        "javax.net.ssl.*", "org.json.*"})
+@PrepareForTest({Crashlytics.class})
 public class SignupNameActivityTest {
 
     SignupNameActivity activity;
@@ -53,8 +67,21 @@ public class SignupNameActivityTest {
     ImageView ivBtFwd;
 
     @Before
-    public void setUp() {
-        activity = Robolectric.setupActivity(SignupNameActivity.class);
+    public void setUp()
+    {
+        mockStatic(Crashlytics.class);
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+
+        activity = Robolectric.buildActivity(SignupNameActivity.class).create().start().resume().get();
+        try {
+            Thread.sleep(1000);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+        if(null != Robolectric.getForegroundThreadScheduler())
+            Robolectric.flushForegroundThreadScheduler();
         mFirstName = activity.mFirstName;
         mLastName = activity.mLastName;
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
@@ -141,9 +168,6 @@ public class SignupNameActivityTest {
         Assert.assertNotNull(activity.photoBitmap);
         ivBtFwd.performClick();
         Assert.assertTrue(UserProfile.getFirstName() != null);
-        Shadows.shadowOf(activity).getNextStartedActivity();
-        Intent expectedIntent = new Intent(activity, SignupCompanyActivity.class);
-        Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

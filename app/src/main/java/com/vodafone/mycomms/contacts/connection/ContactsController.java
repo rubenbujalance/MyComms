@@ -12,6 +12,9 @@ import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.events.ContactListReceivedEvent;
+import com.vodafone.mycomms.events.SetContactListAdapterEvent;
 import com.vodafone.mycomms.realm.RealmAvatarTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmProfileTransactions;
@@ -36,9 +39,9 @@ import model.UserProfile;
 public class ContactsController{
 
     private static RealmContactTransactions realmContactTransactions;
-    private RealmAvatarTransactions realmAvatarTransactions;
     private String mProfileId;
     private Context mContext;
+    private int offsetPaging = 0;
 
 
 
@@ -49,16 +52,7 @@ public class ContactsController{
         this.mProfileId = profileId;
         this.mContext = mContext;
         realmContactTransactions = new RealmContactTransactions(mProfileId);
-        realmAvatarTransactions = new RealmAvatarTransactions();
         mRealmProfileTransactions = new RealmProfileTransactions();
-    }
-
-    public RealmContactTransactions getRealmContactTransactions() {
-        return realmContactTransactions;
-    }
-
-    public void setRealmContactTransactions(RealmContactTransactions realmContactTransactions) {
-        ContactsController.realmContactTransactions = realmContactTransactions;
     }
 
     public ArrayList<Contact> insertContactListInRealm(JSONObject jsonObject)
@@ -81,10 +75,10 @@ public class ContactsController{
                 jsonObject = jsonArray.getJSONObject(i);
 
                 if(null != jsonObject.getString(Constants.CONTACT_ID)){
-                    contact = realmContactTransactions.getContactById(jsonObject.getString
+                    contact = RealmContactTransactions.getContactById(jsonObject.getString
                             (Constants.CONTACT_ID), realm);
                     if (null != contact){
-                        String SF_URL = realmContactTransactions.getContactById(jsonObject
+                        String SF_URL = RealmContactTransactions.getContactById(jsonObject
                                 .getString(Constants.CONTACT_ID), realm)
                                 .getStringField1();
                         if(null != SF_URL)
@@ -113,7 +107,7 @@ public class ContactsController{
             Log.i(Constants.TAG, "ContactsController.insertFavouriteContactInRealm: jsonResponse: " + json.toString());
             jsonArray = json.getJSONArray(Constants.CONTACT_FAVOURITES);
             for (int i = 0; i < jsonArray.length(); i++) {
-                contact = realmContactTransactions.getContactById(jsonArray.getString(i), realm);
+                contact = RealmContactTransactions.getContactById(jsonArray.getString(i), realm);
                 if (contact != null) {
                     contactList.add(mapContactToFavourite(contact));
                 }
@@ -143,7 +137,7 @@ public class ContactsController{
         try {
             jsonArray = json.getJSONArray(Constants.CONTACT_RECENTS);
             for (int i = 0; i < jsonArray.length(); i++) {
-                contact = realmContactTransactions.getContactById(
+                contact = RealmContactTransactions.getContactById(
                         jsonArray.getJSONObject(i).getString(Constants.CONTACT_ID), realm);
                 if (contact != null) {
                     contactList.add(mapContactToRecent(contact, jsonArray.getJSONObject(i)));
@@ -556,6 +550,54 @@ public class ContactsController{
 
     public void setRealmProfileTransactions(RealmProfileTransactions realmProfileTransactions) {
         mRealmProfileTransactions = realmProfileTransactions;
+    }
+
+
+    public void getContactList(String api){
+        Log.i(Constants.TAG, "ContactsController.getContactList: " + api);
+
+        try{
+            OKHttpWrapper.get(api, mContext, new OKHttpWrapper.HttpCallback() {
+                @Override
+                public void onFailure(Response response, IOException e) {
+                    Log.i(Constants.TAG, "ContactsController.onFailure:");
+                }
+
+                @Override
+                public void onSuccess(Response response) {
+                    try {
+                        String json;
+                        if (response.isSuccessful()) {
+                            json = response.body().string();
+                            if (json != null && json.trim().length() > 0) {
+                                JSONObject jsonResponse = new JSONObject(json);
+
+                                insertContactListInRealm(jsonResponse);
+                                //Update Contact List View on every pagination
+                                BusProvider.getInstance().post(new SetContactListAdapterEvent());
+
+                                JSONObject jsonPagination = jsonResponse.getJSONObject(Constants.CONTACT_PAGINATION);
+                                if (jsonPagination.getBoolean(Constants.CONTACT_PAGINATION_MORE_PAGES)) {
+                                    int pageSize = jsonPagination.getInt(Constants.CONTACT_PAGINATION_PAGESIZE);
+                                    offsetPaging = offsetPaging + pageSize;
+                                    getContactList(Constants.CONTACT_API_GET_CONTACTS + "&o=" + offsetPaging);
+                                } else {
+                                    offsetPaging = 0;
+                                    //Bus Event Post when contacts have been received
+                                    BusProvider.getInstance().post(new ContactListReceivedEvent());
+                                }
+                            }
+                        } else {
+                            Log.e(Constants.TAG, "ContactsController.isNOTSuccessful");
+                        }
+                    } catch (Exception e) {
+                        Log.e(Constants.TAG, "ContactsController.onSuccess: ", e);
+                    }
+                }
+            });
+        } catch (Exception e){
+            Log.e(Constants.TAG, "ContactsController.getContactList: ", e);
+        }
     }
 
 }

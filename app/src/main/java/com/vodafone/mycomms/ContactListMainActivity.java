@@ -92,8 +92,6 @@ public class ContactListMainActivity extends ToolbarActivity
         super.onResume();
         setForegroundActivity(0);
         overridePendingTransition(0,0);
-        //Update Pending Messages on Toolbar
-        //RBM - It is done every time a message is received
         checkUnreadChatMessages();
         XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
     }

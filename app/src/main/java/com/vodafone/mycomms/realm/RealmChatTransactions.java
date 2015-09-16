@@ -17,6 +17,7 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import model.Chat;
 import model.ChatMessage;
+import model.GroupChat;
 
 public class RealmChatTransactions
 {

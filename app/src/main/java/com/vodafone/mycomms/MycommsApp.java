@@ -458,40 +458,40 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         }
     }
 
-    public class loadGroupChats extends AsyncTask<String, Void, String>
-    {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try
-            {
-                GroupChatController groupChatController = new GroupChatController(mContext, profile_id);
-                ArrayList<GroupChat> chats = groupChatController.getAllGroupChatsFromAPI();
-                return groupChatController.insertGroupChatsIntoRealmIfNotExist(chats);
-            }
-            catch (Exception e)
-            {
-                Log.e(Constants.TAG, "MyCommsApp.loadGroupChats -> doInBackground: ERROR "
-                        + e.toString());
-                Crashlytics.logException(e);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            super.onPostExecute(result);
-            if(null == result) result = "0";
-            Log.d(Constants.TAG, "MyCommsApp.onPostExecute: Inserted group chat ids (if any): " +
-                    result);
-        }
-    }
+//    public class loadGroupChats extends AsyncTask<String, Void, String>
+//    {
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//        }
+//
+//        @Override
+//        protected String doInBackground(String... params) {
+//            try
+//            {
+//                GroupChatController groupChatController = new GroupChatController(mContext, profile_id);
+//                ArrayList<GroupChat> chats = groupChatController.getAllGroupChatsFromAPI();
+//                return groupChatController.insertGroupChatsIntoRealmIfNotExist(chats);
+//            }
+//            catch (Exception e)
+//            {
+//                Log.e(Constants.TAG, "MyCommsApp.loadGroupChats -> doInBackground: ERROR "
+//                        + e.toString());
+//                Crashlytics.logException(e);
+//                return null;
+//            }
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result)
+//        {
+//            super.onPostExecute(result);
+//            if(null == result) result = "0";
+//            Log.d(Constants.TAG, "MyCommsApp.onPostExecute: Inserted group chat ids (if any): " +
+//                    result);
+//        }
+//    }
 
     public void getNews() {
         Log.i(Constants.TAG, "MycommsApp.getNews: ");

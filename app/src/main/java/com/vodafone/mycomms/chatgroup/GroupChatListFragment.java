@@ -53,6 +53,9 @@ public class GroupChatListFragment extends ListFragment
     private SharedPreferences sp;
     private ArrayList<Contact> contactList;
     private String profileId;
+    private String name = "";
+    private String about = "";
+    private String avatarURL = "";
     private ContactListViewArrayAdapter adapter;
     private Parcelable state;
     private SearchBarController mSearchBarController;
@@ -631,9 +634,9 @@ public class GroupChatListFragment extends ListFragment
                                     , this.profileId
                                     , this.selectedContacts
                                     , this.ownersIds
-                                    , "TestName"
-                                    , "TestAbout"
-                                    , "http://www.google.com"
+                                    , this.name
+                                    , this.about
+                                    , this.avatarURL
                             );
                 }
                 else

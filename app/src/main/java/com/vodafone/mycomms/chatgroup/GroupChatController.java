@@ -336,7 +336,7 @@ public class GroupChatController
             GroupChat groupChat = new GroupChat
                     (
                             object.getString("id")
-                            , object.getString("creator")
+                            , profileId
                             , object.getString("creator")
                             , object.getString("name")
                             , object.getString("avatar")

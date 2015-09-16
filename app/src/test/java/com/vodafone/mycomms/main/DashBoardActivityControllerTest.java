@@ -66,7 +66,7 @@ import static org.mockito.Matchers.eq;
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
 @PrepareForTest({Realm.class, Crashlytics.class, RealmContactTransactions.class, RealmGroupChatTransactions.class,
                     BusProvider.class})
-public class DashBoardActivityControllerTest implements IMockitoConfiguration
+public class DashBoardActivityControllerTest
 {
     @Rule
     public PowerMockRule rule = new PowerMockRule();

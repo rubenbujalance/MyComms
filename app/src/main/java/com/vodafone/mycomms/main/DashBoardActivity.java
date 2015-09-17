@@ -118,9 +118,17 @@ public class DashBoardActivity extends ToolbarActivity
                 //                timeText.setText(time);
 
                 // Set Date line
-                DateFormat df = new SimpleDateFormat("EEEE, d MMMM", Locale.US);
-                String date = df.format(Calendar.getInstance().getTime());
+                Calendar cal = Calendar.getInstance();
+                int day = cal.get(Calendar.DAY_OF_MONTH);
+                String daySuffix;
 
+                if(day==1 || day==21 || day==31) daySuffix = "st";
+                else if(day==2 || day==22) daySuffix = "nd";
+                else if(day==3 || day==23) daySuffix = "rd";
+                else daySuffix = "th";
+
+                DateFormat df = new SimpleDateFormat("EEEE, d'"+daySuffix+"' MMMM", Locale.US);
+                String date = df.format(Calendar.getInstance().getTime());
                 TextView dateText = (TextView) findViewById(R.id.dateDashboard);
                 dateText.setText(date);
             }

@@ -6,7 +6,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     mycomms:contentInsetEnd="0dp"
     mycomms:contentInsetStart="0dp"
-    android:gravity="top"
     mycomms:titleTextAppearance="@style/ActionBar.TitleText"
     android:transitionGroup="true"
     android:touchscreenBlocksFocus="true"
@@ -22,37 +21,31 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp">
+            android:gravity="center">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_gravity="center"
                 >
 
                 <ImageView
                     android:id="@+id/footer_contacts"
                     android:layout_width="wrap_content"
-                    android:layout_height="22dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/btnuser"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_marginTop="5dp"
 
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="14dp"
                     android:text="@string/Contacts"
                     android:id="@+id/tv_contacts"
                     android:textColor="@color/grey_middle"
                     android:layout_below="@+id/footer_contacts"
+                    android:layout_marginTop="5dp"
+                    android:layout_centerHorizontal="true"
                     />
 
 
@@ -77,64 +70,62 @@
                 android:focusable="true" />
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/footer_inbox_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@android:color/transparent"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp"
             >
 
             <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_gravity="center"
+                android:layout_width="45dp"
+                android:layout_height="55dp"
+                android:layout_centerInParent="true"
                 >
 
-                <ImageView
-                    android:id="@+id/footer_recents"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/chat"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="5dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerInParent="true">
 
-                    />
+                    <ImageView
+                        android:id="@+id/footer_recents"
+                        android:layout_width="27dp"
+                        android:layout_height="23dp"
+                        android:src="@drawable/chat"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Chat"
+                        android:textSize="14dp"
+                        android:id="@+id/tv_chat"
+                        android:textColor="@color/grey_middle"
+                        android:layout_below="@+id/footer_recents"
+                        android:layout_marginTop="5dp"
+                        />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/unread_messages"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     tools:text="10"
                     android:textColor="@color/white"
                     android:gravity="center"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:background="@mipmap/blue"
-                    android:layout_marginLeft="6dp"
-                    android:layout_toRightOf="@+id/footer_recents"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
                     />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:text="@string/Chat"
-                    android:id="@+id/tv_chat"
-                    android:textColor="@color/grey_middle"
-                    android:layout_below="@+id/footer_recents"
-
-                    />
-
-
             </RelativeLayout>
-        </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 
 </android.support.v7.widget.Toolbar>

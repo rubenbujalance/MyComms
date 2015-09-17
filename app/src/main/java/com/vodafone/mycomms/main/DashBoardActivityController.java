@@ -245,7 +245,7 @@ public class DashBoardActivityController
                 recentsContainer.addView(childRecents);
                 hashMapRecentIdView.put(childRecents, this.recentContact);
 
-                childRecents.setPadding(10, 20, 10, 20);
+//                childRecents.setPadding(10, 0, 10, 0);
 
                 top_left_avatar = (ImageView) childRecents.findViewById(R.id.top_left_avatar);
                 top_right_avatar = (ImageView) childRecents.findViewById(R.id.top_right_avatar);
@@ -435,7 +435,7 @@ public class DashBoardActivityController
             recentsContainer.addView(childRecents);
             hashMapRecentIdView.put(childRecents,this.recentContact);
 
-            childRecents.setPadding(10, 20, 10, 20);
+//            childRecents.setPadding(10, 0, 10, 0);
             recentAvatar = (ImageView) childRecents.findViewById(R.id.recent_avatar);
 
             //Avatar
@@ -646,7 +646,7 @@ public class DashBoardActivityController
             for (int i = 0; i < newsArrayList.size(); i++) {
                 news = newsArrayList.get(i);
 
-                new DrawSingleNewsAsyncTask(inflater,container,
+                new DrawSingleNewsAsyncTask(inflater,container, i,
                         news.getUuid(),news.getImage(),news.getTitle(),news.getAuthor_avatar(),
                         news.getAuthor_name(),news.getHtml(),news.getPublished_at())
                         .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -662,6 +662,7 @@ public class DashBoardActivityController
         LayoutInflater inflater;
         LinearLayout container;
         View child;
+        int pos;
         String imageUrl;
 
         String titleStr;
@@ -673,11 +674,12 @@ public class DashBoardActivityController
         boolean loadFromDisk;
         ImageView newsImage;
 
-        public DrawSingleNewsAsyncTask(LayoutInflater inflater, LinearLayout container,
+        public DrawSingleNewsAsyncTask(LayoutInflater inflater, LinearLayout container, int pos,
                                        String uuid,String image,String title,String author_avatar,
                                        String author_name,String html,long published_at) {
             this.inflater = inflater;
             this.container = container;
+            this.pos = pos;
             this.uuid = uuid;
             this.image = image;
             this.title = title;
@@ -693,7 +695,8 @@ public class DashBoardActivityController
         protected void onPreExecute() {
             child = inflater.inflate(R.layout.layout_news_dashboard, container, false);
             container.addView(child);
-            child.setPadding(10, 20, 10, 20);
+            if(pos==0) child.setPadding(0, 0, 5, 0);
+            else child.setPadding(5, 0, 5, 0);
         }
 
         @Override

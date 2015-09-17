@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/dashboard_layout"
+    android:background="@drawable/istanbul_bg_blur">
+
+    <FrameLayout
+        android:id="@+id/sample_content_fragment"
+        android:layout_weight="2"
+        android:layout_width="match_parent"
+        android:background="@color/toolbar_selected_item"
+        android:layout_height="0px" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="33dp"
+                android:id="@+id/Line1">
+
+                <include layout="@layout/layout_clock_dashboard" />
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="55dp"
+                    android:id="@+id/magnifier"
+                    android:src="@mipmap/icon_search_white"
+                    android:layout_weight="0.10"
+                    android:background="#2affffff"
+                    android:paddingLeft="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="10dp"
+                    android:clickable="true"
+                    android:layout_alignParentRight="true"/>
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/Line2"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/dateDashboard"
+                    tools:text="tuesday 1st september"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:background="#2affffff"
+                    android:paddingLeft="15dp"
+                    android:paddingStart="15dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/Slider1"
+                android:layout_marginTop="37dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/latestNews"
+                    android:id="@+id/titleLatestNews"
+                    android:textColor="@color/white"
+                    android:paddingStart="15dp"
+                    android:paddingLeft="15dp"
+                    android:textSize="17sp" />
+
+                <HorizontalScrollView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/scroll"
+                    android:layout_marginTop="15dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/list_news"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="37dp"
+                android:background="#2affffff" >
+
+                <RelativeLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/Slider2">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Recents"
+                        android:id="@+id/titleRecents"
+                        android:textColor="@color/white"
+                        android:paddingBottom="10dp"
+                        android:paddingTop="10dp"
+                        android:paddingStart="15dp"
+                        android:paddingLeft="15dp"
+                        android:textSize="16sp"/>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:id="@+id/LayoutFavourite">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/Favorites"
+                            android:id="@+id/btFavourite"
+                            android:textColor="@color/white"
+                            android:paddingBottom="10dp"
+                            android:paddingTop="10dp"
+                            android:textSize="16sp"/>
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:id="@+id/imageView13"
+                            android:src="@drawable/btn_forward_white"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginRight="5dp" />
+                    </LinearLayout>
+                </RelativeLayout>
+                <HorizontalScrollView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/scroll_recents"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginLeft="15dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal" >
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/list_recents"
+                            android:orientation="horizontal">
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/list_recents_2"
+                            android:orientation="horizontal">
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_connection_layout"
+        android:visibility="gone">
+        <include
+            android:id="@+id/layout_connection_not_available"
+            layout="@layout/layout_connection_not_available"
+            />
+    </LinearLayout>
+    <!-- Footer -->
+    <RelativeLayout android:id="@+id/footer"
+        android:layout_width="fill_parent" android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_height="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+
+            <include android:id="@+id/app_footer" layout="@layout/toolbar_footer"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

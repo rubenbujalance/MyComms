@@ -3,9 +3,8 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/notice"
               android:orientation="horizontal"
-              android:layout_width="140dp"
-              android:layout_height="120dp"
-              android:background="?android:attr/selectableItemBackground">
+              android:layout_width="147dp"
+              android:layout_height="103dp" >
 
 
     <LinearLayout
@@ -41,19 +40,15 @@
                     tools:text="Change cultural identity bla bla vcsdjc"
                     android:id="@+id/notice_title"
                     android:textColor="#ffffffff"
+                    android:ellipsize="marquee"
                     android:maxLines="2"
                     android:lines="2"
                     android:padding="5dp"
                     android:textSize="14sp"
-                    android:ellipsize="marquee"
                     android:textStyle="bold"
                     android:layout_weight="1.04"
                     android:gravity="bottom"
-                    android:layout_gravity="bottom"
-                    android:shadowColor="#000000"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="15" />
+                    android:layout_gravity="bottom"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -67,11 +62,7 @@
                     android:layout_alignParentEnd="true"
                     android:textSize="12sp"
                     android:layout_gravity="bottom"
-                    android:gravity="bottom"
-                    android:shadowColor="#000000"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="15" />
+                    android:gravity="bottom" />
 
             </LinearLayout>
 

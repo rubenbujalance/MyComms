@@ -22,13 +22,11 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatListActivity;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
 import com.vodafone.mycomms.main.DashBoardActivity;
-import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.settings.SettingsMainActivity;
 
 import io.realm.Realm;
-import model.Contact;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class ToolbarActivity extends AppCompatActivity {
@@ -226,7 +224,7 @@ public class ToolbarActivity extends AppCompatActivity {
 
         LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
         LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
-        LinearLayout layoutInbox = (LinearLayout) findViewById(R.id.footer_inbox_layout);
+        RelativeLayout layoutInbox = (RelativeLayout) findViewById(R.id.footer_inbox_layout);
 
         SharedPreferences sp = getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -335,7 +333,6 @@ public class ToolbarActivity extends AppCompatActivity {
     public void activateFooterSelected(int selected){
         LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
         LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
-        LinearLayout layoutRecents = (LinearLayout) findViewById(R.id.footer_inbox_layout);
 
         ImageView footerContacts = (ImageView) findViewById(R.id.footer_contacts);
         ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);

@@ -391,7 +391,7 @@ public class AddGlobalContactsActivityTest {
         sp.edit().putString(
                 com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF,
                 Constants.PROFILE_ID)
-                .commit();
+                .apply();
 
         //Execute
         layoutErrorBar.setVisibility(View.VISIBLE);

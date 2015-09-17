@@ -585,15 +585,85 @@ public class RealmChatTransactions
             mRealm = Realm.getDefaultInstance();
         try
         {
-            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
-                    .count();
+            count = count + getSingleChatPendingMessagesCount(realm);
+            count = count + getExistentGroupChatPendingMessagesCount(realm);
         }
         catch(Exception e)
         {
             Log.e(Constants.TAG, "RealmChatTransactions.getAllChatPendingMessagesCount: ",e);
+            Crashlytics.logException(e);
+        }
+        finally
+        {
+            if(null == realm && null != mRealm)
+                mRealm.close();
+        }
+
+        return count;
+    }
+
+    public long getSingleChatPendingMessagesCount(Realm realm){
+        if(_profile_id==null) return 0;
+
+        long count = 0;
+
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getDefaultInstance();
+        try
+        {
+            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+            count = count + query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
+                    .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, "")
+                    .count();
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmChatTransactions.getSingleChatPendingMessagesCount: ",e);
+            Crashlytics.logException(e);
+        }
+        finally
+        {
+            if(null == realm && null != mRealm)
+                mRealm.close();
+        }
+
+        return count;
+    }
+
+    public long getExistentGroupChatPendingMessagesCount(Realm realm){
+        if(_profile_id==null) return 0;
+
+        long count = 0;
+
+        Realm mRealm;
+        if(null != realm)
+            mRealm = realm;
+        else
+            mRealm = Realm.getDefaultInstance();
+        try
+        {
+            RealmQuery<GroupChat> queryGroupChats = mRealm.where(GroupChat.class);
+            queryGroupChats.equalTo(Constants.GROUP_CHAT_REALM_PROFILE_ID, _profile_id);
+            RealmResults<GroupChat> result1 = queryGroupChats.findAll();
+
+            for(GroupChat g : result1)
+            {
+                RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
+                count = count + query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
+                        .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
+                        .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
+                        .equalTo(Constants.CHAT_MESSAGE_FIELD_GROUP_ID, g.getId())
+                        .count();
+            }
+        }
+        catch(Exception e)
+        {
+            Log.e(Constants.TAG, "RealmChatTransactions.getExistentGroupChatPendingMessagesCount: ",e);
             Crashlytics.logException(e);
         }
         finally

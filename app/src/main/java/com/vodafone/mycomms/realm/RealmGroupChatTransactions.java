@@ -21,7 +21,7 @@ import model.GroupChat;
  */
 public class RealmGroupChatTransactions
 {
-    private String _profile_id;
+    private static String _profile_id;
     private Context mContext;
     private String LOG_TAG = RealmGroupChatTransactions.class.getSimpleName();
 
@@ -236,6 +236,7 @@ public class RealmGroupChatTransactions
             String test = id;
             RealmQuery<GroupChat> query = mRealm.where(GroupChat.class);
             query.equalTo(Constants.GROUP_CHAT_REALM_ID, id);
+            query.equalTo(Constants.GROUP_CHAT_REALM_PROFILE_ID, _profile_id);
             return query.findFirst();
         }
         catch(Exception e)

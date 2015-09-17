@@ -191,7 +191,11 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         BusProvider.getInstance().unregister(this);
         if(realm!=null) realm.close();
         //Network listener
-        networkEvents.unregister();
+        try {
+            networkEvents.unregister();
+        }
+        catch (Exception e) {}
+
     }
 
     @Subscribe

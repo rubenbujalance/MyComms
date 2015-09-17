@@ -23,24 +23,10 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="33dp"
                 android:id="@+id/Line1">
 
-                <TextClock
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:format24Hour="HH:mm"
-                    android:text="@string/dummyHour"
-                    android:id="@+id/timeDashboard"
-                    android:textColor="#ffffffff"
-                    android:textSize="38sp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:paddingLeft="15dp"
-                    android:paddingStart="15dp"
-                    android:paddingRight="20dp"
-                    android:paddingEnd="20dp"
-                    android:background="#2affffff" />
+                <include layout="@layout/layout_clock_dashboard" />
 
                 <ImageView
                     android:layout_width="80dp"
@@ -83,44 +69,43 @@
                     android:paddingBottom="10dp" />
             </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/Slider1"
+                android:layout_marginTop="37dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/Slider1"
-                    android:layout_marginTop="40dp">
+                    android:text="@string/latestNews"
+                    android:id="@+id/titleLatestNews"
+                    android:textColor="@color/white"
+                    android:paddingStart="10dp"
+                    android:paddingLeft="15dp"
+                    android:textSize="17sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/latestNews"
-                        android:id="@+id/titleLatestNews"
-                        android:textColor="@color/white"
-                        android:paddingStart="10dp"
-                        android:paddingLeft="15dp"
-                        android:textSize="17sp" />
+                <HorizontalScrollView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/scroll"
+                    android:layout_marginTop="15dp">
 
-                    <HorizontalScrollView
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/scroll"
-                        android:layout_marginTop="18dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/list_news"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:id="@+id/list_news"
-                            android:orientation="horizontal" />
-                    </HorizontalScrollView>
-
-                </LinearLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="40dp"
-                android:paddingBottom="13dp"
+                android:layout_marginTop="37dp"
                 android:background="#2affffff" >
 
                 <RelativeLayout
@@ -169,12 +154,12 @@
                             android:layout_marginEnd="5dp"
                             android:layout_marginRight="5dp" />
                     </LinearLayout>
-
                 </RelativeLayout>
                 <HorizontalScrollView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/scroll_recents">
+                    android:id="@+id/scroll_recents"
+                    android:layout_marginBottom="12dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -213,9 +198,9 @@
     </LinearLayout>
     <!-- Footer -->
     <RelativeLayout android:id="@+id/footer"
-                    android:layout_width="fill_parent" android:orientation="horizontal"
-                    android:layout_alignParentBottom="true"
-                    android:layout_height="wrap_content">
+        android:layout_width="fill_parent" android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_height="?attr/actionBarSize"
             android:layout_width="match_parent"

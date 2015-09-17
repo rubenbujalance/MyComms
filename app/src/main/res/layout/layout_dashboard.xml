@@ -23,22 +23,10 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="30dp"
                 android:id="@+id/Line1">
 
-                <DigitalClock
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/timeDashboard"
-                    android:textColor="#ffffffff"
-                    android:textSize="38sp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:paddingLeft="15dp"
-                    android:paddingStart="15dp"
-                    android:paddingRight="20dp"
-                    android:paddingEnd="20dp"
-                    android:background="#2affffff" />
+                <include layout="@layout/layout_clock_dashboard" />
 
                 <ImageView
                     android:layout_width="80dp"
@@ -86,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/Slider1"
-                android:layout_marginTop="40dp">
+                android:layout_marginTop="25dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -102,7 +90,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/scroll"
-                    android:layout_marginTop="18dp">
+                    android:layout_marginTop="12dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -117,8 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="40dp"
-                android:paddingBottom="13dp"
+                android:layout_marginTop="25dp"
                 android:background="#2affffff" >
 
                 <RelativeLayout
@@ -167,12 +154,12 @@
                             android:layout_marginEnd="5dp"
                             android:layout_marginRight="5dp" />
                     </LinearLayout>
-
                 </RelativeLayout>
                 <HorizontalScrollView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/scroll_recents">
+                    android:id="@+id/scroll_recents"
+                    android:layout_marginBottom="10dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"

@@ -62,9 +62,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, EndpointWrapper.class
+@PrepareForTest({Realm.class
         , Crashlytics.class
-        , SearchController.class, SearchBarController.class
         , RealmContactTransactions.class})
 public class FavouriteContactControllerTest
 {

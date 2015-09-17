@@ -29,7 +29,6 @@ import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
 import com.vodafone.mycomms.test.util.Util;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
 
@@ -65,8 +64,10 @@ import model.News;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, DashBoardActivityController.class, BusProvider.class
-,APIWrapper.class, EndpointWrapper.class})
+@PrepareForTest({Realm.class
+        , Crashlytics.class
+        , BusProvider.class
+        , EndpointWrapper.class})
 public class DashBoardActivityTest
 {
     @Rule
@@ -82,8 +83,6 @@ public class DashBoardActivityTest
         PowerMockito.mockStatic(Realm.class);
         PowerMockito.when(Realm.getDefaultInstance()).thenReturn(null);
         PowerMockito.mockStatic(Crashlytics.class);
-
-        //Mock BusProvider to avoid post "onDashBoardCreatedEvent"
         BusProvider.MainThreadBus bus = BusProvider.getInstance();
         BusProvider.MainThreadBus busSpy = Mockito.spy(bus);
         PowerMockito.doNothing().when(busSpy).post(Mockito.any(DashboardCreatedEvent.class));
@@ -300,8 +299,6 @@ public class DashBoardActivityTest
             System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
             org.junit.Assert.fail();
         }
-
-        PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200)
@@ -346,7 +343,6 @@ public class DashBoardActivityTest
             org.junit.Assert.fail();
         }
 
-        PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200)
@@ -391,7 +387,6 @@ public class DashBoardActivityTest
             org.junit.Assert.fail();
         }
 
-        PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200));
@@ -435,7 +430,6 @@ public class DashBoardActivityTest
             org.junit.Assert.fail();
         }
 
-        PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(400)

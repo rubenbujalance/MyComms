@@ -75,8 +75,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({RealmContactTransactions.class
-        , Realm.class
+@PrepareForTest({Realm.class
         , Crashlytics.class
         , EndpointWrapper.class
         , RealmLDAPSettingsTransactions.class})
@@ -106,9 +105,6 @@ public class SearchGlobalContactsTest {
         whenNew(RealmContactTransactions.class).withAnyArguments()
                 .thenReturn(null);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
-//        mockStatic(BusProvider.class);
-//        BusProvider.MainThreadBus bus = new BusProvider.MainThreadBus();
-//        when(BusProvider.getInstance()).thenReturn(bus);
         context = RuntimeEnvironment.application.getApplicationContext();
         startContactListFragment(2);
         contactListFragment = (ContactListFragment)customFragmentActivity

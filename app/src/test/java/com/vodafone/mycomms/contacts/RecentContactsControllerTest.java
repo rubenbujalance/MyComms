@@ -4,27 +4,17 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.view.View;
-import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
-import com.vodafone.mycomms.contacts.connection.RecentContactController;
-import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
-import com.vodafone.mycomms.events.BusProvider;
-import com.vodafone.mycomms.events.ReloadAdapterEvent;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
-import com.vodafone.mycomms.search.SearchBarController;
-import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
@@ -35,7 +25,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -63,9 +52,8 @@ import static org.powermock.api.mockito.PowerMockito.when;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, EndpointWrapper.class
+@PrepareForTest({Realm.class
         , Crashlytics.class
-        , SearchController.class, SearchBarController.class, RecentContactController.class
         , RealmGroupChatTransactions.class, RealmContactTransactions.class})
 public class RecentContactsControllerTest
 {

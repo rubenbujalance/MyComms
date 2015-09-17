@@ -443,7 +443,6 @@ public class ContactsControllerTest{
             Assert.fail();
         }
 
-        PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
 
@@ -477,7 +476,6 @@ public class ContactsControllerTest{
             Assert.fail();
         }
 
-        PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
 

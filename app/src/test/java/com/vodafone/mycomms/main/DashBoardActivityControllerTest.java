@@ -18,7 +18,6 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
-import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
@@ -64,8 +63,10 @@ import static org.mockito.Matchers.eq;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, RealmContactTransactions.class, RealmGroupChatTransactions.class,
-                    BusProvider.class})
+@PrepareForTest({Realm.class
+        , Crashlytics.class
+        , RealmContactTransactions.class
+        , RealmGroupChatTransactions.class})
 public class DashBoardActivityControllerTest
 {
     @Rule

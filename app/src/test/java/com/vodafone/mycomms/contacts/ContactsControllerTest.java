@@ -78,6 +78,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
 @PrepareForTest({Realm.class, EndpointWrapper.class
+        , Crashlytics.class
         , SearchController.class, SearchBarController.class, RecentContactController.class
         , RealmContactTransactions.class})
 
@@ -442,7 +443,6 @@ public class ContactsControllerTest{
             Assert.fail();
         }
 
-        PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
 
@@ -476,7 +476,6 @@ public class ContactsControllerTest{
             Assert.fail();
         }
 
-        PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
 

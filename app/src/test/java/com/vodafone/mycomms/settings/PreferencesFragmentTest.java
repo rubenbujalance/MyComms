@@ -11,9 +11,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.constants.Constants;
@@ -60,15 +58,13 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({RealmContactTransactions.class, Realm.class, EndpointWrapper.class,
-        RealmProfileTransactions.class})
+@PrepareForTest({Realm.class, Crashlytics.class})
 
 public class PreferencesFragmentTest {
 
     @Rule
     public PowerMockRule rule = new PowerMockRule();
 
-    MockWebServer webServer;
     PreferencesFragment mPreferencesFragment;
     CustomPreferencesFragmentActivity customPreferencesFragmentActivity;
     Context context;

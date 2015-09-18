@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/back_area"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
         android:id="@+id/contact_actions_container">
 
@@ -113,7 +113,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/contact_actions_container"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="50dp"
         android:layout_marginLeft="13dp"
         android:layout_marginStart="13dp"
         android:layout_marginRight="13dp"

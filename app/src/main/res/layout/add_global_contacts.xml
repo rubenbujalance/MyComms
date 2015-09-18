@@ -3,18 +3,17 @@
     android:id="@+id/add_global_contacts_container"
     android:layout_width="fill_parent"
     android:layout_height="48dp"
-    android:visibility="gone"
+    android:visibility="visible"
     android:background="@color/background_add_global_contacts">
 
         <ImageView
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="0dp"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
+            android:layout_centerVertical="true"
             android:background="@drawable/ic_add_vodafone"
             android:id="@+id/imageView15"/>
         <TextView
@@ -31,13 +30,11 @@
             android:id="@+id/btn_add_global_contacts"
             android:layout_width="16dp"
             android:layout_height="28dp"
-            android:layout_marginLeft="14dp"
-            android:layout_marginStart="14dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/btn_add"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/textView17"
-            android:layout_toEndOf="@+id/textView17"/>
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>

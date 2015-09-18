@@ -60,7 +60,7 @@
             android:textSize="15sp"
             android:layout_below="@+id/app_bar"
             android:gravity="center_horizontal"
-            android:ellipsize="end"
+            android:ellipsize="marquee"
             android:lines="2"/>
 
     </RelativeLayout>

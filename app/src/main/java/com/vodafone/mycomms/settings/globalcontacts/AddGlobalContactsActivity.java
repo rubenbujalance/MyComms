@@ -27,6 +27,7 @@ import com.vodafone.mycomms.main.MainActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
+import com.vodafone.mycomms.util.Utils;
 
 import model.GlobalContactsSettings;
 
@@ -62,9 +63,11 @@ public class AddGlobalContactsActivity extends MainActivity {
         setCredentialsTextColor(false);
 
         TextView tvInitialText = (TextView)findViewById(R.id.tvInitialText);
-        tvInitialText.setText(Html.fromHtml(getString(R.string.provide_your_corporate_credentials)));
+        tvInitialText.setText(Utils.trimTrailingWhitespace(
+                Html.fromHtml(getString(R.string.provide_your_corporate_credentials))));
         TextView tvExplanationText = (TextView)findViewById(R.id.tvExplanationText);
-        tvExplanationText.setText(Html.fromHtml(getString(R.string.ldap_need_help_with_your_username)));
+        tvExplanationText.setText(Utils.trimTrailingWhitespace(
+                Html.fromHtml(getString(R.string.ldap_need_help_with_your_username))));
 
         etPassword.setTypeface(etEmail.getTypeface());
         layoutErrorBar.setVisibility(View.GONE);

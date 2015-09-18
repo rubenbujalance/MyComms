@@ -3,23 +3,27 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_height="wrap_content"
-              android:layout_width="70dp">
+              android:layout_width="75dp">
 
     <ImageView android:id="@+id/list_item_recent_type_image"
 
         android:layout_gravity="center"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         tools:src="@drawable/ic_rec_email_grey"/>
 
     <!-- Local Time -->
     <TextView android:id="@+id/list_item_recent_info_time"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:textSize="12sp"
         android:orientation="vertical"
         android:layout_gravity="center"
+        android:gravity="center"
+        android:singleLine="true"
         tools:text="@string/dummyHour"
+        android:ellipsize="none"
+        android:layout_marginTop="8dp"
         android:textColor="@color/contact_soft_grey"/>
 
 </LinearLayout>

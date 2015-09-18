@@ -84,7 +84,7 @@
             android:textSize="15sp"
             android:layout_below="@+id/recent_firstname"
             android:gravity="center_horizontal"
-            android:ellipsize="end"
+            android:ellipsize="marquee"
             android:singleLine="true" />
 
     </RelativeLayout>

@@ -1422,7 +1422,6 @@ public final class XMPPTransactions {
                     _xmppConnection.disconnect();
 
                 _xmppConnection = new XMPPTCPConnection(_xmppConfigBuilder.build());
-                _xmppConnection.addConnectionListener(getConnectionListener());
                 connectionCreated = true;
 
                 // Connect to the server
@@ -1448,6 +1447,8 @@ public final class XMPPTransactions {
                 _reconnectionMgr = ReconnectionManager.getInstanceFor(_xmppConnection);
                 _reconnectionMgr.enableAutomaticReconnection();
                 _reconnectionMgr.setReconnectionPolicy(ReconnectionManager.ReconnectionPolicy.RANDOM_INCREASING_DELAY);
+
+                _xmppConnection.addConnectionListener(getConnectionListener());
 
                 _pingManager = PingManager.getInstanceFor(_xmppConnection);
 //                _pingManager.setPingInterval(5);

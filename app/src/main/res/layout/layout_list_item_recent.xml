@@ -5,10 +5,6 @@
              android:layout_height="match_parent"
              android:background="?android:attr/selectableItemBackground">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
         <RelativeLayout
             android:id="@+id/front"
             android:tag="front"
@@ -43,12 +39,11 @@
             <include
                 android:id="@+id/layout_list_item_recent_info"
                 layout="@layout/layout_list_item_recent_info"
-                android:layout_width="70dp"
+                android:layout_width="75dp"
                 android:layout_height = "wrap_content"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="15dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"/>
         </RelativeLayout>
-    </LinearLayout>
 </FrameLayout >

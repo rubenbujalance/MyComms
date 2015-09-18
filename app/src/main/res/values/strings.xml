@@ -92,7 +92,7 @@
     <string name="dont_have_salesforce">Don\'t have Salesforce?</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="oops_wrong_password">Oops, wrong password</string>
-    <string name="oops_wrong_email">Oops, wrong email</string>
+    <string name="oops_wrong_email">Oops, wrong data</string>
     <string name="title_activity_forgot_pass">ForgotPassActivity</string>
     <string name="send_new_password">Send new password</string>
     <string name="new_password_sent">New password sent</string>

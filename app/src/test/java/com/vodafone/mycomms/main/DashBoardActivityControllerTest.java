@@ -219,7 +219,7 @@ public class DashBoardActivityControllerTest
     public void testLoadRecent_Failed_WithControlledException()
     {
         PowerMockito.mockStatic(RealmContactTransactions.class);
-        Mockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(null);
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
@@ -232,15 +232,15 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions.class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        Mockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChat());
-        Mockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), any(String.class)))
+        PowerMockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), any(String.class)))
                 .thenReturn(MockDataForTests.getMockUserProfile());
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_1));
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_2));
-        Mockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockRecentContactsList_OnlyOneGroupChat());
 
 
@@ -279,15 +279,15 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        Mockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChat());
-        Mockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
+        PowerMockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
                 .thenReturn(MockDataForTests.getMockUserProfile());
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_1));
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_2));
-        Mockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockRecentContactsList_OneRecent_ActionCall());
 
 
@@ -314,15 +314,15 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        Mockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChat());
-        Mockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
+        PowerMockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
                 .thenReturn(MockDataForTests.getMockUserProfile());
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_1));
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_2));
-        Mockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockRecentContactsList_OneRecent_ActionSMS_MyComms());
 
 
@@ -349,15 +349,15 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        Mockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChat());
-        Mockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
+        PowerMockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
                 .thenReturn(MockDataForTests.getMockUserProfile());
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_1));
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_2));
-        Mockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockRecentContactsList_OneRecent_ActionSMS_Global());
 
 
@@ -384,15 +384,15 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        Mockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChat());
-        Mockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
+        PowerMockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
                 .thenReturn(MockDataForTests.getMockUserProfile());
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_1));
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_2));
-        Mockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockRecentContactsList_OneRecent_ActionEMAIL());
 
 
@@ -424,15 +424,15 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        Mockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(null);
-        Mockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
+        PowerMockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
                 .thenReturn(null);
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
                 .thenReturn(null);
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
                 .thenReturn(null);
-        Mockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(null);
 
 
@@ -450,15 +450,15 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        Mockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChat_WithWrongData());
-        Mockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
+        PowerMockito.when(RealmContactTransactions.getUserProfile(any(Realm.class), anyString()))
                 .thenReturn(MockDataForTests.getMockUserProfile());
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_1), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_1));
-        Mockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getContactById(eq(mockContactId_2), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContactById(mockContactId_2));
-        Mockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
+        PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockRecentContactsList_WithWrongData());
 
 
@@ -478,9 +478,9 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.hashMapRecentIdView = new HashMap<>();
         this.mDashBoardActivityController.hashMapRecentIdView.put(view, MockDataForTests.getMockRecentContactsList_OnlyOneGroupChat().get(0));
 
-        RealmGroupChatTransactions mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions.class);
+        PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         RealmChatTransactions mChatTransactions = Mockito.mock(RealmChatTransactions.class);
-        Mockito.when(mRealmGroupChatTransactions
+        PowerMockito.when(RealmGroupChatTransactions
                 .getGroupChatPendingMessagesCount(any(String.class), any(Realm.class))).thenReturn((long) 5);
         Mockito.when(mChatTransactions
                 .getChatPendingMessagesCount(any(String.class), any(Realm.class))).thenReturn((long) 5);
@@ -525,10 +525,10 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.hashMapRecentIdView = new HashMap<>();
         this.mDashBoardActivityController.hashMapRecentIdView.put(view, MockDataForTests.getMockRecentContactsList_OnlyOneGroupChat().get(0));
 
-        this.mDashBoardActivityController.mRealmGroupChatTransactionsRecents = Mockito.mock(RealmGroupChatTransactions.class);
+        PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         this.mDashBoardActivityController.mRealmChatTransactionsRecents = Mockito.mock(RealmChatTransactions.class);
-        Mockito.doReturn(amountMessages).when(this.mDashBoardActivityController.mRealmGroupChatTransactionsRecents)
-                .getGroupChatPendingMessagesCount(eq("mg_55dc2a35a297b90a726e4cc2"), any(Realm.class));
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatPendingMessagesCount(eq("mg_55dc2a35a297b90a726e4cc2"), any(Realm.class)))
+                .thenReturn(amountMessages);
         Mockito.doReturn(amountMessages).when(this.mDashBoardActivityController.mRealmChatTransactionsRecents)
                 .getChatPendingMessagesCount(anyString(), any(Realm.class));
     }

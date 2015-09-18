@@ -481,7 +481,7 @@ public class RealmGroupChatTransactions
         }
     }
 
-    public long getGroupChatPendingMessagesCount(String groupId, Realm realm)
+    public static long getGroupChatPendingMessagesCount(String groupId, Realm realm)
     {
         if(groupId==null || _profile_id==null) return 0;
 

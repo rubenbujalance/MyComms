@@ -25,7 +25,8 @@
 
     <LinearLayout
         style="@style/ContactDetailPlusLinear"
-        android:background="@android:color/transparent">
+        android:background="@android:color/transparent"
+        android:layout_marginTop="20dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -77,7 +78,8 @@
     <LinearLayout
         android:id="@+id/layout_phone"
         style="@style/ContactDetailPlusLinear"
-        android:weightSum="5">
+        android:weightSum="5"
+        android:layout_marginTop="20dp">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -92,16 +94,29 @@
                 style="@style/ContactDetailPlusTextValue"
                 tools:text="(481) 516 2342"/>
         </LinearLayout>
-        <ImageView
-            android:id="@+id/btn_prof_chat"
-            android:layout_weight="1"
-            style="@style/ContactDetailPlusIcon"
-            android:src="@drawable/btn_chat_white"/>
-        <ImageView
-            android:id="@+id/btn_prof_phone"
-            android:layout_weight="1"
-            style="@style/ContactDetailPlusIcon"
-            android:src="@drawable/btn_phone_white"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:layout_weight="2"
+            >
+            <ImageView
+                android:id="@+id/btn_prof_chat"
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:src="@drawable/btn_chat_white"/>
+            <ImageView
+                android:id="@+id/btn_prof_phone"
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:src="@drawable/btn_phone_white"
+                android:layout_marginLeft="25dp"
+                android:layout_marginStart="25dp"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -123,13 +138,20 @@
                 style="@style/ContactDetailPlusTextValue"
                 tools:text="black_widow_00@avengers.com"/>
         </LinearLayout>
-        <ImageView
-            android:id="@+id/btn_prof_email"
-            android:layout_weight="1"
-            style="@style/ContactDetailPlusIcon"
-            android:paddingRight="12dp"
-            android:paddingEnd="12dp"
-            android:src="@drawable/btn_email_white"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="end"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <ImageView
+                android:id="@+id/btn_prof_email"
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:src="@drawable/btn_email_white"/>
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -151,10 +173,19 @@
                 style="@style/ContactDetailPlusTextValue"
                 tools:text="Stark Tower\n5th Avenue New York"/>
         </LinearLayout>
-        <ImageView
-            android:layout_weight="1"
-            style="@style/ContactDetailPlusIcon"
-            android:src="@drawable/btn_location_white"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="end"
+            android:orientation="vertical"
+            android:layout_weight="1">
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:src="@drawable/btn_location_white"/>
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

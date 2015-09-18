@@ -8,16 +8,19 @@
     <LinearLayout
         android:id="@+id/back_area"
         android:orientation="horizontal"
-        android:layout_width="55dp"
-        android:layout_height="55dp">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp"
+        android:paddingRight="10dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="10dp">
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="34dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
             android:id="@+id/ivBtBack"
-            android:src="@drawable/icon_left_white"
+            android:src="@drawable/ic_cancel_and_exit"
             android:focusable="false" />
     </LinearLayout>
 
@@ -36,8 +39,10 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/contact_info_container"
-        android:layout_centerHorizontal="true">
+        android:layout_below="@+id/back_area"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/contact_actions_container">
 
         <com.vodafone.mycomms.custom.CircleImageView
             android:id="@+id/avatar"
@@ -61,7 +66,7 @@
         <ImageView
             android:id="@+id/empty_constellation"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="218dp"
             android:src="@drawable/profile_ellipse"
             android:padding="10dp"
             android:layout_alignParentTop="true"
@@ -106,64 +111,65 @@
         android:layout_width="match_parent"
         android:background="@drawable/round_border_white_transparent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/details_container"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginBottom ="0dp"
-        android:layout_marginTop="39dp"
-        android:id="@+id/contact_info_container">
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/contact_actions_container"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="13dp"
+        android:layout_marginStart="13dp"
+        android:layout_marginRight="13dp"
+        android:layout_marginEnd="13dp"
+        android:id="@+id/contact_info_container"
+        >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="12dp"
+            android:paddingStart="12dp"
+            android:paddingRight="12dp"
+            android:paddingEnd="12dp"
             android:orientation="vertical">
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginTop="10dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <TextView
                     style="@style/ContactDetailInfoTextView"
                     android:layout_width="wrap_content"
                     android:id="@+id/contact_contact_name"
-                    android:textSize="24sp"
+                    android:textSize="18sp"
                     tools:text="James Bond"
                     fontPath="fonts/SourceSansPro-Semibold.ttf"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"/>
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:id="@+id/btFavourite"
                     android:src="@mipmap/icon_favorite_colour"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:paddingBottom="8dp"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/contact_contact_name"
-                    android:layout_toEndOf="@+id/contact_contact_name"/>
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"/>
             </RelativeLayout>
 
             <TextView
                 style="@style/ContactDetailInfoTextView"
                 android:id="@+id/contact_position"
-                android:textSize="15sp"
-                tools:text="Secret Agent"/>
+                android:textSize="13sp"
+                tools:text="Secret Agent"
+                android:gravity="center"/>
             <TextView
                 style="@style/ContactDetailInfoTextView"
                 android:id="@+id/contact_company"
-                android:textSize="15sp"
-                tools:text="MI6"/>
+                android:textSize="13sp"
+                tools:text="MI6"
+                android:gravity="center"/>
             <TextView
                 style="@style/ContactDetailInfoTextView"
                 android:id="@+id/contact_office_location"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 tools:text="London UK"/>
         </LinearLayout>
         <TableRow
@@ -173,7 +179,7 @@
             android:gravity="center_vertical"
             android:weightSum="3">
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/border_white_transparent"
                 android:orientation="vertical"
@@ -181,20 +187,21 @@
                 android:paddingBottom="6dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginEnd="2dp"
+                android:gravity="center_horizontal"
                 android:layout_weight="1">
                 <TextView
                     style="@style/ContactLocationDetailInfoTextView"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:text="@string/contact_current_location"/>
                 <TextView
                     style="@style/ContactLocationDetailInfoTextView"
                     android:id="@+id/contact_country"
-                    android:textSize="15sp"
+                    android:textSize="13sp"
                     fontPath="fonts/SourceSansPro-Semibold.ttf"
                     tools:text="Macau"/>
             </LinearLayout>
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:background="@drawable/border_white_transparent"
@@ -202,61 +209,67 @@
                 android:paddingBottom="6dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginEnd="2dp"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:gravity="center_horizontal">
                 <TextView
                     style="@style/ContactLocationDetailInfoTextView"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:text="@string/contact_last_seen"/>
                 <TextView
                     style="@style/ContactLocationDetailInfoTextView"
-                    android:textSize="15sp"
+                    android:textSize="13sp"
                     android:id="@+id/contact_last_seen"
                     fontPath="fonts/SourceSansPro-Semibold.ttf"
                     tools:text="21h ago"/>
             </LinearLayout>
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/border_white_transparent"
                 android:paddingTop="6dp"
                 android:paddingBottom="6dp"
+                android:paddingLeft="4dp"
+                android:paddingStart="4dp"
+                android:paddingRight="4dp"
+                android:paddingEnd="4dp"
                 android:orientation="vertical"
-                android:layout_weight="1">
-                <RelativeLayout
+                android:layout_weight="1"
+                android:gravity="center_horizontal">
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
                     <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:id="@+id/ivStatus"
-                        android:src="@mipmap/icon_moon_white"
-                        android:paddingBottom="8dp"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"/>
-                    <TextView
-                        style="@style/ContactLocationDetailInfoTextView"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:src="@mipmap/icon_moon_white" />
+                    <LinearLayout
                         android:layout_width="wrap_content"
-                        android:textSize="12sp"
-                        android:text="@string/contact_current_time"
-                        android:id="@+id/textView18"
-                        android:layout_toRightOf="@+id/ivStatus"
-                        android:layout_toEndOf="@+id/ivStatus"
-                        />
-                    <TextView
-                        style="@style/ContactLocationDetailInfoTextView"
-                        android:layout_width="wrap_content"
-                        android:textSize="15sp"
-                        tools:text="01:50"
-                        android:maxLines="1"
-                        fontPath="fonts/SourceSansPro-Semibold.ttf"
-                        android:id="@+id/contact_local_time"
-                        android:layout_below="@+id/textView18"
-                        android:layout_alignLeft="@+id/textView18"
-                        android:layout_alignStart="@+id/textView18"
-                        android:layout_marginLeft="6dp"
-                        android:layout_marginStart="6dp"/>
-                </RelativeLayout>
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal">
+                        <TextView
+                            style="@style/ContactLocationDetailInfoTextView"
+                            android:layout_width="wrap_content"
+                            android:textSize="11sp"
+                            android:text="@string/contact_current_time"
+                            android:id="@+id/textView18"
+                            />
+                        <TextView
+                            style="@style/ContactLocationDetailInfoTextView"
+                            android:layout_width="wrap_content"
+                            android:textSize="13sp"
+                            tools:text="01:50"
+                            android:maxLines="1"
+                            fontPath="fonts/SourceSansPro-Semibold.ttf"
+                            android:id="@+id/contact_local_time"/>
+                    </LinearLayout>
+
+                </LinearLayout>
             </LinearLayout>
 
         </TableRow>
@@ -267,7 +280,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"

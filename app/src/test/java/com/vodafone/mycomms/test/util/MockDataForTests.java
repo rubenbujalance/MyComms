@@ -487,6 +487,11 @@ public class MockDataForTests
                 "\"email\": \"vdf01@stratesys-ts.com\"\n" +
                 "}\n" +
                 "]");
+        mockContact.setPresence
+                ("{\n" +
+                "\"icon\": \"mockIcon\"\n," +
+                "\"detail\": \"#LOCAL_TIME#\"\n" +
+                "}");
         mockContact.setCompany("Stratesys");
         mockContact.setPosition("Senior Developer Consultant");
         mockContact.setOfficeLocation("Barcelona");
@@ -831,7 +836,10 @@ public class MockDataForTests
         mockContact.setId("mc_5570340e7eb7c3512f2f9bf2");
         mockContact.setPlatform("mc");
         mockContact.setLastSeen(123456);
-        mockContact.setPresence("mockPresence");
+        mockContact.setPresence("{\n" +
+                "\"icon\": \"mockIcon\"\n," +
+                "\"detail\": \"#LOCAL_TIME#\"\n" +
+                "}");
         mockContact.setCountry("ESP");
         mockContact.setTimezone("mockTimeZone");
         mockContact.setPosition("mockPosition");

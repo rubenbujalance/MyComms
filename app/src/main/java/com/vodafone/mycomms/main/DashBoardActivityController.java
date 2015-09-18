@@ -99,7 +99,7 @@ public class DashBoardActivityController
             LayoutInflater inflater = LayoutInflater.from(mActivity);
             currentRecentContainer.removeAllViews();
 
-            recentList = mRealmContactTransactions.getAllRecentContacts(mRealm);
+            recentList = RealmContactTransactions.getAllRecentContacts(mRealm);
             this.numberOfRecentContacts = recentList.size();
             for (RecentContact contact: recentList)
             {
@@ -195,7 +195,7 @@ public class DashBoardActivityController
             this.recentContact = recentContact;
             this.groupChatId = groupChatId;
 
-            GroupChat groupChat = mRealmGroupChatTransactions.getGroupChatById(groupChatId, mRealm);
+            GroupChat groupChat = RealmGroupChatTransactions.getGroupChatById(groupChatId, mRealm);
             if(null != groupChat && null != groupChat.getMembers() && !groupChat.getMembers().isEmpty())
             {
                 this.contactId = groupChat.getMembers();

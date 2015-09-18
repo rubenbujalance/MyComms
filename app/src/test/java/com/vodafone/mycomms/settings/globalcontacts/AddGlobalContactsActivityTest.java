@@ -23,6 +23,7 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
 import com.vodafone.mycomms.test.util.Util;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -77,6 +78,15 @@ public class AddGlobalContactsActivityTest {
         tvError = (TextView)activity.findViewById(R.id.tvError);
 
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            if (webServer != null) webServer.shutdown();
+        } catch (Exception e) {}
     }
 
     @Test
@@ -182,7 +192,7 @@ public class AddGlobalContactsActivityTest {
                         .replace("mockUrl", "http://localhost:12345")));
 
         btAddAccount.performClick();
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
@@ -197,7 +207,7 @@ public class AddGlobalContactsActivityTest {
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse().setResponseCode(500));
         btAddAccount.performClick();
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
@@ -213,7 +223,7 @@ public class AddGlobalContactsActivityTest {
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse().setResponseCode(401));
         btAddAccount.performClick();
-        Thread.sleep(3000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
@@ -252,7 +262,7 @@ public class AddGlobalContactsActivityTest {
                                 .replace("mockUrl", "http://localhost:12345")));
 
         btAddAccount.performClick();
-        Thread.sleep(4000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
@@ -274,7 +284,7 @@ public class AddGlobalContactsActivityTest {
                 .setResponseCode(401));
 
         btAddAccount.performClick();
-        Thread.sleep(4000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
@@ -296,7 +306,7 @@ public class AddGlobalContactsActivityTest {
                 .setResponseCode(500));
 
         btAddAccount.performClick();
-        Thread.sleep(4000);
+        Thread.sleep(2000);
         Robolectric.flushForegroundThreadScheduler();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
@@ -327,7 +337,7 @@ public class AddGlobalContactsActivityTest {
         sp.edit().putString(
                 com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF,
                 Constants.PROFILE_ID)
-                .commit();
+                .apply();
 
         btAddAccount.performClick();
         Thread.sleep(2000);
@@ -341,8 +351,16 @@ public class AddGlobalContactsActivityTest {
     }
 
     @Test
-    public void testOK() throws Exception {
-        webServer = Util.newWebMockServer();
+    public void testOK()
+    {
+        try {
+            webServer = Util.newWebMockServer();
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+
         String serverUrl = webServer.getUrl("/").toString();
         PowerMockito.mockStatic(EndpointWrapper.class);
 
@@ -391,13 +409,19 @@ public class AddGlobalContactsActivityTest {
         sp.edit().putString(
                 com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF,
                 Constants.PROFILE_ID)
-                .commit();
+                .apply();
 
         //Execute
         layoutErrorBar.setVisibility(View.VISIBLE);
         btAddAccount.performClick();
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
-        Thread.sleep(4000);
+        try {
+            Thread.sleep(2000);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
         Robolectric.flushForegroundThreadScheduler();
 
         Assert.assertTrue(activity.isFinishing());

@@ -86,6 +86,7 @@ public class AddGlobalContactsActivityTest {
         //Try to shutdown server if it was started
         try {
             if (webServer != null) webServer.shutdown();
+            Robolectric.reset();
         } catch (Exception e) {}
     }
 

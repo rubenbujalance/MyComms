@@ -69,7 +69,7 @@ public class SignupNameActivityTest {
 
         activity = Robolectric.buildActivity(SignupNameActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

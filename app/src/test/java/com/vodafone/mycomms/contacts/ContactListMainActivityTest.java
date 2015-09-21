@@ -71,7 +71,7 @@ public class ContactListMainActivityTest
 
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -91,7 +91,7 @@ public class ContactListMainActivityTest
 
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -124,7 +124,7 @@ public class ContactListMainActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -143,7 +143,7 @@ public class ContactListMainActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -162,7 +162,7 @@ public class ContactListMainActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -181,7 +181,7 @@ public class ContactListMainActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -200,7 +200,7 @@ public class ContactListMainActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -219,7 +219,7 @@ public class ContactListMainActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.MOBILE_CONNECTED);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

@@ -54,7 +54,7 @@ public class SignupCompanyActivityTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         activity = Robolectric.buildActivity(SignupCompanyActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

@@ -110,7 +110,7 @@ public class RecentContactsControllerTest
                 .getSupportFragmentManager().findFragmentByTag("1");
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -153,7 +153,7 @@ public class RecentContactsControllerTest
         mockParams();
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -201,7 +201,7 @@ public class RecentContactsControllerTest
         mockParams();
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -249,7 +249,7 @@ public class RecentContactsControllerTest
         mockParams();
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -297,7 +297,7 @@ public class RecentContactsControllerTest
         mockParams();
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

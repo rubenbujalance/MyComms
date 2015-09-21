@@ -75,7 +75,7 @@ public class SignupPincodeActivityTest {
 
         activity = Robolectric.buildActivity(SignupPincodeActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

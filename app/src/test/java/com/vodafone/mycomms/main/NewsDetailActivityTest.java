@@ -108,7 +108,7 @@ public class NewsDetailActivityTest
                 .resume()
                 .get();
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
 
         TextView title = (TextView) mActivity.findViewById(R.id.title);
@@ -140,7 +140,7 @@ public class NewsDetailActivityTest
                 .resume()
                 .get();
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
 
         TextView title = (TextView) mActivity.findViewById(R.id.title);
@@ -172,7 +172,7 @@ public class NewsDetailActivityTest
                 .resume()
                 .get();
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         ImageView ivBtBack = (ImageView)mActivity.findViewById(R.id.btn_back);
         ivBtBack.performClick();
 
@@ -195,7 +195,7 @@ public class NewsDetailActivityTest
                 .resume()
                 .get();
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         mActivity.onBackPressed();
         Assert.assertTrue(mActivity.isFinishing());
     }

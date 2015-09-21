@@ -60,7 +60,7 @@ public class RealmLDAPSettingsTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
     }

@@ -136,7 +136,7 @@ public class ContactsControllerTest{
                 .getSupportFragmentManager().findFragmentByTag("2");
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -177,7 +177,7 @@ public class ContactsControllerTest{
                 .getSupportFragmentManager().findFragmentByTag("2");
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -228,7 +228,7 @@ public class ContactsControllerTest{
         mockParams();
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -272,7 +272,7 @@ public class ContactsControllerTest{
         mockParams();
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

@@ -53,7 +53,7 @@ public class OAuthActivityTest {
         incomingIntent.putExtra("oauth", "sf");
         activity = Robolectric.buildActivity(OAuthActivity.class).withIntent(incomingIntent).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

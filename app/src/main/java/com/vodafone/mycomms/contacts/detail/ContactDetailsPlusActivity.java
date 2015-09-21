@@ -15,7 +15,6 @@ import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
-import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;

@@ -1,130 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:orientation="vertical" android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:weightSum="1"
-              android:filterTouchesWhenObscured="false"
-              android:paddingLeft="10dp"
-              android:paddingRight="10dp"
-              android:paddingTop="15dp"
-              android:background="@color/grey_profile_background"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:baselineAligned="false"
+    android:background="@color/white"
     >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="22sp"
-        android:layout_gravity="center"
-        android:text="@string/settings_vacation_time_activity_title"/>
-
-    <LinearLayout
+    <!-- Header -->
+    <RelativeLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="left"
-        android:layout_marginBottom="20dp"
-        android:layout_gravity="left">
+        android:layout_height="?actionBarSize"
+        android:id="@+id/topHeader" >
 
-    </LinearLayout>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/header_berlin_blur"
+            android:focusable="false"
+            android:tint="@color/header_background_darken"
+            android:tintMode="src_over"
+            android:scaleType="centerCrop"/>
 
+        <LinearLayout
+            android:id="@+id/back_area"
+            android:orientation="horizontal"
+            android:layout_width="60dp"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:id="@+id/ivBtBack"
+                android:src="@drawable/icon_left_white"
+                android:focusable="false"
+                android:adjustViewBounds="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_gravity="center_vertical"/>
+        </LinearLayout>
+
+        <TextView
+            style="@style/ActionBar.TitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="22sp"
+            android:text="@string/settings_vacation_time_activity_title"/>
+    </RelativeLayout>
+
+    <!-- Body -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@color/white"
         android:orientation="vertical">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="20dp">
-
-        <Switch
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/settings_switch_label_schedule"
-            android:id="@+id/switch_vacation_time"
-            android:checked="true"
-            android:enabled="true" />
-    </LinearLayout>
-    </LinearLayout>
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:id = "@+id/settings_textview_vacation_time"
-        android:text="@string/settings_vacation_time_text"
-        >
-
-    </TextView>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/vacation_time_starts_layout"
-        android:layout_marginTop="10dp"
-        android:background="@color/white"
-        android:visibility="gone">
-
+        <!-- Switch -->
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView11"
-                android:text="@string/settings_label_vacation_time_starts"
-                android:autoText="false" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:text="Jun, 10, 2015"
-                android:id="@+id/vacation_setter_vacation_date_starts_text"
-                android:gravity="right" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@color/white"
-        android:orientation="vertical"
-        android:id = "@+id/vacation_time_ends_layout">
-
-        <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:layout_height="60dp"
+            android:paddingLeft="20dp"
+            android:paddingStart="20dp"
+            android:paddingRight="20dp"
+            android:paddingEnd="20dp"
+            android:gravity="center"
+            >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/settings_label_vacation_time_ends"
-                android:id="@+id/textView5"
-                android:autoText="false" />
-
-            <TextView
+            <Switch
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="Jun, 10, 2015"
-                android:id="@+id/vacation_setter_vacation_date_ends_text"
-                android:gravity="right"
-                />
+                android:text="@string/settings_switch_label_schedule"
+                android:id="@+id/switch_vacation_time"
+                android:checked="true"
+                android:enabled="true"
+                android:layout_gravity="end"/>
+        </LinearLayout>
+
+        <!-- separator-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/profile_lay_separator" />
+
+        <!-- Explanation text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:id = "@+id/settings_textview_vacation_time"
+            android:text="@string/settings_vacation_time_text"
+            >
+
+        </TextView>
+
+        <!-- Start date -->
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:id="@+id/vacation_time_starts_layout"
+            android:visibility="gone"
+            android:gravity="bottom">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingLeft="20dp"
+                android:paddingStart="20dp"
+                android:paddingRight="20dp"
+                android:paddingEnd="20dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView11"
+                    android:text="@string/settings_label_vacation_time_starts"
+                    android:enabled="true"
+                    android:textColor="#000000"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Jun, 10, 2015"
+                    android:id="@+id/vacation_setter_vacation_date_starts_text"
+                    android:gravity="right" />
+            </LinearLayout>
+
+            <!-- start date separator-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/profile_lay_separator"
+                android:visibility="visible"/>
+        </LinearLayout>
+
+        <!-- End date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="vertical"
+            android:gravity="bottom"
+            android:id = "@+id/vacation_time_ends_layout">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp"
+                android:paddingStart="20dp"
+                android:paddingRight="20dp"
+                android:paddingEnd="20dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_label_vacation_time_ends"
+                    android:id="@+id/textView5"
+                    android:enabled="true"
+                    android:textColor="#000000"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Jun, 10, 2015"
+                    android:id="@+id/vacation_setter_vacation_date_ends_text"
+                    android:gravity="right"
+                    />
+            </LinearLayout>
+
+            <!-- end date separator-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/profile_lay_separator" />
+
         </LinearLayout>
 
     </LinearLayout>
-
 </LinearLayout>

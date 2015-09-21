@@ -158,9 +158,9 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <style name="ActionBar.TitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+    <style name="ActionBar.TitleText" parent="">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:gravity">center</item>
     </style>
 

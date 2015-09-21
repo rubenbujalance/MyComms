@@ -219,7 +219,7 @@
     <!-- Settings and Profile-->
     <string name="settings_vacation_time_activity_title">"Vacation Time"</string>
     <string name="settings_switch_label_schedule">"Schedule"</string>
-    <string name="settings_vacation_time_text"> Scheduling Vacation Time will ask that you set the start and end dates for your vacation. At the time of your return trip your status will return to normal. </string>
+    <string name="settings_vacation_time_text"> Scheduling Vacation Time will ask that you set the end date for your vacation. At the time of your return trip your status will return to normal. </string>
     <string name="settings_label_vacation_time_starts">Starts</string>
     <string name="settings_label_vacation_time_ends">Ends</string>
     <string name="settings_label_vacation_time_not_set">Not Set</string>

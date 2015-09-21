@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -103,6 +104,14 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
                 ((Switch)VacationTimeSetterActivity.this.findViewById(R.id.switch_vacation_time)).setChecked(false);
             }
         }
+
+        LinearLayout btBackArea = (LinearLayout)findViewById(R.id.back_area);
+        btBackArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override

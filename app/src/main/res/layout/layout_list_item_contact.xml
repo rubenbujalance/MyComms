@@ -31,8 +31,8 @@
             <include
                 android:id="@+id/layout_list_item_image"
                 layout="@layout/layout_list_item_image"
-                android:layout_width="wrap_content"
-                android:layout_height = "wrap_content"
+                android:layout_width="60dp"
+                android:layout_height = "60dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_gravity="center"

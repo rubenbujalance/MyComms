@@ -96,7 +96,7 @@ public class ContactListFragment extends ListFragment {
         emptyText = (TextView) v.findViewById(android.R.id.empty);
         searchView = (EditText) v.findViewById(R.id.et_search);
 
-
+        listView.addFooterView(new View(getActivity()), null, true);
 
         addGlobalContactsContainer = (RelativeLayout) v.findViewById(R.id.add_global_contacts_container);
 

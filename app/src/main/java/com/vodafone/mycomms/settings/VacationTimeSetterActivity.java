@@ -112,6 +112,14 @@ public class VacationTimeSetterActivity extends FragmentActivity
                 ((Switch)VacationTimeSetterActivity.this.findViewById(R.id.switch_vacation_time)).setChecked(false);
             }
         }
+
+        LinearLayout btBackArea = (LinearLayout)findViewById(R.id.back_area);
+        btBackArea.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override

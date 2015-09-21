@@ -116,7 +116,7 @@ public class FavouriteContactControllerTest
                 .getSupportFragmentManager().findFragmentByTag("0");
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -155,7 +155,7 @@ public class FavouriteContactControllerTest
         mockParams();
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

@@ -56,7 +56,7 @@ public class SignupPassActivityTest {
 
         activity = Robolectric.buildActivity(SignupPassActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

@@ -69,7 +69,7 @@ public class LoginActivityTest {
 
         activity = Robolectric.buildActivity(LoginActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -99,7 +99,7 @@ public class LoginActivityTest {
         etPassword.setText(PASSWORD);
         btLogin.performClick();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -124,7 +124,7 @@ public class LoginActivityTest {
         etPassword.setText(PASSWORD);
         btLogin.performClick();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -150,7 +150,7 @@ public class LoginActivityTest {
         etPassword.setText(PASSWORD);
         btLogin.performClick();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -185,7 +185,7 @@ public class FavouriteController  extends BaseController {
         BusProvider.getInstance().post(new SetContactListAdapterEvent());
     }
 
-    public boolean contactIsFavourite(String contactId)
+    public static boolean contactIsFavourite(String contactId)
     {
         return RealmContactTransactions.favouriteContactIsInRealm(contactId, null);
     }

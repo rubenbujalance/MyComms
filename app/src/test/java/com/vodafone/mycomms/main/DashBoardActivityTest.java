@@ -103,7 +103,7 @@ public class DashBoardActivityTest
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
 
         LinearLayout layConnectionAvailable = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
@@ -121,7 +121,7 @@ public class DashBoardActivityTest
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
 
         LinearLayout layConnectionAvailable = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
@@ -135,7 +135,7 @@ public class DashBoardActivityTest
     public void testInitAllBtnMagnifierOnClick() throws Exception
     {
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
 
         ImageView btMagnifier = (ImageView) mActivity.findViewById(R.id.magnifier);
@@ -154,7 +154,7 @@ public class DashBoardActivityTest
     {
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
 
         LinearLayout btFavourite = (LinearLayout) mActivity.findViewById(R.id.LayoutFavourite);
@@ -172,7 +172,7 @@ public class DashBoardActivityTest
     {
         sp.edit().putBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, true).apply();
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
 
         org.junit.Assert.assertTrue(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false));
@@ -306,7 +306,7 @@ public class DashBoardActivityTest
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -317,7 +317,7 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -350,7 +350,7 @@ public class DashBoardActivityTest
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -361,7 +361,7 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -393,7 +393,7 @@ public class DashBoardActivityTest
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -404,7 +404,7 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -437,7 +437,7 @@ public class DashBoardActivityTest
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {
@@ -448,7 +448,7 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

@@ -53,7 +53,7 @@ public class ForgotPassActivityTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         activity = Robolectric.buildActivity(ForgotPassActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         }
         catch (Exception e)
         {

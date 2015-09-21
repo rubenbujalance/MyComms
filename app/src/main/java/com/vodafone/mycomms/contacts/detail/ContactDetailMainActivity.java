@@ -74,6 +74,7 @@ public class ContactDetailMainActivity extends ToolbarActivity{
     private ImageView btnPhone;
     private ImageView btnCalendar;
     private ImageView btFavourite;
+    private  LinearLayout detailsContainer;
 
     private FavouriteController favouriteController;
 
@@ -110,6 +111,7 @@ public class ContactDetailMainActivity extends ToolbarActivity{
 
         mProfileId = Utils.getProfileId(this);
 
+        new RealmContactTransactions(mProfileId);
         mRecentContactController = new RecentContactController(this, mProfileId);
         new ContactsController(mProfileId, ContactDetailMainActivity.this);
 
@@ -144,7 +146,7 @@ public class ContactDetailMainActivity extends ToolbarActivity{
         btnCalendar = (ImageView)findViewById(R.id.btn_prof_calendar);
         btFavourite = (ImageView)findViewById(R.id.btFavourite);
 
-        LinearLayout detailsContainer = (LinearLayout) findViewById(R.id.details_container);
+        detailsContainer = (LinearLayout) findViewById(R.id.details_container);
 
         detailsContainer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,7 +265,7 @@ public class ContactDetailMainActivity extends ToolbarActivity{
         //Initialization of favourite icon
         favouriteController = new FavouriteController(ContactDetailMainActivity.this, mProfileId);
 
-        if (favouriteController.contactIsFavourite(contactId)) {
+        if (FavouriteController.contactIsFavourite(contactId)) {
             Drawable imageStar = getResources().getDrawable(imageStarOn);
             btFavourite.setImageDrawable(imageStar);
             btFavourite.setTag("icon_favorite_colour");
@@ -289,6 +291,8 @@ public class ContactDetailMainActivity extends ToolbarActivity{
                 favouriteController.manageFavourite(contactId);
             }
         });
+
+
 
         ImageView ivBtBack = (ImageView)findViewById(R.id.ivBtBack);
         ivBtBack.setOnClickListener(new View.OnClickListener() {
@@ -337,22 +341,26 @@ public class ContactDetailMainActivity extends ToolbarActivity{
 
     private String[] loadContactExtra() {
 
-        String contactDetail[] = new String[10];
+        if(null != contact)
+        {
+            String contactDetail[] = new String[10];
 
-        contactDetail[0] = contact.getFirstName();
-        contactDetail[1] = contact.getLastName();
+            contactDetail[0] = contact.getFirstName();
+            contactDetail[1] = contact.getLastName();
 
-        contactDetail[2] = contact.getPhones();
-        contactDetail[3] = contact.getEmails();
+            contactDetail[2] = contact.getPhones();
+            contactDetail[3] = contact.getEmails();
 
-        contactDetail[4] = contact.getOfficeLocation();
-        contactDetail[5] = contact.getPosition();
-        contactDetail[6] = contact.getAvatar();
-        contactDetail[7] = contact.getPlatform();
-        contactDetail[8] = contact.getContactId();
-        contactDetail[9] = contact.getStringField1(); //SFAvatar
-
-        return contactDetail;
+            contactDetail[4] = contact.getOfficeLocation();
+            contactDetail[5] = contact.getPosition();
+            contactDetail[6] = contact.getAvatar();
+            contactDetail[7] = contact.getPlatform();
+            contactDetail[8] = contact.getContactId();
+            contactDetail[9] = contact.getStringField1(); //SFAvatar
+            return contactDetail;
+        }
+        else
+            return null;
     }
 
     private void setButtonsVisibility()

@@ -89,7 +89,7 @@ public class DashBoardActivityControllerTest
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         this.sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
         this.mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().visible().get();
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         this.mDashBoardActivityController = this.mActivity.mDashBoardActivityController;
         mockParams();
     }
@@ -114,7 +114,7 @@ public class DashBoardActivityControllerTest
 
         this.mDashBoardActivityController.loadNews();
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
 
         LinearLayout container = (LinearLayout) mActivity.findViewById(R.id.list_news);
         LayoutInflater inflater = LayoutInflater.from(this.mActivity);
@@ -247,7 +247,7 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         try
         {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
             Robolectric.flushForegroundThreadScheduler();
         }
         catch (Exception e)
@@ -292,7 +292,7 @@ public class DashBoardActivityControllerTest
 
 
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
         Robolectric.flushBackgroundThreadScheduler();
 
@@ -327,7 +327,7 @@ public class DashBoardActivityControllerTest
 
 
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
         Robolectric.flushBackgroundThreadScheduler();
 
@@ -362,7 +362,7 @@ public class DashBoardActivityControllerTest
 
 
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         Robolectric.flushForegroundThreadScheduler();
         Robolectric.flushBackgroundThreadScheduler();
 
@@ -398,7 +398,7 @@ public class DashBoardActivityControllerTest
 
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -437,7 +437,7 @@ public class DashBoardActivityControllerTest
 
 
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-        Thread.sleep(1000);
+        Thread.sleep(3000);
 
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
     }
@@ -463,7 +463,7 @@ public class DashBoardActivityControllerTest
 
 
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-        Thread.sleep(1000);
+        Thread.sleep(3000);
 
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts != 0);
     }
@@ -487,7 +487,7 @@ public class DashBoardActivityControllerTest
 
         this.mDashBoardActivityController.loadUnreadMessages(this.mDashBoardActivityController.mRecentContainer);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
             Log.e(Constants.TAG, "DashBoardActivityControllerTest.testLoadUnreadMessages_GroupChat_OK_MoreThan0Messages: ", e);
@@ -506,7 +506,7 @@ public class DashBoardActivityControllerTest
         mockUnreadMessages(amountMessages);
 
         this.mDashBoardActivityController.loadUnreadMessages(this.mDashBoardActivityController.mRecentContainer);
-        Thread.sleep(1000);
+        Thread.sleep(3000);
 
         View view = this.mDashBoardActivityController.mRecentContainer.getChildAt(0);
         ImageView typeRecent = (ImageView) view.findViewById(R.id.type_recent);

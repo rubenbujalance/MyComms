@@ -2,7 +2,6 @@ package com.vodafone.mycomms.settings;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vodafone.mycomms.BuildConfig;
@@ -15,8 +14,6 @@ import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 public class AboutActivity  extends ToolbarActivity {
-    private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
-    private LinearLayout noConnectionLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,8 +25,6 @@ public class AboutActivity  extends ToolbarActivity {
                 );
         BusProvider.getInstance().register(this);
         setContentView(R.layout.layout_about);
-        ;
-        noConnectionLayout = (LinearLayout) findViewById(R.id.no_connection_layout);
         TextView textVersion = (TextView) findViewById(R.id.text_version);
         textVersion.setText(getResources().getString(R.string.about_version) + BuildConfig.VERSION_NAME);
         TextView textBuild = (TextView) findViewById(R.id.text_build);

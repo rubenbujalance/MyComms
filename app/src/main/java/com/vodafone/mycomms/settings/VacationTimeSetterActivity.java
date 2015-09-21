@@ -14,15 +14,19 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.connection.IConnectionCallback;
 import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.util.OKHttpWrapper;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
 import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -32,13 +36,13 @@ import java.util.HashMap;
 /**
  * Created by str_vig on 10/06/2015.
  */
-public class VacationTimeSetterActivity extends FragmentActivity implements IConnectionCallback {
+public class VacationTimeSetterActivity extends FragmentActivity
+{
     private MyCommsDatePickerFragment datePickerFragment;
     public static final String EXTRA_HOLIDAY_END_DATE = "EXTRA_VACATION_TIME_ID";
     private String holidayEndDate = "";
     private String initialHolidayEndDate = "";
-
-    private ProfileController profileController;
+    private LinearLayout lay_no_connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +54,12 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
                 );
         setContentView(R.layout.activity_vacation_time);
 
-        profileController = new ProfileController(this);
-        profileController.setConnectionCallback(this);
+        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
+
+        if(Utils.isConnected(VacationTimeSetterActivity.this))
+            lay_no_connection.setVisibility(View.GONE);
+        else
+            lay_no_connection.setVisibility(View.VISIBLE);
 
         Switch vacationTimeSwitch = (Switch) findViewById(R.id.switch_vacation_time);
         vacationTimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -152,17 +160,11 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
 
     public void updateHolidayData(){
         Log.d(Constants.TAG, "VacationTimeSetterActivity.updateHolidayData: ");
-
-        //RBM: Changes to adapt Android to new backend date format:
-        // - Don't send "true"
-        // - Change dateFormat to yyyy-MM-dd'T'HH:mm:ss.SSSZ
         try {
-            HashMap holidayHashMap = new HashMap<>();
-            HashMap settingsHashMap = new HashMap<>();
-            if (holidayEndDate != null && holidayEndDate.length() > 0) {
-//                String holidayEndDateUTC = Utils.isoDateToUTC(holidayEndDate);
-//                holidayEndDateUTC = holidayEndDateUTC.substring(
-//                        0, holidayEndDateUTC.length()-5)+"Z";
+            HashMap<String, String> holidayHashMap = new HashMap<>();
+            HashMap<String, Object> settingsHashMap = new HashMap<>();
+            if (holidayEndDate != null && holidayEndDate.length() > 0)
+            {
                 Calendar cal = Calendar.getInstance();
                 cal.set(Calendar.HOUR_OF_DAY, 0);
                 cal.set(Calendar.MINUTE, 0);
@@ -176,9 +178,39 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
             }
 
             settingsHashMap.put(Constants.PROFILE_HOLIDAY, holidayHashMap);
-            profileController.updateSettingsData(settingsHashMap);
+            updateSettingsData(settingsHashMap);
         } catch(Exception e) {
             Log.e(Constants.TAG, "VacationTimeSetterActivity.updateHolidayData: ");
+        }
+    }
+
+    public void updateSettingsData(HashMap<String, Object> settingsHashMap)
+    {
+        Log.i(Constants.TAG, "VacationTimeSetterActivity.updateSettingsData: " + settingsHashMap.get(Constants.PROFILE_HOLIDAY));
+        String URL = "/api/me/settings";
+        JSONObject json = new JSONObject(settingsHashMap);
+        try
+        {
+            OKHttpWrapper.put(URL, VacationTimeSetterActivity.this, new OKHttpWrapper.HttpCallback() {
+                @Override
+                public void onFailure(Response response, IOException e) {
+                    Log.e(Constants.TAG, "updateSettingsData.onFailure:",e);
+                }
+
+                @Override
+                public void onSuccess(Response response) {
+                    try
+                    {
+                        if (null != response && null != response.body())
+                            Log.i(Constants.TAG, "VacationTimeSetterActivity.updateSettingsData: Body content is ->" + response.body().string());
+                    }
+                    catch (Exception e) {
+                        Log.e(Constants.TAG, "VacationTimeSetterActivity.updateSettingsData.onSuccess: ", e);
+                    }
+                }
+            }, json);
+        } catch (Exception e){
+            Log.e(Constants.TAG, "VacationTimeSetterActivity.updateSettingsData: ", e);
         }
     }
 
@@ -197,12 +229,6 @@ public class VacationTimeSetterActivity extends FragmentActivity implements ICon
         TextView endDateTextView  =  (TextView)findViewById(R.id.vacation_setter_vacation_date_ends_text);
         endDateTextView.setText(Constants.SIMPLE_DATE_FORMAT_DISPLAY.format(date));
 
-    }
-
-    @Override
-    public void onConnectionNotAvailable() {
-        Log.d(Constants.TAG, "VacationTimeSetterActivity.onConnectionNotAvailable: ");
-        profileController.showToast(getString(R.string.no_internet_connection));
     }
 
     @Override

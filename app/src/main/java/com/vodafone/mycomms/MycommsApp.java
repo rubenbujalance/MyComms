@@ -88,7 +88,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     private Boolean isScreenOff = false;
 
     //Activity counter
-    private static int stateCounter;
+    public static int stateCounter;
     private boolean countdownOn = false;
     public static boolean disconnectedProcess = false;
     private long startTime = 0;

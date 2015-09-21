@@ -39,6 +39,10 @@ public class OKHttpWrapper {
         call("POST", url, jsonObject, cb, EndpointWrapper.getBaseURL(), context);
     }
 
+    public static void put(String url, Context context, HttpCallback cb, JSONObject jsonObject) {
+        call("PUT", url, jsonObject, cb, EndpointWrapper.getBaseURL(), context);
+    }
+
 //    public static void postNews(String url, Context context,
 //                                HttpCallback cb, JSONObject jsonObject) {
 //        call("POST", url, jsonObject, cb, EndpointWrapper.getBaseNewsURL(), context);
@@ -79,6 +83,15 @@ public class OKHttpWrapper {
             RequestBody body = RequestBody.create(
                     MediaType.parse(Utils.getHttpHeaderContentType()), jsonStr);
             builder.post(body);
+        }
+
+        if(method.compareTo("PUT")==0) {
+            String jsonStr = "{}";
+            if(jsonObject!=null) jsonStr = jsonObject.toString();
+
+            RequestBody body = RequestBody.create(
+                    MediaType.parse(Utils.getHttpHeaderContentType()), jsonStr);
+            builder.put(body);
         }
 
         if(method.compareTo("DELETE")==0)

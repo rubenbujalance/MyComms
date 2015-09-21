@@ -30,10 +30,6 @@ public class FilePushToServerController extends BaseController
 {
 
     private Context mContext;
-    private final String authorization = "Authorization";
-    private final String version_token = "x-mycomms-version";
-    private final String ACCESS_TOKEN = "Bearer ";
-
     private OkHttpClient client;
     private RequestBody requestBody;
     private Request request;
@@ -141,28 +137,6 @@ public class FilePushToServerController extends BaseController
             return null;
         }
 
-    }
-
-    /**
-     * Gets version name of the APP
-     * @author str_oan
-     * @return (String) -> version name as a string
-     */
-    private String getVersionName()
-    {
-        try
-        {
-            PackageInfo pinfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
-            int versionCode = pinfo.versionCode;
-            String versionName = pinfo.versionName;
-
-            return "android/"+versionName+"."+versionCode;
-        }
-        catch (Exception e)
-        {
-            Log.e(Constants.TAG, "FilePushToServerController.getVersionName: ERROR ",e);
-            return "";
-        }
     }
 
     /**
@@ -326,10 +300,6 @@ public class FilePushToServerController extends BaseController
 
     public String getResponseCode() {
         return Integer.toString(responseCode);
-    }
-
-    public void setResponseCode(int responseCode) {
-        this.responseCode = responseCode;
     }
 }
 

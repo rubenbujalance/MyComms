@@ -80,9 +80,6 @@ public class ProfileController extends BaseController {
             }
         }
 
-//        new GetProfileAsyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-//                (String) Constants.CONTACT_API_GET_PROFILE);
-
         OKHttpWrapper.get(Constants.CONTACT_API_GET_PROFILE, getContext(), new OKHttpWrapper.HttpCallback() {
             @Override
             public void onFailure(Response response, IOException e) {
@@ -259,9 +256,6 @@ public class ProfileController extends BaseController {
                     Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
                     Crashlytics.logException(e);
                 }
-
-                //Commented due to "BaseController.onConnectionError: {"err":"auth_proxy_error","des":"invalid body request"}
-                //((IProfileConnectionCallback) this.getConnectionCallback()).onPasswordChangeError(error);
             }
         }
     }

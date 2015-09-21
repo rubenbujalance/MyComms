@@ -80,5 +80,11 @@
 
             </LinearLayout>
         </RelativeLayout>
+
+        <!-- Bottom separator -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/profile_lay_separator"/>
     </LinearLayout>
 </FrameLayout >

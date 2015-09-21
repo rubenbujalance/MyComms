@@ -94,7 +94,7 @@
                 <!-- separator-->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
+                    android:layout_height="1dp"
                     android:background="@color/profile_lay_separator"
                     >
                 </LinearLayout>
@@ -124,7 +124,7 @@
                 <!-- separator-->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
+                    android:layout_height="1dp"
                     android:background="@color/profile_lay_separator"
                     >
                 </LinearLayout>
@@ -170,7 +170,7 @@
                     <!-- separator-->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
+                        android:layout_height="1dp"
                         android:background="@color/profile_lay_separator"
                         >
                     </LinearLayout>
@@ -205,7 +205,7 @@
                     <!-- separator-->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
+                        android:layout_height="1dp"
                         android:background="@color/profile_lay_separator"
                         >
                     </LinearLayout>
@@ -240,7 +240,7 @@
                     <!-- separator-->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
+                        android:layout_height="1dp"
                         android:background="@color/profile_lay_separator"
                         >
                     </LinearLayout>
@@ -275,7 +275,7 @@
                     <!-- separator-->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
+                        android:layout_height="1dp"
                         android:background="@color/profile_lay_separator"
                         >
                     </LinearLayout>
@@ -312,7 +312,7 @@
                 <!-- separator-->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
+                    android:layout_height="1dp"
                     android:background="@color/profile_lay_separator"
                     >
                 </LinearLayout>
@@ -342,7 +342,7 @@
                 <!-- separator-->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
+                    android:layout_height="1dp"
                     android:orientation="horizontal"
                     android:background="@color/profile_lay_separator"
                     >
@@ -398,7 +398,7 @@
                     <!-- separator-->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
+                        android:layout_height="1dp"
                         android:background="@color/profile_lay_separator"
                         >
                     </LinearLayout>
@@ -435,7 +435,7 @@
                 <!-- separator-->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="2dp"
+                    android:layout_height="1dp"
                     android:background="@color/profile_lay_separator"
                     >
                 </LinearLayout>

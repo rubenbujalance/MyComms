@@ -38,11 +38,10 @@ import java.util.HashMap;
  */
 public class VacationTimeSetterActivity extends FragmentActivity
 {
-    private MyCommsDatePickerFragment datePickerFragment;
+    public MyCommsDatePickerFragment datePickerFragment;
     public static final String EXTRA_HOLIDAY_END_DATE = "EXTRA_VACATION_TIME_ID";
-    private String holidayEndDate = "";
-    private String initialHolidayEndDate = "";
-    private LinearLayout lay_no_connection;
+    public String holidayEndDate = "";
+    public String initialHolidayEndDate = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +52,6 @@ public class VacationTimeSetterActivity extends FragmentActivity
                         new UncaughtExceptionHandlerController(this, SplashScreenActivity.class)
                 );
         setContentView(R.layout.activity_vacation_time);
-
-        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-
-        if(Utils.isConnected(VacationTimeSetterActivity.this))
-            lay_no_connection.setVisibility(View.GONE);
-        else
-            lay_no_connection.setVisibility(View.VISIBLE);
 
         Switch vacationTimeSwitch = (Switch) findViewById(R.id.switch_vacation_time);
         vacationTimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

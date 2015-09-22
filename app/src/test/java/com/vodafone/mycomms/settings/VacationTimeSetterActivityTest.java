@@ -2,11 +2,8 @@ package com.vodafone.mycomms.settings;
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.view.View;
 import android.widget.Button;
@@ -21,10 +18,7 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.test.util.Util;
-import com.vodafone.mycomms.util.Constants;
-import com.vodafone.mycomms.view.tab.MyCommsDatePickerFragment;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -42,17 +36,13 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowDatePickerDialog;
 import org.robolectric.shadows.ShadowDialog;
-
-import java.util.zip.DeflaterInputStream;
 
 import io.realm.Realm;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
-import static org.powermock.api.support.membermodification.MemberMatcher.methodsDeclaredIn;
 
 /**
  * Created by str_oan on 22/09/2015.

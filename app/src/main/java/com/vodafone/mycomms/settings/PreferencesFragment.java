@@ -189,7 +189,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.realm.close();
+        if(null != realm)
+            this.realm.close();
     }
 
     private void shareCurrentTime(boolean isChecked) {

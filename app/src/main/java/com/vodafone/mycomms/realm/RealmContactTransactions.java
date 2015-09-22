@@ -770,7 +770,7 @@ public class RealmContactTransactions {
 
     }
 
-    public boolean validateContactPlatformExists(Realm realm, String platform) {
+    public static boolean validateContactPlatformExists(Realm realm, String platform) {
         Realm mRealm;
         if(null != realm)
             mRealm = realm;
@@ -794,7 +794,7 @@ public class RealmContactTransactions {
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
     }

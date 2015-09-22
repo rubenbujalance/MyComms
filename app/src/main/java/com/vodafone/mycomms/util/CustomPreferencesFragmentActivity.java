@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
+import com.vodafone.mycomms.settings.AccountsFragment;
 import com.vodafone.mycomms.settings.PreferencesFragment;
 
 public class CustomPreferencesFragmentActivity extends AppCompatActivity
@@ -16,12 +17,13 @@ public class CustomPreferencesFragmentActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent in = this.getIntent();
-        int index = in.getIntExtra("index", 2);
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        PreferencesFragment fragment = PreferencesFragment.newInstance(index, null);
+        PreferencesFragment fragment = PreferencesFragment.newInstance(0, null);
+        AccountsFragment accountsFragment = AccountsFragment.newInstance(2, null);
 
-        fragmentTransaction.add(fragment, String.valueOf(index));
+        fragmentTransaction.add(fragment, String.valueOf(0));
+        fragmentTransaction.add(accountsFragment, String.valueOf(2));
         fragmentTransaction.commit();
     }
 

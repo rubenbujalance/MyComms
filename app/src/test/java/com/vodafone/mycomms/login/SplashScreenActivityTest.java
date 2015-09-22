@@ -295,7 +295,6 @@ public class SplashScreenActivityTest{
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Thread.sleep(3000);
         Assert.assertTrue(activity.isFinishing());
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);

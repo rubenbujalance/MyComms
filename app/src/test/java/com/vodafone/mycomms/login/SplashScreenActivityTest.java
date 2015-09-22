@@ -282,7 +282,6 @@ public class SplashScreenActivityTest{
                 com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF, "mc_555a0792121ef1695cc7c1c3").apply();
 
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Realm.getDefaultInstance();
         Assert.assertTrue(activity.isFinishing());
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);

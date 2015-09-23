@@ -23,6 +23,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -67,6 +68,18 @@ public class NewsDetailActivityTest
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         mContext = RuntimeEnvironment.application.getApplicationContext();
         mockParams();
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        mActivity = null;
+        mContext = null;
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

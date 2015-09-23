@@ -97,7 +97,6 @@ public class ContactDetailMainActivityTest
             Robolectric.reset();
             webServer = null;
             mActivity = null;
-            System.gc();
         } catch (Exception e) {}
     }
 

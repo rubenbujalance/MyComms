@@ -88,6 +88,15 @@ public class AddGlobalContactsActivityTest {
             if (webServer != null) webServer.shutdown();
             Robolectric.reset();
         } catch (Exception e) {}
+
+        activity = null;
+        etUser = null;
+        etPassword = null;
+        btAddAccount = null;
+        btBack = null;
+        layoutErrorBar = null;
+        tvError = null;
+        webServer = null;
     }
 
     @Test

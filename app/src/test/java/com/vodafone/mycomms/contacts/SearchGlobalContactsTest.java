@@ -36,12 +36,12 @@ import com.vodafone.mycomms.util.CustomFragmentActivity;
 import junit.framework.Assert;
 
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.MockRepository;
@@ -118,6 +118,27 @@ public class SearchGlobalContactsTest {
         layCancel = (LinearLayout) contactListFragment.getView().findViewById(R.id.lay_cancel);
         laySearchBar = (LinearLayout) contactListFragment.getView().findViewById(R.id.lay_search_bar_container);
         testString = "Testing";
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+            if(webServer!=null) webServer.shutdown();
+        } catch (Exception e) {}
+
+        contactListFragment = null;
+        customFragmentActivity = null;
+        context = null;
+        listView = null;
+        emptyText = null;
+        searchView = null;
+        addGlobalContactsContainer = null;
+        cancelButton = null;
+        layCancel = null;
+        laySearchBar = null;
     }
 
     @Test

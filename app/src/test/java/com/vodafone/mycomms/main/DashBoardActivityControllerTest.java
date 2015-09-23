@@ -26,6 +26,7 @@ import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -92,6 +93,19 @@ public class DashBoardActivityControllerTest
         Thread.sleep(3000);
         this.mDashBoardActivityController = this.mActivity.mDashBoardActivityController;
         mockParams();
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        mActivity = null;
+        mDashBoardActivityController = null;
+        sp = null;
     }
 
     @Test

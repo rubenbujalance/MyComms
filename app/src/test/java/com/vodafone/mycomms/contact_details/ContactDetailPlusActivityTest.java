@@ -75,9 +75,14 @@ public class ContactDetailPlusActivityTest
     }
 
     @After
-    public void tearDown()
+    public void tearDown() throws Exception
     {
-        Robolectric.reset();
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        mActivity = null;
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

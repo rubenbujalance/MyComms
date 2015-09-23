@@ -9,16 +9,10 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.contacts.connection.RecentContactController;
-import com.vodafone.mycomms.contacts.detail.ContactDetailsPlusActivity;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
-import com.vodafone.mycomms.search.SearchBarController;
-import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
 import com.vodafone.mycomms.test.util.Util;
-import com.vodafone.mycomms.util.CustomFragmentActivity;
 import com.vodafone.mycomms.util.CustomPreferencesFragmentActivity;
 
 import org.junit.After;

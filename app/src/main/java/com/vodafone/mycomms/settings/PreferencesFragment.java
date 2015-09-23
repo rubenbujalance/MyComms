@@ -43,15 +43,11 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private int mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
     public ProfileController profileController;
-    private boolean isSourceDB = true;
 
     private String holidayEndDate = "";
-    private boolean isFirstLoad = true;
     private boolean doNotDisturb = false;
     private boolean privateTimeZone = false;
     private int commingFrom;
@@ -103,10 +99,6 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
         vacationTimeArrow = (ImageView)getActivity().findViewById(
                 R.id.about_arrow_right_top);
 
-        if (getArguments() != null) {
-            mParam1 = getArguments().getInt(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
         this.realm = Realm.getDefaultInstance();
     }
 
@@ -123,12 +115,8 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
             @Override
             public void onClick(View v) {
                 Log.i(Constants.TAG, "PreferencesFragment.onClick: Logout");
-
-                //Logout on server
                 profileController.logoutToAPI();
                 MycommsApp.appIsInitialized = false;
-
-
             }
         });
 
@@ -198,7 +186,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
         updateProfileInDb();
 
-        HashMap settingsHashMap = new HashMap<>();
+        HashMap<String, Boolean> settingsHashMap = new HashMap<>();
         if(isChecked) {
             settingsHashMap.put(Constants.PROFILE_PRIVATE_TIMEZONE, false);
         }else{
@@ -214,7 +202,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
 
         updateProfileInDb();
 
-        HashMap settingsHashMap = new HashMap<>();
+        HashMap<String, Boolean> settingsHashMap = new HashMap<>();
         if(isChecked) {
             settingsHashMap.put(Constants.PROFILE_DONOTDISTURB, true);
         }else{

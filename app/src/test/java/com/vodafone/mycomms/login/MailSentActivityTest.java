@@ -15,6 +15,7 @@ import com.vodafone.mycomms.test.util.Util;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,6 +69,19 @@ public class MailSentActivityTest {
         Robolectric.flushForegroundThreadScheduler();
         mWeSent = activity.mWeSent;
         mResendEmail = activity.mResendEmail;
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+        mWeSent = null;
+        mResendEmail = null;
     }
 
     @Test

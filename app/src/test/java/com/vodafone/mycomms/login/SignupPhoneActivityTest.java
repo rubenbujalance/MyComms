@@ -18,6 +18,7 @@ import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,6 +72,21 @@ public class SignupPhoneActivityTest {
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         mPhone = activity.mPhone;
         mCountry = activity.mCountry;
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+        mPhone = null;
+        mCountry = null;
+        ivBtFwd = null;
+        ivBtBack = null;
     }
 
     @Test

@@ -19,6 +19,7 @@ import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -71,6 +72,19 @@ public class RecentContactsControllerTest
         mockStatic(Crashlytics.class);
         mContext = RuntimeEnvironment.application.getApplicationContext();
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        mContactListFragment = null;
+        mCustomFragmentActivity = null;
+        mContext = null;
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

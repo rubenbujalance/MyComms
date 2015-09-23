@@ -10,6 +10,7 @@ import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomSimpleActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,6 +72,24 @@ public class UncaughtExceptionHandlerControllerTest
         this.mThrowableAsNull = null;
     }
 
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        mActivityAsNull = null;
+        mActivity = null;
+        mClassAsNull = null;
+        mClass = null;
+        mUncaughtExceptionHandlerController = null;
+        mUncaughtExceptionHandlerControllerForEmptyConstructor = null;
+        mThrowable = null;
+        mThrowableAsNull = null;
+        mUncaughtExceptionHandler = null;
+    }
 
     private CustomSimpleActivity createCustomDashboardActivity()
     {

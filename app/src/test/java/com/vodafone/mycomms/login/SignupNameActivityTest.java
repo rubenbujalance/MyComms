@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -18,10 +17,10 @@ import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
-import com.vodafone.mycomms.custom.CircleImageView;
 import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.test.util.Util;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,11 +53,8 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 public class SignupNameActivityTest {
 
     SignupNameActivity activity;
-    CircleImageView mPhoto;
     ClearableEditText mFirstName;
     ClearableEditText mLastName;
-    Bitmap photoBitmap = null;
-    String photoPath = null;
     ImageView ivBtFwd;
 
     @Before
@@ -80,6 +76,20 @@ public class SignupNameActivityTest {
         mFirstName = activity.mFirstName;
         mLastName = activity.mLastName;
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+        mFirstName = null;
+        mLastName = null;
+        ivBtFwd = null;
     }
 
    @Test

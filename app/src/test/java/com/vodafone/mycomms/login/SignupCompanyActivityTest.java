@@ -14,6 +14,7 @@ import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.test.util.Util;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +47,6 @@ public class SignupCompanyActivityTest {
     ClearableEditText mPosition;
     ClearableEditText mOfficeLoc;
 
-
     @Before
     public void setUp()
     {
@@ -65,6 +65,21 @@ public class SignupCompanyActivityTest {
         mCompany = activity.mCompany;
         mPosition = activity.mPosition;
         mOfficeLoc = activity.mOfficeLoc;
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+        mCompany = null;
+        mPosition = null;
+        mOfficeLoc = null;
+        ivBtFwd = null;
     }
 
     @Test

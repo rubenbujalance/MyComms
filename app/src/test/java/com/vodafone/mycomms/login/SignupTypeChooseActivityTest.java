@@ -12,6 +12,7 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.test.util.Util;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +60,20 @@ public class SignupTypeChooseActivityTest {
         mSignupEmail = (Button)activity.findViewById(R.id.btSignupMail);
         mSignupSalesforce = (Button)activity.findViewById(R.id.btSignupSalesforce);
         mBack = (ImageView)activity.findViewById(R.id.btBack);
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+        mSignupEmail = null;
+        mSignupSalesforce = null;
+        mBack = null;
     }
 
     @Test

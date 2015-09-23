@@ -34,6 +34,7 @@ import com.vodafone.mycomms.util.Utils;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -93,6 +94,20 @@ public class DashBoardActivityTest
         Context context = RuntimeEnvironment.application.getApplicationContext();
         sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+            if(webServer!=null) webServer.shutdown();
+        } catch (Exception e) {}
+
+        mActivity = null;
+        webServer = null;
+        sp = null;
     }
 
     @Test

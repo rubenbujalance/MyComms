@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.crashlytics.android.Crashlytics;
@@ -14,21 +13,16 @@ import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.BuildConfig;
-import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
-import com.vodafone.mycomms.chatgroup.GroupChatActivity;
-import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.contacts.view.ContactListFragment;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
-import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
-import com.vodafone.mycomms.search.SearchBarController;
-import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -81,6 +75,19 @@ public class FavouriteContactControllerTest
         mockStatic(Crashlytics.class);
         mContext = RuntimeEnvironment.application.getApplicationContext();
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        mContactListFragment = null;
+        mCustomFragmentActivity = null;
+        mContext = null;
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

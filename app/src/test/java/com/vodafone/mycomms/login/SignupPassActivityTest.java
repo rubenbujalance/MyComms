@@ -14,6 +14,7 @@ import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.test.util.Util;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +67,21 @@ public class SignupPassActivityTest {
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         mPassword = activity.mPassword;
         mConfirmPass = activity.mConfirmPass;
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+        mPassword = null;
+        mConfirmPass = null;
+        ivBtFwd = null;
+        ivBtBack = null;
     }
 
     @Test

@@ -215,7 +215,6 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         //Save profile_id if accessToken has changed
         String profile_id = validateAccessToken();
-        String deviceId = setDeviceId();
 
         if(profile_id!=null)
             BusProvider.getInstance().post(new ApplicationAndProfileInitialized());

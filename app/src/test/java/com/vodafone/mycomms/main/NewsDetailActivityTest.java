@@ -80,6 +80,7 @@ public class NewsDetailActivityTest
 
         mActivity = null;
         mContext = null;
+        System.gc();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

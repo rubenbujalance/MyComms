@@ -108,6 +108,7 @@ public class DashBoardActivityTest
         mActivity = null;
         webServer = null;
         sp = null;
+        System.gc();
     }
 
     @Test

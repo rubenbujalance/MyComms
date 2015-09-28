@@ -114,6 +114,7 @@ public class ContactsControllerTest{
         mContactListFragment = null;
         mCustomFragmentActivity = null;
         mContext = null;
+        System.gc();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

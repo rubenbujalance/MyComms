@@ -82,6 +82,7 @@ public class MailSentActivityTest {
         activity = null;
         mWeSent = null;
         mResendEmail = null;
+        System.gc();
     }
 
     @Test

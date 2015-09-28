@@ -82,6 +82,7 @@ public class SignupPassActivityTest {
         mConfirmPass = null;
         ivBtFwd = null;
         ivBtBack = null;
+        System.gc();
     }
 
     @Test

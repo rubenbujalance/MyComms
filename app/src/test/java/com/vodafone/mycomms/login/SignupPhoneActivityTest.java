@@ -87,6 +87,7 @@ public class SignupPhoneActivityTest {
         mCountry = null;
         ivBtFwd = null;
         ivBtBack = null;
+        System.gc();
     }
 
     @Test

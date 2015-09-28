@@ -78,6 +78,7 @@ public class ForgotPassActivityTest {
         btSend = null;
         etEmail = null;
         webServer = null;
+        System.gc();
     }
 
     @Test

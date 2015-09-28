@@ -106,6 +106,7 @@ public class DashBoardActivityControllerTest
         mActivity = null;
         mDashBoardActivityController = null;
         sp = null;
+        System.gc();
     }
 
     @Test

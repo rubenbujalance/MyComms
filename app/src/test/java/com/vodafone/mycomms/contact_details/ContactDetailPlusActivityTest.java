@@ -83,6 +83,7 @@ public class ContactDetailPlusActivityTest
         } catch (Exception e) {}
 
         mActivity = null;
+        System.gc();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

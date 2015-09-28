@@ -76,6 +76,7 @@ public class OAuthActivityTest {
         activity = null;
         incomingIntent = null;
         wvOAuth = null;
+        System.gc();
     }
 
     @Test

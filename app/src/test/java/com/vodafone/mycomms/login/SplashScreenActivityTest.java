@@ -95,6 +95,7 @@ public class SplashScreenActivityTest{
 
         activity = null;
         webServer = null;
+        System.gc();
     }
 
     @Test

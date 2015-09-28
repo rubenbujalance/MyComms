@@ -60,8 +60,8 @@ public class ChatListFragment extends Fragment{
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
 
-        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(), getComposedChat
-                (), this.realm);
+        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(
+                getActivity(), getComposedChat(), this.realm);
         mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
 
         mRecyclerView.addOnItemTouchListener(new ChatListRecyclerItemClickListener(getActivity(),
@@ -126,12 +126,11 @@ public class ChatListFragment extends Fragment{
         super.onCreate(savedInstanceState);
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
         this.realm = Realm.getDefaultInstance();
-        this.realm.setAutoRefresh(true);
-        mChatTransactions = new RealmChatTransactions(getActivity());
+        mChatTransactions = RealmChatTransactions.getInstance(getActivity());
         SharedPreferences sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
+        mGroupChatTransactions = RealmGroupChatTransactions.getInstance(getActivity(),profileId);
         BusProvider.getInstance().register(this);
     }
 

@@ -182,23 +182,6 @@ dependencies {
 
 }
 
-// Robolectric config
-robolectric {
-
-    // Configure max heap size of the test JVM
-    maxHeapSize = '2048m'
-
-    // Specify max number of processes (default is 1)
-    maxParallelForks = 4
-
-    // Specify max number of test classes to execute in a test process
-    // before restarting the process (default is unlimited)
-    forkEvery = 150
-
-    // configure whether failing tests should fail the build
-    ignoreFailures false
-}
-
 apply plugin: 'jacoco'
 
 jacoco {
@@ -271,5 +254,9 @@ task jacocoTestReportDebug(type: JacocoReport) {
         xml.enabled = true
         html.enabled = true
     }
+}
+
+tasks.withType(Test) {
+    jvmArgs '-XX:MaxPermSize=512m'
 }
 

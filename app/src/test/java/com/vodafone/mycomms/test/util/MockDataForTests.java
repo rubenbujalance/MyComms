@@ -6,8 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
+import model.Chat;
 import model.Contact;
 import model.FavouriteContact;
 import model.GroupChat;
@@ -987,5 +987,15 @@ public class MockDataForTests
         mockGroupChat.setName("mockName");
         mockGroupChat.setProfileId("mc_55409316799f7e1a109446f4");
         return mockGroupChat;
+    }
+
+    public static ArrayList<Chat> getMockChatList()
+    {
+        return new ArrayList<>();
+    }
+
+    public static ArrayList<GroupChat> getMockGroupChatList()
+    {
+        return new ArrayList<>();
     }
 }

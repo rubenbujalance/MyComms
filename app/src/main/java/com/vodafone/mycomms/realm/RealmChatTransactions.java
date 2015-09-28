@@ -25,6 +25,10 @@ public class RealmChatTransactions
     private Context mContext;
     private RealmContactTransactions contactTx;
 
+    public static RealmChatTransactions getInstance(Context context) {
+        return new RealmChatTransactions(context);
+    }
+
     public RealmChatTransactions(Context context) {
 
         mContext = context;

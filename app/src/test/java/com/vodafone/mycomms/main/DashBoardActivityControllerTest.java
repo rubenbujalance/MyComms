@@ -243,7 +243,7 @@ public class DashBoardActivityControllerTest
     public void testLoadRecent_OK_OnlyGroupChat()
     {
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
-        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions.class);
+//        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions.class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -290,7 +290,7 @@ public class DashBoardActivityControllerTest
     {
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
-        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+//        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -325,7 +325,7 @@ public class DashBoardActivityControllerTest
     {
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
-        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+//        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -360,7 +360,7 @@ public class DashBoardActivityControllerTest
     {
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
-        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+//        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -395,7 +395,7 @@ public class DashBoardActivityControllerTest
     public void testLoadRecent_OK_NoGroup_ActionEmail()
     {
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
-        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+//        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -435,7 +435,7 @@ public class DashBoardActivityControllerTest
     {
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
-        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+//        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -461,7 +461,7 @@ public class DashBoardActivityControllerTest
     {
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
-        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
+//        this.mDashBoardActivityController.mRealmGroupChatTransactions = Mockito.mock(RealmGroupChatTransactions. class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))

@@ -97,6 +97,8 @@ public class AddGlobalContactsActivityTest {
         layoutErrorBar = null;
         tvError = null;
         webServer = null;
+
+        System.gc();
     }
 
     @Test

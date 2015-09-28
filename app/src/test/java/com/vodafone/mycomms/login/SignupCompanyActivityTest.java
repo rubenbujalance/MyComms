@@ -80,6 +80,7 @@ public class SignupCompanyActivityTest {
         mPosition = null;
         mOfficeLoc = null;
         ivBtFwd = null;
+        System.gc();
     }
 
     @Test

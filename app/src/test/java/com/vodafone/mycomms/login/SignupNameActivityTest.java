@@ -90,6 +90,7 @@ public class SignupNameActivityTest {
         mFirstName = null;
         mLastName = null;
         ivBtFwd = null;
+        System.gc();
     }
 
    @Test

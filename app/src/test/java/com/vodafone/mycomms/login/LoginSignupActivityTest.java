@@ -75,6 +75,7 @@ public class LoginSignupActivityTest {
         activity = null;
         btSignup = null;
         btLogin = null;
+        System.gc();
     }
 
     @Test

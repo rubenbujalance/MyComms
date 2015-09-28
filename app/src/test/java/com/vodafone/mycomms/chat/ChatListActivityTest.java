@@ -13,6 +13,7 @@ import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,19 +70,21 @@ public class ChatListActivityTest {
         PowerMockito.mockStatic(RealmChatTransactions.class);
         PowerMockito.when(RealmChatTransactions.getInstance(Mockito.any(Context.class)))
                 .thenReturn(mockChatTx);
-//        //Return mocked instances WhenNew
-//        try {
-//            PowerMockito.whenNew(RealmChatTransactions.class)
-//                    .withArguments(Mockito.any(Context.class))
-//                    .thenReturn(mockChatTx);
-//            PowerMockito.whenNew(RealmGroupChatTransactions.class)
-//                    .withArguments(Mockito.any(Context.class), Mockito.any(String.class))
-//                    .thenReturn(mockGroupChatTx);
-//        } catch (Exception e) {
-//            e.printStackTrace(System.out);
-//        }
 
         activity = Robolectric.setupActivity(ChatListActivity.class);
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+
+        System.gc();
     }
 
     @Test
@@ -95,4 +98,17 @@ public class ChatListActivityTest {
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().compareTo(ChatListActivity.class.getName())!=0);
     }
+
+//    @Test
+//    public void testConnectivityChanged()
+//    {
+//        LinearLayout lay_no_connection = (LinearLayout)activity.findViewById(R.id.no_connection_layout);
+//        ConnectivityChanged event = new ConnectivityChanged();
+//        BusProvider.getInstance().post();
+//
+//        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+//        Intent startedIntent = shadowActivity.getNextStartedActivity();
+//        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+//        Assert.assertTrue(shadowIntent.getComponent().getClassName().compareTo(ChatListActivity.class.getName())!=0);
+//    }
 }

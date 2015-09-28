@@ -90,6 +90,7 @@ public class SignupMailActivityTest {
         etEmail = null;
         ivBtFwd = null;
         ivBtBack = null;
+        System.gc();
     }
 
     @Test

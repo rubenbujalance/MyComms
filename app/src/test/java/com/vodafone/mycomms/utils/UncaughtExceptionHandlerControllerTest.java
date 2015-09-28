@@ -89,6 +89,7 @@ public class UncaughtExceptionHandlerControllerTest
         mThrowable = null;
         mThrowableAsNull = null;
         mUncaughtExceptionHandler = null;
+        System.gc();
     }
 
     private CustomSimpleActivity createCustomDashboardActivity()

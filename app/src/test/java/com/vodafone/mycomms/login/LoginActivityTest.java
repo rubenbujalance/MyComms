@@ -99,6 +99,7 @@ public class LoginActivityTest {
         etEmail = null;
         etPassword = null;
         ivBack = null;
+        System.gc();
     }
 
     @Test

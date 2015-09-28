@@ -61,6 +61,7 @@ public class AboutActivityTest
         } catch (Exception e) {}
 
         mActivity = null;
+        System.gc();
     }
 
     @Test

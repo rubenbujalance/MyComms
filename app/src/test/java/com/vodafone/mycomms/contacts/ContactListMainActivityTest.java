@@ -73,6 +73,7 @@ public class ContactListMainActivityTest
 
         mActivity = null;
         mContext = null;
+        System.gc();
     }
 
     @Test

@@ -118,6 +118,7 @@ public class PreferencesFragmentTest {
         shareCurrentTimeSwitch = null;
         doNotDisturbSwitch = null;
         aboutButton = null;
+        System.gc();
     }
 
     @Test

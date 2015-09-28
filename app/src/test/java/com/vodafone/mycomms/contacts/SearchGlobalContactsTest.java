@@ -139,6 +139,7 @@ public class SearchGlobalContactsTest {
         cancelButton = null;
         layCancel = null;
         laySearchBar = null;
+        System.gc();
     }
 
     @Test

@@ -122,6 +122,7 @@ public class SignupPincodeActivityTest {
         lnPin2 = null;
         lnPin3 = null;
         lnPin4 = null;
+        System.gc();
     }
 
     @Test

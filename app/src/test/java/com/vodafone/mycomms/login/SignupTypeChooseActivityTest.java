@@ -74,6 +74,7 @@ public class SignupTypeChooseActivityTest {
         mSignupEmail = null;
         mSignupSalesforce = null;
         mBack = null;
+        System.gc();
     }
 
     @Test

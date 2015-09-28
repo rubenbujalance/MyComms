@@ -248,7 +248,7 @@ task jacocoTestReportDebug(type: JacocoReport) {
     )
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)
-    executionData = files('build/jacoco/testIDebug.exec')
+    executionData = files('build/jacoco/testIDebugUnitTest.exec')
 
     reports {
         xml.enabled = true
@@ -257,6 +257,7 @@ task jacocoTestReportDebug(type: JacocoReport) {
 }
 
 tasks.withType(Test) {
-    jvmArgs '-XX:MaxPermSize=512m'
+    jvmArgs '-XX:MaxPermSize=1024m'
+    maxParallelForks = Runtime.runtime.availableProcessors()
 }
 

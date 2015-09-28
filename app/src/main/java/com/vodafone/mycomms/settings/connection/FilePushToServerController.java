@@ -23,23 +23,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import model.Contact;
+
 /**
  * Created by str_oan on 12/06/2015.
  */
 public class FilePushToServerController extends BaseController
 {
 
-    private Context mContext;
-    private OkHttpClient client;
-    private RequestBody requestBody;
-    private Request request;
-    private Response response;
-    private int responseCode;
+    public Context mContext;
+    public OkHttpClient client;
+    public RequestBody requestBody;
+    public Request request;
+    public Response response;
+    public int responseCode;
 
     public FilePushToServerController(Context context)
     {
         super(context);
         this.mContext = context;
+    }
+
+    public static FilePushToServerController newInstance(Context context)
+    {
+        return new FilePushToServerController(context);
     }
 
     /**

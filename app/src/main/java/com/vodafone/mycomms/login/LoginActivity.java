@@ -1,8 +1,10 @@
 package com.vodafone.mycomms.login;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -165,6 +167,7 @@ public class LoginActivity extends MainAppCompatActivity implements ILoginConnec
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void resetError()
     {
         if (btLogin.getText().toString().compareTo(getString(R.string.login)) == 0)
@@ -205,10 +208,11 @@ public class LoginActivity extends MainAppCompatActivity implements ILoginConnec
         //Load profile
         ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
 
-        if(((MycommsApp)getApplication()).isProfileAvailable())
+        if(MycommsApp.isProfileAvailable())
             goToApp();
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onLoginError(CharSequence error) {
         Log.e(Constants.TAG, "LoginActivity.onLoginError: ");

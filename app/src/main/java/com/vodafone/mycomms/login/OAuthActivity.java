@@ -31,19 +31,14 @@ import com.vodafone.mycomms.util.UserSecurity;
 import org.json.JSONObject;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class OAuthActivity extends MainActivity {
 
-    WebView wvOAuth;
+    public WebView wvOAuth;
     String oauthPrefix;
-
     private boolean isForeground;
-
-    private boolean pageStarted;
     private RelativeLayout relativeContainer;
 
-    private Map<String,String> noCacheHeaders;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +49,8 @@ public class OAuthActivity extends MainActivity {
                         new UncaughtExceptionHandlerController(this, null)
                 );
         setContentView(R.layout.activity_oauth_web);
-
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);
         relativeContainer = (RelativeLayout)findViewById(R.id.relative_container);
-//        relativeContainer.setVisibility(View.INVISIBLE);
-
-        //Register Otto Bus
         BusProvider.getInstance().register(this);
 
         //Read OAuth prefix
@@ -73,12 +64,12 @@ public class OAuthActivity extends MainActivity {
 
         //Launch OAuth corresponding URL
         wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix,
-                noCacheHeaders);
+                new HashMap<String, String>());
     }
 
     public void callOAuthCallback(String url)
     {
-        HashMap hashUrl = null;
+        HashMap<String,Object> hashUrl = null;
 
         try {
             hashUrl = new HashMap<>();
@@ -113,7 +104,7 @@ public class OAuthActivity extends MainActivity {
                 //Load profile
                 ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
 
-                if(((MycommsApp)getApplication()).isProfileAvailable())
+                if(MycommsApp.isProfileAvailable())
                     goToApp();
             }
             else if (status.compareTo("203") == 0) {
@@ -174,9 +165,9 @@ public class OAuthActivity extends MainActivity {
         if(!isForeground) return;
         Log.e(Constants.TAG, "OAuthActivity.onApplicationAndProfileReadErrorEvent: ");
 
-        if(((MycommsApp)getApplication()).isProfileAvailable()) {
+        if(MycommsApp.isProfileAvailable())
             goToApp();
-        } else {
+        else {
             Toast.makeText(this,
                     getString(R.string.no_internet_connection_log_in_needed),
                     Toast.LENGTH_LONG).show();
@@ -244,33 +235,15 @@ public class OAuthActivity extends MainActivity {
 //                    Utils.clearCacheFolder(getApplicationContext().getCacheDir(), 1);
                     return true;
                 } else {
-                    view.loadUrl(urlNewString, noCacheHeaders);
+                    view.loadUrl(urlNewString, new HashMap<String, String>());
                     return true;
                 }
-//                else {
-//                    if (!loadingFinished) {
-//                        redirect = true;
-//                    }
-//
-//                    loadingFinished = false;
-//
-                // Otherwise, continue...
-//                    return false;
-//                }
             }
-
             @Override
             public void onPageStarted(WebView view, String url, Bitmap facIcon) {
                 super.onPageStarted(view, url, facIcon);
                 relativeContainer.setVisibility(View.VISIBLE);
                 wvOAuth.setVisibility(View.INVISIBLE);
-
-//                loadingFinished = false;
-//                if(relativeContainer.getVisibility() != View.VISIBLE)
-//                {
-//                    relativeContainer.setVisibility(View.VISIBLE);
-//                    wvOAuth.setVisibility(View.INVISIBLE);
-//                }
             }
 
             @Override
@@ -279,21 +252,6 @@ public class OAuthActivity extends MainActivity {
                 relativeContainer.setVisibility(View.INVISIBLE);
                 wvOAuth.setVisibility(View.VISIBLE);
 
-//                if(!redirect){
-//                    loadingFinished = true;
-//                }
-//
-//                if(loadingFinished && !redirect){
-//                    //HIDE LOADING IT HAS FINISHED
-//                    if(relativeContainer.getVisibility() == View.VISIBLE)
-//                    {
-//                        relativeContainer.setVisibility(View.GONE);
-//                        wvOAuth.setVisibility(View.VISIBLE);
-//                    }
-//                } else{
-//                    redirect = false;
-//                }
-//                view.clearCache(true);
             }
 
         });

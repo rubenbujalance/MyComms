@@ -9,6 +9,9 @@ import android.webkit.WebView;
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
@@ -54,7 +57,7 @@ public class OAuthActivityTest {
         incomingIntent.putExtra("oauth", "sf");
         activity = Robolectric.buildActivity(OAuthActivity.class).withIntent(incomingIntent).create().start().resume().get();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         }
         catch (Exception e)
         {
@@ -68,11 +71,7 @@ public class OAuthActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
-
+        Robolectric.reset();
         activity = null;
         incomingIntent = null;
         wvOAuth = null;
@@ -107,4 +106,19 @@ public class OAuthActivityTest {
         Assert.assertTrue(activity.isDestroyed());
     }
 
+    @Test
+    public void testApplicationAndProfileInitialized()
+    {
+        ApplicationAndProfileInitialized event = new ApplicationAndProfileInitialized();
+        BusProvider.getInstance().post(event);
+        Assert.assertTrue(this.activity.isFinishing());
+    }
+
+    @Test
+    public void testApplicationAndProfileReadError()
+    {
+        ApplicationAndProfileReadError event = new ApplicationAndProfileReadError();
+        BusProvider.getInstance().post(event);
+        Assert.assertTrue(this.activity.isFinishing());
+    }
 }

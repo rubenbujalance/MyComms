@@ -106,10 +106,11 @@ public class ProfileFragmentTest
     {
         if (webServer != null)
             webServer.shutdown();
-
+        Robolectric.reset();
         mContext = null;
         mProfileFragment = null;
         mCustomPreferencesFragmentActivity = null;
+        System.gc();
     }
 
     @Test

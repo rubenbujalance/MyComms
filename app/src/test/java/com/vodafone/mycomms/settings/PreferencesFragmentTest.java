@@ -1,7 +1,10 @@
 package com.vodafone.mycomms.settings;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -103,11 +106,7 @@ public class PreferencesFragmentTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
-
+        Robolectric.reset();
         mPreferencesFragment = null;
         customPreferencesFragmentActivity = null;
         context = null;
@@ -119,6 +118,20 @@ public class PreferencesFragmentTest {
         doNotDisturbSwitch = null;
         aboutButton = null;
         System.gc();
+    }
+
+    @Test
+    public void testOnActivityResult()
+    {
+        TextView vacationTimeEnds = (TextView) this.mPreferencesFragment.getView().findViewById(R.id.settings_preferences_vacation_time_value);
+        ImageView vacationTimeArrow = (ImageView) this.mPreferencesFragment.getView().findViewById(R.id.about_arrow_right_top);
+        Intent intent = new Intent();
+        intent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, "2014-07-04T12:08:56.235-0700");
+        this.mPreferencesFragment.onActivityResult(1, Activity.RESULT_OK, intent);
+        Assert.assertTrue(this.mPreferencesFragment.holidayEndDate.compareTo("2014-07-04T12:08:56.235-0700") == 0);
+        Assert.assertTrue(vacationTimeEnds.getVisibility() == View.VISIBLE);
+        Assert.assertTrue(vacationTimeArrow.getVisibility() == View.GONE);
+        this.mPreferencesFragment.onDestroy();
     }
 
     @Test
@@ -239,18 +252,6 @@ public class PreferencesFragmentTest {
         System.err.println("******** Test: Do not disturb OK********");
     }
 
-//    @Test
-//    public void testAboutNavigation() throws Exception {
-//        System.err.println("******** Test: About navigation ********");
-//
-//        aboutButton.performClick();
-//        Intent expectedIntent = new Intent(mPreferencesFragment.getActivity(), AboutActivity.class);
-//        Assert.assertTrue(Shadows.shadowOf(mPreferencesFragment.getActivity())
-//                .getNextStartedActivity().getComponent().getClassName().compareTo(AboutActivity.class.getName())==0);
-//
-//        System.err.println("******** Test: About navigation OK********");
-//    }
-
     @Test
     public void testOnProfileReceivedWithVacation() throws Exception {
         System.err.println("******** Test: On Profile Received ********");
@@ -271,43 +272,34 @@ public class PreferencesFragmentTest {
     @Test
     public void testOnProfileReceivedWithNoHoliday() throws Exception {
         System.err.println("******** Test: On Profile Received ********");
-
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_HOLIDAY);
         ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
         Mockito.doNothing().when(spyProfileController).updateSettingsData(Mockito.any(HashMap.class));
         mPreferencesFragment.profileController = spyProfileController;
         mPreferencesFragment.onProfileReceived(userProfile);
-
         Assert.assertTrue(vacationTimeEnds.getVisibility() == View.GONE);
         Assert.assertTrue(vacationTimeArrow.getVisibility() == View.VISIBLE);
-
         System.err.println("******** Test: On Profile Received OK********");
     }
 
     @Test
     public void testOnProfileReceivedWithPublicTimeZone() throws Exception {
         System.err.println("******** Test: On Profile Received ********");
-
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_TIMEZONE);
         ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
         Mockito.doNothing().when(spyProfileController).updateSettingsData(Mockito.any(HashMap.class));
         mPreferencesFragment.profileController = spyProfileController;
         mPreferencesFragment.onProfileReceived(userProfile);
-
         Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
-
         System.err.println("******** Test: On Profile Received OK********");
     }
 
     @Test
     public void testOnProfileReceivedWithNoDoNotDisturb() throws Exception {
         System.err.println("******** Test: On Profile Received ********");
-
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_DONOTDISTURB);
         mPreferencesFragment.onProfileReceived(userProfile);
-
         Assert.assertTrue(!doNotDisturbSwitch.isChecked());
-
         System.err.println("******** Test: On Profile Received OK********");
     }
 
@@ -324,25 +316,9 @@ public class PreferencesFragmentTest {
     @Test
     public void testVacationTimeClick() throws Exception {
         System.err.println("******** Test: Vacation Time Click ********");
-
         vacationTimeButton.performClick();
-//        Intent expectedIntent = new Intent(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
-//        Assert.assertTrue(Shadows.shadowOf(mPreferencesFragment.getActivity())
-//                .getNextStartedActivityForResult().equals(expectedIntent));
-
         System.err.println("******** Test: Vacation Time Click OK********");
     }
-
-//    @Test
-//    public void shouldSupportStartActivityForResult() throws Exception {
-//        ShadowActivity shadowActivity = Shadows.shadowOf(mPreferencesFragment.getActivity());
-//        Intent intent = new Intent().setClass(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
-//        Assert.assertTrue(shadowActivity.getNextStartedActivity() == null);
-//        mPreferencesFragment.getActivity().startActivityForResult(intent, 142);
-//        Intent startedIntent = shadowActivity.getNextStartedActivity();
-//        Assert.assertTrue(startedIntent != null);
-//        Assert.assertTrue(startedIntent.getComponent().getClassName().compareTo(VacationTimeSetterActivity.class.getName())==0);
-//    }
 
     @Test
     public void shouldSupportGetStartedActivitiesForResult() throws Exception {
@@ -351,32 +327,10 @@ public class PreferencesFragmentTest {
         mPreferencesFragment.getActivity().startActivityForResult(intent, 142);
         ShadowActivity.IntentForResult intentForResult = shadowActivity.getNextStartedActivityForResult();
         Assert.assertTrue(intentForResult!=null);
-        Assert.assertTrue(shadowActivity.getNextStartedActivityForResult()==null);
+        Assert.assertNull(shadowActivity.getNextStartedActivityForResult());
         Assert.assertTrue(intentForResult.intent!=null);
         Assert.assertTrue(intentForResult.intent==intent);
         Assert.assertTrue(intentForResult.requestCode == 142);
-    }
-
-//    @Test
-    public void testVacationTimeActivityResult() throws Exception {
-        System.err.println("******** Test: Vacation Time Click ********");
-
-        vacationTimeButton.performClick();
-
-//        ShadowActivity sActivity = Shadows.shadowOf(mPreferencesFragment.getActivity());
-//        Intent requestIntent = new Intent(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
-//        requestIntent.putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, "Fake Date");
-//        Intent responseIntent = new Intent().putExtra("vacationTimeEndValue","Fake Date");
-//        sActivity.receiveResult(requestIntent, Activity.RESULT_OK, responseIntent);
-//        Assert.assertNotNull(vacationTimeEnds.getText());
-        //        Shadows.shadowOf(mPreferencesFragment.getActivity()).receiveResult(
-//                new Intent(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class),
-//                Activity.RESULT_OK,
-//                new Intent().putExtra(SettingsMainActivity.VACATION_TIME_END_VALUE, Constants.VACATION_END_DATE));
-//
-//        Assert.assertEquals(Constants.VACATION_END_DATE, vacationTimeEnds.getText());
-
-        System.err.println("******** Test: Vacation Time Click OK********");
     }
 
     private UserProfile mockUserProfile(String settings){

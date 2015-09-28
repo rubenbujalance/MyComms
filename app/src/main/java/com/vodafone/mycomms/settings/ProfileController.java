@@ -208,7 +208,7 @@ public class ProfileController extends BaseController {
                 String result = response.getData().toString();
                 if (result != null && result.length() > 0) {
                     JSONObject jsonResponse = new JSONObject(result);
-                    this.userProfile = mapUserProfile(jsonResponse);
+                    userProfile = mapUserProfile(jsonResponse);
 
                     mRealmProfileTransactions.insertUserProfile(userProfile, null);
                     Log.d(Constants.TAG, "ProfileController.onConnectionComplete: UserProfile parsed:" + printUserProfile(userProfile));
@@ -244,17 +244,6 @@ public class ProfileController extends BaseController {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onUpdateProfileConnectionError();
                 } else {
                     ((IProfileConnectionCallback) this.getConnectionCallback()).onProfileConnectionError();
-                }
-            }else if (ex.getUrl() != null && ex.getUrl().contains(PasswordConnection.URL)){
-                JSONObject jsonResponse = null;
-                String error = "Unknown error while changing password";
-
-                try {
-                    jsonResponse = new JSONObject(ex.getContent());
-                    error = jsonResponse.getString("des");
-                } catch (JSONException e) {
-                    Log.e(Constants.TAG, "SettingsController.onConnectionError: ", e);
-                    Crashlytics.logException(e);
                 }
             }
         }

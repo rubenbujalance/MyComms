@@ -47,7 +47,7 @@ public class PreferencesFragment extends Fragment implements IProfileConnectionC
     private OnFragmentInteractionListener mListener;
     public ProfileController profileController;
 
-    private String holidayEndDate = "";
+    public String holidayEndDate = "";
     private boolean doNotDisturb = false;
     private boolean privateTimeZone = false;
     private int commingFrom;

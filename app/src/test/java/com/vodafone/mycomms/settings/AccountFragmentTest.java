@@ -78,6 +78,8 @@ public class AccountFragmentTest
         mAccountsFragment.getActivity().finish();
         mAccountsFragment = null;
         mCustomPreferencesFragmentActivity = null;
+        mContext = null;
+        System.gc();
     }
 
     @Test

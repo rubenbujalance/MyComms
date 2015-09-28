@@ -69,8 +69,11 @@ public class SettingsMainActivityTest
     @After
     public void tearDown()
     {
+        Robolectric.reset();
         mActivity.finish();
         mActivity = null;
+        mContext = null;
+        System.gc();
     }
 
     @Test

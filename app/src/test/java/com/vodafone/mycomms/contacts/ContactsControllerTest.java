@@ -33,10 +33,10 @@ import com.vodafone.mycomms.search.SearchBarController;
 import com.vodafone.mycomms.search.SearchController;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
-import com.vodafone.mycomms.util.APIWrapper;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
 
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -100,6 +100,21 @@ public class ContactsControllerTest{
         mockStatic(Crashlytics.class);
         mContext = RuntimeEnvironment.application.getApplicationContext();
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+            if(webServer!=null) webServer.shutdown();
+        } catch (Exception e) {}
+
+        mContactListFragment = null;
+        mCustomFragmentActivity = null;
+        mContext = null;
+        System.gc();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

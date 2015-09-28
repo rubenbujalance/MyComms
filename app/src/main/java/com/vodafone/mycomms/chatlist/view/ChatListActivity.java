@@ -44,7 +44,6 @@ public class ChatListActivity extends ToolbarActivity{
 
         setContentView(R.layout.layout_main_activity);
         lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
-        lay_no_connection = (LinearLayout) findViewById(R.id.no_connection_layout);
         if(Utils.isConnected(ChatListActivity.this))
             lay_no_connection.setVisibility(View.GONE);
         else

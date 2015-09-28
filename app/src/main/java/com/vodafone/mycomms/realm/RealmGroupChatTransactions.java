@@ -25,6 +25,10 @@ public class RealmGroupChatTransactions
     private Context mContext;
     private String LOG_TAG = RealmGroupChatTransactions.class.getSimpleName();
 
+    public static RealmGroupChatTransactions getInstance(Context context, String profile_id) {
+        return new RealmGroupChatTransactions(context, profile_id);
+    }
+
     public RealmGroupChatTransactions(Context context, String profile_id)
     {
         mContext = context;

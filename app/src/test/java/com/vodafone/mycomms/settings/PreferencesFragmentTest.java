@@ -25,6 +25,7 @@ import junit.framework.Assert;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -97,7 +98,27 @@ public class PreferencesFragmentTest {
         shareCurrentTimeSwitch = (Switch) mPreferencesFragment.getView().findViewById(R.id.setting_share_current_time_switch);
         doNotDisturbSwitch = (Switch) mPreferencesFragment.getView().findViewById(R.id.settings_do_not_disturb_switch);
         aboutButton = (TextView) mPreferencesFragment.getView().findViewById(R.id.btnAbout);
+    }
 
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        mPreferencesFragment = null;
+        customPreferencesFragmentActivity = null;
+        context = null;
+        vacationTimeEnds = null;
+        vacationTimeArrow = null;
+        btLogout = null;
+        vacationTimeButton = null;
+        shareCurrentTimeSwitch = null;
+        doNotDisturbSwitch = null;
+        aboutButton = null;
+        System.gc();
     }
 
     @Test

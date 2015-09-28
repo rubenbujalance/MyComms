@@ -9,6 +9,7 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -49,6 +50,18 @@ public class AboutActivityTest
         mockStatic(Crashlytics.class);
 
         MycommsApp.stateCounter = 0;
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        mActivity = null;
+        System.gc();
     }
 
     @Test

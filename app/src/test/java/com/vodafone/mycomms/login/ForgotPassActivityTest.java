@@ -13,6 +13,7 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,6 +63,22 @@ public class ForgotPassActivityTest {
         Robolectric.flushForegroundThreadScheduler();
         etEmail = (EditText) activity.findViewById(R.id.etEmail);
         btSend = (Button) activity.findViewById(R.id.btSend);
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+            if(webServer!=null) webServer.shutdown();
+        } catch (Exception e) {}
+
+        activity = null;
+        btSend = null;
+        etEmail = null;
+        webServer = null;
+        System.gc();
     }
 
     @Test

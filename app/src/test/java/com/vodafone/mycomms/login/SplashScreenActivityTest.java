@@ -92,6 +92,10 @@ public class SplashScreenActivityTest{
         try {
             if (webServer != null) webServer.shutdown();
         } catch (Exception e) {}
+
+        activity = null;
+        webServer = null;
+        System.gc();
     }
 
     @Test

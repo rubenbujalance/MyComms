@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +18,7 @@ import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +54,6 @@ public class SignupMailActivityTest {
 
     Activity activity;
     ClearableEditText etEmail;
-    Drawable errorIcon;
     ImageView ivBtFwd;
     ImageView ivBtBack;
 
@@ -77,6 +76,21 @@ public class SignupMailActivityTest {
         etEmail = (ClearableEditText)activity.findViewById(R.id.etSignupEmail);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+        etEmail = null;
+        ivBtFwd = null;
+        ivBtBack = null;
+        System.gc();
     }
 
     @Test

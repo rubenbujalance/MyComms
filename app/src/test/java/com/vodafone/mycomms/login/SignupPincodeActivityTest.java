@@ -22,6 +22,7 @@ import com.vodafone.mycomms.main.SplashScreenActivity;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -97,6 +98,31 @@ public class SignupPincodeActivityTest {
         tvPin2 = activity.tvPin2;
         tvPin3 = activity.tvPin3;
         tvPin4 = activity.tvPin4;
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        //Try to shutdown server if it was started
+        try {
+            Robolectric.reset();
+        } catch (Exception e) {}
+
+        activity = null;
+        etPin = null;
+        tvPinPhoneNumber = null;
+        btResendPin = null;
+        ivBtFwd = null;
+        ivBtBack = null;
+        tvPin1 = null;
+        tvPin2 = null;
+        tvPin3 = null;
+        tvPin4 = null;
+        lnPin1 = null;
+        lnPin2 = null;
+        lnPin3 = null;
+        lnPin4 = null;
+        System.gc();
     }
 
     @Test

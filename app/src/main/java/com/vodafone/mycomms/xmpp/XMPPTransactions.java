@@ -1231,69 +1231,10 @@ public final class XMPPTransactions {
     public static boolean downloadToChatFile(String urlStr, String chatMessageId) {
         try {
             Log.i(Constants.TAG, "XMPPTransactions.downloadToChatFile: ");
-//            String dirStr = _appContext.getFilesDir() + Constants.CONTACT_CHAT_FILES;
             String fileStr = "file_" + chatMessageId + ".jpg";
             URL url = new URL(urlStr);
             downloadImage(url,fileStr,Constants.CONTACT_CHAT_FILES);
 
-
-//            final File imageFile = new File(fileStr);
-//            File imagesDir = new File(dirStr);
-//            if(!imagesDir.exists()) imagesDir.mkdirs();
-//
-//            Target target = new Target() {
-//                @Override
-//                public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-//                    Log.i(Constants.TAG, "XMPPTransactions.onBitmapLoaded: ");
-//                    SaveAndShowImageAsyncTask task =
-//                            new SaveAndShowImageAsyncTask(
-//                                    imageFile, bitmap);
-//
-//                    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//                }
-//
-//                @Override
-//                public void onBitmapFailed(Drawable errorDrawable) {
-//                    Log.i(Constants.TAG, "XMPPTransactions.onBitmapFailed: ");
-//                    if(imageFile.exists()) imageFile.delete();
-//                }
-//
-//                @Override
-//                public void onPrepareLoad(Drawable placeHolderDrawable) {
-//
-//                }
-//            };
-//            Log.i(Constants.TAG, "XMPPTransactions.downloadToChatFile: pre Picasso");
-//            Picasso.with(_appContext)
-//                    .load(urlStr)
-//                    .into(target);
-//            Log.i(Constants.TAG, "XMPPTransactions.downloadToChatFile: post Picasso");
-
-//            URL url = new URL(urlStr);
-//            URLConnection ucon = url.openConnection();
-//            ucon.setReadTimeout(Constants.HTTP_READ_FILE_TIMEOUT);
-//            ucon.setConnectTimeout(10000);
-//
-//            InputStream is = ucon.getInputStream();
-//            BufferedInputStream inStream = new BufferedInputStream(is, 1024 * 5);
-//
-//            File dir = new File(dirStr);
-//            dir.mkdirs();
-//
-//            File file = new File(dirStr, fileStr);
-//            if(file.exists()) file.delete();
-//            file.createNewFile();
-//
-//            FileOutputStream outStream = new FileOutputStream(file);
-//            byte[] buff = new byte[5 * 1024];
-//
-//            int len;
-//            while ((len = inStream.read(buff)) != -1) {
-//                outStream.write(buff, 0, len);
-//            }
-//            outStream.flush();
-//            outStream.close();
-//            inStream.close();
         } catch (Exception e) {
             Log.e(Constants.TAG, "XMPPTransactions.downloadToChatFile: ",e);
             Crashlytics.logException(e);

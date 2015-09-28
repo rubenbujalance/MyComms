@@ -43,7 +43,7 @@ import model.UserProfile;
 public class ProfileController extends BaseController {
 
     private RealmProfileTransactions mRealmProfileTransactions;
-    private UserProfile userProfile;
+    private static UserProfile userProfile;
     private String profileId;
     private Context mContext;
 
@@ -104,10 +104,10 @@ public class ProfileController extends BaseController {
         });
     }
 
-    public boolean isUserProfileChanged(String firstName, String lastName, String company, String
+    public static boolean isUserProfileChanged(String firstName, String lastName, String company, String
             position, String officeLocation)
     {
-        if(null != this.userProfile)
+        if(null != userProfile)
         {
             if(firstName.equals(userProfile.getFirstName())
                     && lastName.equals(userProfile.getLastName())

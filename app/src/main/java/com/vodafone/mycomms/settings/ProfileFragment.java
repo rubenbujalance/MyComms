@@ -61,10 +61,10 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     private int mIndex;
 
-    private boolean isEditing = false;
+    public boolean isEditing = false;
 
     private ProfileController profileController;
-    private boolean isUpdating = false;
+    public boolean isUpdating = false;
 
     private CircleImageView profilePicture, opaqueFilter;
     private ImageView imgTakePhoto;
@@ -73,7 +73,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_GALLERY = 2;
 
-    private String photoPath = null;
+    public String photoPath = null;
     private Bitmap photoBitmap = null;
 
     public FilePushToServerController filePushToServerController;
@@ -104,6 +104,8 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             isAvatarHasChangedAfterSelection = false
             , isProfileLoadedAtLeastOnce = false
             , isPasswordHasChanged = false;
+
+    private ProgressBar progressBar;
 
     public static ProfileFragment newInstance(int index, String param2) {
         ProfileFragment fragment = new ProfileFragment();
@@ -141,6 +143,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
         layout_error_edit_profile = (LinearLayout) v.findViewById(R.id.lay_error_edit);
         tv_error_on_edit = (TextView) v.findViewById(R.id.tv_error_on_edit);
+        progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
 
         tv_password_indicator = (TextView) v.findViewById(R.id.tv_password_indicator);
         et_password_content = (EditText) v.findViewById(R.id.et_password_content);
@@ -268,7 +271,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             avatarNewURL = null;
         }
 
-        if(!profileController.isUserProfileChanged(firstName, lastName, company, position,
+        if(!ProfileController.isUserProfileChanged(firstName, lastName, company, position,
                 officeLocation))
         {
             Log.d(Constants.TAG, "ProfileFragment.updateContactData: profile details not changed");
@@ -456,6 +459,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
         }
         else
         {
+            layout_error_edit_profile.setVisibility(View.VISIBLE);
             tv_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
             et_password_content.setTextColor(getResources().getColor(R.color.red_action));
             tv_confirm_password_indicator.setTextColor(getResources().getColor(R.color.red_action));
@@ -815,10 +819,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
 
     public class DecodeAndLoadBitmapAvatar extends AsyncTask<Void, Void, String>
     {
-
-        private ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progress_bar);
-        private TextView editProfile = (TextView) getActivity().findViewById(R.id.edit_profile);
-
         @Override
         protected void onPreExecute()
         {
@@ -833,8 +833,6 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
             photoBitmap = Utils.decodeFile(photoPath);
             return null;
         }
-
-
 
         @Override
         protected void onPostExecute(String result)

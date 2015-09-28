@@ -48,18 +48,13 @@ public class AboutActivityTest
         mockStatic(Realm.class);
         when(Realm.getDefaultInstance()).thenReturn(null);
         mockStatic(Crashlytics.class);
-
         MycommsApp.stateCounter = 0;
     }
 
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
-
+        Robolectric.reset();
         mActivity = null;
         System.gc();
     }

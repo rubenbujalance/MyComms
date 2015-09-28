@@ -146,15 +146,6 @@ public class AccountsFragment extends Fragment {
         return RealmContactTransactions.validateContactPlatformExists(null, Constants.PLATFORM_LOCAL);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    public void onStop(){
-        super.onStop();
-    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

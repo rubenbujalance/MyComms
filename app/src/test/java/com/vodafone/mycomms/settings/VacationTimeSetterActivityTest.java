@@ -72,13 +72,14 @@ public class VacationTimeSetterActivityTest
     }
 
     @After
-    public void tearDown()
+    public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            if (webServer != null) webServer.shutdown();
-            Robolectric.reset();
-        } catch (Exception e) {}
+        if (webServer != null)
+            webServer.shutdown();
+        Robolectric.reset();
+        mActivity = null;
+        mContext = null;
+        System.gc();
     }
 
     @Test

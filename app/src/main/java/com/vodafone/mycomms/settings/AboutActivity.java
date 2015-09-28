@@ -40,16 +40,6 @@ public class AboutActivity  extends ToolbarActivity {
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);

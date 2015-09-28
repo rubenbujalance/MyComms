@@ -269,21 +269,17 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
         editor.putString(Constants.DEVICE_ID_SHARED_PREF, deviceId);
         editor.apply();
 
-        //SessionController sessionController = new SessionController(mContext);
-        //sessionController.setDeviceId(deviceId);
-        //sessionController.setConnectionCallback(this);
-
         return deviceId;
     }
 
-    public void getLocalContacts(){
-        SharedPreferences sp = getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        DownloadLocalContacts downloadLocalContacts =
-                new DownloadLocalContacts(MycommsApp.this, profileId, false);
-        downloadLocalContacts.downloadAndStore();
-    }
+//    public void getLocalContacts(){
+//        SharedPreferences sp = getSharedPreferences(
+//                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+//        String profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
+//        DownloadLocalContacts downloadLocalContacts =
+//                new DownloadLocalContacts(MycommsApp.this, profileId, false);
+//        downloadLocalContacts.downloadAndStore();
+//    }
 
     @Override
     public void onProfileReceived(UserProfile userProfile) {

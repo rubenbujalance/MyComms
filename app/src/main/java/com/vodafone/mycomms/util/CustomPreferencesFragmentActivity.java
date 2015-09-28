@@ -40,8 +40,8 @@ public class CustomPreferencesFragmentActivity extends ToolbarActivity
                 fragmentTransaction.commit();
                 break;
             default:
-                AccountsFragment deafultAccountsFragment = AccountsFragment.newInstance(2, null);
-                fragmentTransaction.add(deafultAccountsFragment, String.valueOf(2));
+                AccountsFragment defaultAccountsFragment = AccountsFragment.newInstance(2, null);
+                fragmentTransaction.add(defaultAccountsFragment, String.valueOf(2));
                 fragmentTransaction.commit();
                 break;
         }

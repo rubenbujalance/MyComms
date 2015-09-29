@@ -14,12 +14,15 @@ import android.widget.RelativeLayout;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.vodafone.mycomms.BuildConfig;
+import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatlist.view.ChatListActivity;
+import com.vodafone.mycomms.chatlist.view.ChatListFragment;
 import com.vodafone.mycomms.chatlist.view.ChatListHolder;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.ChatsReceivedEvent;
 import com.vodafone.mycomms.realm.RealmChatTransactions;
+import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
@@ -42,6 +45,9 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
+import org.robolectric.shadows.ShadowListView;
+import org.robolectric.shadows.ShadowRegion;
+import org.robolectric.shadows.ShadowView;
 import org.robolectric.shadows.ShadowViewGroup;
 
 import io.realm.Realm;
@@ -53,16 +59,23 @@ import io.realm.Realm;
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
-@PrepareForTest({Realm.class, RealmChatTransactions.class, RealmGroupChatTransactions.class})
+@PrepareForTest(
+        {
+                Realm.class
+                , RealmChatTransactions.class
+                , RealmGroupChatTransactions.class
+                , RealmContactTransactions.class
+        })
 public class ChatListActivityTest {
 
     @Rule
     public PowerMockRule rule = new PowerMockRule();
 
-    Activity activity;
+    ChatListActivity activity;
     RealmChatTransactions mockChatTx;
     RealmGroupChatTransactions mockGroupChatTx;
     RecyclerView recyclerView;
+    ChatListFragment mChatListFragment;
 
     @Before
     public void setUp()
@@ -70,26 +83,30 @@ public class ChatListActivityTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         //Mock Realm
         PowerMockito.mockStatic(Realm.class);
-
-        //Mock Chat and GroupChat Transactions
+        PowerMockito.mockStatic(RealmGroupChatTransactions.class);
+        PowerMockito.mockStatic(RealmChatTransactions.class);
+        PowerMockito.mockStatic(RealmContactTransactions.class);
         mockChatTx = PowerMockito.mock(RealmChatTransactions.class);
         mockGroupChatTx = PowerMockito.mock(RealmGroupChatTransactions.class);
+
+        PowerMockito.when(Realm.getInstance(Mockito.any(Context.class))).thenReturn(null);
         PowerMockito.when(mockGroupChatTx.getAllGroupChats(Mockito.any(Realm.class)))
                 .thenReturn(MockDataForTests.getEmptyGroupChatList());
         PowerMockito.when(mockChatTx.getAllChatsFromExistingContacts(Mockito.any(Realm.class)))
                 .thenReturn(MockDataForTests.getEmptyChatList());
-
-        PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getInstance(Mockito.any(Context.class), Mockito.any(String.class)))
                 .thenReturn(mockGroupChatTx);
-        PowerMockito.mockStatic(RealmChatTransactions.class);
         PowerMockito.when(RealmChatTransactions.getInstance(Mockito.any(Context.class)))
                 .thenReturn(mockChatTx);
 
+        MycommsApp.stateCounter = 0;
+
         activity = Robolectric.setupActivity(ChatListActivity.class);
-        recyclerView = (RecyclerView)activity.findViewById(R.id.recycler_view);
+        mChatListFragment = (ChatListFragment)activity.getSupportFragmentManager().getFragments().get(0);
+        recyclerView = (RecyclerView)mChatListFragment.getView().findViewById(R.id.recycler_view);
         recyclerView.measure(0, 0);
         recyclerView.layout(0, 0, 100, 10000);
+
     }
 
     @After
@@ -124,12 +141,27 @@ public class ChatListActivityTest {
     }
 
     @Test
-    public void testLoadSomeChats()
+    public void testOnBackPressed()
     {
+        this.mChatListFragment.getActivity().onBackPressed();
+        Assert.assertFalse(this.mChatListFragment.getActivity().isFinishing());
+    }
+
+    @Test
+    public void testStopActivity()
+    {
+        this.mChatListFragment.onStop();
+        Assert.assertTrue(MycommsApp.stateCounter != 0);
+    }
+
+    @Test
+    public void testLoadSomeChats() {
         PowerMockito.when(mockGroupChatTx.getAllGroupChats(Mockito.any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChatList());
         PowerMockito.when(mockChatTx.getAllChatsFromExistingContacts(Mockito.any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockChatList());
+        PowerMockito.when(RealmContactTransactions.getContactById(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockContact());
 
         //Check number of chats
         BusProvider.getInstance().post(new ChatsReceivedEvent());
@@ -199,5 +231,13 @@ public class ChatListActivityTest {
         //Trying connect
         BusProvider.getInstance().post(eventConnected);
         Assert.assertTrue(lay_no_connection.getVisibility()== View.GONE);
+    }
+
+    private void checkThreadSchedulers()
+    {
+        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
+            Robolectric.flushBackgroundThreadScheduler();
+        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
+            Robolectric.flushForegroundThreadScheduler();
     }
 }

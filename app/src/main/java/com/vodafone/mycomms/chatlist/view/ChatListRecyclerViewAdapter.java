@@ -1,5 +1,6 @@
 package com.vodafone.mycomms.chatlist.view;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -37,8 +38,6 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     private ArrayList<ComposedChat> composedChat = new ArrayList<>();
     private Context mContext;
     private RealmChatTransactions _chatTx;
-    private RealmGroupChatTransactions groupChatTransactions;
-    private RealmContactTransactions mContactTransactions;
     private String profileId;
     private Realm realm;
 
@@ -52,8 +51,8 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         profileId = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        groupChatTransactions = new RealmGroupChatTransactions(mContext, profileId);
-        mContactTransactions = new RealmContactTransactions(profileId);
+        new RealmGroupChatTransactions(mContext, profileId);
+        new RealmContactTransactions(profileId);
     }
 
     @Override
@@ -77,6 +76,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     public void onBindViewHolder(final ChatListHolder chatListHolder, final int i)
     {
         chatListHolder.layContainer.setOnTouchListener(new View.OnTouchListener() {
+            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 int sdk = Build.VERSION.SDK_INT;
@@ -145,7 +145,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         else
             chatListHolder.badgeUnread.setVisibility(View.GONE);
 
-        Contact contact = mContactTransactions.getContactById(getComposedChat(i).getChat()
+        Contact contact = RealmContactTransactions.getContactById(getComposedChat(i).getChat()
                 .getContact_id(), realm);
 
         chatListHolder.top_left_avatar_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
@@ -159,14 +159,14 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
 
     private String getChatMemberName(String contactId)
     {
-        Contact contact = mContactTransactions.getContactById(contactId, realm);
+        Contact contact = RealmContactTransactions.getContactById(contactId, realm);
         String name = contact.getFirstName() + " " + contact.getLastName();
         return  name;
     }
 
     private String getChatMemberInitials(String contactId)
     {
-        Contact contact = mContactTransactions.getContactById(contactId, realm);
+        Contact contact = RealmContactTransactions.getContactById(contactId, realm);
         String name = contact.getFirstName().substring(0,1) + contact.getLastName().substring(0,1);
         return  name;
     }
@@ -175,8 +175,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
     private ArrayList<Contact> loadContactsFromIds(ArrayList<String> ids)
     {
         ArrayList<Contact> contacts = new ArrayList<>();
-        RealmContactTransactions realmContactTransactions =
-                new RealmContactTransactions(profileId);
+        new RealmContactTransactions(profileId);
 
         UserProfile userProfile = RealmContactTransactions.getUserProfile(realm, profileId);
         Contact userContact = new Contact();
@@ -191,7 +190,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         for(String id : ids)
         {
             if(id.compareTo(userProfile.getId())!=0)
-                contact = realmContactTransactions.getContactById(id,realm);
+                contact = RealmContactTransactions.getContactById(id, realm);
             else contact = userContact;
 
             if(null != contact)
@@ -289,7 +288,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         chatListHolder.textViewTime.setText(timeDifference);
 
         //Load unread messages
-        long amountUnreadMessages = groupChatTransactions.getGroupChatPendingMessagesCount(
+        long amountUnreadMessages = RealmGroupChatTransactions.getGroupChatPendingMessagesCount(
                 getComposedChat(i).getGroupChat().getId(), realm);
 
         if(amountUnreadMessages > 0) {

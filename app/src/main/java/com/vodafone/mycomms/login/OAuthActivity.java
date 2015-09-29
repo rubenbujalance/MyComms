@@ -44,25 +44,16 @@ public class OAuthActivity extends MainActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(Constants.TAG, "OAuthActivity.onCreate: ");
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler
-                (
-                        new UncaughtExceptionHandlerController(this, null)
-                );
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandlerController(this, null));
         setContentView(R.layout.activity_oauth_web);
         wvOAuth = (WebView)findViewById(R.id.wvOAuth);
         relativeContainer = (RelativeLayout)findViewById(R.id.relative_container);
         BusProvider.getInstance().register(this);
-
-        //Read OAuth prefix
         oauthPrefix = getIntent().getStringExtra("oauth");
-
-        //Load web view
         wvOAuth.getSettings().setJavaScriptEnabled(true);
         wvOAuth.getSettings().setSupportMultipleWindows(true);
         wvOAuth.getSettings().setAppCacheEnabled(false);
         setWebViewListener();
-
-        //Launch OAuth corresponding URL
         wvOAuth.loadUrl("https://" + EndpointWrapper.getBaseURL() + "/auth/" + oauthPrefix,
                 new HashMap<String, String>());
     }
@@ -74,12 +65,11 @@ public class OAuthActivity extends MainActivity {
         try {
             hashUrl = new HashMap<>();
             hashUrl.put("url", url);
+            new CallOAuthCallback().execute(null, null, hashUrl);
         } catch(Exception ex) {
             Log.e(Constants.TAG, "OAuthActivity.callOAuthToken: \n" + ex.toString());
             return;
         }
-
-        new CallOAuthCallback().execute(null, null, hashUrl);
     }
 
     private void callbackOAuthCallback(HashMap<String, Object> result)
@@ -90,10 +80,10 @@ public class OAuthActivity extends MainActivity {
 
         status = (String)result.get("status");
 
-        try {
-            if (status.compareTo("200") == 0) {
-                //User exists
-                //Get tokens and expiration data from http response
+        try
+        {
+            if (status.compareTo("200") == 0)
+            {
                 JSONObject jsonResponse = (JSONObject)result.get("json");
                 String accessToken = jsonResponse.getString("accessToken");
                 String refreshToken = jsonResponse.getString("refreshToken");
@@ -102,14 +92,19 @@ public class OAuthActivity extends MainActivity {
                 UserSecurity.setTokens(accessToken, refreshToken, expiresIn, this);
 
                 //Load profile
-                ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
+                try {
+                    ((MycommsApp)getApplication()).getProfileIdAndAccessToken();
+                }
+                catch (Exception e)
+                {
+                    Log.e(Constants.TAG, "OAuthActivity.callbackOAuthCallback: ", e);
+                }
 
                 if(MycommsApp.isProfileAvailable())
                     goToApp();
             }
-            else if (status.compareTo("203") == 0) {
-                //We have got user information, continue SignUp process
-                //Save user data and go to signup
+            else if (status.compareTo("203") == 0)
+            {
                 JSONObject jsonResponse = (JSONObject)result.get("json");
                 if(!jsonResponse.isNull("email"))
                     UserProfile.setMail(jsonResponse.getString("email"));
@@ -134,11 +129,8 @@ public class OAuthActivity extends MainActivity {
 
                 goToSignUp();
             }
-            else
-            {
-                //Come back to loginActivity
-                Toast.makeText(this, getString(R.string.error_reading_data_from_server),
-                        Toast.LENGTH_LONG).show();
+            else {
+                Toast.makeText(this, getString(R.string.error_reading_data_from_server), Toast.LENGTH_LONG).show();
                 finish();
             }
         } catch(Exception ex) {
@@ -150,7 +142,6 @@ public class OAuthActivity extends MainActivity {
         }
     }
 
-    //Called when user profile has been loaded
     @Subscribe
     public void onApplicationAndProfileInitializedEvent(ApplicationAndProfileInitialized event){
         if(!isForeground) return;
@@ -159,7 +150,6 @@ public class OAuthActivity extends MainActivity {
         goToApp();
     }
 
-    //Called when user profile has failed
     @Subscribe
     public void onApplicationAndProfileReadErrorEvent(ApplicationAndProfileReadError event){
         if(!isForeground) return;
@@ -187,7 +177,6 @@ public class OAuthActivity extends MainActivity {
 
     private void goToApp()
     {
-        //Go to app
         wvOAuth.clearCache(true);
         Intent in = new Intent(OAuthActivity.this, DashBoardActivity.class);
         startActivity(in);
@@ -229,10 +218,7 @@ public class OAuthActivity extends MainActivity {
                     relativeContainer.setVisibility(View.VISIBLE);
                     wvOAuth.setVisibility(View.INVISIBLE);
 
-                    callOAuthCallback(Uri.parse(urlNewString).getPath() + "?" +
-                            Uri.parse(urlNewString).getQuery());
-//                    view.clearCache(true);
-//                    Utils.clearCacheFolder(getApplicationContext().getCacheDir(), 1);
+                    callOAuthCallback(Uri.parse(urlNewString).getPath() + "?" + Uri.parse(urlNewString).getQuery());
                     return true;
                 } else {
                     view.loadUrl(urlNewString, new HashMap<String, String>());
@@ -251,22 +237,18 @@ public class OAuthActivity extends MainActivity {
                 super.onPageFinished(view, url);
                 relativeContainer.setVisibility(View.INVISIBLE);
                 wvOAuth.setVisibility(View.VISIBLE);
-
             }
-
         });
     }
 
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         super.onStart();
         MycommsApp.activityStarted();
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         MycommsApp.activityStopped();
         super.onStop();
     }

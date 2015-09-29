@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.settings;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,7 +34,6 @@ public class AccountsFragment extends Fragment {
     private ImageView imgCheckLocalContacts, imgCheckGlobalContacts;
     private SharedPreferences sp;
 
-    private OnFragmentInteractionListener mListener;
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -144,34 +142,8 @@ public class AccountsFragment extends Fragment {
 
     private boolean validateLocalContactsRealm() {
         String profile = sp.getString(Constants.PROFILE_ID_SHARED_PREF, "");
-        RealmContactTransactions realmContactTransactions = new RealmContactTransactions(profile);
-        return realmContactTransactions.validateContactPlatformExists(null, Constants.PLATFORM_LOCAL);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public void onStop(){
-        super.onStop();
+        new RealmContactTransactions(profile);
+        return RealmContactTransactions.validateContactPlatformExists(null, Constants.PLATFORM_LOCAL);
     }
 
     /**

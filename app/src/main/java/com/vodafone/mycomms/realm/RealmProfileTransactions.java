@@ -5,6 +5,8 @@ import android.util.Log;
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.util.Constants;
 
+import java.util.MissingResourceException;
+
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -31,9 +33,12 @@ public class RealmProfileTransactions
             mRealm = Realm.getDefaultInstance();
         try
         {
-            mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(userProfile);
-            mRealm.commitTransaction();
+            if(null != mRealm)
+            {
+                mRealm.beginTransaction();
+                mRealm.copyToRealmOrUpdate(userProfile);
+                mRealm.commitTransaction();
+            }
         }
         catch(Exception e)
         {
@@ -43,7 +48,7 @@ public class RealmProfileTransactions
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
     }
@@ -58,10 +63,14 @@ public class RealmProfileTransactions
             mRealm = Realm.getDefaultInstance();
         try
         {
-            mRealm.beginTransaction();
-            UserProfile userProfile = getUserProfile(profileId, mRealm);
-            userProfile.setTimezone(timezone);
-            mRealm.commitTransaction();
+            if(null != mRealm)
+            {
+                mRealm.beginTransaction();
+                UserProfile userProfile = getUserProfile(profileId, mRealm);
+                userProfile.setTimezone(timezone);
+                mRealm.commitTransaction();
+            }
+
         }
         catch(Exception e)
         {
@@ -85,15 +94,18 @@ public class RealmProfileTransactions
             mRealm = Realm.getDefaultInstance();
         try
         {
-            mRealm.beginTransaction();
-            RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);
-            query.equalTo(Constants.PROFILE_ID, profileId);
-            UserProfile userProfile = query.findFirst();
-            if (userProfile != null)
+            if(null != mRealm)
             {
-                userProfile.removeFromRealm();
+                mRealm.beginTransaction();
+                RealmQuery<UserProfile> query = mRealm.where(UserProfile.class);
+                query.equalTo(Constants.PROFILE_ID, profileId);
+                UserProfile userProfile = query.findFirst();
+                if (userProfile != null)
+                {
+                    userProfile.removeFromRealm();
+                }
+                mRealm.commitTransaction();
             }
-            mRealm.commitTransaction();
         }
         catch(Exception e)
         {

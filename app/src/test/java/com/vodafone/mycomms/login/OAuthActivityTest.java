@@ -2,14 +2,23 @@ package com.vodafone.mycomms.login;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.view.View;
 import android.webkit.WebView;
+import android.widget.RelativeLayout;
 
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
+import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
+import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.test.util.Util;
+import com.vodafone.mycomms.util.Constants;
 
 import org.apache.http.HttpResponse;
 import org.junit.After;
@@ -27,6 +36,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowWebView;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import static com.vodafone.mycomms.constants.Constants.OAUTH_200_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.OAUTH_RESPONSE;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -54,7 +64,7 @@ public class OAuthActivityTest {
         incomingIntent.putExtra("oauth", "sf");
         activity = Robolectric.buildActivity(OAuthActivity.class).withIntent(incomingIntent).create().start().resume().get();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         }
         catch (Exception e)
         {
@@ -68,11 +78,7 @@ public class OAuthActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
-
+        Robolectric.reset();
         activity = null;
         incomingIntent = null;
         wvOAuth = null;
@@ -80,10 +86,32 @@ public class OAuthActivityTest {
     }
 
     @Test
+    public void testOAuthToSignupMailResponse200() throws Exception
+    {
+        HttpResponse httpResponse2 = Util.buildResponse(200, OAUTH_200_RESPONSE);
+        FakeHttp.addPendingHttpResponse(httpResponse2);
+        String url = "https://" + EndpointWrapper.getBaseURL() + "/auth/" + activity.oauthPrefix + "/callback";
+        ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
+        boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
+        Assert.assertTrue(didOverrideUrl);
+    }
+
+
+    @Test
     public void testOAuthToSignupMail() throws Exception {
         HttpResponse httpResponse2 = Util.buildResponse(203, OAUTH_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse2);
         String url = "https://" + EndpointWrapper.getBaseURL() + "/auth/" + activity.oauthPrefix + "/callback";
+        ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
+        boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
+        Assert.assertTrue(didOverrideUrl);
+    }
+
+    @Test
+    public void testOAuthToSignupMailWrongURL() throws Exception {
+        HttpResponse httpResponse2 = Util.buildResponse(203, OAUTH_RESPONSE);
+        FakeHttp.addPendingHttpResponse(httpResponse2);
+        String url = "https://" + EndpointWrapper.getBaseURL() + "/auth/" + activity.oauthPrefix + "/call";
         ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
         Assert.assertTrue(didOverrideUrl);
@@ -107,4 +135,41 @@ public class OAuthActivityTest {
         Assert.assertTrue(activity.isDestroyed());
     }
 
+    @Test
+    public void testApplicationAndProfileInitialized()
+    {
+        ApplicationAndProfileInitialized event = new ApplicationAndProfileInitialized();
+        BusProvider.getInstance().post(event);
+        Assert.assertTrue(this.activity.isFinishing());
+    }
+
+    @Test
+    public void testApplicationAndProfileReadError()
+    {
+        ApplicationAndProfileReadError event = new ApplicationAndProfileReadError();
+        BusProvider.getInstance().post(event);
+        Assert.assertTrue(this.activity.isFinishing());
+    }
+
+    @Test
+    public void testOnPageStarted()
+    {
+        RelativeLayout relativeContainer = (RelativeLayout)activity.findViewById(R.id.relative_container);
+        String url = "https://" + EndpointWrapper.getBaseURL() + "/auth/" + activity.oauthPrefix + "/callback";
+        ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
+        sWvOAuth.getWebViewClient().onPageStarted(activity.wvOAuth, url, null);
+        Assert.assertTrue(relativeContainer.getVisibility() == View.VISIBLE);
+        Assert.assertTrue(activity.wvOAuth.getVisibility() == View.INVISIBLE);
+    }
+
+    @Test
+    public void testOnPageFinished()
+    {
+        RelativeLayout relativeContainer = (RelativeLayout)activity.findViewById(R.id.relative_container);
+        String url = "https://" + EndpointWrapper.getBaseURL() + "/auth/" + activity.oauthPrefix + "/callback";
+        ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
+        sWvOAuth.getWebViewClient().onPageFinished(activity.wvOAuth, url);
+        Assert.assertTrue(relativeContainer.getVisibility() == View.INVISIBLE);
+        Assert.assertTrue(activity.wvOAuth.getVisibility() == View.VISIBLE);
+    }
 }

@@ -2,6 +2,7 @@ package com.vodafone.mycomms.login;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -24,25 +25,31 @@ import org.apache.http.HttpResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
+import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
+
+import io.realm.Realm;
 
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_USER_NOT_FOUND_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.PASSWORD;
 import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -54,7 +61,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 @PrepareForTest({Crashlytics.class})
 public class LoginActivityTest {
 
-    Activity activity;
+    LoginActivity activity;
     Button btLoginSalesforce;
     Button btLogin;
     TextView tvForgotPass;
@@ -70,7 +77,7 @@ public class LoginActivityTest {
 
         activity = Robolectric.buildActivity(LoginActivity.class).create().start().resume().get();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         }
         catch (Exception e)
         {
@@ -103,6 +110,15 @@ public class LoginActivityTest {
     }
 
     @Test
+    public void testOnActivityResult()
+    {
+        this.activity.onActivityResult(1, Activity.RESULT_OK,null);
+        AlertDialog dialog = (AlertDialog)ShadowDialog.getLatestDialog();
+        Assert.assertNotNull(dialog);
+        Assert.assertTrue(dialog.isShowing());
+    }
+
+    @Test
     public void testLoginOk()
     {
         try {
@@ -118,7 +134,7 @@ public class LoginActivityTest {
         etPassword.setText(PASSWORD);
         btLogin.performClick();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -143,7 +159,7 @@ public class LoginActivityTest {
         etPassword.setText(PASSWORD);
         btLogin.performClick();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

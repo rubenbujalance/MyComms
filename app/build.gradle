@@ -256,8 +256,4 @@ task jacocoTestReportDebug(type: JacocoReport) {
     }
 }
 
-tasks.withType(Test) {
-    jvmArgs '-XX:MaxPermSize=1024m'
-    maxParallelForks = Runtime.runtime.availableProcessors()
-}
 

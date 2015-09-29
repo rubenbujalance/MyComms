@@ -25,8 +25,6 @@ import java.util.HashMap;
 public class LoginController extends BaseController {
 
     private LoginConnection loginConnection;
-    private ILoginConnectionCallback loginConnectionCallback;
-
     public LoginController(Activity activity) {
         super(activity);
     }
@@ -34,7 +32,7 @@ public class LoginController extends BaseController {
     public void startLogin(String email, String password){
         Log.d(Constants.TAG, "LoginController.startLogin: ");
 
-        HashMap body = new HashMap<>();
+        HashMap<String, String> body = new HashMap<>();
         body.put("username", email);
         body.put("password", password);
 
@@ -82,7 +80,6 @@ public class LoginController extends BaseController {
         if(this.getConnectionCallback() != null && this.getConnectionCallback() instanceof ILoginConnectionCallback && response.getUrl() !=null  && response.getUrl().contains(LoginConnection.URL)){
             ((ILoginConnectionCallback)this.getConnectionCallback()).onLoginSuccess();
         }
-
     }
 
     @Override
@@ -97,12 +94,11 @@ public class LoginController extends BaseController {
     private class GCMGetTokenAsyncTask extends AsyncTask<Object, Void, Object> {
         @Override
         protected Object doInBackground(Object... params) {
-            HashMap body = (HashMap)params[0];
+            HashMap<String, String> body = (HashMap<String, String>) params[0];
 
             String token = Utils.getGCMToken(getContext());
             if(token!=null)
                 body.put("deviceId", token);
-
             return body;
         }
 

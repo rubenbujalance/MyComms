@@ -74,10 +74,6 @@ public class BaseConnection extends DefaultConnection {
         this.context = context;
     }
 
-    public static int getNumOfFailedAuthRequest() {
-        return numOfFailedAuthRequest;
-    }
-
     public static void setNumOfFailedAuthRequest(int numOfFailedAuthRequest) {
         BaseConnection.numOfFailedAuthRequest = numOfFailedAuthRequest;
     }
@@ -180,10 +176,4 @@ public class BaseConnection extends DefaultConnection {
     public Context getContext() {
         return context;
     }
-
-    public void addMultipartData()
-    {
-
-    }
-    
 }

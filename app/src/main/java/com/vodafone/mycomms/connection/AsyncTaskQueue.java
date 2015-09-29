@@ -12,8 +12,6 @@ import java.util.HashMap;
  */
 public class AsyncTaskQueue {
     private HashMap<String, AsyncTask> asyncTaskQueue;
-//    private static ArrayList<String> sortedKeys = new ArrayList<>();
-
     public AsyncTaskQueue()
     {
         asyncTaskQueue = new HashMap<>();
@@ -25,13 +23,10 @@ public class AsyncTaskQueue {
             try {
                 if(asyncTaskQueue.containsKey(key)) {
                     asyncTaskQueue.get(key).cancel(false);
-//                    Log.i(Constants.TAG, "AsyncTaskQueue.putConnection: Task canceled "+key);
                 }
-
                 asyncTaskQueue.put(key, task);
-//                Log.i(Constants.TAG, "AsyncTaskQueue.putConnection: Task added " + key);
             } catch (Exception e) {
-                Log.e(Constants.TAG, "ConnectionsQueue.putConnection: ", e);
+                Log.e(Constants.TAG, "AsyncTaskQueue.putConnection: ", e);
             }
         }
     }
@@ -42,55 +37,10 @@ public class AsyncTaskQueue {
             try {
                 if(asyncTaskQueue.containsKey(key)) {
                     asyncTaskQueue.remove(key);
-//                    Log.i(Constants.TAG, "AsyncTaskQueue.removeConnection: Task removed " + key);
                 }
             } catch (Exception e) {
-                Log.e(Constants.TAG, "ConnectionsQueue.removeConnection: ", e);
+                Log.e(Constants.TAG, "AsyncTaskQueue.removeConnection: ", e);
             }
         }
     }
-
-    public boolean hasConnections()
-    {
-        return asyncTaskQueue.isEmpty();
-    }
-
-    public boolean isConnectionQueued(String key) {
-        return asyncTaskQueue.containsKey(key);
-    }
-
-    public void cancelConnection(String key)
-    {
-        synchronized (AsyncTaskQueue.class) {
-            try {
-                if(asyncTaskQueue.containsKey(key)) {
-                    asyncTaskQueue.get(key).cancel(true);
-                    asyncTaskQueue.remove(key);
-                }
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "ConnectionsQueue.cancelConnection: ", e);
-            }
-        }
-    }
-
-    //Commented due to concurrency problems
-//    public void cancelAllConnections()
-//    {
-//        synchronized (AsyncTaskQueue.class) {
-//            try {
-//                Set<String> keys = asyncTaskQueue.keySet();
-//                Iterator<String> keysIt = keys.iterator();
-//                String key;
-//
-//                while (keysIt.hasNext()) {
-//                    key = keysIt.next();
-//                    asyncTaskQueue.get(key).cancel(true);
-//                    asyncTaskQueue.remove(key);
-//                }
-//
-//            } catch (Exception e) {
-//                Log.e(Constants.TAG, "ConnectionsQueue.cancelAllConnections: ", e);
-//            }
-//        }
-//    }
 }

@@ -5,24 +5,46 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 
+import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.settings.AccountsFragment;
 import com.vodafone.mycomms.settings.PreferencesFragment;
+import com.vodafone.mycomms.settings.ProfileFragment;
 
-public class CustomPreferencesFragmentActivity extends AppCompatActivity
+public class CustomPreferencesFragmentActivity extends ToolbarActivity
         implements PreferencesFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout_profile_activity);
         Intent in = this.getIntent();
-        int index = in.getIntExtra("index", 2);
+        int fragmentId = in.getIntExtra("index", 2);
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        PreferencesFragment fragment = PreferencesFragment.newInstance(index, null);
-
-        fragmentTransaction.add(fragment, String.valueOf(index));
-        fragmentTransaction.commit();
+        switch (fragmentId)
+        {
+            case 0:
+                PreferencesFragment preferencesFragment = PreferencesFragment.newInstance(0, null);
+                fragmentTransaction.add(preferencesFragment, String.valueOf(0));
+                fragmentTransaction.commit();
+                break;
+            case 1:
+                ProfileFragment profileFragment = ProfileFragment.newInstance(1, null);
+                fragmentTransaction.add(profileFragment, String.valueOf(1));
+                fragmentTransaction.commit();
+                break;
+            case 2:
+                AccountsFragment accountsFragment = AccountsFragment.newInstance(2, null);
+                fragmentTransaction.add(accountsFragment, String.valueOf(2));
+                fragmentTransaction.commit();
+                break;
+            default:
+                AccountsFragment defaultAccountsFragment = AccountsFragment.newInstance(2, null);
+                fragmentTransaction.add(defaultAccountsFragment, String.valueOf(2));
+                fragmentTransaction.commit();
+                break;
+        }
     }
 
     @Override

@@ -48,7 +48,7 @@ public class GroupChatListFragment extends ListFragment
     private ListView listView;
     private SearchController mSearchController;
     private SharedPreferences sp;
-    private ArrayList<Contact> contactList;
+    public ArrayList<Contact> contactList;
     private String profileId;
     private String name = "";
     private String about = "";
@@ -134,7 +134,8 @@ public class GroupChatListFragment extends ListFragment
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-        this.realm.close();
+        if(null != realm)
+            this.realm.close();
     }
 
     @Override

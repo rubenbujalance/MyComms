@@ -1,14 +1,18 @@
 package com.vodafone.mycomms.chat;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+import com.github.pwittchen.networkevents.library.ConnectivityStatus;
+import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.picasso.Downloader;
@@ -56,7 +60,10 @@ import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowListView;
 
+import java.util.ArrayList;
+
 import io.realm.Realm;
+import model.Contact;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
@@ -313,16 +320,64 @@ public class GroupChatListActivityTest
     }
 
     @Test
-    public void testReloadAdapterEvent() throws Exception
+    public void testOnConnectivityChanged_Connected() throws Exception
     {
-        PowerMockito.mockStatic(SearchBarController.class);
-        PowerMockito.when(SearchBarController.getContactList()).thenReturn(MockDataForTests.getMockContactsList());
-        ReloadAdapterEvent event = new ReloadAdapterEvent();
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
         setUpActivity_PreviousGroupChatListActivity();
         Thread.sleep(2000);
         checkThreadSchedulers();
         BusProvider.getInstance().post(event);
+        LinearLayout lay_no_connection = (LinearLayout) this.mGroupChatListFragment.getActivity().findViewById(R.id.no_connection_layout);
+        Assert.assertTrue(lay_no_connection.getVisibility() == View.GONE);
+    }
 
+    @Test
+    public void testOnConnectivityChanged_NotConnected() throws Exception
+    {
+        ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
+        setUpActivity_PreviousGroupChatListActivity();
+        Thread.sleep(2000);
+        checkThreadSchedulers();
+        BusProvider.getInstance().post(event);
+        LinearLayout lay_no_connection = (LinearLayout) this.mGroupChatListFragment.getActivity().findViewById(R.id.no_connection_layout);
+        Assert.assertTrue(lay_no_connection.getVisibility() == View.VISIBLE);
+    }
+
+    @Test
+    public void testReloadAdapterEvent() throws Exception
+    {
+        ArrayList<Contact> contactArrayList = new ArrayList<>();
+        contactArrayList.add(MockDataForTests.getMockContact());
+
+        PowerMockito.mockStatic(SearchBarController.class);
+        PowerMockito.when(SearchBarController.getContactList()).thenReturn(contactArrayList);
+        ReloadAdapterEvent event = new ReloadAdapterEvent();
+        setUpActivity_PreviousGroupChatListActivity();
+        Thread.sleep(2000);
+        checkThreadSchedulers();
+        ArrayList<Contact> contacts = this.mGroupChatListFragment.contactList;
+        BusProvider.getInstance().post(event);
+        Assert.assertNotEquals(contacts.size(), this.mGroupChatListFragment.contactList.size());
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    @Test
+    public void testLifeCycle()
+    {
+        MycommsApp.stateCounter = 0;
+        SharedPreferences sp = mContext.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
+
+        PowerMockito.mockStatic(RealmContactTransactions.class);
+        PowerMockito.when(RealmContactTransactions.getAllContacts(Mockito.any(Realm.class), Mockito.anyString()))
+                .thenReturn(MockDataForTests.getMockContactsList());
+        Intent intent = new Intent();
+        intent.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, GroupChatListActivity.class.getSimpleName());
+        this.mActivity = Robolectric.buildActivity(GroupChatListActivity.class).withIntent(intent)
+                .create().start().resume().stop().destroy().get();
+        Assert.assertTrue(MycommsApp.stateCounter == 0);
+        Assert.assertTrue(this.mActivity.isDestroyed());
     }
 
     private void setUpActivity_PreviousGroupChatListActivity()

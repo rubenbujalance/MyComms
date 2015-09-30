@@ -96,16 +96,6 @@ public final class UserSecurity {
         return _refreshToken;
     }
 
-    public static long getExpirationTimeMilis(Context context) {
-        if (_sharedPref == null)
-        {
-            if(!loadSharedPrefs(context))
-                return 0;
-        }
-
-        return _expirationTimeMillis;
-    }
-
     public static boolean isUserLogged(Context context)
     {
         if (_sharedPref == null)
@@ -148,7 +138,7 @@ public final class UserSecurity {
             editor.remove(Constants.PROFILE_REFRESH_TOKEN);
             editor.remove(Constants.PROFILE_EXPIRATION_TIME_MILLIS);
 
-            editor.commit();
+            editor.apply();
 
             _accessToken = null;
             _refreshToken = null;

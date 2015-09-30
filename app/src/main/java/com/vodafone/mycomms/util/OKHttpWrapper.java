@@ -43,11 +43,6 @@ public class OKHttpWrapper {
         call("PUT", url, jsonObject, cb, EndpointWrapper.getBaseURL(), context);
     }
 
-//    public static void postNews(String url, Context context,
-//                                HttpCallback cb, JSONObject jsonObject) {
-//        call("POST", url, jsonObject, cb, EndpointWrapper.getBaseNewsURL(), context);
-//    }
-
     private static void call(String method, final String url, JSONObject jsonObject,
                              final HttpCallback cb, final String endPointWrapper,
                              final Context context) {

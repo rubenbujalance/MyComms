@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -119,23 +117,6 @@ public class ToolbarActivity extends AppCompatActivity {
         return mToolbar;
     }
 
-    public Toolbar activateGroupChatToolbar()
-    {
-        mToolbar = (Toolbar) findViewById(R.id.app_group_chat);
-        Toolbar goneToolbar = (Toolbar) findViewById(R.id.app_bar);
-        Toolbar goneToolbar2 = (Toolbar) findViewById(R.id.app_inbox);
-        if(mToolbar != null) {
-            setSupportActionBar(mToolbar);
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-            mToolbar.setVisibility(View.VISIBLE);
-            goneToolbar.setVisibility(View.GONE);
-            goneToolbar2.setVisibility(View.GONE);
-        }
-        return mToolbar;
-    }
-
-
-
     protected Toolbar activateFooter() {
         if(mFooter == null) {
             mFooter = (Toolbar) findViewById(R.id.app_footer);
@@ -181,46 +162,12 @@ public class ToolbarActivity extends AppCompatActivity {
         }
     }
 
-    protected Toolbar activateToolbarWithHomeEnabled() {
-        activateToolbar();
-        if(mToolbar != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            changeArrowColor(R.color.white);
-        }
-        return mToolbar;
-    }
-
-    protected void changeArrowColor(int color){
-        final Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-        if (upArrow != null) {
-            upArrow.setColorFilter(getResources().getColor(color), PorterDuff.Mode.SRC_ATOP);
-            getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        }
-    }
-
-    protected Toolbar setToolbarBackground(int image) {
-        if(mToolbar == null) {
-            mToolbar = (Toolbar) findViewById(R.id.app_bar);
-        }
-        if(mToolbar != null) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN)
-                mToolbar.setBackgroundDrawable(getResources().getDrawable(image));
-            else
-                mToolbar.setBackground(getResources().getDrawable(image));
-        }
-        return mToolbar;
-    }
-
     protected void setToolbarTitle(String title){
         TextView toolbarTitle = (TextView) findViewById(R.id.toolbar_title);
         toolbarTitle.setText(title);
     }
 
     protected void setFooterListeners(final Context context){
-
-        ImageView footerContacts = (ImageView) findViewById(R.id.footer_contacts);
-        ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);
-        ImageView footerRecents = (ImageView) findViewById(R.id.footer_recents);
 
         LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
         LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
@@ -240,7 +187,6 @@ public class ToolbarActivity extends AppCompatActivity {
                 // set an exit transition
                 Intent in = new Intent(context, ContactListMainActivity.class);
                 in.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                //in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivity(in);
                 overridePendingTransition(0, 0);
                 //overridePendingTransition(R.anim.pull_in_right, R.anim.push_out_left);
@@ -290,8 +236,6 @@ public class ToolbarActivity extends AppCompatActivity {
         contactsAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Intent in = new Intent(context, GroupChatActivity.class);
-                //startActivity(in);
             }
         });
     }
@@ -331,9 +275,6 @@ public class ToolbarActivity extends AppCompatActivity {
     }
 
     public void activateFooterSelected(int selected){
-        LinearLayout layoutContacts = (LinearLayout) findViewById(R.id.footer_contacts_layout);
-        LinearLayout layoutDashboard = (LinearLayout) findViewById(R.id.footer_dashboard_layout);
-
         ImageView footerContacts = (ImageView) findViewById(R.id.footer_contacts);
         ImageView footerHome = (ImageView) findViewById(R.id.footer_dashboard);
         ImageView footerRecents = (ImageView) findViewById(R.id.footer_recents);
@@ -343,10 +284,6 @@ public class ToolbarActivity extends AppCompatActivity {
 
         switch (selected){
             case Constants.TOOLBAR_CONTACTS:
-//                layoutContacts.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
-//                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
-//                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
-
                 tvContacts.setTextColor(getResources().getColor(R.color.white));
                 tvChat.setTextColor(getResources().getColor(R.color.grey_middle));
 
@@ -361,9 +298,6 @@ public class ToolbarActivity extends AppCompatActivity {
                 }
                 break;
             case Constants.TOOLBAR_DASHBOARD:
-//                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
-//                layoutRecents.setBackgroundColor(getResources().getColor(R.color.transparent));
-
                 tvContacts.setTextColor(getResources().getColor(R.color.grey_middle));
                 tvChat.setTextColor(getResources().getColor(R.color.grey_middle));
 
@@ -378,10 +312,6 @@ public class ToolbarActivity extends AppCompatActivity {
                 }
                 break;
             case Constants.TOOLBAR_RECENTS:
-//                layoutDashboard.setBackgroundColor(getResources().getColor(R.color.transparent));
-//                layoutContacts.setBackgroundColor(getResources().getColor(R.color.transparent));
-//                layoutRecents.setBackgroundColor(getResources().getColor(R.color.toolbar_selected_item));
-
                 tvContacts.setTextColor(getResources().getColor(R.color.grey_middle));
                 tvChat.setTextColor(getResources().getColor(R.color.white));
 
@@ -406,23 +336,6 @@ public class ToolbarActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean(Constants.IS_TOOLBAR_CLICKED, enabled);
         editor.apply();
-    }
-
-
-    public RealmChatTransactions getRealmChatTransactions() {
-        return realmChatTransactions;
-    }
-
-    public void setRealmChatTransactions(RealmChatTransactions realmChatTransactions) {
-        this.realmChatTransactions = realmChatTransactions;
-    }
-
-    public RealmGroupChatTransactions getRealmGroupChatTransactions() {
-        return realmGroupChatTransactions;
-    }
-
-    public void setRealmGroupChatTransactions(RealmGroupChatTransactions realmGroupChatTransactions) {
-        this.realmGroupChatTransactions = realmGroupChatTransactions;
     }
 
     @Override

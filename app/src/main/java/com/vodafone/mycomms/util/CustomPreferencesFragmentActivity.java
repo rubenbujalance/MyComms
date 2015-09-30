@@ -39,16 +39,9 @@ public class CustomPreferencesFragmentActivity extends ToolbarActivity
                 fragmentTransaction.add(accountsFragment, String.valueOf(2));
                 fragmentTransaction.commit();
                 break;
-            default:
-                AccountsFragment defaultAccountsFragment = AccountsFragment.newInstance(2, null);
-                fragmentTransaction.add(defaultAccountsFragment, String.valueOf(2));
-                fragmentTransaction.commit();
-                break;
         }
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
+    public void onFragmentInteraction(Uri uri) {}
 }

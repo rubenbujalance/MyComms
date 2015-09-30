@@ -23,62 +23,10 @@ public class InternalContactSearch
     private Context context;
     private String profileId;
 
-
-    public InternalContactSearch()
-    {
-        this.context = null;
-    }
-
     public  InternalContactSearch(Context context, String profileId)
     {
         this.context = context;
         this.profileId = profileId;
-    }
-
-    /**
-     * Loads all contacts from Local DB by key word storing them into ArrayList of contacts
-     * @author str_oan
-     * @param keyWord (String) ->  key word passed as a parameter
-     * @return (ArrayList Contact ) -> list of found contacts
-     */
-    public ArrayList<Contact> getLocalContactsByKeyWord(String keyWord)
-    {
-        ArrayList<String> ids = getContactsIds(keyWord);
-        ArrayList<Contact> contacts = new ArrayList<>();
-        Contact contact;
-        SharedPreferences sp = context.getSharedPreferences(
-                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        String deviceId = sp.getString(Constants.DEVICE_ID_SHARED_PREF,"");
-        for(String id : ids)
-        {
-            contact = new Contact("");
-            contact.setId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
-            contact.setContactId(Constants.CONTACT_LOCAL_CONTENT + "_" + profileId + "_" + deviceId + "_" + id);
-            contact.setPlatform(Constants.PLATFORM_LOCAL);
-            contact.setLongField1(Utils.setPlatformOrder(Constants.PLATFORM_LOCAL));
-            contact.setProfileId(profileId);
-            contact = setContactsCompanyDataByContactsIds(id, contact);
-            contact = setContactsBasicDataByContactsIds(id, contact);
-            contact = setContactsEmailDataByContactsIds(id, contact);
-            contact = setContactsPhoneDataByContactsIds(id, contact);
-            contact.setSearchHelper
-                    ((
-                                    Utils.normalizeStringNFD(contact.getFirstName()) + " " +
-                                            Utils.normalizeStringNFD(contact.getLastName()) + " " +
-                                            Utils.normalizeStringNFD(contact.getCompany()) + " " +
-                                            Utils.normalizeStringNFD(contact.getEmails())).trim()
-                    );
-
-            contact.setSortHelper
-                    ((
-                        contact.getLongField1() + " " +
-                            Utils.normalizeStringNFD(contact.getFirstName()) + " " +
-                            Utils.normalizeStringNFD(contact.getLastName()) + " " +
-                            Utils.normalizeStringNFD(contact.getCompany())).trim()
-                    );
-            contacts.add(contact);
-        }
-        return contacts;
     }
 
     /**
@@ -259,7 +207,7 @@ public class InternalContactSearch
                     ContentResolver cr = this.context.getContentResolver();
                     Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
                             ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = " + id, null, null);
-                    HashMap body = new HashMap<>();
+                    HashMap<String, String> body = new HashMap<>();
                     while (phones.moveToNext()) {
                         //TODO: Get all numbers and save them into a JSON (and show them correctly on detail)
                         String number = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).trim();
@@ -300,81 +248,6 @@ public class InternalContactSearch
     }
 
     /**
-     * Gets distinct contact ids from different kind of Cursor such as given by Contact Name,
-     * Contact Email, Contact Company by given key word
-     * @author str_oan
-     * @param keyWord (String) -> -> key word passed as a parameter
-     * @return (ArrayList String ) -> list of unique contact IDS
-     */
-    private ArrayList<String> getContactsIds(String keyWord)
-    {
-        Cursor cursorByName = getContactsIdsByKeyWordFromName(keyWord);
-        Cursor cursorByCompanyName = getContactsIdsByKeyWordFromCompanyName(keyWord);
-        Cursor cursorByEmailAddress = getContactsIdsByKeyWordFromEmail(keyWord);
-
-        ArrayList<String> distinctIds = new ArrayList<>();
-
-        if(null != cursorByName && cursorByName.moveToFirst())
-        {
-            do
-            {
-                String id = cursorByName
-                        .getString(cursorByName.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                if(!distinctIds.contains(id))
-                {
-                    distinctIds.add(id);
-                }
-            }
-            while (cursorByName.moveToNext());
-        }
-        if(null != cursorByName && !cursorByName.isClosed())
-        {
-            cursorByName.close();
-        }
-
-
-        if(null != cursorByEmailAddress && cursorByEmailAddress.moveToFirst())
-        {
-            do
-            {
-                String id = cursorByEmailAddress
-                        .getString(cursorByEmailAddress.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                if(!distinctIds.contains(id))
-                {
-                    distinctIds.add(id);
-                }
-            }
-            while (cursorByEmailAddress.moveToNext());
-        }
-        if(null != cursorByEmailAddress && !cursorByEmailAddress.isClosed())
-        {
-            cursorByEmailAddress.close();
-        }
-
-
-        if(null != cursorByCompanyName && cursorByCompanyName.moveToFirst())
-        {
-            do
-            {
-                String id = cursorByCompanyName
-                        .getString(cursorByCompanyName.getColumnIndex(ContactsContract.Data.CONTACT_ID));
-                if(!distinctIds.contains(id))
-                {
-                    distinctIds.add(id);
-                }
-            }
-            while (cursorByCompanyName.moveToNext());
-        }
-        if(null != cursorByCompanyName && !cursorByCompanyName.isClosed())
-        {
-            cursorByCompanyName.close();
-        }
-
-
-        return distinctIds;
-    }
-
-    /**
      * Gets all contact ids from Contact Name
      * @author str_vdf01
      * @return (ArrayList String ) -> list of unique contact IDS
@@ -408,40 +281,6 @@ public class InternalContactSearch
     }
 
     /**
-     * Gets Cursor of contact_ids by given key word considered as CONTACT NAME from
-     * ContactsContract.Contacts table
-     * @author str_oan
-     * @param keyWord (String) -> key word passed as a parameter
-     * @return (Cursor) -> ids of contacts if any, otherwise empty Cursor
-     */
-    private Cursor getContactsIdsByKeyWordFromName(String keyWord)
-    {
-        ContentResolver cr = this.context.getContentResolver();
-        try
-        {
-            Uri uri = ContactsContract.Data.CONTENT_URI;
-            String[] projection = new String[]
-                    {
-                            ContactsContract.Data.CONTACT_ID
-                    };
-
-            String selection = ContactsContract.Data.DISPLAY_NAME
-                    + " like '%"+keyWord+"%' "
-                    + " AND "+ContactsContract.Data.HAS_PHONE_NUMBER+" = 1"
-                    + " AND "+ContactsContract.Data.IN_VISIBLE_GROUP+" = '1'"
-                    ;
-
-            return cr.query(uri, projection, selection, null, ContactsContract.Data.CONTACT_ID+" ASC");
-        }
-        catch (Exception ex)
-        {
-            String message = ex.getMessage();
-            Log.e(Constants.TAG, "getContactsIdsByKeyWordFromName() -> ERROR: " + message);
-            return null;
-        }
-    }
-
-    /**
      * Gets Cursor of all contact_ids from ContactsContract.Contacts table
      * @author str_vdf01
      * @return (Cursor) -> ids of contacts if any, otherwise empty Cursor
@@ -457,104 +296,12 @@ public class InternalContactSearch
                             ContactsContract.Data.CONTACT_ID
                     };
 
-            String selection = ContactsContract.Data.DISPLAY_NAME
-                    + " AND "+ContactsContract.Data.HAS_PHONE_NUMBER+" = 1"
-                    + " AND "+ContactsContract.Data.IN_VISIBLE_GROUP+" = '1'"
-                    ;
-
             return cr.query(uri, projection, null, null, ContactsContract.Data.CONTACT_ID+" ASC");
         }
         catch (Exception ex)
         {
             String message = ex.getMessage();
             Log.e(Constants.TAG, "getAllContactsIdsFromName() -> ERROR: " + message);
-            return null;
-        }
-    }
-    /**
-     * Gets Cursor of contact_ids by given key word considered as EMAIL ADDRESS from
-     * ContactsContract.Contacts table
-     * @author str_oan
-     * @param keyWord (String) -> key word passed as a parameter
-     * @return (Cursor) -> ids of contacts if any, otherwise empty Cursor
-     */
-    private Cursor getContactsIdsByKeyWordFromEmail(String keyWord)
-    {
-        ContentResolver cr = this.context.getContentResolver();
-        try
-        {
-            Uri uri = ContactsContract.Data.CONTENT_URI;
-            String[] projection = new String[]
-                    {
-                            ContactsContract.Data.CONTACT_ID
-                    };
-
-            String selection = ContactsContract.CommonDataKinds.Email.ADDRESS
-                    + " like '%"+keyWord+"%' "
-                    + " AND "+ContactsContract.Contacts.Data.MIMETYPE+" = ?"
-                    + " AND "+ContactsContract.Data.CONTACT_ID+ " IS NOT NULL "
-                    ;
-
-            String[] selectionArgs = new String[]
-                    {
-                            ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE
-                    };
-
-            return cr.query
-                    (
-                            uri
-                            , projection
-                            , selection
-                            , selectionArgs
-                            , ContactsContract.Data.CONTACT_ID+" ASC"
-                    );
-        }
-        catch (Exception ex)
-        {
-            String message = ex.getMessage();
-            Log.e(Constants.TAG, "getContactsIdsByKeyWordFromEmail() -> ERROR: " + message);
-            return null;
-        }
-    }
-
-    /**
-     * Gets Cursor of contact_ids by given key word considered as COMPANY NAME from
-     * ContactsContract.Contacts table
-     * @author str_oan
-     * @param keyWord (String) -> key word passed as a parameter
-     * @return (Cursor) -> ids of contacts if any, otherwise empty Cursor
-     */
-    private Cursor getContactsIdsByKeyWordFromCompanyName(String keyWord)
-    {
-        ContentResolver cr = this.context.getContentResolver();
-        try
-        {
-            Uri uri = ContactsContract.Data.CONTENT_URI;
-            String[] projection = new String[]
-                    {
-                            ContactsContract.Data.CONTACT_ID,
-                    };
-
-            String selection = ContactsContract.CommonDataKinds.Organization.COMPANY
-                    + " like '%"+keyWord+"%' "
-                    + " AND "+ContactsContract.Contacts.Data.MIMETYPE+" = ?";
-            String[] selectionArgs = new String[]
-                    {
-                            ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE
-                    };
-            return cr.query
-                    (
-                            uri
-                            , projection
-                            , selection
-                            , selectionArgs
-                            , ContactsContract.Data.CONTACT_ID+" " + "ASC"
-                    );
-        }
-        catch (Exception ex)
-        {
-            String message = ex.getMessage();
-            Log.e(Constants.TAG, "getContactsIdsByKeyWordFromCompanyName() -> ERROR: " + message);
             return null;
         }
     }

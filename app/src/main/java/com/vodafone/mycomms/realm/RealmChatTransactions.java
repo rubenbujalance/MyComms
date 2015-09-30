@@ -21,7 +21,7 @@ import model.GroupChat;
 
 public class RealmChatTransactions
 {
-    private String _profile_id;
+    private static String _profile_id;
     private Context mContext;
     private RealmContactTransactions contactTx;
 
@@ -542,7 +542,7 @@ public class RealmChatTransactions
         return chatMessage;
     }
 
-    public long getChatPendingMessagesCount(String contact_id, Realm realm)
+    public static long getChatPendingMessagesCount(String contact_id, Realm realm)
     {
         if(contact_id==null || _profile_id==null) return 0;
 

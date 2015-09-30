@@ -1,6 +1,5 @@
 package com.vodafone.mycomms.chat;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -45,9 +44,6 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
-import org.robolectric.shadows.ShadowListView;
-import org.robolectric.shadows.ShadowRegion;
-import org.robolectric.shadows.ShadowView;
 import org.robolectric.shadows.ShadowViewGroup;
 
 import io.realm.Realm;
@@ -112,11 +108,7 @@ public class ChatListActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
-
+        Robolectric.reset();
         activity = null;
         mockChatTx = null;
         mockGroupChatTx = null;
@@ -165,7 +157,10 @@ public class ChatListActivityTest {
 
         //Check number of chats
         BusProvider.getInstance().post(new ChatsReceivedEvent());
+        RecyclerView recyclerView = (RecyclerView)mChatListFragment.getView().findViewById(R.id.recycler_view);
         Assert.assertTrue(recyclerView.getAdapter().getItemCount() == 8);
+        ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
+
 
         //Check order
         ChatListHolder holder;

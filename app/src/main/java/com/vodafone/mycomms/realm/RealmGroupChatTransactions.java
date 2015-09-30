@@ -108,11 +108,14 @@ public class RealmGroupChatTransactions
             mRealm = Realm.getDefaultInstance();
         try
         {
-            GroupChat TEST = newChat;
-            Log.i(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: newChatGroup " + newChat.getId());
-            mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(newChat);
-            mRealm.commitTransaction();
+            if(null != mRealm)
+            {
+                GroupChat TEST = newChat;
+                Log.i(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: newChatGroup " + newChat.getId());
+                mRealm.beginTransaction();
+                mRealm.copyToRealmOrUpdate(newChat);
+                mRealm.commitTransaction();
+            }
         }
         catch(Exception e)
         {
@@ -122,7 +125,7 @@ public class RealmGroupChatTransactions
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
     }

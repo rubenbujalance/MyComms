@@ -45,27 +45,23 @@ import model.GroupChat;
 
 public class GroupChatListFragment extends ListFragment
 {
-
-    protected Handler handler = new Handler();
-
     private ListView listView;
     private SearchController mSearchController;
     private SharedPreferences sp;
-    private ArrayList<Contact> contactList;
+    public ArrayList<Contact> contactList;
     private String profileId;
     private String name = "";
     private String about = "";
     private String avatarURL = "";
-    private ContactListViewArrayAdapter adapter;
+    public ContactListViewArrayAdapter adapter;
     private Parcelable state;
-    private SearchBarController mSearchBarController;
+    public SearchBarController mSearchBarController;
     private boolean isRemoveAllViewNeeded = true;
     private LinearLayout chatContactsContainer;
     private LinearLayout layGroupChatHeader;
     private int numberOfAddedContactsToGroupChat = 0;
     private TextView txtNumberParticipants;
     private TextView txtWrite;
-    private String apiCall;
     private boolean isNewGroupChat;
     private GroupChat groupChat;
     private String groupChatId;
@@ -111,8 +107,6 @@ public class GroupChatListFragment extends ListFragment
         Log.i(Constants.TAG, "ChatListFragment.onCreate: ");
         BusProvider.getInstance().register(this);
         this.realm = Realm.getDefaultInstance();
-        this.realm.setAutoRefresh(true);
-
         sp = getActivity().getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
 
@@ -127,7 +121,7 @@ public class GroupChatListFragment extends ListFragment
                 profileId, realm);
         mGroupChatTransactions = new RealmGroupChatTransactions(getActivity(),profileId);
         mContactTransactions = new RealmContactTransactions(profileId);
-        mGroupChatController = new GroupChatController(getActivity(), profileId);
+        mGroupChatController = GroupChatController.newInstance(getActivity(),profileId);
         mRecentContactController = new RecentContactController(getActivity(),profileId);
     }
 
@@ -136,16 +130,12 @@ public class GroupChatListFragment extends ListFragment
         super.onResume();
     }
 
-//    @Override
-//    public void onRefresh() {
-//        handler.postDelayed(testIsGood, 5000);
-//    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
-        this.realm.close();
+        if(null != realm)
+            this.realm.close();
     }
 
     @Override
@@ -161,7 +151,7 @@ public class GroupChatListFragment extends ListFragment
     @Subscribe
     public void reloadAdapterEvent(ReloadAdapterEvent event){
         Log.i(Constants.TAG, "ContactListPagerFragment.reloadAdapterEvent: ");
-        ArrayList<Contact> compareList = mSearchBarController.getContactList();
+        ArrayList<Contact> compareList = SearchBarController.getContactList();
         if(!compareList.equals(contactList))
         {
             contactList = compareList;
@@ -230,17 +220,20 @@ public class GroupChatListFragment extends ListFragment
     private void loadExtras()
     {
         Intent in = getActivity().getIntent();
-        if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatListActivity.class.getSimpleName()))
-            isNewGroupChat = true;
-        else //if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatActivity.class.getSimpleName()))
+        if(null != in)
         {
-            this.isNewGroupChat = false;
-            this.groupChat = mGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants
-                    .GROUP_CHAT_ID), realm);
-            this.groupChatId = in.getStringExtra(Constants.GROUP_CHAT_ID);
-            this.ownersIds = new ArrayList<>();
-            String[] ids = this.groupChat.getOwners().split("@");
-            Collections.addAll(ownersIds, ids);
+            if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatListActivity.class.getSimpleName()))
+                isNewGroupChat = true;
+            else //if(in.getStringExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY).equals(GroupChatActivity.class.getSimpleName()))
+            {
+                this.isNewGroupChat = false;
+                this.groupChat = RealmGroupChatTransactions.getGroupChatById(in.getStringExtra(Constants
+                        .GROUP_CHAT_ID), realm);
+                this.groupChatId = in.getStringExtra(Constants.GROUP_CHAT_ID);
+                this.ownersIds = new ArrayList<>();
+                String[] ids = this.groupChat.getOwners().split("@");
+                Collections.addAll(ownersIds, ids);
+            }
         }
     }
 
@@ -577,7 +570,8 @@ public class GroupChatListFragment extends ListFragment
                 return false;
             }
             finally {
-                realm.close();
+                if(null != realm)
+                    realm.close();
             }
 
         }
@@ -614,9 +608,9 @@ public class GroupChatListFragment extends ListFragment
         mGroupChatController.setChatCreator(this.profileId);
         mGroupChatController.setChatOwners(this.ownersIds);
         //Added new fields here
-        mGroupChatController.setChatName("TestName");
-        mGroupChatController.setChatAbout("TestAbout");
-        mGroupChatController.setChatAvatar("http://www.google.com");
+        mGroupChatController.setChatName("");
+        mGroupChatController.setChatAbout("");
+        mGroupChatController.setChatAvatar("");
 
         if(mGroupChatController.isCreatedJSONBodyForCreateGroupChat())
         {

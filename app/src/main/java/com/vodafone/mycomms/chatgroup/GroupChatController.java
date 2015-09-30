@@ -69,6 +69,11 @@ public class GroupChatController
         this.profileId = profileId;
     }
 
+    public static GroupChatController newInstance(Context context, String profileId)
+    {
+        return new GroupChatController(context, profileId);
+    }
+
     /**
      * Creates JSON body for crete group chat request
      * @author str_oan

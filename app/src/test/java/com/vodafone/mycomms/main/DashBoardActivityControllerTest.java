@@ -67,7 +67,9 @@ import static org.mockito.Matchers.eq;
 @PrepareForTest({Realm.class
         , Crashlytics.class
         , RealmContactTransactions.class
-        , RealmGroupChatTransactions.class})
+        , RealmGroupChatTransactions.class
+        , RealmChatTransactions.class})
+
 public class DashBoardActivityControllerTest
 {
     @Rule
@@ -494,11 +496,11 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.hashMapRecentIdView.put(view, MockDataForTests.getMockRecentContactsList_OnlyOneGroupChat().get(0));
 
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        RealmChatTransactions mChatTransactions = Mockito.mock(RealmChatTransactions.class);
-        PowerMockito.when(RealmGroupChatTransactions
-                .getGroupChatPendingMessagesCount(any(String.class), any(Realm.class))).thenReturn((long) 5);
-        Mockito.when(mChatTransactions
-                .getChatPendingMessagesCount(any(String.class), any(Realm.class))).thenReturn((long) 5);
+        PowerMockito.mockStatic(RealmChatTransactions.class);
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatPendingMessagesCount(eq("mg_55dc2a35a297b90a726e4cc2"), any(Realm.class)))
+                .thenReturn((long)5);
+        PowerMockito.when(RealmChatTransactions.getChatPendingMessagesCount(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn((long)5);
 
         this.mDashBoardActivityController.loadUnreadMessages(this.mDashBoardActivityController.mRecentContainer);
         try {
@@ -541,11 +543,11 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.hashMapRecentIdView.put(view, MockDataForTests.getMockRecentContactsList_OnlyOneGroupChat().get(0));
 
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
-        this.mDashBoardActivityController.mRealmChatTransactionsRecents = Mockito.mock(RealmChatTransactions.class);
+        PowerMockito.mockStatic(RealmChatTransactions.class);
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatPendingMessagesCount(eq("mg_55dc2a35a297b90a726e4cc2"), any(Realm.class)))
                 .thenReturn(amountMessages);
-        Mockito.doReturn(amountMessages).when(this.mDashBoardActivityController.mRealmChatTransactionsRecents)
-                .getChatPendingMessagesCount(anyString(), any(Realm.class));
+        PowerMockito.when(RealmChatTransactions.getChatPendingMessagesCount(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn(amountMessages);
     }
 
     private void mockParams()

@@ -10,31 +10,31 @@ import android.widget.TextView;
 import com.vodafone.mycomms.R;
 
 public class ChatListHolder extends RecyclerView.ViewHolder {
-    protected TextView textViewName;
-    protected TextView textViewMessage;
-    protected TextView textViewTime;
+    public TextView textViewName;
+    public TextView textViewMessage;
+    public TextView textViewTime;
 
-    protected ImageView top_left_avatar;
-    protected ImageView top_right_avatar;
-    protected ImageView bottom_left_avatar;
-    protected ImageView bottom_right_avatar;
-    protected ImageView bottom_right_chat_availability;
-    protected ImageView bottom_left_chat_availability;
-    protected ImageView top_right_chat_availability;
-    protected ImageView top_left_chat_availability;
-    protected ImageView chat_availability;
+    public ImageView top_left_avatar;
+    public ImageView top_right_avatar;
+    public ImageView bottom_left_avatar;
+    public ImageView bottom_right_avatar;
+    public ImageView bottom_right_chat_availability;
+    public ImageView bottom_left_chat_availability;
+    public ImageView top_right_chat_availability;
+    public ImageView top_left_chat_availability;
+    public ImageView chat_availability;
 
-    protected TextView top_left_avatar_text;
-    protected TextView top_right_avatar_text;
-    protected TextView bottom_left_avatar_text;
-    protected TextView bottom_right_avatar_text;
+    public TextView top_left_avatar_text;
+    public TextView top_right_avatar_text;
+    public TextView bottom_left_avatar_text;
+    public TextView bottom_right_avatar_text;
 
-    protected LinearLayout lay_top_right_image_hide;
-    protected LinearLayout lay_bottom_both_image_hide;
-    protected LinearLayout lay_top_left_image;
+    public LinearLayout lay_top_right_image_hide;
+    public LinearLayout lay_bottom_both_image_hide;
+    public LinearLayout lay_top_left_image;
 
-    protected TextView badgeUnread;
-    protected RelativeLayout layContainer;
+    public TextView badgeUnread;
+    public RelativeLayout layContainer;
 
 
     public ChatListHolder(View view)

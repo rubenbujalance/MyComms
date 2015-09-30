@@ -615,8 +615,8 @@ public class ContactsControllerTest{
         String searchHelper = "mockMyName mockMyLastName Stratesys ";
         String sortHelper = "mockMyName mockMyLastName Stratesys";
         JSONObject jsonObject = MockDataForTests.getContactJSONObject();
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        Contact contact = contactsController.mapContact(jsonObject, mProfileId);
+        new ContactsController(this.mProfileId, this.mContext);
+        Contact contact = ContactsController.mapContact(jsonObject, mProfileId);
 
         Assert.assertTrue(contact.getSearchHelper().startsWith(searchHelper));
         Assert.assertTrue(contact.getSortHelper().contains(sortHelper));
@@ -625,8 +625,8 @@ public class ContactsControllerTest{
     @Test
     public void testMapContact_Fail()
     {
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        contactsController.mapContact(null, null);
+        new ContactsController(this.mProfileId, this.mContext);
+        ContactsController.mapContact(null, null);
     }
 
     public void startContactListFragment(int index)

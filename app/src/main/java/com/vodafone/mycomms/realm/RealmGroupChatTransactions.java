@@ -108,11 +108,14 @@ public class RealmGroupChatTransactions
             mRealm = Realm.getDefaultInstance();
         try
         {
-            GroupChat TEST = newChat;
-            Log.i(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: newChatGroup " + newChat.getId());
-            mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(newChat);
-            mRealm.commitTransaction();
+            if(null != mRealm)
+            {
+                GroupChat TEST = newChat;
+                Log.i(Constants.TAG, "RealmGroupChatTransactions.insertOrUpdateGroupChat: newChatGroup " + newChat.getId());
+                mRealm.beginTransaction();
+                mRealm.copyToRealmOrUpdate(newChat);
+                mRealm.commitTransaction();
+            }
         }
         catch(Exception e)
         {
@@ -122,7 +125,7 @@ public class RealmGroupChatTransactions
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
     }
@@ -138,24 +141,27 @@ public class RealmGroupChatTransactions
             mRealm = Realm.getDefaultInstance();
         try
         {
-            mRealm.beginTransaction();
-            if(null != name)
-                groupChat.setName(name);
-            if(null != avatar)
-                groupChat.setAvatar(avatar);
-            if(null != about)
-                groupChat.setAbout(about);
-            if(null != members)
-                groupChat.setMembers(members);
-            if(0 != lastMessageTime)
-                groupChat.setLastMessageTime(lastMessageTime);
-            if(null != lastMessage)
-                groupChat.setLastMessage(lastMessage);
-            if(null != lastMessage_id)
-                groupChat.setLastMessage_id(lastMessage_id);
-            if(null != owners)
-                groupChat.setOwners(owners);
-            mRealm.commitTransaction();
+            if(null != mRealm)
+            {
+                mRealm.beginTransaction();
+                if(null != name)
+                    groupChat.setName(name);
+                if(null != avatar)
+                    groupChat.setAvatar(avatar);
+                if(null != about)
+                    groupChat.setAbout(about);
+                if(null != members)
+                    groupChat.setMembers(members);
+                if(0 != lastMessageTime)
+                    groupChat.setLastMessageTime(lastMessageTime);
+                if(null != lastMessage)
+                    groupChat.setLastMessage(lastMessage);
+                if(null != lastMessage_id)
+                    groupChat.setLastMessage_id(lastMessage_id);
+                if(null != owners)
+                    groupChat.setOwners(owners);
+                mRealm.commitTransaction();
+            }
         }
         catch(Exception e)
         {
@@ -165,7 +171,7 @@ public class RealmGroupChatTransactions
         }
         finally
         {
-            if(null == realm)
+            if(null == realm && null != mRealm)
                 mRealm.close();
         }
     }

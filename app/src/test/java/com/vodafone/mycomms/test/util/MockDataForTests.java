@@ -989,13 +989,123 @@ public class MockDataForTests
         return mockGroupChat;
     }
 
-    public static ArrayList<Chat> getMockChatList()
+    public static ArrayList<Chat> getEmptyChatList()
     {
         return new ArrayList<>();
     }
 
-    public static ArrayList<GroupChat> getMockGroupChatList()
+    public static ArrayList<GroupChat> getEmptyGroupChatList()
     {
         return new ArrayList<>();
+    }
+
+    public static ArrayList<Chat> getMockChatList()
+    {
+        ArrayList<Chat> chatList = new ArrayList<>();
+
+        Chat chat = new Chat(
+                "mc_55409316799f7e1a109446f4", //Profile_id
+                "mc_5570340e7eb7c3512f2f9bf2", //Contact_id
+                "1111_1111_1111_1111", //LastMessage_id
+                "chat_message_1", //LastMessage
+                1443437630 //LastMessage_Timestamp (2015/09/28 12:54)
+                );
+        chatList.add(chat);
+
+        chat = new Chat(
+                "mc_55409316799f7e1a109446f4", //Profile_id
+                "mc_5535b2ac13be4b7975c51600", //Contact_id
+                "1111_2222_2222_2222", //LastMessage_id
+                "chat_message_2", //LastMessage
+                1443437640 //LastMessage_Timestamp (2015/09/28 12:54)
+                );
+        chatList.add(chat);
+
+        chat = new Chat(
+                "mc_55409316799f7e1a109446f4", //Profile_id
+                "mc_55509316799f7e1a109446f4", //Contact_id
+                "1111_3333_3333_3333", //LastMessage_id
+                "chat_message_3", //LastMessage
+                1443437650 //LastMessage_Timestamp (2015/09/28 12:54)
+                );
+        chatList.add(chat);
+
+        chat = new Chat(
+                "mc_55409316799f7e1a109446f4", //Profile_id
+                "mc_5565b2ac13be4b7975c51600", //Contact_id
+                "1111_4444_4444_4444", //LastMessage_id
+                "chat_message_4", //LastMessage
+                1443437660 //LastMessage_Timestamp (2015/09/28 12:54)
+                );
+        chatList.add(chat);
+
+        return chatList;
+    }
+
+    public static ArrayList<GroupChat> getMockGroupChatList()
+    {
+        ArrayList<GroupChat> groupChatList = new ArrayList<>();
+
+        GroupChat groupChat = new GroupChat(
+                "mg_55dc2a35a297b90a726e4cc1", //Group Id
+                "mc_55409316799f7e1a109446f4", //Profile_id
+                "mc_5570340e7eb7c3512f2f9bf2", //Creator_id
+                "TestGroupChat1", //Name
+                "testAvatar1", //Avatar
+                "testAbout1", //About
+                "mc_5570340e7eb7c3512f2f9bf2@mc_5535b2ac13be4b7975c51600@mc_55409316799f7e1a109446f4", //Members
+                "mc_5570340e7eb7c3512f2f9bf2@mc_5535b2ac13be4b7975c51600@mc_55409316799f7e1a109446f4", //Owners
+                1443437625, //LastMessage_Timestamp (2015/09/28 12:54)
+                "groupchat_message_1", //LastMessage
+                "2222_1111_1111_1111" //LastMessage_id
+                );
+        groupChatList.add(groupChat);
+
+        groupChat = new GroupChat(
+                "mg_55dc2a35a297b90a726e4cc2", //Group Id
+                "mc_55409316799f7e1a109446f4", //Profile_id
+                "mc_5535b2ac13be4b7975c51600", //Creator_id
+                "TestGroupChat2", //Name
+                "testAvatar2", //Avatar
+                "testAbout2", //About
+                "mc_5570340e7eb7c3512f2f9bf2@mc_5535b2ac13be4b7975c51600@mc_55409316799f7e1a109446f4", //Members
+                "mc_5570340e7eb7c3512f2f9bf2@mc_5535b2ac13be4b7975c51600@mc_55409316799f7e1a109446f4", //Owners
+                1443437635, //LastMessage_Timestamp (2015/09/28 12:54)
+                "groupchat_message_2", //LastMessage
+                "2222_2222_2222_2222" //LastMessage_id
+        );
+        groupChatList.add(groupChat);
+
+        groupChat = new GroupChat(
+                "mg_55dc2a35a297b90a726e4cc3", //Group Id
+                "mc_55409316799f7e1a109446f4", //Profile_id
+                "mc_55409316799f7e1a109446f4", //Creator_id
+                "TestGroupChat3", //Name
+                "testAvatar3", //Avatar
+                "testAbout3", //About
+                "mc_5570340e7eb7c3512f2f9bf2@mc_5535b2ac13be4b7975c51600@mc_55409316799f7e1a109446f4", //Members
+                "mc_5570340e7eb7c3512f2f9bf2@mc_5535b2ac13be4b7975c51600@mc_55409316799f7e1a109446f4", //Owners
+                1443437645, //LastMessage_Timestamp (2015/09/28 12:54)
+                "groupchat_message_3", //LastMessage
+                "2222_3333_3333_3333" //LastMessage_id
+        );
+        groupChatList.add(groupChat);
+
+        groupChat = new GroupChat(
+                "mg_55dc2a35a297b90a726e4cc4", //Group Id
+                "mc_55409316799f7e1a109446f4", //Profile_id
+                "mc_5570340e7eb7c3512f2f9bf2", //Creator_id
+                "TestGroupChat4", //Name
+                "testAvatar4", //Avatar
+                "testAbout4", //About
+                "mc_5570340e7eb7c3512f2f9bf2@mc_5535b2ac13be4b7975c51600@mc_55409316799f7e1a109446f4", //Members
+                "mc_5570340e7eb7c3512f2f9bf2@mc_5535b2ac13be4b7975c51600@mc_55409316799f7e1a109446f4", //Owners
+                1443437655, //LastMessage_Timestamp (2015/09/28 12:54)
+                "groupchat_message_4", //LastMessage
+                "2222_4444_4444_4444" //LastMessage_id
+        );
+        groupChatList.add(groupChat);
+
+        return groupChatList;
     }
 }

@@ -569,7 +569,8 @@ public class GroupChatListFragment extends ListFragment
                 return false;
             }
             finally {
-                realm.close();
+                if(null != realm)
+                    realm.close();
             }
 
         }

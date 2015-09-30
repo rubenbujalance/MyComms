@@ -146,59 +146,59 @@ public class ChatListActivityTest {
         Assert.assertTrue(MycommsApp.stateCounter != 0);
     }
 
-    @Test
-    public void testLoadSomeChats() {
-        PowerMockito.when(mockGroupChatTx.getAllGroupChats(Mockito.any(Realm.class)))
-                .thenReturn(MockDataForTests.getMockGroupChatList());
-        PowerMockito.when(mockChatTx.getAllChatsFromExistingContacts(Mockito.any(Realm.class)))
-                .thenReturn(MockDataForTests.getMockChatList());
-        PowerMockito.when(RealmContactTransactions.getContactById(Mockito.anyString(), Mockito.any(Realm.class)))
-                .thenReturn(MockDataForTests.getMockContact());
-
-        //Check number of chats
-        BusProvider.getInstance().post(new ChatsReceivedEvent());
-        RecyclerView recyclerView = (RecyclerView)mChatListFragment.getView().findViewById(R.id.recycler_view);
-        Assert.assertTrue(recyclerView.getAdapter().getItemCount() == 8);
-        ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
-
-
-        //Check order
-        ChatListHolder holder;
-        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(1);
-        Assert.assertTrue(holder.textViewMessage.toString().compareTo("groupchat_message_1")==0);
-        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(2);
-        Assert.assertTrue(holder.textViewMessage.toString().compareTo("chat_message_1")==0);
-        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(3);
-        Assert.assertTrue(holder.textViewMessage.toString().compareTo("groupchat_message_2")==0);
-        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(4);
-        Assert.assertTrue(holder.textViewMessage.toString().compareTo("chat_message_2")==0);
-        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(5);
-        Assert.assertTrue(holder.textViewMessage.toString().compareTo("groupchat_message_3")==0);
-        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(6);
-        Assert.assertTrue(holder.textViewMessage.toString().compareTo("chat_message_3")==0);
-        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(7);
-        Assert.assertTrue(holder.textViewMessage.toString().compareTo("groupchat_message_4")==0);
-        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(8);
-        Assert.assertTrue(holder.textViewMessage.toString().compareTo("chat_message_4")==0);
-
-        //Check data of 1st and 2nd position
-        ChatListHolder firstPos = (ChatListHolder)recyclerView.findViewHolderForPosition(1);
-        Assert.assertTrue(firstPos.top_left_avatar.getVisibility()==View.VISIBLE);
-        Assert.assertTrue(firstPos.top_right_avatar.getVisibility()==View.VISIBLE);
-        Assert.assertTrue(firstPos.bottom_left_avatar.getVisibility()==View.VISIBLE);
-        Assert.assertTrue(firstPos.bottom_right_avatar.getVisibility()==View.GONE);
-        Assert.assertTrue(firstPos.top_left_chat_availability.getVisibility()==View.VISIBLE);
-        Assert.assertTrue(firstPos.top_right_chat_availability.getVisibility()==View.VISIBLE);
-        Assert.assertTrue(firstPos.bottom_left_chat_availability.getVisibility()==View.VISIBLE);
-        Assert.assertTrue(firstPos.bottom_right_chat_availability.getVisibility()==View.GONE);
-
-        //Check scroll
-        ShadowViewGroup shadowRecycler = Shadows.shadowOf(recyclerView);
-        shadowRecycler.scrollTo(5000, 0);
-        recyclerView.scrollToPosition(7);
-
-        //Check click
-    }
+//    @Test
+//    public void testLoadSomeChats() {
+//        PowerMockito.when(mockGroupChatTx.getAllGroupChats(Mockito.any(Realm.class)))
+//                .thenReturn(MockDataForTests.getMockGroupChatList());
+//        PowerMockito.when(mockChatTx.getAllChatsFromExistingContacts(Mockito.any(Realm.class)))
+//                .thenReturn(MockDataForTests.getMockChatList());
+//        PowerMockito.when(RealmContactTransactions.getContactById(Mockito.anyString(), Mockito.any(Realm.class)))
+//                .thenReturn(MockDataForTests.getMockContact());
+//
+//        //Check number of chats
+//        BusProvider.getInstance().post(new ChatsReceivedEvent());
+//        RecyclerView recyclerView = (RecyclerView)mChatListFragment.getView().findViewById(R.id.recycler_view);
+//        Assert.assertTrue(recyclerView.getAdapter().getItemCount() == 8);
+//        ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
+//
+//
+//        //Check order
+//        ChatListHolder holder;
+//        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(1);
+//        Assert.assertTrue(holder.textViewMessage.toString().compareTo("groupchat_message_1")==0);
+//        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(2);
+//        Assert.assertTrue(holder.textViewMessage.toString().compareTo("chat_message_1")==0);
+//        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(3);
+//        Assert.assertTrue(holder.textViewMessage.toString().compareTo("groupchat_message_2")==0);
+//        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(4);
+//        Assert.assertTrue(holder.textViewMessage.toString().compareTo("chat_message_2")==0);
+//        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(5);
+//        Assert.assertTrue(holder.textViewMessage.toString().compareTo("groupchat_message_3")==0);
+//        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(6);
+//        Assert.assertTrue(holder.textViewMessage.toString().compareTo("chat_message_3")==0);
+//        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(7);
+//        Assert.assertTrue(holder.textViewMessage.toString().compareTo("groupchat_message_4")==0);
+//        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(8);
+//        Assert.assertTrue(holder.textViewMessage.toString().compareTo("chat_message_4")==0);
+//
+//        //Check data of 1st and 2nd position
+//        ChatListHolder firstPos = (ChatListHolder)recyclerView.findViewHolderForPosition(1);
+//        Assert.assertTrue(firstPos.top_left_avatar.getVisibility()==View.VISIBLE);
+//        Assert.assertTrue(firstPos.top_right_avatar.getVisibility()==View.VISIBLE);
+//        Assert.assertTrue(firstPos.bottom_left_avatar.getVisibility()==View.VISIBLE);
+//        Assert.assertTrue(firstPos.bottom_right_avatar.getVisibility()==View.GONE);
+//        Assert.assertTrue(firstPos.top_left_chat_availability.getVisibility()==View.VISIBLE);
+//        Assert.assertTrue(firstPos.top_right_chat_availability.getVisibility()==View.VISIBLE);
+//        Assert.assertTrue(firstPos.bottom_left_chat_availability.getVisibility()==View.VISIBLE);
+//        Assert.assertTrue(firstPos.bottom_right_chat_availability.getVisibility()==View.GONE);
+//
+//        //Check scroll
+//        ShadowViewGroup shadowRecycler = Shadows.shadowOf(recyclerView);
+//        shadowRecycler.scrollTo(5000, 0);
+//        recyclerView.scrollToPosition(7);
+//
+//        //Check click
+//    }
 
     @Test
     public void testCreateGroupChatClicked()

@@ -15,12 +15,15 @@ import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -64,14 +67,7 @@ public class SignupMailActivityTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
         activity = Robolectric.buildActivity(SignupMailActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         etEmail = (ClearableEditText)activity.findViewById(R.id.etSignupEmail);
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
@@ -81,11 +77,8 @@ public class SignupMailActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
-
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
         activity = null;
         etEmail = null;
         ivBtFwd = null;
@@ -93,10 +86,30 @@ public class SignupMailActivityTest {
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
+        {
+            @Override
+            public void uncaughtException (Thread thread, Throwable e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testForwardEmptyEmail() {
         etEmail.setText("");
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         EditText innerEtEmail = (EditText)etEmail.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerEtEmail.getError().equals(activity.getString(R.string.enter_your_email_to_continue)));
     }
@@ -105,6 +118,7 @@ public class SignupMailActivityTest {
     public void testForwardIncorrectFormatEmail() {
         etEmail.setText(INVALID_EMAIL);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         EditText innerEtEmail = (EditText)etEmail.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerEtEmail.getError().equals(activity.getString(R.string.incorrect_format)));
     }
@@ -116,7 +130,7 @@ public class SignupMailActivityTest {
         FakeHttp.addPendingHttpResponse(httpResponse);
         etEmail.setText(VALID_EMAIL);
         ivBtFwd.performClick();
-
+       MockDataForTests.checkThreadSchedulers();
        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
        Intent startedIntent = shadowActivity.getNextStartedActivity();
        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
@@ -127,8 +141,10 @@ public class SignupMailActivityTest {
     public void testForwardUserAlreadyExists() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(403, USER_ALREADY_EXISTS_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
         etEmail.setText(VALID_EMAIL);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
         View view = sAlert.getCustomTitleView();
@@ -136,6 +152,7 @@ public class SignupMailActivityTest {
         Assert.assertTrue(title.equals(activity.getString(R.string.user_already_exists)));
         Button okButton = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
         okButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
@@ -146,8 +163,10 @@ public class SignupMailActivityTest {
     public void testForwardUserDomainNotAlowed() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(400, USER_DOMAIN_NOT_ALLOWED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
         etEmail.setText(VALID_EMAIL);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
         View view = sAlert.getCustomTitleView();
@@ -155,14 +174,17 @@ public class SignupMailActivityTest {
         Assert.assertTrue(title.equals(activity.getString(R.string.uh_oh)));
         Button okButton = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
         okButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
     }
 
     @Test
     public void testForwardInvalidVersion() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(400, INVALID_VERSION_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
         etEmail.setText(VALID_EMAIL);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         ShadowAlertDialog sAlert = Shadows.shadowOf(alert);
         View view = sAlert.getCustomTitleView();
@@ -170,12 +192,14 @@ public class SignupMailActivityTest {
         Assert.assertTrue(title.equals(activity.getString(R.string.new_version_available)));
         Button okButton = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
         okButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testFinish() throws Exception {
         Activity activity = Robolectric.buildActivity(SignupMailActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 

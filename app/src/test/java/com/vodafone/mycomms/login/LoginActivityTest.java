@@ -19,12 +19,15 @@ import com.vodafone.mycomms.events.ApplicationAndProfileInitialized;
 import com.vodafone.mycomms.events.ApplicationAndProfileReadError;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.main.DashBoardActivity;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +44,8 @@ import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
+
+import java.util.concurrent.ExecutionException;
 
 import io.realm.Realm;
 
@@ -70,19 +75,13 @@ public class LoginActivityTest {
     ImageView ivBack;
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
         activity = Robolectric.buildActivity(LoginActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(2000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
         btLogin = (Button) activity.findViewById(R.id.btLogin);
         btLoginSalesforce = (Button) activity.findViewById(R.id.btLoginSalesforce);
         tvForgotPass = (TextView) activity.findViewById(R.id.tvForgotPass);
@@ -94,11 +93,8 @@ public class LoginActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
-
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
         activity = null;
         btLoginSalesforce = null;
         btLogin = null;
@@ -107,6 +103,25 @@ public class LoginActivityTest {
         etPassword = null;
         ivBack = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
+        {
+            @Override
+            public void uncaughtException (Thread thread, Throwable e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
@@ -119,7 +134,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testLoginOk()
+    public void testLoginOk() throws Exception
     {
         try {
             HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);
@@ -133,19 +148,14 @@ public class LoginActivityTest {
         etEmail.setText(VALID_EMAIL);
         etPassword.setText(PASSWORD);
         btLogin.performClick();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
     }
 
     @Test
-    public void testLoginError()
+    public void testLoginError() throws Exception
     {
         try {
             HttpResponse httpResponse = Util.buildResponse(409, LOGIN_USER_NOT_FOUND_RESPONSE);
@@ -158,18 +168,14 @@ public class LoginActivityTest {
         etEmail.setText(VALID_EMAIL);
         etPassword.setText(PASSWORD);
         btLogin.performClick();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         etPassword.setText("changed_pwd");
         Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.login)));
     }
 
     @Test
-    public void testLoginConnectionError(){
+    public void testLoginConnectionError() throws Exception
+    {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
@@ -184,20 +190,17 @@ public class LoginActivityTest {
         etEmail.setText(VALID_EMAIL);
         etPassword.setText(PASSWORD);
         btLogin.performClick();
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.connection_error)));
         etPassword.setText("changed_pwd");
         Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.login)));
     }
 
     @Test
-    public void testForgotPass(){
+    public void testForgotPass() throws Exception
+    {
         tvForgotPass.performClick();
+        MockDataForTests.checkThreadSchedulers();
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
@@ -205,8 +208,10 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testLoginSalesforce(){
+    public void testLoginSalesforce() throws Exception
+    {
         btLoginSalesforce.performClick();
+        MockDataForTests.checkThreadSchedulers();
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
@@ -214,31 +219,39 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testApplicationAndProfileInitializedBusEvent() {
+    public void testApplicationAndProfileInitializedBusEvent() throws Exception
+    {
         BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
+        MockDataForTests.checkThreadSchedulers();
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
     }
 
     @Test
-    public void testProfileConnectionErrorBusEvent() {
+    public void testProfileConnectionErrorBusEvent() throws Exception
+    {
         BusProvider.getInstance().post(new ApplicationAndProfileReadError());
+        MockDataForTests.checkThreadSchedulers();
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
     }
 
     @Test
-    public void testBack(){
+    public void testBack() throws Exception
+    {
         ivBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
-    public void testFinish(){
+    public void testFinish() throws Exception
+    {
         Activity activity = Robolectric.buildActivity(LoginActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 }

@@ -12,11 +12,14 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -53,14 +56,7 @@ public class SignupCompanyActivityTest {
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         activity = Robolectric.buildActivity(SignupCompanyActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         mCompany = activity.mCompany;
         mPosition = activity.mPosition;
@@ -70,10 +66,8 @@ public class SignupCompanyActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         activity = null;
         mCompany = null;
@@ -83,9 +77,29 @@ public class SignupCompanyActivityTest {
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
+        {
+            @Override
+            public void uncaughtException (Thread thread, Throwable e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testForwardEmptyCompany() {
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mCompany.getError().equals(activity.getString(R.string.select_your_company_to_continue)));
     }
 
@@ -97,6 +111,7 @@ public class SignupCompanyActivityTest {
         mCompany.setCodeSelected(companyCode);
         mCompany.callOnClick();
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(companyName.equals(UserProfile.getCompanyName()));
 
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
@@ -109,6 +124,7 @@ public class SignupCompanyActivityTest {
     public void testBack() throws Exception {
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
     }
 
@@ -116,6 +132,7 @@ public class SignupCompanyActivityTest {
     @Test
     public void testFinish() throws Exception {
         Activity activity = Robolectric.buildActivity(SignupCompanyActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 }

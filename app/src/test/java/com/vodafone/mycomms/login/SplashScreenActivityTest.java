@@ -24,15 +24,19 @@ import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.events.OKHttpErrorReceivedEvent;
 import com.vodafone.mycomms.main.DashBoardActivity;
 import com.vodafone.mycomms.main.SplashScreenActivity;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.APIWrapper;
+import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.UserSecurity;
 import com.vodafone.mycomms.util.Utils;
 
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +53,7 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowIntent;
+import org.robolectric.shadows.ShadowLooper;
 
 import java.util.HashMap;
 
@@ -66,7 +71,12 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
-@PrepareForTest({Realm.class, Crashlytics.class, EndpointWrapper.class, APIWrapper.class})
+@PrepareForTest({
+        Realm.class
+        , Crashlytics.class
+        , EndpointWrapper.class
+        , APIWrapper.class
+        })
 public class SplashScreenActivityTest{
 
     @Rule
@@ -88,14 +98,32 @@ public class SplashScreenActivityTest{
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            if (webServer != null) webServer.shutdown();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
+        if (webServer != null) webServer.shutdown();
 
         activity = null;
         webServer = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
+        {
+            @Override
+            public void uncaughtException (Thread thread, Throwable e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
@@ -105,6 +133,7 @@ public class SplashScreenActivityTest{
         intent.putExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA, true);
         intent.putExtra(com.vodafone.mycomms.util.Constants.APP_CRASH_MESSAGE, mCrashMessage);
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA));
         if(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA))
@@ -139,8 +168,7 @@ public class SplashScreenActivityTest{
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(uri);
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertNotNull(UserSecurity.getAccessToken(activity));
     }
 
@@ -161,8 +189,7 @@ public class SplashScreenActivityTest{
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(uri);
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -195,6 +222,7 @@ public class SplashScreenActivityTest{
     public void testAllLifeCycleEvents()
     {
         activity = Robolectric.buildActivity(SplashScreenActivity.class).create().start().resume().pause().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 
@@ -217,6 +245,8 @@ public class SplashScreenActivityTest{
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button btnNegative = alert.getButton(AlertDialog.BUTTON_NEGATIVE);
         btnNegative.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
     }
 
@@ -225,6 +255,8 @@ public class SplashScreenActivityTest{
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button btnNegative = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         btnNegative.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
         testSendSupportEmail();
     }
@@ -233,6 +265,7 @@ public class SplashScreenActivityTest{
     public void testOnCreateWithoutExtras()
     {
         activity = Robolectric.buildActivity(SplashScreenActivity.class).create().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA));
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.APP_CRASH_MESSAGE));
     }
@@ -245,8 +278,8 @@ public class SplashScreenActivityTest{
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(9999));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
+
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
@@ -261,8 +294,8 @@ public class SplashScreenActivityTest{
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(500));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
+
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
@@ -286,6 +319,8 @@ public class SplashScreenActivityTest{
                 com.vodafone.mycomms.util.Constants.PROFILE_ID_SHARED_PREF, "mc_555a0792121ef1695cc7c1c3").apply();
 
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(activity.isFinishing());
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -299,6 +334,8 @@ public class SplashScreenActivityTest{
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(activity.isFinishing());
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -310,13 +347,16 @@ public class SplashScreenActivityTest{
     {
         String serverUrl = startWebMockServer();
         PowerMockito.mockStatic(EndpointWrapper.class);
+        PowerMockito.mockStatic(APIWrapper.class);
         UserSecurity.setTokens(Constants.ACCESS_TOKEN, Constants.REFRESH_TOKEN, 0, RuntimeEnvironment.application);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), Mockito.any(HashMap.class), Mockito.any(HashMap.class), Mockito.any(Context.class)))
+                .thenReturn(null);
         webServer.enqueue(new MockResponse().setResponseCode(200).setBody(Constants.VALID_VERSION_RESPONSE));
         webServer.enqueue(new MockResponse().setResponseCode(500).setBody(Constants.VALID_VERSION_RESPONSE));
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
+
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
@@ -424,7 +464,9 @@ public class SplashScreenActivityTest{
     public void testBusProvider_OnApplicationAndProfileInitializedEvent()
     {
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
+        MockDataForTests.checkThreadSchedulers();
 
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -436,7 +478,12 @@ public class SplashScreenActivityTest{
     public void testBusProvider_OnApplicationAndProfileReadErrorEvent_WithProfileAvailable()
     {
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(new ApplicationAndProfileReadError());
+        PowerMockito.mockStatic(APIWrapper.class);
+        PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), Mockito.any(HashMap.class), Mockito.any(HashMap.class), Mockito.any(Context.class)))
+                .thenReturn(null);
+        MockDataForTests.checkThreadSchedulers();
 
         SharedPreferences sp = activity.getSharedPreferences(
                 com.vodafone.mycomms.util.Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -455,7 +502,9 @@ public class SplashScreenActivityTest{
     public void testBusProvider_OnApplicationAndProfileReadErrorEvent_NOProfileAvailable()
     {
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(new ApplicationAndProfileReadError());
+        MockDataForTests.checkThreadSchedulers();
 
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
@@ -470,9 +519,11 @@ public class SplashScreenActivityTest{
     {
         String mockMessage = "mockErrorMessage";
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
+        MockDataForTests.checkThreadSchedulers();
         OKHttpErrorReceivedEvent event = new OKHttpErrorReceivedEvent();
         event.setErrorMessage(mockMessage);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertEquals(mockMessage, event.getErrorMessage());
     }

@@ -19,12 +19,15 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.main.SplashScreenActivity;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -75,14 +78,7 @@ public class SignupPincodeActivityTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
         activity = Robolectric.buildActivity(SignupPincodeActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         Shadows.shadowOf(activity).getNextStartedActivity();
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
@@ -103,10 +99,8 @@ public class SignupPincodeActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         activity = null;
         etPin = null;
@@ -125,15 +119,38 @@ public class SignupPincodeActivityTest {
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
+        {
+            @Override
+            public void uncaughtException (Thread thread, Throwable e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testSendPincode() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, CHECK_PHONE_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         KeyEvent keyEvent = new KeyEvent(0,0,KeyEvent.ACTION_UP, KeyEvent.KEYCODE_1, 0, 0);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
+        MockDataForTests.checkThreadSchedulers();
+
         Intent expectedIntent = new Intent(activity, MailSentActivity.class);
         expectedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         expectedIntent.putExtra("pin", activity.pin);
@@ -145,11 +162,15 @@ public class SignupPincodeActivityTest {
     public void testSendPincodeOAuth() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(201, LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         KeyEvent keyEvent = new KeyEvent(0,0,KeyEvent.ACTION_UP, KeyEvent.KEYCODE_1, 0, 0);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
+        MockDataForTests.checkThreadSchedulers();
+
         Intent expectedIntent = new Intent(activity, SplashScreenActivity.class);
         expectedIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -161,11 +182,15 @@ public class SignupPincodeActivityTest {
     public void testSendPinCodeInvalidResponseCode() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(400);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         KeyEvent keyEvent = new KeyEvent(0,0,KeyEvent.ACTION_UP, KeyEvent.KEYCODE_A, 0, 0);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
         etPin.dispatchKeyEvent(keyEvent);
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(lnPin1.getBackground().equals(activity.getResources().getDrawable(android.R.color.holo_red_dark)));
     }
 
@@ -173,6 +198,7 @@ public class SignupPincodeActivityTest {
     public void testSendPinCodeText() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
 
         etPin.setText("1");
         Assert.assertTrue(activity.nextPinPos == 2);
@@ -213,7 +239,11 @@ public class SignupPincodeActivityTest {
     public void testResendPin() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         btResendPin.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Intent expectedIntent = new Intent(activity, MailSentActivity.class);
         expectedIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         expectedIntent.putExtra("pin", activity.pin);
@@ -267,6 +297,8 @@ public class SignupPincodeActivityTest {
     public void testSendPincodeOK() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(201, LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         etPin.setText("1");
         etPin.setText("12");
         etPin.setText("123");
@@ -282,6 +314,7 @@ public class SignupPincodeActivityTest {
     public void testBack() throws Exception {
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
     }
 
@@ -289,6 +322,7 @@ public class SignupPincodeActivityTest {
     @Test
     public void testFinish() throws Exception {
         Activity activity = Robolectric.buildActivity(SignupPincodeActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 

@@ -45,6 +45,8 @@ import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.concurrent.ExecutionException;
 
 import io.realm.Realm;
@@ -108,12 +110,14 @@ public class LoginActivityTest {
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-        {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                e.printStackTrace();
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at LoginActivityTest: \n" + writer.toString());
             }
         });
     }

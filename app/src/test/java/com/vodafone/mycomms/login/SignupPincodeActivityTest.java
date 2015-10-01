@@ -41,6 +41,9 @@ import org.robolectric.shadows.ShadowInputMethodManager;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import static com.vodafone.mycomms.constants.Constants.CHECK_PHONE_OK_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -122,12 +125,14 @@ public class SignupPincodeActivityTest {
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-        {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                e.printStackTrace();
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at SignupPincodeActivityTest: \n" + writer.toString());
             }
         });
     }

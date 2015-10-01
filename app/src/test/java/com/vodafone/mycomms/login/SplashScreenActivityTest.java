@@ -55,6 +55,8 @@ import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowLooper;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 
 import io.realm.Realm;
@@ -87,8 +89,7 @@ public class SplashScreenActivityTest{
     MockWebServer webServer;
 
     @Before
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         mockStatic(Realm.class);
         when(Realm.getDefaultInstance()).thenReturn(null);
         mockStatic(Crashlytics.class);
@@ -110,12 +111,14 @@ public class SplashScreenActivityTest{
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-        {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                e.printStackTrace();
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter( writer );
+                e.printStackTrace( printWriter );
+                printWriter.flush();
+                System.err.println("Uncaught exception at SplashScreenActivityTest: \n"+writer.toString());
             }
         });
     }

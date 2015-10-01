@@ -28,8 +28,10 @@ import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +49,8 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 
 import io.realm.Realm;
@@ -115,6 +119,27 @@ public class DashBoardActivityControllerTest
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at DashBoardActivityControllerTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testCorrectlyCreated()
     {
@@ -132,9 +157,7 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.mRealmNewsTransactions = Mockito.mock(RealmNewsTransactions.class);
         Mockito.when(this.mDashBoardActivityController.mRealmNewsTransactions.getAllNews(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockNewsArrayList());
-
         this.mDashBoardActivityController.loadNews();
-
         MockDataForTests.checkThreadSchedulers();
 
         LinearLayout container = (LinearLayout) mActivity.findViewById(R.id.list_news);
@@ -144,21 +167,21 @@ public class DashBoardActivityControllerTest
         LinearLayout btnews = (LinearLayout) v.findViewById(R.id.notice_content);
         int numberOfChild = container.getChildCount();
         btnews.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         ShadowActivity shadowActivity = Shadows.shadowOf(this.mActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
-
         Assert.assertNotNull(this.mDashBoardActivityController.newsArrayList);
         Assert.assertEquals(numberOfChild, MockDataForTests.getMockNewsArrayList().size());
         assertThat(shadowIntent.getComponent().getClassName(), equalTo(NewsDetailActivity.class.getName()));
-
-        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
     }
 
     @Test
     public void testDrawNews_OK()
     {
         this.mDashBoardActivityController.drawNews(MockDataForTests.getMockNewsArrayList());
+        MockDataForTests.checkThreadSchedulers();
         LinearLayout container = (LinearLayout) mActivity.findViewById(R.id.list_news);
         Assert.assertNotNull(container);
     }
@@ -167,6 +190,7 @@ public class DashBoardActivityControllerTest
     public void testDrawNews_ControlledException()
     {
         this.mDashBoardActivityController.drawNews(null);
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.newsArrayList.isEmpty());
     }
 
@@ -175,6 +199,7 @@ public class DashBoardActivityControllerTest
     {
         this.mDashBoardActivityController.numberOfRecentContacts = 5;
         this.mDashBoardActivityController.loadRecentLayout();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 4);
     }
 
@@ -184,6 +209,8 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.isCurrentRecentContainerFirst = true;
         this.mDashBoardActivityController.numberOfRecentContacts = 1;
         this.mDashBoardActivityController.loadRecentLayout();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertFalse(this.mDashBoardActivityController.isCurrentRecentContainerFirst);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer2.getVisibility(), View.GONE);
@@ -196,6 +223,8 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.isCurrentRecentContainerFirst = false;
         this.mDashBoardActivityController.numberOfRecentContacts = 1;
         this.mDashBoardActivityController.loadRecentLayout();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.isCurrentRecentContainerFirst);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer.getVisibility(), View.GONE);
@@ -206,6 +235,8 @@ public class DashBoardActivityControllerTest
     public void testLoadLocalContacts_OK()
     {
         this.mDashBoardActivityController.loadLocalContacts();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(this.mDashBoardActivityController.mProfileId != null);
         Assert.assertTrue(this.mDashBoardActivityController.mProfileId.length() > 0);
         Assert.assertTrue(this.mDashBoardActivityController.mActivity != null);
@@ -217,6 +248,8 @@ public class DashBoardActivityControllerTest
     {
         this.mDashBoardActivityController.mProfileId = null;
         this.mDashBoardActivityController.loadLocalContacts();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(this.mDashBoardActivityController.mProfileId == null);
     }
 
@@ -225,6 +258,8 @@ public class DashBoardActivityControllerTest
     {
         this.mDashBoardActivityController.isCurrentRecentContainerFirst = true;
         this.mDashBoardActivityController.loadRecentContactsAndUnreadMessages();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer != null);
     }
 
@@ -233,16 +268,19 @@ public class DashBoardActivityControllerTest
     {
         this.mDashBoardActivityController.isCurrentRecentContainerFirst = false;
         this.mDashBoardActivityController.loadRecentContactsAndUnreadMessages();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer2 != null);
     }
 
     @Test
     public void testLoadRecent_Failed_WithControlledException()
     {
-
         PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(null);
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
     }
 
@@ -262,20 +300,16 @@ public class DashBoardActivityControllerTest
                 .thenReturn(MockDataForTests.getMockRecentContactsList_OnlyOneGroupChat());
 
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-
         MockDataForTests.checkThreadSchedulers();
 
         View mView = this.mDashBoardActivityController.mRecentContainer.getChildAt(0);
         LinearLayout btRecent = (LinearLayout) mView.findViewById(R.id.recent_content);
-
         Assert.assertTrue(btRecent.performClick());
-
         MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(this.mActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
-
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
         assertThat(shadowIntent.getComponent().getClassName(), equalTo(GroupChatActivity.class.getName()));
@@ -304,6 +338,7 @@ public class DashBoardActivityControllerTest
         View mView = this.mDashBoardActivityController.mRecentContainer.getChildAt(0);
         LinearLayout lay_main_container = (LinearLayout) mView.findViewById(R.id.recent_content);
         boolean isClicked = lay_main_container.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(isClicked);
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
@@ -334,6 +369,7 @@ public class DashBoardActivityControllerTest
         View mView = this.mDashBoardActivityController.mRecentContainer.getChildAt(0);
         LinearLayout lay_main_container = (LinearLayout) mView.findViewById(R.id.recent_content);
         boolean isClicked = lay_main_container.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(isClicked);
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
@@ -364,6 +400,7 @@ public class DashBoardActivityControllerTest
         View mView = this.mDashBoardActivityController.mRecentContainer.getChildAt(0);
         LinearLayout lay_main_container = (LinearLayout) mView.findViewById(R.id.recent_content);
         boolean isClicked = lay_main_container.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(isClicked);
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
@@ -387,13 +424,13 @@ public class DashBoardActivityControllerTest
         PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockRecentContactsList_OneRecent_ActionEMAIL());
 
-
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-        MockDataForTests.checkThreadSchedulers();;
+        MockDataForTests.checkThreadSchedulers();
 
         View mView = this.mDashBoardActivityController.mRecentContainer.getChildAt(0);
         LinearLayout lay_main_container = (LinearLayout) mView.findViewById(R.id.recent_content);
         boolean isClicked = lay_main_container.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(isClicked);
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
@@ -418,10 +455,8 @@ public class DashBoardActivityControllerTest
         PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(null);
 
-
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         MockDataForTests.checkThreadSchedulers();
-
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
     }
 
@@ -443,8 +478,7 @@ public class DashBoardActivityControllerTest
 
 
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
-        MockDataForTests.checkThreadSchedulers();;
-
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts != 0);
     }
 
@@ -467,7 +501,6 @@ public class DashBoardActivityControllerTest
         MockDataForTests.checkThreadSchedulers();
 
         TextView unread_messages = (TextView) view.findViewById(R.id.unread_messages);
-
         Assert.assertNotNull(unread_messages);
         Assert.assertNotNull(unread_messages.getText().toString());
     }
@@ -511,6 +544,4 @@ public class DashBoardActivityControllerTest
         builder.downloader(downloader);
         MycommsApp.picasso = builder.build();
     }
-
-
 }

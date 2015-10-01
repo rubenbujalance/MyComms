@@ -39,6 +39,8 @@ import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
 
 import static com.vodafone.mycomms.constants.Constants.FIRSTNAME;
@@ -88,12 +90,14 @@ public class SignupNameActivityTest {
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-        {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                e.printStackTrace();
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at SignupNameActivityTest: \n" + writer.toString());
             }
         });
     }

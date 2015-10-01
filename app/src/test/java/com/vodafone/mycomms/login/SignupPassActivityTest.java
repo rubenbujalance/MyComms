@@ -32,6 +32,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import static com.vodafone.mycomms.constants.Constants.ANOTHER_PASSWORD;
 import static com.vodafone.mycomms.constants.Constants.PASSWORD;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -82,12 +85,14 @@ public class SignupPassActivityTest {
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-        {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                e.printStackTrace();
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at SignupPassActivityTest: \n" + writer.toString());
             }
         });
     }

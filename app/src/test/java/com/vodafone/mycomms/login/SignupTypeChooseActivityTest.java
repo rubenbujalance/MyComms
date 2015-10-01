@@ -28,6 +28,9 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
@@ -74,12 +77,14 @@ public class SignupTypeChooseActivityTest {
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-        {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                e.printStackTrace();
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at SignupTypeChooseActivityTest: \n" + writer.toString());
             }
         });
     }

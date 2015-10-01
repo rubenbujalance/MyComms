@@ -39,6 +39,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowWebView;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import static com.vodafone.mycomms.constants.Constants.OAUTH_200_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.OAUTH_RESPONSE;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -84,12 +87,14 @@ public class OAuthActivityTest {
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-        {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                e.printStackTrace();
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at OAuthActivityTest: \n" + writer.toString());
             }
         });
     }

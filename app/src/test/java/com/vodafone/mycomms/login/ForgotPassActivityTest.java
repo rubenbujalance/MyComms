@@ -29,6 +29,9 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
 import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -78,12 +81,14 @@ public class ForgotPassActivityTest {
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
-        {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
-            public void uncaughtException (Thread thread, Throwable e)
-            {
-                e.printStackTrace();
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at ForgotPassActivityTest: \n" + writer.toString());
             }
         });
     }

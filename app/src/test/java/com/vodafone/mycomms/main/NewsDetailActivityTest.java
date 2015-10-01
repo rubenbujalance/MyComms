@@ -20,12 +20,15 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +40,9 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import io.realm.Realm;
 
@@ -73,14 +79,33 @@ public class NewsDetailActivityTest
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         mActivity = null;
         mContext = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at NewsDetailActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -103,6 +128,7 @@ public class NewsDetailActivityTest
                 .stop()
                 .destroy()
                 .get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mActivity.isDestroyed());
     }
 
@@ -122,8 +148,7 @@ public class NewsDetailActivityTest
                 .resume()
                 .get();
 
-        Thread.sleep(3000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         TextView title = (TextView) mActivity.findViewById(R.id.title);
         ImageView avatar = (ImageView) mActivity.findViewById(R.id.avatar);
@@ -153,9 +178,7 @@ public class NewsDetailActivityTest
                 .start()
                 .resume()
                 .get();
-
-        Thread.sleep(3000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         TextView title = (TextView) mActivity.findViewById(R.id.title);
         ImageView avatar = (ImageView) mActivity.findViewById(R.id.avatar);
@@ -185,10 +208,11 @@ public class NewsDetailActivityTest
                 .start()
                 .resume()
                 .get();
+        MockDataForTests.checkThreadSchedulers();
 
-        Thread.sleep(3000);
         ImageView ivBtBack = (ImageView)mActivity.findViewById(R.id.btn_back);
         ivBtBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(mActivity.isFinishing());
     }
@@ -208,9 +232,9 @@ public class NewsDetailActivityTest
                 .start()
                 .resume()
                 .get();
-
-        Thread.sleep(3000);
+        MockDataForTests.checkThreadSchedulers();
         mActivity.onBackPressed();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mActivity.isFinishing());
     }
 

@@ -37,7 +37,9 @@ import junit.framework.Assert;
 
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,6 +60,8 @@ import org.robolectric.shadows.ShadowInputMethodManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URLEncoder;
 
 import io.realm.Realm;
@@ -109,6 +113,7 @@ public class SearchGlobalContactsTest {
         startContactListFragment(2);
         contactListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("2");
+        MockDataForTests.checkThreadSchedulers();
 
         listView = (ListView) contactListFragment.getView().findViewById(android.R.id.list);
         emptyText = (TextView) contactListFragment.getView().findViewById(android.R.id.empty);
@@ -123,11 +128,9 @@ public class SearchGlobalContactsTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-            if(webServer!=null) webServer.shutdown();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
+        if(webServer!=null) webServer.shutdown();
 
         contactListFragment = null;
         customFragmentActivity = null;
@@ -142,9 +145,29 @@ public class SearchGlobalContactsTest {
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void shouldNotBeNull() throws Exception {
-        System.err.println("******** Test: NOT NULL OBJECTS ********");
         Assert.assertTrue(contactListFragment != null);
         Assert.assertTrue(listView != null);
         Assert.assertTrue(emptyText != null);
@@ -153,7 +176,9 @@ public class SearchGlobalContactsTest {
         Assert.assertTrue(cancelButton != null);
         Assert.assertTrue(layCancel != null);
         Assert.assertTrue(laySearchBar != null);
-        System.err.println("******** Test: NO NULL OBJECTS OK ********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -165,33 +190,36 @@ public class SearchGlobalContactsTest {
                 com.vodafone.mycomms.util.Constants.IS_GLOBAL_CONTACTS_LOADING_ENABLED,
                 true)
                 .apply();
-        System.err.println("******** Test: IS_GLOBAL_CONTACTS_LOADING_ENABLED FALSE ********");
 
         //addGCBar.setVisibility(View.VISIBLE);
         Assert.assertTrue(addGlobalContactsContainer.getVisibility() == (View.VISIBLE));
-        System.err.println("******** Test: Global Contacts Visibility ON CONTACTS LIST OK********");
 
         startContactListFragment(0);
         ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("0");
+        MockDataForTests.checkThreadSchedulers();
+
         addGlobalContactsContainer = (RelativeLayout) favoriteListFragment.getView().findViewById(R.id.add_global_contacts_container);
         Assert.assertTrue(addGlobalContactsContainer.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Global Contacts Visibility ON FAVORITE LIST OK********");
 
         startContactListFragment(1);
         ContactListFragment recentListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
+        MockDataForTests.checkThreadSchedulers();
+
         addGlobalContactsContainer = (RelativeLayout) recentListFragment.getView().findViewById(R.id.add_global_contacts_container);
         Assert.assertTrue(addGlobalContactsContainer.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Global Contacts Visibility ON RECENT LIST OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testInitiateSearchViewComponentsOnFavoriteFragment() throws Exception {
-        System.err.println("******** Test: Initiate SearchView Components ON FAVORITE LIST********");
         startContactListFragment(0);
         ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("0");
+        MockDataForTests.checkThreadSchedulers();
 
         SearchBarController searchBarController = new SearchBarController(favoriteListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
         try{
@@ -209,91 +237,96 @@ public class SearchGlobalContactsTest {
 
         addGlobalContactsContainer = (RelativeLayout) favoriteListFragment.getView().findViewById(R.id.add_global_contacts_container);
         Assert.assertTrue(addGlobalContactsContainer.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Initiate SearchView Components ON FAVORITE LIST OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
-    public void testClickBarAndGoToAddGlobalContacts() throws Exception {
+    public void testClickBarAndGoToAddGlobalContacts() throws Exception
+    {
         addGlobalContactsContainer.setVisibility(View.VISIBLE);
         addGlobalContactsContainer.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Intent expectedIntent = new Intent(contactListFragment.getActivity(), AddGlobalContactsActivity.class);
         Assert.assertTrue(Shadows.shadowOf(contactListFragment.getActivity())
                 .getNextStartedActivity().equals(expectedIntent));
-        System.err.println("******** Test: Navigation to AddGlobalContactsActivity OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testSearchBarVisibility() throws Exception {
-        System.err.println("******** Test: Search Bar Visibility ********");
         Assert.assertTrue(laySearchBar.getVisibility() == (View.VISIBLE));
-        System.err.println("******** Test: Search Bar Visibility ON CONTACT LIST OK********");
 
         startContactListFragment(0);
         ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("0");
+        MockDataForTests.checkThreadSchedulers();
+
         laySearchBar = (LinearLayout) favoriteListFragment.getView().findViewById(R.id.lay_search_bar_container);
         Assert.assertTrue(laySearchBar.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Search Bar Visibility ON FAVORITE LIST OK********");
 
         startContactListFragment(1);
         ContactListFragment recentListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
+        MockDataForTests.checkThreadSchedulers();
+
         laySearchBar = (LinearLayout) recentListFragment.getView().findViewById(R.id.lay_search_bar_container);
         Assert.assertTrue(laySearchBar.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Search Bar Visibility ON RECENT LIST OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testSearchBarInitialContentVisibility() throws Exception {
-        System.err.println("******** Test: Search Bar Content Visibility ********");
         Assert.assertTrue(layCancel.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Search Cancel Layout Visibility ON CONTACT LIST OK********");
         Assert.assertTrue(searchView.getHint().equals(context.getResources().getString(R.string.search_bar_text)));
-        System.err.println("******** Test: Search Hint not empty ON CONTACT LIST OK********");
 
         startContactListFragment(0);
         ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("0");
+        MockDataForTests.checkThreadSchedulers();
+
         layCancel = (LinearLayout) favoriteListFragment.getView().findViewById(R.id.lay_search_bar_container);
         Assert.assertTrue(layCancel.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Search Cancel Layout Visibility ON FAVORITE LIST OK********");
         searchView = (EditText) favoriteListFragment.getView().findViewById(R.id.et_search);
         Assert.assertTrue(searchView.getText().equals(""));
-        System.err.println("******** Test: Search Text Empty ON FAVORITE LIST OK********");
 
         startContactListFragment(1);
         ContactListFragment recentListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
+        MockDataForTests.checkThreadSchedulers();
+
         layCancel = (LinearLayout) recentListFragment.getView().findViewById(R.id.lay_search_bar_container);
         Assert.assertTrue(layCancel.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Search Cancel Layout Visibility ON RECENT LIST OK********");
         searchView = (EditText) recentListFragment.getView().findViewById(R.id.et_search);
         Assert.assertTrue(searchView.getText().equals(""));
-        System.err.println("******** Test: Search Text Empty ON RECENT LIST OK********");
 
         Constants.isSearchBarFocusRequested = true;
         startContactListFragment(2);
-        System.err.println("******** Test: Search Bar Content with Focus Visibility ********");
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(layCancel.getVisibility() == (View.GONE));
-        System.err.println("******** Test: Search Cancel Layout with Focus  Visibility ON CONTACT LIST OK********");
         Assert.assertTrue(searchView.getHint().equals(context.getResources().getString(R.string.search_bar_text)));
-        System.err.println("******** Test: Search Hint with Focus not empty ON CONTACT LIST OK********");
         InputMethodManager inputManager = (InputMethodManager) contactListFragment.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         ShadowInputMethodManager shadowInputMethodManager = Shadows.shadowOf(inputManager);
         Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
-        System.err.println("******** Test: Search View Key Listener Events OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testSearchViewTouchEvent() throws Exception {
-        System.err.println("******** Test: Search Bar Touch Events ********");
         // Obtain MotionEvent object
         long downTime = SystemClock.uptimeMillis();
         long eventTime = SystemClock.uptimeMillis() + 100;
         float x = 0.0f;
         float y = 0.0f;
-        // List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
         int metaState = 0;
         MotionEvent motionEvent = MotionEvent.obtain(
                 downTime,
@@ -309,7 +342,6 @@ public class SearchGlobalContactsTest {
         InputMethodManager inputManager = (InputMethodManager)contactListFragment.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         ShadowInputMethodManager shadowInputMethodManager = Shadows.shadowOf(inputManager);
         Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
-        System.err.println("******** Test: Search Keyboard showing motion event up ON CONTACT LIST OK********");
 
         motionEvent = MotionEvent.obtain(
                 downTime,
@@ -323,19 +355,17 @@ public class SearchGlobalContactsTest {
         searchView.dispatchTouchEvent(motionEvent);
         //Show Keyboard Soft Input
         Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
-        System.err.println("******** Test: Search Keyboard showing motion event not up ON CONTACT LIST OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
-    //TODO: BusProvider Error is blocking this test. Fix it.
     @Test
     public void testSearchViewTouchDeleteEvent() throws Exception {
-        System.err.println("******** Test: Search Bar Touch Delete Events ********");
 
         //Prepare Mock SearchView in order to avoid onTextChange events
         final int drLeft = android.R.drawable.ic_menu_search;
         final int drRight = R.drawable.ic_action_remove;
-//        EditText spySearchView = Mockito.spy(searchView);
-//        Mockito.doNothing().when(spySearchView).setText(testString);
         try {
             searchView.setText(testString);
         } catch (RuntimeException e){
@@ -351,7 +381,6 @@ public class SearchGlobalContactsTest {
         long eventTime = SystemClock.uptimeMillis() + 100;
         float x = searchView.getRight() - searchView.getCompoundDrawables()[2].getBounds().width();
         float y = 0.0f;
-        // List of meta states found here:     developer.android.com/reference/android/view/KeyEvent.html#getMetaState()
         int metaState = 0;
         MotionEvent motionEvent = MotionEvent.obtain(
                 downTime,
@@ -365,21 +394,20 @@ public class SearchGlobalContactsTest {
         try {
             searchView.dispatchTouchEvent(motionEvent);
         } catch (RuntimeException e){
-            System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
         //Show Keyboard Soft Input
         InputMethodManager inputManager = (InputMethodManager)contactListFragment.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         ShadowInputMethodManager shadowInputMethodManager = Shadows.shadowOf(inputManager);
         Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
-        System.err.println("******** Test: Search Keyboard showing ON CONTACT LIST OK********");
         //Show CancelButton
-        Assert.assertTrue(searchView.getText().equals(""));
-        System.err.println("******** Test: Cancel Button Visibility ON CONTACT LIST OK********");
+        Assert.assertTrue(searchView.getText().toString().equals(""));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testSearchViewOnTextChangedEvent() throws Exception {
-        System.err.println("******** Test: Search On Text Changed Events ********");
         SearchController mSearchController = Mockito.mock(SearchController.class);
         Mockito.when(mSearchController.getContactsByKeyWord(Matchers.anyString())).thenReturn(MockDataForTests.getMockContactsList());
 
@@ -387,56 +415,49 @@ public class SearchGlobalContactsTest {
         searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
         searchBarController.searchContactsOnTextChanged("");
         Assert.assertTrue(layCancel.getVisibility() == View.GONE);
-        System.err.println("******** Test: Cancel Layout GONE NULL CHAR ON CONTACT LIST OK********");
 
         //Input 1 char
         searchBarController.searchContactsOnTextChanged("1");
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
-        System.err.println("******** Test: Cancel Button and Layout VISIBLE 1 CHAR ON CONTACT LIST OK********");
 
         //Input more than 1 letter text
         searchBarController.searchContactsOnTextChanged("Testing");
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
-        System.err.println("******** Test: Cancel Button and Layout VISIBLE 6 CHAR ON CONTACT LIST OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testSearchViewOnTextChangedRealEvent() throws Exception {
-        System.err.println("******** Test: Search On Real Text Changed Events ********");
         try {
             searchView.setText("1");
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
-        System.err.println("******** Test: Change Text Listener Test OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testSearchViewOnKeyListenerEvent() throws Exception {
-        System.err.println("******** Test: Search View Key Listener Events ********");
         searchView.dispatchKeyEvent((new KeyEvent(KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_ENTER)));
         InputMethodManager inputManager = (InputMethodManager)contactListFragment.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         ShadowInputMethodManager shadowInputMethodManager = Shadows.shadowOf(inputManager);
         Assert.assertFalse(shadowInputMethodManager.isSoftInputVisible());
-        System.err.println("******** Test: Search View Key Listener Events OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
-    //TODO: BusProvider Error is blocking this test. Fix it.
     @Test
     public void testCancelButtonClickEvent() throws Exception {
-        System.err.println("******** Test: Search Cancel Button Click Events ********");
-
-//        SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,null,2,null,false,null,contactListFragment);
-//        SearchBarController spySearchBarController = Mockito.spy(searchBarController);
-//
-//        //Input ""
-//        Mockito.doNothing().when(spySearchBarController).loadAllContactsFromDB();
 
         layCancel.setVisibility(View.VISIBLE);
-//        spySearchBarController.initiateComponentsForSearchView(contactListFragment.getView());
 
         try {
             searchView.setText(testString);
@@ -446,6 +467,7 @@ public class SearchGlobalContactsTest {
 
         try {
             cancelButton.performClick();
+            MockDataForTests.checkThreadSchedulers();
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
@@ -456,15 +478,14 @@ public class SearchGlobalContactsTest {
         Assert.assertFalse(shadowInputMethodManager.isSoftInputVisible());
 
         //Hide SearchBar Validation
-        Assert.assertTrue(searchView.getText().equals(""));
+        Assert.assertTrue(searchView.getText().toString().equals(""));
 
-        System.err.println("******** Test: Search Cancel Button Click Events OK********");
-
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testLoadContactsFromDBEvent() throws Exception {
-        System.err.println("******** Test: Load Contacts from DB Events ********");
         SearchController searchController = new SearchController(context, Constants.PROFILE_ID, null);
         SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
         searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
@@ -475,7 +496,7 @@ public class SearchGlobalContactsTest {
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         try{
             searchBarController.searchContactsOnTextChanged("1");
@@ -483,13 +504,14 @@ public class SearchGlobalContactsTest {
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
-        Robolectric.flushForegroundThreadScheduler();
-        System.err.println("******** Test: Load Contacts from DB Events OK ********");
+        MockDataForTests.checkThreadSchedulers();
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testLoadAllContactsFromPlatformSearch(){
-        System.err.println("******** Test: Load All Contacts Search from Platform Events ********");
 
         String serverUrl = null;
         try
@@ -539,16 +561,7 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
 
-        try
-        {
-            Thread.sleep(2000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(5000)********\n"+e.getMessage());
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         try {
             webServer.shutdown();
@@ -560,7 +573,8 @@ public class SearchGlobalContactsTest {
         }
         org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
 
-        System.err.println("******** Test: Load All Contacts from Platforms Events OK ********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -576,8 +590,6 @@ public class SearchGlobalContactsTest {
             org.junit.Assert.fail();
             System.err.println("******** Failed due serverUrl = startWebMockServer()********\n" + e.getMessage());
         }
-
-
 
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
@@ -610,16 +622,7 @@ public class SearchGlobalContactsTest {
                         , "mockPwd"
                 );
 
-        try {
-            Thread.sleep(5000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
-        }
-
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
 
@@ -632,7 +635,8 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.err.println("******** Passed, onFailure with wrong response code ********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -681,27 +685,7 @@ public class SearchGlobalContactsTest {
                         , "mockPwd"
                 );
 
-        try {
-            Thread.sleep(2000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(2000)********\n" + e.getMessage());
-        }
-
-        Robolectric.flushForegroundThreadScheduler();
-
-        try {
-            Thread.sleep(2000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
-        }
-
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
 
@@ -714,7 +698,8 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.err.println("******** Passed, onFailure + onFailure -> addGlobalContactsContainer is visible ********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -763,16 +748,8 @@ public class SearchGlobalContactsTest {
                         , "mockPwd"
                 );
 
-        try {
-            Thread.sleep(5000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
-        }
+        MockDataForTests.checkThreadSchedulers();
 
-        Robolectric.flushForegroundThreadScheduler();
         org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
 
         try {
@@ -784,7 +761,8 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.err.println("******** Passed, onFailure + onFailure -> addGlobalContactsContainer is not visible ********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -835,16 +813,8 @@ public class SearchGlobalContactsTest {
                         , "mockPwd"
                 );
 
-        try {
-            Thread.sleep(5000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
-        }
+        MockDataForTests.checkThreadSchedulers();
 
-        Robolectric.flushForegroundThreadScheduler();
         org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
 
         try {
@@ -856,7 +826,8 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.err.println("******** Passed, onFailure + onSuccess + onFailure ********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -908,16 +879,8 @@ public class SearchGlobalContactsTest {
                         , "mockPwd"
                 );
 
-        try {
-            Thread.sleep(5000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
-        }
+        MockDataForTests.checkThreadSchedulers();
 
-        Robolectric.flushForegroundThreadScheduler();
         org.junit.Assert.assertTrue(addGlobalContactsContainer.getVisibility() == View.VISIBLE);
 
         try {
@@ -930,7 +893,9 @@ public class SearchGlobalContactsTest {
         }
 
         org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
-        System.err.println("******** Passed, onFailure + onSuccess + onSuccess ********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -977,14 +942,7 @@ public class SearchGlobalContactsTest {
                         , "mockPwd"
                 );
 
-        try {
-            Thread.sleep(5000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(2000)********\n"+e.getMessage());
-        }
+        MockDataForTests.checkThreadSchedulers();
 
         org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
         try {
@@ -995,7 +953,9 @@ public class SearchGlobalContactsTest {
             org.junit.Assert.fail();
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
-        System.err.println("******** Passed, onSuccess ********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -1044,16 +1004,8 @@ public class SearchGlobalContactsTest {
                         , "mockPwd"
                 );
 
-        try {
-            Thread.sleep(5000);
-        }
-        catch (Exception e)
-        {
-            org.junit.Assert.fail();
-            System.err.println("******** Failed due Thread.sleep(2000)********\n" + e.getMessage());
-        }
+        MockDataForTests.checkThreadSchedulers();
 
-        Robolectric.flushForegroundThreadScheduler();
         org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
 
         try {
@@ -1064,7 +1016,9 @@ public class SearchGlobalContactsTest {
             org.junit.Assert.fail();
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
-        System.err.println("******** Passed, onSuccess ********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -1089,7 +1043,8 @@ public class SearchGlobalContactsTest {
 
         org.junit.Assert.assertNull(mGlobalContactsSettings.getToken());
 
-        System.err.println("******** Passed, buildRequestForSearchLDAPContacts_Fail ********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 
@@ -1108,7 +1063,8 @@ public class SearchGlobalContactsTest {
         org.junit.Assert.assertTrue(MockDataForTests.getMockContactsList().get(2).getPlatform().equals(Constants.PLATFORM_GLOBAL_CONTACTS));
         org.junit.Assert.assertTrue(MockDataForTests.getMockContactsList().get(3).getPlatform().equals(Constants.PLATFORM_LOCAL));
 
-        System.err.println("******** Passed, validateNoPlatformRecords_OK ********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -1159,21 +1115,16 @@ public class SearchGlobalContactsTest {
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
-        Thread.sleep(5000);
-        Robolectric.flushForegroundThreadScheduler();
-        Robolectric.flushBackgroundThreadScheduler();
-
-//        String toast = ShadowToast.getTextOfLatestToast();
-//        Assert.assertTrue(toast.equals("Error reading data from server"));
+        MockDataForTests.checkThreadSchedulers();
 
         webServer.shutdown();
 
-        System.err.println("******** Test: Load Contacts from Server Events OK ********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testLoadAllContactsFromGroupSearch() throws Exception {
-        System.err.println("******** Test: Load All Contacts From Group Search Events ********");
         SearchController searchController = new SearchController(context, Constants.PROFILE_ID, null);
         SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,true,null,contactListFragment);
         searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
@@ -1184,14 +1135,10 @@ public class SearchGlobalContactsTest {
         } catch (RuntimeException e){
             System.err.println("******** Test: RunTimeException Handled OK********" + e);
         }
-        Robolectric.flushForegroundThreadScheduler();
-        System.err.println("******** Test: Load All Contacts From Group Search Events OK********");
-    }
+        MockDataForTests.checkThreadSchedulers();
 
-    @Test
-    public void testLoadAllWithNoContactsSearch() throws Exception {
-        System.err.println("******** Test: Load All Contacts From Group Search Events ********");
-        System.err.println("******** Test: Load All Contacts From Group Search Events OK********");
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     public void startContactListFragment(int index)

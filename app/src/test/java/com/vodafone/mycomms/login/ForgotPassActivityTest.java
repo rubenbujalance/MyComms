@@ -121,6 +121,9 @@ public class ForgotPassActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test "+Thread.currentThread().getStackTrace()[1].getMethodName()
+                +" from class "+this.getClass().getSimpleName()+" successfully finished!");
     }
 
     @Test
@@ -132,6 +135,8 @@ public class ForgotPassActivityTest {
         btSend.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
+        System.out.println("Test "+Thread.currentThread().getStackTrace()[1].getMethodName()
+                +" from class "+this.getClass().getSimpleName()+" successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -140,5 +145,7 @@ public class ForgotPassActivityTest {
         Activity activity = Robolectric.buildActivity(ForgotPassActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+        System.out.println("Test "+Thread.currentThread().getStackTrace()[1].getMethodName()
+                +" from class "+this.getClass().getSimpleName()+" successfully finished!");
     }
 }

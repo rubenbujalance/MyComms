@@ -116,6 +116,9 @@ public class SignupPhoneActivityTest {
         ivBtFwd.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mCountry.getError().equals(activity.getString(R.string.select_your_phone_country_to_continue)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -126,6 +129,9 @@ public class SignupPhoneActivityTest {
         ivBtFwd.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mCountry.getError().equals(activity.getString(R.string.select_your_phone_country_to_continue)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -139,6 +145,9 @@ public class SignupPhoneActivityTest {
         MockDataForTests.checkThreadSchedulers();
         EditText innerPhone = (EditText)mPhone.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPhone.getError().equals(activity.getString(R.string.enter_your_phone_number_to_continue)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -163,6 +172,9 @@ public class SignupPhoneActivityTest {
         expectedIntent.putExtra("phoneNumber", dialCode + " " + mPhone.getText().toString());
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SignupPincodeActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -187,6 +199,9 @@ public class SignupPhoneActivityTest {
         expectedIntent.putExtra("phoneNumber", dialCode + " " + mPhone.getText().toString());
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SignupPincodeActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -205,6 +220,9 @@ public class SignupPhoneActivityTest {
 
         String toast = ShadowToast.getTextOfLatestToast();
         Assert.assertTrue(toast.equals(activity.getResources().getString(R.string.error_reading_data_from_server)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -229,6 +247,9 @@ public class SignupPhoneActivityTest {
         expectedIntent.putExtra("phoneNumber", dialCode + " " + mPhone.getText().toString());
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SplashScreenActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -237,6 +258,9 @@ public class SignupPhoneActivityTest {
         ivBtBack.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -245,6 +269,9 @@ public class SignupPhoneActivityTest {
         Activity activity = Robolectric.buildActivity(SignupPhoneActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 }

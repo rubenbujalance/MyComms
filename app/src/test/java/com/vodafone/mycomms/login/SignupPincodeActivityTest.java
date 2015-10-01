@@ -161,6 +161,9 @@ public class SignupPincodeActivityTest {
         expectedIntent.putExtra("pin", activity.pin);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (MailSentActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -181,6 +184,9 @@ public class SignupPincodeActivityTest {
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SplashScreenActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -197,6 +203,9 @@ public class SignupPincodeActivityTest {
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(lnPin1.getBackground().equals(activity.getResources().getDrawable(android.R.color.holo_red_dark)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -238,6 +247,9 @@ public class SignupPincodeActivityTest {
         Assert.assertTrue(tvPin2.getText().equals("  "));
         Assert.assertTrue(tvPin3.getText().equals("  "));
         Assert.assertTrue(tvPin4.getText().equals("  "));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -254,6 +266,9 @@ public class SignupPincodeActivityTest {
         expectedIntent.putExtra("pin", activity.pin);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (MailSentActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -296,6 +311,9 @@ public class SignupPincodeActivityTest {
         Thread.sleep(500);
         Robolectric.flushForegroundThreadScheduler();
         Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -313,6 +331,9 @@ public class SignupPincodeActivityTest {
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SplashScreenActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -321,6 +342,9 @@ public class SignupPincodeActivityTest {
         ivBtBack.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -329,6 +353,9 @@ public class SignupPincodeActivityTest {
         Activity activity = Robolectric.buildActivity(SignupPincodeActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 }

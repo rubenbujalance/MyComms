@@ -319,34 +319,6 @@ public class RealmChatTransactions
         return chatMessage;
     }
 
-    public boolean existsChatMessageById(String id, Realm realm)
-    {
-        boolean exists = false;
-        Realm mRealm;
-        if(null != realm)
-            mRealm = realm;
-        else
-            mRealm = Realm.getDefaultInstance();
-        try
-        {
-            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, id);
-            long count = query.count();
-            if(count>0) exists = true;
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "RealmChatTransactions.existsChatMessageById: ",e);
-            Crashlytics.logException(e);
-        }
-        finally
-        {
-            if(null == realm)
-                mRealm.close();
-        }
-        return exists;
-    }
-
     public ArrayList<ChatMessage> getNotReadReceivedContactChatMessages (String contactId, Realm
             realm)
     {
@@ -495,7 +467,7 @@ public class RealmChatTransactions
             if (result1 != null) {
                 result1.sort(Constants.CHAT_FIELD_LAST_MESSAGE_TIME, RealmResults.SORT_ORDER_DESCENDING);
                 for (Chat chatMessageListItem : result1) {
-                    if(contactTx.getContactById(chatMessageListItem.getContact_id(), mRealm)!=null)
+                    if(RealmContactTransactions.getContactById(chatMessageListItem.getContact_id(), mRealm)!=null)
                         chatMessageArrayList.add(chatMessageListItem);
                 }
             }

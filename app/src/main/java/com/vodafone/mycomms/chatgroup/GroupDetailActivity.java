@@ -258,7 +258,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
     {
         Intent in = getIntent();
 
-        _groupChat = mGroupChatTransactions.getGroupChatById(
+        _groupChat = RealmGroupChatTransactions.getGroupChatById(
                 in.getStringExtra(Constants.GROUP_CHAT_ID), mRealm);
         loadContactIds();
         loadGroupChatOwnerIds();
@@ -293,7 +293,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         for(String id : contactIds)
         {
             if(id.compareTo(_profile_id)!=0)
-                contact = contactTransactions.getContactById(id, mRealm);
+                contact = RealmContactTransactions.getContactById(id, mRealm);
             else contact = userContact;
 
             if(contact != null)

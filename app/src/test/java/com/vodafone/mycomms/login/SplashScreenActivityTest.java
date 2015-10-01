@@ -274,7 +274,7 @@ public class SplashScreenActivityTest{
     {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr =
-                (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         UserSecurity.setTokens(
                 Constants.ACCESS_TOKEN, Constants.REFRESH_TOKEN, Constants.EXPIRES_IN, RuntimeEnvironment.application);
@@ -296,7 +296,7 @@ public class SplashScreenActivityTest{
     public void testCheckVersionNoNetworkConnectionUserNotLogged() throws Exception {
         Context context = RuntimeEnvironment.application.getApplicationContext();
         UserSecurity.resetTokens(context);
-        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         Assert.assertTrue(activity.isFinishing());

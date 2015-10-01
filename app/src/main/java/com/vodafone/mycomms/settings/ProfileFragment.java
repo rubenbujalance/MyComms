@@ -695,7 +695,7 @@ public class ProfileFragment extends Fragment implements IProfileConnectionCallb
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(String id);
+        void onFragmentInteraction(String id);
     }
 
 

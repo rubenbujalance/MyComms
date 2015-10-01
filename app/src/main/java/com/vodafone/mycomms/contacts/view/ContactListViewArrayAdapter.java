@@ -102,10 +102,7 @@ public class ContactListViewArrayAdapter extends ArrayAdapter<Contact> {
             if (position == 0)
                 showSeparator = true;
             else {
-                if (!contact.getPlatform().equals(getItem(position - 1).getPlatform()))
-                    showSeparator = true;
-                else
-                    showSeparator = false;
+                showSeparator = !contact.getPlatform().equals(getItem(position - 1).getPlatform());
             }
             if (showSeparator) {
                 viewHolder.platformLabel.setVisibility(View.VISIBLE);

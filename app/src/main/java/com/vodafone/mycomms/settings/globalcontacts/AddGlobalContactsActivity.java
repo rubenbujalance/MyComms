@@ -204,10 +204,8 @@ public class AddGlobalContactsActivity extends MainActivity {
     }
 
     private boolean checkData() {
-        if (etEmail.getText() != null && etEmail.getText().toString().length() > 0 &&
-                etPassword.getText() != null && etPassword.getText().toString().length() > 0)
-            return true;
-        else return false;
+        return etEmail.getText() != null && etEmail.getText().toString().length() > 0 &&
+                etPassword.getText() != null && etPassword.getText().toString().length() > 0;
     }
 
     private void showMessageBarOnUIThread(final String message, final int code) {

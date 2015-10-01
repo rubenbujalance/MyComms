@@ -25,13 +25,11 @@ import org.apache.http.HttpResponse;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
@@ -42,14 +40,11 @@ import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.httpclient.FakeHttp;
 
-import io.realm.Realm;
-
 import static com.vodafone.mycomms.constants.Constants.LOGIN_OK_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.LOGIN_USER_NOT_FOUND_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.PASSWORD;
 import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -171,7 +166,7 @@ public class LoginActivityTest {
     @Test
     public void testLoginConnectionError(){
         Context context = RuntimeEnvironment.application.getApplicationContext();
-        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         try {
             HttpResponse httpResponse = Util.buildResponse(204, LOGIN_OK_RESPONSE);

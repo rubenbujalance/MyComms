@@ -98,12 +98,10 @@ public class SettingsMainActivity extends ToolbarActivity implements ProfileFrag
                 event.getConnectivityStatus()!=ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET)
         {
             lay_no_connection.setVisibility(View.VISIBLE);
-            Constants.isConnectionAvailable = false;
         }
         else
         {
             lay_no_connection.setVisibility(View.GONE);
-            Constants.isConnectionAvailable = true;
         }
     }
 

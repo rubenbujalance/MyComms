@@ -540,7 +540,7 @@ public class ContactsControllerTest{
     {
         UserProfile mUserProfile = MockDataForTests.getMockUserProfile();
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
-        Contact contact = contactsController.mapProfileToContact(mUserProfile);
+        Contact contact = ContactsController.mapProfileToContact(mUserProfile);
 
         Assert.assertTrue(mUserProfile.getAvailability().equals(contact.getAvailability()));
         Assert.assertTrue(mUserProfile.getFirstName().equals(contact.getFirstName()));

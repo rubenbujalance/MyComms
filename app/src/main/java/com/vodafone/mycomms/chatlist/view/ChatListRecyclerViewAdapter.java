@@ -131,7 +131,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         //Show visibility to availability
         chatListHolder.chat_availability.setVisibility(View.VISIBLE);
 
-        long amountUnreadMessages = _chatTx.getChatPendingMessagesCount(getComposedChat(i)
+        long amountUnreadMessages = RealmChatTransactions.getChatPendingMessagesCount(getComposedChat(i)
                 .getChat().getContact_id(), realm);
 
         if(amountUnreadMessages > 0) {
@@ -163,14 +163,6 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListHo
         String name = contact.getFirstName() + " " + contact.getLastName();
         return  name;
     }
-
-    private String getChatMemberInitials(String contactId)
-    {
-        Contact contact = RealmContactTransactions.getContactById(contactId, realm);
-        String name = contact.getFirstName().substring(0,1) + contact.getLastName().substring(0,1);
-        return  name;
-    }
-
 
     private ArrayList<Contact> loadContactsFromIds(ArrayList<String> ids)
     {

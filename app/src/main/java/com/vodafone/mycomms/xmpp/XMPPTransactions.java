@@ -205,53 +205,6 @@ public final class XMPPTransactions {
         pingThread.start();
     }
 
-    public static void sleepXMPPAfterMilis(final int miliseconds)
-    {
-        if(sleepThread!=null)
-            sleepThread.interrupt();
-
-        sleepThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(Constants.TAG, "XMPPTransactions.sleepThread: Sleeping in "+miliseconds/1000+" seconds");
-                //Divide the time in 10 seconds slots
-                int tenSecSlots = miliseconds / 10000;
-                int i = 1;
-
-                try {
-                    while(i<=tenSecSlots && !Thread.interrupted()) {
-                        //Sleep during 10 seconds
-                        Thread.sleep(10000);
-                        i++;
-                    }
-
-                    //If have arrived to the end of counter, go to sleep
-                    if(i==tenSecSlots) {
-                        Log.i(Constants.TAG, "XMPPTransactions.sleepThread: Go to sleep");
-                        _xmppConnection.disconnect();
-                    }
-                    else {
-                        Log.e(Constants.TAG, "XMPPTransactions.sleepThread: Application awake detected");
-                    }
-
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "XMPPTransactions.sleepThread: ", e);
-                    Crashlytics.logException(e);
-                }
-            }
-        });
-
-        sleepThread.start();
-    }
-
-    public static void awakeXMPP()
-    {
-        if(sleepThread!=null) {
-            sleepThread.interrupt();
-            sleepThread = null;
-        }
-    }
-
     public static boolean disconnectMsgServerSession()
     {
         try {
@@ -951,7 +904,7 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            GroupChat chat = groupTx.getGroupChatById(groupId, realm);
+            GroupChat chat = RealmGroupChatTransactions.getGroupChatById(groupId, realm);
 
             //Save ChatMessage to DB
             groupTx.insertGroupChatMessage(groupId, newChatMessage, null);
@@ -1178,7 +1131,7 @@ public final class XMPPTransactions {
             groupTx.insertGroupChatMessage(groupId, newChatMessage, null);
 
             //Load chat and create if it didn't exist
-            GroupChat chat = groupTx.getGroupChatById(groupId, realm);
+            GroupChat chat = RealmGroupChatTransactions.getGroupChatById(groupId, realm);
 
             if(chat==null) {
                 //Get group from API in background, and save to Realm
@@ -1478,9 +1431,4 @@ public final class XMPPTransactions {
 
         return _connectionListener;
     }
-
-    public static XMPPTCPConnection getXmppConnection() {
-        return _xmppConnection;
-    }
-
 }

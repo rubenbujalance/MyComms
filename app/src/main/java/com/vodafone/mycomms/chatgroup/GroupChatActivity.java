@@ -1,17 +1,13 @@
 package com.vodafone.mycomms.chatgroup;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -64,7 +60,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.Serializable;
-import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -404,8 +399,8 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
 
         if(isGroupChatMode)
         {
-            _groupChat = mGroupChatTransactions.getGroupChatById(
-                    in.getStringExtra(Constants.GROUP_CHAT_ID),realm);
+            _groupChat = RealmGroupChatTransactions.getGroupChatById(
+                    in.getStringExtra(Constants.GROUP_CHAT_ID), realm);
             _groupId = _groupChat.getId();
             loadContactIds();
             loadGroupChatOwnerIds();
@@ -451,7 +446,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
             for(String id : contactIds)
             {
                 if(!id.equals(_profile_id))
-                    contact = contactTransactions.getContactById(id, realm);
+                    contact = RealmContactTransactions.getContactById(id, realm);
                 else contact = userContact;
 
                 if(contact != null)
@@ -460,7 +455,7 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         }
         else
         {
-            Contact contact = contactTransactions.getContactById(contactIds.get(0), realm);
+            Contact contact = RealmContactTransactions.getContactById(contactIds.get(0), realm);
             if(contact != null)
                 contactList.add(contact);
         }
@@ -926,77 +921,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         return imgUri;
     }
 
-    public Bitmap decodeFile(String path)
-    {
-        try
-        {
-            // Decode image size
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(path, o);
-            return BitmapFactory.decodeFile(path);
-        }
-        catch (Exception e)
-        {
-            Log.e(Constants.TAG, "GroupChatActivity.decodeFile: ",e);
-            Crashlytics.logException(e);
-        }
-        return null;
-    }
-
-    private String getRealPathFromURI(Uri contentURI)
-    {
-        String result;
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null,
-                null);
-        if (cursor == null) {
-            result = contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            result = cursor.getString(idx);
-            cursor.close();
-        }
-        return result;
-    }
-
-    @SuppressLint("NewApi")
-    public Uri transformUriAPI22(Uri selectedImage) {
-        if (selectedImage != null && selectedImage.toString().length() > 0) {
-            try {
-                final String extractUriFrom = selectedImage.toString();
-                String firstExtraction = extractUriFrom.contains("com.google.android.apps.photos.contentprovider") ? extractUriFrom.split("/1/")[1] : extractUriFrom;
-                firstExtraction = firstExtraction.contains("/ACTUAL") ? firstExtraction.replace("/ACTUAL", "").toString() : firstExtraction;
-
-                String secondExtraction = URLDecoder.decode(firstExtraction, "UTF-8");
-                selectedImage = Uri.parse(secondExtraction);
-            } catch (Exception e) {
-                Log.e(Constants.TAG, "GroupChatActivity.transformUriAPI22: ",e);
-            }
-        }
-
-        return selectedImage;
-    }
-
-    @SuppressLint("NewApi")
-    public String getRealPathFromURI_API11to18(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        String result = null;
-
-        CursorLoader cursorLoader = new CursorLoader(
-                this,
-                contentUri, proj, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-
-        if(cursor != null){
-            int column_index =
-                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            result = cursor.getString(column_index);
-        }
-        return result;
-    }
-
     private class sendFile extends AsyncTask<Void, Void, String> {
         private ProgressDialog pdia;
         private Bitmap bitmap;
@@ -1068,26 +992,6 @@ public class GroupChatActivity extends ToolbarActivity implements Serializable
         if((isGroupChatMode && chatMsg!=null && chatMsg.getGroup_id().compareTo(_groupId)==0)
                 || (!isGroupChatMode && chatMsg!=null && chatMsg.getContact_id().compareTo(_contactId)==0))
             loadMessagesArray();
-    }
-
-    private class DownloadFile extends AsyncTask<String, Void, Boolean> {
-        private String param0;
-        private String param1;
-
-        @Override
-        protected Boolean doInBackground(String[] params) {
-            Log.i(Constants.TAG, "DownloadFile.doInBackground: ");
-            param0 = params[0];
-            param1 = params[1];
-            XMPPTransactions.downloadToChatFile(param0,param1);
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            Log.i(Constants.TAG, "DownloadFile.onPostExecute: ");
-            refreshAdapter();
-        }
     }
 
     @Subscribe

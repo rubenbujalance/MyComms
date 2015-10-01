@@ -18,9 +18,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
-import com.vodafone.mycomms.chatgroup.GroupChatController;
 import com.vodafone.mycomms.contacts.connection.ContactsController;
-import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
@@ -54,7 +52,6 @@ import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import model.ChatMessage;
-import model.GroupChat;
 import model.News;
 import model.UserProfile;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -246,8 +243,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public static boolean isProfileAvailable()
     {
         try {
-            if(sp.contains(Constants.PROFILE_ID_SHARED_PREF)) return true;
-            else return false;
+            return sp.contains(Constants.PROFILE_ID_SHARED_PREF);
 
         } catch(Exception e) {
             Log.e(Constants.TAG, "SplashScreenActivity.isProfileAvailable: ",e);

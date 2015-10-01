@@ -80,7 +80,7 @@ public class SearchBarController {
     {
         this.mActivity = activity;
         this.mContactTransactions = contactTransactions;
-        this.contactList = contactList;
+        SearchBarController.contactList = contactList;
         this.mSearchController = searchController;
         this.mIndex = index;
         this.mListView = listView;
@@ -229,7 +229,7 @@ public class SearchBarController {
      */
     public void hideKeyboard()
     {
-        InputMethodManager imm = (InputMethodManager)mActivity.getSystemService(mActivity
+        InputMethodManager imm = (InputMethodManager)mActivity.getSystemService(Context
                 .INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
     }

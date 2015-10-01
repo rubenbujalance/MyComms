@@ -104,8 +104,7 @@ public final class UserSecurity {
                 return false;
         }
 
-        if(_accessToken != null && _refreshToken != null) return true;
-        else return false;
+        return _accessToken != null && _refreshToken != null;
     }
 
     public static boolean hasExpired(Context context)

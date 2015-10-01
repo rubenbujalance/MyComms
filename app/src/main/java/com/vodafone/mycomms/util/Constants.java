@@ -222,10 +222,6 @@ public class Constants {
     public static final String XMPP_ATTR_RECEIVER = "receiver";
     public static final String XMPP_ATTR_SENT = "sent";
 
-    //Kind of files to send as multipart;
-    public static final String IMAGE_FILE_TO_SEND = "image_file";
-    public static final String SIMPLE_FILE_TO_SEND = "simple_file";
-
     public static final String DATE_DISPLAY_FORMAT = "MMM d, yyyy";
     public static final String API_DATE_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     public final static SimpleDateFormat SIMPLE_DATE_FORMAT_DISPLAY = new SimpleDateFormat (DATE_DISPLAY_FORMAT);

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
@@ -42,11 +43,6 @@ public class OKHttpWrapper {
     public static void put(String url, Context context, HttpCallback cb, JSONObject jsonObject) {
         call("PUT", url, jsonObject, cb, EndpointWrapper.getBaseURL(), context);
     }
-
-//    public static void postNews(String url, Context context,
-//                                HttpCallback cb, JSONObject jsonObject) {
-//        call("POST", url, jsonObject, cb, EndpointWrapper.getBaseNewsURL(), context);
-//    }
 
     private static void call(String method, final String url, JSONObject jsonObject,
                              final HttpCallback cb, final String endPointWrapper,
@@ -107,8 +103,14 @@ public class OKHttpWrapper {
 
                 OKHttpErrorReceivedEvent errorEvent = new OKHttpErrorReceivedEvent();
                 errorEvent.setErrorMessage(context.getString(R.string.wrapper_connection_error));
-                BusProvider.getInstance().post(errorEvent);
-
+                try {
+                    BusProvider.getInstance().post(errorEvent);
+                }
+                catch (Exception exception)
+                {
+                    Log.e(Constants.TAG, "OKHttpWrapper.onFailure: ", exception);
+                    Crashlytics.logException(exception);
+                }
                 cb.onFailure(null, e);
             }
 

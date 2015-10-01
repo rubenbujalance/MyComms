@@ -10,12 +10,15 @@ import com.crashlytics.android.Crashlytics;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -25,6 +28,9 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.httpclient.FakeHttp;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static com.vodafone.mycomms.constants.Constants.INVALID_EMAIL;
 import static com.vodafone.mycomms.constants.Constants.VALID_EMAIL;
@@ -53,14 +59,7 @@ public class ForgotPassActivityTest {
         mockStatic(Crashlytics.class);
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         activity = Robolectric.buildActivity(ForgotPassActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         etEmail = (EditText) activity.findViewById(R.id.etEmail);
         btSend = (Button) activity.findViewById(R.id.btSend);
     }
@@ -68,17 +67,36 @@ public class ForgotPassActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-            if(webServer!=null) webServer.shutdown();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
+        if(webServer!=null) webServer.shutdown();
 
         activity = null;
         btSend = null;
         etEmail = null;
         webServer = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at ForgotPassActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
@@ -90,14 +108,17 @@ public class ForgotPassActivityTest {
         FakeHttp.addPendingHttpResponse(httpResponse);
         //Empty e-mail
         btSend.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertEquals(activity.getString(R.string.oops_wrong_email), btSend.getText());
         //Invalid e-mail
         etEmail.setText(INVALID_EMAIL);
         btSend.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertEquals(activity.getString(R.string.oops_wrong_email), btSend.getText());
         //Valid e-mail
         etEmail.setText(VALID_EMAIL);
         btSend.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
         Assert.assertTrue(activity.isFinishing());
     }
@@ -109,6 +130,7 @@ public class ForgotPassActivityTest {
         //Valid e-mail
         etEmail.setText(VALID_EMAIL);
         btSend.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertEquals(activity.getString(R.string.send_new_password), btSend.getText());
     }
 
@@ -116,6 +138,7 @@ public class ForgotPassActivityTest {
     @Test
     public void testFinish() throws Exception {
         Activity activity = Robolectric.buildActivity(ForgotPassActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 }

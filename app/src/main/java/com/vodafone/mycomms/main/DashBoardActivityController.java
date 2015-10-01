@@ -527,7 +527,7 @@ public class DashBoardActivityController
                         }
                     }
                 });
-                Contact contact = mRealmContactTransactions.getContactById(contactId, mRealm);
+                Contact contact = RealmContactTransactions.getContactById(contactId, mRealm);
                 Utils.loadContactAvatar
                         (
                                 firstName
@@ -544,8 +544,8 @@ public class DashBoardActivityController
                         );
 
                 // Badges
-                RealmChatTransactions realmChatTransactions = new RealmChatTransactions(mActivity);
-                pendingMsgsCount = realmChatTransactions.getChatPendingMessagesCount(contactId, mRealm);
+                new RealmChatTransactions(mActivity);
+                pendingMsgsCount = RealmChatTransactions.getChatPendingMessagesCount(contactId, mRealm);
 
                 // Names
                 firstNameView.setText(firstName);
@@ -584,12 +584,12 @@ public class DashBoardActivityController
 
             if(contact.getContactId().startsWith("mg_"))
             {
-                pendingMsgsCount = mRealmGroupChatTransactionsRecents.getGroupChatPendingMessagesCount(contact.getContactId(), mRealm);
+                pendingMsgsCount = RealmGroupChatTransactions.getGroupChatPendingMessagesCount(contact.getContactId(), mRealm);
                 action = "sms";
             }
             else
             {
-                pendingMsgsCount = mRealmChatTransactionsRecents.getChatPendingMessagesCount(contact.getContactId(), mRealm);
+                pendingMsgsCount = RealmChatTransactions.getChatPendingMessagesCount(contact.getContactId(), mRealm);
                 action = contact.getAction();
             }
 

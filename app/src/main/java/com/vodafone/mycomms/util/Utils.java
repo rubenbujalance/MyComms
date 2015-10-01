@@ -179,13 +179,6 @@ public final class Utils extends MainActivity {
         return true;
     }
 
-    public static HashMap<String, HashMap<String,String>> getCountries(Context context)
-    {
-        if(!loadCountriesHash(context))
-            return null;
-        else return _countries;
-    }
-
     public static HashMap<String,String> getCountry(String code, Context context)
     {
         if(!loadCountriesHash(context))
@@ -241,24 +234,22 @@ public final class Utils extends MainActivity {
                 .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
                 .putExtra(CalendarContract.Events.TITLE, context.getResources().getString(R.string.new_meeting) + " " + name)
                 .putExtra(CalendarContract.Events.DESCRIPTION, "My Comms")
-//                .putExtra(CalendarContract.Events.EVENT_LOCATION, "Location")
-//                .putExtra(Intent.EXTRA_EMAIL, "test@test.com")
                 .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY);
         context.startActivity(intent);
     }
 
-    public static String getStringTimeDifference(int millis){
-        long timeDiffMilis = millis;
-        long minutes = timeDiffMilis / 60000;
-        long hours = minutes / 60;
-        long days = hours / 24;
-        String difference = "";
-        if(days >= 1) difference = days + " days ";
-        else if(hours >=1) difference = hours + " hours ";
-        else if(minutes >=1) difference = minutes + " min";
-
-        return difference;
-    }
+//    public static String getStringTimeDifference(int millis){
+//        long timeDiffMilis = millis;
+//        long minutes = timeDiffMilis / 60000;
+//        long hours = minutes / 60;
+//        long days = hours / 24;
+//        String difference = "";
+//        if(days >= 1) difference = days + " days ";
+//        else if(hours >=1) difference = hours + " hours ";
+//        else if(minutes >=1) difference = minutes + " min";
+//
+//        return difference;
+//    }
 
     public static String getShortStringTimeDifference(long millis){
         long timeDiffMilis = millis;
@@ -293,23 +284,23 @@ public final class Utils extends MainActivity {
     /*
     * Returns the unique device ID: IMSI for a GSM phone.
     */
-    public String getImsi() {
-        TelephonyManager   telephonyManager  =  ( TelephonyManager
-                )getSystemService( Context.TELEPHONY_SERVICE );
-
-        String imsistring = telephonyManager.getSubscriberId();
-
-        return imsistring;
-    }
+//    public String getImsi() {
+//        TelephonyManager   telephonyManager  =  ( TelephonyManager
+//                )getSystemService( Context.TELEPHONY_SERVICE );
+//
+//        String imsistring = telephonyManager.getSubscriberId();
+//
+//        return imsistring;
+//    }
 
     /*
     * Returns the unique device ID: HardwareID
     */
-    public static String getHardWareId() {
-        String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
-
-        return hwID;
-    }
+//    public static String getHardWareId() {
+//        String hwID = android.os.SystemProperties.get("ro.serialno", "unknown");
+//
+//        return hwID;
+//    }
 
     /*
     * Returns the unique device ID: SerialNumber
@@ -367,21 +358,21 @@ public final class Utils extends MainActivity {
         }
     }
 
-    private static String setAMOrPM(String time)
-    {
-        String hourFirstPart = time.substring(0, 1);
-        String hourSecondPart = time.substring(1, 2);
-        if(hourFirstPart.equals("0"))
-            return " a.m.";
-        else if(hourFirstPart.equals(1)
-                &&
-                (hourSecondPart.equals(0)
-                    ||hourSecondPart.equals(1)
-                    ||hourSecondPart.equals(2)))
-            return " a.m.";
-        else
-            return " p.m.";
-    }
+//    private static String setAMOrPM(String time)
+//    {
+//        String hourFirstPart = time.substring(0, 1);
+//        String hourSecondPart = time.substring(1, 2);
+//        if(hourFirstPart.equals("0"))
+//            return " a.m.";
+//        else if(hourFirstPart.equals(1)
+//                &&
+//                (hourSecondPart.equals(0)
+//                    ||hourSecondPart.equals(1)
+//                    ||hourSecondPart.equals(2)))
+//            return " a.m.";
+//        else
+//            return " p.m.";
+//    }
 
 
     public static String getElementFromJsonArrayString(String jsonArrayString, String key){
@@ -505,7 +496,6 @@ public final class Utils extends MainActivity {
             }
             else
             {
-
                 retBitmap = Bitmap.createBitmap(
                         bm,
                         0,
@@ -585,33 +575,33 @@ public final class Utils extends MainActivity {
 
     }
 
-    public static int clearCacheFolder(final File dir, final int numDays) {
-
-        int deletedFiles = 0;
-        if (dir!= null && dir.isDirectory()) {
-            try {
-                for (File child:dir.listFiles()) {
-
-                    //first delete subdirectories recursively
-                    if (child.isDirectory()) {
-                        deletedFiles += clearCacheFolder(child, numDays);
-                    }
-
-                    //then delete the files and subdirectories in this dir
-                    //only empty directories can be deleted, so subdirs have been done first
-                    if (child.lastModified() < new Date().getTime() - numDays * DateUtils.DAY_IN_MILLIS) {
-                        if (child.delete()) {
-                            deletedFiles++;
-                        }
-                    }
-                }
-            }
-            catch(Exception e) {
-                Log.e(Constants.TAG, "Utils.clearCacheFolder: ", e);
-            }
-        }
-        return deletedFiles;
-    }
+//    public static int clearCacheFolder(final File dir, final int numDays) {
+//
+//        int deletedFiles = 0;
+//        if (dir!= null && dir.isDirectory()) {
+//            try {
+//                for (File child:dir.listFiles()) {
+//
+//                    //first delete subdirectories recursively
+//                    if (child.isDirectory()) {
+//                        deletedFiles += clearCacheFolder(child, numDays);
+//                    }
+//
+//                    //then delete the files and subdirectories in this dir
+//                    //only empty directories can be deleted, so subdirs have been done first
+//                    if (child.lastModified() < new Date().getTime() - numDays * DateUtils.DAY_IN_MILLIS) {
+//                        if (child.delete()) {
+//                            deletedFiles++;
+//                        }
+//                    }
+//                }
+//            }
+//            catch(Exception e) {
+//                Log.e(Constants.TAG, "Utils.clearCacheFolder: ", e);
+//            }
+//        }
+//        return deletedFiles;
+//    }
 
     public static void loadContactAvatar(String firstName, String lastName, final ImageView
             imageAvatar, final TextView textAvatar, final String avatarURL, float textAvatarSize)
@@ -729,9 +719,9 @@ public final class Utils extends MainActivity {
         return avatarURL;
     }
 
-    public static boolean isMainThread() {
-        return (Looper.getMainLooper().getThread() == Thread.currentThread());
-    }
+//    public static boolean isMainThread() {
+//        return (Looper.getMainLooper().getThread() == Thread.currentThread());
+//    }
 
     public static String getGCMToken(Context context) {
         if(_gcmToken==null) {
@@ -940,18 +930,18 @@ public final class Utils extends MainActivity {
         }, 500);
     }
 
-    public static void hideKeyboard(final View view, final Context context)
-    {
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                view.requestFocus();
-                InputMethodManager imm = (InputMethodManager) context.getSystemService(
-                        context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-            }
-        }, 300);
-    }
+//    public static void hideKeyboard(final View view, final Context context)
+//    {
+//        Handler handler = new Handler(Looper.getMainLooper());
+//        handler.postDelayed(new Runnable() {
+//            public void run() {
+//                view.requestFocus();
+//                InputMethodManager imm = (InputMethodManager) context.getSystemService(
+//                        context.INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//            }
+//        }, 300);
+//    }
 
     public static String timestampToFormatedString(long timestamp, String format) {
         String formatedDate = null;
@@ -973,23 +963,23 @@ public final class Utils extends MainActivity {
         return formatedDate;
     }
 
-    public static Date dateToUTC(Date date) {
-        TimeZone tz = TimeZone.getDefault();
-        Date ret = new Date( date.getTime() - tz.getRawOffset() );
-
-        // if we are now in DST, back off by the delta.  Note that we are checking the GMT date, this is the KEY.
-        if ( tz.inDaylightTime( ret )){
-            Date dstDate = new Date( ret.getTime() - tz.getDSTSavings() );
-
-            // check to make sure we have not crossed back into standard time
-            // this happens when we are on the cusp of DST (7pm the day before the change for PDT)
-            if ( tz.inDaylightTime( dstDate )){
-                ret = dstDate;
-            }
-        }
-
-        return ret;
-    }
+//    public static Date dateToUTC(Date date) {
+//        TimeZone tz = TimeZone.getDefault();
+//        Date ret = new Date( date.getTime() - tz.getRawOffset() );
+//
+//        // if we are now in DST, back off by the delta.  Note that we are checking the GMT date, this is the KEY.
+//        if ( tz.inDaylightTime( ret )){
+//            Date dstDate = new Date( ret.getTime() - tz.getDSTSavings() );
+//
+//            // check to make sure we have not crossed back into standard time
+//            // this happens when we are on the cusp of DST (7pm the day before the change for PDT)
+//            if ( tz.inDaylightTime( dstDate )){
+//                ret = dstDate;
+//            }
+//        }
+//
+//        return ret;
+//    }
 
     public static String isoDateToTimezone(String date) {
         String result = "";
@@ -1099,37 +1089,37 @@ public final class Utils extends MainActivity {
         }
     }
 
-    public static HashMap<String,Object> okHttpResToHash(Response response)
-    {
-        if(response == null) return null;
-        HashMap<String, Object> hash = new HashMap<>();
-        String textEntity = null;
-        try {
-            if(response.body() != null)
-                textEntity = response.body().string();
-
-            String contentType;
-
-            if(textEntity != null && textEntity.length() > 0) {
-                contentType = response.header("Content-Type");
-
-                if (contentType.compareTo("application/json") == 0) {
-                    JSONObject json = new JSONObject(textEntity);
-                    hash.put("json", json);
-                } else {
-                    hash.put("text", textEntity);
-                }
-            }
-
-            hash.put("status", String.valueOf(response.code()));
-
-        } catch(Exception ex) {
-            Log.e(Constants.TAG, "APIWrapper.httpResToHash: \n" + ex.toString());
-            return null;
-        }
-
-        return hash;
-    }
+//    public static HashMap<String,Object> okHttpResToHash(Response response)
+//    {
+//        if(response == null) return null;
+//        HashMap<String, Object> hash = new HashMap<>();
+//        String textEntity = null;
+//        try {
+//            if(response.body() != null)
+//                textEntity = response.body().string();
+//
+//            String contentType;
+//
+//            if(textEntity != null && textEntity.length() > 0) {
+//                contentType = response.header("Content-Type");
+//
+//                if (contentType.compareTo("application/json") == 0) {
+//                    JSONObject json = new JSONObject(textEntity);
+//                    hash.put("json", json);
+//                } else {
+//                    hash.put("text", textEntity);
+//                }
+//            }
+//
+//            hash.put("status", String.valueOf(response.code()));
+//
+//        } catch(Exception ex) {
+//            Log.e(Constants.TAG, "APIWrapper.httpResToHash: \n" + ex.toString());
+//            return null;
+//        }
+//
+//        return hash;
+//    }
 
     public static String getCountryValue(String countryCode, Context context) {
         String countryValue;

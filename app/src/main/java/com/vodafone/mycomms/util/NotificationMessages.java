@@ -59,57 +59,15 @@ public final class NotificationMessages extends MainActivity
 
         String message = data.getString("message");
         NotificationCompat.Builder builder = createNotificationMessagesInstance(context, data);
-//        String from = data.getString(Constants.NOTIFICATION_BUNDLE_FROM_KEY);
-//        if (from != null && from.contains("@"))
-//            from = from.substring(0, from.indexOf("@"));
-//        else from = null;
-
-//        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-//        inboxStyle.setBigContentTitle(context.getString(R.string.new_unread_messages));
-//        addMessageToInbox(from, message);
-//        fillInbox(from, inboxStyle);
-//        inboxStyle.setSummaryText(inboxMessages.get(from).size() + " new messages");
-//        builder.setStyle(inboxStyle);
         builder.setWhen(System.currentTimeMillis());
         builder.setContentText(message);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
         builder.setAutoCancel(true);
         Notification notification = builder.build();
 
-//        if(from!=null) {
-//            int id;
-//            if(notificationIds.containsKey(from)) {id = notificationIds.get(from);}
-//            else {
-//                id = (int)System.currentTimeMillis();
-//                notificationIds.put(from,id);
-//            }
-//
-//            mNotificationManager.notify(id, notification);
-//        }
         int id = (int)System.currentTimeMillis();
         notificationIds.put(data.toString(), id);
         mNotificationManager.notify((int)System.currentTimeMillis(), notification);
-    }
-
-    private static void addMessageToInbox(String from, String message) {
-        if(inboxMessages.containsKey(from))
-        {inboxMessages.get(from).add(0,message);}
-        else {
-            ArrayList<String> messages = new ArrayList<>();
-            messages.add(0,message);
-            inboxMessages.put(from, messages);
-        }
-//        if(inboxMessages.size() > INBOX_LENGTH)
-//            inboxMessages.remove(inboxMessages.size() - 1);
-    }
-
-    private static void fillInbox(String from, NotificationCompat.InboxStyle inboxStyle) {
-        ArrayList<String> messages = inboxMessages.get(from);
-
-        for(int i=0; i<INBOX_LENGTH; i++) {
-            if(i >= messages.size()) break;
-            inboxStyle.addLine(messages.get(i));
-        }
     }
 
     public static void resetInboxMessages(Context context) {

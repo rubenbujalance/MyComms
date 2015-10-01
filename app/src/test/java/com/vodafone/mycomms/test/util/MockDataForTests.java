@@ -4,6 +4,8 @@ import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Assert;
+import org.robolectric.Robolectric;
 
 import java.util.ArrayList;
 
@@ -1107,5 +1109,43 @@ public class MockDataForTests
         groupChatList.add(groupChat);
 
         return groupChatList;
+    }
+
+    public static void checkThreadSchedulers()
+    {
+        checkThreadSchedulers(1000);
+    }
+
+    public static void checkThreadSchedulers(long time)
+    {
+        try {
+            Thread.sleep(time);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+
+        boolean taskDetected = false;
+        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
+        {
+            taskDetected = true;
+            Robolectric.flushBackgroundThreadScheduler();
+            while(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
+            {
+                Robolectric.flushBackgroundThreadScheduler();
+            }
+        }
+        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
+        {
+            taskDetected = true;
+            Robolectric.flushForegroundThreadScheduler();
+            while (Robolectric.getForegroundThreadScheduler().areAnyRunnable())
+            {
+                Robolectric.flushForegroundThreadScheduler();
+            }
+        }
+        if(taskDetected)
+            checkThreadSchedulers();
     }
 }

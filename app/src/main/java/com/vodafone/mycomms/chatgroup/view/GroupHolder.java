@@ -31,6 +31,10 @@ public class GroupHolder extends RecyclerView.ViewHolder {
         imageViewDayNight = (ImageView) view.findViewById(R.id.list_item_image_status_daynight);
         chatAvailability = (ImageView) view.findViewById(R.id.chat_availability);
     }
+    public TextView getTextViewName()
+    {
+        return this.textViewName;
+    }
 
 
 

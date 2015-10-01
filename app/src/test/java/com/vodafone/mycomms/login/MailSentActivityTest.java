@@ -10,14 +10,17 @@ import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -29,6 +32,9 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.httpclient.FakeHttp;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static com.vodafone.mycomms.constants.Constants.CHECK_PHONE_OK_RESPONSE;
 import static com.vodafone.mycomms.constants.Constants.PIN;
@@ -59,14 +65,7 @@ public class MailSentActivityTest {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("pin", PIN);
         activity = Robolectric.buildActivity(MailSentActivity.class).withIntent(intent).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         mWeSent = activity.mWeSent;
         mResendEmail = activity.mResendEmail;
     }
@@ -74,15 +73,34 @@ public class MailSentActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         activity = null;
         mWeSent = null;
         mResendEmail = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at MailSentActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
@@ -94,7 +112,9 @@ public class MailSentActivityTest {
     public void testResendEmail() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, CHECK_PHONE_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
         mResendEmail.performClick();
+        MockDataForTests.checkThreadSchedulers();
         HttpPost latestSentHttpPost = (HttpPost)FakeHttp.getLatestSentHttpRequest();
         Header header = latestSentHttpPost.getFirstHeader("x-otp-pin");
         Assert.assertNotNull(header);
@@ -105,7 +125,7 @@ public class MailSentActivityTest {
     @Test
     public void shouldCallFinishInOnBackPressed() {
         activity.onBackPressed();
-
+        MockDataForTests.checkThreadSchedulers();
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
         Assert.assertTrue(shadowActivity.isFinishing());
     }
@@ -114,6 +134,7 @@ public class MailSentActivityTest {
     @Test
     public void testFinish() throws Exception {
         Activity activity = Robolectric.buildActivity(MailSentActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 }

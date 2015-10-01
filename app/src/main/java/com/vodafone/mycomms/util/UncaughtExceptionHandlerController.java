@@ -2,9 +2,10 @@ package com.vodafone.mycomms.util;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Process;
 import android.util.Log;
+
 import com.crashlytics.android.Crashlytics;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -35,8 +36,6 @@ public class UncaughtExceptionHandlerController implements java.lang.Thread.Unca
     @Override
     public void uncaughtException(Thread thread, Throwable ex)
     {
-        Thread t = thread;
-        Throwable tr = ex;
         Log.e(Constants.TAG, "UncaughtExceptionHandlerController.uncaughtException: ", ex);
         Crashlytics.logException(ex);
         String errorMessage = getStringFromThrowable(ex);
@@ -50,7 +49,6 @@ public class UncaughtExceptionHandlerController implements java.lang.Thread.Unca
                 startRecoverIntent("Exception reference: \n"+ex.toString());
 
             this.mActivity.finish();
-            //killProcess();
         }
     }
 
@@ -74,12 +72,4 @@ public class UncaughtExceptionHandlerController implements java.lang.Thread.Unca
         else
             return null;
     }
-
-//    private void killProcess()
-//    {
-//        Process.killProcess(Process.myPid());
-//        System.exit(0);
-//    }
-
-
 }

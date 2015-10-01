@@ -197,14 +197,6 @@ public class ChatListActivityTest {
         Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_1")==0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(7);
         Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_1") == 0);
-
-        //Check scroll and click
-//        recyclerView.scrollToPosition(7);
-//        recyclerView.measure(0, 0);
-//        recyclerView.layout(0, 0, 100, 10000);
-//        recyclerView.performClick();
-//        recyclerView.getChildAt(0).performClick();
-//        Shadows.shadowOf(recyclerView).checkedPerformClick();
     }
 
     @Test

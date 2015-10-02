@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
@@ -13,20 +17,29 @@ import com.squareup.picasso.Picasso;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatgroup.GroupChatActivity;
+import com.vodafone.mycomms.chatgroup.GroupChatListActivity;
 import com.vodafone.mycomms.chatgroup.GroupDetailActivity;
 import com.vodafone.mycomms.chatgroup.view.GroupHolder;
+import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.JUnit4TestAdapterCache;
+
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -37,10 +50,20 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.internal.Shadow;
+import org.robolectric.shadows.ShadowActivity;
+import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowLooper;
+import org.robolectric.shadows.ShadowView;
+import org.robolectric.shadows.ShadowViewGroup;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import io.realm.Realm;
+import model.GroupChat;
 
 /**
  * Created by str_oan on 30/09/2015.
@@ -61,6 +84,7 @@ public class GroupDetailActivityTest
     public PowerMockRule rule = new PowerMockRule();
     public GroupDetailActivity activity;
     public Context mContext;
+    public MotionEvent motionEvent;
 
     @Before
     public void setUp()
@@ -70,6 +94,7 @@ public class GroupDetailActivityTest
         PowerMockito.when(Realm.getInstance(Mockito.any(Context.class))).thenReturn(null);
         MycommsApp.stateCounter = 0;
         mContext = RuntimeEnvironment.application.getApplicationContext();
+        motionEvent = MotionEvent.obtain(500, -1, MotionEvent.ACTION_UP, 30, 30, -1);
         preparePicasso();
     }
 
@@ -80,6 +105,27 @@ public class GroupDetailActivityTest
         activity = null;
         mContext = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -101,17 +147,20 @@ public class GroupDetailActivityTest
         intent.putExtra(Constants.GROUP_CHAT_ID, "mg_55dc2a35a297b90a726e4cc2");
         this.activity = Robolectric.buildActivity(GroupDetailActivity.class).withIntent(intent)
                 .create().start().resume().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue( MycommsApp.stateCounter == 0);
         Assert.assertTrue(this.activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
     public void testCreationAndModifyGroupButtonClicked() throws Exception
     {
         setUpActivity();
-        ShadowLooper.pauseMainLooper();
-        checkThreadSchedulers();
-        ShadowLooper.unPauseMainLooper();
+        MockDataForTests.checkThreadSchedulers();
 
         RecyclerView mRecyclerView = (RecyclerView) this.activity.findViewById(R.id.recycler_view);
         mRecyclerView.measure(0, 0);
@@ -120,7 +169,157 @@ public class GroupDetailActivityTest
         GroupHolder holder = (GroupHolder)mRecyclerView.findViewHolderForPosition(0);
         Assert.assertNotNull(holder);
         Assert.assertTrue(holder.getTextViewName().getText().toString().length() > 0);
+
+        LinearLayout lay_add_contact = (LinearLayout) this.activity.findViewById(R.id.lay_add_member);
+        Assert.assertTrue(lay_add_contact.performClick());
+        MockDataForTests.checkThreadSchedulers();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(this.activity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatListActivity.class.getName()));
+        Assert.assertTrue(this.activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
+
+    @Test
+    public void testCreationAndClickOnContact() throws Exception {
+        setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
+        RecyclerView mRecyclerView = (RecyclerView) this.activity.findViewById(R.id.recycler_view);
+        mRecyclerView.measure(0, 0);
+        mRecyclerView.layout(0, 0, 100, 100);
+
+        GroupHolder holder = (GroupHolder) mRecyclerView.findViewHolderForPosition(0);
+        Assert.assertNotNull(holder);
+        Assert.assertTrue(holder.getTextViewName().getText().toString().length() > 0);
+
+        View view = mRecyclerView.getChildAt(0);
+        view.setClickable(true);
+        view.setEnabled(true);
+        ShadowView shadowView = Shadows.shadowOf(view);
+        shadowView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.startContactDetailMainActivity(0);
+            }
+        });
+
+        Assert.assertTrue(shadowView.checkedPerformClick());
+        MockDataForTests.checkThreadSchedulers();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(this.activity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+    }
+
+    @Test
+    public void testCreationWithAvatarNameAndClickOnContact() throws Exception
+    {
+        PowerMockito.mockStatic(RealmGroupChatTransactions.class);
+        PowerMockito.mockStatic(RealmContactTransactions.class);
+        GroupChat groupChat = MockDataForTests.getMockGroupChat();
+        groupChat.setAvatar("");
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn(groupChat);
+        PowerMockito.when(RealmContactTransactions.getContactById(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockContact());
+        PowerMockito.when(RealmContactTransactions.getUserProfile(Mockito.any(Realm.class), Mockito.anyString()))
+                .thenReturn(MockDataForTests.getMockUserProfile());
+        Intent intent = new Intent();
+        intent.putExtra(Constants.GROUP_CHAT_ID, "mg_55dc2a35a297b90a726e4cc2");
+        this.activity = Robolectric.buildActivity(GroupDetailActivity.class).withIntent(intent)
+                .create().start().resume().visible().get();
+
+        MockDataForTests.checkThreadSchedulers();
+
+        RecyclerView mRecyclerView = (RecyclerView) this.activity.findViewById(R.id.recycler_view);
+        mRecyclerView.measure(0, 0);
+        mRecyclerView.layout(0, 0, 100, 100);
+
+        GroupHolder holder = (GroupHolder) mRecyclerView.findViewHolderForPosition(0);
+        Assert.assertNotNull(holder);
+        Assert.assertTrue(holder.getTextViewName().getText().toString().length() > 0);
+
+        View view = mRecyclerView.getChildAt(0);
+        view.setClickable(true);
+        view.setEnabled(true);
+        ShadowView shadowView = Shadows.shadowOf(view);
+        shadowView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                activity.startContactDetailMainActivity(0);
+            }
+        });
+
+        Assert.assertTrue(shadowView.checkedPerformClick());
+        MockDataForTests.checkThreadSchedulers();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(this.activity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+    }
+
+    @Test
+    public void testCreationAndBackButtonClicked() throws Exception
+    {
+        setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
+        RecyclerView mRecyclerView = (RecyclerView) this.activity.findViewById(R.id.recycler_view);
+        mRecyclerView.measure(0, 0);
+        mRecyclerView.layout(0, 0, 100, 100);
+
+        GroupHolder holder = (GroupHolder)mRecyclerView.findViewHolderForPosition(0);
+        Assert.assertNotNull(holder);
+        Assert.assertTrue(holder.getTextViewName().getText().toString().length() > 0);
+
+        ImageView backButton = (ImageView) this.activity.findViewById(R.id.back_button);
+        Assert.assertTrue(backButton.performClick());
+        MockDataForTests.checkThreadSchedulers();
+
+        Assert.assertTrue(this.activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+    }
+
+    @Test
+    public void testCreationAndBackLayoutClicked() throws Exception
+    {
+        setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
+        RecyclerView mRecyclerView = (RecyclerView) this.activity.findViewById(R.id.recycler_view);
+        mRecyclerView.measure(0, 0);
+        mRecyclerView.layout(0, 0, 100, 100);
+
+        GroupHolder holder = (GroupHolder)mRecyclerView.findViewHolderForPosition(0);
+        Assert.assertNotNull(holder);
+        Assert.assertTrue(holder.getTextViewName().getText().toString().length() > 0);
+
+        LinearLayout backArea = (LinearLayout) this.activity.findViewById(R.id.back_area);
+        Assert.assertTrue(backArea.performClick());
+        MockDataForTests.checkThreadSchedulers();
+
+        Assert.assertTrue(this.activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+    }
+
+
 
     private void setUpActivity()
     {
@@ -144,13 +343,5 @@ public class GroupDetailActivityTest
         Picasso.Builder builder = new Picasso.Builder(RuntimeEnvironment.application.getApplicationContext());
         builder.downloader(downloader);
         MycommsApp.picasso = builder.build();
-    }
-
-    private void checkThreadSchedulers()
-    {
-        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushBackgroundThreadScheduler();
-        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushForegroundThreadScheduler();
     }
 }

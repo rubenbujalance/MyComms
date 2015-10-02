@@ -116,15 +116,21 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
         mRecyclerView.addOnItemTouchListener(new GroupDetailRecyclerItemClickListener(GroupDetailActivity.this,
                 mRecyclerView, new GroupDetailRecyclerItemClickListener.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
-                Intent in = new Intent(GroupDetailActivity.this, ContactDetailMainActivity.class);
-                MycommsApp.contactViewOrigin = Constants.CONTACTS_ALL;
-                in.putExtra(Constants.CONTACT_CONTACT_ID, contactList.get(position).getContactId());
-                startActivity(in);
+            public void onItemClick(View view, int position)
+            {
+                startContactDetailMainActivity(position);
             }
         }));
 
         refreshAdapter();
+    }
+
+    public void startContactDetailMainActivity(int position)
+    {
+        Intent in = new Intent(GroupDetailActivity.this, ContactDetailMainActivity.class);
+        MycommsApp.contactViewOrigin = Constants.CONTACTS_ALL;
+        in.putExtra(Constants.CONTACT_CONTACT_ID, contactList.get(position).getContactId());
+        startActivity(in);
     }
 
     public void setHeaderAvatar()
@@ -151,7 +157,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
             int i = 0;
             boolean profileInside = false;
             String groupNames = "";
-            String groupNComponents = contactList.size() + " people in group"; //TODO: Hardcode
+            String groupNComponents = contactList.size() + getResources().getString(R.string.people_in_group);
             for(Contact contact : contactList)
             {
                 if(i>3) break;

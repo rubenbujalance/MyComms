@@ -544,7 +544,7 @@ public class DashBoardActivityController
                         );
 
                 // Badges
-                RealmChatTransactions realmChatTransactions = new RealmChatTransactions(mActivity);
+                new RealmChatTransactions(mActivity);
                 pendingMsgsCount = RealmChatTransactions.getChatPendingMessagesCount(contactId, mRealm);
 
                 // Names

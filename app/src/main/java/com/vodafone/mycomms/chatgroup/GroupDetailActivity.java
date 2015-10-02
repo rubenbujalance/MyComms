@@ -32,7 +32,6 @@ import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.ToolbarActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 import com.vodafone.mycomms.util.Utils;
-import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -119,7 +118,7 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
             @Override
             public void onItemClick(View view, int position) {
                 Intent in = new Intent(GroupDetailActivity.this, ContactDetailMainActivity.class);
-                ((MycommsApp) getApplication()).contactViewOrigin = Constants.CONTACTS_ALL;
+                MycommsApp.contactViewOrigin = Constants.CONTACTS_ALL;
                 in.putExtra(Constants.CONTACT_CONTACT_ID, contactList.get(position).getContactId());
                 startActivity(in);
             }
@@ -257,7 +256,6 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
     private void loadExtras()
     {
         Intent in = getIntent();
-
         _groupChat = RealmGroupChatTransactions.getGroupChatById(
                 in.getStringExtra(Constants.GROUP_CHAT_ID), mRealm);
         loadContactIds();
@@ -311,13 +309,13 @@ public class GroupDetailActivity extends ToolbarActivity implements Serializable
     @Override
     protected void onResume() {
         super.onResume();
-        XMPPTransactions.checkAndReconnectXMPP(getApplicationContext());
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.mRealm.close();
+        if(null != mRealm)
+            this.mRealm.close();
     }
 
     private void loadTheRestOfTheComponents()

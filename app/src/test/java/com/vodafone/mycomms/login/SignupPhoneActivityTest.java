@@ -15,12 +15,15 @@ import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.custom.AutoCompleteTVSelectOnly;
 import com.vodafone.mycomms.custom.ClearableEditText;
 import com.vodafone.mycomms.main.SplashScreenActivity;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.apache.http.HttpResponse;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -33,6 +36,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowToast;
 import org.robolectric.shadows.httpclient.FakeHttp;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static com.vodafone.mycomms.constants.Constants.PHONE;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -60,14 +66,7 @@ public class SignupPhoneActivityTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
         activity = Robolectric.buildActivity(SignupPhoneActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         mPhone = activity.mPhone;
@@ -77,10 +76,8 @@ public class SignupPhoneActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         activity = null;
         mPhone = null;
@@ -90,12 +87,34 @@ public class SignupPhoneActivityTest {
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at SignupPhoneActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testForwardNoCountrySelected() {
         System.err.println("******** Test: Empty Country********");
         mCountry.setText("");
         mCountry.setCodeSelected("");
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mCountry.getError().equals(activity.getString(R.string.select_your_phone_country_to_continue)));
     }
 
@@ -105,6 +124,7 @@ public class SignupPhoneActivityTest {
         mCountry.setText(null);
         mCountry.setCodeSelected(null);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mCountry.getError().equals(activity.getString(R.string.select_your_phone_country_to_continue)));
     }
 
@@ -116,6 +136,7 @@ public class SignupPhoneActivityTest {
         mCountry.setCodeSelected(countryCode);
         mPhone.setText("");
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         EditText innerPhone = (EditText)mPhone.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPhone.getError().equals(activity.getString(R.string.enter_your_phone_number_to_continue)));
     }
@@ -124,12 +145,16 @@ public class SignupPhoneActivityTest {
     public void testForwardInvalidResponseCode200() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(200, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         String countryName = "United States";
         String countryCode = "US";
         mCountry.setText(countryName);
         mCountry.setCodeSelected(countryCode);
         mPhone.setText(PHONE);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(PHONE.equals(UserProfile.getPhone()));
         Assert.assertTrue(countryCode.equals(UserProfile.getCountryISO()));
         Intent expectedIntent = new Intent(activity, SignupPincodeActivity.class);
@@ -144,12 +169,16 @@ public class SignupPhoneActivityTest {
     public void testForwardValidResponseCode403() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(403, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         String countryName = "United States";
         String countryCode = "US";
         mCountry.setText(countryName);
         mCountry.setCodeSelected(countryCode);
         mPhone.setText(PHONE);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(PHONE.equals(UserProfile.getPhone()));
         Assert.assertTrue(countryCode.equals(UserProfile.getCountryISO()));
         Intent expectedIntent = new Intent(activity, SignupPincodeActivity.class);
@@ -164,12 +193,16 @@ public class SignupPhoneActivityTest {
     public void testForwardUnexpectedException() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(500, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         String countryName = "United States";
         String countryCode = "US";
         mCountry.setText(countryName);
         mCountry.setCodeSelected(countryCode);
         mPhone.setText(PHONE);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         String toast = ShadowToast.getTextOfLatestToast();
         Assert.assertTrue(toast.equals(activity.getResources().getString(R.string.error_reading_data_from_server)));
     }
@@ -178,12 +211,16 @@ public class SignupPhoneActivityTest {
     public void testForwardValidResponseCode() throws Exception {
         HttpResponse httpResponse = Util.buildResponse(201, Constants.LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
+        MockDataForTests.checkThreadSchedulers();
+
         String countryName = "United States";
         String countryCode = "US";
         mCountry.setText(countryName);
         mCountry.setCodeSelected(countryCode);
         mPhone.setText(PHONE);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(PHONE.equals(UserProfile.getPhone()));
         Assert.assertTrue(countryCode.equals(UserProfile.getCountryISO()));
         Intent expectedIntent = new Intent(activity, SplashScreenActivity.class);
@@ -198,6 +235,7 @@ public class SignupPhoneActivityTest {
     public void testBack() throws Exception {
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
     }
 
@@ -205,6 +243,7 @@ public class SignupPhoneActivityTest {
     @Test
     public void testFinish() throws Exception {
         Activity activity = Robolectric.buildActivity(SignupPhoneActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 

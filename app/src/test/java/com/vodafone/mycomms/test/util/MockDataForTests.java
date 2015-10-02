@@ -2,8 +2,12 @@ package com.vodafone.mycomms.test.util;
 
 import com.vodafone.mycomms.util.Constants;
 
+import org.jivesoftware.smack.util.PacketParserUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.junit.Assert;
+import org.robolectric.Robolectric;
 
 import java.util.ArrayList;
 
@@ -1108,4 +1112,75 @@ public class MockDataForTests
 
         return groupChatList;
     }
+
+    public static void checkThreadSchedulers()
+    {
+        checkThreadSchedulers(1000);
+    }
+
+    public static void checkThreadSchedulers(long time)
+    {
+        try {
+            Thread.sleep(time);
+        }
+        catch (Exception e)
+        {
+            Assert.fail();
+        }
+
+        boolean taskDetected = false;
+        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
+        {
+            taskDetected = true;
+            Robolectric.flushBackgroundThreadScheduler();
+            while(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
+            {
+                Robolectric.flushBackgroundThreadScheduler();
+            }
+        }
+        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
+        {
+            taskDetected = true;
+            Robolectric.flushForegroundThreadScheduler();
+            while (Robolectric.getForegroundThreadScheduler().areAnyRunnable())
+            {
+                Robolectric.flushForegroundThreadScheduler();
+            }
+        }
+        if(taskDetected)
+            checkThreadSchedulers();
+    }
+
+    //CHAT
+    public static XmlPullParser getMockChatMessageStanza() {
+        String messageStanza = "<message type=\"chat\" id=\"A0858E94412145D9A82252FBA5E4A808\" to=\"mc_55409316799f7e1a109446f4@my-comms.com\" from=\"mc_5565b2ac13be4b7975c51600@my-comms.com/867949020576518\" mediaType=\"text\" sent=\"1443697338314\" status=\"sent\" receiver=\"mc_55409316799f7e1a109446f4@my-comms.com\"><body>Test</body></message>";
+        return getParserFor(messageStanza, "message");
+    }
+
+    public static XmlPullParser getMockGroupChatMessageStanza() {
+        String messageStanza = "<message type=\"groupchat\" to=\"mg_55dc2a35a297b90a726e4cc4@my-comms.com\" id=\"43A33E61-028C-41C0-BE39-6C7DEF7AD864\" mediaType=\"text\" from=\"mc_5570340e7eb7c3512f2f9bf2@my-comms.com/fb7fdb18e0fa3a0ae75651ce2691028f2ef9f81b53fa4799a78e70c228d4632a\" sent=\"1443708968430\" status=\"sent\" receiver=\"mc_55409316799f7e1a109446f4@my-comms.com\"><body>TestGroup</body></message>";
+        return getParserFor(messageStanza, "message");
+    }
+
+    private static XmlPullParser getParserFor(String stanza, String startTag) {
+        XmlPullParser xmlPullParser = null;
+
+        try {
+            xmlPullParser = PacketParserUtils.getParserFor(stanza, startTag);
+        } catch (Exception e) {}
+
+        return xmlPullParser;
+    }
+
+    private static XmlPullParser getParserFor(String stanza) {
+        XmlPullParser xmlPullParser = null;
+
+        try {
+            xmlPullParser = PacketParserUtils.getParserFor(stanza);
+        } catch (Exception e) {}
+
+        return xmlPullParser;
+    }
+
+
 }

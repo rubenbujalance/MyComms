@@ -408,7 +408,7 @@ public class RealmGroupChatTransactions
             return chatMessage;
         }
         catch(Exception e) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatMessageById: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatMessageById: ", e);
             Crashlytics.logException(e);
             return null;
         }

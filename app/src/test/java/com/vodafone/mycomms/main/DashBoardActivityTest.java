@@ -28,6 +28,7 @@ import com.vodafone.mycomms.events.GroupChatCreatedEvent;
 import com.vodafone.mycomms.events.MessageStatusChanged;
 import com.vodafone.mycomms.events.NewsReceivedEvent;
 import com.vodafone.mycomms.events.RecentContactsReceivedEvent;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.Utils;
@@ -35,7 +36,9 @@ import com.vodafone.mycomms.util.Utils;
 import junit.framework.Assert;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +55,8 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowIntent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -84,11 +89,6 @@ public class DashBoardActivityTest
         PowerMockito.mockStatic(Realm.class);
         PowerMockito.when(Realm.getDefaultInstance()).thenReturn(null);
         PowerMockito.mockStatic(Crashlytics.class);
-        BusProvider.MainThreadBus bus = BusProvider.getInstance();
-        BusProvider.MainThreadBus busSpy = Mockito.spy(bus);
-        PowerMockito.doNothing().when(busSpy).post(Mockito.any(DashboardCreatedEvent.class));
-        PowerMockito.mockStatic(BusProvider.class);
-        PowerMockito.when(BusProvider.getInstance()).thenReturn(bus);
 
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         Context context = RuntimeEnvironment.application.getApplicationContext();
@@ -99,16 +99,48 @@ public class DashBoardActivityTest
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-            if(webServer!=null) webServer.shutdown();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
+        if(webServer!=null)
+        {
+            try {
+                webServer.shutdown();
+            }
+            catch (Exception e)
+            {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("TearDown Exception at DashBoardActivityTest: \n" + writer.toString());
+            }
+        }
 
         mActivity = null;
         webServer = null;
         sp = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at DashBoardActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
@@ -119,11 +151,9 @@ public class DashBoardActivityTest
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(3000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout layConnectionAvailable = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
-
         Assert.assertNotNull(layConnectionAvailable);
         Assert.assertFalse(Utils.isConnected(mActivity));
         Assert.assertEquals(layConnectionAvailable.getVisibility(), View.VISIBLE);
@@ -137,11 +167,9 @@ public class DashBoardActivityTest
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(3000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout layConnectionAvailable = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
-
         Assert.assertNotNull(layConnectionAvailable);
         Assert.assertTrue(Utils.isConnected(mActivity));
         Assert.assertEquals(layConnectionAvailable.getVisibility(), View.GONE);
@@ -151,15 +179,15 @@ public class DashBoardActivityTest
     public void testInitAllBtnMagnifierOnClick() throws Exception
     {
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(3000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         ImageView btMagnifier = (ImageView) mActivity.findViewById(R.id.magnifier);
         btMagnifier.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(Constants.isSearchBarFocusRequested);
         Assert.assertTrue(Constants.isDashboardOrigin);
         Assert.assertEquals(MycommsApp.contactViewOrigin, Constants.CONTACTS_ALL);
-
         Intent expectedIntent = new Intent(mActivity, ContactListMainActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (ContactListMainActivity.class.getName()));
@@ -170,14 +198,13 @@ public class DashBoardActivityTest
     {
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(3000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout btFavourite = (LinearLayout) mActivity.findViewById(R.id.LayoutFavourite);
         btFavourite.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertEquals(MycommsApp.contactViewOrigin, Constants.CONTACTS_FAVOURITE);
-
         Intent expectedIntent = new Intent(mActivity, ContactListMainActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (ContactListMainActivity.class.getName()));
@@ -188,10 +215,8 @@ public class DashBoardActivityTest
     {
         sp.edit().putBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, true).apply();
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
-        Thread.sleep(3000);
-        Robolectric.flushForegroundThreadScheduler();
-
-        org.junit.Assert.assertTrue(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false));
+        MockDataForTests.checkThreadSchedulers();
+        Assert.assertTrue(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false));
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -200,6 +225,7 @@ public class DashBoardActivityTest
     {
         Mockito.mock(DashBoardActivityController.class);
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertTrue(mActivity.isDestroyed());
     }
 
@@ -213,7 +239,9 @@ public class DashBoardActivityTest
         event.setNews(mockNewsList);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
     }
 
@@ -224,7 +252,9 @@ public class DashBoardActivityTest
         event.setPendingMessages(0);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(event.getPendingMessages(), 0);
     }
 
@@ -234,7 +264,9 @@ public class DashBoardActivityTest
         MessageStatusChanged event = new MessageStatusChanged();
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
     }
 
@@ -244,7 +276,9 @@ public class DashBoardActivityTest
         RecentContactsReceivedEvent event = new RecentContactsReceivedEvent();
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
     }
 
@@ -254,8 +288,10 @@ public class DashBoardActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
     }
 
@@ -265,8 +301,10 @@ public class DashBoardActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
     }
 
@@ -276,8 +314,10 @@ public class DashBoardActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
     }
 
@@ -287,8 +327,10 @@ public class DashBoardActivityTest
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
     }
 
@@ -298,7 +340,9 @@ public class DashBoardActivityTest
         GroupChatCreatedEvent event = new GroupChatCreatedEvent();
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
     }
 
@@ -317,31 +361,13 @@ public class DashBoardActivityTest
         }
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
-        webServer.enqueue(new MockResponse().setResponseCode(200)
-                .setBody(com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE));
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
-            org.junit.Assert.fail();
-        }
-
+        MockDataForTests.checkThreadSchedulers();
+        webServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody(com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE));
         BusProvider.getInstance().post(event);
-
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
-            org.junit.Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
-
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
     }
 
@@ -361,31 +387,13 @@ public class DashBoardActivityTest
 
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
-        webServer.enqueue(new MockResponse().setResponseCode(200)
-                .setBody("mockBody"));
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
-            org.junit.Assert.fail();
-        }
-
+        MockDataForTests.checkThreadSchedulers();
+        webServer.enqueue(new MockResponse().setResponseCode(200)
+                .setBody("mockBody"));
         BusProvider.getInstance().post(event);
-
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
-            org.junit.Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
-
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
     }
 
@@ -405,30 +413,12 @@ public class DashBoardActivityTest
 
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
-        webServer.enqueue(new MockResponse().setResponseCode(200));
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
-            org.junit.Assert.fail();
-        }
-
+        MockDataForTests.checkThreadSchedulers();
+        webServer.enqueue(new MockResponse().setResponseCode(200));
         BusProvider.getInstance().post(event);
-
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
-            org.junit.Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
-
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
     }
 
@@ -448,30 +438,12 @@ public class DashBoardActivityTest
 
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
+        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
         webServer.enqueue(new MockResponse().setResponseCode(400)
                 .setBody(com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE));
-
-        mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
-            org.junit.Assert.fail();
-        }
-
         BusProvider.getInstance().post(event);
-
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: test_onGlobalContactsAddedEvent Failed due to: ********\n"+e.getMessage());
-            org.junit.Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         org.junit.Assert.assertNotNull(event);
     }

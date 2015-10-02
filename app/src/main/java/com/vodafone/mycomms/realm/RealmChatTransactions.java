@@ -180,8 +180,7 @@ public class RealmChatTransactions
             }
             mRealm.commitTransaction();
         }
-        catch(Exception e)
-        {
+        catch(Exception e) {
             Log.e(Constants.TAG, "RealmChatTransactions.setContactAllChatMessagesReceivedAsRead: ", e);
             Crashlytics.logException(e);
             mRealm.cancelTransaction();

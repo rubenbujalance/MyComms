@@ -642,7 +642,7 @@ public final class XMPPTransactions {
                         "Error parsing sent time");
             }
 
-            chatTx = new RealmChatTransactions(_appContext);
+            chatTx = RealmChatTransactions.getInstance(_appContext);
             boolean changeStatus = false;
 
             //Check if chat message has already been received
@@ -698,7 +698,11 @@ public final class XMPPTransactions {
                 ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
                 chatEvent.setMessage(newChatMessage);
                 chatEvent.setPendingMessages(_pendingMessages);
-                BusProvider.getInstance().post(chatEvent);
+                try {
+                    BusProvider.getInstance().post(chatEvent);
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyMessageReceived: ", e);
+                }
             }
 
             //All pending messages received
@@ -1431,4 +1435,8 @@ public final class XMPPTransactions {
 
         return _connectionListener;
     }
+
+    public static XMPPTCPConnection getXMPPConnection() {return _xmppConnection;}
+    public static void setXMPPConnection(XMPPTCPConnection xmppConnection) {_xmppConnection = xmppConnection;}
+
 }

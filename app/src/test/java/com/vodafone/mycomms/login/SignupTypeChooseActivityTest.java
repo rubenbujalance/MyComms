@@ -10,11 +10,14 @@ import android.widget.ImageView;
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -24,6 +27,9 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -49,14 +55,7 @@ public class SignupTypeChooseActivityTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
         activity = Robolectric.buildActivity(SignupTypeChooseActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
         mSignupEmail = (Button)activity.findViewById(R.id.btSignupMail);
         mSignupSalesforce = (Button)activity.findViewById(R.id.btSignupSalesforce);
         mBack = (ImageView)activity.findViewById(R.id.btBack);
@@ -65,10 +64,8 @@ public class SignupTypeChooseActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         activity = null;
         mSignupEmail = null;
@@ -77,9 +74,32 @@ public class SignupTypeChooseActivityTest {
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at SignupTypeChooseActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testSignupTypeChooseToSignupMail() throws Exception {
         mSignupEmail.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Intent expectedIntent = new Intent(activity, SignupMailActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
     }
@@ -87,6 +107,8 @@ public class SignupTypeChooseActivityTest {
     @Test
     public void testSignupTypeChooseToSignupOAuth() throws Exception {
         mSignupSalesforce.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Intent expectedIntent = new Intent(activity, OAuthActivity.class);
         expectedIntent.putExtra("oauth", "sf");
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
@@ -95,6 +117,8 @@ public class SignupTypeChooseActivityTest {
     @Test
     public void testBack() throws Exception {
         mBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(activity.isFinishing());
     }
 
@@ -102,6 +126,7 @@ public class SignupTypeChooseActivityTest {
     @Test
     public void testFinish() throws Exception {
         Activity activity = Robolectric.buildActivity(SignupTypeChooseActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 

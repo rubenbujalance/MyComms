@@ -140,7 +140,8 @@ public class ContactSearchController {
             return null;
         }
         finally {
-            realm.close();
+            if(null != realm)
+                realm.close();
         }
         return ids;
     }

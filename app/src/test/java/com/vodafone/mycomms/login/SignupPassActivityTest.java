@@ -12,11 +12,14 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.UserProfile;
 import com.vodafone.mycomms.custom.ClearableEditText;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -28,6 +31,9 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static com.vodafone.mycomms.constants.Constants.ANOTHER_PASSWORD;
 import static com.vodafone.mycomms.constants.Constants.PASSWORD;
@@ -56,13 +62,7 @@ public class SignupPassActivityTest {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
 
         activity = Robolectric.buildActivity(SignupPassActivity.class).create().start().resume().get();
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
         ivBtFwd = (ImageView)activity.findViewById(R.id.ivBtForward);
         ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         mPassword = activity.mPassword;
@@ -72,11 +72,8 @@ public class SignupPassActivityTest {
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
-
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
         activity = null;
         mPassword = null;
         mConfirmPass = null;
@@ -85,9 +82,31 @@ public class SignupPassActivityTest {
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at SignupPassActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testForwardBadPassword() {
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         EditText innerPassword = (EditText)mPassword.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPassword.getError().equals(activity.getString(R.string.incorrect_format)));
     }
@@ -97,6 +116,7 @@ public class SignupPassActivityTest {
         mPassword.setText(PASSWORD);
         mConfirmPass.setText(ANOTHER_PASSWORD);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
         EditText innerConfirmPass = (EditText)mConfirmPass.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerConfirmPass.getError().equals(activity.getString(R.string.passwords_do_not_match)));
     }
@@ -106,6 +126,8 @@ public class SignupPassActivityTest {
         mPassword.setText(PASSWORD);
         mConfirmPass.setText(PASSWORD);
         ivBtFwd.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(PASSWORD.equals(UserProfile.getPassword()));
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
@@ -117,6 +139,7 @@ public class SignupPassActivityTest {
     public void testBack() throws Exception {
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
     }
 
@@ -124,6 +147,7 @@ public class SignupPassActivityTest {
     @Test
     public void testFinish() throws Exception {
         Activity activity = Robolectric.buildActivity(SignupPassActivity.class).create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
     }
 

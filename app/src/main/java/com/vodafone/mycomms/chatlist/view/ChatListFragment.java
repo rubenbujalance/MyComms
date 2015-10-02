@@ -148,29 +148,33 @@ public class ChatListFragment extends Fragment{
 
     public void refreshAdapter()
     {
-        ArrayList<ComposedChat> composedChatList = getComposedChat();
-        Collections.sort(composedChatList, new Comparator<ComposedChat>() {
-            @Override
-            public int compare(ComposedChat lhs, ComposedChat rhs) {
-                long lhsTime;
-                long rhsTime;
+        try {
+            ArrayList<ComposedChat> composedChatList = getComposedChat();
+            Collections.sort(composedChatList, new Comparator<ComposedChat>() {
+                @Override
+                public int compare(ComposedChat lhs, ComposedChat rhs) {
+                    long lhsTime;
+                    long rhsTime;
 
-                if(lhs.getChat()==null)
-                    lhsTime = lhs.getGroupChat().getLastMessageTime();
-                else lhsTime = lhs.getChat().getLastMessageTime();
+                    if (lhs.getChat() == null)
+                        lhsTime = lhs.getGroupChat().getLastMessageTime();
+                    else lhsTime = lhs.getChat().getLastMessageTime();
 
-                if(rhs.getChat()==null)
-                    rhsTime = rhs.getGroupChat().getLastMessageTime();
-                else rhsTime = rhs.getChat().getLastMessageTime();
+                    if (rhs.getChat() == null)
+                        rhsTime = rhs.getGroupChat().getLastMessageTime();
+                    else rhsTime = rhs.getChat().getLastMessageTime();
 
-                if(lhsTime>rhsTime) return -1;
-                else return 1;
-            }
-        });
+                    if (lhsTime > rhsTime) return -1;
+                    else return 1;
+                }
+            });
 
-        mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(),
-                composedChatList, this.realm);
-        mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+            mChatRecyclerViewAdapter = new ChatListRecyclerViewAdapter(getActivity(),
+                    composedChatList, this.realm);
+            mRecyclerView.setAdapter(mChatRecyclerViewAdapter);
+        } catch (Exception e) {
+            Log.e(Constants.TAG, "ChatListFragment.refreshAdapter: ",e);
+        }
     }
 
 //    @Subscribe

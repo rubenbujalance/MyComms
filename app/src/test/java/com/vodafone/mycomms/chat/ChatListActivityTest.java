@@ -148,7 +148,7 @@ public class ChatListActivityTest {
         mChatListFragment = (ChatListFragment)activity.getSupportFragmentManager().getFragments().get(0);
         recyclerView = (RecyclerView)mChatListFragment.getView().findViewById(R.id.recycler_view);
 
-//        MockDataForTests.
+        MockDataForTests.checkThreadSchedulers();
     }
 
     @After
@@ -212,6 +212,8 @@ public class ChatListActivityTest {
         recyclerView.measure(0, 0);
         recyclerView.layout(0, 0, 100, 10000);
 
+        MockDataForTests.checkThreadSchedulers();
+
         //Check number of chats
         Assert.assertTrue(recyclerView.getAdapter().getItemCount() == 8);
 
@@ -251,8 +253,6 @@ public class ChatListActivityTest {
                 .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
         Mockito.doReturn(MockDataForTests.getMockGroupChatList())
                 .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
-        Mockito.doReturn(Long.valueOf(1))
-                .when(mockChatTx).getAllChatPendingMessagesCount(Mockito.any(Realm.class));
 
         //Mock to return a Contact and a UserProfile when requested to Realm
         PowerMockito.when(RealmContactTransactions.getContactById(Mockito.anyString(), Mockito.any(Realm.class)))
@@ -260,10 +260,11 @@ public class ChatListActivityTest {
         PowerMockito.when(RealmContactTransactions.getUserProfile(Mockito.any(Realm.class), Mockito.anyString()))
                 .thenReturn(MockDataForTests.getMockUserProfile());
 
-        //Draw list
-        BusProvider.getInstance().post(new ChatsReceivedEvent());
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+//        //Draw list
+//        BusProvider.getInstance().post(new ChatsReceivedEvent());
+//        recyclerView.measure(0, 0);
+//        recyclerView.layout(0, 0, 100, 10000);
+//        MockDataForTests.checkThreadSchedulers();
 
         //The ChatMessage doesn't exist initially
         Mockito.doReturn(null).when(mockChatTx)
@@ -277,23 +278,29 @@ public class ChatListActivityTest {
         Mockito.doNothing().when(mockChatTx).insertChat(Mockito.any(Chat.class), Mockito.any(Realm.class));
         Mockito.doReturn(true).when(mockChatTx).insertChatMessage(Mockito.any(ChatMessage.class), Mockito.any(Realm.class));
 
-        //Build stanza for chat in position 0
+        //Mock number of unread messages
+        Mockito.doReturn(Long.valueOf(1))
+                .when(mockChatTx).getAllChatPendingMessagesCount(Mockito.any(Realm.class));
         PowerMockito.when(RealmChatTransactions.getChatPendingMessagesCount(Mockito.any(String.class), Mockito.any(Realm.class)))
                 .thenReturn(Long.valueOf(1));
 
+        //Build stanza for chat in position 0
         PacketParserUtils.saveAndNotifyStanzaReceived(MockDataForTests.getMockChatMessageStanza());
 //        BusProvider.getInstance().post(new ChatsReceivedEvent());
 
         //Build stanza for groupChat in position 1
 
+
         //Refresh list
         recyclerView.measure(0, 0);
         recyclerView.layout(0, 0, 100, 10000);
+        MockDataForTests.checkThreadSchedulers();
 
         //Check order
         ChatListHolder holder;
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(0);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_4")==0);
+        Assert.assertTrue(((ChatListHolder)recyclerView.findViewHolderForPosition(0))
+                .badgeUnread.getText().toString().compareTo("1")==0);
     }
 
     @Test

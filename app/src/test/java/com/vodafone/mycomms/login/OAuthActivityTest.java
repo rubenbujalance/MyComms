@@ -116,6 +116,9 @@ public class OAuthActivityTest {
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(didOverrideUrl);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 
@@ -129,6 +132,9 @@ public class OAuthActivityTest {
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(didOverrideUrl);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -141,6 +147,9 @@ public class OAuthActivityTest {
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(didOverrideUrl);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -154,6 +163,9 @@ public class OAuthActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(didOverrideUrl);
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -162,6 +174,10 @@ public class OAuthActivityTest {
         Activity activity = Robolectric.buildActivity(OAuthActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+
     }
 
     @Test
@@ -171,6 +187,9 @@ public class OAuthActivityTest {
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -180,6 +199,9 @@ public class OAuthActivityTest {
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -192,6 +214,9 @@ public class OAuthActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(relativeContainer.getVisibility() == View.VISIBLE);
         Assert.assertTrue(activity.wvOAuth.getVisibility() == View.INVISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -204,5 +229,8 @@ public class OAuthActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(relativeContainer.getVisibility() == View.INVISIBLE);
         Assert.assertTrue(activity.wvOAuth.getVisibility() == View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 }

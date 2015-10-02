@@ -23,8 +23,10 @@ import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +44,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowListView;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import io.realm.Realm;
 
@@ -80,15 +85,34 @@ public class FavouriteContactControllerTest
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         mContactListFragment = null;
         mCustomFragmentActivity = null;
         mContext = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -101,7 +125,12 @@ public class FavouriteContactControllerTest
         mCustomFragmentActivity = Robolectric.buildActivity(CustomFragmentActivity.class)
                 .withIntent(in)
                 .create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(mCustomFragmentActivity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -122,19 +151,13 @@ public class FavouriteContactControllerTest
         startContactListFragment(0);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("0");
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(!mContactListFragment.getFavouriteContactList().isEmpty());
         Assert.assertTrue(mContactListFragment.getFavouriteContactList().size() == 3);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
 
     }
 
@@ -160,17 +183,9 @@ public class FavouriteContactControllerTest
         startContactListFragment(0);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("0");
+        MockDataForTests.checkThreadSchedulers();
+
         mockParams();
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
 
         ShadowListView shadowListView = Shadows.shadowOf(mContactListFragment.getListView());
         shadowListView.populateItems();
@@ -188,13 +203,16 @@ public class FavouriteContactControllerTest
         Assert.assertTrue(lay2.getVisibility() == View.INVISIBLE);
         Assert.assertTrue(lay3.getVisibility() == View.INVISIBLE);
 
-
         Assert.assertTrue(shadowListView.performItemClick(0));
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     public void startContactListFragment(int index)

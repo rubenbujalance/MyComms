@@ -109,6 +109,9 @@ public class SignupPassActivityTest {
         MockDataForTests.checkThreadSchedulers();
         EditText innerPassword = (EditText)mPassword.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPassword.getError().equals(activity.getString(R.string.incorrect_format)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -119,6 +122,9 @@ public class SignupPassActivityTest {
         MockDataForTests.checkThreadSchedulers();
         EditText innerConfirmPass = (EditText)mConfirmPass.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerConfirmPass.getError().equals(activity.getString(R.string.passwords_do_not_match)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -133,6 +139,9 @@ public class SignupPassActivityTest {
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(SignupPhoneActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -141,6 +150,9 @@ public class SignupPassActivityTest {
         ivBtBack.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -149,6 +161,9 @@ public class SignupPassActivityTest {
         Activity activity = Robolectric.buildActivity(SignupPassActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 }

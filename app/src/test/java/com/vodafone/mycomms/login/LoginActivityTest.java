@@ -135,6 +135,8 @@ public class LoginActivityTest {
         AlertDialog dialog = (AlertDialog)ShadowDialog.getLatestDialog();
         Assert.assertNotNull(dialog);
         Assert.assertTrue(dialog.isShowing());
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -156,6 +158,9 @@ public class LoginActivityTest {
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -175,6 +180,9 @@ public class LoginActivityTest {
         MockDataForTests.checkThreadSchedulers();
         etPassword.setText("changed_pwd");
         Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.login)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -198,6 +206,9 @@ public class LoginActivityTest {
         Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.connection_error)));
         etPassword.setText("changed_pwd");
         Assert.assertTrue(btLogin.getText().equals(activity.getString(R.string.login)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -209,6 +220,8 @@ public class LoginActivityTest {
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ForgotPassActivity.class.getName()));
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -220,6 +233,9 @@ public class LoginActivityTest {
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(OAuthActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -230,6 +246,9 @@ public class LoginActivityTest {
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -240,6 +259,9 @@ public class LoginActivityTest {
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -248,6 +270,9 @@ public class LoginActivityTest {
         ivBack.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -257,5 +282,8 @@ public class LoginActivityTest {
         Activity activity = Robolectric.buildActivity(LoginActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 }

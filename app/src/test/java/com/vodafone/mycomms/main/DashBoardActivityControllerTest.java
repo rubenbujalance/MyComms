@@ -149,6 +149,9 @@ public class DashBoardActivityControllerTest
         Assert.assertNotNull(this.mDashBoardActivityController.mRecentContactController);
         Assert.assertNotNull(this.mDashBoardActivityController.mRealmContactTransactions);
         Assert.assertNotNull(this.mDashBoardActivityController.mRealmGroupChatTransactions);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -175,6 +178,9 @@ public class DashBoardActivityControllerTest
         Assert.assertNotNull(this.mDashBoardActivityController.newsArrayList);
         Assert.assertEquals(numberOfChild, MockDataForTests.getMockNewsArrayList().size());
         assertThat(shadowIntent.getComponent().getClassName(), equalTo(NewsDetailActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -184,6 +190,9 @@ public class DashBoardActivityControllerTest
         MockDataForTests.checkThreadSchedulers();
         LinearLayout container = (LinearLayout) mActivity.findViewById(R.id.list_news);
         Assert.assertNotNull(container);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test (expected = NullPointerException.class)
@@ -192,6 +201,9 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.drawNews(null);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.newsArrayList.isEmpty());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -201,6 +213,9 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.loadRecentLayout();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 4);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -215,6 +230,9 @@ public class DashBoardActivityControllerTest
         Assert.assertFalse(this.mDashBoardActivityController.isCurrentRecentContainerFirst);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer2.getVisibility(), View.GONE);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -229,6 +247,9 @@ public class DashBoardActivityControllerTest
         Assert.assertTrue(this.mDashBoardActivityController.isCurrentRecentContainerFirst);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer.getVisibility(), View.GONE);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer2.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -241,6 +262,9 @@ public class DashBoardActivityControllerTest
         Assert.assertTrue(this.mDashBoardActivityController.mProfileId.length() > 0);
         Assert.assertTrue(this.mDashBoardActivityController.mActivity != null);
 
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+
     }
 
     @Test
@@ -251,6 +275,9 @@ public class DashBoardActivityControllerTest
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(this.mDashBoardActivityController.mProfileId == null);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -261,6 +288,9 @@ public class DashBoardActivityControllerTest
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer != null);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -271,6 +301,9 @@ public class DashBoardActivityControllerTest
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer2 != null);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -282,6 +315,9 @@ public class DashBoardActivityControllerTest
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -313,6 +349,9 @@ public class DashBoardActivityControllerTest
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
         assertThat(shadowIntent.getComponent().getClassName(), equalTo(GroupChatActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -344,6 +383,9 @@ public class DashBoardActivityControllerTest
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -375,6 +417,9 @@ public class DashBoardActivityControllerTest
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -407,6 +452,9 @@ public class DashBoardActivityControllerTest
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
 
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+
     }
 
     @Test
@@ -436,6 +484,9 @@ public class DashBoardActivityControllerTest
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 
@@ -458,6 +509,9 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -480,6 +534,9 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts != 0);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -503,6 +560,9 @@ public class DashBoardActivityControllerTest
         TextView unread_messages = (TextView) view.findViewById(R.id.unread_messages);
         Assert.assertNotNull(unread_messages);
         Assert.assertNotNull(unread_messages.getText().toString());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -520,6 +580,9 @@ public class DashBoardActivityControllerTest
 
         Assert.assertTrue(typeRecent.getVisibility() == View.VISIBLE);
         Assert.assertTrue(unread_messages.getVisibility() != View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     private void mockUnreadMessages(long amountMessages)

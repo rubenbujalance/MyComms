@@ -157,6 +157,9 @@ public class DashBoardActivityTest
         Assert.assertNotNull(layConnectionAvailable);
         Assert.assertFalse(Utils.isConnected(mActivity));
         Assert.assertEquals(layConnectionAvailable.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -173,6 +176,9 @@ public class DashBoardActivityTest
         Assert.assertNotNull(layConnectionAvailable);
         Assert.assertTrue(Utils.isConnected(mActivity));
         Assert.assertEquals(layConnectionAvailable.getVisibility(), View.GONE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -191,6 +197,9 @@ public class DashBoardActivityTest
         Intent expectedIntent = new Intent(mActivity, ContactListMainActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (ContactListMainActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -208,6 +217,9 @@ public class DashBoardActivityTest
         Intent expectedIntent = new Intent(mActivity, ContactListMainActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (ContactListMainActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -217,6 +229,9 @@ public class DashBoardActivityTest
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -227,6 +242,9 @@ public class DashBoardActivityTest
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertTrue(mActivity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -243,6 +261,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -256,6 +277,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(event.getPendingMessages(), 0);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -268,6 +292,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -280,6 +307,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -293,6 +323,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -306,6 +339,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -319,6 +355,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -332,6 +371,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -344,6 +386,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -369,6 +414,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -395,6 +443,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -420,6 +471,9 @@ public class DashBoardActivityTest
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -446,6 +500,9 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
 
         org.junit.Assert.assertNotNull(event);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     private String startWebMockServer() throws Exception

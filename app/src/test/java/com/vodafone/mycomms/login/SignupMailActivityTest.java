@@ -117,6 +117,9 @@ public class SignupMailActivityTest {
         MockDataForTests.checkThreadSchedulers();
         EditText innerEtEmail = (EditText)etEmail.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerEtEmail.getError().equals(activity.getString(R.string.enter_your_email_to_continue)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -126,6 +129,9 @@ public class SignupMailActivityTest {
         MockDataForTests.checkThreadSchedulers();
         EditText innerEtEmail = (EditText)etEmail.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerEtEmail.getError().equals(activity.getString(R.string.incorrect_format)));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
    @Test
@@ -140,6 +146,9 @@ public class SignupMailActivityTest {
        Intent startedIntent = shadowActivity.getNextStartedActivity();
        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(SignupNameActivity.class.getName()));
+
+       System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+               + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -162,6 +171,9 @@ public class SignupMailActivityTest {
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(LoginActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -180,6 +192,9 @@ public class SignupMailActivityTest {
         Button okButton = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
         okButton.performClick();
         MockDataForTests.checkThreadSchedulers();
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -198,6 +213,10 @@ public class SignupMailActivityTest {
         Button okButton = alert.getButton(AlertDialog.BUTTON_NEUTRAL);
         okButton.performClick();
         MockDataForTests.checkThreadSchedulers();
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -206,6 +225,9 @@ public class SignupMailActivityTest {
         Activity activity = Robolectric.buildActivity(SignupMailActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 }

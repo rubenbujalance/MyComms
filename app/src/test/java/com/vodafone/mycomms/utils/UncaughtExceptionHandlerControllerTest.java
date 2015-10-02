@@ -6,13 +6,16 @@ import android.content.Intent;
 import com.crashlytics.android.Crashlytics;
 import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.main.SplashScreenActivity;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomSimpleActivity;
 import com.vodafone.mycomms.util.UncaughtExceptionHandlerController;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.MockRepository;
@@ -25,6 +28,9 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -75,10 +81,8 @@ public class UncaughtExceptionHandlerControllerTest
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         mActivityAsNull = null;
         mActivity = null;
@@ -92,6 +96,27 @@ public class UncaughtExceptionHandlerControllerTest
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     private CustomSimpleActivity createCustomDashboardActivity()
     {
         Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
@@ -100,6 +125,8 @@ public class UncaughtExceptionHandlerControllerTest
         mActivity = Robolectric.buildActivity(CustomSimpleActivity.class)
                 .withIntent(in)
                 .create().start().resume().get();
+        MockDataForTests.checkThreadSchedulers();
+
         return mActivity;
     }
 
@@ -110,6 +137,9 @@ public class UncaughtExceptionHandlerControllerTest
         String exceptionMessage2 = this.mUncaughtExceptionHandlerControllerForEmptyConstructor.getStringFromThrowable(mThrowable);
         Assert.assertNotNull(exceptionMessage1);
         Assert.assertNotNull(exceptionMessage2);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -119,6 +149,9 @@ public class UncaughtExceptionHandlerControllerTest
         String exceptionMessage2 = this.mUncaughtExceptionHandlerControllerForEmptyConstructor.getStringFromThrowable(mThrowableAsNull);
         Assert.assertNull(exceptionMessage1);
         Assert.assertNull(exceptionMessage2);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -126,12 +159,15 @@ public class UncaughtExceptionHandlerControllerTest
     {
         String errorMessage = "mockErrorMessage";
         mUncaughtExceptionHandlerController.startRecoverIntent(errorMessage);
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (mClass.getName()));
-        System.err.println("******** Test: Navigation to testStartRecoverIntentOK OK********");
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test (expected = Exception.class)
@@ -139,7 +175,10 @@ public class UncaughtExceptionHandlerControllerTest
     {
         String errorMessage = "mockErrorMessage";
         mUncaughtExceptionHandlerControllerForEmptyConstructor.startRecoverIntent(errorMessage);
-        System.err.println("******** Test: Navigation to testStartRecoverIntentOK OK********");
+        MockDataForTests.checkThreadSchedulers();
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -161,6 +200,9 @@ public class UncaughtExceptionHandlerControllerTest
         testThread.setUncaughtExceptionHandler(mUncaughtExceptionHandlerControllerForEmptyConstructor);
         testThread.start();
         testThread.join();
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -183,6 +225,9 @@ public class UncaughtExceptionHandlerControllerTest
         testThread.setUncaughtExceptionHandler(mUncaughtExceptionHandlerController);
         testThread.start();
         testThread.join();
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -205,6 +250,9 @@ public class UncaughtExceptionHandlerControllerTest
         testThread.setUncaughtExceptionHandler(mUncaughtExceptionHandlerController);
         testThread.start();
         testThread.join();
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 }

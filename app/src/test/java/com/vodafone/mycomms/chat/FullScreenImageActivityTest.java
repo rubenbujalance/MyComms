@@ -11,11 +11,14 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.chatgroup.FullscreenImageActivity;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +31,9 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.annotation.Config;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import io.realm.Realm;
 
@@ -61,18 +67,47 @@ public class FullScreenImageActivityTest
     @After
     public void tearDown() throws Exception
     {
+        MockDataForTests.checkThreadSchedulers();
         Robolectric.reset();
         activity = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
     public void testCreationAndClick()
     {
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
         SubsamplingScaleImageView ivImage = (SubsamplingScaleImageView)this.activity.findViewById(R.id.image);
         ivImage.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(this.activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -84,8 +119,13 @@ public class FullScreenImageActivityTest
         intent.putExtra("imageFilePath", "mockPath");
         this.activity = Robolectric.buildActivity(FullscreenImageActivity.class).withIntent(intent)
                 .create().start().resume().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(MycommsApp.stateCounter == 0);
         Assert.assertTrue(this.activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     private void setUpActivity()

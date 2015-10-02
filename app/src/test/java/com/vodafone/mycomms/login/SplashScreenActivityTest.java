@@ -118,7 +118,7 @@ public class SplashScreenActivityTest{
                 PrintWriter printWriter = new PrintWriter( writer );
                 e.printStackTrace( printWriter );
                 printWriter.flush();
-                System.err.println("Uncaught exception at SplashScreenActivityTest: \n"+writer.toString());
+                System.err.println("Uncaught exception at SplashScreenActivityTest: \n" + writer.toString());
             }
         });
     }
@@ -152,6 +152,9 @@ public class SplashScreenActivityTest{
         testAlertWithNegativeButton();
         testAlertWithPositiveButton();
 
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+
     }
 
     @Test
@@ -173,6 +176,9 @@ public class SplashScreenActivityTest{
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertNotNull(UserSecurity.getAccessToken(activity));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -198,6 +204,9 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 //    @Test
@@ -227,6 +236,9 @@ public class SplashScreenActivityTest{
         activity = Robolectric.buildActivity(SplashScreenActivity.class).create().start().resume().pause().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     public void testSendSupportEmail()
@@ -271,6 +283,9 @@ public class SplashScreenActivityTest{
         MockDataForTests.checkThreadSchedulers();
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA));
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.APP_CRASH_MESSAGE));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -287,6 +302,9 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
 
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+
     }
 
     @Test
@@ -302,6 +320,9 @@ public class SplashScreenActivityTest{
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
 
     }
 
@@ -328,6 +349,9 @@ public class SplashScreenActivityTest{
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -343,6 +367,9 @@ public class SplashScreenActivityTest{
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -363,6 +390,9 @@ public class SplashScreenActivityTest{
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 //    @Test
@@ -475,6 +505,9 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -499,6 +532,9 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -513,6 +549,9 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
         Assert.assertTrue(activity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 
@@ -529,5 +568,8 @@ public class SplashScreenActivityTest{
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertEquals(mockMessage, event.getErrorMessage());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 }

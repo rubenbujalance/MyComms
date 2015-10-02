@@ -130,6 +130,9 @@ public class NewsDetailActivityTest
                 .get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mActivity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -161,6 +164,9 @@ public class NewsDetailActivityTest
         Assert.assertTrue(author.getText().toString().equals("mockAuthorName"));
         Assert.assertTrue(published.getText().toString().equals("mockPublishedAt"));
         Assert.assertNull(html.getUrl());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -191,6 +197,9 @@ public class NewsDetailActivityTest
         Assert.assertTrue(author.getText().toString().equals("mockAuthorName"));
         Assert.assertTrue(published.getText().toString().equals("mockPublishedAt"));
         Assert.assertNull(html.getUrl());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -215,6 +224,9 @@ public class NewsDetailActivityTest
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(mActivity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -236,6 +248,9 @@ public class NewsDetailActivityTest
         mActivity.onBackPressed();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mActivity.isFinishing());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     private void mockParams()

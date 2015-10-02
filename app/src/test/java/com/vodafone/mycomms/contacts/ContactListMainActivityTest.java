@@ -14,11 +14,14 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.ContactListMainActivity;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.events.BusProvider;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +34,9 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import io.realm.Realm;
 
@@ -66,14 +72,33 @@ public class ContactListMainActivityTest
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         mActivity = null;
         mContext = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
@@ -84,16 +109,13 @@ public class ContactListMainActivityTest
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
 
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testConnectionAvailable Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
+
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.GONE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -104,16 +126,13 @@ public class ContactListMainActivityTest
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
 
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testConnectionAvailable Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
+
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -128,7 +147,12 @@ public class ContactListMainActivityTest
                 .stop()
                 .destroy()
                 .get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(mActivity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 
@@ -137,18 +161,16 @@ public class ContactListMainActivityTest
     {
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -156,18 +178,16 @@ public class ContactListMainActivityTest
     {
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -175,18 +195,16 @@ public class ContactListMainActivityTest
     {
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -194,18 +212,16 @@ public class ContactListMainActivityTest
     {
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -213,18 +229,16 @@ public class ContactListMainActivityTest
     {
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -232,19 +246,15 @@ public class ContactListMainActivityTest
     {
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.MOBILE_CONNECTED);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
-        try {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testBackButton_Clicked Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
-
-
 }

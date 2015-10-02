@@ -118,6 +118,9 @@ public class SignupNameActivityTest {
         Assert.assertTrue(innerFirstName.getError().equals(activity.getString(R.string.enter_your_first_name_to_continue)));
         EditText innerLastName = (EditText)mLastName.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerLastName.getError().equals(activity.getString(R.string.enter_your_last_name_to_continue)));
+
+       System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+               + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -143,6 +146,9 @@ public class SignupNameActivityTest {
         sActivity.receiveResult(requestIntent, Activity.RESULT_OK, responseIntent);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertNotNull(activity.photoBitmap);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -173,6 +179,9 @@ public class SignupNameActivityTest {
 
         Assert.assertNotNull(activity.photoPath);
         Assert.assertNotNull(activity.photoBitmap);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @Test
@@ -206,6 +215,9 @@ public class SignupNameActivityTest {
         ivBtFwd.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(UserProfile.getFirstName() != null);
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -214,6 +226,9 @@ public class SignupNameActivityTest {
         Activity activity = Robolectric.buildActivity(SignupNameActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
+                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
     }
 
 }

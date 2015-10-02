@@ -286,10 +286,6 @@ public class ChatListActivityTest {
 
         //Build stanza for chat in position 0
         PacketParserUtils.saveAndNotifyStanzaReceived(MockDataForTests.getMockChatMessageStanza());
-//        BusProvider.getInstance().post(new ChatsReceivedEvent());
-
-        //Build stanza for groupChat in position 1
-
 
         //Refresh list
         recyclerView.measure(0, 0);

@@ -549,12 +549,17 @@ public class SplashScreenActivityTest{
         MockDataForTests.printStartTest(this.getClass().getSimpleName()
                 ,Thread.currentThread().getStackTrace()[1].getMethodName());
 
-        activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        MockDataForTests.checkThreadSchedulers();
-        BusProvider.getInstance().post(new ApplicationAndProfileReadError());
         PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), Mockito.any(HashMap.class), Mockito.any(HashMap.class), Mockito.any(Context.class)))
                 .thenReturn(null);
+
+        activity = Robolectric.buildActivity(SplashScreenActivity.class)
+                .create().start().resume().visible().get();
+        MockDataForTests.checkThreadSchedulers();
+
+        PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), Mockito.any(HashMap.class), Mockito.any(HashMap.class), Mockito.any(Context.class)))
+                .thenReturn(null);
+        BusProvider.getInstance().post(new ApplicationAndProfileReadError());
         MockDataForTests.checkThreadSchedulers();
 
         SharedPreferences sp = activity.getSharedPreferences(

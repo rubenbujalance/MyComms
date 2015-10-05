@@ -193,9 +193,9 @@ public class AddGlobalContactsActivityTest {
         resetScreen();
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn("http://localhost:12345");
         Assert.assertTrue(btAddAccount.performClick());
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
-        Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
 
@@ -204,7 +204,7 @@ public class AddGlobalContactsActivityTest {
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(500));
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -215,7 +215,7 @@ public class AddGlobalContactsActivityTest {
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200).setBody("{'incorrectJSON':'0'}"));
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -249,7 +249,7 @@ public class AddGlobalContactsActivityTest {
         btAddAccount.performClick();
         MockDataForTests.checkThreadSchedulers();
 
-        Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
 
@@ -318,9 +318,9 @@ public class AddGlobalContactsActivityTest {
                                 .replace("mockUrl", "http://localhost:12345")));
 
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
-        Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
 
@@ -339,7 +339,7 @@ public class AddGlobalContactsActivityTest {
                 .setResponseCode(401));
 
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -360,7 +360,7 @@ public class AddGlobalContactsActivityTest {
                 .setResponseCode(500));
 
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -393,7 +393,7 @@ public class AddGlobalContactsActivityTest {
                 .apply();
 
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");

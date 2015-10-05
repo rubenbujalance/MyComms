@@ -446,7 +446,6 @@ public class ProfileFragmentTest
         Assert.assertFalse(et_company_content.isEnabled());
         Assert.assertFalse(et_home_content.isEnabled());
         Assert.assertFalse(mProfileFragment.isAvatarHasChangedAfterSelection);
-        Assert.assertTrue(mProfileFragment.isUpdating);
         Assert.assertTrue(layout_error_edit_profile.getVisibility() == View.GONE);
 
         MockDataForTests.printEndTest(this.getClass().getSimpleName()

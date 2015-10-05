@@ -82,43 +82,46 @@ public class GlobalContactsController {
         Request.Builder builder = new Request.Builder();
         //TODO: Check why this crashes on MASTER
 //        Request request = builder.url(EndpointWrapper.getLDAPDiscover()).build();
-        Request request = builder.url(EndpointWrapper.getLDAPDiscover()).build();
+        if(null!= builder.url(EndpointWrapper.getLDAPDiscover()))
+        {
+            Request request = builder.url(EndpointWrapper.getLDAPDiscover()).build();
 
-        System.err.println("- Discover call: " + request.urlString());
+            System.err.println("- Discover call: " + request.urlString());
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Request request, IOException e) {
-                System.err.println("- Discover onFailure");
-                cb.onFailure(context.getString(R.string.connection_error), 0);
-            }
-
-            @Override
-            public void onResponse(Response response) {
-                try {
-                    int code = response.code();
-                    System.err.println("- Discover onResponse (" + code + ")");
-
-                    if (code != 200) {
-                        cb.onFailure(context.getString(R.string.error_reading_data_from_server), code);
-                    } else {
-                        JSONObject jsonObject = new JSONObject(response.body().string());
-                        jsonObject = jsonObject.getJSONObject("_links");
-                        String href = ((JSONObject) jsonObject.get("user"))
-                                .getString("href");
-
-                        //If everything is OK, save url and continue the process
-                        tempUrl = href;
-                        callLDAPUser(href);
-                    }
-                } catch (Exception ex) {
-                    System.err.println("- Discover onResponse Exception (" + ex.getMessage() + ")");
-                    Log.e(Constants.TAG,
-                            "GlobalContactsController.callLDAPDiscover: ", ex);
-                    cb.onFailure(context.getString(R.string.error_reading_data_from_server), 0);
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Request request, IOException e) {
+                    System.err.println("- Discover onFailure");
+                    cb.onFailure(context.getString(R.string.connection_error), 0);
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(Response response) {
+                    try {
+                        int code = response.code();
+                        System.err.println("- Discover onResponse (" + code + ")");
+
+                        if (code != 200) {
+                            cb.onFailure(context.getString(R.string.error_reading_data_from_server), code);
+                        } else {
+                            JSONObject jsonObject = new JSONObject(response.body().string());
+                            jsonObject = jsonObject.getJSONObject("_links");
+                            String href = ((JSONObject) jsonObject.get("user"))
+                                    .getString("href");
+
+                            //If everything is OK, save url and continue the process
+                            tempUrl = href;
+                            callLDAPUser(href);
+                        }
+                    } catch (Exception ex) {
+                        System.err.println("- Discover onResponse Exception (" + ex.getMessage() + ")");
+                        Log.e(Constants.TAG,
+                                "GlobalContactsController.callLDAPDiscover: ", ex);
+                        cb.onFailure(context.getString(R.string.error_reading_data_from_server), 0);
+                    }
+                }
+            });
+        }
     }
 
     //Step 2

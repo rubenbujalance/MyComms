@@ -155,7 +155,7 @@ public class AddGlobalContactsActivityTest {
         etPassword.setText("12345");
         etUser.setText("");
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         Assert.assertEquals(tvError.getText().toString(),
@@ -168,7 +168,7 @@ public class AddGlobalContactsActivityTest {
         etPassword.setText("");
         etUser.setText("testUser");
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         Assert.assertEquals(tvError.getText().toString(),
@@ -247,7 +247,7 @@ public class AddGlobalContactsActivityTest {
                         .replace("mockUrl", "http://localhost:12345")));
 
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -261,7 +261,7 @@ public class AddGlobalContactsActivityTest {
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse().setResponseCode(500));
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -276,7 +276,7 @@ public class AddGlobalContactsActivityTest {
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse().setResponseCode(401));
         btAddAccount.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");

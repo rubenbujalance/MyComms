@@ -113,7 +113,7 @@ public class ChatListActivityTest {
         //Save profile into SharedPreferences
         SharedPreferences sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-        sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_55409316799f7e1a109446f4").commit();
+        sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_55409316799f7e1a109446f4").apply();
 
         XMPPTransactions._isUnitTesting = true;
         XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);

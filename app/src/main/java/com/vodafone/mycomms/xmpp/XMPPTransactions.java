@@ -877,7 +877,7 @@ public final class XMPPTransactions {
                         "Error parsing sent time");
             }
 
-            groupTx = new RealmGroupChatTransactions(_appContext, _profile_id);
+            groupTx = RealmGroupChatTransactions.getInstance(_appContext, _profile_id);
 
             //Check if chat message has already been received
             ChatMessage tempMsg = groupTx.getGroupChatMessageById(id, realm);

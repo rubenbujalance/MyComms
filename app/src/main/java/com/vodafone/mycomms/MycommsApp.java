@@ -170,10 +170,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         try {
             networkEvents.register();
-        } catch (Exception ex) {
-            Log.e(Constants.TAG, "MycommsApp.onCreate: ",ex);
-            Crashlytics.logException(ex);
-        }
+        } catch (Exception ex) {}
 
         startUserInactivityDetectThread(); // start the thread to detect inactivity
         new ScreenReceiver();  // creating receive SCREEN_OFF and SCREEN_ON broadcast msgs from the device.
@@ -572,9 +569,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                             disconnectedProcess = false;
                             try {
                                 networkEvents.register();
-                            } catch (Exception e) {
-                                Log.e(Constants.TAG, "MyCommsApp.startUserInactivityDetectThread: e ", e);
-                            }
+                            } catch (Exception e) {}
                         }
                         if (!countdownOn && (isScreenOff || isApplicationOnBackground())) {
                             Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: Starting CountDown");
@@ -591,9 +586,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                                 XMPPTransactions.disconnectPingThreadSession();
                                 try {
                                     networkEvents.unregister();
-                                } catch (Exception e) {
-                                    Log.e(Constants.TAG, "MyCommsApp.startUserInactivityDetectThread: e ", e);
-                                }
+                                } catch (Exception e) {}
                                 disconnectedProcess = true;
                             }
                         }

@@ -41,7 +41,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk=18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest({Crashlytics.class})
@@ -96,17 +96,23 @@ public class LoginSignupActivityTest {
 
     @Test
     public void testLoginSignupToSignupTypeChooseActivity() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         btSignup.performClick();
         MockDataForTests.checkThreadSchedulers();
         Intent expectedIntent = new Intent(activity, SignupTypeChooseActivity.class);
         Assert.assertTrue(Shadows.shadowOf(activity).getNextStartedActivity().equals(expectedIntent));
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
     }
 
     @Test
     public void testLoginSignupToLogin() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         btLogin.performClick();
         MockDataForTests.checkThreadSchedulers();
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
@@ -114,12 +120,15 @@ public class LoginSignupActivityTest {
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(LoginActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testErrorReceivedBusEvent() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         OKHttpErrorReceivedEvent errorEvent = new OKHttpErrorReceivedEvent();
         String errorMessage = activity.getString(R.string.wrapper_connection_error);
         errorEvent.setErrorMessage(errorMessage);
@@ -128,19 +137,22 @@ public class LoginSignupActivityTest {
         String toast = ShadowToast.getTextOfLatestToast();
         Assert.assertTrue(toast.equals(errorMessage));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testFinish() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Activity activity = Robolectric.buildActivity(LoginSignupActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 }

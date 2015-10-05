@@ -44,7 +44,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest({Crashlytics.class})
@@ -105,14 +105,20 @@ public class MailSentActivityTest {
 
     @Test
     public void testCheckMessage() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Assert.assertTrue(mWeSent.getText().toString().startsWith(activity.getString(R.string.we_sent_an_email_to)));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testResendEmail() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(200, CHECK_PHONE_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -124,29 +130,35 @@ public class MailSentActivityTest {
         Assert.assertTrue(header.getValue().equals(PIN));
         Assert.assertTrue("/api/profile".equals(latestSentHttpPost.getURI().getPath()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void shouldCallFinishInOnBackPressed() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         activity.onBackPressed();
         MockDataForTests.checkThreadSchedulers();
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
         Assert.assertTrue(shadowActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testFinish() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Activity activity = Robolectric.buildActivity(MailSentActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 }

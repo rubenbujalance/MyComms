@@ -53,7 +53,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -112,6 +112,9 @@ public class NewsDetailActivityTest
     @Test
     public void testActivityLifeCycle() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent intent = new Intent();
         intent.putExtra(Constants.NEWS_IMAGE, "mockImageURL");
         intent.putExtra(Constants.NEWS_TITLE, "mockTitle");
@@ -131,13 +134,16 @@ public class NewsDetailActivityTest
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithoutAvatarURL() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent intent = new Intent();
         intent.putExtra(Constants.NEWS_IMAGE, "mockImageURL");
         intent.putExtra(Constants.NEWS_TITLE, "mockTitle");
@@ -165,13 +171,16 @@ public class NewsDetailActivityTest
         Assert.assertTrue(published.getText().toString().equals("mockPublishedAt"));
         Assert.assertNull(html.getUrl());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithAvatarURL() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent intent = new Intent();
         intent.putExtra(Constants.NEWS_IMAGE, "mockImageURL");
         intent.putExtra(Constants.NEWS_TITLE, "mockTitle");
@@ -198,13 +207,16 @@ public class NewsDetailActivityTest
         Assert.assertTrue(published.getText().toString().equals("mockPublishedAt"));
         Assert.assertNull(html.getUrl());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testClickOnBack() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent intent = new Intent();
         intent.putExtra(Constants.NEWS_IMAGE, "mockImageURL");
         intent.putExtra(Constants.NEWS_TITLE, "mockTitle");
@@ -225,13 +237,16 @@ public class NewsDetailActivityTest
 
         Assert.assertTrue(mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testClickOnBackAction() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent intent = new Intent();
         intent.putExtra(Constants.NEWS_IMAGE, "mockImageURL");
         intent.putExtra(Constants.NEWS_TITLE, "mockTitle");
@@ -249,8 +264,8 @@ public class NewsDetailActivityTest
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void mockParams()

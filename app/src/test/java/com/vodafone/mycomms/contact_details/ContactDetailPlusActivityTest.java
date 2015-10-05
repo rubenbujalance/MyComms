@@ -59,7 +59,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 15/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -114,6 +114,9 @@ public class ContactDetailPlusActivityTest
     @Test
     public void testActivityLifeCycle() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact contact = MockDataForTests.getMockContact();
         String contactDetail[] = new String[10];
 
@@ -142,13 +145,16 @@ public class ContactDetailPlusActivityTest
 
         Assert.assertTrue(mActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testConnectionAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityManager connMgr =
             (ConnectivityManager)(RuntimeEnvironment.application.getApplicationContext()).getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
@@ -158,13 +164,16 @@ public class ContactDetailPlusActivityTest
         LinearLayout layNoConnection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(layNoConnection.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testConnectionNotAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityManager connMgr =
                 (ConnectivityManager)(RuntimeEnvironment.application.getApplicationContext()).getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
@@ -174,13 +183,16 @@ public class ContactDetailPlusActivityTest
         LinearLayout layNoConnection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(layNoConnection.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadContactInfo_NotLocalContact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -200,13 +212,16 @@ public class ContactDetailPlusActivityTest
         Assert.assertNotNull(contactOfficeLabel);
         Assert.assertNotNull(contactOfficeLabel.getText().toString());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadContactInfo_LocalContact_NoPhone_NoEmail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact contact = MockDataForTests.getMockContact();
         String contactDetail[] = new String[10];
 
@@ -242,13 +257,16 @@ public class ContactDetailPlusActivityTest
         Assert.assertNotNull(contactOfficeLabel);
         Assert.assertNotNull(contactOfficeLabel.getText().toString());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadContactInfo_LocalContact_WithPhone_WithEmail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact contact = MockDataForTests.getMockContact();
         String contactDetail[] = new String[10];
 
@@ -286,13 +304,16 @@ public class ContactDetailPlusActivityTest
         Assert.assertNotNull(contactOfficeLabel);
         Assert.assertNotNull(contactOfficeLabel.getText().toString());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testButtonChatClick_LocalContact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact contact = MockDataForTests.getMockContact();
         String contactDetail[] = new String[10];
 
@@ -330,13 +351,16 @@ public class ContactDetailPlusActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_VIEW));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testButtonChatClick_NotLocalContact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -351,13 +375,16 @@ public class ContactDetailPlusActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testButtonEmailClick_LocalContact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact contact = MockDataForTests.getMockContact();
         String contactDetail[] = new String[10];
 
@@ -395,13 +422,16 @@ public class ContactDetailPlusActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_SEND));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testButtonEmailClick_NotLocalContact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -414,13 +444,16 @@ public class ContactDetailPlusActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_SEND));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testButtonPhoneClick_LocalContact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact contact = MockDataForTests.getMockContact();
         String contactDetail[] = new String[10];
 
@@ -458,13 +491,16 @@ public class ContactDetailPlusActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_CALL));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testButtonPhoneClick_NotLocalContact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -477,13 +513,16 @@ public class ContactDetailPlusActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_CALL));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLayoutBack_Click()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -493,13 +532,16 @@ public class ContactDetailPlusActivityTest
 
         Assert.assertTrue(this.mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityChanged_HasInternet_Event()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event;
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
@@ -518,13 +560,16 @@ public class ContactDetailPlusActivityTest
 
         Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testConnectivityChangedEvent()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event;
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
@@ -567,8 +612,8 @@ public class ContactDetailPlusActivityTest
         
         Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpActivity()

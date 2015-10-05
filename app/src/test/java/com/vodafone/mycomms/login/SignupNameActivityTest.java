@@ -51,7 +51,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest({Crashlytics.class})
@@ -110,6 +110,9 @@ public class SignupNameActivityTest {
 
    @Test
     public void testForwardEmptyName() {
+       MockDataForTests.printStartTest(this.getClass().getSimpleName()
+               ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mFirstName.setText("");
         mLastName.setText("");
         ivBtFwd.performClick();
@@ -119,12 +122,15 @@ public class SignupNameActivityTest {
         EditText innerLastName = (EditText)mLastName.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerLastName.getError().equals(activity.getString(R.string.enter_your_last_name_to_continue)));
 
-       System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-               + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+       MockDataForTests.printEndTest(this.getClass().getSimpleName()
+               , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardEmptyPictureTakeAPhoto() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mFirstName.setText(FIRSTNAME);
         mLastName.setText(LASTNAME);
         ivBtFwd.performClick();
@@ -147,12 +153,15 @@ public class SignupNameActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertNotNull(activity.photoBitmap);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardEmptyPictureChooseAPhoto() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mFirstName.setText(FIRSTNAME);
         mLastName.setText(LASTNAME);
         ivBtFwd.performClick();
@@ -180,12 +189,15 @@ public class SignupNameActivityTest {
         Assert.assertNotNull(activity.photoPath);
         Assert.assertNotNull(activity.photoBitmap);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardToSignupCompany() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mFirstName.setText(FIRSTNAME);
         mLastName.setText(LASTNAME);
         ivBtFwd.performClick();
@@ -216,19 +228,22 @@ public class SignupNameActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(UserProfile.getFirstName() != null);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testFinish() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Activity activity = Robolectric.buildActivity(SignupNameActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 }

@@ -57,7 +57,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 10/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -119,6 +119,9 @@ public class FavouriteContactControllerTest
     @Test
     public void testContactListFragmentLifecycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
                 CustomFragmentActivity.class);
         in.putExtra("index", 0);
@@ -129,13 +132,16 @@ public class FavouriteContactControllerTest
 
         Assert.assertTrue(mCustomFragmentActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadFavouriteContacts()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -156,14 +162,17 @@ public class FavouriteContactControllerTest
         Assert.assertTrue(!mContactListFragment.getFavouriteContactList().isEmpty());
         Assert.assertTrue(mContactListFragment.getFavouriteContactList().size() == 3);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -211,8 +220,8 @@ public class FavouriteContactControllerTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     public void startContactListFragment(int index)

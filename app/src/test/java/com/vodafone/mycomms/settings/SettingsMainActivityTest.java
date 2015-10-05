@@ -49,7 +49,7 @@ import static org.powermock.api.support.membermodification.MemberModifier.suppre
  * Created by str_oan on 23/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*", "com.vodafone.mycomms.view.tab.*"
@@ -107,6 +107,9 @@ public class SettingsMainActivityTest
     @Test
     public void testConnectionAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+            , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityManager connMgr =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
@@ -116,13 +119,16 @@ public class SettingsMainActivityTest
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testConnectionNotAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityManager connMgr =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
@@ -132,13 +138,16 @@ public class SettingsMainActivityTest
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityEvent()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
@@ -179,13 +188,16 @@ public class SettingsMainActivityTest
 
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnExitPreferencesClicked()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -195,13 +207,16 @@ public class SettingsMainActivityTest
 
         Assert.assertTrue(mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnBackPressed()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -210,13 +225,16 @@ public class SettingsMainActivityTest
 
         Assert.assertTrue(mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnStop()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         mActivity = Robolectric
                 .buildActivity(SettingsMainActivity.class).create().start().resume().stop().get();
@@ -224,13 +242,16 @@ public class SettingsMainActivityTest
 
         Assert.assertTrue(MycommsApp.stateCounter == 0);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnStart()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         mActivity = Robolectric
                 .buildActivity(SettingsMainActivity.class).create().start().get();
@@ -238,8 +259,8 @@ public class SettingsMainActivityTest
 
         Assert.assertTrue(MycommsApp.stateCounter == 1);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpActivity()

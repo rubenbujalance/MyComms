@@ -54,7 +54,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 10/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -116,6 +116,9 @@ public class RecentContactsControllerTest
     @Test
     public void testContactListFragmentLifecycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
                 CustomFragmentActivity.class);
         in.putExtra("index", 1);
@@ -126,13 +129,16 @@ public class RecentContactsControllerTest
 
         Assert.assertTrue(mCustomFragmentActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadRecentContacts()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -157,13 +163,16 @@ public class RecentContactsControllerTest
         Assert.assertTrue(!mContactListFragment.getRecentContactList().isEmpty());
         Assert.assertTrue(mContactListFragment.getRecentContactList().size() == 4);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click_ActionSMS_SimpleChat()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -201,13 +210,16 @@ public class RecentContactsControllerTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click_ActionSMS_GroupChat()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -245,13 +257,16 @@ public class RecentContactsControllerTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click_ActionCall()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -289,13 +304,16 @@ public class RecentContactsControllerTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_CALL));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click_ActionEmail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -333,8 +351,8 @@ public class RecentContactsControllerTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_SEND));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     public void startContactListFragment(int index)

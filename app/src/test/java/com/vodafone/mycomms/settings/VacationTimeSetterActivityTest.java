@@ -54,7 +54,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 22/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -113,6 +113,9 @@ public class VacationTimeSetterActivityTest
     @Test
     public void testStop()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         mActivity = Robolectric.buildActivity(VacationTimeSetterActivity.class)
                 .create().start().resume().stop().get();
@@ -120,14 +123,17 @@ public class VacationTimeSetterActivityTest
 
         Assert.assertTrue(MycommsApp.stateCounter == 0);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testDestroy()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         mActivity = Robolectric.buildActivity(VacationTimeSetterActivity.class)
                 .create().start().resume().stop().destroy().get();
@@ -136,13 +142,16 @@ public class VacationTimeSetterActivityTest
         Assert.assertTrue(MycommsApp.stateCounter == 0);
         Assert.assertTrue(mActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithoutIntent_BackPressed()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -152,13 +161,16 @@ public class VacationTimeSetterActivityTest
 
         Assert.assertTrue(mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntent_BackPressed_Check_CorrectUpdate() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -183,13 +195,16 @@ public class VacationTimeSetterActivityTest
 
         Assert.assertTrue(mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntent_BackPressed_Check_WrongUpdate() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -214,13 +229,16 @@ public class VacationTimeSetterActivityTest
 
         Assert.assertTrue(mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntentCorrectData()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivityWithExtraIntent();
         MockDataForTests.checkThreadSchedulers();
 
@@ -236,13 +254,16 @@ public class VacationTimeSetterActivityTest
         Assert.assertNotNull(endDateTextView.getText().toString());
         Assert.assertTrue(endDateTextView.getText().toString().length() > 0);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testVacationTime_SwitchNotChecked_AND_SwitchChecked()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivityWithExtraIntent();
         MockDataForTests.checkThreadSchedulers();
 
@@ -278,13 +299,16 @@ public class VacationTimeSetterActivityTest
 
         Assert.assertFalse(mDialog.isShowing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntentWrongData()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivityWithExtraIntentWrongData();
         MockDataForTests.checkThreadSchedulers();
 
@@ -300,13 +324,16 @@ public class VacationTimeSetterActivityTest
         Assert.assertNotNull(endDateTextView.getText().toString());
         Assert.assertTrue(endDateTextView.getText().toString().length() == 0);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntentEmptyData()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivityWithExtraIntentEmptyData();
         MockDataForTests.checkThreadSchedulers();
 
@@ -321,8 +348,8 @@ public class VacationTimeSetterActivityTest
         Assert.assertNotNull(aSwitch);
         Assert.assertFalse(aSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpActivity()

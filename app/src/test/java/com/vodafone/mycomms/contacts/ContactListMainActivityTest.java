@@ -47,7 +47,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 16/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*", "com.vodafone.mycomms.view.tab.*"})
@@ -104,6 +104,9 @@ public class ContactListMainActivityTest
     @Test
     public void testConnectionAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityManager connMgr =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
@@ -114,13 +117,16 @@ public class ContactListMainActivityTest
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testConnectionNotAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityManager connMgr =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
@@ -131,14 +137,17 @@ public class ContactListMainActivityTest
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testActivityLifeCycle() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mActivity = Robolectric.buildActivity(ContactListMainActivity.class)
                 .create()
                 .start()
@@ -151,14 +160,17 @@ public class ContactListMainActivityTest
 
         Assert.assertTrue(mActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 
     @Test
     public void testOnConnectivityChanged_HasInternet_Event()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         MockDataForTests.checkThreadSchedulers();
@@ -169,13 +181,16 @@ public class ContactListMainActivityTest
 
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityChanged_Unknown_Event()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         MockDataForTests.checkThreadSchedulers();
@@ -186,13 +201,16 @@ public class ContactListMainActivityTest
 
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityChanged_Offline_Event()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         MockDataForTests.checkThreadSchedulers();
@@ -203,13 +221,16 @@ public class ContactListMainActivityTest
 
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityChanged_ConnectedNoInternet_Event()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         MockDataForTests.checkThreadSchedulers();
@@ -220,13 +241,16 @@ public class ContactListMainActivityTest
 
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityChanged_WifiConnected_Event()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         MockDataForTests.checkThreadSchedulers();
@@ -237,13 +261,16 @@ public class ContactListMainActivityTest
 
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityChanged_MobileConnected_Event()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.MOBILE_CONNECTED);
         mActivity = Robolectric.setupActivity(ContactListMainActivity.class);
         MockDataForTests.checkThreadSchedulers();
@@ -254,7 +281,7 @@ public class ContactListMainActivityTest
 
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 }

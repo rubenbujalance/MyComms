@@ -1,13 +1,18 @@
 package com.vodafone.mycomms.test.util;
 
+import android.annotation.SuppressLint;
+import android.view.View;
+
 import com.vodafone.mycomms.util.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.robolectric.Robolectric;
+import org.robolectric.util.ReflectionHelpers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import model.Chat;
 import model.Contact;
@@ -1147,5 +1152,21 @@ public class MockDataForTests
         }
         if(taskDetected)
             checkThreadSchedulers();
+    }
+
+    //Should be used with this params:
+    // className: this.getClass().getSimpleName()
+    // methodName: Thread.currentThread().getStackTrace()[1].getMethodName())
+    public static void printStartTest(String className, String methodName)
+    {
+        System.out.println("Starting Test "+methodName+" from class "+className+".......");
+    }
+
+    //Should be used with this params:
+    // className: this.getClass().getSimpleName()
+    // methodName: Thread.currentThread().getStackTrace()[1].getMethodName())
+    public static void printEndTest(String className, String methodName)
+    {
+        System.out.println("Test "+methodName+" from class "+className+" successfully finished!");
     }
 }

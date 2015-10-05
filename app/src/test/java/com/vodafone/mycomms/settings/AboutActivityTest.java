@@ -38,7 +38,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -90,45 +90,57 @@ public class AboutActivityTest
     @Test
     public void testStarted()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mActivity = Robolectric.buildActivity(AboutActivity.class).create().start().get();
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(MycommsApp.stateCounter != 0);
         MycommsApp.activityStopped();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testStopped()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mActivity = Robolectric.buildActivity(AboutActivity.class).create().start().resume().stop().get();
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(MycommsApp.stateCounter == 0);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testDestroyed()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mActivity = Robolectric.buildActivity(AboutActivity.class)
                 .create().start().resume().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(mActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testBackPressed()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mActivity = Robolectric.buildActivity(AboutActivity.class).create().start().resume().get();
         MockDataForTests.checkThreadSchedulers();
 
@@ -136,14 +148,17 @@ public class AboutActivityTest
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mActivity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
     }
 
     @Test
     public void testCorrectlyCreated()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mActivity = Robolectric.buildActivity(AboutActivity.class).create().start().resume().visible().get();
         MockDataForTests.checkThreadSchedulers();
 
@@ -156,8 +171,8 @@ public class AboutActivityTest
         Assert.assertTrue(textBuild.getText().toString()
                 .compareTo(mActivity.getResources().getString(R.string.about_build) + versionCode)==0);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 }

@@ -47,7 +47,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest({Crashlytics.class})
@@ -110,32 +110,39 @@ public class SignupPhoneActivityTest {
 
     @Test
     public void testForwardNoCountrySelected() {
-        System.err.println("******** Test: Empty Country********");
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mCountry.setText("");
         mCountry.setCodeSelected("");
         ivBtFwd.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mCountry.getError().equals(activity.getString(R.string.select_your_phone_country_to_continue)));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardNullCountrySelected() {
-        System.err.println("******** Test: Empty Country********");
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mCountry.setText(null);
         mCountry.setCodeSelected(null);
         ivBtFwd.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(mCountry.getError().equals(activity.getString(R.string.select_your_phone_country_to_continue)));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardNoPhone() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String countryName = "United States";
         String countryCode = "US";
         mCountry.setText(countryName);
@@ -146,12 +153,15 @@ public class SignupPhoneActivityTest {
         EditText innerPhone = (EditText)mPhone.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPhone.getError().equals(activity.getString(R.string.enter_your_phone_number_to_continue)));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardInvalidResponseCode200() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(200, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -173,12 +183,15 @@ public class SignupPhoneActivityTest {
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SignupPincodeActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardValidResponseCode403() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(403, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -200,12 +213,15 @@ public class SignupPhoneActivityTest {
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SignupPincodeActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardUnexpectedException() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(500, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -221,12 +237,15 @@ public class SignupPhoneActivityTest {
         String toast = ShadowToast.getTextOfLatestToast();
         Assert.assertTrue(toast.equals(activity.getResources().getString(R.string.error_reading_data_from_server)));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardValidResponseCode() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(201, Constants.LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -248,30 +267,36 @@ public class SignupPhoneActivityTest {
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SplashScreenActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testBack() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testFinish() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Activity activity = Robolectric.buildActivity(SignupPhoneActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 }

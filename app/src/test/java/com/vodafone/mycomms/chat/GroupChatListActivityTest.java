@@ -76,7 +76,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 29/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21)
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest(
@@ -142,6 +142,9 @@ public class GroupChatListActivityTest
     @Test
     public void testCreateNewChat() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity_PreviousGroupChatListActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -185,13 +188,16 @@ public class GroupChatListActivityTest
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
         Assert.assertTrue(this.mGroupChatListFragment.getActivity().isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreateGroupChatWithErrorAndOk() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         PowerMockito.mockStatic(GroupChatController.class);
         GroupChatController mController = PowerMockito.mock(GroupChatController.class);
         PowerMockito.when(GroupChatController.newInstance(Mockito.any(Context.class), Mockito.anyString()))
@@ -248,13 +254,16 @@ public class GroupChatListActivityTest
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
         Assert.assertTrue(this.mGroupChatListFragment.getActivity().isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testUpdateExistentGroupChat() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         PowerMockito.mockStatic(GroupChatController.class);
         GroupChatController mController = PowerMockito.mock(GroupChatController.class);
         PowerMockito.when(GroupChatController.newInstance(Mockito.any(Context.class), Mockito.anyString()))
@@ -347,14 +356,17 @@ public class GroupChatListActivityTest
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
         Assert.assertTrue(this.mGroupChatListFragment.getActivity().isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
     }
 
     @Test
     public void testOnConnectivityChanged_Connected() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
         setUpActivity_PreviousGroupChatListActivity();
         MockDataForTests.checkThreadSchedulers();
@@ -365,13 +377,16 @@ public class GroupChatListActivityTest
         LinearLayout lay_no_connection = (LinearLayout) this.mGroupChatListFragment.getActivity().findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityChanged_NotConnected() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
         setUpActivity_PreviousGroupChatListActivity();
         MockDataForTests.checkThreadSchedulers();
@@ -382,13 +397,16 @@ public class GroupChatListActivityTest
         LinearLayout lay_no_connection = (LinearLayout) this.mGroupChatListFragment.getActivity().findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testReloadAdapterEvent() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ArrayList<Contact> contactArrayList = new ArrayList<>();
         contactArrayList.add(MockDataForTests.getMockContact());
 
@@ -404,14 +422,17 @@ public class GroupChatListActivityTest
 
         Assert.assertNotEquals(contacts.size(), this.mGroupChatListFragment.contactList.size());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testLifeCycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -429,8 +450,8 @@ public class GroupChatListActivityTest
         Assert.assertTrue(MycommsApp.stateCounter == 0);
         Assert.assertTrue(this.mActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpActivity_PreviousGroupChatListActivity()

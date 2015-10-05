@@ -72,7 +72,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 23/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*", "com.vodafone.mycomms.view.tab.*"
@@ -141,6 +141,9 @@ public class ProfileFragmentTest
     @Test
     public void testCorrectCreationWithEditButtonPressed_TakePictureButtonPressed_DoneButtonPressed() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpProfileFragment();
         MockDataForTests.checkThreadSchedulers();
 
@@ -446,14 +449,17 @@ public class ProfileFragmentTest
         Assert.assertTrue(mProfileFragment.isUpdating);
         Assert.assertTrue(layout_error_edit_profile.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testLifeCycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -487,13 +493,16 @@ public class ProfileFragmentTest
 
         Assert.assertTrue(mCustomPreferencesFragmentActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnProfile() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpProfileFragment();
         MockDataForTests.checkThreadSchedulers();
 
@@ -526,14 +535,17 @@ public class ProfileFragmentTest
 
         Assert.assertFalse(mProfileFragment.isUpdating);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
     }
 
     @Test
     public void testEnableEditProfileEvent_True() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpProfileFragment();
         MockDataForTests.checkThreadSchedulers();
 
@@ -545,13 +557,16 @@ public class ProfileFragmentTest
         TextView editProfile = (TextView) mProfileFragment.getActivity().findViewById(R.id.edit_profile);
         Assert.assertTrue(editProfile.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testEnableEditProfileEvent_False() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpProfileFragment();
         MockDataForTests.checkThreadSchedulers();
 
@@ -563,13 +578,16 @@ public class ProfileFragmentTest
         TextView editProfile = (TextView) mProfileFragment.getActivity().findViewById(R.id.edit_profile);
         Assert.assertTrue(editProfile.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnActivityResult() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new
                 Date().getTime() + ".png");
         Uri imgUri = Uri.fromFile(file);
@@ -602,8 +620,8 @@ public class ProfileFragmentTest
 
         Assert.assertFalse(mProfileFragment.isAvatarHasChangedAfterSelection);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpProfileFragment() throws Exception

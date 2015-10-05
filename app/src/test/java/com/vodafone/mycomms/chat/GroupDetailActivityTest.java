@@ -60,7 +60,7 @@ import model.GroupChat;
  * Created by str_oan on 30/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21)
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest(
@@ -123,6 +123,9 @@ public class GroupDetailActivityTest
     @Test
     public void testLifeCycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
@@ -143,13 +146,16 @@ public class GroupDetailActivityTest
         Assert.assertTrue( MycommsApp.stateCounter == 0);
         Assert.assertTrue(this.activity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreationAndModifyGroupButtonClicked() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -171,12 +177,15 @@ public class GroupDetailActivityTest
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatListActivity.class.getName()));
         Assert.assertTrue(this.activity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreationAndClickOnContact() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -207,13 +216,16 @@ public class GroupDetailActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreationWithAvatarNameAndClickOnContact() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
         GroupChat groupChat = MockDataForTests.getMockGroupChat();
@@ -258,13 +270,16 @@ public class GroupDetailActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreationAndBackButtonClicked() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -282,13 +297,16 @@ public class GroupDetailActivityTest
 
         Assert.assertTrue(this.activity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreationAndBackLayoutClicked() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -306,8 +324,8 @@ public class GroupDetailActivityTest
 
         Assert.assertTrue(this.activity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 

@@ -66,7 +66,7 @@ import model.News;
  * Created by str_oan on 01/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -146,6 +146,9 @@ public class DashBoardActivityTest
     @Test
     public void testConnectionNotAvailableLayout_Visible() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -158,13 +161,16 @@ public class DashBoardActivityTest
         Assert.assertFalse(Utils.isConnected(mActivity));
         Assert.assertEquals(layConnectionAvailable.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testConnectionNotAvailableLayout_NotVisible() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -177,13 +183,16 @@ public class DashBoardActivityTest
         Assert.assertTrue(Utils.isConnected(mActivity));
         Assert.assertEquals(layConnectionAvailable.getVisibility(), View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testInitAllBtnMagnifierOnClick() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
         MockDataForTests.checkThreadSchedulers();
 
@@ -198,13 +207,15 @@ public class DashBoardActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (ContactListMainActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testInitAllBtnFavoriteOnClick() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
         MockDataForTests.checkThreadSchedulers();
@@ -218,38 +229,47 @@ public class DashBoardActivityTest
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (ContactListMainActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadLocalContacts() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         sp.edit().putBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, true).apply();
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(sp.getBoolean(Constants.IS_LOCAL_CONTACTS_LOADING_ENABLED, false));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testActivityFullLifeCycle() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Mockito.mock(DashBoardActivityController.class);
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertTrue(mActivity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onEventNewsReceived()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         News mockNews = new News();
         ArrayList<News> mockNewsList = new ArrayList<>();
         mockNewsList.add(mockNews);
@@ -262,13 +282,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onEventChatReceived()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ChatsReceivedEvent event = new ChatsReceivedEvent();
         event.setPendingMessages(0);
 
@@ -278,13 +301,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(event.getPendingMessages(), 0);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onEventMessageStatusChanged()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MessageStatusChanged event = new MessageStatusChanged();
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -293,13 +319,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onRecentContactsReceived()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         RecentContactsReceivedEvent event = new RecentContactsReceivedEvent();
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -308,13 +337,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onConnectivityChanged_Connected()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -324,13 +356,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onConnectivityChanged_NotConnected1()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -340,13 +375,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onConnectivityChanged_NotConnected2()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -356,13 +394,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onConnectivityChanged_NotConnected3()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -372,13 +413,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onEventGroupChatCreated()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         GroupChatCreatedEvent event = new GroupChatCreatedEvent();
 
         mActivity = Robolectric.buildActivity(DashBoardActivity.class).create().start().resume().get();
@@ -387,13 +431,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onGlobalContactsAddedEvent_OK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
         String serverUrl = null;
         try {
@@ -415,13 +462,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onGlobalContactsAddedEvent_OK_WrongJSON()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
         String serverUrl = null;
         try {
@@ -444,13 +494,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onGlobalContactsAddedEvent_OK_NoResponse()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
         String serverUrl = null;
         try {
@@ -472,13 +525,16 @@ public class DashBoardActivityTest
         MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertNotNull(event);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void test_onGlobalContactsAddedEvent_Fail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         GlobalContactsAddedEvent event = new GlobalContactsAddedEvent();
         String serverUrl = null;
         try {
@@ -501,8 +557,8 @@ public class DashBoardActivityTest
 
         org.junit.Assert.assertNotNull(event);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private String startWebMockServer() throws Exception

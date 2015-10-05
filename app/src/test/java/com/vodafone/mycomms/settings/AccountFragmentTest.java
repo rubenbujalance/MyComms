@@ -51,7 +51,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -113,6 +113,9 @@ public class AccountFragmentTest
     @Test
     public void testLocalContactsEnabled()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mockStatics_ContactPlatformExists();
         setSharedPreferencesWithLocal_NOGlobalContactsEnabled();
         startAccountsFragment();
@@ -128,13 +131,16 @@ public class AccountFragmentTest
         Assert.assertTrue(vAddGlobalContacts.getVisibility() == View.VISIBLE);
         Assert.assertTrue(imgCheckGlobalContacts.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testGlobalContactsEnabled()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mockStatics_ContactPlatformNotExists();
         setSharedPreferencesNOLocal_AndGlobalContactsEnabled();
         startAccountsFragment();
@@ -150,13 +156,16 @@ public class AccountFragmentTest
         Assert.assertTrue(vAddGlobalContacts.getVisibility() == View.GONE);
         Assert.assertTrue(imgCheckGlobalContacts.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testAddGlobalContacts() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mockStatics_ContactPlatformExists();
         setSharedPreferencesNoLocal_AndNoGlobalContactsEnabled();
         startAccountsFragment();
@@ -170,13 +179,16 @@ public class AccountFragmentTest
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         Assert.assertTrue(startedIntent.getComponent().getClassName().compareTo(AddGlobalContactsActivity.class.getName()) == 0);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testAddLocalContacts() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mockStatics_ContactPlatformExists();
         setSharedPreferencesNoLocal_AndNoGlobalContactsEnabled();
         startAccountsFragment();
@@ -194,8 +206,8 @@ public class AccountFragmentTest
         Assert.assertTrue(vAddGlobalContacts.getVisibility() == View.VISIBLE);
         Assert.assertTrue(imgCheckGlobalContacts.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void mockStatics_ContactPlatformExists()

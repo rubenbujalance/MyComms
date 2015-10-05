@@ -38,7 +38,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * Created by str_oan on 26/08/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -133,30 +133,39 @@ public class UncaughtExceptionHandlerControllerTest
     @Test
     public void testGetStringFromThrowableOK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String exceptionMessage1 = this.mUncaughtExceptionHandlerController.getStringFromThrowable(mThrowable);
         String exceptionMessage2 = this.mUncaughtExceptionHandlerControllerForEmptyConstructor.getStringFromThrowable(mThrowable);
         Assert.assertNotNull(exceptionMessage1);
         Assert.assertNotNull(exceptionMessage2);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testGetStringFromThrowableWithException()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String exceptionMessage1 = this.mUncaughtExceptionHandlerController.getStringFromThrowable(mThrowableAsNull);
         String exceptionMessage2 = this.mUncaughtExceptionHandlerControllerForEmptyConstructor.getStringFromThrowable(mThrowableAsNull);
         Assert.assertNull(exceptionMessage1);
         Assert.assertNull(exceptionMessage2);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testStartRecoverIntentOK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String errorMessage = "mockErrorMessage";
         mUncaughtExceptionHandlerController.startRecoverIntent(errorMessage);
         MockDataForTests.checkThreadSchedulers();
@@ -166,24 +175,30 @@ public class UncaughtExceptionHandlerControllerTest
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (mClass.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test (expected = Exception.class)
     public void testStartRecoverIntentKO()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String errorMessage = "mockErrorMessage";
         mUncaughtExceptionHandlerControllerForEmptyConstructor.startRecoverIntent(errorMessage);
         MockDataForTests.checkThreadSchedulers();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testUncaughtException_ConstructorWithoutParams() throws InterruptedException
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Thread testThread = new Thread()
         {
             public void run()
@@ -201,13 +216,16 @@ public class UncaughtExceptionHandlerControllerTest
         testThread.start();
         testThread.join();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testUncaughtException_ConstructorWithParams() throws InterruptedException
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Thread testThread = new Thread()
         {
             public void run()
@@ -226,13 +244,16 @@ public class UncaughtExceptionHandlerControllerTest
         testThread.start();
         testThread.join();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testUncaughtException_ConstructorWithParamsNullMessage() throws InterruptedException
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Thread testThread = new Thread()
         {
             public void run()
@@ -251,8 +272,8 @@ public class UncaughtExceptionHandlerControllerTest
         testThread.start();
         testThread.join();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 }

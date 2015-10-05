@@ -41,7 +41,7 @@ import io.realm.Realm;
  * Created by str_oan on 30/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21)
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.davemorrissey.labs.subscaleview.*"})
 @PrepareForTest(
@@ -97,6 +97,9 @@ public class FullScreenImageActivityTest
     @Test
     public void testCreationAndClick()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
         MockDataForTests.checkThreadSchedulers();
 
@@ -106,14 +109,17 @@ public class FullScreenImageActivityTest
 
         Assert.assertTrue(this.activity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testLifeCycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         Intent intent = new Intent();
         intent.putExtra("imageFilePath", "mockPath");
@@ -124,8 +130,8 @@ public class FullScreenImageActivityTest
         Assert.assertTrue(MycommsApp.stateCounter == 0);
         Assert.assertTrue(this.activity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpActivity()

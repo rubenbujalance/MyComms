@@ -75,7 +75,7 @@ import static org.powermock.api.mockito.PowerMockito.whenNew;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -168,6 +168,9 @@ public class SearchGlobalContactsTest {
 
     @Test
     public void shouldNotBeNull() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Assert.assertTrue(contactListFragment != null);
         Assert.assertTrue(listView != null);
         Assert.assertTrue(emptyText != null);
@@ -177,12 +180,15 @@ public class SearchGlobalContactsTest {
         Assert.assertTrue(layCancel != null);
         Assert.assertTrue(laySearchBar != null);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testShowAddGlobalContactsBarInContacts() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         //Save fake Global Contacts loading to false
         SharedPreferences sp = context.getSharedPreferences(
                 com.vodafone.mycomms.util.Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -210,12 +216,15 @@ public class SearchGlobalContactsTest {
         addGlobalContactsContainer = (RelativeLayout) recentListFragment.getView().findViewById(R.id.add_global_contacts_container);
         Assert.assertTrue(addGlobalContactsContainer.getVisibility() == (View.GONE));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testInitiateSearchViewComponentsOnFavoriteFragment() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         startContactListFragment(0);
         ContactListFragment favoriteListFragment = (ContactListFragment)customFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("0");
@@ -238,13 +247,16 @@ public class SearchGlobalContactsTest {
         addGlobalContactsContainer = (RelativeLayout) favoriteListFragment.getView().findViewById(R.id.add_global_contacts_container);
         Assert.assertTrue(addGlobalContactsContainer.getVisibility() == (View.GONE));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testClickBarAndGoToAddGlobalContacts() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         addGlobalContactsContainer.setVisibility(View.VISIBLE);
         addGlobalContactsContainer.performClick();
         MockDataForTests.checkThreadSchedulers();
@@ -253,12 +265,15 @@ public class SearchGlobalContactsTest {
         Assert.assertTrue(Shadows.shadowOf(contactListFragment.getActivity())
                 .getNextStartedActivity().equals(expectedIntent));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSearchBarVisibility() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Assert.assertTrue(laySearchBar.getVisibility() == (View.VISIBLE));
 
         startContactListFragment(0);
@@ -277,12 +292,15 @@ public class SearchGlobalContactsTest {
         laySearchBar = (LinearLayout) recentListFragment.getView().findViewById(R.id.lay_search_bar_container);
         Assert.assertTrue(laySearchBar.getVisibility() == (View.GONE));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSearchBarInitialContentVisibility() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Assert.assertTrue(layCancel.getVisibility() == (View.GONE));
         Assert.assertTrue(searchView.getHint().equals(context.getResources().getString(R.string.search_bar_text)));
 
@@ -316,12 +334,15 @@ public class SearchGlobalContactsTest {
         ShadowInputMethodManager shadowInputMethodManager = Shadows.shadowOf(inputManager);
         Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSearchViewTouchEvent() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         // Obtain MotionEvent object
         long downTime = SystemClock.uptimeMillis();
         long eventTime = SystemClock.uptimeMillis() + 100;
@@ -356,12 +377,15 @@ public class SearchGlobalContactsTest {
         //Show Keyboard Soft Input
         Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSearchViewTouchDeleteEvent() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
 
         //Prepare Mock SearchView in order to avoid onTextChange events
         final int drLeft = android.R.drawable.ic_menu_search;
@@ -402,12 +426,15 @@ public class SearchGlobalContactsTest {
         //Show CancelButton
         Assert.assertTrue(searchView.getText().toString().equals(""));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSearchViewOnTextChangedEvent() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         SearchController mSearchController = Mockito.mock(SearchController.class);
         Mockito.when(mSearchController.getContactsByKeyWord(Matchers.anyString())).thenReturn(MockDataForTests.getMockContactsList());
 
@@ -426,12 +453,15 @@ public class SearchGlobalContactsTest {
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
         Assert.assertTrue(cancelButton.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSearchViewOnTextChangedRealEvent() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try {
             searchView.setText("1");
         } catch (RuntimeException e){
@@ -439,23 +469,28 @@ public class SearchGlobalContactsTest {
         }
         Assert.assertTrue(layCancel.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSearchViewOnKeyListenerEvent() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         searchView.dispatchKeyEvent((new KeyEvent(KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_ENTER)));
         InputMethodManager inputManager = (InputMethodManager)contactListFragment.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         ShadowInputMethodManager shadowInputMethodManager = Shadows.shadowOf(inputManager);
         Assert.assertFalse(shadowInputMethodManager.isSoftInputVisible());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCancelButtonClickEvent() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         layCancel.setVisibility(View.VISIBLE);
 
@@ -480,12 +515,15 @@ public class SearchGlobalContactsTest {
         //Hide SearchBar Validation
         Assert.assertTrue(searchView.getText().toString().equals(""));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadContactsFromDBEvent() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         SearchController searchController = new SearchController(context, Constants.PROFILE_ID, null);
         SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
         searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
@@ -506,12 +544,14 @@ public class SearchGlobalContactsTest {
         }
         MockDataForTests.checkThreadSchedulers();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromPlatformSearch(){
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         String serverUrl = null;
         try
@@ -573,13 +613,16 @@ public class SearchGlobalContactsTest {
         }
         org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromLDAP_onFailure_405()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try
         {
@@ -635,13 +678,16 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromLDAP_onFailure_401_OnFailure_401()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try
         {
@@ -698,13 +744,16 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromLDAP_onFailure_401_OnFailure_500()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try
         {
@@ -761,13 +810,16 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromLDAP_onFailure_401_onSuccess_200_onFailure_401()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try
         {
@@ -826,13 +878,16 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromLDAP_onFailure_401_onSuccess_200_onSuccess_200()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try
         {
@@ -894,13 +949,16 @@ public class SearchGlobalContactsTest {
 
         org.junit.Assert.assertNotNull(MockDataForTests.getMockContactsList());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromLDAP_onSuccess_200_No_Body()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try
         {
@@ -954,13 +1012,16 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromLDAP_onSuccess_200_With_Body()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try
         {
@@ -1017,13 +1078,16 @@ public class SearchGlobalContactsTest {
             System.err.println("******** Failed due webServer.shutdown()********\n"+e.getMessage());
         }
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void buildRequestForSearchLDAPContacts_Fail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         GlobalContactsSettings mGlobalContactsSettings = new GlobalContactsSettings();
         mGlobalContactsSettings.setProfileId("mockId");
         mGlobalContactsSettings.setPassword("mockPWD");
@@ -1043,14 +1107,17 @@ public class SearchGlobalContactsTest {
 
         org.junit.Assert.assertNull(mGlobalContactsSettings.getToken());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 
     @Test
     public void validateNoPlatformRecords_OK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         SearchController searchController = Mockito.mock(SearchController.class);
         Mockito.when(searchController.insertContactListInRealm(Matchers.any(JSONObject.class))).thenReturn(MockDataForTests.getMockContactsList());
         SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,false,null,contactListFragment);
@@ -1063,13 +1130,15 @@ public class SearchGlobalContactsTest {
         org.junit.Assert.assertTrue(MockDataForTests.getMockContactsList().get(2).getPlatform().equals(Constants.PLATFORM_GLOBAL_CONTACTS));
         org.junit.Assert.assertTrue(MockDataForTests.getMockContactsList().get(3).getPlatform().equals(Constants.PLATFORM_LOCAL));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadContactsFromServer() throws Exception {
-        System.err.println("******** Test: Load Contacts from Server Events ********");
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         String serverUrl = startWebMockServer();
         PowerMockito.mockStatic(EndpointWrapper.class);
@@ -1119,12 +1188,15 @@ public class SearchGlobalContactsTest {
 
         webServer.shutdown();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadAllContactsFromGroupSearch() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         SearchController searchController = new SearchController(context, Constants.PROFILE_ID, null);
         SearchBarController searchBarController = new SearchBarController(contactListFragment.getActivity(),null,null,searchController,2,null,true,null,contactListFragment);
         searchBarController.initiateComponentsForSearchView(contactListFragment.getView());
@@ -1137,8 +1209,8 @@ public class SearchGlobalContactsTest {
         }
         MockDataForTests.checkThreadSchedulers();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     public void startContactListFragment(int index)

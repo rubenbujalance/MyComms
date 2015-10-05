@@ -43,7 +43,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest({Crashlytics.class})
@@ -105,17 +105,23 @@ public class SignupPassActivityTest {
 
     @Test
     public void testForwardBadPassword() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ivBtFwd.performClick();
         MockDataForTests.checkThreadSchedulers();
         EditText innerPassword = (EditText)mPassword.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerPassword.getError().equals(activity.getString(R.string.incorrect_format)));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForwardPasswordAndPasswordConfirmNoMatching() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mPassword.setText(PASSWORD);
         mConfirmPass.setText(ANOTHER_PASSWORD);
         ivBtFwd.performClick();
@@ -123,12 +129,15 @@ public class SignupPassActivityTest {
         EditText innerConfirmPass = (EditText)mConfirmPass.findViewById(R.id.clearable_edit);
         Assert.assertTrue(innerConfirmPass.getError().equals(activity.getString(R.string.passwords_do_not_match)));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testForward() {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mPassword.setText(PASSWORD);
         mConfirmPass.setText(PASSWORD);
         ivBtFwd.performClick();
@@ -140,30 +149,36 @@ public class SignupPassActivityTest {
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(SignupPhoneActivity.class.getName()));
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testBack() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testFinish() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Activity activity = Robolectric.buildActivity(SignupPassActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 }

@@ -61,7 +61,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -150,6 +150,9 @@ public class PreferencesFragmentTest {
     @Test
     public void testOnActivityResult()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         TextView vacationTimeEnds = (TextView) this.mPreferencesFragment.getView().findViewById(R.id.settings_preferences_vacation_time_value);
         ImageView vacationTimeArrow = (ImageView) this.mPreferencesFragment.getView().findViewById(R.id.about_arrow_right_top);
         Intent intent = new Intent();
@@ -160,12 +163,15 @@ public class PreferencesFragmentTest {
         Assert.assertTrue(vacationTimeArrow.getVisibility() == View.GONE);
         this.mPreferencesFragment.onDestroy();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void shouldNotBeNull() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Assert.assertTrue(vacationTimeEnds != null);
         Assert.assertTrue(vacationTimeArrow != null);
         Assert.assertTrue(btLogout != null);
@@ -174,12 +180,15 @@ public class PreferencesFragmentTest {
         Assert.assertTrue(doNotDisturbSwitch != null);
         Assert.assertTrue(aboutButton != null);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testReceivedProfile() throws Exception {
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         //Private Time Zone
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_TIMEZONE_PRIVATE);
@@ -195,12 +204,15 @@ public class PreferencesFragmentTest {
 
         Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLogout() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
         Mockito.doNothing().when(spyProfileController).logoutToAPI();
 
@@ -209,12 +221,15 @@ public class PreferencesFragmentTest {
 
         Assert.assertFalse(MycommsApp.appIsInitialized);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testShareCurrentTimeSwitch() throws Exception {
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_TIMEZONE_PUBLIC);
         ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
@@ -228,12 +243,15 @@ public class PreferencesFragmentTest {
 
         Assert.assertFalse(shareCurrentTimeSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testShareCurrentTimeSwitchOff() throws Exception {
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         shareCurrentTimeSwitch.setChecked(true);
         shareCurrentTimeSwitch.performClick();
@@ -241,12 +259,15 @@ public class PreferencesFragmentTest {
 
         Assert.assertTrue(!shareCurrentTimeSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testShareCurrentTimeSwitchOn() throws Exception {
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         shareCurrentTimeSwitch.setChecked(false);
         shareCurrentTimeSwitch.performClick();
@@ -254,12 +275,15 @@ public class PreferencesFragmentTest {
 
         Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testDoNotDisturbSwitch() throws Exception {
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_DONOTDISTURB);
         doNotDisturbSwitch.performClick();
@@ -272,12 +296,15 @@ public class PreferencesFragmentTest {
 
         Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testDoNotDisturbSwitchOn() throws Exception {
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         doNotDisturbSwitch.setChecked(false);
         doNotDisturbSwitch.performClick();
@@ -285,12 +312,15 @@ public class PreferencesFragmentTest {
 
         Assert.assertTrue(doNotDisturbSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testDoNotDisturbSwitchOff() throws Exception {
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         doNotDisturbSwitch.setChecked(true);
         doNotDisturbSwitch.performClick();
@@ -298,12 +328,15 @@ public class PreferencesFragmentTest {
 
         Assert.assertTrue(!doNotDisturbSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnProfileReceivedWithVacation() throws Exception {
+
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_FULL);
         ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
@@ -317,12 +350,15 @@ public class PreferencesFragmentTest {
         Assert.assertTrue(vacationTimeEnds.getVisibility() == View.VISIBLE);
         Assert.assertTrue(vacationTimeArrow.getVisibility() == View.GONE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnProfileReceivedWithNoHoliday() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_HOLIDAY);
         ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
         Mockito.doNothing().when(spyProfileController).updateSettingsData(Mockito.any(HashMap.class));
@@ -333,13 +369,16 @@ public class PreferencesFragmentTest {
         Assert.assertTrue(vacationTimeEnds.getVisibility() == View.GONE);
         Assert.assertTrue(vacationTimeArrow.getVisibility() == View.VISIBLE);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 
     @Test
     public void testOnProfileReceivedWithPublicTimeZone() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_TIMEZONE);
         ProfileController spyProfileController = Mockito.spy(new ProfileController(mPreferencesFragment.getActivity()));
         Mockito.doNothing().when(spyProfileController).updateSettingsData(Mockito.any(HashMap.class));
@@ -349,20 +388,23 @@ public class PreferencesFragmentTest {
 
         Assert.assertTrue(shareCurrentTimeSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnProfileReceivedWithNoDoNotDisturb() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         UserProfile userProfile = mockUserProfile(Constants.SETTINGS_JSON_NO_DONOTDISTURB);
         mPreferencesFragment.onProfileReceived(userProfile);
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(!doNotDisturbSwitch.isChecked());
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     public void startPreferencesFragment(int index)
@@ -377,15 +419,21 @@ public class PreferencesFragmentTest {
 
     @Test
     public void testVacationTimeClick() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         vacationTimeButton.performClick();
         MockDataForTests.checkThreadSchedulers();
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void shouldSupportGetStartedActivitiesForResult() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ShadowActivity shadowActivity = Shadows.shadowOf(mPreferencesFragment.getActivity());
         Intent intent = new Intent().setClass(mPreferencesFragment.getActivity(), VacationTimeSetterActivity.class);
         mPreferencesFragment.getActivity().startActivityForResult(intent, 142);
@@ -396,8 +444,8 @@ public class PreferencesFragmentTest {
         Assert.assertTrue(intentForResult.intent==intent);
         Assert.assertTrue(intentForResult.requestCode == 142);
 
-        System.out.println("Test " + Thread.currentThread().getStackTrace()[1].getMethodName()
-                + " from class " + this.getClass().getSimpleName() + " successfully finished!");
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private UserProfile mockUserProfile(String settings){

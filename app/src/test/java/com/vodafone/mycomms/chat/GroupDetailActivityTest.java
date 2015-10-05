@@ -92,6 +92,7 @@ public class GroupDetailActivityTest
     @After
     public void tearDown() throws Exception
     {
+        MockDataForTests.checkThreadSchedulers();
         Robolectric.reset();
         activity = null;
         mContext = null;

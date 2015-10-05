@@ -36,6 +36,7 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.PacketParserUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -56,6 +57,8 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -67,7 +70,7 @@ import model.GroupChat;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21)
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "org.kxml2.io.*", "org.xmlpull.*"})
 @PrepareForTest(
@@ -90,17 +93,12 @@ public class ChatListActivityTest {
     RecyclerView recyclerView;
     ChatListFragment mChatListFragment;
     Context context;
-//    BusProvider.MainThreadBus busProvider;
-
-    @BeforeClass
-    public static void beforeClass() throws Exception{
-
-    }
 
     @Before
     public void setUp()
     {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+        MockDataForTests.checkThreadSchedulers();
         context = RuntimeEnvironment.application.getApplicationContext();
 
         //Mock static: Realm, RealmGroupChatTransactions, RealmChatTransactions, RealmContactTransactions
@@ -165,12 +163,34 @@ public class ChatListActivityTest {
     @After
     public void tearDown() throws Exception
     {
+        MockDataForTests.checkThreadSchedulers();
         Robolectric.reset();
         activity = null;
         mockChatTx = null;
         mockGroupChatTx = null;
         recyclerView = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at ForgotPassActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
@@ -232,15 +252,15 @@ public class ChatListActivityTest {
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(0);
         Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_4")==0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(1);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_4")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_4") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(2);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_3")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_3") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(3);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_3")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_3") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(4);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_2")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_2") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(5);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_2")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_2") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(6);
         Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_1")==0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(7);

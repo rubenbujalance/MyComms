@@ -22,8 +22,10 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.chatgroup.GroupChatActivity;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.detail.ContactDetailMainActivity;
+import com.vodafone.mycomms.contacts.detail.ContactDetailsPlusActivity;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
@@ -31,8 +33,10 @@ import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +54,8 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -63,7 +69,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -89,182 +95,271 @@ public class ContactDetailMainActivityTest
     }
 
     @After
-    public void tearDown()
+    public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            if (webServer != null) webServer.shutdown();
-            Robolectric.reset();
-            webServer = null;
-            mActivity = null;
-            System.gc();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        //MockDataForTests.resetWindowManager(this.getClass());
+        if (webServer != null) webServer.shutdown();
+        Robolectric.reset();
+        webServer = null;
+        mActivity = null;
+        System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
     public void testConnectionAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityManager connMgr =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(true);
 
         setUpParams();
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testConnectionNotAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityManager connMgr =
                 (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         Shadows.shadowOf(connMgr.getActiveNetworkInfo()).setConnectionStatus(false);
         setUpParams();
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
-//    @Test
-//    public void testDetailsPlusActivity_Visible() throws Exception
-//    {
-//        setUpParams();
-//        setUpActivity();
-//
-//        LinearLayout detailsContainer = (LinearLayout) mActivity.findViewById(R.id.details_container);
-//        detailsContainer.performClick();
-//
-//        //TODO Gradle test fail on this point. Somehow assert is not correct. Unknown reason...
-//
-//        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
-//        Intent startedIntent = shadowActivity.getNextStartedActivity();
-//        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
-//        System.out.println("* testDetailsPlusActivity_Visible - startedIntentClassName: " +
-//                shadowIntent.getComponent().getClassName());
-//        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailsPlusActivity.class.getName()));
-//
-////        System.out.println("testDetailsPlusActivity_Visible -> Intent to start is: " + startedIntent.getAction());
-////        System.out.println("testDetailsPlusActivity_Visible -> Intent to start is: " + startedIntent.getComponent().getClassName());
-////        System.out.println("testDetailsPlusActivity_Visible -> Activity over testing is: " + mActivity.getPackageName() + " " + mActivity.getComponentName());
-//    }
+    @Test
+    public void testDetailsPlusActivity_Visible() throws Exception
+    {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        setUpParams();
+        setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
+        LinearLayout detailsContainer = (LinearLayout) mActivity.findViewById(R.id.details_container);
+        detailsContainer.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailsPlusActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+    }
 
     @Test
     public void testButton_Phone_Clicked() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpParams();
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         ImageView btnPhone = (ImageView)mActivity.findViewById(R.id.btn_prof_phone);
         btnPhone.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().compareTo(Intent.ACTION_CALL) == 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testButton_Email_Clicked() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpParams();
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         ImageView btnEmail = (ImageView) mActivity.findViewById(R.id.btn_prof_email);
         btnEmail.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().compareTo(Intent.ACTION_SEND) == 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
-//    @Test
-//    public void testButton_Calendar_Clicked() throws Exception
-//    {
-//        setUpParams();
-//        setUpActivity();
-//
-//        ImageView btnCalendar = (ImageView) mActivity.findViewById(R.id.btn_prof_calendar);
-//        btnCalendar.performClick();
-//
-//        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
-//        Intent startedIntent = shadowActivity.getNextStartedActivity();
-//        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
-//        Assert.assertTrue(shadowIntent.getAction().compareTo(Intent.ACTION_INSERT) == 0);
-//    }
+    @Test
+    public void testButton_Calendar_Clicked() throws Exception
+    {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        setUpParams();
+        setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
+        ImageView btnCalendar = (ImageView) mActivity.findViewById(R.id.btn_prof_calendar);
+        btnCalendar.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getAction().compareTo(Intent.ACTION_INSERT) == 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+    }
 
     @Test
     public void testButton_Back_Clicked() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpParams();
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         ImageView ivBtBack = (ImageView)mActivity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(mActivity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testBackLayout_Clicked() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpParams();
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout backArea = (LinearLayout)mActivity.findViewById(R.id.back_area);
         backArea.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(mActivity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
-//    @Test
-//    public void testButtonChat_Clicked() throws Exception
-//    {
-//        setUpParams();
-//        setUpActivity();
-//
-//        ImageView btnChat = (ImageView) mActivity.findViewById(R.id.btn_prof_chat);
-//        btnChat.performClick();
-//
-//        //TODO Gradle test fail on this point. Somehow assert is not correct. Unknown reason...
-//
-//        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
-//        Intent startedIntent = shadowActivity.getNextStartedActivity();
-//        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
-//        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
-//    }
+    @Test
+    public void testButtonChat_Clicked() throws Exception
+    {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
-//    @Test
-//    public void testButtonChatLocal_Clicked() throws Exception
-//    {
-////        SharedPreferences sp = mContext.getSharedPreferences(
-////                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
-////        sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
-////        PowerMockito.mockStatic(RealmContactTransactions.class);
-////        ArrayList<Contact> mockContactList = MockDataForTests.getMockContactsList();
-////        mockContactList.get(0).setPlatform(Constants.PLATFORM_LOCAL);
-////        PowerMockito.when(RealmContactTransactions.getFilteredContacts(Matchers.anyString(), Matchers.anyString(), Matchers.any(Realm.class)))
-////                .thenReturn(mockContactList);
-//
-//        setUpParams();
-//        setUpActivity();
-//
-//        ImageView btnChat = (ImageView) mActivity.findViewById(R.id.btn_prof_chat);
-//        btnChat.performClick();
-//
-//        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
-//        Intent startedIntent = shadowActivity.getNextStartedActivity();
-//        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
-//        System.out.println("* testButtonChatLocal_Clicked - Started action: "+shadowIntent.getAction());
-//                Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_VIEW));
-//    }
+        setUpParams();
+        setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
+        ImageView btnChat = (ImageView) mActivity.findViewById(R.id.btn_prof_chat);
+        btnChat.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+    }
+
+    @Test
+    public void testButtonChatLocal_Clicked() throws Exception
+    {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
+        SharedPreferences sp = mContext.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
+        PowerMockito.mockStatic(RealmContactTransactions.class);
+        ArrayList<Contact> mockContactList = MockDataForTests.getMockContactsList();
+        mockContactList.get(0).setPlatform(Constants.PLATFORM_LOCAL);
+        PowerMockito.when(RealmContactTransactions.getFilteredContacts(Matchers.anyString(), Matchers.anyString(), Matchers.any(Realm.class)))
+                .thenReturn(mockContactList);
+
+        setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
+        ImageView btnChat = (ImageView) mActivity.findViewById(R.id.btn_prof_chat);
+        Assert.assertTrue(btnChat.performClick());
+        MockDataForTests.checkThreadSchedulers();
+
+        ShadowActivity shadowActivity = Shadows.shadowOf(mActivity);
+        Intent startedIntent = shadowActivity.getNextStartedActivity();
+        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
+        Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_VIEW));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+    }
 
     @Test
     public void testContactWithoutPhone_NoEmail_WithOfficeLocation_WithPresence_WithLastSeen() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_5570340e7eb7c3512f2f9bf2").apply();
@@ -283,6 +378,7 @@ public class ContactDetailMainActivityTest
                 .thenReturn(mockContactList);
 
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         int phoneDrawable = R.drawable.btn_prof_phone_off;
         int chatDrawable = R.drawable.btn_prof_chat_off;
@@ -300,16 +396,23 @@ public class ContactDetailMainActivityTest
 
         TextView tvOfficeLocation = (TextView)mActivity.findViewById(R.id.contact_office_location);
         Assert.assertTrue(tvOfficeLocation.getVisibility() == View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactIsFavorite_StarVisibility() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpParams();
         PowerMockito.mockStatic(FavouriteController.class);
         PowerMockito.when(FavouriteController.contactIsFavourite(Matchers.anyString()))
                 .thenReturn(true);
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         ImageView btFavourite = (ImageView)mActivity.findViewById(R.id.btFavourite);
         Assert.assertTrue(null != btFavourite);
@@ -321,6 +424,7 @@ public class ContactDetailMainActivityTest
         Assert.assertTrue(btFavourite.getDrawable().equals(imageStar));
 
         btFavourite.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         int imageStarOff = R.mipmap.icon_favorite_grey;
         imageStar = mActivity.getResources().getDrawable(imageStarOff);
@@ -328,20 +432,28 @@ public class ContactDetailMainActivityTest
         Assert.assertTrue(btFavourite.getDrawable().equals(imageStar));
 
         btFavourite.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         imageStar = mActivity.getResources().getDrawable(imageStarOn);
         Assert.assertTrue(null != imageStar);
         Assert.assertTrue(btFavourite.getDrawable().equals(imageStar));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactIsNOTFavorite_StarVisibility()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpParams();
         PowerMockito.mockStatic(FavouriteController.class);
         PowerMockito.when(FavouriteController.contactIsFavourite(Matchers.anyString()))
                 .thenReturn(false);
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         ImageView btFavourite = (ImageView)mActivity.findViewById(R.id.btFavourite);
         Assert.assertTrue(null != btFavourite);
@@ -351,11 +463,17 @@ public class ContactDetailMainActivityTest
         Assert.assertTrue(null != imageStar);
 
         Assert.assertTrue(btFavourite.getDrawable().equals(imageStar));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testServerWithErrorResponse()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -372,56 +490,79 @@ public class ContactDetailMainActivityTest
 
         setUpParams();
         setUpActivity();
-        Contact contact = mActivity.getContact();
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
+        Contact contact = mActivity.getContact();
         Contact contact2 = mActivity.getContact();
         Assert.assertTrue(contact.equals(contact2));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testServerWithCorrectResponse()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setCorrectOKHTPResponse();
         setUpParams();
         setUpActivity();
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         Contact contact = mActivity.getContact();
         Assert.assertTrue(contact.getFirstName().equals(MockDataForTests.getMockContact().getFirstName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityEvent()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
         setUpParams();
         PowerMockito.when(RealmContactTransactions.favouriteContactIsInRealm(Matchers.anyString(), Matchers.any(Realm.class)))
                 .thenReturn(true);
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         LinearLayout lay_no_connection = (LinearLayout) mActivity.findViewById(R.id.no_connection_layout);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
 
         event = new ConnectivityChanged(ConnectivityStatus.UNKNOWN);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
         event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
         event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_NO_INTERNET);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
         event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.VISIBLE);
 
         event = new ConnectivityChanged(ConnectivityStatus.MOBILE_CONNECTED);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
         org.junit.Assert.assertEquals(lay_no_connection.getVisibility(), View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setCorrectOKHTPResponse()
@@ -478,13 +619,5 @@ public class ContactDetailMainActivityTest
         String serverUrl = webServer.getUrl("").toString();
 
         return serverUrl;
-    }
-
-    private void checkThreadSchedulers()
-    {
-        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushBackgroundThreadScheduler();
-        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushForegroundThreadScheduler();
     }
 }

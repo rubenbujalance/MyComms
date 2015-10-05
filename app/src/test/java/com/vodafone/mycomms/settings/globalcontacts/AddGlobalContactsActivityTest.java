@@ -21,11 +21,14 @@ import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.constants.Constants;
 import com.vodafone.mycomms.events.BusProvider;
 import com.vodafone.mycomms.realm.RealmLDAPSettingsTransactions;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +43,9 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import io.realm.Realm;
 import model.GlobalContactsSettings;
 
@@ -47,7 +53,7 @@ import model.GlobalContactsSettings;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
@@ -68,26 +74,27 @@ public class AddGlobalContactsActivityTest {
     MockWebServer webServer;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws Exception
+    {
+        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
         activity = Robolectric.setupActivity(AddGlobalContactsActivity.class);
+        MockDataForTests.checkThreadSchedulers();
+
         etUser = (EditText)activity.findViewById(R.id.etEmail);
         etPassword = (EditText)activity.findViewById(R.id.etPassword);
         btAddAccount = (Button)activity.findViewById(R.id.btAddAccount);
         btBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         layoutErrorBar = (LinearLayout)activity.findViewById(R.id.layoutErrorBar);
         tvError = (TextView)activity.findViewById(R.id.tvError);
-
-        MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
     }
 
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            if (webServer != null) webServer.shutdown();
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+
+        if (webServer != null) webServer.shutdown();
+        Robolectric.reset();
 
         activity = null;
         etUser = null;
@@ -101,9 +108,32 @@ public class AddGlobalContactsActivityTest {
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at :"+this.getClass().getSimpleName()+" \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void shouldNotBeNull() throws Exception {
-        System.err.println("******** Test: NOT NULL OBJECTS ********");
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         junit.framework.Assert.assertTrue(activity != null);
         junit.framework.Assert.assertTrue(etUser != null);
         junit.framework.Assert.assertTrue(etPassword != null);
@@ -111,15 +141,22 @@ public class AddGlobalContactsActivityTest {
         junit.framework.Assert.assertTrue(btBack != null);
         junit.framework.Assert.assertTrue(layoutErrorBar != null);
         junit.framework.Assert.assertTrue(tvError != null);
-        System.err.println("******** Test: NO NULL OBJECTS OK ********");
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSendFormatErrorAndReset() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         //User empty
         etPassword.setText("12345");
         etUser.setText("");
         btAddAccount.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         Assert.assertEquals(tvError.getText().toString(),
                 activity.getString(R.string.credentials_are_incorrect));
@@ -131,28 +168,32 @@ public class AddGlobalContactsActivityTest {
         etPassword.setText("");
         etUser.setText("testUser");
         btAddAccount.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         Assert.assertEquals(tvError.getText().toString(),
                 activity.getString(R.string.credentials_are_incorrect));
         //Change password
         etPassword.setText("passChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testDiscoverErrors() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         webServer = Util.newWebMockServer();
         String serverUrl = webServer.getUrl("/").toString();
         PowerMockito.mockStatic(EndpointWrapper.class);
 
-        //Discover connection error
-        System.err.println("******** Test: Discover Connection Error ********");
-
         resetScreen();
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn("http://localhost:12345");
-        btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        Assert.assertTrue(btAddAccount.performClick());
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -163,8 +204,7 @@ public class AddGlobalContactsActivityTest {
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(500));
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -175,18 +215,21 @@ public class AddGlobalContactsActivityTest {
         PowerMockito.when(EndpointWrapper.getLDAPDiscover()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200).setBody("{'incorrectJSON':'0'}"));
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
 
-        webServer.shutdown();
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testUserError() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         webServer = Util.newWebMockServer();
         String serverUrl = webServer.getUrl("/").toString();
         PowerMockito.mockStatic(EndpointWrapper.class);
@@ -204,8 +247,7 @@ public class AddGlobalContactsActivityTest {
                         .replace("mockUrl", "http://localhost:12345")));
 
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -219,8 +261,7 @@ public class AddGlobalContactsActivityTest {
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse().setResponseCode(500));
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -235,18 +276,21 @@ public class AddGlobalContactsActivityTest {
                 .setBody(mockedDiscoverResponse));
         webServer.enqueue(new MockResponse().setResponseCode(401));
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
 
-        webServer.shutdown();
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testAuthErrors() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         webServer = Util.newWebMockServer();
         String serverUrl = webServer.getUrl("/").toString();
         PowerMockito.mockStatic(EndpointWrapper.class);
@@ -274,8 +318,7 @@ public class AddGlobalContactsActivityTest {
                                 .replace("mockUrl", "http://localhost:12345")));
 
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -296,8 +339,7 @@ public class AddGlobalContactsActivityTest {
                 .setResponseCode(401));
 
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -318,8 +360,7 @@ public class AddGlobalContactsActivityTest {
                 .setResponseCode(500));
 
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
@@ -352,19 +393,22 @@ public class AddGlobalContactsActivityTest {
                 .apply();
 
         btAddAccount.performClick();
-        Thread.sleep(2000);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.VISIBLE);
         etUser.setText("testUserChanged");
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
 
-        webServer.shutdown();
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try {
             webServer = Util.newWebMockServer();
         }
@@ -426,21 +470,20 @@ public class AddGlobalContactsActivityTest {
         //Execute
         layoutErrorBar.setVisibility(View.VISIBLE);
         btAddAccount.performClick();
-        Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
-        try {
-            Thread.sleep(2000);
-        }
-        catch (Exception e)
-        {
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
+        Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
         Assert.assertTrue(activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testConnectivityChanged() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         resetScreen();
 
         System.err.println("******** Test: Connectivity Offline received ********");
@@ -450,13 +493,25 @@ public class AddGlobalContactsActivityTest {
         System.err.println("******** Test: Connectivity Online received ********");
         BusProvider.getInstance().post(
                 new ConnectivityChanged(ConnectivityStatus.MOBILE_CONNECTED));
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(layoutErrorBar.getVisibility() == View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testGoBack() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         btBack.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(activity.isFinishing());
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void resetScreen() {

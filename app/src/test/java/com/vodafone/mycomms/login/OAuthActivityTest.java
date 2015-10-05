@@ -51,7 +51,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms",
-    manifest = "./src/main/AndroidManifest.xml")
+    manifest = "./src/main/AndroidManifest.xml", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
 @PrepareForTest({Crashlytics.class})
@@ -108,6 +108,9 @@ public class OAuthActivityTest {
     @Test
     public void testOAuthToSignupMailResponse200() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse2 = Util.buildResponse(200, OAUTH_200_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse2);
         MockDataForTests.checkThreadSchedulers();
@@ -116,11 +119,17 @@ public class OAuthActivityTest {
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(didOverrideUrl);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 
     @Test
     public void testOAuthToSignupMail() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse2 = Util.buildResponse(203, OAUTH_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse2);
         MockDataForTests.checkThreadSchedulers();
@@ -129,10 +138,16 @@ public class OAuthActivityTest {
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(didOverrideUrl);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOAuthToSignupMailWrongURL() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse2 = Util.buildResponse(203, OAUTH_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse2);
         MockDataForTests.checkThreadSchedulers();
@@ -141,10 +156,16 @@ public class OAuthActivityTest {
         boolean didOverrideUrl = sWvOAuth.getWebViewClient().shouldOverrideUrlLoading(activity.wvOAuth, url);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(didOverrideUrl);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOAuthToLogin() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse2 = Util.buildResponse(400);
         FakeHttp.addPendingHttpResponse(httpResponse2);
         MockDataForTests.checkThreadSchedulers();
@@ -154,37 +175,62 @@ public class OAuthActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(didOverrideUrl);
         Assert.assertTrue(activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testFinish() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Activity activity = Robolectric.buildActivity(OAuthActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
     }
 
     @Test
     public void testApplicationAndProfileInitialized()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ApplicationAndProfileInitialized event = new ApplicationAndProfileInitialized();
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testApplicationAndProfileReadError()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ApplicationAndProfileReadError event = new ApplicationAndProfileReadError();
         BusProvider.getInstance().post(event);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnPageStarted()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         RelativeLayout relativeContainer = (RelativeLayout)activity.findViewById(R.id.relative_container);
         String url = "https://" + EndpointWrapper.getBaseURL() + "/auth/" + activity.oauthPrefix + "/callback";
         ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
@@ -192,11 +238,17 @@ public class OAuthActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(relativeContainer.getVisibility() == View.VISIBLE);
         Assert.assertTrue(activity.wvOAuth.getVisibility() == View.INVISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnPageFinished()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         RelativeLayout relativeContainer = (RelativeLayout)activity.findViewById(R.id.relative_container);
         String url = "https://" + EndpointWrapper.getBaseURL() + "/auth/" + activity.oauthPrefix + "/callback";
         ShadowWebView sWvOAuth = Shadows.shadowOf(wvOAuth);
@@ -204,5 +256,8 @@ public class OAuthActivityTest {
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(relativeContainer.getVisibility() == View.INVISIBLE);
         Assert.assertTrue(activity.wvOAuth.getVisibility() == View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 }

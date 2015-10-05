@@ -37,8 +37,10 @@ import com.vodafone.mycomms.util.CustomFragmentActivity;
 
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +61,9 @@ import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowListView;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import io.realm.Realm;
 import model.Contact;
 import model.FavouriteContact;
@@ -73,7 +78,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  */
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -105,11 +110,9 @@ public class ContactsControllerTest{
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-            if(webServer!=null) webServer.shutdown();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
+        if(webServer!=null) webServer.shutdown();
 
         mContactListFragment = null;
         mCustomFragmentActivity = null;
@@ -117,22 +120,54 @@ public class ContactsControllerTest{
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testContactListFragmentLifecycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
                 CustomFragmentActivity.class);
         in.putExtra("index", 2);
         mCustomFragmentActivity = Robolectric.buildActivity(CustomFragmentActivity.class)
                 .withIntent(in)
                 .create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(mCustomFragmentActivity.isDestroyed());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadContactsFromDB_NullKeyWord()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             com.vodafone.mycomms.util.Constants.isDashboardOrigin = true;
@@ -149,16 +184,7 @@ public class ContactsControllerTest{
         startContactListFragment(2);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("2");
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(!mContactListFragment.getContactList().isEmpty());
         Assert.assertTrue(mContactListFragment.getContactList().size() == 9);
@@ -166,11 +192,17 @@ public class ContactsControllerTest{
 
         checkOnItemClick();
 
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
     }
 
     @Test
     public void testReloadAdapterEvent()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -190,21 +222,17 @@ public class ContactsControllerTest{
         startContactListFragment(2);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("2");
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
+        MockDataForTests.checkThreadSchedulers();
 
         ReloadAdapterEvent event = new ReloadAdapterEvent();
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(!mContactListFragment.getContactList().isEmpty());
         Assert.assertTrue(mContactListFragment.getContactList().size() == 9);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void checkOnItemClick()
@@ -215,6 +243,7 @@ public class ContactsControllerTest{
         long id = listView.getItemIdAtPosition(position);
 
         listView.performItemClick(view, position, id);
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
@@ -225,6 +254,9 @@ public class ContactsControllerTest{
     @Test
     public void testContactListFragment_LoadListViewElements_Click()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -241,16 +273,7 @@ public class ContactsControllerTest{
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("2");
         mockParams();
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(!mContactListFragment.getContactList().isEmpty());
         Assert.assertTrue(mContactListFragment.getContactList().size() == 9);
@@ -258,17 +281,24 @@ public class ContactsControllerTest{
         ShadowListView shadowListView = Shadows.shadowOf(mContactListFragment.getListView());
         shadowListView.populateItems();
         Assert.assertTrue(shadowListView.performItemClick(0));
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(ContactDetailMainActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 
     @Test
     public void testContactListFragment_InviteOption_Click()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -285,16 +315,7 @@ public class ContactsControllerTest{
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("2");
         mockParams();
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(!mContactListFragment.getContactList().isEmpty());
         Assert.assertTrue(mContactListFragment.getContactList().size() == 9);
@@ -305,66 +326,105 @@ public class ContactsControllerTest{
         View view = listView.getChildAt(0);
         LinearLayout layInviteMyComms = (LinearLayout) view.findViewById(R.id.lay_invite_mycomms);
         layInviteMyComms.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button acceptButton = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         acceptButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testIsContactCanBeInvited_False()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mockEmail = "mock_email@mockdomain.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(0), mockEmail);
 
         Assert.assertFalse(canBeInvited);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testIsContactCanBeInvited_False_mc()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mockEmail = "mock_email@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(0), mockEmail);
 
         Assert.assertFalse(canBeInvited);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testIsContactCanBeInvited_False_same_email()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mockEmail = "vdf01@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(1), mockEmail);
 
         Assert.assertFalse(canBeInvited);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testIsContactCanBeInvited_False_neither_case()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mockEmail = "vdf01@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(2), mockEmail);
 
         Assert.assertFalse(canBeInvited);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testIsContactCanBeInvited_True()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mockEmail = "mock_email@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         boolean canBeInvited = contactsController.isContactCanBeInvited(MockDataForTests.getMockContactsList().get(1), mockEmail);
 
         Assert.assertTrue(canBeInvited);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testGetUserProfileEmails_OK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         UserProfile mUserProfile = new UserProfile();
         mUserProfile.setEmails
                 (
@@ -382,11 +442,17 @@ public class ContactsControllerTest{
         String emails = contactsController.getUserProfileEmails();
 
         Assert.assertEquals(emails, "vdf01@stratesys-ts.com");
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreateInviteAlertWithEvents_OK_Invite_Btn_Clicked()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact mContact = MockDataForTests.getMockContactsList().get(0);
 
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
@@ -395,12 +461,20 @@ public class ContactsControllerTest{
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button inviteButton = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         inviteButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreateInviteAlertWithEvents_OK_Cancel_Btn_Clicked()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact mContact = MockDataForTests.getMockContactsList().get(0);
 
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
@@ -409,12 +483,20 @@ public class ContactsControllerTest{
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button cancelButton = alert.getButton(AlertDialog.BUTTON_NEGATIVE);
         cancelButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreateInviteAlertWithEvents_Fail_Void_Email()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact mContact = MockDataForTests.getMockContactsList().get(0);
         mContact.setEmails("[\n" +
                 "{\n" +
@@ -428,12 +510,20 @@ public class ContactsControllerTest{
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button acceptButton = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         acceptButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test (expected = NullPointerException.class)
     public void testCreateInviteAlertWithEvents_Fail_Null_Contact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact mContact = null;
 
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
@@ -442,12 +532,20 @@ public class ContactsControllerTest{
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button acceptButton = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         acceptButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSendInvitation_On_Success()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -465,22 +563,18 @@ public class ContactsControllerTest{
         String email = "mockemail@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         contactsController.sendInvitation(email);
+        MockDataForTests.checkThreadSchedulers();
 
-        try {
-            Thread.sleep(2000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testSendInvitation Failed due to: Thread.sleep********\n"+e.getMessage());
-            Assert.fail();
-        }
-
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSendInvitation_On_Failure()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -498,48 +592,60 @@ public class ContactsControllerTest{
         String email = "mockemail@vodafone.com";
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         contactsController.sendInvitation(email);
+        MockDataForTests.checkThreadSchedulers();
 
-        try {
-            Thread.sleep(2000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testSendInvitation Failed due to: Thread.sleep********\n"+e.getMessage());
-            Assert.fail();
-        }
-
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testShowSuccessOrErrorResponse_Success()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         contactsController.showSuccessOrErrorResponse(true);
 
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button acceptButton = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         acceptButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testShowSuccessOrErrorResponse_Error()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         contactsController.showSuccessOrErrorResponse(false);
 
         AlertDialog alert = ShadowAlertDialog.getLatestAlertDialog();
         Button acceptButton = alert.getButton(AlertDialog.BUTTON_POSITIVE);
         acceptButton.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(!alert.isShowing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testMapProfileToContact()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         UserProfile mUserProfile = MockDataForTests.getMockUserProfile();
-        ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
+        new ContactsController(this.mProfileId, this.mContext);
         Contact contact = ContactsController.mapProfileToContact(mUserProfile);
 
         Assert.assertTrue(mUserProfile.getAvailability().equals(contact.getAvailability()));
@@ -548,11 +654,17 @@ public class ContactsControllerTest{
         Assert.assertTrue(mUserProfile.getPhones().equals(contact.getPhones()));
         Assert.assertTrue(mUserProfile.getEmails().equals(contact.getEmails()));
         Assert.assertTrue(mUserProfile.getCompany().equals(contact.getCompany()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testMapContactToRecent_OK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact mContact = MockDataForTests.getMockContact();
         JSONObject jsonObject = new JSONObject();
         try
@@ -574,11 +686,17 @@ public class ContactsControllerTest{
         Assert.assertTrue(mContact.getPhones().equals(contact.getPhones()));
         Assert.assertTrue(mContact.getEmails().equals(contact.getEmails()));
         Assert.assertTrue(mContact.getCompany().equals(contact.getCompany()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testMapContactToRecent_Fail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact mContact = MockDataForTests.getMockContact();
         JSONObject jsonObject = new JSONObject();
 
@@ -591,11 +709,17 @@ public class ContactsControllerTest{
         Assert.assertTrue(mContact.getPhones().equals(contact.getPhones()));
         Assert.assertTrue(mContact.getEmails().equals(contact.getEmails()));
         Assert.assertTrue(mContact.getCompany().equals(contact.getCompany()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testMapContactToFavourite()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Contact mContact = MockDataForTests.getMockContact();
         ContactsController contactsController = new ContactsController(this.mProfileId, this.mContext);
         FavouriteContact contact = contactsController.mapContactToFavourite(mContact);
@@ -606,11 +730,17 @@ public class ContactsControllerTest{
         Assert.assertTrue(mContact.getPhones().equals(contact.getPhones()));
         Assert.assertTrue(mContact.getEmails().equals(contact.getEmails()));
         Assert.assertTrue(mContact.getCompany().equals(contact.getCompany()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testMapContact_OK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mProfileId = "mc_mock_id";
         String searchHelper = "mockMyName mockMyLastName Stratesys ";
         String sortHelper = "mockMyName mockMyLastName Stratesys";
@@ -620,13 +750,22 @@ public class ContactsControllerTest{
 
         Assert.assertTrue(contact.getSearchHelper().startsWith(searchHelper));
         Assert.assertTrue(contact.getSortHelper().contains(sortHelper));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testMapContact_Fail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         new ContactsController(this.mProfileId, this.mContext);
         ContactsController.mapContact(null, null);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     public void startContactListFragment(int index)

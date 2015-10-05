@@ -118,7 +118,7 @@ public class SplashScreenActivityTest{
                 PrintWriter printWriter = new PrintWriter( writer );
                 e.printStackTrace( printWriter );
                 printWriter.flush();
-                System.err.println("Uncaught exception at SplashScreenActivityTest: \n"+writer.toString());
+                System.err.println("Uncaught exception at SplashScreenActivityTest: \n" + writer.toString());
             }
         });
     }
@@ -132,6 +132,9 @@ public class SplashScreenActivityTest{
     @Test
     public void testOnCreate()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.putExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA, true);
         intent.putExtra(com.vodafone.mycomms.util.Constants.APP_CRASH_MESSAGE, mCrashMessage);
@@ -152,11 +155,17 @@ public class SplashScreenActivityTest{
         testAlertWithNegativeButton();
         testAlertWithPositiveButton();
 
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
     }
 
     @Test
     public void testOnCreateWithExtraDataWithStatus200() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HashMap<String, Object> returnMap = new HashMap<>();
         returnMap.put("status", "200");
         JSONObject jsonObject = new JSONObject("{\"accessToken\":\"accessToken\",\"expiresIn\":\"20\"}");
@@ -173,11 +182,17 @@ public class SplashScreenActivityTest{
         activity = Robolectric.buildActivity(SplashScreenActivity.class).withIntent(intent).create().start().resume().visible().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertNotNull(UserSecurity.getAccessToken(activity));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnCreateWithExtraDataWithStatus500() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HashMap<String, Object> returnMap = new HashMap<>();
         returnMap.put("status", "500");
         JSONObject jsonObject = new JSONObject("{\"accessToken\":\"accessToken\",\"expiresIn\":\"20\"}");
@@ -198,6 +213,9 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
         Assert.assertTrue(activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 //    @Test
@@ -224,9 +242,15 @@ public class SplashScreenActivityTest{
     @Test
     public void testAllLifeCycleEvents()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         activity = Robolectric.buildActivity(SplashScreenActivity.class).create().start().resume().pause().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     public void testSendSupportEmail()
@@ -267,15 +291,24 @@ public class SplashScreenActivityTest{
     @Test
     public void testOnCreateWithoutExtras()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         activity = Robolectric.buildActivity(SplashScreenActivity.class).create().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.IS_APP_CRASHED_EXTRA));
         Assert.assertFalse(activity.getIntent().hasExtra(com.vodafone.mycomms.util.Constants.APP_CRASH_MESSAGE));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCheckVersionFailedWithNullResponse() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = startWebMockServer()+"/";
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
@@ -287,11 +320,17 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
 
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
     }
 
     @Test
     public void testCheckVersionFailedWithResponse500() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = startWebMockServer();
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
@@ -303,11 +342,17 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
 
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
     }
 
     @Test
     public void testCheckVersionNoNetworkConnectionUserLoggedOk() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Context context = RuntimeEnvironment.application.getApplicationContext();
         ConnectivityManager connMgr =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -328,10 +373,16 @@ public class SplashScreenActivityTest{
         Intent expectedIntent = new Intent(activity, DashBoardActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCheckVersionNoNetworkConnectionUserNotLogged() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Context context = RuntimeEnvironment.application.getApplicationContext();
         UserSecurity.resetTokens(context);
         ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -343,11 +394,17 @@ public class SplashScreenActivityTest{
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCheckVersionUserLoggedRenewTokenToLoginSignup() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = startWebMockServer();
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.mockStatic(APIWrapper.class);
@@ -363,6 +420,9 @@ public class SplashScreenActivityTest{
         Intent expectedIntent = new Intent(activity, LoginSignupActivity.class);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 //    @Test
@@ -466,6 +526,9 @@ public class SplashScreenActivityTest{
     @Test
     public void testBusProvider_OnApplicationAndProfileInitializedEvent()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(new ApplicationAndProfileInitialized());
@@ -475,17 +538,28 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
         Assert.assertTrue(activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testBusProvider_OnApplicationAndProfileReadErrorEvent_WithProfileAvailable()
     {
-        activity = Robolectric.setupActivity(SplashScreenActivity.class);
-        MockDataForTests.checkThreadSchedulers();
-        BusProvider.getInstance().post(new ApplicationAndProfileReadError());
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         PowerMockito.mockStatic(APIWrapper.class);
         PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), Mockito.any(HashMap.class), Mockito.any(HashMap.class), Mockito.any(Context.class)))
                 .thenReturn(null);
+
+        activity = Robolectric.buildActivity(SplashScreenActivity.class)
+                .create().start().resume().visible().get();
+        MockDataForTests.checkThreadSchedulers();
+
+        PowerMockito.when(APIWrapper.httpPostAPI(Mockito.anyString(), Mockito.any(HashMap.class), Mockito.any(HashMap.class), Mockito.any(Context.class)))
+                .thenReturn(null);
+        BusProvider.getInstance().post(new ApplicationAndProfileReadError());
         MockDataForTests.checkThreadSchedulers();
 
         SharedPreferences sp = activity.getSharedPreferences(
@@ -499,11 +573,17 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (DashBoardActivity.class.getName()));
         Assert.assertTrue(activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testBusProvider_OnApplicationAndProfileReadErrorEvent_NOProfileAvailable()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         MockDataForTests.checkThreadSchedulers();
         BusProvider.getInstance().post(new ApplicationAndProfileReadError());
@@ -513,6 +593,9 @@ public class SplashScreenActivityTest{
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (LoginSignupActivity.class.getName()));
         Assert.assertTrue(activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 
@@ -520,6 +603,9 @@ public class SplashScreenActivityTest{
     @Test
     public void testBusProvider_OnOKHttpErrorReceived()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mockMessage = "mockErrorMessage";
         activity = Robolectric.setupActivity(SplashScreenActivity.class);
         MockDataForTests.checkThreadSchedulers();
@@ -529,5 +615,8 @@ public class SplashScreenActivityTest{
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertEquals(mockMessage, event.getErrorMessage());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 }

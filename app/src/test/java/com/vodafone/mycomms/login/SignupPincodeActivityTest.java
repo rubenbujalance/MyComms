@@ -52,7 +52,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
  * Created by str_evc on 18/05/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms")
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest({Crashlytics.class})
@@ -145,6 +145,9 @@ public class SignupPincodeActivityTest {
 
     @Test
     public void testSendPincode() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(200, CHECK_PHONE_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -161,10 +164,16 @@ public class SignupPincodeActivityTest {
         expectedIntent.putExtra("pin", activity.pin);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (MailSentActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSendPincodeOAuth() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(201, LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -181,10 +190,16 @@ public class SignupPincodeActivityTest {
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SplashScreenActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSendPinCodeInvalidResponseCode() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(400);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -197,10 +212,16 @@ public class SignupPincodeActivityTest {
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(lnPin1.getBackground().equals(activity.getResources().getDrawable(android.R.color.holo_red_dark)));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSendPinCodeText() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(200, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -238,10 +259,16 @@ public class SignupPincodeActivityTest {
         Assert.assertTrue(tvPin2.getText().equals("  "));
         Assert.assertTrue(tvPin3.getText().equals("  "));
         Assert.assertTrue(tvPin4.getText().equals("  "));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testResendPin() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(200, Constants.USER_PHONE_NOT_VERIFIED_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -254,10 +281,16 @@ public class SignupPincodeActivityTest {
         expectedIntent.putExtra("pin", activity.pin);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (MailSentActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testShowKeyboard() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         InputMethodManager inputManager = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         ShadowInputMethodManager shadowInputMethodManager = Shadows.shadowOf(inputManager);
 
@@ -296,10 +329,16 @@ public class SignupPincodeActivityTest {
         Thread.sleep(500);
         Robolectric.flushForegroundThreadScheduler();
         Assert.assertTrue(shadowInputMethodManager.isSoftInputVisible());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testSendPincodeOK() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         HttpResponse httpResponse = Util.buildResponse(201, LOGIN_OK_RESPONSE);
         FakeHttp.addPendingHttpResponse(httpResponse);
         MockDataForTests.checkThreadSchedulers();
@@ -313,22 +352,37 @@ public class SignupPincodeActivityTest {
                 Intent.FLAG_ACTIVITY_CLEAR_TASK);
         ShadowIntent shadowIntent = Shadows.shadowOf(expectedIntent);
         Assert.assertEquals(shadowIntent.getComponent().getClassName(), (SplashScreenActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testBack() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ImageView ivBtBack = (ImageView)activity.findViewById(R.id.ivBtBack);
         ivBtBack.performClick();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testFinish() throws Exception {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Activity activity = Robolectric.buildActivity(SignupPincodeActivity.class).create().start().resume().pause().stop().destroy().get();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(activity.isDestroyed());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 }

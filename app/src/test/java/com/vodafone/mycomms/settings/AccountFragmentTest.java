@@ -12,12 +12,15 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.R;
 import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.settings.globalcontacts.AddGlobalContactsActivity;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomPreferencesFragmentActivity;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +37,9 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import io.realm.Realm;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -45,7 +51,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -75,19 +81,46 @@ public class AccountFragmentTest
     @After
     public void tearDown()
     {
-        mAccountsFragment.getActivity().finish();
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
         mAccountsFragment = null;
         mCustomPreferencesFragmentActivity = null;
         mContext = null;
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testLocalContactsEnabled()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mockStatics_ContactPlatformExists();
         setSharedPreferencesWithLocal_NOGlobalContactsEnabled();
         startAccountsFragment();
+        MockDataForTests.checkThreadSchedulers();
+
         TextView tvAddLocalContacts = (TextView) mAccountsFragment.getView().findViewById(R.id.btn_add_local_contacts);
         ImageView imgCheckLocalContacts = (ImageView) mAccountsFragment.getView().findViewById(R.id.acc_check_local_contacts);
         TextView vAddGlobalContacts = (TextView) mAccountsFragment.getView().findViewById(R.id.btn_add_vodafone_global);
@@ -97,14 +130,22 @@ public class AccountFragmentTest
         Assert.assertTrue(imgCheckLocalContacts.getVisibility() == View.VISIBLE);
         Assert.assertTrue(vAddGlobalContacts.getVisibility() == View.VISIBLE);
         Assert.assertTrue(imgCheckGlobalContacts.getVisibility() == View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testGlobalContactsEnabled()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mockStatics_ContactPlatformNotExists();
         setSharedPreferencesNOLocal_AndGlobalContactsEnabled();
         startAccountsFragment();
+        MockDataForTests.checkThreadSchedulers();
+
         TextView tvAddLocalContacts = (TextView) mAccountsFragment.getView().findViewById(R.id.btn_add_local_contacts);
         ImageView imgCheckLocalContacts = (ImageView) mAccountsFragment.getView().findViewById(R.id.acc_check_local_contacts);
         TextView vAddGlobalContacts = (TextView) mAccountsFragment.getView().findViewById(R.id.btn_add_vodafone_global);
@@ -114,41 +155,59 @@ public class AccountFragmentTest
         Assert.assertTrue(imgCheckLocalContacts.getVisibility() == View.GONE);
         Assert.assertTrue(vAddGlobalContacts.getVisibility() == View.GONE);
         Assert.assertTrue(imgCheckGlobalContacts.getVisibility() == View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testAddGlobalContacts() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mockStatics_ContactPlatformExists();
         setSharedPreferencesNoLocal_AndNoGlobalContactsEnabled();
         startAccountsFragment();
+        MockDataForTests.checkThreadSchedulers();
+
         TextView vAddGlobalContacts = (TextView) mAccountsFragment.getView().findViewById(R.id.btn_add_vodafone_global);
         vAddGlobalContacts.performClick();
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mAccountsFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         Assert.assertTrue(startedIntent.getComponent().getClassName().compareTo(AddGlobalContactsActivity.class.getName()) == 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testAddLocalContacts() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         mockStatics_ContactPlatformExists();
         setSharedPreferencesNoLocal_AndNoGlobalContactsEnabled();
         startAccountsFragment();
+        MockDataForTests.checkThreadSchedulers();
+
         TextView tvAddLocalContacts = (TextView) mAccountsFragment.getView().findViewById(R.id.btn_add_local_contacts);
         ImageView imgCheckLocalContacts = (ImageView) mAccountsFragment.getView().findViewById(R.id.acc_check_local_contacts);
         TextView vAddGlobalContacts = (TextView) mAccountsFragment.getView().findViewById(R.id.btn_add_vodafone_global);
         ImageView imgCheckGlobalContacts = (ImageView) mAccountsFragment.getView().findViewById(R.id.acc_check_vodafone_global);
         tvAddLocalContacts.performClick();
-        checkThreadSchedulers();
-        Thread.sleep(2000);
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(tvAddLocalContacts.getVisibility() == View.GONE);
         Assert.assertTrue(imgCheckLocalContacts.getVisibility() == View.VISIBLE);
         Assert.assertTrue(vAddGlobalContacts.getVisibility() == View.VISIBLE);
         Assert.assertTrue(imgCheckGlobalContacts.getVisibility() == View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void mockStatics_ContactPlatformExists()
@@ -231,14 +290,4 @@ public class AccountFragmentTest
                 mProfileId)
                 .apply();
     }
-
-    private void checkThreadSchedulers()
-    {
-        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushBackgroundThreadScheduler();
-        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushForegroundThreadScheduler();
-    }
-
-
 }

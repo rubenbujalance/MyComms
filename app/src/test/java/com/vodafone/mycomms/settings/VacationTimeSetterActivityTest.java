@@ -18,11 +18,14 @@ import com.vodafone.mycomms.BuildConfig;
 import com.vodafone.mycomms.EndpointWrapper;
 import com.vodafone.mycomms.MycommsApp;
 import com.vodafone.mycomms.R;
+import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +42,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowDatePickerDialog;
 import org.robolectric.shadows.ShadowDialog;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import io.realm.Realm;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -48,7 +54,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 22/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -74,6 +80,7 @@ public class VacationTimeSetterActivityTest
     @After
     public void tearDown() throws Exception
     {
+        MockDataForTests.checkThreadSchedulers();
         if (webServer != null)
             webServer.shutdown();
         Robolectric.reset();
@@ -82,38 +89,88 @@ public class VacationTimeSetterActivityTest
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testStop()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         mActivity = Robolectric.buildActivity(VacationTimeSetterActivity.class)
                 .create().start().resume().stop().get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(MycommsApp.stateCounter == 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testDestroy()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         mActivity = Robolectric.buildActivity(VacationTimeSetterActivity.class)
                 .create().start().resume().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(MycommsApp.stateCounter == 0);
         Assert.assertTrue(mActivity.isDestroyed());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithoutIntent_BackPressed()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
+
         LinearLayout btBackArea = (LinearLayout)mActivity.findViewById(R.id.back_area);
         btBackArea.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(mActivity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntent_BackPressed_Check_CorrectUpdate() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -128,19 +185,26 @@ public class VacationTimeSetterActivityTest
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(200).setBody(com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE));
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         mActivity.holidayEndDate = "2014-07-04T12:08:56.235-0700";
         mActivity.initialHolidayEndDate = "2014-06-04T12:08:56.235-0700";
         LinearLayout btBackArea = (LinearLayout)mActivity.findViewById(R.id.back_area);
         btBackArea.performClick();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(mActivity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntent_BackPressed_Check_WrongUpdate() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -155,20 +219,29 @@ public class VacationTimeSetterActivityTest
         PowerMockito.when(EndpointWrapper.getBaseURL()).thenReturn(serverUrl);
         webServer.enqueue(new MockResponse().setResponseCode(400).setBody(com.vodafone.mycomms.constants.Constants.VALID_VERSION_RESPONSE));
         setUpActivity();
+        MockDataForTests.checkThreadSchedulers();
 
         mActivity.holidayEndDate = "2014-07-04T12:08:56.235-0700";
         mActivity.initialHolidayEndDate = "2014-06-04T12:08:56.235-0700";
         LinearLayout btBackArea = (LinearLayout)mActivity.findViewById(R.id.back_area);
         btBackArea.performClick();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(mActivity.isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntentCorrectData()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivityWithExtraIntent();
+        MockDataForTests.checkThreadSchedulers();
+
         TextView tvVacTime = (TextView)mActivity.findViewById(R.id.settings_textview_vacation_time);
         LinearLayout layVacTime = (LinearLayout)mActivity.findViewById(R.id.vacation_time_ends_layout);
         TextView endDateTextView  =  (TextView)mActivity.findViewById(R.id.vacation_setter_vacation_date_ends_text);
@@ -179,16 +252,25 @@ public class VacationTimeSetterActivityTest
         Assert.assertTrue(layVacTime.getVisibility() == View.VISIBLE);
         Assert.assertNotNull(endDateTextView);
         Assert.assertNotNull(endDateTextView.getText().toString());
-        Assert.assertTrue(endDateTextView.getText().toString().length()>0);
+        Assert.assertTrue(endDateTextView.getText().toString().length() > 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testVacationTime_SwitchNotChecked_AND_SwitchChecked()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivityWithExtraIntent();
+        MockDataForTests.checkThreadSchedulers();
 
         Switch vacationTimeSwitch = (Switch) mActivity.findViewById(R.id.switch_vacation_time);
         vacationTimeSwitch.setChecked(false);
+        MockDataForTests.checkThreadSchedulers();
+
         TextView tvVacTime = (TextView)mActivity.findViewById(R.id.settings_textview_vacation_time);
         LinearLayout layVacTime = (LinearLayout)mActivity.findViewById(R.id.vacation_time_ends_layout);
 
@@ -199,7 +281,8 @@ public class VacationTimeSetterActivityTest
 
         mActivity.holidayEndDate = "2014-07-04T12:08:56.235-0700";
         vacationTimeSwitch.setChecked(true);
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
+
         DatePickerDialog mDialog = (DatePickerDialog)ShadowDialog.getLatestDialog();
         Assert.assertNotNull(mDialog);
         Assert.assertTrue(mDialog.isShowing());
@@ -212,13 +295,23 @@ public class VacationTimeSetterActivityTest
         shadowDatePickerDialog.getOnDateSetListenerCallback().onDateSet(mDialog.getDatePicker(), 2014, 5, 1);
         Button button = mDialog.getButton(DatePickerDialog.BUTTON_NEGATIVE);
         button.performClick();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertFalse(mDialog.isShowing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntentWrongData()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivityWithExtraIntentWrongData();
+        MockDataForTests.checkThreadSchedulers();
+
         TextView tvVacTime = (TextView)mActivity.findViewById(R.id.settings_textview_vacation_time);
         LinearLayout layVacTime = (LinearLayout)mActivity.findViewById(R.id.vacation_time_ends_layout);
         TextView endDateTextView  =  (TextView)mActivity.findViewById(R.id.vacation_setter_vacation_date_ends_text);
@@ -230,12 +323,20 @@ public class VacationTimeSetterActivityTest
         Assert.assertNotNull(endDateTextView);
         Assert.assertNotNull(endDateTextView.getText().toString());
         Assert.assertTrue(endDateTextView.getText().toString().length() == 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testWithIntentEmptyData()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivityWithExtraIntentEmptyData();
+        MockDataForTests.checkThreadSchedulers();
+
         TextView tvVacTime = (TextView)mActivity.findViewById(R.id.settings_textview_vacation_time);
         LinearLayout layVacTime = (LinearLayout)mActivity.findViewById(R.id.vacation_time_ends_layout);
         Switch aSwitch = ((Switch) mActivity.findViewById(R.id.switch_vacation_time));
@@ -246,6 +347,9 @@ public class VacationTimeSetterActivityTest
         Assert.assertTrue(layVacTime.getVisibility() == View.GONE);
         Assert.assertNotNull(aSwitch);
         Assert.assertFalse(aSwitch.isChecked());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpActivity()
@@ -287,13 +391,4 @@ public class VacationTimeSetterActivityTest
 
         return serverUrl;
     }
-
-    private void checkThreadSchedulers()
-    {
-        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushBackgroundThreadScheduler();
-        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushForegroundThreadScheduler();
-    }
-
 }

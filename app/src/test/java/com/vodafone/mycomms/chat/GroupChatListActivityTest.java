@@ -39,8 +39,10 @@ import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.Constants;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,6 +62,8 @@ import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowListView;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -72,7 +76,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 29/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21)
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*"})
 @PrepareForTest(
@@ -114,12 +118,36 @@ public class GroupChatListActivityTest
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testCreateNewChat() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpActivity_PreviousGroupChatListActivity();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         ListView listView = mGroupChatListFragment.getListView();
         LinearLayout chatContactsContainer = (LinearLayout) this.mGroupChatListFragment.getView().findViewById(R.id.list_group_chat_contacts);
         LinearLayout layGroupChatHeader = (LinearLayout) this.mGroupChatListFragment.getView().findViewById(R.id.group_chat_header);
@@ -135,6 +163,7 @@ public class GroupChatListActivityTest
         ShadowListView shadowListView = Shadows.shadowOf(listView);
         shadowListView.populateItems();
         Assert.assertTrue(shadowListView.performItemClick(0));
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(layGroupChatHeader.getVisibility() == View.VISIBLE);
         Assert.assertTrue(txtNumberParticipants.getText().toString().length() > 0);
@@ -148,20 +177,27 @@ public class GroupChatListActivityTest
         Assert.assertTrue(layGroupChatHeader.getVisibility() == View.GONE);
 
         Assert.assertTrue(shadowListView.performItemClick(0));
+        MockDataForTests.checkThreadSchedulers();
 
         txtWrite.performClick();
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(this.mGroupChatListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
         Assert.assertTrue(this.mGroupChatListFragment.getActivity().isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testCreateGroupChatWithErrorAndOk() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         PowerMockito.mockStatic(GroupChatController.class);
         GroupChatController mController = PowerMockito.mock(GroupChatController.class);
         PowerMockito.when(GroupChatController.newInstance(Mockito.any(Context.class), Mockito.anyString()))
@@ -172,8 +208,8 @@ public class GroupChatListActivityTest
         PowerMockito.when(mController.getCreatedGroupChatId(Mockito.anyString())).thenReturn(null);
 
         setUpActivity_PreviousGroupChatListActivity();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         ListView listView = mGroupChatListFragment.getListView();
         LinearLayout chatContactsContainer = (LinearLayout) this.mGroupChatListFragment.getView().findViewById(R.id.list_group_chat_contacts);
         LinearLayout layGroupChatHeader = (LinearLayout) this.mGroupChatListFragment.getView().findViewById(R.id.group_chat_header);
@@ -200,8 +236,7 @@ public class GroupChatListActivityTest
 
         //Test error on group chat creation
         txtWrite.performClick();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertFalse(this.mGroupChatListFragment.getActivity().isFinishing());
         //Test OK in group chat creation
@@ -211,27 +246,32 @@ public class GroupChatListActivityTest
         PowerMockito.when(mController.getCreatedGroupChatId(Mockito.anyString())).thenReturn("mg_55dc2a35a297b90a726e4cc2");
 
         txtWrite.performClick();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(this.mGroupChatListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
         Assert.assertTrue(this.mGroupChatListFragment.getActivity().isFinishing());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testUpdateExistentGroupChat() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         PowerMockito.mockStatic(GroupChatController.class);
         GroupChatController mController = PowerMockito.mock(GroupChatController.class);
         PowerMockito.when(GroupChatController.newInstance(Mockito.any(Context.class), Mockito.anyString()))
                 .thenReturn(mController);
 
         setUpActivity_PreviousChatListActivity();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         ListView listView = mGroupChatListFragment.getListView();
         LinearLayout chatContactsContainer = (LinearLayout) this.mGroupChatListFragment.getView().findViewById(R.id.list_group_chat_contacts);
         LinearLayout layGroupChatHeader = (LinearLayout) this.mGroupChatListFragment.getView().findViewById(R.id.group_chat_header);
@@ -249,7 +289,9 @@ public class GroupChatListActivityTest
         //Check that we cannot take out more contacts, because this converts group chat in chat
         //which is not available here
 
-        chatContactsContainer.getChildAt(0).performClick();
+        Assert.assertTrue(chatContactsContainer.getChildAt(0).performClick());
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertNotNull(this.mGroupChatListFragment.mSearchBarController);
         Assert.assertTrue(chatContactsContainer.getVisibility() == View.VISIBLE);
         Assert.assertTrue(chatContactsContainer.getChildCount() == 1);
@@ -284,8 +326,7 @@ public class GroupChatListActivityTest
         PowerMockito.when(mController.getCreatedGroupChatId(Mockito.anyString())).thenReturn(null);
 
         txtWrite.performClick();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertFalse(this.mGroupChatListFragment.getActivity().isFinishing());
 
@@ -296,8 +337,7 @@ public class GroupChatListActivityTest
         PowerMockito.when(mController.getCreatedGroupChatId(Mockito.anyString())).thenReturn(null);
 
         txtWrite.performClick();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertFalse(this.mGroupChatListFragment.getActivity().isFinishing());
 
@@ -308,8 +348,7 @@ public class GroupChatListActivityTest
         PowerMockito.when(mController.getCreatedGroupChatId(Mockito.anyString())).thenReturn("mg_55dc2a35a297b90a726e4cc2");
 
         txtWrite.performClick();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(this.mGroupChatListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
@@ -317,35 +356,57 @@ public class GroupChatListActivityTest
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
         Assert.assertTrue(this.mGroupChatListFragment.getActivity().isFinishing());
 
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
     }
 
     @Test
     public void testOnConnectivityChanged_Connected() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.WIFI_CONNECTED_HAS_INTERNET);
         setUpActivity_PreviousGroupChatListActivity();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         LinearLayout lay_no_connection = (LinearLayout) this.mGroupChatListFragment.getActivity().findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnConnectivityChanged_NotConnected() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ConnectivityChanged event = new ConnectivityChanged(ConnectivityStatus.OFFLINE);
         setUpActivity_PreviousGroupChatListActivity();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         LinearLayout lay_no_connection = (LinearLayout) this.mGroupChatListFragment.getActivity().findViewById(R.id.no_connection_layout);
         Assert.assertTrue(lay_no_connection.getVisibility() == View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testReloadAdapterEvent() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         ArrayList<Contact> contactArrayList = new ArrayList<>();
         contactArrayList.add(MockDataForTests.getMockContact());
 
@@ -353,17 +414,25 @@ public class GroupChatListActivityTest
         PowerMockito.when(SearchBarController.getContactList()).thenReturn(contactArrayList);
         ReloadAdapterEvent event = new ReloadAdapterEvent();
         setUpActivity_PreviousGroupChatListActivity();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         ArrayList<Contact> contacts = this.mGroupChatListFragment.contactList;
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertNotEquals(contacts.size(), this.mGroupChatListFragment.contactList.size());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testLifeCycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         MycommsApp.stateCounter = 0;
         SharedPreferences sp = mContext.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
@@ -376,8 +445,13 @@ public class GroupChatListActivityTest
         intent.putExtra(Constants.GROUP_CHAT_PREVIOUS_ACTIVITY, GroupChatListActivity.class.getSimpleName());
         this.mActivity = Robolectric.buildActivity(GroupChatListActivity.class).withIntent(intent)
                 .create().start().resume().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(MycommsApp.stateCounter == 0);
         Assert.assertTrue(this.mActivity.isDestroyed());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpActivity_PreviousGroupChatListActivity()
@@ -416,14 +490,6 @@ public class GroupChatListActivityTest
         this.mActivity = Robolectric.buildActivity(GroupChatListActivity.class).withIntent(intent)
                 .create().start().resume().visible().get();
         this.mGroupChatListFragment = (GroupChatListFragment)this.mActivity.getSupportFragmentManager().getFragments().get(0);
-    }
-
-    private void checkThreadSchedulers()
-    {
-        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushBackgroundThreadScheduler();
-        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushForegroundThreadScheduler();
     }
 
     private void preparePicasso()

@@ -35,8 +35,10 @@ import com.vodafone.mycomms.util.CustomPreferencesFragmentActivity;
 
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,10 +56,11 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowDialog;
-import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.ShadowToast;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Date;
 
 import io.realm.Realm;
@@ -69,7 +72,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 23/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*", "com.vodafone.mycomms.view.tab.*"
@@ -104,6 +107,7 @@ public class ProfileFragmentTest
     @After
     public void tearDown() throws Exception
     {
+        MockDataForTests.checkThreadSchedulers();
         if (webServer != null)
             webServer.shutdown();
         Robolectric.reset();
@@ -113,11 +117,35 @@ public class ProfileFragmentTest
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @Test
     public void testCorrectCreationWithEditButtonPressed_TakePictureButtonPressed_DoneButtonPressed() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpProfileFragment();
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         EditText et_password_content = (EditText) mProfileFragment.getView().findViewById(R.id.et_password_content);
         EditText et_confirm_password_content = (EditText) mProfileFragment.getView().findViewById(R.id.et_confirm_password_content);
@@ -142,7 +170,8 @@ public class ProfileFragmentTest
 
         //Test edit button clicked
         editProfile.performClick();
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
         Assert.assertTrue(opaqueFilter.getVisibility() == View.VISIBLE);
@@ -156,7 +185,8 @@ public class ProfileFragmentTest
         //Test profile picture clicked, alert dialog is showing
         CircleImageView profilePicture = (CircleImageView) mProfileFragment.getView().findViewById(R.id.profile_picture);
         profilePicture.performClick();
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         AlertDialog mDialog = (AlertDialog) ShadowDialog.getLatestDialog();
         Assert.assertNotNull(mDialog);
         Assert.assertTrue(mDialog.isShowing());
@@ -164,7 +194,8 @@ public class ProfileFragmentTest
         //Test item take picture as photo
         ShadowAlertDialog shadowAlertDialog = Shadows.shadowOf(mDialog);
         shadowAlertDialog.clickOnItem(0);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         ShadowActivity shadowActivity = Shadows.shadowOf(mProfileFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         Assert.assertTrue(startedIntent.getAction().compareTo(MediaStore.ACTION_IMAGE_CAPTURE)==0);
@@ -172,7 +203,8 @@ public class ProfileFragmentTest
         //Test item take picture as internal image
         shadowAlertDialog = Shadows.shadowOf(mDialog);
         shadowAlertDialog.clickOnItem(1);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         shadowActivity = Shadows.shadowOf(mProfileFragment.getActivity());
         startedIntent = shadowActivity.getNextStartedActivity();
         Assert.assertTrue(startedIntent.getAction().compareTo(Intent.ACTION_PICK) == 0);
@@ -180,11 +212,11 @@ public class ProfileFragmentTest
         //Test cancel button on alert dialog clicked
         Button btnClose = mDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
         btnClose.performClick();
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertFalse(mDialog.isShowing());
 
         mProfileFragment.isAvatarHasChangedAfterSelection = true;
-        Thread.sleep(2000);
 
         PowerMockito.mockStatic(FilePushToServerController.class);
         FilePushToServerController controller = PowerMockito.mock(FilePushToServerController.class);
@@ -198,8 +230,7 @@ public class ProfileFragmentTest
         et_password_content.setText("mock");
         et_confirm_password_content.setText("");
         editProfile.performClick();
-        Thread.sleep(2000);
-        checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -220,6 +251,7 @@ public class ProfileFragmentTest
         et_password_content.setText("");
         et_confirm_password_content.setText("mock");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -240,6 +272,7 @@ public class ProfileFragmentTest
         et_password_content.setText("mock");
         et_confirm_password_content.setText("mock2");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -260,6 +293,7 @@ public class ProfileFragmentTest
         et_password_content.setText("");
         et_confirm_password_content.setText("");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -281,6 +315,7 @@ public class ProfileFragmentTest
         et_confirm_password_content.setText("mock");
         et_first_name_content.setText("");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -302,6 +337,7 @@ public class ProfileFragmentTest
         et_first_name_content.setText("mockName");
         et_last_name_content.setText("");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -324,6 +360,7 @@ public class ProfileFragmentTest
         et_last_name_content.setText("mockLastName");
         et_job_title_content.setText("");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -347,6 +384,7 @@ public class ProfileFragmentTest
         et_job_title_content.setText("mockJobTitle");
         et_company_content.setText("");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -371,6 +409,7 @@ public class ProfileFragmentTest
         et_company_content.setText("mockCompany");
         et_home_content.setText("");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_done)) == 0);
@@ -395,6 +434,7 @@ public class ProfileFragmentTest
         et_company_content.setText("mockCompany");
         et_home_content.setText("MockHome");
         editProfile.performClick();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(editProfile.getText().toString()
                 .compareTo(mProfileFragment.getActivity().getString(R.string.profile_edit_mode_edit)) == 0);
@@ -406,14 +446,19 @@ public class ProfileFragmentTest
         Assert.assertFalse(et_company_content.isEnabled());
         Assert.assertFalse(et_home_content.isEnabled());
         Assert.assertFalse(mProfileFragment.isAvatarHasChangedAfterSelection);
-        Assert.assertTrue(mProfileFragment.isUpdating);
         Assert.assertTrue(layout_error_edit_profile.getVisibility() == View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testLifeCycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String serverUrl = null;
         try {
             serverUrl = startWebMockServer();
@@ -443,61 +488,105 @@ public class ProfileFragmentTest
 
         mProfileFragment = (ProfileFragment) mCustomPreferencesFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(mCustomPreferencesFragmentActivity.isDestroyed());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnProfile() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpProfileFragment();
+        MockDataForTests.checkThreadSchedulers();
+
         this.mProfileFragment.onProfileConnectionError();
+        MockDataForTests.checkThreadSchedulers();
         Assert.assertFalse(mProfileFragment.isUpdating);
 
         this.mProfileFragment.onUpdateProfileConnectionError();
-        ShadowLooper.idleMainLooper();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(ShadowToast.getTextOfLatestToast()
                 .equals(this.mProfileFragment.getResources().getString(R.string.wrong_profile_update)));
         Assert.assertFalse(mProfileFragment.isUpdating);
 
         this.mProfileFragment.onUpdateProfileConnectionCompleted();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertFalse(mProfileFragment.isUpdating);
 
         this.mProfileFragment.onPasswordChangeError("error");
-        ShadowLooper.idleMainLooper();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(ShadowToast.getTextOfLatestToast().equals("error"));
 
         this.mProfileFragment.onPasswordChangeCompleted();
+        MockDataForTests.checkThreadSchedulers();
+
         this.mProfileFragment.onConnectionNotAvailable();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertFalse(mProfileFragment.isUpdating);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
 
     }
 
     @Test
     public void testEnableEditProfileEvent_True() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpProfileFragment();
+        MockDataForTests.checkThreadSchedulers();
+
         EnableEditProfileEvent event = new EnableEditProfileEvent();
         event.setMessage(true);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         TextView editProfile = (TextView) mProfileFragment.getActivity().findViewById(R.id.edit_profile);
         Assert.assertTrue(editProfile.getVisibility() == View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testEnableEditProfileEvent_False() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         setUpProfileFragment();
+        MockDataForTests.checkThreadSchedulers();
+
         EnableEditProfileEvent event = new EnableEditProfileEvent();
         event.setMessage(false);
         BusProvider.getInstance().post(event);
+        MockDataForTests.checkThreadSchedulers();
+
         TextView editProfile = (TextView) mProfileFragment.getActivity().findViewById(R.id.edit_profile);
         Assert.assertTrue(editProfile.getVisibility() == View.GONE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testOnActivityResult() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         File file = new File(Environment.getExternalStorageDirectory() + "/DCIM/", "image" + new
                 Date().getTime() + ".png");
         Uri imgUri = Uri.fromFile(file);
@@ -505,7 +594,10 @@ public class ProfileFragmentTest
         in.putExtra(MediaStore.EXTRA_OUTPUT, imgUri);
 
         setUpProfileFragment();
+        MockDataForTests.checkThreadSchedulers();
+
         this.mProfileFragment.onActivityResult(1, Activity.RESULT_OK, in);
+        MockDataForTests.checkThreadSchedulers();
 
         TextView editProfile = (TextView) mProfileFragment.getActivity().findViewById(R.id.edit_profile);
         CircleImageView profilePicture = (CircleImageView) mProfileFragment.getView().findViewById(R.id.profile_picture);
@@ -518,10 +610,17 @@ public class ProfileFragmentTest
         Assert.assertTrue(textAvatar.getText().toString().length() == 0);
 
         this.mProfileFragment.onActivityResult(2, Activity.RESULT_OK, in);
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(mProfileFragment.isAvatarHasChangedAfterSelection);
 
         this.mProfileFragment.onActivityResult(0, Activity.RESULT_CANCELED, in);
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertFalse(mProfileFragment.isAvatarHasChangedAfterSelection);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void setUpProfileFragment() throws Exception
@@ -534,7 +633,6 @@ public class ProfileFragmentTest
         {
             Assert.fail();
         }
-
         PowerMockito.mockStatic(ProfileController.class);
         PowerMockito.mockStatic(EndpointWrapper.class);
         PowerMockito.mockStatic(BaseConnection.class);
@@ -555,16 +653,6 @@ public class ProfileFragmentTest
 
         mProfileFragment = (ProfileFragment) mCustomPreferencesFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
-
-        Thread.sleep(2000);
-    }
-
-    private void checkThreadSchedulers()
-    {
-        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushBackgroundThreadScheduler();
-        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushForegroundThreadScheduler();
     }
 
     private String startWebMockServer() throws Exception {

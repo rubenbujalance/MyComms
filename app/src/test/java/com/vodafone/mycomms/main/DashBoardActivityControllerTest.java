@@ -65,7 +65,7 @@ import static org.mockito.Matchers.eq;
  * Created by str_oan on 02/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -143,17 +143,26 @@ public class DashBoardActivityControllerTest
     @Test
     public void testCorrectlyCreated()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Assert.assertNotNull(this.mDashBoardActivityController);
         Assert.assertEquals(this.mDashBoardActivityController.mActivity, this.mActivity);
         Assert.assertEquals(this.mDashBoardActivityController.mProfileId, "mc_5570340e7eb7c3512f2f9bf2");
         Assert.assertNotNull(this.mDashBoardActivityController.mRecentContactController);
         Assert.assertNotNull(this.mDashBoardActivityController.mRealmContactTransactions);
         Assert.assertNotNull(this.mDashBoardActivityController.mRealmGroupChatTransactions);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadNews_WithClickOnNew_OK() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.mRealmNewsTransactions = Mockito.mock(RealmNewsTransactions.class);
         Mockito.when(this.mDashBoardActivityController.mRealmNewsTransactions.getAllNews(any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockNewsArrayList());
@@ -175,37 +184,61 @@ public class DashBoardActivityControllerTest
         Assert.assertNotNull(this.mDashBoardActivityController.newsArrayList);
         Assert.assertEquals(numberOfChild, MockDataForTests.getMockNewsArrayList().size());
         assertThat(shadowIntent.getComponent().getClassName(), equalTo(NewsDetailActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testDrawNews_OK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.drawNews(MockDataForTests.getMockNewsArrayList());
         MockDataForTests.checkThreadSchedulers();
         LinearLayout container = (LinearLayout) mActivity.findViewById(R.id.list_news);
         Assert.assertNotNull(container);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test (expected = NullPointerException.class)
     public void testDrawNews_ControlledException()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.drawNews(null);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.newsArrayList.isEmpty());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecentLayout_MoreThenOneRecent()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.numberOfRecentContacts = 5;
         this.mDashBoardActivityController.loadRecentLayout();
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 4);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecentLayout_OneRecent_FirstContainerIsVisible()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.isCurrentRecentContainerFirst = true;
         this.mDashBoardActivityController.numberOfRecentContacts = 1;
         this.mDashBoardActivityController.loadRecentLayout();
@@ -215,11 +248,17 @@ public class DashBoardActivityControllerTest
         Assert.assertFalse(this.mDashBoardActivityController.isCurrentRecentContainerFirst);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer2.getVisibility(), View.GONE);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer.getVisibility(), View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecentLayout_OneRecent_SecondContainerIsVisible()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.isCurrentRecentContainerFirst = false;
         this.mDashBoardActivityController.numberOfRecentContacts = 1;
         this.mDashBoardActivityController.loadRecentLayout();
@@ -229,11 +268,17 @@ public class DashBoardActivityControllerTest
         Assert.assertTrue(this.mDashBoardActivityController.isCurrentRecentContainerFirst);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer.getVisibility(), View.GONE);
         Assert.assertEquals(this.mDashBoardActivityController.mRecentContainer2.getVisibility(), View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadLocalContacts_OK()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.loadLocalContacts();
         MockDataForTests.checkThreadSchedulers();
 
@@ -241,52 +286,82 @@ public class DashBoardActivityControllerTest
         Assert.assertTrue(this.mDashBoardActivityController.mProfileId.length() > 0);
         Assert.assertTrue(this.mDashBoardActivityController.mActivity != null);
 
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
     }
 
     @Test
     public void testLoadLocalContacts_Fail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.mProfileId = null;
         this.mDashBoardActivityController.loadLocalContacts();
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(this.mDashBoardActivityController.mProfileId == null);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecentContactsAndUnreadMessages_FirstContainer()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.isCurrentRecentContainerFirst = true;
         this.mDashBoardActivityController.loadRecentContactsAndUnreadMessages();
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer != null);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecentContactsAndUnreadMessages_SecondContainer()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.isCurrentRecentContainerFirst = false;
         this.mDashBoardActivityController.loadRecentContactsAndUnreadMessages();
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer2 != null);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecent_Failed_WithControlledException()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         PowerMockito.when(RealmContactTransactions.getAllRecentContacts(any(Realm.class)))
                 .thenReturn(null);
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecent_OK_OnlyGroupChat() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChat());
@@ -313,11 +388,16 @@ public class DashBoardActivityControllerTest
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
         assertThat(shadowIntent.getComponent().getClassName(), equalTo(GroupChatActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecent_OK_NoGroup_ActionCall() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -344,11 +424,16 @@ public class DashBoardActivityControllerTest
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecent_OK_NoGroup_ActionSMS_MyComms() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -375,11 +460,16 @@ public class DashBoardActivityControllerTest
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecent_OK_NoGroup_ActionSMS_GlobalContacts() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -407,11 +497,17 @@ public class DashBoardActivityControllerTest
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
 
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
     }
 
     @Test
     public void testLoadRecent_OK_NoGroup_ActionEmail() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockGroupChat());
@@ -436,12 +532,17 @@ public class DashBoardActivityControllerTest
         Assert.assertNull(mView.findViewById(R.id.lay_top_right_image_hide));
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
         Assert.assertTrue(this.mDashBoardActivityController.mRecentContainer.getChildCount() == 1);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
 
     @Test
     public void testLoadRecent_FailWithNullData() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -458,11 +559,16 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts == 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadRecent_FailWithWrongNotNullData() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
 
         String mockContactId_1 = "mc_5535b2ac13be4b7975c51600", mockContactId_2 = "mc_55409316799f7e1a109446f4";
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(anyString(), any(Realm.class)))
@@ -480,11 +586,17 @@ public class DashBoardActivityControllerTest
         this.mDashBoardActivityController.loadRecents(this.mDashBoardActivityController.mRecentContainer);
         MockDataForTests.checkThreadSchedulers();
         Assert.assertTrue(this.mDashBoardActivityController.numberOfRecentContacts != 0);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadUnreadMessages_GroupChat_OK_MoreThan0Messages() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         this.mDashBoardActivityController.mRecentContainer.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this.mActivity);
         View view = inflater.inflate(R.layout.layout_recents_dashboard, this.mDashBoardActivityController.mRecentContainer, false);
@@ -503,11 +615,17 @@ public class DashBoardActivityControllerTest
         TextView unread_messages = (TextView) view.findViewById(R.id.unread_messages);
         Assert.assertNotNull(unread_messages);
         Assert.assertNotNull(unread_messages.getText().toString());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testLoadUnreadMessages_GroupChat_OK_0Messages() throws Exception
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                ,Thread.currentThread().getStackTrace()[1].getMethodName());
+
         long amountMessages = 0;
         mockUnreadMessages(amountMessages);
 
@@ -520,6 +638,9 @@ public class DashBoardActivityControllerTest
 
         Assert.assertTrue(typeRecent.getVisibility() == View.VISIBLE);
         Assert.assertTrue(unread_messages.getVisibility() != View.VISIBLE);
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     private void mockUnreadMessages(long amountMessages)

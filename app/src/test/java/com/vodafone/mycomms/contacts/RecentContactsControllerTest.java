@@ -20,8 +20,10 @@ import com.vodafone.mycomms.test.util.Util;
 import com.vodafone.mycomms.util.CustomFragmentActivity;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +42,9 @@ import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 import org.robolectric.shadows.ShadowListView;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import io.realm.Realm;
 
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -49,7 +54,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
  * Created by str_oan on 10/09/2015.
  */
 @RunWith(RobolectricGradleTestRunner.class)
-@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 21,
+@Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18,
         manifest = "./src/main/AndroidManifest.xml")
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
         "javax.net.ssl.*", "org.json.*", "com.crashlytics.*"})
@@ -77,10 +82,8 @@ public class RecentContactsControllerTest
     @After
     public void tearDown() throws Exception
     {
-        //Try to shutdown server if it was started
-        try {
-            Robolectric.reset();
-        } catch (Exception e) {}
+        MockDataForTests.checkThreadSchedulers();
+        Robolectric.reset();
 
         mContactListFragment = null;
         mCustomFragmentActivity = null;
@@ -88,22 +91,54 @@ public class RecentContactsControllerTest
         System.gc();
     }
 
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at " + this.getClass().getSimpleName() + ": \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
+    }
+
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Test
     public void testContactListFragmentLifecycle()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         Intent in = new Intent(RuntimeEnvironment.application.getApplicationContext(),
                 CustomFragmentActivity.class);
         in.putExtra("index", 1);
         mCustomFragmentActivity = Robolectric.buildActivity(CustomFragmentActivity.class)
                 .withIntent(in)
                 .create().start().resume().pause().stop().destroy().get();
+        MockDataForTests.checkThreadSchedulers();
+
         Assert.assertTrue(mCustomFragmentActivity.isDestroyed());
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadRecentContacts()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -123,25 +158,21 @@ public class RecentContactsControllerTest
         startContactListFragment(1);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadContactsFromDB Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
+        MockDataForTests.checkThreadSchedulers();
 
         Assert.assertTrue(!mContactListFragment.getRecentContactList().isEmpty());
         Assert.assertTrue(mContactListFragment.getRecentContactList().size() == 4);
 
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click_ActionSMS_SimpleChat()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -165,31 +196,30 @@ public class RecentContactsControllerTest
         startContactListFragment(1);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
+        MockDataForTests.checkThreadSchedulers();
+
         mockParams();
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadListViewElements_Click_ActionSMS_SimpleChat Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
 
         ShadowListView shadowListView = Shadows.shadowOf(mContactListFragment.getListView());
         shadowListView.populateItems();
         Assert.assertTrue(shadowListView.performItemClick(0));
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click_ActionSMS_GroupChat()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -213,31 +243,30 @@ public class RecentContactsControllerTest
         startContactListFragment(1);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
+        MockDataForTests.checkThreadSchedulers();
+
         mockParams();
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadListViewElements_Click_ActionSMS_GroupChat Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
 
         ShadowListView shadowListView = Shadows.shadowOf(mContactListFragment.getListView());
         shadowListView.populateItems();
         Assert.assertTrue(shadowListView.performItemClick(1));
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getComponent().getClassName().equals(GroupChatActivity.class.getName()));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click_ActionCall()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -261,31 +290,30 @@ public class RecentContactsControllerTest
         startContactListFragment(1);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
+        MockDataForTests.checkThreadSchedulers();
+
         mockParams();
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadListViewElements_Click_ActionCall Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
 
         ShadowListView shadowListView = Shadows.shadowOf(mContactListFragment.getListView());
         shadowListView.populateItems();
         Assert.assertTrue(shadowListView.performItemClick(2));
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_CALL));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     @Test
     public void testContactListFragment_LoadListViewElements_Click_ActionEmail()
     {
+        MockDataForTests.printStartTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
+
         try
         {
             PowerMockito.mockStatic(RealmContactTransactions.class);
@@ -309,26 +337,22 @@ public class RecentContactsControllerTest
         startContactListFragment(1);
         mContactListFragment = (ContactListFragment)mCustomFragmentActivity
                 .getSupportFragmentManager().findFragmentByTag("1");
+        MockDataForTests.checkThreadSchedulers();
+
         mockParams();
-        try
-        {
-            Thread.sleep(3000);
-        }
-        catch (Exception e)
-        {
-            System.err.println("******** Test: testContactListFragment_LoadListViewElements_Click_ActionCall Failed due to: ********\n"+e.getMessage());
-            Assert.fail();
-        }
-        Robolectric.flushForegroundThreadScheduler();
 
         ShadowListView shadowListView = Shadows.shadowOf(mContactListFragment.getListView());
         shadowListView.populateItems();
         Assert.assertTrue(shadowListView.performItemClick(3));
+        MockDataForTests.checkThreadSchedulers();
 
         ShadowActivity shadowActivity = Shadows.shadowOf(mContactListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
         ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
         Assert.assertTrue(shadowIntent.getAction().equals(Intent.ACTION_SEND));
+
+        MockDataForTests.printEndTest(this.getClass().getSimpleName()
+                , Thread.currentThread().getStackTrace()[1].getMethodName());
     }
 
     public void startContactListFragment(int index)

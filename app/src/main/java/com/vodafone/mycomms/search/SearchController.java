@@ -118,13 +118,13 @@ public class SearchController
 
 
             if(null != jsonObject.getString(Constants.CONTACT_ID)
-                    && null != realmContactTransactions.getContactById(jsonObject.getString
+                    && null != RealmContactTransactions.getContactById(jsonObject.getString
                     (Constants.CONTACT_ID), realm)
                     && null != jsonObject.getString(Constants.CONTACT_PLATFORM)
                     && Constants.PLATFORM_SALES_FORCE.equals(jsonObject.getString(Constants
                     .CONTACT_PLATFORM)))
             {
-                String SF_URL = realmContactTransactions.getContactById(jsonObject.getString
+                String SF_URL = RealmContactTransactions.getContactById(jsonObject.getString
                         (Constants.CONTACT_ID), realm)
                         .getStringField1();
                 if(null != SF_URL)

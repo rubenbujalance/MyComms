@@ -8,9 +8,9 @@ import android.view.View;
 
 public class GroupDetailRecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
 
-    public static interface OnItemClickListener
+    public interface OnItemClickListener
     {
-        public void onItemClick(View view, int position);
+        void onItemClick(View view, int position);
     }
 
     private OnItemClickListener mListener;

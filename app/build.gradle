@@ -204,7 +204,7 @@ task jacocoTestReport(type: JacocoReport) {
     )
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)
-    executionData = files('build/jacoco/testIRelease.exec')
+    executionData = files('build/jacoco/testIReleaseUnitTest.exec')
 
     reports {
         xml.enabled = true
@@ -226,7 +226,7 @@ task jacocoTestReportQA(type: JacocoReport) {
     )
     additionalSourceDirs = files(coverageSourceDirs)
     sourceDirectories = files(coverageSourceDirs)
-    executionData = files('build/jacoco/testQRelease.exec')
+    executionData = files('build/jacoco/testQReleaseUnitTest.exec')
 
     reports {
         xml.enabled = true

@@ -924,7 +924,7 @@ public final class Utils extends MainActivity {
             public void run() {
                 view.requestFocus();
                 InputMethodManager imm = (InputMethodManager) context.getSystemService(
-                        context.INPUT_METHOD_SERVICE);
+                        INPUT_METHOD_SERVICE);
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
             }
         }, 500);
@@ -1065,12 +1065,9 @@ public final class Utils extends MainActivity {
 
     //Check network connection
     public static boolean isConnected(Context context){
-        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected())
-            return true;
-        else
-            return false;
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     public static boolean checkConnectionAndAlert(Context context){

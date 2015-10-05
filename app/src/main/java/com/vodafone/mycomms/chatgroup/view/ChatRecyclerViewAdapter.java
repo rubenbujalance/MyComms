@@ -3,7 +3,6 @@ package com.vodafone.mycomms.chatgroup.view;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,6 @@ import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import io.realm.Realm;
 import model.ChatMessage;
@@ -111,7 +109,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
         if(null != chatList.get(i).getContact_id() && chatList.get(i).getContact_id().length() >
                 0 && chatList.get(i).getDirection().equals(Constants.CHAT_MESSAGE_DIRECTION_RECEIVED))
         {
-            contact = _contactTx.getContactById(chatList.get(i).getContact_id(), realm);
+            contact = RealmContactTransactions.getContactById(chatList.get(i).getContact_id(), realm);
         }
         else
         {
@@ -223,15 +221,6 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatHolder>{
             setTextListeners(chatHolder.chatTextView);
 
         //setInternalURLPatterns(chatHolder.chatTextView);
-    }
-
-
-    private void setInternalURLPatterns(TextView textView)
-    {
-        Pattern pattern = Pattern.compile
-                ("\\b(mycomms)://\\b(news)/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*");
-        String scheme = "http://www.google.com";
-        Linkify.addLinks(textView, pattern, scheme);
     }
 
     @Override

@@ -11,32 +11,6 @@ import model.GlobalContactsSettings;
 
 public class RealmLDAPSettingsTransactions {
 
-    private static void insertOrUpdateSettings (GlobalContactsSettings settings, Realm realm)
-    {
-        Realm mRealm;
-        if(null != realm)
-            mRealm = realm;
-        else
-            mRealm = Realm.getDefaultInstance();
-        try
-        {
-            mRealm.beginTransaction();
-            mRealm.copyToRealmOrUpdate(settings);
-            mRealm.commitTransaction();
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "RealmLDAPSettingsTransactions.insertOrUpdateSettings: ",e);
-            Crashlytics.logException(e);
-            mRealm.cancelTransaction();
-        }
-        finally
-        {
-            if(null == realm)
-                mRealm.close();
-        }
-    }
-
     public static GlobalContactsSettings getSettings(String profileId, Realm realm)
     {
 
@@ -77,9 +51,7 @@ public class RealmLDAPSettingsTransactions {
             GlobalContactsSettings settings = mRealm.where(GlobalContactsSettings.class)
                     .equalTo(Constants.LDAP_SETTINGS_FIELD_PROFILE_ID, profileId).findFirst();
 
-            if(settings!=null && settings.getToken()!=null && settings.getToken().length()>0)
-                return true;
-            else return false;
+            return settings != null && settings.getToken() != null && settings.getToken().length() > 0;
         }
         catch(Exception e)
         {

@@ -2,6 +2,7 @@ package com.vodafone.mycomms.chat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.pwittchen.networkevents.library.ConnectivityStatus;
 import com.github.pwittchen.networkevents.library.event.ConnectivityChanged;
 import com.squareup.picasso.Downloader;
@@ -28,10 +30,16 @@ import com.vodafone.mycomms.realm.RealmContactTransactions;
 import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.test.util.MockDataForTests;
 import com.vodafone.mycomms.test.util.Util;
+import com.vodafone.mycomms.util.Constants;
+import com.vodafone.mycomms.xmpp.XMPPTransactions;
 
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.util.PacketParserUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,7 +57,14 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowIntent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+
 import io.realm.Realm;
+import model.Chat;
+import model.ChatMessage;
+import model.GroupChat;
 
 /**
  * Created by str_evc on 18/05/2015.
@@ -57,13 +72,15 @@ import io.realm.Realm;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
-        "javax.net.ssl.*", "org.json.*"})
+        "javax.net.ssl.*", "org.json.*", "org.kxml2.io.*", "org.xmlpull.*"})
 @PrepareForTest(
         {
                 Realm.class
                 , RealmChatTransactions.class
                 , RealmGroupChatTransactions.class
                 , RealmContactTransactions.class
+                , Crashlytics.class
+                , BusProvider.class
         })
 public class ChatListActivityTest {
 
@@ -81,27 +98,49 @@ public class ChatListActivityTest {
     public void setUp()
     {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+        MockDataForTests.checkThreadSchedulers();
+        context = RuntimeEnvironment.application.getApplicationContext();
 
         //Mock static: Realm, RealmGroupChatTransactions, RealmChatTransactions, RealmContactTransactions
         PowerMockito.mockStatic(Realm.class);
         PowerMockito.mockStatic(RealmGroupChatTransactions.class);
         PowerMockito.mockStatic(RealmChatTransactions.class);
         PowerMockito.mockStatic(RealmContactTransactions.class);
+        PowerMockito.mockStatic(Crashlytics.class);
 
-        //Mock instances: RealmChatTransactions, RealmGroupChatTransactions
-        mockChatTx = PowerMockito.mock(RealmChatTransactions.class);
-        mockGroupChatTx = PowerMockito.mock(RealmGroupChatTransactions.class);
+        PowerMockito.when(Realm.getInstance(Mockito.any(Context.class))).thenReturn(null);
+
+        //Save profile into SharedPreferences
+        SharedPreferences sp = context.getSharedPreferences(
+                Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
+        sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_55409316799f7e1a109446f4").commit();
+
+        XMPPTransactions._isUnitTesting = true;
+        XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);
+        XMPPTransactions.setXMPPConnection(xmppConnection);
+        XMPPTransactions.initializeMsgServerSession(context);
+
+        //Spy instances: RealmChatTransactions, RealmGroupChatTransactions
+        RealmChatTransactions chatTx = new RealmChatTransactions(context);
+        RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(context, "mc_55409316799f7e1a109446f4");
+        mockChatTx = Mockito.spy(chatTx);
+        mockGroupChatTx = Mockito.spy(groupChatTx);
+
+        Mockito.doReturn(MockDataForTests.getEmptyChatList())
+                .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
+        Mockito.doReturn(MockDataForTests.getEmptyGroupChatList())
+                .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
+        Mockito.doReturn(Long.valueOf(0)).when(mockChatTx)
+                .getAllChatPendingMessagesCount(Mockito.any(Realm.class));
+
+        PowerMockito.when(RealmChatTransactions.getChatPendingMessagesCount(Mockito.any(String.class), Mockito.any(Realm.class)))
+                .thenReturn(Long.valueOf(0));
 
         //Set mocked instances when newInstance is called
-        PowerMockito.when(Realm.getInstance(Mockito.any(Context.class))).thenReturn(null);
-        PowerMockito.when(mockGroupChatTx.getAllGroupChats(Mockito.any(Realm.class)))
-                .thenReturn(MockDataForTests.getEmptyGroupChatList());
-        PowerMockito.when(mockChatTx.getAllChatsFromExistingContacts(Mockito.any(Realm.class)))
-                .thenReturn(MockDataForTests.getEmptyChatList());
-        PowerMockito.when(RealmGroupChatTransactions.getInstance(Mockito.any(Context.class), Mockito.any(String.class)))
-                .thenReturn(mockGroupChatTx);
         PowerMockito.when(RealmChatTransactions.getInstance(Mockito.any(Context.class)))
                 .thenReturn(mockChatTx);
+        PowerMockito.when(RealmGroupChatTransactions.getInstance(Mockito.any(Context.class), Mockito.any(String.class)))
+                .thenReturn(mockGroupChatTx);
 
         //MyCommsApp configuration
         MycommsApp.stateCounter = 0;
@@ -117,17 +156,41 @@ public class ChatListActivityTest {
         activity = Robolectric.buildActivity(ChatListActivity.class).create().start().resume().visible().get();
         mChatListFragment = (ChatListFragment)activity.getSupportFragmentManager().getFragments().get(0);
         recyclerView = (RecyclerView)mChatListFragment.getView().findViewById(R.id.recycler_view);
+
+        MockDataForTests.checkThreadSchedulers();
     }
 
     @After
     public void tearDown() throws Exception
     {
+        MockDataForTests.checkThreadSchedulers();
         Robolectric.reset();
         activity = null;
         mockChatTx = null;
         mockGroupChatTx = null;
         recyclerView = null;
         System.gc();
+    }
+
+    @BeforeClass
+    public static void setUpBeforeClass()
+    {
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable e) {
+                StringWriter writer = new StringWriter();
+                PrintWriter printWriter = new PrintWriter(writer);
+                e.printStackTrace(printWriter);
+                printWriter.flush();
+                System.err.println("Uncaught exception at ForgotPassActivityTest: \n" + writer.toString());
+            }
+        });
+    }
+
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception
+    {
+        Thread.currentThread().interrupt();
     }
 
     @Test
@@ -162,10 +225,13 @@ public class ChatListActivityTest {
 
     @Test
     public void testLoadSomeChats() {
-        PowerMockito.when(mockGroupChatTx.getAllGroupChats(Mockito.any(Realm.class)))
-                .thenReturn(MockDataForTests.getMockGroupChatList());
-        PowerMockito.when(mockChatTx.getAllChatsFromExistingContacts(Mockito.any(Realm.class)))
-                .thenReturn(MockDataForTests.getMockChatList());
+        //Mock Chat and GroupChat Transactions to return filled lists
+        Mockito.doReturn(MockDataForTests.getMockChatList())
+                .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
+        Mockito.doReturn(MockDataForTests.getMockGroupChatList())
+                .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
+
+        //Mock to return a Contact and a UserProfile when requested to Realm
         PowerMockito.when(RealmContactTransactions.getContactById(Mockito.anyString(), Mockito.any(Realm.class)))
                 .thenReturn(MockDataForTests.getMockContact());
         PowerMockito.when(RealmContactTransactions.getUserProfile(Mockito.any(Realm.class), Mockito.anyString()))
@@ -176,6 +242,8 @@ public class ChatListActivityTest {
         recyclerView.measure(0, 0);
         recyclerView.layout(0, 0, 100, 10000);
 
+        MockDataForTests.checkThreadSchedulers();
+
         //Check number of chats
         Assert.assertTrue(recyclerView.getAdapter().getItemCount() == 8);
 
@@ -184,19 +252,135 @@ public class ChatListActivityTest {
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(0);
         Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_4")==0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(1);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_4")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_4") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(2);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_3")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_3") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(3);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_3")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_3") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(4);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_2")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_2") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(5);
-        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_2")==0);
+        Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_2") == 0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(6);
         Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("chat_message_1")==0);
         holder = (ChatListHolder)recyclerView.findViewHolderForPosition(7);
         Assert.assertTrue(holder.textViewMessage.getText().toString().compareTo("groupchat_message_1") == 0);
+    }
+
+    @Test
+    public void testMessageReceived() {
+//        PowerMockito.mockStatic(BusProvider.class);
+//        BusProvider.MainThreadBus mockBusProvider = Mockito.mock(BusProvider.MainThreadBus.class);
+//        PowerMockito.when(BusProvider.getInstance()).thenReturn(mockBusProvider);
+
+        XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);
+        XMPPTransactions.setXMPPConnection(xmppConnection);
+
+        ArrayList<Chat> chatList = MockDataForTests.getMockChatList();
+
+        //Mock Chat and GroupChat Transactions to return filled lists
+        Mockito.doReturn(chatList)
+                .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
+        Mockito.doReturn(MockDataForTests.getMockGroupChatList())
+                .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
+
+        //Mock to return a Contact and a UserProfile when requested to Realm
+        PowerMockito.when(RealmContactTransactions.getContactById(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockContact());
+        PowerMockito.when(RealmContactTransactions.getUserProfile(Mockito.any(Realm.class), Mockito.anyString()))
+                .thenReturn(MockDataForTests.getMockUserProfile());
+
+//        //Draw list
+//        BusProvider.getInstance().post(new ChatsReceivedEvent());
+//        recyclerView.measure(0, 0);
+//        recyclerView.layout(0, 0, 100, 10000);
+//        MockDataForTests.checkThreadSchedulers();
+
+        //The ChatMessage doesn't exist initially
+        Mockito.doReturn(null).when(mockChatTx)
+                .getChatMessageById(Mockito.any(String.class), Mockito.eq(true), Mockito.any(Realm.class));
+
+        //Same Chat as in list
+        Mockito.doReturn(chatList.get(3)).when(mockChatTx)
+                .getChatByContactId(Mockito.any(String.class), Mockito.any(Realm.class));
+
+        //Mock insertChat and insertChatMessage
+        Mockito.doNothing().when(mockChatTx).insertChat(Mockito.any(Chat.class), Mockito.any(Realm.class));
+        Mockito.doReturn(true).when(mockChatTx).insertChatMessage(Mockito.any(ChatMessage.class), Mockito.any(Realm.class));
+
+        //Mock number of unread messages
+        Mockito.doReturn(Long.valueOf(1))
+                .when(mockChatTx).getAllChatPendingMessagesCount(Mockito.any(Realm.class));
+        PowerMockito.when(RealmChatTransactions.getChatPendingMessagesCount(Mockito.any(String.class), Mockito.any(Realm.class)))
+                .thenReturn(Long.valueOf(1));
+
+        //Build stanza for chat in position 0
+        PacketParserUtils.saveAndNotifyStanzaReceived(MockDataForTests.getMockChatMessageStanza());
+
+        //Refresh list
+        recyclerView.measure(0, 0);
+        recyclerView.layout(0, 0, 100, 10000);
+        MockDataForTests.checkThreadSchedulers();
+
+        //Check order
+        ChatListHolder holder;
+        holder = (ChatListHolder)recyclerView.findViewHolderForPosition(0);
+        Assert.assertTrue(((ChatListHolder)recyclerView.findViewHolderForPosition(0))
+                .badgeUnread.getText().toString().compareTo("1")==0);
+    }
+
+    @Test
+    public void testGroupMessageReceived() {
+        XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);
+        XMPPTransactions.setXMPPConnection(xmppConnection);
+
+        ArrayList<Chat> chatList = MockDataForTests.getMockChatList();
+        ArrayList<GroupChat> groupChatList = MockDataForTests.getMockGroupChatList();
+
+        //Mock Chat and GroupChat Transactions to return filled lists
+        Mockito.doReturn(chatList)
+                .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
+        Mockito.doReturn(groupChatList)
+                .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
+
+        //Mock to return a Contact and a UserProfile when requested to Realm
+        PowerMockito.when(RealmContactTransactions.getContactById(Mockito.anyString(), Mockito.any(Realm.class)))
+                .thenReturn(MockDataForTests.getMockContact());
+        PowerMockito.when(RealmContactTransactions.getUserProfile(Mockito.any(Realm.class), Mockito.anyString()))
+                .thenReturn(MockDataForTests.getMockUserProfile());
+
+        //The ChatMessage doesn't exist initially
+        Mockito.doReturn(null).when(mockGroupChatTx)
+                .getGroupChatMessageById(Mockito.any(String.class), Mockito.any(Realm.class));
+
+        //Same Chat as in list
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatById(Mockito.any(String.class), Mockito.any(Realm.class)))
+                .thenReturn(groupChatList.get(3));
+
+        //Mock insertChat and insertChatMessage
+        Mockito.doNothing().when(mockGroupChatTx).insertOrUpdateGroupChat(
+                Mockito.any(GroupChat.class), Mockito.any(Realm.class));
+        Mockito.doReturn(true).when(mockGroupChatTx).insertGroupChatMessage(
+                Mockito.any(String.class), Mockito.any(ChatMessage.class), Mockito.any(Realm.class));
+
+        //Mock number of unread messages
+        Mockito.doReturn(Long.valueOf(1))
+                .when(mockChatTx).getAllChatPendingMessagesCount(Mockito.any(Realm.class));
+        PowerMockito.when(RealmGroupChatTransactions.getGroupChatPendingMessagesCount(
+                Mockito.any(String.class), Mockito.any(Realm.class)))
+                .thenReturn(Long.valueOf(1));
+
+        //Build stanza for chat in position 0
+        PacketParserUtils.saveAndNotifyStanzaReceived(MockDataForTests.getMockGroupChatMessageStanza());
+
+        //Refresh list
+        recyclerView.measure(0, 0);
+        recyclerView.layout(0, 0, 100, 10000);
+        MockDataForTests.checkThreadSchedulers();
+
+        //Check order
+        Assert.assertTrue(((ChatListHolder)recyclerView.findViewHolderForPosition(1))
+                .badgeUnread.getText().toString().compareTo("1")==0);
     }
 
     @Test
@@ -227,11 +411,28 @@ public class ChatListActivityTest {
         Assert.assertTrue(lay_no_connection.getVisibility()== View.GONE);
     }
 
-    private void checkThreadSchedulers()
+    @Test
+    public void testPingPong()
     {
-        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushBackgroundThreadScheduler();
-        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushForegroundThreadScheduler();
+        XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);
+        XMPPTransactions.setXMPPConnection(xmppConnection);
+
+        String pingId = XMPPTransactions.sendPing();
+        Assert.assertTrue(XMPPTransactions.pingWaitingID != null);
+        Assert.assertTrue(XMPPTransactions.pingWaitingID.compareTo(pingId) == 0);
+
+        PacketParserUtils.saveAndNotifyStanzaReceived(MockDataForTests.getMockPong(pingId));
+        Assert.assertTrue(XMPPTransactions.pingWaitingID == null);
+    }
+
+    @Test
+    public void testPendingMessagesReceived()
+    {
+        XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);
+        XMPPTransactions.setXMPPConnection(xmppConnection);
+
+        PacketParserUtils.saveAndNotifyStanzaReceived(MockDataForTests.getMockPendingMessagesIQ());
+        Assert.assertTrue(XMPPTransactions._pendingMessages == 9);
+        XMPPTransactions._pendingMessages = 0;
     }
 }

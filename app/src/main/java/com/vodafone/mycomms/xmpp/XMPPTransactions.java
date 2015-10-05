@@ -71,12 +71,13 @@ public final class XMPPTransactions {
 
     //Control to not retry consecutive connections
     private static boolean _isConnecting = false;
+    public static boolean _isUnitTesting = false;
     private static long _isConnectingTime;
 
     //Control of pings to server
     private static Thread pingThread = null;
-    private static String pingWaitingID = null;
-    private static boolean isPinging = false;
+    public static String pingWaitingID = null;
+    public static boolean isPinging = false;
     private static PingManager _pingManager = null;
 
     //Control of sleep when app in background
@@ -90,7 +91,7 @@ public final class XMPPTransactions {
     private static final int PINGING_TIME_MILLIS = 30000;
 
     //Pending messages handling
-    private static int _pendingMessages;
+    public static int _pendingMessages;
 
     /*
      * Methods
@@ -148,8 +149,10 @@ public final class XMPPTransactions {
             intervalPinging(PINGING_TIME_MILLIS);
 
             //Connect to server
-            XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
-            xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            if(!_isUnitTesting) {
+                XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
+                xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
 //        }
         }
     }
@@ -172,7 +175,7 @@ public final class XMPPTransactions {
 
     private static void intervalPinging(final int miliseconds)
     {
-        if(pingThread!=null) return;
+        if(pingThread!=null || _isUnitTesting) return;
 
         pingThread = new Thread(new Runnable() {
             @Override
@@ -203,53 +206,6 @@ public final class XMPPTransactions {
         });
 
         pingThread.start();
-    }
-
-    public static void sleepXMPPAfterMilis(final int miliseconds)
-    {
-        if(sleepThread!=null)
-            sleepThread.interrupt();
-
-        sleepThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(Constants.TAG, "XMPPTransactions.sleepThread: Sleeping in "+miliseconds/1000+" seconds");
-                //Divide the time in 10 seconds slots
-                int tenSecSlots = miliseconds / 10000;
-                int i = 1;
-
-                try {
-                    while(i<=tenSecSlots && !Thread.interrupted()) {
-                        //Sleep during 10 seconds
-                        Thread.sleep(10000);
-                        i++;
-                    }
-
-                    //If have arrived to the end of counter, go to sleep
-                    if(i==tenSecSlots) {
-                        Log.i(Constants.TAG, "XMPPTransactions.sleepThread: Go to sleep");
-                        _xmppConnection.disconnect();
-                    }
-                    else {
-                        Log.e(Constants.TAG, "XMPPTransactions.sleepThread: Application awake detected");
-                    }
-
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "XMPPTransactions.sleepThread: ", e);
-                    Crashlytics.logException(e);
-                }
-            }
-        });
-
-        sleepThread.start();
-    }
-
-    public static void awakeXMPP()
-    {
-        if(sleepThread!=null) {
-            sleepThread.interrupt();
-            sleepThread = null;
-        }
     }
 
     public static boolean disconnectMsgServerSession()
@@ -297,7 +253,7 @@ public final class XMPPTransactions {
                 Calendar.getInstance().getTimeInMillis() > _isConnectingTime+10000)
             _isConnecting = false;
 
-        if(_isConnecting || isPinging) return;
+        if(_isConnecting || isPinging || _isUnitTesting) return;
 
         //If it's first time, initialize
         if(_xmppConnection==null) {
@@ -365,7 +321,7 @@ public final class XMPPTransactions {
         return true;
     }
 
-    public static boolean sendPing()
+    public static String sendPing()
     {
         String id = UUID.randomUUID().toString().toUpperCase().replaceAll("-","");
 
@@ -385,10 +341,10 @@ public final class XMPPTransactions {
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendPing: Error sending message", e);
-            return false;
+            return null;
         }
 
-        return true;
+        return id;
     }
 
     public static boolean sendImage(boolean isGroup, String destinationId,
@@ -689,7 +645,7 @@ public final class XMPPTransactions {
                         "Error parsing sent time");
             }
 
-            chatTx = new RealmChatTransactions(_appContext);
+            chatTx = RealmChatTransactions.getInstance(_appContext);
             boolean changeStatus = false;
 
             //Check if chat message has already been received
@@ -745,7 +701,11 @@ public final class XMPPTransactions {
                 ChatsReceivedEvent chatEvent = new ChatsReceivedEvent();
                 chatEvent.setMessage(newChatMessage);
                 chatEvent.setPendingMessages(_pendingMessages);
-                BusProvider.getInstance().post(chatEvent);
+                try {
+                    BusProvider.getInstance().post(chatEvent);
+                } catch (Exception e) {
+                    Log.e(Constants.TAG, "XMPPTransactions.saveAndNotifyMessageReceived: ", e);
+                }
             }
 
             //All pending messages received
@@ -920,7 +880,7 @@ public final class XMPPTransactions {
                         "Error parsing sent time");
             }
 
-            groupTx = new RealmGroupChatTransactions(_appContext, _profile_id);
+            groupTx = RealmGroupChatTransactions.getInstance(_appContext, _profile_id);
 
             //Check if chat message has already been received
             ChatMessage tempMsg = groupTx.getGroupChatMessageById(id, realm);
@@ -951,7 +911,7 @@ public final class XMPPTransactions {
             if(newChatMessage == null) return false;
 
             //Load chat and create if it didn't exist
-            GroupChat chat = groupTx.getGroupChatById(groupId, realm);
+            GroupChat chat = RealmGroupChatTransactions.getGroupChatById(groupId, realm);
 
             //Save ChatMessage to DB
             groupTx.insertGroupChatMessage(groupId, newChatMessage, null);
@@ -999,7 +959,8 @@ public final class XMPPTransactions {
         }
         finally
         {
-            realm.close();
+            if(realm!=null)
+                realm.close();
         }
     }
 
@@ -1178,7 +1139,7 @@ public final class XMPPTransactions {
             groupTx.insertGroupChatMessage(groupId, newChatMessage, null);
 
             //Load chat and create if it didn't exist
-            GroupChat chat = groupTx.getGroupChatById(groupId, realm);
+            GroupChat chat = RealmGroupChatTransactions.getGroupChatById(groupId, realm);
 
             if(chat==null) {
                 //Get group from API in background, and save to Realm
@@ -1479,8 +1440,7 @@ public final class XMPPTransactions {
         return _connectionListener;
     }
 
-    public static XMPPTCPConnection getXmppConnection() {
-        return _xmppConnection;
-    }
+    public static XMPPTCPConnection getXMPPConnection() {return _xmppConnection;}
+    public static void setXMPPConnection(XMPPTCPConnection xmppConnection) {_xmppConnection = xmppConnection;}
 
 }

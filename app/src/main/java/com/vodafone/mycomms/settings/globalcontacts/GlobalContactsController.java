@@ -391,11 +391,11 @@ public class GlobalContactsController {
          * @param error - in case of failure, error message to show
          * @param errorCode - the error code
          */
-        public void onFailure(String error, int errorCode);
+        void onFailure(String error, int errorCode);
 
         /**
          * called when the process has been finished successfully
          */
-        public void onSuccess(GlobalContactsSettings settings);
+        void onSuccess(GlobalContactsSettings settings);
     }
 }

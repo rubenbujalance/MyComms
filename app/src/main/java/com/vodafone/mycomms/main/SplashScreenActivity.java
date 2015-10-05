@@ -576,7 +576,7 @@ public class SplashScreenActivity extends MainActivity {
                                         new RealmGroupChatTransactions(
                                                 SplashScreenActivity.this, profileId);
                                 GroupChat groupChat =
-                                        realmGroupChatTransactions.getGroupChatById(from, realm);
+                                        RealmGroupChatTransactions.getGroupChatById(from, realm);
 
                                 if (groupChat != null) {
                                     intentChat = new Intent(SplashScreenActivity.this, GroupChatActivity.class);

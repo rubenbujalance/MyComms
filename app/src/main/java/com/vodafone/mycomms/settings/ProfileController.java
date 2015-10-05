@@ -109,15 +109,11 @@ public class ProfileController extends BaseController {
     {
         if(null != userProfile)
         {
-            if(firstName.equals(userProfile.getFirstName())
+            return !(firstName.equals(userProfile.getFirstName())
                     && lastName.equals(userProfile.getLastName())
                     && company.equals(userProfile.getCompany())
                     && position.equals(userProfile.getPosition())
-                    && officeLocation.equals(userProfile.getOfficeLocation()))
-            {
-                return false;
-            }
-            return true;
+                    && officeLocation.equals(userProfile.getOfficeLocation()));
         }
         else
         {

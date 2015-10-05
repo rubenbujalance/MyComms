@@ -225,7 +225,7 @@ public class DashBoardActivityController
             {
                 id = ids.get(imageIndex);
                 if(id.compareTo(userProfile.getId())!=0)
-                    contact = mRealmContactTransactions.getContactById(id, mRealm);
+                    contact = RealmContactTransactions.getContactById(id, mRealm);
                 else
                     contact = userContact;
 

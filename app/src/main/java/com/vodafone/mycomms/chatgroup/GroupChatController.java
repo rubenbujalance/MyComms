@@ -11,7 +11,6 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.vodafone.mycomms.EndpointWrapper;
-import com.vodafone.mycomms.realm.RealmGroupChatTransactions;
 import com.vodafone.mycomms.util.Constants;
 import com.vodafone.mycomms.util.UserSecurity;
 
@@ -21,7 +20,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import io.realm.Realm;
 import model.GroupChat;
 
 /**
@@ -296,36 +294,12 @@ public class GroupChatController
      * @author str_oan
      * @return (ArrayList) -> list of group chats is any.
      */
-    public ArrayList<GroupChat> getAllGroupChatsFromAPI()
-    {
-        createRequest(URL_GET_ALL_GROUP_CHATS, "get");
-        String response = executeRequest();
-        return getResponseAsGroupChats(response);
-    }
-
-    /**
-     * Inserts group chats into realm if they not exist
-     * @param chats (ArrayList<GroupChats>) group chats to be inserted
-     * @return (String) -> ids of inserted group chats separated by "@"
-     */
-    public String insertGroupChatsIntoRealmIfNotExist(ArrayList<GroupChat> chats)
-    {
-        RealmGroupChatTransactions realmGroupChatTransactions =
-                new RealmGroupChatTransactions(mContext, profileId);
-        String insertedGroupChatIds = null;
-        for(GroupChat chat : chats)
-        {
-            Realm realm = Realm.getDefaultInstance();
-            if(null == realmGroupChatTransactions.getGroupChatById(chat.getId(),realm))
-            {
-                realmGroupChatTransactions.insertOrUpdateGroupChat(chat, null);
-                if(null == insertedGroupChatIds) insertedGroupChatIds = chat.getId();
-                else insertedGroupChatIds = insertedGroupChatIds + "@" + chat.getId();
-            }
-            realm.close();
-        }
-        return insertedGroupChatIds;
-    }
+//    public ArrayList<GroupChat> getAllGroupChatsFromAPI()
+//    {
+//        createRequest(URL_GET_ALL_GROUP_CHATS, "get");
+//        String response = executeRequest();
+//        return getResponseAsGroupChats(response);
+//    }
 
     /**
      * Created new group chat from JSON object

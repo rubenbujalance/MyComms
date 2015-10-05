@@ -408,39 +408,9 @@ public class RealmGroupChatTransactions
             return chatMessage;
         }
         catch(Exception e) {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatMessageById: ",e);
+            Log.e(Constants.TAG, "RealmGroupChatTransactions.getGroupChatMessageById: ", e);
             Crashlytics.logException(e);
             return null;
-        }
-        finally
-        {
-            if(null == realm)
-                mRealm.close();
-        }
-    }
-
-    public boolean existsChatMessageById(String id, Realm realm)
-    {
-        boolean exists = false;
-
-        Realm mRealm;
-        if(null != realm)
-            mRealm = realm;
-        else
-            mRealm = Realm.getDefaultInstance();
-        try
-        {
-            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            query.equalTo(Constants.CHAT_MESSAGE_FIELD_ID, id);
-            long count = query.count();
-            if(count>0) exists = true;
-            return exists;
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.existsChatMessageById: ",e);
-            Crashlytics.logException(e);
-            return false;
         }
         finally
         {
@@ -519,37 +489,6 @@ public class RealmGroupChatTransactions
         finally
         {
             if(null == realm && null != mRealm)
-                mRealm.close();
-        }
-    }
-
-    public long getAllChatPendingMessagesCount(Realm realm)
-    {
-        if(_profile_id==null) return 0;
-
-        Realm mRealm;
-        if(null != realm)
-            mRealm = realm;
-        else
-            mRealm = Realm.getDefaultInstance();
-        try
-        {
-            RealmQuery<ChatMessage> query = mRealm.where(ChatMessage.class);
-            long count = query.equalTo(Constants.CHAT_MESSAGE_FIELD_PROFILE_ID, _profile_id)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_READ, Constants.CHAT_MESSAGE_NOT_READ)
-                    .equalTo(Constants.CHAT_MESSAGE_FIELD_DIRECTION, Constants.CHAT_MESSAGE_DIRECTION_RECEIVED)
-                    .count();
-            return count;
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "RealmGroupChatTransactions.getAllChatPendingMessagesCount: ",e);
-            Crashlytics.logException(e);
-            return 0;
-        }
-        finally
-        {
-            if(null == realm)
                 mRealm.close();
         }
     }

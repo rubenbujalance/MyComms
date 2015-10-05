@@ -348,7 +348,7 @@ public class ContactListFragment extends ListFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onFragmentInteraction(String id);
+        void onFragmentInteraction(String id);
     }
 
     public void setListAdapterTabs() {

@@ -18,9 +18,7 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
-import com.vodafone.mycomms.chatgroup.GroupChatController;
 import com.vodafone.mycomms.contacts.connection.ContactsController;
-import com.vodafone.mycomms.contacts.connection.DownloadLocalContacts;
 import com.vodafone.mycomms.contacts.connection.FavouriteController;
 import com.vodafone.mycomms.contacts.connection.RecentContactController;
 import com.vodafone.mycomms.events.AllPendingMessagesReceivedEvent;
@@ -54,7 +52,6 @@ import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import model.ChatMessage;
-import model.GroupChat;
 import model.News;
 import model.UserProfile;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -173,10 +170,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
 
         try {
             networkEvents.register();
-        } catch (Exception ex) {
-            Log.e(Constants.TAG, "MycommsApp.onCreate: ",ex);
-            Crashlytics.logException(ex);
-        }
+        } catch (Exception ex) {}
 
         startUserInactivityDetectThread(); // start the thread to detect inactivity
         new ScreenReceiver();  // creating receive SCREEN_OFF and SCREEN_ON broadcast msgs from the device.
@@ -246,8 +240,7 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
     public static boolean isProfileAvailable()
     {
         try {
-            if(sp.contains(Constants.PROFILE_ID_SHARED_PREF)) return true;
-            else return false;
+            return sp.contains(Constants.PROFILE_ID_SHARED_PREF);
 
         } catch(Exception e) {
             Log.e(Constants.TAG, "SplashScreenActivity.isProfileAvailable: ",e);
@@ -574,8 +567,9 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                             Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: Interaction!!!");
                             countdownOn = false;
                             disconnectedProcess = false;
-                            if(null != networkEvents)
+                            try {
                                 networkEvents.register();
+                            } catch (Exception e) {}
                         }
                         if (!countdownOn && (isScreenOff || isApplicationOnBackground())) {
                             Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: Starting CountDown");
@@ -590,13 +584,16 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                                 Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: TIME OUT. Shut down services");
                                 XMPPTransactions.disconnectMsgServerSession();
                                 XMPPTransactions.disconnectPingThreadSession();
-                                if(null != networkEvents)
+                                try {
                                     networkEvents.unregister();
+                                } catch (Exception e) {}
                                 disconnectedProcess = true;
                             }
                         }
 
                     } catch (InterruptedException e) {
+                        Log.e(Constants.TAG, "MyCommsApp.run: e ", e);
+                    } catch (Exception e) {
                         Log.e(Constants.TAG, "MyCommsApp.run: e ", e);
                     }
                 }

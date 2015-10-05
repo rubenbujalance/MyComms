@@ -165,7 +165,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
         viewHolder.bottom_left_chat_availability.setVisibility(View.GONE);
         viewHolder.top_right_chat_availability.setVisibility(View.GONE);
         viewHolder.top_left_chat_availability.setVisibility(View.VISIBLE);
-        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) viewHolder.top_left_chat_availability.getLayoutParams();
+        ViewGroup.LayoutParams params = viewHolder.top_left_chat_availability.getLayoutParams();
         params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25,
                 mContext.getResources().getDisplayMetrics());
         params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25,
@@ -249,7 +249,7 @@ public class RecentListViewArrayAdapter extends ArrayAdapter<RecentContact>
                         new LinearLayout.LayoutParams(width, width)
                 );
 
-        ViewGroup.LayoutParams params = (ViewGroup.LayoutParams) viewHolder.top_left_chat_availability.getLayoutParams();
+        ViewGroup.LayoutParams params = viewHolder.top_left_chat_availability.getLayoutParams();
         params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10,
                 mContext.getResources().getDisplayMetrics());
         params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10,

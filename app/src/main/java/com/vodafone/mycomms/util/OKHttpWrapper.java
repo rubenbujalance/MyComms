@@ -180,13 +180,13 @@ public class OKHttpWrapper {
          *                 in case of IO exception this is null
          * @param e - contains the exception. in case of server error (4xx, 5xx) this is null
          */
-        public void onFailure(Response response, IOException e);
+        void onFailure(Response response, IOException e);
 
         /**
          * contains the server response
          * @param response
          */
-        public void onSuccess(Response response);
+        void onSuccess(Response response);
     }
 
 }

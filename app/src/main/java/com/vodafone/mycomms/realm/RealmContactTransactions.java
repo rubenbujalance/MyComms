@@ -354,37 +354,6 @@ public class RealmContactTransactions {
         }
     }
 
-    public boolean isAnyContactSaved(Realm realm)
-    {
-        Realm mRealm;
-        if(null != realm)
-            mRealm = realm;
-        else
-            mRealm = Realm.getDefaultInstance();
-        try
-        {
-            RealmQuery<Contact> query = mRealm.where(Contact.class)
-                    .equalTo(Constants.CONTACT_PLATFORM,Constants.PLATFORM_MY_COMMS)
-                    .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
-
-            Contact result = query.findFirst();
-
-            if (result==null) return false;
-            else return true;
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "RealmContactTransactions.isAnyContactSaved: ", e);
-            Crashlytics.logException(e);
-            return false;
-        }
-        finally
-        {
-            if(null == realm)
-                mRealm.close();
-        }
-    }
-
     public static UserProfile getUserProfile(Realm realm, String mProfileId)
     {
         Realm mRealm;
@@ -474,11 +443,7 @@ public class RealmContactTransactions {
                     .equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
             RealmResults<FavouriteContact> result1 = query.findAll();
 
-            if (result1!=null && result1.size()!=0){
-                return true;
-            }else {
-                return false;
-            }
+            return result1 != null && result1.size() != 0;
         }
         catch(Exception e)
         {
@@ -526,36 +491,6 @@ public class RealmContactTransactions {
         finally
         {
             if(null == realm && mRealm != null)
-                mRealm.close();
-        }
-    }
-
-    public FavouriteContact getFavouriteContactByContactId(String contactId, Realm realm)
-    {
-        Realm mRealm;
-        if(null != realm)
-            mRealm = realm;
-        else
-            mRealm = Realm.getDefaultInstance();
-        try
-        {
-            Log.i(Constants.TAG, "RealmContactTransactions.getFavouriteContactByContactId: ");
-            RealmQuery<FavouriteContact> query = mRealm.where(FavouriteContact.class);
-            query.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
-            query.equalTo(Constants.CONTACT_CONTACT_ID, contactId);
-            FavouriteContact favouriteContact = query.findFirst();
-
-            return favouriteContact;
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "RealmContactTransactions.getFavouriteContactByContactId: ", e);
-            Crashlytics.logException(e);
-            return null;
-        }
-        finally
-        {
-            if(null == realm)
                 mRealm.close();
         }
     }
@@ -623,34 +558,6 @@ public class RealmContactTransactions {
                 mRealm.close();
         }
 
-    }
-
-    public RecentContact getRecentContactByContactId(String contactId, Realm realm)
-    {
-        Realm mRealm;
-        if(null != realm)
-            mRealm = realm;
-        else
-            mRealm = Realm.getDefaultInstance();
-        try
-        {
-            RealmQuery<RecentContact> query = mRealm.where(RecentContact.class);
-            query.equalTo(Constants.CONTACT_CONTACT_ID, contactId);
-            query.equalTo(Constants.CONTACT_PROFILE_ID, mProfileId);
-            RecentContact recentContact = query.findFirst();
-            return recentContact;
-        }
-        catch(Exception e)
-        {
-            Log.e(Constants.TAG, "RealmContactTransactions.getRecentContactByContactId: ",e);
-            Crashlytics.logException(e);
-            return null;
-        }
-        finally
-        {
-            if(null == realm)
-                mRealm.close();
-        }
     }
 
     public void deleteAllFavouriteContacts(Realm realm)

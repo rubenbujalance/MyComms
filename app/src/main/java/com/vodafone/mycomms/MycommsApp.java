@@ -570,7 +570,11 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                             Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: Interaction!!!");
                             countdownOn = false;
                             disconnectedProcess = false;
-                            networkEvents.register();
+                            try {
+                                networkEvents.register();
+                            } catch (Exception e) {
+                                Log.e(Constants.TAG, "MyCommsApp.startUserInactivityDetectThread: e ", e);
+                            }
                         }
                         if (!countdownOn && (isScreenOff || isApplicationOnBackground())) {
                             Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: Starting CountDown");
@@ -585,12 +589,18 @@ public class MycommsApp extends Application implements IProfileConnectionCallbac
                                 Log.i(Constants.TAG, "MycommsApp.startUserInactivityDetectThread: TIME OUT. Shut down services");
                                 XMPPTransactions.disconnectMsgServerSession();
                                 XMPPTransactions.disconnectPingThreadSession();
-                                networkEvents.unregister();
+                                try {
+                                    networkEvents.unregister();
+                                } catch (Exception e) {
+                                    Log.e(Constants.TAG, "MyCommsApp.startUserInactivityDetectThread: e ", e);
+                                }
                                 disconnectedProcess = true;
                             }
                         }
 
                     } catch (InterruptedException e) {
+                        Log.e(Constants.TAG, "MyCommsApp.run: e ", e);
+                    } catch (Exception e) {
                         Log.e(Constants.TAG, "MyCommsApp.run: e ", e);
                     }
                 }

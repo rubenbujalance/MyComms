@@ -1162,6 +1162,16 @@ public class MockDataForTests
         return getParserFor(messageStanza, "message");
     }
 
+    public static XmlPullParser getMockPong(String id) {
+        String messageStanza = "<iq id=\""+id+"\" from=\"my-comms.com\" to=\"mc_55409316799f7e1a109446f4@my-comms.com/355847069754161\" type=\"result\"/>";
+        return getParserFor(messageStanza, "iq");
+    }
+
+    public static XmlPullParser getMockPendingMessagesIQ() {
+        String messageStanza = "<iq to=\"mc_55409316799f7e1a109446f4@my-comms.com/355847069754161\" type=\"pendingMessages\" from=\"host\" pending=\"9\"/>";
+        return getParserFor(messageStanza, "iq");
+    }
+
     private static XmlPullParser getParserFor(String stanza, String startTag) {
         XmlPullParser xmlPullParser = null;
 

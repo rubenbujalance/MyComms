@@ -71,12 +71,13 @@ public final class XMPPTransactions {
 
     //Control to not retry consecutive connections
     private static boolean _isConnecting = false;
+    public static boolean _isUnitTesting = false;
     private static long _isConnectingTime;
 
     //Control of pings to server
     private static Thread pingThread = null;
-    private static String pingWaitingID = null;
-    private static boolean isPinging = false;
+    public static String pingWaitingID = null;
+    public static boolean isPinging = false;
     private static PingManager _pingManager = null;
 
     //Control of sleep when app in background
@@ -90,7 +91,7 @@ public final class XMPPTransactions {
     private static final int PINGING_TIME_MILLIS = 30000;
 
     //Pending messages handling
-    private static int _pendingMessages;
+    public static int _pendingMessages;
 
     /*
      * Methods
@@ -148,8 +149,10 @@ public final class XMPPTransactions {
             intervalPinging(PINGING_TIME_MILLIS);
 
             //Connect to server
-            XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
-            xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            if(!_isUnitTesting) {
+                XMPPOpenConnectionTask xmppOpenConnectionTask = new XMPPOpenConnectionTask();
+                xmppOpenConnectionTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
 //        }
         }
     }
@@ -172,7 +175,7 @@ public final class XMPPTransactions {
 
     private static void intervalPinging(final int miliseconds)
     {
-        if(pingThread!=null) return;
+        if(pingThread!=null || _isUnitTesting) return;
 
         pingThread = new Thread(new Runnable() {
             @Override
@@ -250,7 +253,7 @@ public final class XMPPTransactions {
                 Calendar.getInstance().getTimeInMillis() > _isConnectingTime+10000)
             _isConnecting = false;
 
-        if(_isConnecting || isPinging) return;
+        if(_isConnecting || isPinging || _isUnitTesting) return;
 
         //If it's first time, initialize
         if(_xmppConnection==null) {
@@ -318,7 +321,7 @@ public final class XMPPTransactions {
         return true;
     }
 
-    public static boolean sendPing()
+    public static String sendPing()
     {
         String id = UUID.randomUUID().toString().toUpperCase().replaceAll("-","");
 
@@ -338,10 +341,10 @@ public final class XMPPTransactions {
         }
         catch (SmackException.NotConnectedException e) {
             Log.e(Constants.TAG, "XMPPTransactions.sendPing: Error sending message", e);
-            return false;
+            return null;
         }
 
-        return true;
+        return id;
     }
 
     public static boolean sendImage(boolean isGroup, String destinationId,
@@ -956,7 +959,8 @@ public final class XMPPTransactions {
         }
         finally
         {
-            realm.close();
+            if(realm!=null)
+                realm.close();
         }
     }
 

@@ -38,6 +38,7 @@ import org.jivesoftware.smack.util.PacketParserUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,13 +90,18 @@ public class ChatListActivityTest {
     RecyclerView recyclerView;
     ChatListFragment mChatListFragment;
     Context context;
-    SharedPreferences sp;
 //    BusProvider.MainThreadBus busProvider;
+
+    @BeforeClass
+    public static void beforeClass() throws Exception{
+
+    }
 
     @Before
     public void setUp()
     {
         MockRepository.addAfterMethodRunner(new Util.MockitoStateCleaner());
+        context = RuntimeEnvironment.application.getApplicationContext();
 
         //Mock static: Realm, RealmGroupChatTransactions, RealmChatTransactions, RealmContactTransactions
         PowerMockito.mockStatic(Realm.class);
@@ -107,10 +113,14 @@ public class ChatListActivityTest {
         PowerMockito.when(Realm.getInstance(Mockito.any(Context.class))).thenReturn(null);
 
         //Save profile into SharedPreferences
-        context = RuntimeEnvironment.application.getApplicationContext();
-        sp = context.getSharedPreferences(
+        SharedPreferences sp = context.getSharedPreferences(
                 Constants.MYCOMMS_SHARED_PREFS, Context.MODE_PRIVATE);
         sp.edit().putString(Constants.PROFILE_ID_SHARED_PREF, "mc_55409316799f7e1a109446f4").commit();
+
+        XMPPTransactions._isUnitTesting = true;
+        XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);
+        XMPPTransactions.setXMPPConnection(xmppConnection);
+        XMPPTransactions.initializeMsgServerSession(context);
 
         //Spy instances: RealmChatTransactions, RealmGroupChatTransactions
         RealmChatTransactions chatTx = new RealmChatTransactions(context);
@@ -160,7 +170,6 @@ public class ChatListActivityTest {
         mockChatTx = null;
         mockGroupChatTx = null;
         recyclerView = null;
-//        busProvider = null;
         System.gc();
     }
 
@@ -382,11 +391,28 @@ public class ChatListActivityTest {
         Assert.assertTrue(lay_no_connection.getVisibility()== View.GONE);
     }
 
-    private void checkThreadSchedulers()
+    @Test
+    public void testPingPong()
     {
-        if(Robolectric.getBackgroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushBackgroundThreadScheduler();
-        if(Robolectric.getForegroundThreadScheduler().areAnyRunnable())
-            Robolectric.flushForegroundThreadScheduler();
+        XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);
+        XMPPTransactions.setXMPPConnection(xmppConnection);
+
+        String pingId = XMPPTransactions.sendPing();
+        Assert.assertTrue(XMPPTransactions.pingWaitingID != null);
+        Assert.assertTrue(XMPPTransactions.pingWaitingID.compareTo(pingId) == 0);
+
+        PacketParserUtils.saveAndNotifyStanzaReceived(MockDataForTests.getMockPong(pingId));
+        Assert.assertTrue(XMPPTransactions.pingWaitingID == null);
+    }
+
+    @Test
+    public void testPendingMessagesReceived()
+    {
+        XMPPTCPConnection xmppConnection = Mockito.mock(XMPPTCPConnection.class);
+        XMPPTransactions.setXMPPConnection(xmppConnection);
+
+        PacketParserUtils.saveAndNotifyStanzaReceived(MockDataForTests.getMockPendingMessagesIQ());
+        Assert.assertTrue(XMPPTransactions._pendingMessages == 9);
+        XMPPTransactions._pendingMessages = 0;
     }
 }

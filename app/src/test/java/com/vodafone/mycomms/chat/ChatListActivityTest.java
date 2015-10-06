@@ -72,7 +72,7 @@ import model.GroupChat;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
-        "javax.net.ssl.*", "org.json.*", "org.kxml2.io.*", "org.xmlpull.*", "com.vodafone.mycomms.*"})
+        "javax.net.ssl.*", "org.json.*", "org.kxml2.io.*", "org.xmlpull.*"})
 @PrepareForTest(
         {
                 Realm.class
@@ -123,14 +123,14 @@ public class ChatListActivityTest {
         //Spy instances: RealmChatTransactions, RealmGroupChatTransactions
         RealmChatTransactions chatTx = new RealmChatTransactions(context);
         RealmGroupChatTransactions groupChatTx = new RealmGroupChatTransactions(context, "mc_55409316799f7e1a109446f4");
-        mockChatTx = Mockito.spy(chatTx);
-        mockGroupChatTx = Mockito.spy(groupChatTx);
+        mockChatTx = PowerMockito.spy(chatTx);
+        mockGroupChatTx = PowerMockito.spy(groupChatTx);
 
-        Mockito.doReturn(MockDataForTests.getEmptyChatList())
+        PowerMockito.doReturn(MockDataForTests.getEmptyChatList())
                 .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
-        Mockito.doReturn(MockDataForTests.getEmptyGroupChatList())
+        PowerMockito.doReturn(MockDataForTests.getEmptyGroupChatList())
                 .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
-        Mockito.doReturn(Long.valueOf(0)).when(mockChatTx)
+        PowerMockito.doReturn(Long.valueOf(0)).when(mockChatTx)
                 .getAllChatPendingMessagesCount(Mockito.any(Realm.class));
 
         PowerMockito.when(RealmChatTransactions.getChatPendingMessagesCount(Mockito.any(String.class), Mockito.any(Realm.class)))

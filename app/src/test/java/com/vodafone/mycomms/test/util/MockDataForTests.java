@@ -1,20 +1,15 @@
 package com.vodafone.mycomms.test.util;
 
-import android.annotation.SuppressLint;
-import android.view.View;
-
 import com.vodafone.mycomms.util.Constants;
 
 import org.jivesoftware.smack.util.PacketParserUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
 import org.junit.Assert;
 import org.robolectric.Robolectric;
-import org.robolectric.util.ReflectionHelpers;
+import org.xmlpull.v1.XmlPullParser;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import model.Chat;
 import model.Contact;
@@ -1120,7 +1115,7 @@ public class MockDataForTests
 
     public static void checkThreadSchedulers()
     {
-        checkThreadSchedulers(3000);
+        checkThreadSchedulers(1000);
     }
 
     public static void checkThreadSchedulers(long time)

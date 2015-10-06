@@ -226,9 +226,9 @@ public class ChatListActivityTest {
     @Test
     public void testLoadSomeChats() {
         //Mock Chat and GroupChat Transactions to return filled lists
-        Mockito.doReturn(MockDataForTests.getMockChatList())
+        PowerMockito.doReturn(MockDataForTests.getMockChatList())
                 .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
-        Mockito.doReturn(MockDataForTests.getMockGroupChatList())
+        PowerMockito.doReturn(MockDataForTests.getMockGroupChatList())
                 .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
 
         //Mock to return a Contact and a UserProfile when requested to Realm
@@ -279,9 +279,9 @@ public class ChatListActivityTest {
         ArrayList<Chat> chatList = MockDataForTests.getMockChatList();
 
         //Mock Chat and GroupChat Transactions to return filled lists
-        Mockito.doReturn(chatList)
+        PowerMockito.doReturn(chatList)
                 .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
-        Mockito.doReturn(MockDataForTests.getMockGroupChatList())
+        PowerMockito.doReturn(MockDataForTests.getMockGroupChatList())
                 .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
 
         //Mock to return a Contact and a UserProfile when requested to Realm
@@ -297,19 +297,19 @@ public class ChatListActivityTest {
 //        MockDataForTests.checkThreadSchedulers();
 
         //The ChatMessage doesn't exist initially
-        Mockito.doReturn(null).when(mockChatTx)
+        PowerMockito.doReturn(null).when(mockChatTx)
                 .getChatMessageById(Mockito.any(String.class), Mockito.eq(true), Mockito.any(Realm.class));
 
         //Same Chat as in list
-        Mockito.doReturn(chatList.get(3)).when(mockChatTx)
+        PowerMockito.doReturn(chatList.get(3)).when(mockChatTx)
                 .getChatByContactId(Mockito.any(String.class), Mockito.any(Realm.class));
 
         //Mock insertChat and insertChatMessage
-        Mockito.doNothing().when(mockChatTx).insertChat(Mockito.any(Chat.class), Mockito.any(Realm.class));
-        Mockito.doReturn(true).when(mockChatTx).insertChatMessage(Mockito.any(ChatMessage.class), Mockito.any(Realm.class));
+        PowerMockito.doNothing().when(mockChatTx).insertChat(Mockito.any(Chat.class), Mockito.any(Realm.class));
+        PowerMockito.doReturn(true).when(mockChatTx).insertChatMessage(Mockito.any(ChatMessage.class), Mockito.any(Realm.class));
 
         //Mock number of unread messages
-        Mockito.doReturn(Long.valueOf(1))
+        PowerMockito.doReturn(Long.valueOf(1))
                 .when(mockChatTx).getAllChatPendingMessagesCount(Mockito.any(Realm.class));
         PowerMockito.when(RealmChatTransactions.getChatPendingMessagesCount(Mockito.any(String.class), Mockito.any(Realm.class)))
                 .thenReturn(Long.valueOf(1));
@@ -338,9 +338,9 @@ public class ChatListActivityTest {
         ArrayList<GroupChat> groupChatList = MockDataForTests.getMockGroupChatList();
 
         //Mock Chat and GroupChat Transactions to return filled lists
-        Mockito.doReturn(chatList)
+        PowerMockito.doReturn(chatList)
                 .when(mockChatTx).getAllChatsFromExistingContacts(Mockito.any(Realm.class));
-        Mockito.doReturn(groupChatList)
+        PowerMockito.doReturn(groupChatList)
                 .when(mockGroupChatTx).getAllGroupChats(Mockito.any(Realm.class));
 
         //Mock to return a Contact and a UserProfile when requested to Realm
@@ -350,7 +350,7 @@ public class ChatListActivityTest {
                 .thenReturn(MockDataForTests.getMockUserProfile());
 
         //The ChatMessage doesn't exist initially
-        Mockito.doReturn(null).when(mockGroupChatTx)
+        PowerMockito.doReturn(null).when(mockGroupChatTx)
                 .getGroupChatMessageById(Mockito.any(String.class), Mockito.any(Realm.class));
 
         //Same Chat as in list
@@ -358,13 +358,13 @@ public class ChatListActivityTest {
                 .thenReturn(groupChatList.get(3));
 
         //Mock insertChat and insertChatMessage
-        Mockito.doNothing().when(mockGroupChatTx).insertOrUpdateGroupChat(
+        PowerMockito.doNothing().when(mockGroupChatTx).insertOrUpdateGroupChat(
                 Mockito.any(GroupChat.class), Mockito.any(Realm.class));
-        Mockito.doReturn(true).when(mockGroupChatTx).insertGroupChatMessage(
+        PowerMockito.doReturn(true).when(mockGroupChatTx).insertGroupChatMessage(
                 Mockito.any(String.class), Mockito.any(ChatMessage.class), Mockito.any(Realm.class));
 
         //Mock number of unread messages
-        Mockito.doReturn(Long.valueOf(1))
+        PowerMockito.doReturn(Long.valueOf(1))
                 .when(mockChatTx).getAllChatPendingMessagesCount(Mockito.any(Realm.class));
         PowerMockito.when(RealmGroupChatTransactions.getGroupChatPendingMessagesCount(
                 Mockito.any(String.class), Mockito.any(Realm.class)))

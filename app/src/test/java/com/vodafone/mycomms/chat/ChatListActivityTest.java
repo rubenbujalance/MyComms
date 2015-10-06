@@ -72,7 +72,7 @@ import model.GroupChat;
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, packageName = "com.vodafone.mycomms", sdk = 18)
 @PowerMockIgnore({ "org.mockito.*", "org.robolectric.*", "android.*",
-        "javax.net.ssl.*", "org.json.*", "org.kxml2.io.*", "org.xmlpull.*"})
+        "javax.net.ssl.*", "org.json.*", "org.kxml2.io.*", "org.xmlpull.*", "com.vodafone.mycomms.*"})
 @PrepareForTest(
         {
                 Realm.class

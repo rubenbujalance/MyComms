@@ -154,10 +154,10 @@ public class ChatListActivityTest {
 
         //Activity initialization
         activity = Robolectric.buildActivity(ChatListActivity.class).create().start().resume().visible().get();
+        MockDataForTests.checkThreadSchedulers();
+
         mChatListFragment = (ChatListFragment)activity.getSupportFragmentManager().getFragments().get(0);
         recyclerView = (RecyclerView)mChatListFragment.getView().findViewById(R.id.recycler_view);
-
-        MockDataForTests.checkThreadSchedulers();
     }
 
     @After

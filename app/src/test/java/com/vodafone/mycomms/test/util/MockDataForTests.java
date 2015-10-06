@@ -1120,7 +1120,7 @@ public class MockDataForTests
 
     public static void checkThreadSchedulers()
     {
-        checkThreadSchedulers(1000);
+        checkThreadSchedulers(3000);
     }
 
     public static void checkThreadSchedulers(long time)

@@ -112,6 +112,7 @@ public class GroupChatListActivityTest
     @After
     public void tearDown() throws Exception
     {
+        MockDataForTests.checkThreadSchedulers();
         Robolectric.reset();
         this.mActivity = null;
         this.mGroupChatListFragment = null;
@@ -236,7 +237,7 @@ public class GroupChatListActivityTest
 
         //Test error on group chat creation
         txtWrite.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        MockDataForTests.checkThreadSchedulers(3000);
 
         Assert.assertFalse(this.mGroupChatListFragment.getActivity().isFinishing());
         //Test OK in group chat creation
@@ -245,8 +246,8 @@ public class GroupChatListActivityTest
         PowerMockito.when(mController.getResponseCode()).thenReturn("200");
         PowerMockito.when(mController.getCreatedGroupChatId(Mockito.anyString())).thenReturn("mg_55dc2a35a297b90a726e4cc2");
 
-        txtWrite.performClick();
-        MockDataForTests.checkThreadSchedulers();
+        Assert.assertTrue(txtWrite.performClick());
+        MockDataForTests.checkThreadSchedulers(3000);
 
         ShadowActivity shadowActivity = Shadows.shadowOf(this.mGroupChatListFragment.getActivity());
         Intent startedIntent = shadowActivity.getNextStartedActivity();
